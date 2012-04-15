@@ -47,7 +47,7 @@ void main(void)
         if (COMM_RecvMessage(msg, &msglen)) {
             COMM_AcknowledgeMessage();
             //send copy of message back message
-            COMM_SendMessage(msg, msglen)
+            COMM_SendMessage(msg, msglen);
         }
     }
 }

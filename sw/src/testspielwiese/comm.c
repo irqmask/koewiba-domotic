@@ -19,6 +19,10 @@
 
 #define NOW 0
 
+#define UBRRVAL ((uint16_t)(((F_CPU / (16.0 * COMM_BAUDRATE)) - 1.0) + 0.5))
+#define UBRRVALH ((uint8_t)(UBRRVAL>>8))
+#define UBRRVALL ((uint8_t)UBRRVAL)
+
 // --- Type definitions --------------------------------------------------------
 
 typedef enum eCommState {
@@ -158,16 +162,16 @@ uint8_t COMM__Send(void)
 void COMM_Initialize(void)
 {
     // initialize UART
-    // TODO RFM: Insert automatic baudrate calculating macro and set baudrate to 38400
 #if defined (__AVR_ATmega8__)
-    UBRRL  = 51;
-    UBRRH  = 0;
+    UBRRH = UBRRVALH;
+    UBRRL = UBRRVALL;
     UCSRB |= 0b10011000;
 #elif defined (__AVR_ATmega88__)
-    UBRR0L  = 51;
-    UBRR0H  = 0;
+    UBRR0H = UBRRVALH;
+    UBRR0L = UBRRVALL;
     UCSR0B |= 0b10011000;
 #endif
+
     // sender is initial off, receiver is always on.
     COMM_ActivateSender(FALSE);
     COMM_ActivateReceiver(TRUE);
@@ -260,13 +264,13 @@ void COMM_AcknowledgeMessage(void)
     }
 }
 
-BOOL COMM_SendMessage(uint8_t* puMsg, uint8_t uMsgLen)
-{
-    if ((eState != eComm_Idle) || (eSendState != eComm_SendIdle)) {
-        return FALSE;
-    }
-    uCurrentBytesToSend = uMsgLen;
-    return TRUE;
-}
+//BOOL COMM_SendMessage(uint8_t* puMsg, uint8_t uMsgLen)
+//{
+//    if ((eState != eComm_Idle) || (eSendState != eComm_SendIdle)) {
+//        return FALSE;
+//    }
+//    uCurrentBytesToSend = uMsgLen;
+//    return TRUE;
+//}
 
 /** @} */

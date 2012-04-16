@@ -1,0 +1,76 @@
+Begriffe
+--------
+Netz - Verbund von Controllern (Netzteilnehmer), welche miteinander kommunizieren können.
+Segment - Ein Teil eines Netzes mit gleicher Bustopologie z.B. ein RS485 Bus
+
+
+Anforderungen
+-------------
+Alle Netzteilnehmer können miteinander kommunizieren.
+Netzsegmente können über Routercontroller miteinander verbunden werden.
+Alle Netzteilnehmer haben eine eindeutige Adresse.
+
+
+Netzaufbau
+----------
+
+Kommunikationsablauf:
+
+1) Zu Beginn sendet der Master das Token für den ersten Sender.
+2) Der angesprochene Sender sendet daraufhin seine Nachricht. Wenn er nichts zu senden hat sendet er eine leere Nachricht.
+3) Der Master sendet das Token für den nächsten Sender.
+4) Der nächste Sender sendet seine Nachricht.
+5) Und so weiter.
+6) Wenn alle Teilnehmer angeprochen wurden, gibt es eine Pause von 3Bytes ms.
+
+
+Fehlersituationen:
+
+ * Ein Sender sendet nicht, nachdem das Token verschickt wurde:
+   Jeder Sender muss innerhalb von 2Bytes Sendezeit auf das Token antworten, an sonsten wird nach einer Pause von einem weiteren Byte mit dem nächsten Token weitergemacht. Damit sieht es auf dem Bus so aus, wie eine neue Runde Kommunikation.
+ * Der Master fällt aus:
+   Der Master kann mit einer Nachricht Stellvertreter ernennen. Wird innerhalb von 10Bytes Sendezeit kein Token empfangen, übernimmt der Vertreter das Takten des Busses.
+
+
+Nachrichtenformate auf dem  Bus
+-------------------------------
+
+Token:
+
++--+
+|TS|
++--+
+TS - Token for next sender. MSB=1 lower 7bit = address of next sender.
+
+
+Nachricht:
+
++--+--+--+--+---------+----+----+
+|AS|LE|AR|EA|MD ... MD|CRCH|CRCL|
++--+--+--+--+---------+----+----+
+AS Address sender on bus 7bit
+LE Length of message from AR to CRCL
+AR Address receiver 7bit
+EA Extended address 4bit sender in higher nibble, 4bit receiver in lower nibble.
+MD Message data
+CRCH High byte of 16bit CRC
+CRCL Low byte of 16bit CRC
+
+
+Leere Nachricht:
+
++--+--+
+|AS| 0|
++--+--+
+AS Address sender on bus 7bit
+LE Length of message == 0
+
+
+Adressierung der Busteilnehmer:
+
+Damit dürfen keine zwei Teilnehmer mit identischen unteren 7bits der Adresse in einem Segment liegen.
+Die Adresse für Nachrichten an Alle "Broadcasts" ist 0b11111111111 = 0x3FF.
+Der Busteilnehmer, welcher das Takten des Busses übernimmt, hat die Adresse 0.
+
+
+

@@ -33,9 +33,30 @@ typedef enum busstate {
     eComm_Sending
 } eBusState_t;
 
+typedef enum busflags
+{
+    e_uartrxflag    = 0b00000001,
+    e_uarttxflag    = 0b00000010,
+    e_uartrxerrflag = 0b00000100,
+    e_uarttxerrflag = 0b00001000,
+    e_timeout       = 0b00010000
+} eBusFlags_t;
+
+
+typedef unsigned char uRecBuf_t[BUS_MAXBIGMSGSIZE];
+
+typedef struct recvbuf {
+	uint8_t		uReadPos;
+	uint8_t		uWritePos;
+	uRecBuf_t 	buf;
+} sBusRec_t;
+
 typedef struct busphy {
     uint8_t         uUart;
     uint8_t         uCurrentBytesToSend;
+    uint8_t         uCurrentBytesReceived;
+    eBusFlags_t		uflags;
+    sBusRec_t		sRecvBuf;
     const uint8_t*  puSendPtr;
 } sBusPhy_t;
 

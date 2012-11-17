@@ -40,9 +40,26 @@ sBusPhy_t* g_UART0Phy = NULL;
 
 // --- Local functions ---------------------------------------------------------
 
+
 ISR(SIG_USART_RECV)
 {
+	unsigned char data, fe;
+	sBusRec_t	  buffer = g_UART0Phy->sRecvBuf;
 
+	fe = (UCSR0A & (1<<FE0));
+	// Daten auslesen, dadurch wird das Interruptflag gelöscht
+	data = UDR0;
+
+	if(0!=fe)
+	{
+		g_UART0Phy->uflags |= e_uartrxerrflag;
+		return;
+	}
+	if( buffer.uWritePos == (buffer.uReadPos-1+sizeof(buffer.buf))%(sizeof(buffer.buf)) ) return;
+	buffer.buf[buffer.uWritePos] = data;
+	buffer.uWritePos = (buffer.uWritePos+1)%sizeof(buffer.buf);
+	if(fe) UCSR0A &= ~(1<<FE0); // FrameError-Flag zurücksetzen
+	g_UART0Phy->uflags |= e_uartrxflag;
 }
 
 ISR(SIG_USART_DATA)
@@ -56,6 +73,7 @@ ISR(SIG_USART_DATA)
         g_UART0Phy->uCurrentBytesToSend = 0;
     }
 }
+
 
 // --- Module global functions -------------------------------------------------
 
@@ -117,6 +135,25 @@ BOOL BUS__bPhySend(sBusPhy_t* psPhy, const uint8_t* puMsg, uint8_t uLen)
         UCSR0B |= (1<<UDRIE0);      // enable data register empty interrupt
     }
     return TRUE;
+}
+
+BOOL BUS__bPhyDataReceived(sBusPhy_t* psPhy)
+{
+	return (0 != (psPhy->uflags & e_uartrxflag));
+}
+
+uint8_t BUS__uPhyRead(sBusPhy_t* psPhy, uint8_t *puInBuf)
+{
+	uint8_t    n = 0;
+	sBusRec_t  buffer = psPhy->sRecvBuf;
+	while(buffer.uWritePos != buffer.uReadPos)
+	{
+		puInBuf[n] = buffer.buf[buffer.uReadPos];
+		buffer.uReadPos = (buffer.uReadPos+1)%sizeof(buffer.buf);
+		n++;
+	}
+	psPhy->uflags &= !(e_uartrxflag);
+	return n;
 }
 
 // --- Global functions --------------------------------------------------------

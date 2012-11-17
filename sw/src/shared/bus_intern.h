@@ -21,10 +21,10 @@
 
 // --- Definitions -------------------------------------------------------------
 
-#define BUS_BITTIME            10 //TODO
-#define BUS_INITWAIT_TIME  (24 * COMM_BITTIME)
-#define BUS_RECOVERY       (12 * COMM_BITTIME)
-#define BUS_INTERBYTE_TIMEOUT  (8 * COMM_BITTIME)
+#define BUS_BITTIME             10 //TODO
+#define BUS_INITWAIT_TIME       (24 * COMM_BITTIME)
+#define BUS_RECOVERY            (12 * COMM_BITTIME)
+#define BUS_INTERBYTE_TIMEOUT   (8 * COMM_BITTIME)
 
 // --- Type definitions --------------------------------------------------------
 
@@ -48,8 +48,6 @@ typedef enum eCommMsgByteIndex {
     eMsgLast
 } eCommMsgByteIndex_t;
 
-
-
 // --- Local variables ---------------------------------------------------------
 
 // --- Global variables --------------------------------------------------------
@@ -59,8 +57,6 @@ typedef enum eCommMsgByteIndex {
 // --- Local functions ---------------------------------------------------------
 
 // --- Module global functions -------------------------------------------------
-
-// --- Global functions --------------------------------------------------------
 
 void    BUS__vPhyInitialize         (sBusPhy_t*     psPhy,
                                      uint8_t        uUart);
@@ -75,7 +71,13 @@ BOOL    BUS__bPhySend               (sBusPhy_t*     psPhy,
                                      const uint8_t* puMsg, 
                                      uint8_t        uLen);
 
-uint8_t BUS__bPhyPendingBytes       (sBusPhy_t*     psPhy);
+BOOL    BUS__bPhyDataReceived       (sBusPhy_t*     psPhy);
+
+uint8_t BUS__uPhyRead               (sBusPhy_t*     psPhy,
+									 uint8_t*       puInBuf);
+
+// --- Global functions --------------------------------------------------------
+
 #endif /* _BUS_INTERN_H_ */
 /** @} */
 /** @} */

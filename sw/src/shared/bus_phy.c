@@ -59,8 +59,6 @@ ISR(SIG_USART_DATA)
 
 // --- Module global functions -------------------------------------------------
 
-// --- Global functions --------------------------------------------------------
-
 void BUS__vPhyInitialize(sBusPhy_t* psPhy, uint8_t uUart)
 {
     psPhy->uCurrentBytesToSend = 0;
@@ -82,8 +80,6 @@ void BUS__vPhyInitialize(sBusPhy_t* psPhy, uint8_t uUart)
         g_UART0Phy = psPhy;
     }
     
-    UART_DDR |= (UART_DRIVER | UART_RECVSTOP);
-
     // sender is initial off, receiver is always on.
     BUS__vPhyActivateSender(psPhy, FALSE);
     BUS__vPhyActivateReceiver(psPhy, TRUE);
@@ -122,6 +118,8 @@ BOOL BUS__bPhySend(sBusPhy_t* psPhy, const uint8_t* puMsg, uint8_t uLen)
     }
     return TRUE;
 }
+
+// --- Global functions --------------------------------------------------------
 
 /** @} */
 /** @} */

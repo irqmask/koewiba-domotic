@@ -16,16 +16,7 @@
 
 // --- Definitions -------------------------------------------------------------
 
-#define NOW 0
-
 // --- Type definitions --------------------------------------------------------
-
-typedef enum eCommState {
-    eComm_InitWait,
-    eComm_Idle,
-    eComm_Receiving,
-    eComm_Sending
-} eCommState_t;
 
 typedef enum eCommRecvState {
     eComm_RecvCheckBusRecovery,
@@ -43,24 +34,82 @@ typedef enum eCommSendState {
 
 // --- Local variables ---------------------------------------------------------
 
-volatile eCommState_t       eState      = eComm_InitWait;
-volatile eCommRecvState_t   eRecvState  = eComm_RecvAcknowledged;
-volatile eCommSendState_t   eSendState  = eComm_SendIdle;
-volatile BOOL               bBusIsRecovered = FALSE;
-volatile BOOL               bBusBytePending = FALSE;
-volatile uint8_t            uBusMirrorByte = 0;
-volatile uint8_t            uCurrentReceivedBytes = 0;
-volatile uint8_t            uCurrentBytesToSend = 0;
-volatile uint8_t            auMessage[COMM_MAXMSGSIZE];
-uint16_t                    uLastByteTime = 0;
-
 // --- Global variables --------------------------------------------------------
 
 // --- Module global variables -------------------------------------------------
 
 // --- Local functions ---------------------------------------------------------
 
+BOOL bReceive(sBus_t* psBus)
+{
+    uint8_t u;
+    
+    do {
+        if (!BUS__bPhyDataReceived(psBus->sPhy)) {
+            break;
+        }
+        u = BUS__uPhyReceiveByte(psBus->sPhy);
+        
+        // 1. byte: check sync byte
+        if (psBus->sMsg.uOverallLength == 0) {
+            
+        // 2. byte: check token byte
+        } else if (psBus->sMsg.uOverallLength == 1) {
+            
+        }
+        psBus->sMsg.uOverallLength++;
+        return TRUE;
+    } while ( FALSE );
+    
+    return FALSE;
+}
+
 // --- Module global functions -------------------------------------------------
+
+BOOL BUS__vTrpSendReceive(sBus_t* psBus)
+{
+    BOOL rc = FALSE;
+    
+    switch (psBus->eState) {
+    case eComm_InitWait:
+        break;
+    case eComm_Idle:
+        break;
+    case eComm_Receiving:
+        bReceive(psBus);
+        break;
+    case eComm_Sending:
+        break;
+    default:
+        break;
+    }
+    
+    return rc;
+}
+
+// --- Global functions --------------------------------------------------------
+
+void BUS_vInitialize(sBus_t* psBus, uint8_t uUart)
+{
+    psBus->eState = eComm_InitWait;
+    BUS__vPhyInitialize(&psBus->sPhy, uUart);
+}
+
+BOOL BUS_bGetMessage(sBus_t* psBus)
+{
+    return BUS__vTrpSendReceive(psBus);  
+}
+
+BOOL BUS_bReadMessage(sBus_t* psBus, 
+                      uint8_t* puSender, 
+                      uint8_t* puLen, 
+                      uint8_t* puMsg)
+{
+    return FALSE;
+}
+
+
+/*
 
 uint8_t COMM__Receive(void)
 {
@@ -109,9 +158,7 @@ uint8_t COMM__Receive(void)
 
     return 1;
 }
-
-// --- Global functions --------------------------------------------------------
-
+*/
 
 /** @} */
 /** @} */

@@ -26,25 +26,30 @@
 
 // --- Type definitions --------------------------------------------------------
 
-typedef enum eCommMsgByteIndex {
-    eMsgLength,
-    eMsgSender,
-    eMsgData0,
-    eMsgData1,
-    eMsgData2,
-    eMsgData3,
-    eMsgData4,
-    eMsgData5,
-    eMsgData6,
-    eMsgData7,
-    eMsgData8,
-    eMsgData9,
-    eMsgData10,
-    eMsgData11,
-    eMsgCRCHigh,
-    eMsgCRCLow,
-    eMsgLast
-} eCommMsgByteIndex_t;
+typedef enum busstate {
+    eComm_InitWait,
+    eComm_Idle,
+    eComm_Receiving,
+    eComm_Sending
+} eBusState_t;
+
+typedef struct busphy {
+    uint8_t         uUart;
+    uint8_t         uCurrentBytesToSend;
+    const uint8_t*  puSendPtr;
+} sBusPhy_t;
+
+typedef struct busmsg {
+    uint16_t        uReceiver;
+    uint8_t         uLength;
+    uint8_t         uOverallLength;
+} sBusMsg_t;
+
+typedef struct bus {
+    eBusState_t     eState;  
+    sBusPhy_t       sPhy;  
+    sBusMsg_t       sMsg;
+} sBus_t;
 
 // --- Local variables ---------------------------------------------------------
 
@@ -58,5 +63,20 @@ typedef enum eCommMsgByteIndex {
 
 // --- Global functions --------------------------------------------------------
 
+void    BUS_vInitialize             (sBus_t*        psBus,
+                                     uint8_t        uUart);
+                                     
+BOOL    BUS_bGetMessage             (sBus_t*        psBus);
+
+BOOL    BUS_bReadMessage            (sBus_t*        psBus, 
+                                     uint8_t*       puSender, 
+                                     uint8_t*       puLen, 
+                                     uint8_t*       puMsg);
+                                     
+BOOL    BUS_bSendMessage            (sBus_t*        psBus, 
+                                     uint8_t*       puReceiver, 
+                                     uint8_t*       puLen, 
+                                     uint8_t*       puMsg);
+                                     
 #endif /* _BUS_H_ */
 /** @} */

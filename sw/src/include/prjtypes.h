@@ -46,6 +46,5 @@ typedef uint8_t BOOL;
 
 // --- Global functions --------------------------------------------------------
 
-
 #endif /* _PRJTYPES_H__ */
 /** @} */

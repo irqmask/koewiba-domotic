@@ -28,11 +28,27 @@
 
 // --- Type definitions --------------------------------------------------------
 
-typedef struct busphy {
-    uint8_t         uUart;
-    uint8_t         uCurrentBytesToSend;
-    const uint8_t*  puSendPtr;
-} sBusPhy_t;
+typedef enum eCommMsgByteIndex {
+    eMsgLength,
+    eMsgSender,
+    eMsgData0,
+    eMsgData1,
+    eMsgData2,
+    eMsgData3,
+    eMsgData4,
+    eMsgData5,
+    eMsgData6,
+    eMsgData7,
+    eMsgData8,
+    eMsgData9,
+    eMsgData10,
+    eMsgData11,
+    eMsgCRCHigh,
+    eMsgCRCLow,
+    eMsgLast
+} eCommMsgByteIndex_t;
+
+
 
 // --- Local variables ---------------------------------------------------------
 
@@ -46,19 +62,20 @@ typedef struct busphy {
 
 // --- Global functions --------------------------------------------------------
 
-void BUS__vPhyInitialize        (sBusPhy_t*     psPhy,
-                                 uint8_t        uUart);
+void    BUS__vPhyInitialize         (sBusPhy_t*     psPhy,
+                                     uint8_t        uUart);
 
-void BUS__vPhyActivateSender    (sBusPhy_t*     psPhy,
-                                 BOOL           bActivate);
+void    BUS__vPhyActivateSender     (sBusPhy_t*     psPhy,
+                                     BOOL           bActivate);
 
-void BUS__vPhyActivateReceiver  (sBusPhy_t*     psPhy,
-                                 BOOL           bActivate);
+void    BUS__vPhyActivateReceiver   (sBusPhy_t*     psPhy,
+                                     BOOL           bActivate);
 
-BOOL BUS__bPhySend              (sBusPhy_t*     psPhy, 
-                                 const uint8_t* puMsg, 
-                                 uint8_t        uLen);
+BOOL    BUS__bPhySend               (sBusPhy_t*     psPhy, 
+                                     const uint8_t* puMsg, 
+                                     uint8_t        uLen);
 
+uint8_t BUS__bPhyPendingBytes       (sBusPhy_t*     psPhy);
 #endif /* _BUS_INTERN_H_ */
 /** @} */
 /** @} */

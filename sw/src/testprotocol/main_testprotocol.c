@@ -1,8 +1,8 @@
 /**
- * @addtogroup TODO_MODULE_NAME_TODO
+ * @addtogroup TEST_PROTOCOL
  *
  * @{
- * @file    main.c
+ * @file    main_testprotocol.c
  * @brief   TODO describe briefly.
  * @todo    describe file purpose
  * @author  Christian Verhalen
@@ -10,15 +10,15 @@
 
 // --- Include section ---------------------------------------------------------
 
-#include <avr/io.h>
-#include "comm.h"
+#include "bus.h"
 
 // --- Definitions -------------------------------------------------------------
-
 
 // --- Type definitions --------------------------------------------------------
 
 // --- Local variables ---------------------------------------------------------
+
+static sBus_t g_sBus;
 
 // --- Global variables --------------------------------------------------------
 
@@ -30,26 +30,19 @@
 
 // --- Global functions --------------------------------------------------------
 
-
-
-void main(void)
+int main(void)
 {
     uint8_t msglen = 0;
-    uint8_t msg[COMM_MAXMSGSIZE];
+    uint8_t msg[BUS_MAXMSGSIZE];
 
-    // Initialize port pins
-    UART_DDR |= (UART_DRIVER | UART_RECVSTOP);
-
-    COMM_Initialize();
+    BUS_vInitialize(&g_sBus, 0);
 
     while (1) {
-        COMM_Communicate();
-        if (COMM_RecvMessage(msg, &msglen)) {
-            COMM_AcknowledgeMessage();
-            //send copy of message back message
-            COMM_SendMessage(msg, msglen);
+        if (BUS_bGetMessage(&g_sBus)) {
+            BUS_bReadMessage(&g_sBus, &msglen, &msglen, &msg);
         }
     }
+    return 0;
 }
 
 /** @} */

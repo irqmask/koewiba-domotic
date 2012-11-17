@@ -4,7 +4,7 @@
  * @{
  * @file    main_testuart.c
  * @brief   Test UART functionality.
- * @author  Robert Müller
+ * @author  Robert Mï¿½ller
  */ //---------------------------------------------------------------------------
 
 // --- Include section ---------------------------------------------------------
@@ -54,7 +54,7 @@ int main(void)
             sendchar        = 0;
     BOOL rc = FALSE;
     
-    DDRD |= (LED_TEST | LED_EXP | RS485_DRIVER | RS485_RECVSTOP);
+    DDRD |= (LED_TEST | LED_EXP);
     DDRD &= ~(BTN_TEST);
 
     PORTD |= LED_TEST;              // switch on test led

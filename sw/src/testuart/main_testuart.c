@@ -2,42 +2,33 @@
  * @addtogroup TEST_UART
  *
  * @{
- * @file    main.c
+ * @file    main_testuart.c
  * @brief   Test UART functionality.
- * @author  Robert MÃ¼ller
+ * @author  Robert Müller
  */ //---------------------------------------------------------------------------
+
 // --- Include section ---------------------------------------------------------
 #include <avr/io.h>
+#include <avr/interrupt.h>
 #include <util/delay.h>
 #include <stdint.h>
 
+#include "bus_intern.h"
+
 // --- Definitions -------------------------------------------------------------
-
-#ifndef TRUE
-#define TRUE 1
-#endif
-
-#ifndef FALSE
-#define FALSE 0
-#endif
-
-#define UART_BAUDRATE   38400
-
-#define UBRRVAL ((uint16_t)(((F_CPU / (16.0 * UART_BAUDRATE)) - 1.0) + 0.5))
-#define UBRRVALH ((uint8_t)(UBRRVAL>>8))
-#define UBRRVALL ((uint8_t)UBRRVAL)
 
 // Port D pin assignments
 #define LED_TEST        0b00010000
 #define LED_EXP         0b01000000
 #define BTN_TEST        0b00100000
 #define BTN_EXP         0b10000000
-#define RS485_DRIVER    0b00000100
-#define RS485_RECVSTOP  0b00001000
 
 // --- Type definitions --------------------------------------------------------
 
 // --- Local variables ---------------------------------------------------------
+
+sBusPhy_t   g_sBusPhy0;
+uint8_t     g_auTestMsg[] = "Hallo Bus!\n\r";
 
 // --- Global variables --------------------------------------------------------
 
@@ -48,7 +39,7 @@
 /**
  * Toggle the test LED.
  */
-void ToggleLED(void)
+void vToggleLED(void)
 {
     PORTD ^= LED_TEST;
 }
@@ -61,34 +52,26 @@ int main(void)
 {
     uint8_t buttonstatus    = 0,
             sendchar        = 0;
-
+    BOOL rc = FALSE;
+    
     DDRD |= (LED_TEST | LED_EXP | RS485_DRIVER | RS485_RECVSTOP);
     DDRD &= ~(BTN_TEST);
 
     PORTD |= LED_TEST;              // switch on test led
     PORTD |= BTN_TEST;              // set pull-up for button
 
-    // initialize UART
-#if defined (__AVR_ATmega8__)
-    UBRRH = UBRRVALH;
-    UBRRL = UBRRVALL;
-    UCSRB |= 0b10011000;
-#elif defined (__AVR_ATmega88__)
-    UBRR0H = UBRRVALH;
-    UBRR0L = UBRRVALL;
-    UCSR0B |= 0b10011000;
-#endif
+    // initialize physical layer of bus
+    BUS__vPhyInitialize(&g_sBusPhy0, 0);
+    BUS__vPhyActivateSender(&g_sBusPhy0, TRUE);
 
-    // activate RS485 driver for sending and receiving
-    PORTD |= RS485_DRIVER;
-    PORTD &= ~(RS485_RECVSTOP);
+    sei();
 
     while (1) {
         // If test-button is pressed
         if ((PIND & BTN_TEST) == 0) {
             // Is this the first time, we are seeing a pressed button?
             if (buttonstatus == FALSE) {
-                ToggleLED(); // toggle test-led
+                vToggleLED(); // toggle test-led
                 sendchar = TRUE;
             }
             buttonstatus = TRUE;
@@ -101,20 +84,10 @@ int main(void)
         if (TRUE == sendchar) {
             sendchar = FALSE;
             PORTD |= LED_EXP;       // switch EXP LED on
-#if   defined (__AVR_ATmega8__)
-            // wait until transmit-buffer is ready for next char
-            while (!(UCSRA & 0b00100000)) {}
-            UDR = 'Z';              // put next char in buffer
-
-            while (!(UCSRA & 0b00100000)) {}
-#elif defined (__AVR_ATmega88__)
-            // wait until transmit-buffer is ready for next char
-            while (!(UCSR0A & 0b00100000)) {
-            }
-            UDR0 = 'Z';             // put next char in buffer
-            while (!(UCSR0A & 0b00100000)) {
-            }
-#endif
+            
+            // Initiate sending of test message
+            rc = BUS__bPhySend(&g_sBusPhy0, g_auTestMsg, sizeof(g_auTestMsg));
+                       
             _delay_ms(500);
             PORTD &= ~LED_EXP;      // switch EXP LED off
         }

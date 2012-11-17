@@ -2,7 +2,7 @@ Begriffe
 --------
 Netz - Verbund von Controllern (Netzteilnehmer), welche miteinander kommunizieren können.
 Segment - Ein Teil eines Netzes mit gleicher Bustopologie z.B. ein RS485 Bus
-
+Router - Verbindet mehrere Segmente der gleicher oder unterschiedlicher Topologie.
 
 Anforderungen
 -------------

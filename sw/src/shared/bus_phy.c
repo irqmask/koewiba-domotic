@@ -16,6 +16,9 @@
 #include <avr/interrupt.h>
 #include "bus_intern.h"
 
+// --- Switches ----------------------------------------------------------------
+#define sw_recvlisten FALSE
+
 // --- Definitions -------------------------------------------------------------
 
 #define UART_PORT               PORTD
@@ -74,7 +77,7 @@ ISR(INTERRUPT_USART_RXC)
 	sBusRec_t	  buffer = g_UART0Phy->sRecvBuf;
 
 	fe = (REGBIT_UCSRA & (1<<REGBIT_FE));
-	// Daten auslesen, dadurch wird das Interruptflag gel�scht
+	// Daten auslesen, dadurch wird das Interruptflag gel?scht
 	data = REGBIT_UDR;
 
 	if(0!=fe) {
@@ -98,6 +101,12 @@ ISR(INTERRUPT_USART_UDRE)
         REGBIT_UCSRB &= ~(1<<REGBIT_UDRIE);
         g_UART0Phy->uCurrentBytesToSend = 0;
     }
+}
+
+ISR(INTERRUPT_UART_TRANS)
+{
+	BUS__vPhyActivateSender(g_UART0Phy, FALSE);
+	BUS__vPhyActivateReceiver(g_UART0Phy, TRUE);
 }
 
 // --- Module global functions -------------------------------------------------
@@ -125,6 +134,7 @@ void BUS__vPhyInitialize(sBusPhy_t* psPhy, uint8_t uUart)
 void BUS__vPhyActivateSender(sBusPhy_t* psPhy, BOOL bActivate)
 {
     if (bActivate) {
+    	if(!sw_recvlisten) BUS__vPhyActivateReceiver(psPhy, FALSE);
         UART_PORT |= UART_DRIVER;
     }
     else {
@@ -150,6 +160,7 @@ BOOL BUS__bPhySend(sBusPhy_t* psPhy, const uint8_t* puMsg, uint8_t uLen)
     psPhy->uCurrentBytesToSend = uLen;
     psPhy->puSendPtr = puMsg;
     if (psPhy->uUart == 0) {
+    	BUS__vPhyActivateSender(psPhy, TRUE);
         REGBIT_UDR = *psPhy->puSendPtr;   // send first byte
         REGBIT_UCSRB |= (1<<REGBIT_UDRIE);      // enable data register empty interrupt
     }

@@ -63,6 +63,14 @@ int main(void)
     // initialize physical layer of bus
     BUS__vPhyInitialize(&g_sBusPhy0, 0);
     BUS__vPhyActivateSender(&g_sBusPhy0, TRUE);
+            _delay_ms(500);
+    BUS__vPhyActivateSender(&g_sBusPhy0, FALSE);
+            _delay_ms(500);
+    BUS__vPhyActivateSender(&g_sBusPhy0, TRUE);
+            _delay_ms(500);
+    BUS__vPhyActivateSender(&g_sBusPhy0, FALSE);
+            _delay_ms(500);
+    BUS__vPhyActivateSender(&g_sBusPhy0, TRUE);
 
     sei();
 

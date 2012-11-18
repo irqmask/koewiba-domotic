@@ -42,7 +42,6 @@ typedef enum busflags
     e_timeout       = 0b00010000
 } eBusFlags_t;
 
-
 typedef unsigned char uRecBuf_t[BUS_MAXBIGMSGSIZE];
 
 typedef struct recvbuf {
@@ -54,7 +53,7 @@ typedef struct recvbuf {
 typedef struct busphy {
     uint8_t         uUart;
     uint8_t         uCurrentBytesToSend;
-    uint8_t         uCurrentBytesReceived;
+    //uint8_t         uCurrentBytesReceived;
     eBusFlags_t		uflags;
     sBusRec_t		sRecvBuf;
     const uint8_t*  puSendPtr;

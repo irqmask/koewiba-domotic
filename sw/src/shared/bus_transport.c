@@ -45,10 +45,10 @@ BOOL bReceive(sBus_t* psBus)
     uint8_t u;
     
     do {
-        if (!BUS__bPhyDataReceived(psBus->sPhy)) {
+        if (!BUS__bPhyDataReceived(&psBus->sPhy)) {
             break;
         }
-        u = BUS__uPhyReceiveByte(psBus->sPhy);
+        BUS__bPhyReadByte(&psBus->sPhy, &u);
         
         // 1. byte: check sync byte
         if (psBus->sMsg.uOverallLength == 0) {
@@ -66,7 +66,7 @@ BOOL bReceive(sBus_t* psBus)
 
 // --- Module global functions -------------------------------------------------
 
-BOOL BUS__vTrpSendReceive(sBus_t* psBus)
+BOOL BUS__bTrpSendReceive(sBus_t* psBus)
 {
     BOOL rc = FALSE;
     
@@ -97,10 +97,10 @@ void BUS_vInitialize(sBus_t* psBus, uint8_t uUart)
 
 BOOL BUS_bGetMessage(sBus_t* psBus)
 {
-    return BUS__vTrpSendReceive(psBus);  
+    return BUS__bTrpSendReceive(psBus);  
 }
 
-BOOL BUS_bReadMessage(sBus_t* psBus, 
+BOOL BUS_bReadMessage(sBus_t*  psBus, 
                       uint8_t* puSender, 
                       uint8_t* puLen, 
                       uint8_t* puMsg)

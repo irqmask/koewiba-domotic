@@ -40,7 +40,6 @@ sBusPhy_t* g_UART0Phy = NULL;
 
 // --- Local functions ---------------------------------------------------------
 
-
 ISR(SIG_USART_RECV)
 {
 	unsigned char data, fe;
@@ -50,15 +49,14 @@ ISR(SIG_USART_RECV)
 	// Daten auslesen, dadurch wird das Interruptflag gelöscht
 	data = UDR0;
 
-	if(0!=fe)
-	{
-		g_UART0Phy->uflags |= e_uartrxerrflag;
-		return;
+	if(0!=fe) {
+        g_UART0Phy->uflags |= e_uartrxerrflag;
+        return;
 	}
-	if( buffer.uWritePos == (buffer.uReadPos-1+sizeof(buffer.buf))%(sizeof(buffer.buf)) ) return;
+	if ( buffer.uWritePos == (buffer.uReadPos-1+sizeof(buffer.buf))%(sizeof(buffer.buf)) ) return;
 	buffer.buf[buffer.uWritePos] = data;
 	buffer.uWritePos = (buffer.uWritePos+1)%sizeof(buffer.buf);
-	if(fe) UCSR0A &= ~(1<<FE0); // FrameError-Flag zurücksetzen
+	if (fe) UCSR0A &= ~(1<<FE0); // FrameError-Flag zurücksetzen
 	g_UART0Phy->uflags |= e_uartrxflag;
 }
 
@@ -74,7 +72,6 @@ ISR(SIG_USART_DATA)
     }
 }
 
-
 // --- Module global functions -------------------------------------------------
 
 void BUS__vPhyInitialize(sBusPhy_t* psPhy, uint8_t uUart)
@@ -86,7 +83,6 @@ void BUS__vPhyInitialize(sBusPhy_t* psPhy, uint8_t uUart)
     if (psPhy->uUart == 0) {
         // initialize UART
     #if defined (__AVR_ATmega8__)
-        sjd
         UBRRH = UBRRVALH;
         UBRRL = UBRRVALL;
         UCSRB |= ((1<<RXCIE) | (1<<RXEN) | (1<<TXEN));
@@ -95,6 +91,7 @@ void BUS__vPhyInitialize(sBusPhy_t* psPhy, uint8_t uUart)
         UBRR0L = UBRRVALL;
         UCSR0B |= ((1<<RXCIE0) | (1<<UDRIE0) | (1<<TXEN0));
     #endif
+        UART_DDR |= (UART_DRIVER | UART_RECVSTOP);
         g_UART0Phy = psPhy;
     }
     
@@ -146,14 +143,30 @@ uint8_t BUS__uPhyRead(sBusPhy_t* psPhy, uint8_t *puInBuf)
 {
 	uint8_t    n = 0;
 	sBusRec_t  buffer = psPhy->sRecvBuf;
+
 	while(buffer.uWritePos != buffer.uReadPos)
 	{
 		puInBuf[n] = buffer.buf[buffer.uReadPos];
-		buffer.uReadPos = (buffer.uReadPos+1)%sizeof(buffer.buf);
+		buffer.uReadPos = (buffer.uReadPos+1) % sizeof(buffer.buf);
 		n++;
 	}
-	psPhy->uflags &= !(e_uartrxflag);
+	psPhy->uflags &= ~(e_uartrxflag);
 	return n;
+}
+
+BOOL BUS__bPhyReadByte(sBusPhy_t* psPhy, uint8_t *puByte)
+{   
+	sBusRec_t  buffer = psPhy->sRecvBuf;
+
+	if (buffer.uWritePos != buffer.uReadPos) {
+        *puByte = buffer.buf[buffer.uReadPos];
+        buffer.uReadPos = (buffer.uReadPos+1) % sizeof(buffer.buf);
+        if (buffer.uWritePos == buffer.uReadPos) {
+            psPhy->uflags &= ~(e_uartrxflag);
+        }
+        return TRUE;
+	}
+	return FALSE;
 }
 
 // --- Global functions --------------------------------------------------------

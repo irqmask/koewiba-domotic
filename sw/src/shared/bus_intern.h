@@ -22,9 +22,9 @@
 // --- Definitions -------------------------------------------------------------
 
 #define BUS_BITTIME             10 //TODO
-#define BUS_INITWAIT_TIME       (24 * COMM_BITTIME)
-#define BUS_RECOVERY            (12 * COMM_BITTIME)
-#define BUS_INTERBYTE_TIMEOUT   (8 * COMM_BITTIME)
+#define BUS_INITWAIT_TIME       (24 * BUS_BITTIME)
+#define BUS_RECOVERY            (12 * BUS_BITTIME)
+#define BUS_INTERBYTE_TIMEOUT   (8 * BUS_BITTIME)
 
 // --- Type definitions --------------------------------------------------------
 
@@ -75,6 +75,9 @@ BOOL    BUS__bPhyDataReceived       (sBusPhy_t*     psPhy);
 
 uint8_t BUS__uPhyRead               (sBusPhy_t*     psPhy,
 									 uint8_t*       puInBuf);
+                                     
+BOOL    BUS__bPhyReadByte           (sBusPhy_t*     psPhy, 
+                                     uint8_t*       puByte);
 
 // --- Global functions --------------------------------------------------------
 

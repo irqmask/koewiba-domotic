@@ -51,13 +51,13 @@ BOOL bReceive(sBus_t* psBus)
         BUS__bPhyReadByte(&psBus->sPhy, &u);
         
         // 1. byte: check sync byte
-        if (psBus->sMsg.uOverallLength == 0) {
+        if (psBus->sRecvMsg.uOverallLength == 0) {
             
         // 2. byte: check token byte
-        } else if (psBus->sMsg.uOverallLength == 1) {
+        } else if (psBus->sRecvMsg.uOverallLength == 1) {
             
         }
-        psBus->sMsg.uOverallLength++;
+        psBus->sRecvMsg.uOverallLength++;
         return TRUE;
     } while ( FALSE );
     
@@ -71,14 +71,14 @@ BOOL BUS__bTrpSendReceive(sBus_t* psBus)
     BOOL rc = FALSE;
     
     switch (psBus->eState) {
-    case eComm_InitWait:
+    case eBus_InitWait:
         break;
-    case eComm_Idle:
+    case eBus_Idle:
         break;
-    case eComm_Receiving:
+    case eBus_Receiving:
         bReceive(psBus);
         break;
-    case eComm_Sending:
+    case eBus_Sending:
         break;
     default:
         break;
@@ -91,7 +91,7 @@ BOOL BUS__bTrpSendReceive(sBus_t* psBus)
 
 void BUS_vInitialize(sBus_t* psBus, uint8_t uUart)
 {
-    psBus->eState = eComm_InitWait;
+    psBus->eState = eBus_InitWait;
     BUS__vPhyInitialize(&psBus->sPhy, uUart);
 }
 
@@ -101,13 +101,27 @@ BOOL BUS_bGetMessage(sBus_t* psBus)
 }
 
 BOOL BUS_bReadMessage(sBus_t*  psBus, 
-                      uint8_t* puSender, 
-                      uint8_t* puLen, 
-                      uint8_t* puMsg)
+                        uint8_t* puSender,
+                        uint8_t* puLen,
+                        uint8_t* puMsg)
 {
     return FALSE;
 }
 
+BOOL BUS_bWriteMessage(sBus_t*    psBus,
+                         uint16_t   uAddrReceiver,
+                         uint8_t    puLen,
+                         uint8_t*   puMsg)
+{
+    do {
+        if (psBus->eState != eBus_Idle) {
+            break;
+        }
+
+        return TRUE;
+    } while ( FALSE );
+    return FALSE;
+}
 
 /*
 

@@ -74,17 +74,17 @@ ISR(INTERRUPT_USART_RXC)
 	sBusRec_t	  buffer = g_UART0Phy->sRecvBuf;
 
 	fe = (REGBIT_UCSRA & (1<<REGBIT_FE));
-	// Daten auslesen, dadurch wird das Interruptflag gelöscht
+	// Daten auslesen, dadurch wird das Interruptflag gelï¿½scht
 	data = REGBIT_UDR;
 
 	if(0!=fe) {
         g_UART0Phy->uflags |= e_uartrxerrflag;
         return;
 	}
-	if ( buffer.uWritePos == (buffer.uReadPos-1+sizeof(buffer.buf))%(sizeof(buffer.buf)) ) return;
-	buffer.buf[buffer.uWritePos] = data;
-	buffer.uWritePos = (buffer.uWritePos+1)%sizeof(buffer.buf);
-	if (fe) REGBIT_UCSRA &= ~(1<<REGBIT_FE); // FrameError-Flag zurücksetzen
+	if ( buffer.uWritePos == (buffer.uReadPos-1+sizeof(buffer.auBuf)) % (sizeof(buffer.auBuf)) ) return;
+	buffer.auBuf[buffer.uWritePos] = data;
+	buffer.uWritePos = (buffer.uWritePos+1) % sizeof(buffer.auBuf);
+	if (fe) REGBIT_UCSRA &= ~(1<<REGBIT_FE); // Reset FrameError-Flag
 	g_UART0Phy->uflags |= e_uartrxflag;
 }
 
@@ -168,8 +168,8 @@ uint8_t BUS__uPhyRead(sBusPhy_t* psPhy, uint8_t *puInBuf)
 
 	while(buffer.uWritePos != buffer.uReadPos)
 	{
-		puInBuf[n] = buffer.buf[buffer.uReadPos];
-		buffer.uReadPos = (buffer.uReadPos+1) % sizeof(buffer.buf);
+		puInBuf[n] = buffer.auBuf[buffer.uReadPos];
+		buffer.uReadPos = (buffer.uReadPos+1) % sizeof(buffer.auBuf);
 		n++;
 	}
 	psPhy->uflags &= ~(e_uartrxflag);
@@ -181,8 +181,8 @@ BOOL BUS__bPhyReadByte(sBusPhy_t* psPhy, uint8_t *puByte)
 	sBusRec_t  buffer = psPhy->sRecvBuf;
 
 	if (buffer.uWritePos != buffer.uReadPos) {
-        *puByte = buffer.buf[buffer.uReadPos];
-        buffer.uReadPos = (buffer.uReadPos+1) % sizeof(buffer.buf);
+        *puByte = buffer.auBuf[buffer.uReadPos];
+        buffer.uReadPos = (buffer.uReadPos+1) % sizeof(buffer.auBuf);
         if (buffer.uWritePos == buffer.uReadPos) {
             psPhy->uflags &= ~(e_uartrxflag);
         }

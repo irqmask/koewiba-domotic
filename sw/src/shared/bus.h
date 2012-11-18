@@ -27,10 +27,10 @@
 // --- Type definitions --------------------------------------------------------
 
 typedef enum busstate {
-    eComm_InitWait,
-    eComm_Idle,
-    eComm_Receiving,
-    eComm_Sending
+    eBus_InitWait,
+    eBus_Idle,
+    eBus_Receiving,
+    eBus_Sending
 } eBusState_t;
 
 typedef enum busflags
@@ -42,33 +42,42 @@ typedef enum busflags
     e_timeout       = 0b00010000
 } eBusFlags_t;
 
-typedef unsigned char uRecBuf_t[BUS_MAXBIGMSGSIZE];
+typedef uint8_t auRecBuf_t[BUS_MAXBIGMSGSIZE];
+typedef uint8_t auSndBuf_t[BUS_MAXMSGSIZE];
 
 typedef struct recvbuf {
-	uint8_t		uReadPos;
-	uint8_t		uWritePos;
-	uRecBuf_t 	buf;
+    uint8_t		uReadPos;
+    uint8_t		uWritePos;
+    auRecBuf_t  auBuf;
 } sBusRec_t;
 
 typedef struct busphy {
     uint8_t         uUart;
     uint8_t         uCurrentBytesToSend;
-    //uint8_t         uCurrentBytesReceived;
-    eBusFlags_t		uflags;
-    sBusRec_t		sRecvBuf;
-    const uint8_t*  puSendPtr;
+    eBusFlags_t     uflags;
+    sBusRec_t       sRecvBuf;
+    const uint8_t* puSendPtr;
 } sBusPhy_t;
 
-typedef struct busmsg {
+typedef struct rcvbusmsg {
     uint16_t        uReceiver;
     uint8_t         uLength;
     uint8_t         uOverallLength;
-} sBusMsg_t;
+    auSndBuf_t      auBuf;
+} sRcvBusMsg_t;
+
+typedef struct sndbusmsg {
+    uint16_t        uReceiver;
+    uint8_t         uLength;
+    uint8_t         uOverallLength;
+    auSndBuf_t      auBuf;
+} sSndBusMsg_t;
 
 typedef struct bus {
     eBusState_t     eState;  
     sBusPhy_t       sPhy;  
-    sBusMsg_t       sMsg;
+    sRcvBusMsg_t    sRecvMsg;
+    sSndBusMsg_t    sSendMsg;
 } sBus_t;
 
 // --- Local variables ---------------------------------------------------------

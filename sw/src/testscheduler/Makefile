@@ -4,9 +4,11 @@
 
 MCU = atmega88
 FORMAT = ihex
-TARGET = testuart
+TARGET = testscheduler
 SRC = ../shared/bus_phy.c \
-      main_testuart.c
+      ../shared/bus_schedul.c \
+      ../shared/bus_transport.c \
+      main_testscheduler.c
 
 
 ASRC =
@@ -28,7 +30,7 @@ DEBUG = stabs
 CSTANDARD = -std=gnu99
 
 # Place -D or -U options here
-CDEFS = -DF_CPU=16000000
+CDEFS = -DF_CPU=16000000 -DBUS_SCHEDULER
 
 # Place -I options here
 CINCS = -I../include \
@@ -81,7 +83,7 @@ LDFLAGS = $(EXTMEMOPTS) $(LDMAP) $(PRINTF_LIB) $(SCANF_LIB) $(MATH_LIB)
 
 # Programming support using avrdude. Settings and variables.
 
-AVRDUDE_PROGRAMMER = dragon_isp
+AVRDUDE_PROGRAMMER = avrisp2
 AVRDUDE_PORT = usb
 
 AVRDUDE_WRITE_FLASH = -U flash:w:$(TARGET).hex

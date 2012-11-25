@@ -1,8 +1,8 @@
 /**
- * @addtogroup TEST_PROTOCOL
+ * @addtogroup TEST_SCHEDULER
  *
  * @{
- * @file    main_testprotocol.c
+ * @file    main_testscheduler.c
  * @brief   TODO describe briefly.
  * @todo    describe file purpose
  * @author  Christian Verhalen
@@ -39,9 +39,9 @@ int main(void)
     BUS_vInitialize(&g_sBus, 0);// initialize bus on UART 0
 
     while (1) {
-        // check for message and read it
+        BUS_vSchedule(&g_sBus);
         if (BUS_bGetMessage(&g_sBus)) {
-            BUS_bReadMessage(&g_sBus, &msglen, &msglen, msg);
+            BUS_bReadMessage(&g_sBus, &msglen, &msglen, &msg);
         }
     }
     return 0;

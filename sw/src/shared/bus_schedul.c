@@ -30,5 +30,19 @@
 
 // --- Global functions --------------------------------------------------------
 
+/**
+ * Schedule nodes on bus.
+ * 
+ * @param[in] psBus
+ * Handle of the bus.
+ */
+void BUS_vSchedule(sBus_t* psBus)
+{
+    psBus->uCurrentNode++;
+    if (psBus->uCurrentNode >= BUS_MAXNODES) {
+        psBus->uCurrentNode = 0;
+    }
+}
+
 /** @} */
 /** @} */

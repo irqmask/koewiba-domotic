@@ -1,13 +1,13 @@
 Begriffe
 --------
-Netz - Verbund von Controllern (Netzteilnehmer), welche miteinander kommunizieren können.
+Netz - Verbund von Controllern (Netzteilnehmer), welche miteinander kommunizieren koennen.
 Segment - Ein Teil eines Netzes mit gleicher Bustopologie z.B. ein RS485 Bus
 Router - Verbindet mehrere Segmente der gleicher oder unterschiedlicher Topologie.
 
 Anforderungen
 -------------
-Alle Netzteilnehmer können miteinander kommunizieren.
-Netzsegmente können über Routercontroller miteinander verbunden werden.
+Alle Netzteilnehmer koennen miteinander kommunizieren.
+Netzsegmente koennen Ueber Routercontroller miteinander verbunden werden.
 Alle Netzteilnehmer haben eine eindeutige Adresse.
 
 
@@ -16,10 +16,10 @@ Netzaufbau
 
 Kommunikationsablauf:
 
-1) Zu Beginn sendet der Master das Token für den ersten Sender.
+1) Zu Beginn sendet der Master das Token fuer den ersten Sender.
 2) Der angesprochene Sender sendet daraufhin seine Nachricht. Wenn er nichts zu senden hat sendet er eine leere Nachricht.
-3) Der Master sendet das Token für den nächsten Sender.
-4) Der nächste Sender sendet seine Nachricht.
+3) Der Master sendet das Token fuer den naechsten Sender.
+4) Der naechste Sender sendet seine Nachricht.
 5) Und so weiter.
 6) Wenn alle Teilnehmer angeprochen wurden, gibt es eine Pause von 3Bytes ms.
 
@@ -28,7 +28,7 @@ Fehlersituationen:
 
  * Ein Sender sendet nicht, nachdem das Token verschickt wurde:
    Jeder Sender muss innerhalb von 2Bytes Sendezeit auf das Token antworten, an sonsten wird nach einer Pause von einem weiteren Byte mit dem nächsten Token weitergemacht. Damit sieht es auf dem Bus so aus, wie eine neue Runde Kommunikation.
- * Der Master fällt aus:
+ * Der Master faellt aus:
    Der Master kann mit einer Nachricht Stellvertreter ernennen. Wird innerhalb von 10Bytes Sendezeit kein Token empfangen, übernimmt der Vertreter das Takten des Busses.
 
 
@@ -40,8 +40,9 @@ Token:
 +--+--+
 |SY|TS|
 +--+--+
-TS - Token for next sender. MSB=1 lower 7bit = address of next sender.
 SY - Syncronization byte: '�' = 0b10011010
+TS - Token for next sender. MSB=1 lower 7bit = address of next sender.
+
 
 Nachricht:
 

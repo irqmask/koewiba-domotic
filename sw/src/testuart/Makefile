@@ -141,7 +141,7 @@ sym: $(TARGET).sym
 
 # Program the device.
 program: $(TARGET).hex $(TARGET).eep
-	$(AVRDUDE) $(AVRDUDE_FLAGS) $(AVRDUDE_WRITE_FLASH) $(AVRDUDE_WRITE_EEPROM)
+    $(AVRDUDE) $(AVRDUDE_FLAGS) $(AVRDUDE_WRITE_FLASH) $(AVRDUDE_WRITE_EEPROM)
 
 
 # Convert ELF to COFF for use in debugging / simulating in AVR Studio or VMLAB.
@@ -153,70 +153,70 @@ COFFCONVERT=$(OBJCOPY) --debugging \
 
 
 coff: $(TARGET).elf
-	$(COFFCONVERT) -O coff-avr $(TARGET).elf $(TARGET).cof
+    $(COFFCONVERT) -O coff-avr $(TARGET).elf $(TARGET).cof
 
 
 extcoff: $(TARGET).elf
-	$(COFFCONVERT) -O coff-ext-avr $(TARGET).elf $(TARGET).cof
+    $(COFFCONVERT) -O coff-ext-avr $(TARGET).elf $(TARGET).cof
 
 
 .SUFFIXES: .elf .hex .eep .lss .sym
 
 .elf.hex:
-	$(OBJCOPY) -O $(FORMAT) -R .eeprom $< $@
+    $(OBJCOPY) -O $(FORMAT) -R .eeprom $< $@
 
 .elf.eep:
-	-$(OBJCOPY) -j .eeprom --set-section-flags=.eeprom="alloc,load" \
-	--change-section-lma .eeprom=0 -O $(FORMAT) $< $@
+    -$(OBJCOPY) -j .eeprom --set-section-flags=.eeprom="alloc,load" \
+    --change-section-lma .eeprom=0 -O $(FORMAT) $< $@
 
 # Create extended listing file from ELF output file.
 .elf.lss:
-	$(OBJDUMP) -h -S $< > $@
+    $(OBJDUMP) -h -S $< > $@
 
 # Create a symbol table from ELF output file.
 .elf.sym:
-	$(NM) -n $< > $@
+    $(NM) -n $< > $@
 
 
 
 # Link: create ELF output file from object files.
 $(TARGET).elf: $(OBJ)
-	$(CC) $(ALL_CFLAGS) $(OBJ) --output $@ $(LDFLAGS)
+    $(CC) $(ALL_CFLAGS) $(OBJ) --output $@ $(LDFLAGS)
 
 
 # Compile: create object files from C source files.
 .c.o:
-	$(CC) -c $(ALL_CFLAGS) $< -o $@
+    $(CC) -c $(ALL_CFLAGS) $< -o $@
 
 
 # Compile: create assembler files from C source files.
 .c.s:
-	$(CC) -S $(ALL_CFLAGS) $< -o $@
+    $(CC) -S $(ALL_CFLAGS) $< -o $@
 
 
 # Assemble: create object files from assembler source files.
 .S.o:
-	$(CC) -c $(ALL_ASFLAGS) $< -o $@
+    $(CC) -c $(ALL_ASFLAGS) $< -o $@
 
 
 
 # Target: clean project.
 clean:
-	$(REMOVE) $(TARGET).hex $(TARGET).eep $(TARGET).cof $(TARGET).elf \
-	$(TARGET).map $(TARGET).sym $(TARGET).lss \
-	$(OBJ) $(LST) $(SRC:.c=.s) $(SRC:.c=.d)
+    $(REMOVE) $(TARGET).hex $(TARGET).eep $(TARGET).cof $(TARGET).elf \
+    $(TARGET).map $(TARGET).sym $(TARGET).lss \
+    $(OBJ) $(LST) $(SRC:.c=.s) $(SRC:.c=.d)
 
 depend:
-	if grep '^# DO NOT DELETE' $(MAKEFILE) >/dev/null; \
-	then \
-		sed -e '/^# DO NOT DELETE/,$$d' $(MAKEFILE) > \
-			$(MAKEFILE).$$$$ && \
-		$(MV) $(MAKEFILE).$$$$ $(MAKEFILE); \
-	fi
-	echo '# DO NOT DELETE THIS LINE -- make depend depends on it.' \
-		>> $(MAKEFILE); \
-	$(CC) -M -mmcu=$(MCU) $(CDEFS) $(CINCS) $(SRC) $(ASRC) >> $(MAKEFILE)
+    if grep '^# DO NOT DELETE' $(MAKEFILE) >/dev/null; \
+    then \
+        sed -e '/^# DO NOT DELETE/,$$d' $(MAKEFILE) > \
+            $(MAKEFILE).$$$$ && \
+        $(MV) $(MAKEFILE).$$$$ $(MAKEFILE); \
+    fi
+    echo '# DO NOT DELETE THIS LINE -- make depend depends on it.' \
+        >> $(MAKEFILE); \
+    $(CC) -M -mmcu=$(MCU) $(CDEFS) $(CINCS) $(SRC) $(ASRC) >> $(MAKEFILE)
 
-.PHONY:	all build elf hex eep lss sym program coff extcoff clean depend
+.PHONY:    all build elf hex eep lss sym program coff extcoff clean depend
 
 

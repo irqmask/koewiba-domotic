@@ -46,8 +46,8 @@ typedef uint8_t auRecBuf_t[BUS_MAXBIGMSGSIZE];
 typedef uint8_t auSndBuf_t[BUS_MAXMSGSIZE];
 
 typedef struct recvbuf {
-    uint8_t		uReadPos;
-    uint8_t		uWritePos;
+    uint8_t        uReadPos;
+    uint8_t        uWritePos;
     auRecBuf_t  auBuf;
 } sBusRec_t;
 

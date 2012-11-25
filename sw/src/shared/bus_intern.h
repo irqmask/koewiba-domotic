@@ -74,7 +74,7 @@ BOOL    BUS__bPhySend               (sBusPhy_t*     psPhy,
 BOOL    BUS__bPhyDataReceived       (sBusPhy_t*     psPhy);
 
 uint8_t BUS__uPhyRead               (sBusPhy_t*     psPhy,
-									 uint8_t*       puInBuf);
+                                     uint8_t*       puInBuf);
                                      
 BOOL    BUS__bPhyReadByte           (sBusPhy_t*     psPhy, 
                                      uint8_t*       puByte);

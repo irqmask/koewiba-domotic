@@ -17,13 +17,15 @@
 // --- Include section ---------------------------------------------------------
 
 #include "prjtypes.h"
+#include "clock.h"
 
 // --- Definitions -------------------------------------------------------------
 
 #define BUS_BAUDRATE           38400
-#define BUS_MAXMSGSIZE         16
-#define BUS_MAXBIGMSGSIZE      (64 + 2)
-#define BUS_EMPTY_MSG_SIZE      3
+#define BUS_MAXMSGLEN          16
+#define BUS_MAXBIGMSGLEN       (64 + 2)
+#define BUS_EMPTY_MSG_LEN      3
+#define BUS_TOKEN_MSG_LEN      2
 
 #ifndef BUS_MAXNODES
 #define BUS_MAXNODES 16
@@ -34,11 +36,12 @@
 //! Possible states of the bus, as seen by each node
 typedef enum busstate {
     eBus_InitWait,          //!< We are not synced on bus yet.
+    eBus_Idle,              //!< Not sending and not receiving.
+    eBus_SendingToken,      //!< Scheduler is sending the token.
     eBus_ReceivingActive,   //!< We suggest the message is for us.
     eBus_ReceivingPassive,  //!< We receive byte but those are not for us.
     eBus_GotToken,          //!< We have got the bus token.
     eBus_Sending,           //!< We are sending now our message.
-    eBus_Idle,              //!< Not sending and not receiving.
     eBus_Last
 } eBusState_t;
 
@@ -55,8 +58,8 @@ typedef struct busconfig {
     uint16_t        uOwnNodeAddress;    //!< address of node on bus.
 } sBusCfg_t;
 
-typedef uint8_t auRecBuf_t[BUS_MAXBIGMSGSIZE];
-typedef uint8_t auSndBuf_t[BUS_MAXMSGSIZE];
+typedef uint8_t auRecBuf_t[BUS_MAXBIGMSGLEN];
+typedef uint8_t auSndBuf_t[BUS_MAXMSGLEN];
 
 //! common receive queue
 typedef struct recvbuf {
@@ -89,29 +92,33 @@ typedef struct sndbusmsg {
     uint16_t        uReceiver;
     uint8_t         uLength;
     uint8_t         uOverallLength;
-    auSndBuf_t      auBuf;          //!< message data including header, data and crc
+    auSndBuf_t      auBuf;          //!< message data including header, data and crc.
 } sSndBusMsg_t;
 
-//! contains all information about a node needed for scheduling
+//! contains all information about a node needed for scheduling.
 typedef struct nodeinfo {
     uint16_t        uAddress;
     uint16_t        uErrCnt;
 } sNodeInfo_t;
 
-// data of bus. used as handle for all public methods.
+//! data of bus. used as handle for all public methods.
 typedef struct bus {
-    eBusState_t     eState;         //!< current stae of the bus.
+    eBusState_t     eState;         //!< current state of the bus.
     BOOL            bMsgReceived;   //!< flag, stating that there is an unread message
     sBusCfg_t       sCfg;           //!< configuration data.
     sBusPhy_t       sPhy;           //!< physical layer data.
     sRcvBusMsg_t    sRecvMsg;       //!< contains current received message.
     sSndBusMsg_t    sSendMsg;       //!< contains current message to be sent.
-    uint8_t         auEmptyMsg[BUS_EMPTY_MSG_SIZE]; //!< precompiled empty message.
+    uint8_t         auEmptyMsg[BUS_EMPTY_MSG_LEN]; //!< pre-compiled empty message.
     
     // following data is only used by bus scheduler
 #ifdef BUS_SCHEDULER
-    sNodeInfo_t     asNodeList[BUS_MAXNODES];
-    uint8_t         uCurrentNode;
+    sNodeInfo_t     asNodeList[BUS_MAXNODES];       //!< list of configured nodes
+    uint8_t         uCurrentNode;                   //!< current processed node
+    uint8_t         auTokenMsg[BUS_TOKEN_MSG_LEN];  //!< pre-compiled token message.
+    BOOL            bSchedWaitingForAnswer;         //!< flag, if scheduler is waiting for an answer
+    BOOL            bSchedMsgReceived;              //!< flag, if any message has been received
+    sClkTimer_t     sNodeAnsTimeout;                //!< node answer timeout
 #endif
 } sBus_t;
 
@@ -146,7 +153,10 @@ BOOL    BUS_bSendMessage            (sBus_t*        psBus,
                                      uint8_t*       puMsg);
 
 #ifdef BUS_SCHEDULER
-void    BUS_vSchedule               (sBus_t*        psBus);
+BOOL    BUS_bSchedulAddNode         (sBus_t*        psBus,
+                                    uint8_t         uNodeAddress);
+
+BOOL    BUS_bScheduleAndGetMessage  (sBus_t*        psBus);
 #endif
                                      
 #endif /* _BUS_H_ */

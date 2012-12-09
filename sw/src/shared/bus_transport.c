@@ -89,7 +89,7 @@ BOOL bReceive(sBus_t* psBus)
             // 3. byte: LE - Length of message from AR to CRCL
             if (psBus->sRecvMsg.uOverallLength == 2) {
                 // check correctness of length
-                if (u > BUS_MAXBIGMSGSIZE) {
+                if (u > BUS_MAXBIGMSGLEN) {
                     vResetBus(psBus);
                     break;
                 }
@@ -135,6 +135,9 @@ BOOL bReceive(sBus_t* psBus)
                 // TODO check CRC
                 if (1) {
                     psBus->bMsgReceived = TRUE;
+#ifdef BUS_SCHEDULER
+                    psBus->bSchedMsgReceived = TRUE;
+#endif
                     psBus->eState = eBus_Idle;
                 }
                 
@@ -147,9 +150,12 @@ BOOL bReceive(sBus_t* psBus)
         psBus->sRecvMsg.uOverallLength++;
         
         // passive receiving state, only count bytes till the end of the message 
-        // and then go byck to eBus_Idle state.
+        // and then go back to eBus_Idle state.
         if (psBus->eState == eBus_ReceivingPassive) {
             if (psBus->sRecvMsg.uOverallLength >= (psBus->sRecvMsg.uLength + 3)) {
+#ifdef BUS_SCHEDULER
+                psBus->bSchedMsgReceived = TRUE;
+#endif
                 psBus->eState = eBus_Idle;
             }
         }
@@ -166,10 +172,10 @@ static void vInitiateSending(sBus_t* psBus)
     // is there a pending message to be sent?
     //TODO implement check for message to be sent
     if (0) {
-        //TODO initiate sendiong of the message       
+        //TODO initiate sending of the message
     } else {
         // send empty message
-        BUS__bPhySend(&psBus->sPhy, psBus->auEmptyMsg, BUS_EMPTY_MSG_SIZE);
+        BUS__bPhySend(&psBus->sPhy, psBus->auEmptyMsg, BUS_EMPTY_MSG_LEN);
     }
     
 }
@@ -178,7 +184,7 @@ static void vInitiateSending(sBus_t* psBus)
 static void vSend(sBus_t* psBus)
 {
     // data completely sent?
-    if (BUS__bPhySending(psBus->sPhy) == FALSE) { 
+    if (BUS__bPhySending(&psBus->sPhy) == FALSE) {
         psBus->eState = eBus_Idle;
     }
 }
@@ -202,7 +208,7 @@ BOOL BUS__bTrpSendReceive(sBus_t* psBus)
         break;
     
     case eBus_Sending:
-        // message is currently beeing sent
+        // message is currently being sent
         vSend(psBus);
         break;
     
@@ -234,6 +240,9 @@ void BUS_vConfigure(sBus_t* psBus, uint16_t uNodeAddress)
 {
     psBus->sCfg.uOwnNodeAddress = uNodeAddress;
     vCreateEmptyMessage(psBus);
+#ifdef BUS_SCHEDULER
+    BUS__vSchedulConfigure(psBus);
+#endif
 }
 
 /**

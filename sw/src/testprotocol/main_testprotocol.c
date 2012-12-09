@@ -33,7 +33,7 @@ static sBus_t g_sBus;
 int main(void)
 {
     uint8_t msglen = 0;
-    uint8_t msg[BUS_MAXMSGSIZE];
+    uint8_t msg[BUS_MAXMSGLEN];
 
     BUS_vConfigure(&g_sBus, 2); // configure a bus node with address 2
     BUS_vInitialize(&g_sBus, 0);// initialize bus on UART 0

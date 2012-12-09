@@ -52,29 +52,23 @@ int main(void)
 {
     uint8_t buttonstatus    = 0,
             sendchar        = 0;
-    BOOL rc = FALSE;
-    
+    BOOL    rc              = FALSE;
+
     DDRD |= (LED_TEST | LED_EXP);
     DDRD &= ~(BTN_TEST);
-
-    PORTD |= LED_TEST;              // switch on test led
     PORTD |= BTN_TEST;              // set pull-up for button
 
     // initialize physical layer of bus
     BUS__vPhyInitialize(&g_sBusPhy0, 0);
-    BUS__vPhyActivateSender(&g_sBusPhy0, TRUE);
-            _delay_ms(500);
-    BUS__vPhyActivateSender(&g_sBusPhy0, FALSE);
-            _delay_ms(500);
-    BUS__vPhyActivateSender(&g_sBusPhy0, TRUE);
-            _delay_ms(500);
-    BUS__vPhyActivateSender(&g_sBusPhy0, FALSE);
-            _delay_ms(500);
-    BUS__vPhyActivateSender(&g_sBusPhy0, TRUE);
 
     sei();
 
+    _delay_ms(10);
+    PORTD |= LED_TEST;              // switch on test led
+
+
     while (1) {
+
         // If test-button is pressed
         if ((PIND & BTN_TEST) == 0) {
             // Is this the first time, we are seeing a pressed button?
@@ -88,7 +82,7 @@ int main(void)
             buttonstatus = FALSE;
         }
 
-        // if the sendchar flag is set, send a char on the bus
+        // If the sendchar flag is set, send a char on the bus
         if (TRUE == sendchar) {
             sendchar = FALSE;
             PORTD |= LED_EXP;       // switch EXP LED on

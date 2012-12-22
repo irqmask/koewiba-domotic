@@ -36,21 +36,25 @@
     #define REGBIT_UBRRL UBRRL
     #define REGBIT_RXCIE RXCIE
     #define REGBIT_UDRIE UDRIE
+    #define REGBIT_TXCIE TXCIE
+    #define REGBIT_RXEN  RXEN
     #define REGBIT_TXEN  TXEN
     #define REGBIT_FE    FE
     #define INTERRUPT_USART_RXC  USART_RXC_vect
     #define INTERRUPT_USART_UDRE USART_UDRE_vect
     #define INTERRUPT_UART_TRANS USART_TXC_vect
 #elif defined (__AVR_ATmega88__)
-    #define REGBIT_UCSRA UCSR0A
-    #define REGBIT_UCSRB UCSR0B
-    #define REGBIT_UDR   UDR0
-    #define REGBIT_UBRRH UBRR0H
-    #define REGBIT_UBRRL UBRR0L
-    #define REGBIT_RXCIE RXCIE0
-    #define REGBIT_UDRIE UDRIE0
-    #define REGBIT_TXEN  TXEN0
-    #define REGBIT_FE    FE0
+    #define REGBIT_UCSRA   UCSR0A
+    #define REGBIT_UCSRB   UCSR0B
+    #define REGBIT_UDR     UDR0
+    #define REGBIT_UBRRH   UBRR0H
+    #define REGBIT_UBRRL   UBRR0L
+    #define REGBIT_RXCIE   RXCIE0
+    #define REGBIT_UDRIE   UDRIE0
+    #define REGBIT_TXCIE   TXCIE0
+    #define REGBIT_RXEN    RXEN0
+    #define REGBIT_TXEN    TXEN0
+    #define REGBIT_FE      FE0
     #define INTERRUPT_USART_RXC  USART_RX_vect
     #define INTERRUPT_USART_UDRE USART_UDRE_vect
     #define INTERRUPT_UART_TRANS USART_TX_vect
@@ -74,8 +78,9 @@ sBusPhy_t* g_UART0Phy = NULL;
 
 ISR(INTERRUPT_USART_RXC)
 {
-    unsigned char data, fe;
-    sBusRec_t     buffer = g_UART0Phy->sRecvBuf;
+    uint8_t     data, fe;
+    sBusRec_t   buffer;
+    buffer = g_UART0Phy->sRecvBuf;
 
     fe = (REGBIT_UCSRA & (1<<REGBIT_FE));
     // read data to clear interrupt flag
@@ -96,8 +101,7 @@ ISR(INTERRUPT_USART_RXC)
 ISR(INTERRUPT_USART_UDRE)
 {
     if (g_UART0Phy->uCurrentBytesToSend > 1) {
-        g_UART0Phy->puSendPtr++;
-        REGBIT_UDR = *g_UART0Phy->puSendPtr;
+        REGBIT_UDR = *++g_UART0Phy->puSendPtr;
         g_UART0Phy->uCurrentBytesToSend--;
     } else {
         REGBIT_UCSRB &= ~(1<<REGBIT_UDRIE);
@@ -105,6 +109,9 @@ ISR(INTERRUPT_USART_UDRE)
     }
 }
 
+/**
+ * Transmit complete interrupt
+ */
 ISR(INTERRUPT_UART_TRANS)
 {
     BUS__vPhyActivateSender(g_UART0Phy, FALSE);
@@ -116,7 +123,7 @@ ISR(INTERRUPT_UART_TRANS)
 
 /**
  * Initialize data and hardware of bus's physical layer.
- *
+ * 
  * @param[in] psPhy
  * Handle of bus physical layer.
  * @param[in] uUart
@@ -127,17 +134,17 @@ void BUS__vPhyInitialize(sBusPhy_t* psPhy, uint8_t uUart)
     psPhy->uCurrentBytesToSend = 0;
     psPhy->uUart = uUart;
     psPhy->uFlags = 0;
-
+    
     // configure UART hardware
     if (psPhy->uUart == 0) {
+        g_UART0Phy = psPhy;
         // initialize UART
         REGBIT_UBRRH = UBRRVALH;
         REGBIT_UBRRL = UBRRVALL;
-        REGBIT_UCSRB |= ((1<<REGBIT_RXCIE) | (1<<REGBIT_UDRIE) | (1<<REGBIT_TXEN));
+        REGBIT_UCSRB |= ((1<<REGBIT_RXCIE) | (0<<REGBIT_UDRIE) | (1<<REGBIT_TXCIE) | (1<<REGBIT_RXEN) | (1<<REGBIT_TXEN));
         UART_DDR |= (UART_DRIVER | UART_RECVSTOP);
-        g_UART0Phy = psPhy;
     }
-
+    
     // sender is initial off, receiver is always on.
     BUS__vPhyActivateSender(psPhy, FALSE);
     BUS__vPhyActivateReceiver(psPhy, TRUE);
@@ -241,7 +248,7 @@ BOOL BUS__bPhyDataReceived(sBusPhy_t* psPhy)
  * @param[in] psPhy
  * Handle of bus physical layer.
  * @param[out] puInBuf
- * Pointer to buffer where received data is copied to. It has at least to be as
+ * Pointer to buffer where received data is copied to. It has at least to be as 
  * big as the internal input buffer in physical layer.
  *
  * @returns Number of bytes read.
@@ -271,7 +278,7 @@ uint8_t BUS__uPhyRead(sBusPhy_t* psPhy, uint8_t *puInBuf)
  * @returns TRUE if a byte has been received, otherwise false.
  */
 BOOL BUS__bPhyReadByte(sBusPhy_t* psPhy, uint8_t *puByte)
-{
+{   
     sBusRec_t  buffer = psPhy->sRecvBuf;
 
     if (buffer.uWritePos != buffer.uReadPos) {

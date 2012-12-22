@@ -18,6 +18,7 @@
 // --- Include section ---------------------------------------------------------
 
 #include "bus_intern.h"
+#include "led_debug.h"
 
 // --- Definitions -------------------------------------------------------------
 
@@ -204,7 +205,8 @@ BOOL BUS__bTrpSendReceive(sBus_t* psBus)
     switch (psBus->eState) {
     case eBus_GotToken:
         // initiate sending of message
-        vInitiateSending(psBus);
+    	vToggleStatusLED();
+    	//vInitiateSending(psBus);
         break;
     
     case eBus_Sending:

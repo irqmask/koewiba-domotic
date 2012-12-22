@@ -15,6 +15,7 @@
 #include <util/delay.h>
 #include "bus.h"
 #include "clock.h"
+#include "led_debug.h"
 
 // --- Definitions -------------------------------------------------------------
 
@@ -37,31 +38,6 @@ static sClkTimer_t g_sLedTimer;
 // --- Module global variables -------------------------------------------------
 
 // --- Local functions ---------------------------------------------------------
-
-/**
- * Initialize LEDs and keys.
- */
-void vInitLedAndKeys(void)
-{
-    DDRD |= (LED_ERROR | LED_STATUS);
-    DDRD &= ~(BTN_TEST | BTN_EXP);
-
-    PORTD &= ~(LED_ERROR | LED_STATUS); // switch LEDs off.
-    PORTD |= (BTN_TEST | BTN_EXP);      // set pull-up for buttons
-}
-
-/**
- * Toggle the status LED.
- */
-void vToggleStatusLED(void)
-{
-    PORTD ^= LED_STATUS;
-}
-
-void vToggleErrorLED(void)
-{
-    PORTD ^= LED_ERROR;
-}
 
 // --- Module global functions -------------------------------------------------
 

@@ -39,7 +39,7 @@ BOOL bSendNextTimeSlotToken(sBus_t* psBus)
     node = &psBus->asNodeList[psBus->uCurrentNode];
 
     if (node->uAddress != 0) {
-        psBus->auTokenMsg[1] = 'v';//TODOnode->uAddress | 0x80;
+        psBus->auTokenMsg[1] = node->uAddress + '0';
         return BUS__bPhySend(&psBus->sPhy, psBus->auTokenMsg, BUS_TOKEN_MSG_LEN);
     }
     return FALSE;
@@ -69,10 +69,11 @@ void BUS__vSchedulConfigure(sBus_t* psBus)
 
     psBus->uCurrentNode = BUS_MAXNODES - 1;
     for (ii=0; ii<BUS_MAXNODES; ii++) {
-        psBus->asNodeList[ii].uAddress = 0;
+        psBus->asNodeList[ii].uAddress = ii;
+        //psBus->asNodeList[ii].uAddress = 0;
         psBus->asNodeList[ii].uErrCnt = 0;
     }
-    psBus->auTokenMsg[0] = 'c';//TODO BUS_SYNCBYTE;
+    psBus->auTokenMsg[0] = 'ü';//TODO BUS_SYNCBYTE;
     psBus->auTokenMsg[1] = 0;
 }
 
@@ -93,11 +94,12 @@ BOOL BUS_bSchedulAddNode(sBus_t* psBus, uint8_t uNodeAddress)
     uint8_t ii = 0;
 
     // check node address correctness
-    if ((uNodeAddress < 1) && (uNodeAddress > 127)) {
+    if ((uNodeAddress < 1) || (uNodeAddress > 127)) {
         return FALSE;
     }
     // search free place in nodelist
     for (ii=0; ii<BUS_MAXNODES; ii++) {
+        if (psBus->asNodeList[ii].uAddress == uNodeAddress) return FALSE; // Adresse
         if (psBus->asNodeList[ii].uAddress == 0) {
             psBus->asNodeList[ii].uAddress = uNodeAddress;
             return TRUE;

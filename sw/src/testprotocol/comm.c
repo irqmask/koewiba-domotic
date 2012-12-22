@@ -76,13 +76,13 @@ ISR(SIG_USART_RECV)
     case eComm_Receiving:
         if (eRecvState == eComm_RecvByte) {
             bBusBytePending = TRUE;
-            auMessage[uCurrentReceivedBytes++] = UDR0;
+            auMessage[uCurrentReceivedBytes++] = REGISTER_UDR;
         }
         break;
 
     case eComm_Sending:
         bBusBytePending = TRUE;
-        uBusMirrorByte = UDR0;
+        uBusMirrorByte = REGISTER_UDR;
         break;
 
     default:
@@ -97,7 +97,7 @@ uint8_t COMM__Receive(void)
     switch (eRecvState) {
     case eComm_RecvFirstByte:
         // save first byte and initiate receiving
-        auMessage[eMsgLength] = UDR0;
+        auMessage[eMsgLength] = REGISTER_UDR;
         uCurrentReceivedBytes = 1;
         uLastByteTime = NOW;
         eRecvState = eComm_RecvByte;

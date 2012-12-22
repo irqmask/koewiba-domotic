@@ -28,37 +28,6 @@
 #define UART_DRIVER             0b00000100
 #define UART_RECVSTOP           0b00001000
 
-#if defined (__AVR_ATmega8__)
-    #define REGBIT_UCSRA UCSRA
-    #define REGBIT_UCSRB UCSRB
-    #define REGBIT_UDR   UDR
-    #define REGBIT_UBRRH UBRRH
-    #define REGBIT_UBRRL UBRRL
-    #define REGBIT_RXCIE RXCIE
-    #define REGBIT_UDRIE UDRIE
-    #define REGBIT_TXCIE TXCIE
-    #define REGBIT_RXEN  RXEN
-    #define REGBIT_TXEN  TXEN
-    #define REGBIT_FE    FE
-    #define INTERRUPT_USART_RXC  USART_RXC_vect
-    #define INTERRUPT_USART_UDRE USART_UDRE_vect
-    #define INTERRUPT_UART_TRANS USART_TXC_vect
-#elif defined (__AVR_ATmega88__)
-    #define REGBIT_UCSRA   UCSR0A
-    #define REGBIT_UCSRB   UCSR0B
-    #define REGBIT_UDR     UDR0
-    #define REGBIT_UBRRH   UBRR0H
-    #define REGBIT_UBRRL   UBRR0L
-    #define REGBIT_RXCIE   RXCIE0
-    #define REGBIT_UDRIE   UDRIE0
-    #define REGBIT_TXCIE   TXCIE0
-    #define REGBIT_RXEN    RXEN0
-    #define REGBIT_TXEN    TXEN0
-    #define REGBIT_FE      FE0
-    #define INTERRUPT_USART_RXC  USART_RX_vect
-    #define INTERRUPT_USART_UDRE USART_UDRE_vect
-    #define INTERRUPT_UART_TRANS USART_TX_vect
-#endif
 
 #define UBRRVAL ((uint16_t)(((F_CPU / (16.0 * BUS_BAUDRATE)) - 1.0) + 0.5))
 #define UBRRVALH ((uint8_t)(UBRRVAL>>8))
@@ -82,9 +51,9 @@ ISR(INTERRUPT_USART_RXC)
     sBusRec_t   buffer;
     buffer = g_UART0Phy->sRecvBuf;
 
-    fe = (REGBIT_UCSRA & (1<<REGBIT_FE));
+    fe = (REGISTER_UCSRA & (1<<REGBIT_FE));
     // read data to clear interrupt flag
-    data = REGBIT_UDR;
+    data = REGISTER_UDR;
 
     // framing error ?
     if(0 != fe) {
@@ -94,17 +63,17 @@ ISR(INTERRUPT_USART_RXC)
     if ( buffer.uWritePos == (buffer.uReadPos-1+sizeof(buffer.auBuf)) % (sizeof(buffer.auBuf)) ) return;
     buffer.auBuf[buffer.uWritePos] = data;
     buffer.uWritePos = (buffer.uWritePos+1) % sizeof(buffer.auBuf);
-    if (fe) REGBIT_UCSRA &= ~(1<<REGBIT_FE); // Reset FrameError-Flag
+    if (fe) REGISTER_UCSRA &= ~(1<<REGBIT_FE); // Reset FrameError-Flag
     g_UART0Phy->uFlags |= e_uartrxflag;
 }
 
 ISR(INTERRUPT_USART_UDRE)
 {
     if (g_UART0Phy->uCurrentBytesToSend > 1) {
-        REGBIT_UDR = *++g_UART0Phy->puSendPtr;
+    	REGISTER_UDR = *++g_UART0Phy->puSendPtr;
         g_UART0Phy->uCurrentBytesToSend--;
     } else {
-        REGBIT_UCSRB &= ~(1<<REGBIT_UDRIE);
+        REGISTER_UCSRB &= ~(1<<REGBIT_UDRIE);
         g_UART0Phy->uCurrentBytesToSend = 0;
     }
 }
@@ -139,9 +108,9 @@ void BUS__vPhyInitialize(sBusPhy_t* psPhy, uint8_t uUart)
     if (psPhy->uUart == 0) {
         g_UART0Phy = psPhy;
         // initialize UART
-        REGBIT_UBRRH = UBRRVALH;
-        REGBIT_UBRRL = UBRRVALL;
-        REGBIT_UCSRB |= ((1<<REGBIT_RXCIE) | (0<<REGBIT_UDRIE) | (1<<REGBIT_TXCIE) | (1<<REGBIT_RXEN) | (1<<REGBIT_TXEN));
+        REGISTER_UBRRH = UBRRVALH;
+        REGISTER_UBRRL = UBRRVALL;
+        REGISTER_UCSRB |= ((1<<REGBIT_RXCIE) | (0<<REGBIT_UDRIE) | (1<<REGBIT_TXCIE) | (1<<REGBIT_RXEN) | (1<<REGBIT_TXEN));
         UART_DDR |= (UART_DRIVER | UART_RECVSTOP);
     }
     
@@ -210,8 +179,8 @@ BOOL BUS__bPhySend(sBusPhy_t* psPhy, const uint8_t* puMsg, uint8_t uLen)
     psPhy->puSendPtr = puMsg;
     if (psPhy->uUart == 0) {
         BUS__vPhyActivateSender(psPhy, TRUE);
-        REGBIT_UDR = *psPhy->puSendPtr;   // send first byte
-        REGBIT_UCSRB |= (1<<REGBIT_UDRIE);      // enable data register empty interrupt
+        REGISTER_UDR = *psPhy->puSendPtr;   // send first byte
+        REGISTER_UCSRB |= (1<<REGBIT_UDRIE);      // enable data register empty interrupt
     }
     return TRUE;
 }

@@ -51,9 +51,9 @@
     #define REGBIT_UDRIE UDRIE0
     #define REGBIT_TXEN  TXEN0
     #define REGBIT_FE    FE0
-    #define INTERRUPT_USART_RXC  SIG_UART_RECV
-    #define INTERRUPT_USART_UDRE SIG_UART_DATA
-    #define INTERRUPT_UART_TRANS SIG_UART_TRANS
+    #define INTERRUPT_USART_RXC  USART_RX_vect
+    #define INTERRUPT_USART_UDRE USART_UDRE_vect
+    #define INTERRUPT_UART_TRANS USART_TX_vect
 #endif
 
 #define UBRRVAL ((uint16_t)(((F_CPU / (16.0 * BUS_BAUDRATE)) - 1.0) + 0.5))
@@ -116,7 +116,7 @@ ISR(INTERRUPT_UART_TRANS)
 
 /**
  * Initialize data and hardware of bus's physical layer.
- * 
+ *
  * @param[in] psPhy
  * Handle of bus physical layer.
  * @param[in] uUart
@@ -127,7 +127,7 @@ void BUS__vPhyInitialize(sBusPhy_t* psPhy, uint8_t uUart)
     psPhy->uCurrentBytesToSend = 0;
     psPhy->uUart = uUart;
     psPhy->uFlags = 0;
-    
+
     // configure UART hardware
     if (psPhy->uUart == 0) {
         // initialize UART
@@ -137,7 +137,7 @@ void BUS__vPhyInitialize(sBusPhy_t* psPhy, uint8_t uUart)
         UART_DDR |= (UART_DRIVER | UART_RECVSTOP);
         g_UART0Phy = psPhy;
     }
-    
+
     // sender is initial off, receiver is always on.
     BUS__vPhyActivateSender(psPhy, FALSE);
     BUS__vPhyActivateReceiver(psPhy, TRUE);
@@ -241,7 +241,7 @@ BOOL BUS__bPhyDataReceived(sBusPhy_t* psPhy)
  * @param[in] psPhy
  * Handle of bus physical layer.
  * @param[out] puInBuf
- * Pointer to buffer where received data is copied to. It has at least to be as 
+ * Pointer to buffer where received data is copied to. It has at least to be as
  * big as the internal input buffer in physical layer.
  *
  * @returns Number of bytes read.
@@ -271,7 +271,7 @@ uint8_t BUS__uPhyRead(sBusPhy_t* psPhy, uint8_t *puInBuf)
  * @returns TRUE if a byte has been received, otherwise false.
  */
 BOOL BUS__bPhyReadByte(sBusPhy_t* psPhy, uint8_t *puByte)
-{   
+{
     sBusRec_t  buffer = psPhy->sRecvBuf;
 
     if (buffer.uWritePos != buffer.uReadPos) {

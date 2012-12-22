@@ -14,6 +14,7 @@
 
 #include <avr/io.h>
 #include <avr/interrupt.h>
+#include "ucontroller.h"
 #include "bus_intern.h"
 
 // --- Switches ----------------------------------------------------------------

@@ -12,6 +12,7 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include "bus.h"
+#include "clock.h"
 #include "led_debug.h"
 
 // --- Definitions -------------------------------------------------------------
@@ -20,7 +21,8 @@
 
 // --- Local variables ---------------------------------------------------------
 
-static sBus_t g_sBus;
+static sBus_t      g_sBus;
+static sClkTimer_t g_sLedTimer;
 
 // --- Global variables --------------------------------------------------------
 
@@ -37,14 +39,23 @@ int main(void)
     uint8_t msglen = 0;
     uint8_t msg[BUS_MAXMSGLEN];
 
+    CLK_vInitialize();
+
     BUS_vConfigure(&g_sBus, 2); // configure a bus node with address 2
     BUS_vInitialize(&g_sBus, 0);// initialize bus on UART 0
+
+    CLK_bTimerStart(&g_sLedTimer, 1000);
+    vInitLedAndKeys();
 
     while (1) {
         // check for message and read it
         if (BUS_bGetMessage(&g_sBus)) {
             BUS_bReadMessage(&g_sBus, &msglen, &msglen, msg);
         }
+        if (CLK_bTimerIsElapsed(&g_sLedTimer)) {
+			vToggleStatusLED();
+			CLK_bTimerStart(&g_sLedTimer, 1000);
+		}
     }
     return 0;
 }

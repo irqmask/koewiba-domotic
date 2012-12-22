@@ -90,7 +90,7 @@ void CLK_vInitialize(void)
     TCCR1B |= (1<<WGM12);                          // CTC mode (clear timer on compare match)
     OCR1AH = (F_CPU/(64*CLOCK_TICKS_PER_SECOND) - 1) >> 8;
     OCR1AL = (F_CPU/(64*CLOCK_TICKS_PER_SECOND) - 1) & 0x00FF;
-    TIMSK1 |= (1<<OCIE1A);                          // enable output compare interrupt
+    REGBIT_TIMSK |= (1<<REGBIT_OCIEA);                          // enable output compare interrupt
 }
 
 /**

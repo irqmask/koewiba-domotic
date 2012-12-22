@@ -18,6 +18,14 @@
 
 #include "prjtypes.h"
 
+#if defined (__AVR_ATmega8__)
+    #define REGBIT_TIMSK TIMSK
+    #define REGBIT_OCIEA OCIE1A
+#elif defined (__AVR_ATmega88__)
+    #define REGBIT_TIMSK TIMSK1
+    #define REGBIT_OCIEA OCIE1A
+#endif
+
 // --- Definitions -------------------------------------------------------------
 
 #define CLOCK_NUM_TIMER        8

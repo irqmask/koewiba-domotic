@@ -44,18 +44,16 @@ int main(void)
     BUS_vConfigure(&g_sBus, 2); // configure a bus node with address 2
     BUS_vInitialize(&g_sBus, 0);// initialize bus on UART 0
 
-    CLK_bTimerStart(&g_sLedTimer, 1000);
     vInitLedAndKeys();
+    sei();
+
+    CLK_bTimerStart(&g_sLedTimer, 1000);
 
     while (1) {
         // check for message and read it
         if (BUS_bGetMessage(&g_sBus)) {
             BUS_bReadMessage(&g_sBus, &msglen, &msglen, msg);
         }
-        if (CLK_bTimerIsElapsed(&g_sLedTimer)) {
-			vToggleStatusLED();
-			CLK_bTimerStart(&g_sLedTimer, 1000);
-		}
     }
     return 0;
 }

@@ -42,6 +42,8 @@
 // --- Global functions --------------------------------------------------------
 void vInitLedAndKeys(void);
 void vToggleStatusLED(void);
+void vStatusLED_on(void);
+void vStatusLED_off(void);
 void vToggleErrorLED(void);
 
 

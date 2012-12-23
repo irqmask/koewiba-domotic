@@ -72,12 +72,15 @@ BOOL bReceive(sBus_t* psBus)
             // token received?
             if (u & 0x80) {
                 // is it me?
+				vResetBus(psBus);
                 if ((u & 0x7F) == (psBus->sCfg.uOwnNodeAddress & 0x007f)) {
                     psBus->eState = eBus_GotToken;
                 } else {
                     psBus->eState = eBus_Idle;
                 }
-            } else {
+				break;
+            }
+            else {
                 // message received. save sender-address lower byte 
                 psBus->sRecvMsg.uSender = u;
                 psBus->eState = eBus_ReceivingActive;
@@ -90,7 +93,10 @@ BOOL bReceive(sBus_t* psBus)
             // 3. byte: LE - Length of message from AR to CRCL
             if (psBus->sRecvMsg.uOverallLength == 2) {
                 // check correctness of length
-                if (u > BUS_MAXBIGMSGLEN) {
+                if ((u > BUS_MAXBIGMSGLEN)||(0==u)) {
+					vStatusLED_on();
+					_delay_ms(50);
+					vStatusLED_off();
                     vResetBus(psBus);
                     break;
                 }
@@ -140,11 +146,14 @@ BOOL bReceive(sBus_t* psBus)
                     psBus->bSchedMsgReceived = TRUE;
 #endif
                     psBus->eState = eBus_Idle;
+					vResetBus(psBus);
+					break;
                 }
                 
             } else {
                 // invalid length of message
                 vResetBus(psBus);
+				break;
             }
         }
 
@@ -205,8 +214,7 @@ BOOL BUS__bTrpSendReceive(sBus_t* psBus)
     switch (psBus->eState) {
     case eBus_GotToken:
         // initiate sending of message
-    	vToggleStatusLED();
-    	//vInitiateSending(psBus);
+    	vInitiateSending(psBus);
         break;
     
     case eBus_Sending:
@@ -216,6 +224,7 @@ BOOL BUS__bTrpSendReceive(sBus_t* psBus)
     
     case eBus_InitWait:
     case eBus_Idle:
+    case eBus_ReceivingWait:
     case eBus_ReceivingActive:
     case eBus_ReceivingPassive:
     default:
@@ -307,6 +316,7 @@ BOOL BUS_bReadMessage(sBus_t*  psBus,
             puMsg[len] = psBus->sRecvMsg.auBuf[len];
             len ++;
         }
+        psBus->bMsgReceived = FALSE;
 
         *puLen      = len;
         return TRUE;

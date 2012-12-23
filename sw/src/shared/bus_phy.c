@@ -16,6 +16,7 @@
 #include <avr/interrupt.h>
 #include "ucontroller.h"
 #include "bus_intern.h"
+#include "led_debug.h"
 
 // --- Switches ----------------------------------------------------------------
 
@@ -49,8 +50,7 @@ sBusPhy_t* g_UART0Phy = NULL;
 ISR(INTERRUPT_USART_RXC)
 {
     uint8_t     data, fe;
-    sBusRec_t   buffer;
-    buffer = g_UART0Phy->sRecvBuf;
+    sBusRec_t   *buffer = &g_UART0Phy->sRecvBuf;
 
     fe = (REGISTER_UCSRA & (1<<REGBIT_FE));
     // read data to clear interrupt flag
@@ -61,16 +61,16 @@ ISR(INTERRUPT_USART_RXC)
         g_UART0Phy->uFlags |= e_uartrxerrflag;
         return;
     }
-    if ( buffer.uWritePos == (buffer.uReadPos-1+sizeof(buffer.auBuf)) % (sizeof(buffer.auBuf)) ) return;
-    buffer.auBuf[buffer.uWritePos] = data;
-    buffer.uWritePos = (buffer.uWritePos+1) % sizeof(buffer.auBuf);
+    if ( buffer->uWritePos == (buffer->uReadPos-1+sizeof(buffer->auBuf)) % (sizeof(buffer->auBuf)) ) return;
+    buffer->auBuf[buffer->uWritePos] = data;
+    buffer->uWritePos = (buffer->uWritePos+1) % sizeof(buffer->auBuf);
     if (fe) REGISTER_UCSRA &= ~(1<<REGBIT_FE); // Reset FrameError-Flag
     g_UART0Phy->uFlags |= e_uartrxflag;
 }
 
 ISR(INTERRUPT_USART_UDRE)
 {
-    if (g_UART0Phy->uCurrentBytesToSend > 1) {
+	if (g_UART0Phy->uCurrentBytesToSend > 1) {
     	REGISTER_UDR = *++g_UART0Phy->puSendPtr;
         g_UART0Phy->uCurrentBytesToSend--;
     } else {
@@ -136,6 +136,7 @@ void BUS__vPhyActivateSender(sBusPhy_t* psPhy, BOOL bActivate)
     }
     else {
         UART_PORT &= ~UART_DRIVER;
+        BUS__vPhyActivateReceiver(psPhy, TRUE);
     }
 }
 
@@ -226,11 +227,11 @@ BOOL BUS__bPhyDataReceived(sBusPhy_t* psPhy)
 uint8_t BUS__uPhyRead(sBusPhy_t* psPhy, uint8_t *puInBuf)
 {
     uint8_t    n = 0;
-    sBusRec_t  buffer = psPhy->sRecvBuf;
+    sBusRec_t  *buffer = &psPhy->sRecvBuf;
 
-    while(buffer.uWritePos != buffer.uReadPos) {
-        puInBuf[n] = buffer.auBuf[buffer.uReadPos];
-        buffer.uReadPos = (buffer.uReadPos+1) % sizeof(buffer.auBuf);
+    while(buffer->uWritePos != buffer->uReadPos) {
+        puInBuf[n] = buffer->auBuf[buffer->uReadPos];
+        buffer->uReadPos = (buffer->uReadPos+1) % sizeof(buffer->auBuf);
         n++;
     }
     psPhy->uFlags &= ~(e_uartrxflag);
@@ -249,18 +250,19 @@ uint8_t BUS__uPhyRead(sBusPhy_t* psPhy, uint8_t *puInBuf)
  */
 BOOL BUS__bPhyReadByte(sBusPhy_t* psPhy, uint8_t *puByte)
 {   
-    sBusRec_t  buffer = psPhy->sRecvBuf;
+    sBusRec_t  *buffer = &psPhy->sRecvBuf;
 
-    if (buffer.uWritePos != buffer.uReadPos) {
-        *puByte = buffer.auBuf[buffer.uReadPos];
-        buffer.uReadPos = (buffer.uReadPos+1) % sizeof(buffer.auBuf);
-        // check if there are still bytes pending in queue
-        if (buffer.uWritePos == buffer.uReadPos) {
-            psPhy->uFlags &= ~(e_uartrxflag);
-        }
-        return TRUE;
+    if (buffer->uWritePos == buffer->uReadPos) {
+		psPhy->uFlags &= ~(e_uartrxflag);
+		return FALSE;
     }
-    return FALSE;
+	*puByte = buffer->auBuf[buffer->uReadPos];
+	buffer->uReadPos = (buffer->uReadPos+1) % sizeof(buffer->auBuf);
+	// check if there are still bytes pending in queue
+	if (buffer->uWritePos == buffer->uReadPos) {
+		psPhy->uFlags &= ~(e_uartrxflag);
+	}
+	return TRUE;
 }
 
 // --- Global functions --------------------------------------------------------

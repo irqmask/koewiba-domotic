@@ -39,7 +39,7 @@ BOOL bSendNextTimeSlotToken(sBus_t* psBus)
     node = &psBus->asNodeList[psBus->uCurrentNode];
 
     if (node->uAddress != 0) {
-        psBus->auTokenMsg[1] = node->uAddress + '0';
+        psBus->auTokenMsg[1] = node->uAddress | 0x80;
         return BUS__bPhySend(&psBus->sPhy, psBus->auTokenMsg, BUS_TOKEN_MSG_LEN);
     }
     return FALSE;
@@ -73,7 +73,7 @@ void BUS__vSchedulConfigure(sBus_t* psBus)
         //psBus->asNodeList[ii].uAddress = 0;
         psBus->asNodeList[ii].uErrCnt = 0;
     }
-    psBus->auTokenMsg[0] = 'ü';//TODO BUS_SYNCBYTE;
+    psBus->auTokenMsg[0] = BUS_SYNCBYTE;
     psBus->auTokenMsg[1] = 0;
 }
 
@@ -132,7 +132,7 @@ BOOL BUS_bScheduleAndGetMessage(sBus_t* psBus)
 
         // send token
         if (bSendNextTimeSlotToken(psBus)) {
-            CLK_bTimerStart(&psBus->sNodeAnsTimeout, 1000);
+            CLK_bTimerStart(&psBus->sNodeAnsTimeout, 100);
             psBus->eState = eBus_SendingToken;
         }
         break;
@@ -141,7 +141,7 @@ BOOL BUS_bScheduleAndGetMessage(sBus_t* psBus)
         // wait for finished token sending
         if (!BUS__bPhySending(&psBus->sPhy)) {
             psBus->bSchedWaitingForAnswer = TRUE;
-            psBus->eState = eBus_ReceivingActive;
+            psBus->eState = eBus_ReceivingWait;
         } else {
             //TODO CV: timeout and error handling, if token is not sent
         }
@@ -164,7 +164,7 @@ BOOL BUS_bScheduleAndGetMessage(sBus_t* psBus)
             if (CLK_bTimerIsElapsed(&psBus->sNodeAnsTimeout)) {
                 // pulse error LED
                 PORTD |= 0b00010000;
-                _delay_ms(50);
+                _delay_ms(5);
                 PORTD &= ~(0b00010000);
                 // save error to node
                 vNodeError(psBus);

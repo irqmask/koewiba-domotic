@@ -45,6 +45,14 @@ void vToggleStatusLED(void)
 {
     PORTD ^= LED_STATUS;
 }
+void vStatusLED_on(void)
+{
+    PORTD |= LED_STATUS;
+}
+void vStatusLED_off(void)
+{
+    PORTD &= ~LED_STATUS;
+}
 
 void vToggleErrorLED(void)
 {

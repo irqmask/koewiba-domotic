@@ -46,13 +46,13 @@ static sClkTimer_t g_sLedTimer;
 int main(void)
 {
     uint8_t msglen = 0;
+    uint8_t msgfrom = 0;
     uint8_t msg[BUS_MAXMSGLEN];
 
     CLK_vInitialize();
     BUS_vConfigure(&g_sBus, 2); // configure a bus node with address 2
     BUS_vInitialize(&g_sBus, 0);// initialize bus on UART 0
 
-    BUS_bSchedulAddNode(&g_sBus, 2);
 
     vInitLedAndKeys();
     sei();

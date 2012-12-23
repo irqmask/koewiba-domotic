@@ -38,6 +38,7 @@ typedef enum busstate {
     eBus_InitWait,          //!< We are not synced on bus yet.
     eBus_Idle,              //!< Not sending and not receiving.
     eBus_SendingToken,      //!< Scheduler is sending the token.
+    eBus_ReceivingWait,     //!< Waiting for incoming message.
     eBus_ReceivingActive,   //!< We suggest the message is for us.
     eBus_ReceivingPassive,  //!< We receive byte but those are not for us.
     eBus_GotToken,          //!< We have got the bus token.
@@ -103,13 +104,14 @@ typedef struct nodeinfo {
 
 //! data of bus. used as handle for all public methods.
 typedef struct bus {
-    eBusState_t     eState;         //!< current state of the bus.
-    BOOL            bMsgReceived;   //!< flag, stating that there is an unread message
-    sBusCfg_t       sCfg;           //!< configuration data.
-    sBusPhy_t       sPhy;           //!< physical layer data.
-    sRcvBusMsg_t    sRecvMsg;       //!< contains current received message.
-    sSndBusMsg_t    sSendMsg;       //!< contains current message to be sent.
-    uint8_t         auEmptyMsg[BUS_EMPTY_MSG_LEN]; //!< pre-compiled empty message.
+    eBusState_t     eState;                         //!< current state of the bus.
+    BOOL            bMsgReceived;                   //!< flag, stating that there is an unread message
+    sBusCfg_t       sCfg;                           //!< configuration data.
+    sBusPhy_t       sPhy;                           //!< physical layer data.
+    sRcvBusMsg_t    sRecvMsg;                       //!< contains current received message.
+    sSndBusMsg_t    sSendMsg;                       //!< contains current message to be sent.
+    uint8_t         auEmptyMsg[BUS_EMPTY_MSG_LEN];  //!< pre-compiled empty message.
+    sClkTimer_t     sReceiveTimeout;                //!< receive timeout
     
     // following data is only used by bus scheduler
 #ifdef BUS_SCHEDULER

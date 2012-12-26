@@ -75,13 +75,13 @@ BOOL bReceive(sBus_t* psBus)
             // token received?
             if (u & 0x80) {
                 // is it me?
-				vResetBus(psBus); // TODO RM why reset bus when everything is OK?
-				                  // TODO RM uOverallLength will be reseted, too
                 if ((u & 0x7F) == (psBus->sCfg.uOwnNodeAddress & 0x007f)) {
                     psBus->eState = eBus_GotToken;
                 } else {
                     psBus->eState = eBus_Idle;
                 }
+                psBus->sRecvMsg.uOverallLength = 0;
+                psBus->sRecvMsg.uLength = 0;
 				break;
             }
             else {
@@ -152,9 +152,6 @@ BOOL bReceive(sBus_t* psBus)
 #ifdef BUS_SCHEDULER
                     psBus->bSchedMsgReceived = TRUE;
 #endif
-                    psBus->eState = eBus_Idle;
-					vResetBus(psBus); // TODO RM/CV: why reset the bus when everything is OK?
-									  // TODO RM/CV: message may be overwritten by next message!
 					break;
                 }
                 
@@ -188,9 +185,11 @@ static void vInitiateSending(sBus_t* psBus)
 {
     psBus->eState = eBus_Sending;
     // is there a pending message to be sent?
-    //TODO implement check for message to be sent
-    if (0) {
-        //TODO initiate sending of the message
+    if (psBus->sSendMsg.uOverallLength != 0) {
+        // initiate sending of the message
+        BUS__bPhySend(&psBus->sPhy,
+        		      psBus->sSendMsg.auBuf,
+        		      psBus->sSendMsg.uOverallLength);
     } else {
         // send empty message
         BUS__bPhySend(&psBus->sPhy, psBus->auEmptyMsg, BUS_EMPTY_MSG_LEN);
@@ -204,6 +203,8 @@ static void vSend(sBus_t* psBus)
     // data completely sent?
     if (BUS__bPhySending(&psBus->sPhy) == FALSE) {
         psBus->eState = eBus_Idle;
+        psBus->sSendMsg.uOverallLength = 0;
+        psBus->sSendMsg.uLength = 0;
     }
 }
 
@@ -212,13 +213,14 @@ static void vSend(sBus_t* psBus)
 /**
  * Manage sending and receiving of messages.
  *
- * @param[in] psBus
- * Handle of the bus.
+ * @param[in]   psBus       Handle of the bus.
  *
- * @returns TRUE if there is a pending received message, otherwise FALSE
+ * @returns TRUE, if there is a pending received message, otherwise FALSE
  */
 BOOL BUS__bTrpSendReceive(sBus_t* psBus)
 {
+	uint8_t bb = 0;
+
     switch (psBus->eState) {
     case eBus_GotToken:
         // initiate sending of message
@@ -236,8 +238,11 @@ BOOL BUS__bTrpSendReceive(sBus_t* psBus)
     case eBus_ReceivingActive:
     case eBus_ReceivingPassive:
     default:
-        bReceive(psBus);
-        //TODO: maybe repeat receiving while queue is not empty
+    	// repeat receiving while queue is not empty
+        while (!psBus->bMsgReceived && bb<2) {
+        	if (bReceive(psBus) == FALSE) break;
+        	bb++;
+        }
         break;
     }
     
@@ -250,10 +255,8 @@ BOOL BUS__bTrpSendReceive(sBus_t* psBus)
  * Configure the bus interface and data.
  * @note Has to be called before BUS_vInitialize() is called the first time.
  *
- * @param[in] psBus
- * Handle of the bus.
- * @param[in] uNodeAddress
- * Address of this node.
+ * @param[in]   psBus       Handle of the bus.
+ * @param[in]   uNodeAddress Address of this node.
  */
 void BUS_vConfigure(sBus_t* psBus, uint16_t uNodeAddress)
 {
@@ -267,10 +270,8 @@ void BUS_vConfigure(sBus_t* psBus, uint16_t uNodeAddress)
 /**
  * Initialize Bus interface.
  *
- * @param[in] psBus
- * Handle of the bus.
- * @param[in] uUart
- * Number of the UART. 0=first.
+ * @param[in]   psBus       Handle of the bus.
+ * @param[in]   uUart       Number of the UART. 0=first.
  */
 void BUS_vInitialize(sBus_t* psBus, uint8_t uUart)
 {
@@ -282,8 +283,7 @@ void BUS_vInitialize(sBus_t* psBus, uint8_t uUart)
 /**
  * Checks if there is a pending message to be read.
  *
- * @param[in] psBus
- * Handle of the bus.
+ * @param[in]   psBus       Handle of the bus.
  * 
  * @returns TRUE, if there is a pending message.
  */
@@ -295,21 +295,17 @@ BOOL BUS_bGetMessage(sBus_t* psBus)
 /**
  * Reads a pending message.
  *
- * @param[in] psBus
- * Handle of the bus.
- * @param[out] puSender
- * Sender of the message.
- * @param[out] puLen
- * (Netto) Length of the message.
- * @param[out] puMsg
- * Received message.
+ * @param[in] 	psBus       Handle of the bus.
+ * @param[out] 	puSender    Sender of the message.
+ * @param[out] 	puLen       (Netto) Length of the message.
+ * @param[out]  puMsg       Received message.
  *
- * @returns TRUE, if there is a pending message.
+ * @returns TRUE, if a message has been received and.
  */
 BOOL BUS_bReadMessage(sBus_t*  psBus, 
-                      uint8_t* puSender,
-                      uint8_t* puLen,
-                      uint8_t* puMsg)
+                        uint8_t* puSender,
+                        uint8_t* puLen,
+                        uint8_t* puMsg)
 {
     uint8_t len = 0;
     
@@ -324,7 +320,11 @@ BOOL BUS_bReadMessage(sBus_t*  psBus,
             puMsg[len] = psBus->sRecvMsg.auBuf[len];
             len ++;
         }
+        // reset bus to IDLE state, so we are ready to receive the next message
         psBus->bMsgReceived = FALSE;
+        psBus->sRecvMsg.uLength = 0;
+        psBus->sRecvMsg.uOverallLength = 0;
+        psBus->eState = eBus_Idle;
 
         *puLen      = len;
         return TRUE;
@@ -334,18 +334,60 @@ BOOL BUS_bReadMessage(sBus_t*  psBus,
 }
 
 /** 
+ * Send a message.
  *
+ * @param[in]   psBus       Handle of the bus.
+ * @param[in]   uReceiver   Receiver address of the message.
+ * @param[in]   uLen        (Netto) Length of the message.
+ * @param[in]   puMsg       Message to send.
+ *
+ * @returns TRUE, if the message has successfully been queued.
+ * @note Use BUS_bIsIdle() to check if message is successfully transmitted.
  */
 BOOL BUS_bWriteMessage(sBus_t*    psBus,
-                       uint16_t   uAddrReceiver,
-                       uint8_t    puLen,
-                       uint8_t*   puMsg)
+                         uint16_t   uReceiver,
+                         uint8_t    uLen,
+                         uint8_t*   puMsg)
 {
     do {
-        // TODO: 
+    	// check length of message to be sent.
+        if (uLen > BUS_MAXMSGLEN-7) {
+        	break;
+        }
+        // prepare message header
+        psBus->sSendMsg.uOverallLength = 0;
+        psBus->sSendMsg.uLength = 0;
+        psBus->sSendMsg.auBuf[psBus->sSendMsg.uOverallLength++] = BUS_SYNCBYTE;
+        psBus->sSendMsg.auBuf[psBus->sSendMsg.uOverallLength++] = psBus->sCfg.uOwnNodeAddress & 0x007F;
+        psBus->sSendMsg.auBuf[psBus->sSendMsg.uOverallLength++] = uLen + 2;
+        psBus->sSendMsg.auBuf[psBus->sSendMsg.uOverallLength++] = uReceiver & 0x007F;
+        // EA - Extended address 4bit sender in higher nibble, 4bit receiver in lower nibble.
+        psBus->sSendMsg.auBuf[psBus->sSendMsg.uOverallLength++] =
+            (((uReceiver & 0x0F00) >> 8) |
+            ((psBus->sCfg.uOwnNodeAddress & 0x0F00) >> 4));
+        // copy data
+        while (uLen--) {
+        	psBus->sSendMsg.auBuf[psBus->sSendMsg.uOverallLength] = puMsg[psBus->sSendMsg.uLength];
+        	psBus->sSendMsg.uLength++;
+        	psBus->sSendMsg.uOverallLength++;
+        }
+        // TODO calculate and send CRC
+        psBus->sSendMsg.auBuf[psBus->sSendMsg.uOverallLength++] = 0;
+        psBus->sSendMsg.auBuf[psBus->sSendMsg.uOverallLength++] = 0;
         return TRUE;
     } while ( FALSE );
     return FALSE;
+}
+
+/**
+ * Check if bus is in IDLE state.
+ *
+ * @param[in]   psBus       Handle of the bus.
+ * @returns TRUE, if bus is IDLE.
+ */
+BOOL BUS_bIsIdle(sBus_t*       psBus)
+{
+    return (psBus->eState == eBus_Idle);
 }
 
 /** @} */

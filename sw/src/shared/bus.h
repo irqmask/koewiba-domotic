@@ -16,6 +16,7 @@
 
 // --- Include section ---------------------------------------------------------
 
+#include "config.h"
 #include "prjtypes.h"
 #include "clock.h"
 
@@ -137,26 +138,28 @@ typedef struct bus {
 // --- Global functions --------------------------------------------------------
 
 void    BUS_vConfigure              (sBus_t*        psBus, 
-                                     uint16_t       uNodeAddress);
+                                       uint16_t       uNodeAddress);
 
 void    BUS_vInitialize             (sBus_t*        psBus,
-                                     uint8_t        uUart);
+                                        uint8_t        uUart);
                                      
 BOOL    BUS_bGetMessage             (sBus_t*        psBus);
 
 BOOL    BUS_bReadMessage            (sBus_t*        psBus, 
-                                     uint8_t*       puSender, 
-                                     uint8_t*       puLen, 
-                                     uint8_t*       puMsg);
+                                       uint8_t*       puSender,
+                                       uint8_t*       puLen,
+                                       uint8_t*       puMsg);
                                      
-BOOL    BUS_bSendMessage            (sBus_t*        psBus, 
-                                     uint8_t*       puReceiver, 
-                                     uint8_t*       puLen, 
-                                     uint8_t*       puMsg);
+BOOL    BUS_bSendMessage             (sBus_t*        psBus,
+                                       uint8_t*       puReceiver,
+                                       uint8_t*       puLen,
+                                       uint8_t*       puMsg);
+
+BOOL    BUS_bIsIdle                  (sBus_t*       psBus);
 
 #ifdef BUS_SCHEDULER
 BOOL    BUS_bSchedulAddNode         (sBus_t*        psBus,
-                                    uint8_t         uNodeAddress);
+                                      uint8_t       uNodeAddress);
 
 BOOL    BUS_bScheduleAndGetMessage  (sBus_t*        psBus);
 #endif

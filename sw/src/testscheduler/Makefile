@@ -32,7 +32,7 @@ DEBUG = stabs
 CSTANDARD = -std=gnu99
 
 # Place -D or -U options here
-CDEFS = -DF_CPU=16000000 -DBUS_SCHEDULER
+CDEFS = -DF_CPU=16000000
 
 # Place -I options here
 CINCS = -I../include \

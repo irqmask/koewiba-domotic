@@ -7,6 +7,8 @@ FORMAT = ihex
 TARGET = testprotocol
 SRC = ../shared/bus_phy.c \
       ../shared/bus_transport.c \
+      ../shared/clock.c \
+      ../shared/led_debug.c \
       main_testprotocol.c
 
 

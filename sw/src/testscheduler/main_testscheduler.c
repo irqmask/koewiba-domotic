@@ -45,14 +45,21 @@ static sClkTimer_t g_sLedTimer;
 
 int main(void)
 {
+	uint8_t ii;
     uint8_t msglen = 0;
-    uint8_t msgfrom = 0;
+    //uint8_t msgfrom = 0;
     uint8_t msg[BUS_MAXMSGLEN];
 
     CLK_vInitialize();
     BUS_vConfigure(&g_sBus, 2); // configure a bus node with address 2
     BUS_vInitialize(&g_sBus, 0);// initialize bus on UART 0
 
+    // add own address
+    BUS_bSchedulAddNode(&g_sBus, 1);
+    // add nodes with addresses 2..BUS_MAXNODES-1
+    for (ii=2; ii<BUS_MAXNODES; ii++) {
+        if (!BUS_bSchedulAddNode(&g_sBus, ii))	break;
+    }
 
     vInitLedAndKeys();
     sei();

@@ -18,6 +18,9 @@
 // --- Include section ---------------------------------------------------------
 
 #include "bus_intern.h"
+
+// TODO remove after debug
+#include <util/delay.h>
 #include "led_debug.h"
 
 // --- Definitions -------------------------------------------------------------
@@ -72,7 +75,8 @@ BOOL bReceive(sBus_t* psBus)
             // token received?
             if (u & 0x80) {
                 // is it me?
-				vResetBus(psBus);
+				vResetBus(psBus); // TODO RM why reset bus when everything is OK?
+				                  // TODO RM uOverallLength will be reseted, too
                 if ((u & 0x7F) == (psBus->sCfg.uOwnNodeAddress & 0x007f)) {
                     psBus->eState = eBus_GotToken;
                 } else {
@@ -93,11 +97,13 @@ BOOL bReceive(sBus_t* psBus)
             // 3. byte: LE - Length of message from AR to CRCL
             if (psBus->sRecvMsg.uOverallLength == 2) {
                 // check correctness of length
-                if ((u > BUS_MAXBIGMSGLEN)||(0==u)) {
-					vStatusLED_on();
+                if ((u > BUS_MAXBIGMSGLEN) || (0==u)) {
+                	// length is zero or length is too big
+                    vResetBus(psBus); // wait for next message on bus
+                    //TODO remove LED blinking and delays after debug
+                    vStatusLED_on();
 					_delay_ms(50);
 					vStatusLED_off();
-                    vResetBus(psBus);
                     break;
                 }
                 psBus->sRecvMsg.uLength = u;
@@ -106,6 +112,7 @@ BOOL bReceive(sBus_t* psBus)
             } else if (psBus->sRecvMsg.uOverallLength == 3) {
                 // check correctness of receiver address
                 if (u & 0x80) {
+                	// bad receiver address. valid range is 0x00..0x7F
                     vResetBus(psBus);
                     break;
                 }
@@ -126,7 +133,7 @@ BOOL bReceive(sBus_t* psBus)
                 // check receiver address again
                 // TODO
                 
-            // receive data (5th byte till length + 3(SY+AS+LE) - 2(crc))
+            // receive data (5th byte till length + 3(SY+AS+LE) - 2(CRC))
             } else if ((psBus->sRecvMsg.uOverallLength > 4) &&
                        (psBus->sRecvMsg.uOverallLength < psBus->sRecvMsg.uLength + 3 - 2)) {
                 // save message data
@@ -146,7 +153,8 @@ BOOL bReceive(sBus_t* psBus)
                     psBus->bSchedMsgReceived = TRUE;
 #endif
                     psBus->eState = eBus_Idle;
-					vResetBus(psBus);
+					vResetBus(psBus); // TODO RM/CV: why reset the bus when everything is OK?
+									  // TODO RM/CV: message may be overwritten by next message!
 					break;
                 }
                 

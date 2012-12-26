@@ -9,6 +9,7 @@ SRC = ../shared/bus_phy.c \
       ../shared/bus_schedul.c \
       ../shared/bus_transport.c \
       ../shared/clock.c \
+      ../shared/led_debug.c \
       main_testscheduler.c
 
 

@@ -15,6 +15,7 @@
 #include <avr/io.h>
 #include <util/delay.h>
 
+#include "bus.h"
 #include "bus_intern.h"
 
 // --- Definitions -------------------------------------------------------------
@@ -69,8 +70,7 @@ void BUS__vSchedulConfigure(sBus_t* psBus)
 
     psBus->uCurrentNode = BUS_MAXNODES - 1;
     for (ii=0; ii<BUS_MAXNODES; ii++) {
-        psBus->asNodeList[ii].uAddress = ii;
-        //psBus->asNodeList[ii].uAddress = 0;
+        psBus->asNodeList[ii].uAddress = 0;
         psBus->asNodeList[ii].uErrCnt = 0;
     }
     psBus->auTokenMsg[0] = BUS_SYNCBYTE;
@@ -97,9 +97,14 @@ BOOL BUS_bSchedulAddNode(sBus_t* psBus, uint8_t uNodeAddress)
     if ((uNodeAddress < 1) || (uNodeAddress > 127)) {
         return FALSE;
     }
-    // search free place in nodelist
+
+    // search if node is already in the list
     for (ii=0; ii<BUS_MAXNODES; ii++) {
         if (psBus->asNodeList[ii].uAddress == uNodeAddress) return FALSE; // Adresse
+    }
+
+    // search a free place in node list
+    for (ii=0; ii<BUS_MAXNODES; ii++) {
         if (psBus->asNodeList[ii].uAddress == 0) {
             psBus->asNodeList[ii].uAddress = uNodeAddress;
             return TRUE;
@@ -155,8 +160,8 @@ BOOL BUS_bScheduleAndGetMessage(sBus_t* psBus)
 
     if (psBus->bSchedWaitingForAnswer) {
         if (psBus->bSchedMsgReceived) {
-            // TODO check node ID of received message
-
+            // TODO check node ID of received message and route eventually
+        	//      to other line or net
             psBus->bSchedMsgReceived = FALSE;
             psBus->bSchedWaitingForAnswer = FALSE;
             psBus->eState = eBus_Idle;

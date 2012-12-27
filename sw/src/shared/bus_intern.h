@@ -27,7 +27,7 @@
 #define BUS_INTERBYTE_TIMEOUT   (8 * BUS_BITTIME)
 
 //! synchronization byte every message begins with.
-#define BUS_SYNCBYTE            0b10011010 
+#define BUS_SYNCBYTE            0b10011010
 
 // --- Type definitions --------------------------------------------------------
 

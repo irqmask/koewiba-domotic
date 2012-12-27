@@ -36,8 +36,10 @@ static sClkTimer_t g_sLedTimer;
 
 int main(void)
 {
+	uint8_t ii;
     uint8_t msglen = 0;
     uint8_t msg[BUS_MAXMSGLEN];
+    uint16_t sender = 0;
 
     CLK_vInitialize();
 
@@ -49,10 +51,21 @@ int main(void)
 
     CLK_bTimerStart(&g_sLedTimer, 1000);
 
+    sender = 1; msglen = 1;
+	for (ii=0; ii<msglen; ii++) {
+		msg[ii] = 0;
+	}
+    BUS_bSendMessage(&g_sBus, sender, msglen, msg);
+
     while (1) {
         // check for message and read it
         if (BUS_bGetMessage(&g_sBus)) {
-            BUS_bReadMessage(&g_sBus, &msglen, &msglen, msg);
+            if (BUS_bReadMessage(&g_sBus, &sender, &msglen, msg)) {
+            	for (ii=0; ii<msglen; ii++) {
+            		msg[ii]++;
+            	}
+            	BUS_bSendMessage(&g_sBus, sender, msglen, msg);
+            }
         }
     }
     return 0;

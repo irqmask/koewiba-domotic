@@ -47,11 +47,11 @@ int main(void)
 {
 	uint8_t ii;
     uint8_t msglen = 0;
-    //uint8_t msgfrom = 0;
+    uint16_t sender = 0;
     uint8_t msg[BUS_MAXMSGLEN];
 
     CLK_vInitialize();
-    BUS_vConfigure(&g_sBus, 2); // configure a bus node with address 2
+    BUS_vConfigure(&g_sBus, 1); // configure a bus node with address 1
     BUS_vInitialize(&g_sBus, 0);// initialize bus on UART 0
 
     // add own address
@@ -68,7 +68,12 @@ int main(void)
 
     while (1) {
         if (BUS_bScheduleAndGetMessage(&g_sBus)) {
-            BUS_bReadMessage(&g_sBus, &msglen, &msglen, msg);
+            if (BUS_bReadMessage(&g_sBus, &sender, &msglen, msg)) {
+            	for (ii=0; ii<msglen; ii++) {
+            		msg[ii]++;
+            	}
+            	BUS_bSendMessage(&g_sBus, sender, msglen, msg);
+            }
         }
 
         if (CLK_bTimerIsElapsed(&g_sLedTimer)) {

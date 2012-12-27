@@ -303,7 +303,7 @@ BOOL BUS_bGetMessage(sBus_t* psBus)
  * @returns TRUE, if a message has been received and.
  */
 BOOL BUS_bReadMessage(sBus_t*  psBus, 
-                        uint8_t* puSender,
+                        uint16_t* puSender,
                         uint8_t* puLen,
                         uint8_t* puMsg)
 {
@@ -316,7 +316,7 @@ BOOL BUS_bReadMessage(sBus_t*  psBus,
         }
         *puSender   = psBus->sRecvMsg.uSender;
         
-        while (len < psBus->sRecvMsg.uLength - 3) {
+        while (len < psBus->sRecvMsg.uLength - 4) {
             puMsg[len] = psBus->sRecvMsg.auBuf[len];
             len ++;
         }
@@ -344,14 +344,14 @@ BOOL BUS_bReadMessage(sBus_t*  psBus,
  * @returns TRUE, if the message has successfully been queued.
  * @note Use BUS_bIsIdle() to check if message is successfully transmitted.
  */
-BOOL BUS_bWriteMessage(sBus_t*    psBus,
-                         uint16_t   uReceiver,
-                         uint8_t    uLen,
-                         uint8_t*   puMsg)
+BOOL BUS_bSendMessage(sBus_t*    psBus,
+                        uint16_t   uReceiver,
+                        uint8_t    uLen,
+                        uint8_t*   puMsg)
 {
     do {
     	// check length of message to be sent.
-        if (uLen > BUS_MAXMSGLEN-7) {
+        if (uLen == 0 || uLen > BUS_MAXMSGLEN) {
         	break;
         }
         // prepare message header
@@ -359,7 +359,7 @@ BOOL BUS_bWriteMessage(sBus_t*    psBus,
         psBus->sSendMsg.uLength = 0;
         psBus->sSendMsg.auBuf[psBus->sSendMsg.uOverallLength++] = BUS_SYNCBYTE;
         psBus->sSendMsg.auBuf[psBus->sSendMsg.uOverallLength++] = psBus->sCfg.uOwnNodeAddress & 0x007F;
-        psBus->sSendMsg.auBuf[psBus->sSendMsg.uOverallLength++] = uLen + 2;
+        psBus->sSendMsg.auBuf[psBus->sSendMsg.uOverallLength++] = uLen + 4;
         psBus->sSendMsg.auBuf[psBus->sSendMsg.uOverallLength++] = uReceiver & 0x007F;
         // EA - Extended address 4bit sender in higher nibble, 4bit receiver in lower nibble.
         psBus->sSendMsg.auBuf[psBus->sSendMsg.uOverallLength++] =

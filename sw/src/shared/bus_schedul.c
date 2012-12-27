@@ -56,6 +56,21 @@ void vNodeError(sBus_t* psBus)
     }
 }
 
+/**
+ * Check if current node is the scheduler node.
+ */
+BOOL bCurrNodeIsMe(sBus_t* psBus)
+{
+    sNodeInfo_t* node;
+
+    node = &psBus->asNodeList[psBus->uCurrentNode];
+
+    if (node->uAddress == psBus->sCfg.uOwnNodeAddress) {
+    	return TRUE;
+    }
+    return FALSE;
+}
+
 // --- Module global functions -------------------------------------------------
 
 /**
@@ -145,8 +160,15 @@ BOOL BUS_bScheduleAndGetMessage(sBus_t* psBus)
     case eBus_SendingToken:
         // wait for finished token sending
         if (!BUS__bPhySending(&psBus->sPhy)) {
-            psBus->bSchedWaitingForAnswer = TRUE;
-            psBus->eState = eBus_ReceivingWait;
+        	if (bCurrNodeIsMe(psBus)) {
+        		// The scheduler cannot receive its own message,
+        		// so we set the state to eBus_GotToken "manually".
+        	    psBus->eState = eBus_GotToken;
+        	} else {
+        		// Token has been sent, now wait for a message.
+                psBus->bSchedWaitingForAnswer = TRUE;
+                psBus->eState = eBus_ReceivingWait;
+        	}
         } else {
             //TODO CV: timeout and error handling, if token is not sent
         }

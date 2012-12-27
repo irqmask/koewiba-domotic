@@ -24,6 +24,8 @@
 
 #define BUS_BAUDRATE           38400
 #define BUS_MAXMSGLEN          16
+//! length of message including header and footer
+#define BUS_MAXTOTALMSGLEN		(BUS_MAXMSGLEN + 7)
 #define BUS_MAXBIGMSGLEN       (64 + 2)
 #define BUS_EMPTY_MSG_LEN      3
 #define BUS_TOKEN_MSG_LEN      2
@@ -61,7 +63,7 @@ typedef struct busconfig {
 } sBusCfg_t;
 
 typedef uint8_t auRecBuf_t[BUS_MAXBIGMSGLEN];
-typedef uint8_t auSndBuf_t[BUS_MAXMSGLEN];
+typedef uint8_t auSndBuf_t[BUS_MAXTOTALMSGLEN];
 
 //! common receive queue
 typedef struct recvbuf {
@@ -146,13 +148,13 @@ void    BUS_vInitialize             (sBus_t*        psBus,
 BOOL    BUS_bGetMessage             (sBus_t*        psBus);
 
 BOOL    BUS_bReadMessage            (sBus_t*        psBus, 
-                                       uint8_t*       puSender,
+                                       uint16_t*      puSender,
                                        uint8_t*       puLen,
                                        uint8_t*       puMsg);
                                      
 BOOL    BUS_bSendMessage             (sBus_t*        psBus,
-                                       uint8_t*       puReceiver,
-                                       uint8_t*       puLen,
+                                       uint16_t        uReceiver,
+                                       uint8_t         uLen,
                                        uint8_t*       puMsg);
 
 BOOL    BUS_bIsIdle                  (sBus_t*       psBus);

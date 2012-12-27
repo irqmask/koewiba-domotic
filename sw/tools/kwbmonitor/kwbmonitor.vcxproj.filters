@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="libSrc">
+      <UniqueIdentifier>{270ad8d2-c572-4c16-af02-019b7b9c5301}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\src\PortableSerialLib.c">
+      <Filter>libSrc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\PortableSerialLibLinux.c">
+      <Filter>libSrc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\PortableSerialLibWindows.c">
+      <Filter>libSrc</Filter>
+    </ClCompile>
+    <ClCompile Include="PortableSerialLibTest.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\src\PortableSerialLib.h">
+      <Filter>libSrc</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\src\doxy\mainfile.dox">
+      <Filter>libSrc</Filter>
+    </None>
+  </ItemGroup>
+</Project>

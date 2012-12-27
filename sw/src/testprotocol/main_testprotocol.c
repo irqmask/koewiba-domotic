@@ -51,7 +51,7 @@ int main(void)
 
     CLK_bTimerStart(&g_sLedTimer, 1000);
 
-    sender = 1; msglen = 1;
+    sender = 1; msglen = 16;
 	for (ii=0; ii<msglen; ii++) {
 		msg[ii] = 0;
 	}

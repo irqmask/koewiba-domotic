@@ -185,7 +185,10 @@ void vThdParseMessage(uint8_t uNewByte, sBusHistory_t* psBus)
     }
 
     // fill line
-    for (i=0; i<(BUS_MAXTOTALMSGLEN-psBus->uCurrMsgBytes); i++) printf("   ");
+    if (msgstatus != eMsgNothing) {
+        for (i=0; i<(BUS_MAXTOTALMSGLEN-psBus->uCurrMsgBytes); i++) printf("   ");
+        psBus->uCurrMsgBytes = 0;
+    }
 
     // print status at end of line
     switch (msgstatus) {
@@ -193,15 +196,12 @@ void vThdParseMessage(uint8_t uNewByte, sBusHistory_t* psBus)
         break;
     case eMsgError:
         printf("| ERR stray bytes\r\n");
-        psBus->uCurrMsgBytes = 0;
         break;
     case eMsgToken:
         printf("| TOKEN\r\n");
-        psBus->uCurrMsgBytes = 0;
         break;
     case eMsgEmpty:
         printf("| EMPTY MESSAGE\r\n");
-        psBus->uCurrMsgBytes = 0;
         break;
     case eMsgComplete:
         printf("| MESSAGE");
@@ -210,7 +210,6 @@ void vThdParseMessage(uint8_t uNewByte, sBusHistory_t* psBus)
         } else {
             printf("\r\n");
         }
-        psBus->uCurrMsgBytes = 0;
         break;
     default:
         break;

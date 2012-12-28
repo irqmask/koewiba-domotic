@@ -1,6 +1,6 @@
 #include "system.h"
 
-#ifdef _SYS_LINUX
+#ifdef _SYS_LINUX_
 #include <sys/time.h>
 #endif
 #ifdef _SYS_WINDOWS_
@@ -9,7 +9,7 @@
 
 #include "systime.h"
 
-#ifdef _SYS_LINUX
+#ifdef _SYS_LINUX_
 
 uSysTime_t SYS_uGetTimeUSecs(void)
 {
@@ -34,13 +34,13 @@ uSysTime_t SYS_uGetTimeUSecs(void)
 	freq.QuadPart = 0;
 
 	QueryPerformanceCounter(&usecs);
-	
+
 	if (QueryPerformanceFrequency(&freq) && freq.QuadPart > 0) {
 		temp = usecs.QuadPart * 1000000;
 		temp /= freq.QuadPart;
 		usecs.QuadPart = (uSysTime_t)temp;
 	}
-	
+
 	return (uSysTime_t)usecs.QuadPart;
 }
 #endif

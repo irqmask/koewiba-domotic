@@ -7,7 +7,7 @@ Router - Verbindet mehrere Segmente der gleicher oder unterschiedlicher Topologi
 Anforderungen
 -------------
 Alle Netzteilnehmer koennen miteinander kommunizieren.
-Netzsegmente koennen Ueber Routercontroller miteinander verbunden werden.
+Netzsegmente koennen ueber Routercontroller miteinander verbunden werden.
 Alle Netzteilnehmer haben eine eindeutige Adresse.
 
 
@@ -27,9 +27,9 @@ Kommunikationsablauf:
 Fehlersituationen:
 
  * Ein Sender sendet nicht, nachdem das Token verschickt wurde:
-   Jeder Sender muss innerhalb von 2Bytes Sendezeit auf das Token antworten, an sonsten wird nach einer Pause von einem weiteren Byte mit dem nÃ¤chsten Token weitergemacht. Damit sieht es auf dem Bus so aus, wie eine neue Runde Kommunikation.
+   Jeder Sender muss innerhalb von 2Bytes Sendezeit auf das Token antworten, an sonsten wird nach einer Pause von einem weiteren Byte mit dem naechsten Token weitergemacht. Damit sieht es auf dem Bus so aus, wie eine neue Runde Kommunikation.
  * Der Master faellt aus:
-   Der Master kann mit einer Nachricht Stellvertreter ernennen. Wird innerhalb von 10Bytes Sendezeit kein Token empfangen, Ã¼bernimmt der Vertreter das Takten des Busses.
+   Der Master kann mit einer Nachricht Stellvertreter ernennen. Wird innerhalb von 10Bytes Sendezeit kein Token empfangen, uebernimmt der Vertreter das Takten des Busses.
 
 
 Nachrichtenformate auf dem Bus
@@ -72,9 +72,12 @@ LE - Length of message == 0
 Adressierung der Busteilnehmer:
 
 Damit dürfen keine zwei Teilnehmer mit identischen unteren 7bits der Adresse in einem Segment liegen.
-Die Adresse für Nachrichten an alle "Broadcasts" ist 0b11111111111 = 0x3FF.
-Die Adresse für Nachriten an alle Teilnehmer eines Segments ist 0b1111111 = 0x7F.
-Der Busteilnehmer, welcher das Takten des Busses übernimmt, also der Master, hat die Adresse 0.
+Die Adresse für Nachrichten an alle "Broadcasts" ist 0b011111111111 = 0x7FF.
+Die Adresse für Nachriten an alle Teilnehmer eines Segments ist 0b01111111 = 0x7F.
+Der Busteilnehmer, welcher das Takten des Busses übernimmt, also der Master, hat die Adresse 1.
 
 
+
+High-Level Kommunikationsprotokoll (Anwendungsschicht)
+-------------------------------------------------------
 

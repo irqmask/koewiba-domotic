@@ -43,7 +43,7 @@ int main(void)
 
     CLK_vInitialize();
 
-    BUS_vConfigure(&g_sBus, 2); // configure a bus node with address 2
+    BUS_vConfigure(&g_sBus, 3); // configure a bus node with address 2
     BUS_vInitialize(&g_sBus, 0);// initialize bus on UART 0
 
     vInitLedAndKeys();

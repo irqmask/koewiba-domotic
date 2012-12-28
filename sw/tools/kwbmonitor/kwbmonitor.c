@@ -30,8 +30,25 @@
 #include <stdlib.h>
 #include <string.h>
 #include "PortableSerialLib.h"
+#include "bus.h"
+#include "systime.h"
 
-PSerLibHandle_t port = PSL_NOPORT_HANDLE;
+typedef double float_t;
+
+typedef struct bushistory {
+    uSysTime_t      uTimeStart;
+    uSysTime_t      uTimeLastByte;
+    uSysTime_t      uTimeCurrByte;
+    uint8_t         uCurrMsgBytes;
+    uint8_t         uExpectedLength;
+    uint16_t        uExpectedCRC;
+    uint8_t         uCurrSender;
+    uint8_t         auMessage[BUS_MAXTOTALMSGLEN+10];
+} sBusHistory_t;
+
+PSerLibHandle_t g_sSerPort = PSL_NOPORT_HANDLE;
+sBusHistory_t   g_sBusHistory;
+
 
 void listPorts(void)
 {
@@ -58,9 +75,9 @@ void listPorts(void)
 void printUsage(void)
 {
     printf(
-        "PortableSerialLibTest   simple programm to test portable serial port lib\n"
+        "kwbmonitor - KoeWiBa domotic bus monitor\n"
         "\n"
-        "Usage:   PortableSerialLibTest [Options] \n"
+        "Usage:       kwbmonitor [Options] \n"
         "Options:\n"
         "  -p, --port arg           port to open\n"
         "  -b, --baudrate arg       baud rate to use 'baud' shall be an integral number\n"
@@ -71,24 +88,151 @@ void printUsage(void)
     );
 }
 
+float_t uCurrTimeDiff(sBusHistory_t* psBus)
+{
+    return (float_t)(psBus->uTimeCurrByte - psBus->uTimeStart) / 1000.0;
+}
+
+float_t uLastTimeDiff(sBusHistory_t* psBus)
+{
+    return (float_t)(psBus->uTimeLastByte - psBus->uTimeStart) / 1000.0;
+}
+
+void vThdInitBusHistory(sBusHistory_t* psBus)
+{
+    psBus->uTimeStart = SYS_uGetTimeUSecs();
+    psBus->uTimeCurrByte = 0;
+    psBus->uTimeLastByte = 0;
+    psBus->uCurrMsgBytes = 0;
+}
+
+void vThdParseMessage(uint8_t uNewByte, sBusHistory_t* psBus)
+{
+    uint8_t i;
+
+    enum {
+        eMsgNothing,
+        eMsgError,
+        eMsgToken,
+        eMsgEmpty,
+        eMsgComplete
+    } msgstatus;
+
+    msgstatus = eMsgNothing;
+
+    psBus->uTimeLastByte = psBus->uTimeCurrByte;
+    psBus->uTimeCurrByte = SYS_uGetTimeUSecs();
+
+    if (psBus->uCurrMsgBytes == 0) {
+        printf("%9.1f | ", uCurrTimeDiff(psBus));
+    }
+    printf("%02X ", uNewByte);
+
+    // compute status of message
+    if (psBus->uCurrMsgBytes == 0) {
+        // check for sync byte
+        if (uNewByte != 0x9a) {
+            msgstatus = eMsgError;
+        }
+        psBus->auMessage[psBus->uCurrMsgBytes] = uNewByte;
+
+    } else if (psBus->uCurrMsgBytes == 1) {
+        // check if token or message
+        if (uNewByte & 0x80) {
+            msgstatus = eMsgToken;
+        }
+        psBus->uCurrSender = uNewByte & 0x7F;
+        psBus->auMessage[psBus->uCurrMsgBytes] = uNewByte;
+
+    } else if (psBus->uCurrMsgBytes == 2) {
+        // check length
+        if (uNewByte == 0) {
+            msgstatus = eMsgEmpty;
+        } else if (uNewByte > BUS_MAXTOTALMSGLEN) {
+            msgstatus = eMsgError;
+        } else {
+            psBus->uExpectedLength = uNewByte;
+        }
+        psBus->auMessage[psBus->uCurrMsgBytes] = uNewByte;
+
+    } else if (psBus->uCurrMsgBytes == 3) {
+        // check address receiver
+        if (uNewByte & 0x80) {
+            msgstatus = eMsgError;
+        } else
+            psBus->auMessage[psBus->uCurrMsgBytes] = uNewByte;
+
+    } else if (psBus->uCurrMsgBytes == 4) {
+        // extended address
+        psBus->auMessage[psBus->uCurrMsgBytes] = uNewByte;
+
+    } else if (psBus->uCurrMsgBytes < 3 + psBus->uExpectedLength - 2) {
+        // message data
+        psBus->auMessage[psBus->uCurrMsgBytes] = uNewByte;
+
+    } else if (psBus->uCurrMsgBytes == 3 + psBus->uExpectedLength - 2) {
+        // CRC high byte
+        psBus->uExpectedCRC = uNewByte << 8;
+
+    } else if (psBus->uCurrMsgBytes == 3 + psBus->uExpectedLength - 1) {
+        // CRC high byte
+        psBus->uExpectedCRC |= (uNewByte & 0xFF);
+        msgstatus = eMsgComplete;
+    }
+    psBus->uCurrMsgBytes++;
+    if (psBus->uCurrMsgBytes >= BUS_MAXTOTALMSGLEN+9) {
+        msgstatus = eMsgError;
+    }
+
+    // fill line
+    for (i=0; i<(BUS_MAXTOTALMSGLEN-psBus->uCurrMsgBytes); i++) printf("   ");
+
+    // print status at end of line
+    switch (msgstatus) {
+    case eMsgNothing:
+        break;
+    case eMsgError:
+        printf("| ERR stray bytes\r\n");
+        psBus->uCurrMsgBytes = 0;
+        break;
+    case eMsgToken:
+        printf("| TOKEN\r\n");
+        psBus->uCurrMsgBytes = 0;
+        break;
+    case eMsgEmpty:
+        printf("| EMPTY MESSAGE\r\n");
+        psBus->uCurrMsgBytes = 0;
+        break;
+    case eMsgComplete:
+        printf("| MESSAGE");
+        if (psBus->uExpectedCRC != 0) {
+            printf(" BAD CRC\r\n");
+        } else {
+            printf("\r\n");
+        }
+        psBus->uCurrMsgBytes = 0;
+        break;
+    default:
+        break;
+    }
+}
+
 
 ThreadFunc(readerThread)
 {
     unsigned char buffer[200];
-    int bytesread, chars = 0;
+    int bytesread;
+
+    vThdInitBusHistory(&g_sBusHistory);
 
     while(42) {
         bytesread = 0;
-        PSerLib_readBinaryData(port, buffer, 1, &bytesread);
+        PSerLib_readBinaryData(g_sSerPort, buffer, 1, &bytesread);
         if (bytesread > 0) {
-            printf("%02X ", buffer[0]);
-            chars++;
-            if (chars >= 16) {
-                printf("\r\n");
-                chars = 0;
-            }
+            vThdParseMessage(buffer[0], &g_sBusHistory);
         }
     }
+    return 0;
 }
 
 
@@ -97,11 +241,12 @@ int main(int argc, char* argv[])
     int i;
     bool cmdlineError=false;
     const char* portname = "COM1";
-    int  baudrate = 9600;
+    int  baudrate = 38400;
     PSL_ErrorCodes_e ec;
     PSL_FlowControl_e flowControl = PSL_FC_none;
 
-    setbuf(stdout, NULL);
+    setbuf(stdout, NULL);       // disable buffering of stdout
+
     for (i=1; (i<argc)&&(!cmdlineError); ++i) {
         if (strcmp(argv[i], "--listports") == 0) {
             listPorts();
@@ -161,20 +306,12 @@ int main(int argc, char* argv[])
         return 1;
     }
 
-    ec = PSerLib_open(portname, &port);
+    ec = PSerLib_open(portname, &g_sSerPort);
     if (ec == PSL_ERROR_none) {
-        ec = PSerLib_setParams(port, baudrate, PSL_DB_8, PSL_P_none, PSL_SB_1, flowControl);
-
+        ec = PSerLib_setParams(g_sSerPort, baudrate, PSL_DB_8, PSL_P_none, PSL_SB_1, flowControl);
         if (ec == PSL_ERROR_none) {
-            int n = 0;
-            char buff[100];
-
-            //readerThread(NULL);
             startThread(&readerThread);
             while(42) {
-                snprintf(buff, sizeof(buff), "Hello World! -%d-\n", n);
-                //PSerLib_puts(port, buff);
-                ++n;
                 sleep_ms(1000);
             }
         }
@@ -184,6 +321,6 @@ int main(int argc, char* argv[])
         printf("error: %s\n", PSerLib_getErrorMessage(ec));
     }
 
-    PSerLib_close(&port);
+    PSerLib_close(&g_sSerPort);
     return ec == PSL_ERROR_none;
 }

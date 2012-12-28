@@ -7,10 +7,10 @@ TOOLPREFIX=
 
 PROJECT=kwbmonitor
 
-SRC_FILES += kwbmonitor.c
+SRC_FILES += kwbmonitor.c systime.c
 SRC_FILES += PortableSerialLib.c
 
-INCLUDES += -I./
+INCLUDES += -I./ -I../../src/shared -I../../src/include
 
 LIBS += -lpthread
 # LIBS += -lusb

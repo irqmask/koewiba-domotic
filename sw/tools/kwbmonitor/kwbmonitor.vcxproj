@@ -11,10 +11,10 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{AC9F8DBD-0A11-4A4C-B8E4-A99C954CBF34}</ProjectGuid>
+    <ProjectGuid>{0B5BF48D-91EF-46E7-A725-A304826D7241}</ProjectGuid>
     <RootNamespace>PortableSerialLibTestWin</RootNamespace>
     <Keyword>Win32Proj</Keyword>
-    <ProjectName>PortableSerialLibTest</ProjectName>
+    <ProjectName>kwbmonitor</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
@@ -90,22 +90,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\src\PortableSerialLib.c" />
-    <ClCompile Include="..\src\PortableSerialLibLinux.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\src\PortableSerialLibWindows.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="PortableSerialLibTest.c" />
+    <ClCompile Include="kwbmonitor.c" />
+    <ClCompile Include="PortableSerialLib.c" />
+    <ClCompile Include="PortableSerialLibLinux.c" />
+    <ClCompile Include="PortableSerialLibWindows.c" />
+    <ClCompile Include="systime.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\src\PortableSerialLib.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\src\doxy\mainfile.dox" />
+    <ClInclude Include="config.h" />
+    <ClInclude Include="PortableSerialLib.h" />
+    <ClInclude Include="system.h" />
+    <ClInclude Include="systime.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

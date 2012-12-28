@@ -1,5 +1,6 @@
+#include "system.h"
 
-#ifdef _MSC_VER
+#ifdef _SYS_WINDOWS_
 #  ifndef _WIN32_WINNT            // Gibt an, dass Windows Vista die mindestens erforderliche Plattform ist.
 #    define _WIN32_WINNT 0x0600     // Ändern Sie den entsprechenden Wert, um auf andere Versionen von Windows abzuzielen.
 #  endif
@@ -7,7 +8,6 @@
 #  define bool  int
 #  define true  (1==1)
 #  define false (1==0)
-#  define sleep_ms(x) do{Sleep(x);}while(0)
 #  define snprintf sprintf_s
 #  define ThreadFunc(name) DWORD WINAPI name( LPVOID p)
 #  define startThread(func)  do{                 \
@@ -18,7 +18,7 @@
 #  include <pthread.h>
 #  include <unistd.h>
 #  include <stdbool.h>
-#  define sleep_ms(x) do{usleep((x)*1000);}while(0)
+
 #  define ThreadFunc(name) void *name(void *p)
 #  define startThread(func)  do{                 \
                                pthread_t tid;   \
@@ -30,8 +30,12 @@
 #include <stdlib.h>
 #include <string.h>
 #include "PortableSerialLib.h"
-#include "bus.h"
 #include "systime.h"
+
+//! (netto) length of the message
+#define BUS_MAXMSGLEN          16
+//! length of message including header and footer
+#define BUS_MAXTOTALMSGLEN		(BUS_MAXMSGLEN + 7)
 
 typedef double float_t;
 
@@ -311,7 +315,7 @@ int main(int argc, char* argv[])
         if (ec == PSL_ERROR_none) {
             startThread(&readerThread);
             while(42) {
-                sleep_ms(1000);
+                SYS_vSleepMs(1000);
             }
         }
     }

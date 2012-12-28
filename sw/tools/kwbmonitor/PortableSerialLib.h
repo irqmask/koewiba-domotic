@@ -21,7 +21,7 @@
 #ifndef _PortableSerialLib_h__3322127
 #define _PortableSerialLib_h__3322127
 
-#include <inttypes.h>
+#include <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {

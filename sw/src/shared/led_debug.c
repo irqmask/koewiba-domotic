@@ -58,6 +58,14 @@ void vToggleErrorLED(void)
 {
     PORTD ^= LED_ERROR;
 }
+void vErrorLED_on(void)
+{
+    PORTD |= LED_ERROR;
+}
+void vErrorLED_off(void)
+{
+    PORTD &= ~LED_ERROR;
+}
 
 // --- Module global functions -------------------------------------------------
 

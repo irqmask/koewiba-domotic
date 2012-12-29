@@ -16,6 +16,7 @@
 #include <avr/interrupt.h>
 #include "ucontroller.h"
 #include "bus_intern.h"
+// TODO remove after debug
 #include "led_debug.h"
 
 // --- Switches ----------------------------------------------------------------
@@ -94,10 +95,8 @@ ISR(INTERRUPT_UART_TRANS)
 /**
  * Initialize data and hardware of bus's physical layer.
  * 
- * @param[in] psPhy
- * Handle of bus physical layer.
- * @param[in] uUart
- * Number of the UART. 0=first.
+ * @param[in] psPhy		Handle of bus physical layer.
+ * @param[in] uUart		Number of the UART. 0=first.
  */
 void BUS__vPhyInitialize(sBusPhy_t* psPhy, uint8_t uUart)
 {
@@ -123,10 +122,9 @@ void BUS__vPhyInitialize(sBusPhy_t* psPhy, uint8_t uUart)
 /**
  * Activate or deactivate bus's sender hardware (driver).
  *
- * @param[in] psPhy
- * Handle of bus physical layer.
+ * @param[in] psPhy		Handle of bus physical layer.
  * @param[in] bActivate
- * TRUE: activate sender, FALSE: deactivate sender.
+ * @returns TRUE: activate sender, FALSE: deactivate sender.
  */
 void BUS__vPhyActivateSender(sBusPhy_t* psPhy, BOOL bActivate)
 {
@@ -143,10 +141,9 @@ void BUS__vPhyActivateSender(sBusPhy_t* psPhy, BOOL bActivate)
 /**
  * Activate or deactivate bus's receiver hardware.
  *
- * @param[in] psPhy
- * Handle of bus physical layer.
+ * @param[in] psPhy		Handle of bus physical layer.
  * @param[in] bActivate
- * TRUE: activate receiver, FALSE: deactivate receiver.
+ * @returns TRUE: activate receiver, FALSE: deactivate receiver.
  */
 void BUS__vPhyActivateReceiver(sBusPhy_t* psPhy, BOOL bActivate)
 {
@@ -158,16 +155,30 @@ void BUS__vPhyActivateReceiver(sBusPhy_t* psPhy, BOOL bActivate)
     }
 }
 
+void BUS__vDebugSend(uint8_t *data, uint8_t len)
+{
+	uint8_t ii;
+	REGISTER_UCSRB &= ~(1<<REGBIT_TXCIE);
+	UART_PORT |= UART_RECVSTOP;
+	UART_PORT |= UART_DRIVER;
+	for(ii=0;ii<len;ii++) {
+		REGISTER_UDR = data[ii];   // send byte
+		while ( !( UCSRA & (1<<UDRE)) ) {};
+	}
+	while ( !( UCSRA & (1<<TXC)) ) {};
+	UCSRA |= (1<<TXC);
+	UART_PORT &= ~UART_DRIVER;
+	UART_PORT &= ~UART_RECVSTOP;
+	REGISTER_UCSRB |= (1<<REGBIT_TXCIE);
+}
+
 /**
  * Send given number of data on the bus.
  * Sending is initiated, if the previous sending process finished.
  *
- * @param[in] psPhy
- * Handle of bus physical layer.
- * @param[in] puMsg
- * Pointer to message to be sent.
- * @param[in] uLen
- * Length in bytes of mesage to be sent.
+ * @param[in] psPhy	 	Handle of bus physical layer.
+ * @param[in] puMsg		Pointer to message to be sent.
+ * @param[in] uLen		Length in bytes of mesage to be sent.
  *
  * @returns TRUE: sending successfully initiated, otherwise FALSE.
  */
@@ -190,10 +201,9 @@ BOOL BUS__bPhySend(sBusPhy_t* psPhy, const uint8_t* puMsg, uint8_t uLen)
 /**
  * Checks if data is currently beeing sent.
  *
- * @param[in] psPhy
- * Handle of bus physical layer.
+ * @param[in] psPhy		Handle of bus physical layer.
  *
- * @returns TRUE: sending in progress.
+ * @returns TRUE: 		sending in progress.
  */
 BOOL BUS__bPhySending(sBusPhy_t* psPhy)
 {
@@ -203,8 +213,7 @@ BOOL BUS__bPhySending(sBusPhy_t* psPhy)
 /**
  * Checks if data has been received.
  *
- * @param[in] psPhy
- * Handle of bus physical layer.
+ * @param[in] psPhy		Handle of bus physical layer.
  *
  * @returns TRUE: at least one byte is waiting in receive buffer.
  */
@@ -241,10 +250,8 @@ uint8_t BUS__uPhyRead(sBusPhy_t* psPhy, uint8_t *puInBuf)
 /**
  * Read a byte from the received bytes queue.
  *
- * @param[in] psPhy
- * Handle to bus's phsical layer
- * @param[out] puByte
- * Received byte. *puByte remains unchange if no byte has been received.
+ * @param[in] psPhy		Handle to bus's phsical layer
+ * @param[out] puByte	Received byte. *puByte remains unchange if no byte has been received.
  *
  * @returns TRUE if a byte has been received, otherwise false.
  */

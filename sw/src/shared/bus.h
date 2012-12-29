@@ -34,6 +34,10 @@
 #define BUS_MAXNODES 16
 #endif
 
+#define BUS_MAX_ANSWERFAILS		5	//!< Maximum number a member's answer can be missing, before disconnecting.
+#define BUS_DISCOVERYLOOPS		3   //!< Number of discovery-loops till normal scheduling begins.
+
+
 // --- Type definitions --------------------------------------------------------
 
 //! Possible states of the bus, as seen by each node
@@ -119,8 +123,11 @@ typedef struct bus {
     // following data is only used by bus scheduler
 #ifdef BUS_SCHEDULER
     sNodeInfo_t     asNodeList[BUS_MAXNODES];       //!< list of configured nodes
+    sNodeInfo_t     asDiscoveryList[BUS_MAXNODES];  //!< list of empty nodes
     uint8_t         uCurrentNode;                   //!< current processed node
+    uint8_t         uDiscoverNode;                  //!< current discovery-address
     uint8_t         auTokenMsg[BUS_TOKEN_MSG_LEN];  //!< pre-compiled token message.
+    BOOL            bSchedDiscovery;                //!< bus-discovery mode.
     BOOL            bSchedWaitingForAnswer;         //!< flag, if scheduler is waiting for an answer
     BOOL            bSchedMsgReceived;              //!< flag, if any message has been received
     sClkTimer_t     sNodeAnsTimeout;                //!< node answer timeout
@@ -140,28 +147,26 @@ typedef struct bus {
 // --- Global functions --------------------------------------------------------
 
 void    BUS_vConfigure              (sBus_t*        psBus, 
-                                       uint16_t       uNodeAddress);
+                                     uint16_t       uNodeAddress);
 
 void    BUS_vInitialize             (sBus_t*        psBus,
-                                        uint8_t        uUart);
+                                     uint8_t        uUart);
                                      
 BOOL    BUS_bGetMessage             (sBus_t*        psBus);
 
 BOOL    BUS_bReadMessage            (sBus_t*        psBus, 
-                                       uint16_t*      puSender,
-                                       uint8_t*       puLen,
-                                       uint8_t*       puMsg);
+                                     uint16_t*      puSender, 
+                                     uint8_t*       puLen, 
+                                     uint8_t*       puMsg);
                                      
-BOOL    BUS_bSendMessage             (sBus_t*        psBus,
-                                       uint16_t        uReceiver,
-                                       uint8_t         uLen,
-                                       uint8_t*       puMsg);
-
-BOOL    BUS_bIsIdle                  (sBus_t*       psBus);
+BOOL    BUS_bSendMessage            (sBus_t*        psBus, 
+                                     uint16_t       uReceiver, 
+                                     uint8_t        uLen, 
+                                     uint8_t*       puMsg);
 
 #ifdef BUS_SCHEDULER
 BOOL    BUS_bSchedulAddNode         (sBus_t*        psBus,
-                                      uint8_t       uNodeAddress);
+                                    uint8_t         uNodeAddress);
 
 BOOL    BUS_bScheduleAndGetMessage  (sBus_t*        psBus);
 #endif

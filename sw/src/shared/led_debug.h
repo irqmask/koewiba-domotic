@@ -27,6 +27,14 @@
 #define BTN_TEST        0b00100000
 #define BTN_EXP         0b10000000
 
+#define LED_STATUS_ON 		PORTD |=  LED_STATUS
+#define LED_STATUS_OFF 		PORTD &= ~LED_STATUS
+#define LED_STATUS_TOGGLE 	PORTD ^=  LED_STATUS
+
+#define LED_ERROR_ON 		PORTD |=  LED_ERROR
+#define LED_ERROR_OFF 		PORTD &= ~LED_ERROR
+#define LED_ERROR_TOGGLE 	PORTD ^=  LED_ERROR
+
 // --- Type definitions --------------------------------------------------------
 
 // --- Local variables ---------------------------------------------------------
@@ -41,10 +49,6 @@
 
 // --- Global functions --------------------------------------------------------
 void vInitLedAndKeys(void);
-void vToggleStatusLED(void);
-void vStatusLED_on(void);
-void vStatusLED_off(void);
-void vToggleErrorLED(void);
 
 
 #endif /* LED_DEBUG_H_ */

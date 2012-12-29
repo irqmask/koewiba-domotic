@@ -11,12 +11,14 @@
  *///---------------------------------------------------------------------------
 
 // --- Include section ---------------------------------------------------------
-//TODO remove after debug
 #include <avr/io.h>
-#include <util/delay.h>
 
 #include "bus.h"
 #include "bus_intern.h"
+
+//TODO remove after debug
+#include "led_debug.h"
+#include <util/delay.h>
 
 // --- Definitions -------------------------------------------------------------
 
@@ -33,11 +35,12 @@
 /**
  * Start sending of next token.
  */
-BOOL bSendNextTimeSlotToken(sBus_t* psBus)
+BOOL bSendNextTimeSlotToken(sBus_t* psBus, BOOL discovery)
 {
     sNodeInfo_t* node;
 
-    node = &psBus->asNodeList[psBus->uCurrentNode];
+    if(TRUE != discovery) 	node = &psBus->asNodeList[psBus->uCurrentNode];
+    else 					node = &psBus->asDiscoveryList[psBus->uDiscoverNode];
 
     if (node->uAddress != 0) {
         psBus->auTokenMsg[1] = node->uAddress | 0x80;
@@ -46,14 +49,115 @@ BOOL bSendNextTimeSlotToken(sBus_t* psBus)
     return FALSE;
 }
 
+// --- Module global functions -------------------------------------------------
+
+/**
+ * Initialize scheduler functions.
+ *
+ * @param[in] psBus		Handle of the bus.
+ */
+void BUS__vSchedulConfigure(sBus_t* psBus)
+{
+    uint8_t ii;
+
+    psBus->uCurrentNode  = 0;
+    psBus->uDiscoverNode = 0;
+    for (ii=0; ii<BUS_MAXNODES; ii++) {
+        psBus->asNodeList[ii].uAddress = 0;
+        psBus->asNodeList[ii].uErrCnt = 0;
+		psBus->asDiscoveryList[ii].uAddress = ii+1;
+    }
+    psBus->auTokenMsg[0] = BUS_SYNCBYTE;
+    psBus->auTokenMsg[1] = 0;
+}
+
+// --- Global functions --------------------------------------------------------
+
+/**
+ * Add new node to scheduler list.
+ *
+ * @param[in] psBus			Handle of the bus.
+ * @param[in] uNodeAddress	Node address.
+ *
+ * @returns TRUE if node has been successfully added, otherwise false.
+ */
+BOOL BUS_bSchedulAddNode(sBus_t* psBus, uint8_t uNodeAddress)
+{
+    uint8_t ii    = 0;
+    BOOL	found = FALSE;
+
+    // search node in emptynode-list and remove it.
+    for (ii=0; ii<BUS_MAXNODES; ii++) {
+        if (psBus->asDiscoveryList[ii].uAddress == uNodeAddress) {
+        	found = TRUE;
+        }
+        else if(found) { // shift following elements to avoid gaps in list
+			LED_STATUS_ON;
+        	psBus->asDiscoveryList[ii-1].uAddress = psBus->asDiscoveryList[ii].uAddress;
+        	psBus->asDiscoveryList[ii-1].uErrCnt = psBus->asDiscoveryList[ii].uErrCnt;
+        }
+    }
+    if(found) { // add node to nodelist
+		psBus->asDiscoveryList[BUS_MAXNODES-1].uAddress = 0; // delete last field, others were already shifted
+		for (ii=0; ii<BUS_MAXNODES; ii++) {
+			if (psBus->asNodeList[ii].uAddress == 0) {
+				psBus->asNodeList[ii].uAddress = uNodeAddress;
+				psBus->asNodeList[ii].uErrCnt = 0;
+				break;
+			}
+		}
+    }
+
+    return found;
+}
+
+/**
+ * Remove node from scheduler list.
+ *
+ * @param[in] psBus			Handle of the bus.
+ * @param[in] uNodeAddress	Node address.
+ *
+ * @returns TRUE if node has been successfully removed, otherwise false.
+ */
+BOOL BUS_bSchedulRemNode(sBus_t* psBus, uint8_t uNodeAddress)
+{
+    uint8_t ii    = 0;
+    BOOL	found = FALSE;
+
+    // search and remove node in nodelist
+    for (ii=0; ii<BUS_MAXNODES; ii++) {
+        if (psBus->asNodeList[ii].uAddress == uNodeAddress) {
+        	found = TRUE;
+        }
+        else if(found) { // shift following elements to avoid gaps in list
+        	psBus->asNodeList[ii-1].uAddress = psBus->asNodeList[ii].uAddress;
+        	psBus->asNodeList[ii-1].uErrCnt = psBus->asNodeList[ii].uErrCnt;
+        }
+    }
+    if(found) { // add node to discovery-list
+		psBus->asNodeList[BUS_MAXNODES-1].uAddress = 0; // delete last field, others were already shifted
+		for (ii=0; ii<BUS_MAXNODES; ii++) {
+			if (psBus->asDiscoveryList[ii].uAddress == 0) {
+				psBus->asDiscoveryList[ii].uAddress = uNodeAddress;
+				break;
+			}
+		}
+    }
+    return found;
+}
+
 /**
  * Count node errors.
  */
 void vNodeError(sBus_t* psBus)
 {
-    if (psBus->asNodeList[psBus->uCurrentNode].uErrCnt < 255) {
-        psBus->asNodeList[psBus->uCurrentNode].uErrCnt++;
-    }
+	if (psBus->asNodeList[psBus->uCurrentNode].uErrCnt < 255) {
+		psBus->asNodeList[psBus->uCurrentNode].uErrCnt++;
+		// Remove node-address from scheduling-list after max number of missing answers.
+		if(BUS_MAX_ANSWERFAILS < psBus->asNodeList[psBus->uCurrentNode].uErrCnt) {
+			BUS_bSchedulRemNode(psBus, psBus->auTokenMsg[1] & 0x7F);
+		}
+	}
 }
 
 /**
@@ -71,62 +175,7 @@ BOOL bCurrNodeIsMe(sBus_t* psBus)
     return FALSE;
 }
 
-// --- Module global functions -------------------------------------------------
 
-/**
- * Initialize scheduler functions.
- *
- * @param[in] psBus
- * Handle of the bus.
- */
-void BUS__vSchedulConfigure(sBus_t* psBus)
-{
-    uint8_t ii;
-
-    psBus->uCurrentNode = BUS_MAXNODES - 1;
-    for (ii=0; ii<BUS_MAXNODES; ii++) {
-        psBus->asNodeList[ii].uAddress = 0;
-        psBus->asNodeList[ii].uErrCnt = 0;
-    }
-    psBus->auTokenMsg[0] = BUS_SYNCBYTE;
-    psBus->auTokenMsg[1] = 0;
-}
-
-// --- Global functions --------------------------------------------------------
-
-/**
- * Add new node to scheduler list.
- *
- * @param[in] psBus
- * Handle of the bus.
- * @param[in] uNodeAddress
- * Node address.
- *
- * @returns TRUE f node has been successfully added, otherwise false.
- */
-BOOL BUS_bSchedulAddNode(sBus_t* psBus, uint8_t uNodeAddress)
-{
-    uint8_t ii = 0;
-
-    // check node address correctness
-    if ((uNodeAddress < 1) || (uNodeAddress > 127)) {
-        return FALSE;
-    }
-
-    // search if node is already in the list
-    for (ii=0; ii<BUS_MAXNODES; ii++) {
-        if (psBus->asNodeList[ii].uAddress == uNodeAddress) return FALSE; // Adresse
-    }
-
-    // search a free place in node list
-    for (ii=0; ii<BUS_MAXNODES; ii++) {
-        if (psBus->asNodeList[ii].uAddress == 0) {
-            psBus->asNodeList[ii].uAddress = uNodeAddress;
-            return TRUE;
-        }
-    }
-    return FALSE;
-}
 
 /**
  * Schedule nodes on bus.
@@ -136,24 +185,42 @@ BOOL BUS_bSchedulAddNode(sBus_t* psBus, uint8_t uNodeAddress)
  */
 BOOL BUS_bScheduleAndGetMessage(sBus_t* psBus)
 {
-    BOOL rc = FALSE;
+	static uint8_t 	busdiscovery = BUS_DISCOVERYLOOPS;
+    BOOL			rc 			 = FALSE;
 
     switch (psBus->eState) {
     case eBus_InitWait:
-        psBus->eState = eBus_Idle;
+    {
+    	psBus->bSchedDiscovery = TRUE;
+        if ((psBus->uDiscoverNode == BUS_MAXNODES) || (psBus->asDiscoveryList[psBus->uDiscoverNode].uAddress == 0)) {
+        	psBus->uDiscoverNode = 0;
+        	--busdiscovery;
+        }
+        // send token
+        if (bSendNextTimeSlotToken(psBus, psBus->bSchedDiscovery)) {
+            CLK_bTimerStart(&psBus->sNodeAnsTimeout, 100);
+            psBus->eState = eBus_SendingToken;
+			++psBus->uDiscoverNode;
+        }
         break;
-
+    }
     case eBus_Idle:
+    	psBus->bSchedDiscovery = FALSE;
         // select next node
-        psBus->uCurrentNode++;
-        if (psBus->uCurrentNode >= BUS_MAXNODES) {
+        if ((psBus->uCurrentNode == BUS_MAXNODES) || (psBus->asNodeList[psBus->uCurrentNode].uAddress == 0)) {
             psBus->uCurrentNode = 0;
+            psBus->bSchedDiscovery = TRUE;
+			if ((psBus->uDiscoverNode == BUS_MAXNODES) || (psBus->asDiscoveryList[psBus->uDiscoverNode].uAddress == 0)) {
+				psBus->uDiscoverNode = 0;
+			}
         }
 
         // send token
-        if (bSendNextTimeSlotToken(psBus)) {
+        if (bSendNextTimeSlotToken(psBus, psBus->bSchedDiscovery)) {
             CLK_bTimerStart(&psBus->sNodeAnsTimeout, 100);
             psBus->eState = eBus_SendingToken;
+            if(TRUE != psBus->bSchedDiscovery) 	++psBus->uCurrentNode;
+			else 								++psBus->uDiscoverNode;
         }
         break;
 
@@ -169,9 +236,10 @@ BOOL BUS_bScheduleAndGetMessage(sBus_t* psBus)
                 psBus->bSchedWaitingForAnswer = TRUE;
                 psBus->eState = eBus_ReceivingWait;
         	}
-        } else {
-            //TODO CV: timeout and error handling, if token is not sent
         }
+        else {
+			//TODO CV: timeout and error handling, if token is not sent
+		}
         break;
 
     default:
@@ -182,23 +250,27 @@ BOOL BUS_bScheduleAndGetMessage(sBus_t* psBus)
 
     if (psBus->bSchedWaitingForAnswer) {
         if (psBus->bSchedMsgReceived) {
+			if(TRUE==psBus->bSchedDiscovery) {
+				if(BUS_bSchedulAddNode(psBus, psBus->auTokenMsg[1] & 0x7F)) {
+					--psBus->uDiscoverNode; // re-establish last used index, because addresses were shifted.
+				}
+				psBus->bSchedDiscovery = FALSE;
+			}
             // TODO check node ID of received message and route eventually
         	//      to other line or net
             psBus->bSchedMsgReceived = FALSE;
             psBus->bSchedWaitingForAnswer = FALSE;
             psBus->eState = eBus_Idle;
-        } else {
+			if(busdiscovery > 0) psBus->eState = eBus_InitWait;
+        }
+        else {
             if (CLK_bTimerIsElapsed(&psBus->sNodeAnsTimeout)) {
-                // pulse error LED
-                PORTD |= 0b00010000;
-                _delay_ms(5);
-                PORTD &= ~(0b00010000);
-                // save error to node
                 vNodeError(psBus);
                 // return to IDLE state
                 psBus->bSchedMsgReceived = FALSE;
                 psBus->bSchedWaitingForAnswer = FALSE;
                 psBus->eState = eBus_Idle;
+				if(busdiscovery > 0) psBus->eState = eBus_InitWait;
             }
         }
     }

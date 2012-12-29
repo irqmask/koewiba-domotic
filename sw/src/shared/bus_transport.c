@@ -38,7 +38,7 @@
 // Reset bus to eBus_InitWait state.
 void vResetBus(sBus_t* psBus)
 {
-    psBus->eState = eBus_InitWait;
+    psBus->eState = eBus_Idle;
     psBus->sRecvMsg.uOverallLength = 0;
     psBus->sRecvMsg.uLength = 0;
 }
@@ -58,8 +58,8 @@ BOOL bReceive(sBus_t* psBus)
     BOOL    bytereceived;
     
     do {
-        if (!(bytereceived = BUS__bPhyDataReceived(&psBus->sPhy))) {
-            break;
+        if (!(bytereceived = BUS__bPhyDataReceived(&psBus->sPhy)) || psBus->bMsgReceived) {
+            break; // No byte received or message not retrieved.
         }
         BUS__bPhyReadByte(&psBus->sPhy, &u);
         
@@ -75,10 +75,13 @@ BOOL bReceive(sBus_t* psBus)
             // token received?
             if (u & 0x80) {
                 // is it me?
+				vResetBus(psBus); // byte collecting ends after token.
                 if ((u & 0x7F) == (psBus->sCfg.uOwnNodeAddress & 0x007f)) {
                     psBus->eState = eBus_GotToken;
+                    LED_STATUS_ON;
                 } else {
                     psBus->eState = eBus_Idle;
+                    LED_STATUS_OFF;
                 }
                 psBus->sRecvMsg.uOverallLength = 0;
                 psBus->sRecvMsg.uLength = 0;
@@ -97,13 +100,17 @@ BOOL bReceive(sBus_t* psBus)
             // 3. byte: LE - Length of message from AR to CRCL
             if (psBus->sRecvMsg.uOverallLength == 2) {
                 // check correctness of length
-                if ((u > BUS_MAXBIGMSGLEN) || (0==u)) {
+                if ((0==u)) {
+                	psBus->eState = eBus_Idle;
+                	psBus->sRecvMsg.uOverallLength = 0;
+#ifdef BUS_SCHEDULER
+                	psBus->bSchedMsgReceived = TRUE;
+#endif
+                	break;
+                }
+                else if (u > BUS_MAXBIGMSGLEN) {
                 	// length is zero or length is too big
                     vResetBus(psBus); // wait for next message on bus
-                    //TODO remove LED blinking and delays after debug
-                    vStatusLED_on();
-					_delay_ms(50);
-					vStatusLED_off();
                     break;
                 }
                 psBus->sRecvMsg.uLength = u;
@@ -152,6 +159,8 @@ BOOL bReceive(sBus_t* psBus)
 #ifdef BUS_SCHEDULER
                     psBus->bSchedMsgReceived = TRUE;
 #endif
+                    psBus->eState = eBus_Idle;
+					psBus->sRecvMsg.uOverallLength = 0;
 					break;
                 }
                 
@@ -303,9 +312,9 @@ BOOL BUS_bGetMessage(sBus_t* psBus)
  * @returns TRUE, if a message has been received and.
  */
 BOOL BUS_bReadMessage(sBus_t*  psBus, 
-                        uint16_t* puSender,
-                        uint8_t* puLen,
-                        uint8_t* puMsg)
+                      uint16_t* puSender,
+                      uint8_t* puLen,
+                      uint8_t* puMsg)
 {
     uint8_t len = 0;
     

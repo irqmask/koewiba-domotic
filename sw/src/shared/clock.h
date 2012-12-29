@@ -29,7 +29,7 @@
 // --- Definitions -------------------------------------------------------------
 
 #define CLOCK_NUM_TIMER        8
-#define CLOCK_TICKS_PER_SECOND 10
+#define CLOCK_TICKS_PER_SECOND 100
 
 // --- Type definitions --------------------------------------------------------
 

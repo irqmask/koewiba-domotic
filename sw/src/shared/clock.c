@@ -47,6 +47,30 @@ BOOL bRegisterTimer(sClkTimer_t* psTimer)
 }
 
 /**
+ * Sign off timer in list.
+ */
+BOOL bDeregisterTimer(sClkTimer_t* psTimer)
+{
+    uint8_t ii;
+    BOOL    found = FALSE;
+
+    for (ii=0; ii<CLOCK_NUM_TIMER; ii++) {
+        if (g_asRunningTimers[ii] == psTimer) {
+            g_asRunningTimers[ii] = NULL;
+            found = TRUE;
+        }
+        else if(found)
+        {
+        	REGBIT_TIMSK &= ~(1<<REGBIT_OCIEA);  // disable interrupt
+        	// shift following timers, to avoid gaps in the list.
+        	g_asRunningTimers[ii-1] = g_asRunningTimers[ii];
+        }
+    }
+	REGBIT_TIMSK |= (1<<REGBIT_OCIEA); // enable interrupt
+    return found;
+}
+
+/**
  * Timer interrupt. Increase clock and iterate through running timers list.
  */
 ISR(TIMER1_COMPA_vect)
@@ -103,7 +127,7 @@ void CLK_vInitialize(void)
  *
  * @returns TRUE, if timer has been started, otherwise FALSE.
  */
-BOOL CLK_bTimerStart (sClkTimer_t* psTimer, uint16_t uTime)
+BOOL CLK_bTimerStart(sClkTimer_t* psTimer, uint16_t uTime)
 {
     uint32_t tick;
 
@@ -113,7 +137,7 @@ BOOL CLK_bTimerStart (sClkTimer_t* psTimer, uint16_t uTime)
     }
 
     // calculate ticks (from milliseconds)
-    tick = (uTime * CLOCK_TICKS_PER_SECOND);
+    tick = uTime * (uint32_t)CLOCK_TICKS_PER_SECOND;
     tick /= 1000;
     if (tick == 0) tick = 1;
 
@@ -129,7 +153,7 @@ BOOL CLK_bTimerStart (sClkTimer_t* psTimer, uint16_t uTime)
  *
  * @returns TRUE, if time is over, otherwise false.
  */
-BOOL CLK_bTimerIsElapsed    (sClkTimer_t* psTimer)
+BOOL CLK_bTimerIsElapsed(sClkTimer_t* psTimer)
 {
     if (psTimer->uTicks == 0) {
         return TRUE;

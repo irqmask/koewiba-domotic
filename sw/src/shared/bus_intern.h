@@ -77,6 +77,9 @@ void    BUS__vPhyActivateSender     (sBusPhy_t*     psPhy,
 void    BUS__vPhyActivateReceiver   (sBusPhy_t*     psPhy,
                                      BOOL           bActivate);
 
+// TODO remove after debug
+void 	BUS__vDebugSend 			(uint8_t 		*data,
+									 uint8_t 		len);
 BOOL    BUS__bPhySend               (sBusPhy_t*     psPhy, 
                                      const uint8_t* puMsg, 
                                      uint8_t        uLen);

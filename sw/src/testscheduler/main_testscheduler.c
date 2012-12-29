@@ -12,9 +12,10 @@
 
 #include <avr/io.h>
 #include <avr/interrupt.h>
-#include <util/delay.h>
+
 #include "bus.h"
 #include "clock.h"
+// TODO remove after debug
 #include "led_debug.h"
 
 // --- Definitions -------------------------------------------------------------
@@ -30,8 +31,8 @@
 
 // --- Local variables ---------------------------------------------------------
 
-static sBus_t g_sBus;
-static sClkTimer_t g_sLedTimer;
+static sBus_t 		g_sBus;
+static sClkTimer_t 	g_sLedTimer;
 
 // --- Global variables --------------------------------------------------------
 
@@ -54,13 +55,6 @@ int main(void)
     BUS_vConfigure(&g_sBus, 1); // configure a bus node with address 1
     BUS_vInitialize(&g_sBus, 0);// initialize bus on UART 0
 
-    // add own address
-    BUS_bSchedulAddNode(&g_sBus, 1);
-    // add nodes with addresses 2..BUS_MAXNODES-1
-    for (ii=2; ii<BUS_MAXNODES; ii++) {
-        if (!BUS_bSchedulAddNode(&g_sBus, ii))	break;
-    }
-
     vInitLedAndKeys();
     sei();
 
@@ -77,7 +71,8 @@ int main(void)
         }
 
         if (CLK_bTimerIsElapsed(&g_sLedTimer)) {
-            vToggleStatusLED();
+        	// TODO remove after debug
+            LED_STATUS_TOGGLE;
             CLK_bTimerStart(&g_sLedTimer, 1000);
         }
     }

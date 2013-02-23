@@ -133,3 +133,66 @@ sollte daher nach dem Einschalten eine "Here I am"-Nachricht als Broadcast auf d
 er einmal erkannt wird.
 WICHTIG: Bei der Konfiguration dieser Untersegmente muss peinlich darauf geachtet werden, daß innerhalb
 des Hauptsegmentes jede Adresse nur einmal vergeben wird.
+
+
+High-Level Protocol
+-------------------------------
+
+Im High-Level Protocol sind die Formate der zu übertragenden Informationen festgelegt. Dabei wird 
+zwischen Allgemeingültigen Befehlen und Zustandsmeldungen, sowie applikationsspezifischen Befehlen und
+Zustandsmeldungen unterschieden. Befehle lösen beim Empfänger eine Aktion aus, Zustandsmeldungen
+können eine Aktion auslösen, müssen aber nicht.
+
+Allgemeine Zustandsmeldungen (Typ 0x00 - 0x10)
+Format: Typ, Kanal, spez. Daten
+
+0x00 - Typenlos
+0x00, Daten
+
+0x01 - Bitfeld
+Beispiel: 0x01, Anzahl Bytes, Zustand Byte0, Änderung Byte0, Zustand Byte1, Änderung Byte1, ...
+
+0x02 - 8bit
+Beispiel: 0x02, Kanalnummer, 8bit Wert
+
+0x03 - 16bit
+Beispiel: 0x03, Kanalnummer, 16bit Wert (HighByte, LowByte)
+
+0x04 - 32bit
+Beispiel: 0x04, Kanalnummer, 32bit Wert (HighByte, ..., LowByte)
+
+0x05 - Datum/Uhrzeit(UTC)
+
+
+Allgemeine Befehle (Typ 0x20 - 0x3F)
+Format: Typ, spez. Parameter
+
+0xXX - Reg Version
+Fordert Firmwareversionsstring an.
+
+0xXX - Set Version
+Gibt Firmwareversion an
+Beispiel: 0xXX, <Versionsstring max 10Byte>
+
+Registerbefehle: Für Konfigurations- und Debugzwecke
+
+0x20 - Req Register
+Beispiel: 0x20, Registernummer
+
+0x21 - Set Register 8bit
+Beispiel: 0x21, Registernummer, 8bit- Wert
+
+0x22 - Set Register 16bit
+Beispiel: 0x22, Registernummer, 16bit- Wert
+
+0x23 - Set Register 32bit
+Beispiel: 0x23, Registernummer, 32bit- Wert
+
+
+0x21 - Set Register 8bit
+0x21, Registernummer, 8bit- Wert
+
+0x22 - Start Flash
+0x23 - Set Flash
+0x24 - End Flash
+

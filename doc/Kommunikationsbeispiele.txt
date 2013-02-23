@@ -1,0 +1,84 @@
+Modul 2: Multifunktions GUI
+
+Das Soll ich machen:
+Fenstersensor (Bit 0.0)
+Taster 1 (Bit 0.1) (Temperatur rauf)
+Taster 2 (Bit 0.2) (Temperatur runter)
+Taster 3 (Bit 0.3) (Kanal 3) (Dimmer 1)
+Taster 4 (Bit 0.4) (Kanal 4) (Dimmer 2)
+Taster 5 (Bit 0.5) (Schalter 1)
+Taster 6 (Bit 0.6) (Schalter 2)
+Taster 7 (Bit 0.7) (Jalosie rauf)
+Taster 8 (Bit 1.0) (Jalosie runter)
+Temperatursensor (Kanal 16)
+Display
+
+
+Registerbeschreibung
++0 Z Zustand Taster 0.x 8bit (hat den augenblicklichen Zustand der Taster)
++1 Z Zustand Taster 1.x 8bit
++2 Z aktuelle Temperatur 16bit
++3 Z Display Wert 1 (Solltemperatur)
++4 Z Display Wert 2 (Isttemperatur)
++5 K Bit 0.0 Modus 
++6 K Bit 0.0 Empfänger 
++7 K Bit 0.1 Modus = 1 (Ereignis bei steigender Flanke => schickt Zustandsmeldung Typ 0x01 Bitfeld)
++8 K Bit 0.1 Empfänger = 3 
+...
++11 K Bit 0.3 Modus = 3 (Dimmermodus)
++12 K Bit 0.3 Empfänger = 5 
+...
++x K Bit 0.7 Modus (0=Ereignis bei fallender Flanke, 1=Ereignis bei steigender Flanke, 2=Ereignis bei Zustandswechsel , 3=Dimmermodus, 
++x K Bit 0.7 Empfänger 
++x K Intervall Temperatursensor auslesen
+
+Mapping
+Modul 3 Kanal 0 -> Register 3
+Modul 3 Kanal 1 -> Register 4
+
+===========================================
+
+Modul 3: Heizungsregelung
+
+
+Registerbeschreibung
+01 Z Solltemperatur
+02 Z Isttemperatur
+03 K Regelparameter P
+04 K Regelparameter I
+05 K Regelparameter D
+06 K Taster Solltemperatur rauf: Modulnummer = 2
+07 K Taster Solltemperatur rauf: Kanalnummer = 1
+08 K Taster Solltemperatur runter: Modulnummer = 2
+09 K Taster Solltemperatur runter: Kanalnummer = 2
+10 K Empfänger Solltemperatur (Kanal 0) Modul 255 (Broadcast)
+11 K Empfänger Isttemperatur (Kanal 1) Modul 255 (Broadcast)
+
+Mappingtabelle:
+leer, weil nicht benötigt
+
+===========================================
+
+Modul 5: doofer Dimmer
+
+Registerbeschreibung
++1 Dimmstufe 0-255
+
+Mappingtabelle:
+Modul 2, Kanal 3 -> Register 1
+
+
+
+Beispiel Taster Temperatur rauf gedrückt:
+Modul 2 sendet Zustandsmeldung Typ 0x01, Inhalt aller Taster: 0x01, 2, 0b00000010, 0b00000010, 0b10101010, 0b000000000
+Modul 3 empfängt Zustandsmeldung von Modul 2 und schaut auf die Bits 1 und 2 des Moduls 2
+Modul 3 bemerkt (ausprogrammiert), dass sich Bit 1 geändert hat -> erhöhe Solltemperatur um 1°
+Modul 3 sendet neue Soll-Temperatur an alle Module: 0x03, 29800 (in 1/100tel Kelvin entspricht ca 25°C)
+Modul 2 empfängt das und mappt den Wert auf Register 3, wodurch er im Display angezeigt wird.
+Modul x empfängt das und mappt den Wert auf Register 3, wodurch er im Display angezeigt wird.
+
+
+Beispiel Taster Dimmer 1 kurz gedrückt:
+Lampe war vorher aus. Modul 2 weis das, weil es die Dimmerfunktion hat
+Modul 2 sendet Zustandsmeldung Typ 0x02, Kanalnummer, 8bit Wert an Modul 5
+Modul 5 empfängt Zustandsmeldung Typ 0x02 (8bit Wert) und schreibt den Wert auf Register 5 (Stellwert Dimmer)

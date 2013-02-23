@@ -91,13 +91,13 @@ BOOL BUS_bSchedulAddNode(sBus_t* psBus, uint8_t uNodeAddress)
         if (psBus->asDiscoveryList[ii].uAddress == uNodeAddress) {
         	found = TRUE;
         }
-        else if(found) { // shift following elements to avoid gaps in list
+        else if (found) { // shift following elements to avoid gaps in list
 			LED_STATUS_ON;
         	psBus->asDiscoveryList[ii-1].uAddress = psBus->asDiscoveryList[ii].uAddress;
         	psBus->asDiscoveryList[ii-1].uErrCnt = psBus->asDiscoveryList[ii].uErrCnt;
         }
     }
-    if(found) { // add node to nodelist
+    if (found) { // add node to nodelist
 		psBus->asDiscoveryList[BUS_MAXNODES-1].uAddress = 0; // delete last field, others were already shifted
 		for (ii=0; ii<BUS_MAXNODES; ii++) {
 			if (psBus->asNodeList[ii].uAddress == 0) {
@@ -107,7 +107,6 @@ BOOL BUS_bSchedulAddNode(sBus_t* psBus, uint8_t uNodeAddress)
 			}
 		}
     }
-
     return found;
 }
 
@@ -129,7 +128,7 @@ BOOL BUS_bSchedulRemNode(sBus_t* psBus, uint8_t uNodeAddress)
         if (psBus->asNodeList[ii].uAddress == uNodeAddress) {
         	found = TRUE;
         }
-        else if(found) { // shift following elements to avoid gaps in list
+        else if (found) { // shift following elements to avoid gaps in list
         	psBus->asNodeList[ii-1].uAddress = psBus->asNodeList[ii].uAddress;
         	psBus->asNodeList[ii-1].uErrCnt = psBus->asNodeList[ii].uErrCnt;
         }
@@ -175,8 +174,6 @@ BOOL bCurrNodeIsMe(sBus_t* psBus)
     return FALSE;
 }
 
-
-
 /**
  * Schedule nodes on bus.
  * 
@@ -219,8 +216,8 @@ BOOL BUS_bScheduleAndGetMessage(sBus_t* psBus)
         if (bSendNextTimeSlotToken(psBus, psBus->bSchedDiscovery)) {
             CLK_bTimerStart(&psBus->sNodeAnsTimeout, 100);
             psBus->eState = eBus_SendingToken;
-            if(TRUE != psBus->bSchedDiscovery) 	++psBus->uCurrentNode;
-			else 								++psBus->uDiscoverNode;
+            if (TRUE != psBus->bSchedDiscovery) ++psBus->uCurrentNode;
+			else                                ++psBus->uDiscoverNode;
         }
         break;
 
@@ -231,7 +228,8 @@ BOOL BUS_bScheduleAndGetMessage(sBus_t* psBus)
         		// The scheduler cannot receive its own message,
         		// so we set the state to eBus_GotToken "manually".
         	    psBus->eState = eBus_GotToken;
-        	} else {
+        	}
+        	else {
         		// Token has been sent, now wait for a message.
                 psBus->bSchedWaitingForAnswer = TRUE;
                 psBus->eState = eBus_ReceivingWait;
@@ -250,7 +248,7 @@ BOOL BUS_bScheduleAndGetMessage(sBus_t* psBus)
 
     if (psBus->bSchedWaitingForAnswer) {
         if (psBus->bSchedMsgReceived) {
-			if(TRUE==psBus->bSchedDiscovery) {
+			if (TRUE==psBus->bSchedDiscovery) {
 				if(BUS_bSchedulAddNode(psBus, psBus->auTokenMsg[1] & 0x7F)) {
 					--psBus->uDiscoverNode; // re-establish last used index, because addresses were shifted.
 				}
@@ -261,7 +259,7 @@ BOOL BUS_bScheduleAndGetMessage(sBus_t* psBus)
             psBus->bSchedMsgReceived = FALSE;
             psBus->bSchedWaitingForAnswer = FALSE;
             psBus->eState = eBus_Idle;
-			if(busdiscovery > 0) psBus->eState = eBus_InitWait;
+			if (busdiscovery > 0) psBus->eState = eBus_InitWait;
         }
         else {
             if (CLK_bTimerIsElapsed(&psBus->sNodeAnsTimeout)) {
@@ -270,11 +268,10 @@ BOOL BUS_bScheduleAndGetMessage(sBus_t* psBus)
                 psBus->bSchedMsgReceived = FALSE;
                 psBus->bSchedWaitingForAnswer = FALSE;
                 psBus->eState = eBus_Idle;
-				if(busdiscovery > 0) psBus->eState = eBus_InitWait;
+				if (busdiscovery > 0) psBus->eState = eBus_InitWait;
             }
         }
     }
-
     return rc;
 }
 

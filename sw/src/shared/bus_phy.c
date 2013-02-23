@@ -155,23 +155,6 @@ void BUS__vPhyActivateReceiver(sBusPhy_t* psPhy, BOOL bActivate)
     }
 }
 
-void BUS__vDebugSend(uint8_t *data, uint8_t len)
-{
-	uint8_t ii;
-	REGISTER_UCSRB &= ~(1<<REGBIT_TXCIE);
-	UART_PORT |= UART_RECVSTOP;
-	UART_PORT |= UART_DRIVER;
-	for(ii=0;ii<len;ii++) {
-		REGISTER_UDR = data[ii];   // send byte
-		while ( !( UCSRA & (1<<UDRE)) ) {};
-	}
-	while ( !( UCSRA & (1<<TXC)) ) {};
-	UCSRA |= (1<<TXC);
-	UART_PORT &= ~UART_DRIVER;
-	UART_PORT &= ~UART_RECVSTOP;
-	REGISTER_UCSRB |= (1<<REGBIT_TXCIE);
-}
-
 /**
  * Send given number of data on the bus.
  * Sending is initiated, if the previous sending process finished.
@@ -274,5 +257,24 @@ BOOL BUS__bPhyReadByte(sBusPhy_t* psPhy, uint8_t *puByte)
 
 // --- Global functions --------------------------------------------------------
 
+
+/*
+void BUS__vDebugSend(uint8_t *data, uint8_t len)
+{
+	uint8_t ii;
+	REGISTER_UCSRB &= ~(1<<REGBIT_TXCIE);
+	UART_PORT |= UART_RECVSTOP;
+	UART_PORT |= UART_DRIVER;
+	for(ii=0;ii<len;ii++) {
+		REGISTER_UDR = data[ii];   // send byte
+		while ( !( UCSRA & (1<<UDRE)) ) {};
+	}
+	while ( !( UCSRA & (1<<TXC)) ) {};
+	UCSRA |= (1<<TXC);
+	UART_PORT &= ~UART_DRIVER;
+	UART_PORT &= ~UART_RECVSTOP;
+	REGISTER_UCSRB |= (1<<REGBIT_TXCIE);
+}
+*/
 /** @} */
 /** @} */

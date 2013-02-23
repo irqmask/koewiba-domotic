@@ -1,0 +1,40 @@
+Modul 8fach Taster
+---------------------------
+Zum Tasten und Schalten von Aktoren. Keine eigene Ablaufsteuerung, gibt nur die Zustände per RS485 weiter und Empfängt anzuzeigende Zustände der LEDs über RS485.
+Hardwaremerkmale:
+ - 8 Tasten
+ - optional 8 LEDs zur Zustandsanzeige
+ - Controller
+ - RS845 Schnittstelle
+
+
+Modul Raumtemperatursensor
+---------------------------
+Misst und regelt die Temperatur in einem Zimmer. 
+Hardwaremerkmale:
+ - Display
+ - 3 Taster
+ - Temperatursensor
+ - optionaler Anschluss für externen Temperatursensor
+ - Anschlussmöglichkeit für 1 (besser 2) Fensterkontakte und 1 (besser 2) Sabotagekontakte
+ - Controller
+ - RS845 Schnittstelle
+
+Softwaremerkmale:
+ - Konfiguration im EEProm
+ - Wochentagabhängige und Zeitabhängige RT Regelung
+ - Temperatursensor (intern/extern/von anderem Busteilnehmer) auswählbar
+ - Fensterkontakt(e) (extern/von anderem Busteilnehmer) auswählbar
+
+
+Modul Heizungssteller
+---------------------------
+Hardwaremerkmale:
+ - optionaler Anschluss für externen Temperatursensor
+ - Anschlussmöglichkeit für 1 (besser 2) Fensterkontakte und 1 (besser 2) Sabotagekontakte als individueller digitaler Eingang
+ - Sensoren und Aktoren für Stellantrieb
+ - Controller
+ - RS845 Schnittstelle
+
+Softwaremerkmale:
+TODO

@@ -214,7 +214,7 @@ BOOL BUS_bScheduleAndGetMessage(sBus_t* psBus)
 
         // send token
         if (bSendNextTimeSlotToken(psBus, psBus->bSchedDiscovery)) {
-            CLK_bTimerStart(&psBus->sNodeAnsTimeout, 100);
+            CLK_bTimerStart(&psBus->sNodeAnsTimeout, 500);
             psBus->eState = eBus_SendingToken;
             if (TRUE != psBus->bSchedDiscovery) ++psBus->uCurrentNode;
 			else                                ++psBus->uDiscoverNode;

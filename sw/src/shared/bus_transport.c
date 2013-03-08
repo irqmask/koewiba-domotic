@@ -180,7 +180,7 @@ BOOL bReceive(sBus_t* psBus)
 #ifdef BUS_SCHEDULER
                 psBus->bSchedMsgReceived = TRUE;
 #endif
-                psBus->eState = eBus_Idle;
+                vResetBus(psBus);
             }
         }
 

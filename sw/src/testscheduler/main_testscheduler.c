@@ -46,7 +46,6 @@ static sClkTimer_t 	g_sLedTimer;
 
 int main(void)
 {
-	uint8_t ii;
     uint8_t msglen = 0;
     uint16_t sender = 0;
     uint8_t msg[BUS_MAXMSGLEN];
@@ -63,10 +62,6 @@ int main(void)
     while (1) {
         if (BUS_bScheduleAndGetMessage(&g_sBus)) {
             if (BUS_bReadMessage(&g_sBus, &sender, &msglen, msg)) {
-            	for (ii=0; ii<msglen; ii++) {
-            		msg[ii]++;
-            	}
-            	BUS_bSendMessage(&g_sBus, sender, msglen, msg);
             }
         }
 

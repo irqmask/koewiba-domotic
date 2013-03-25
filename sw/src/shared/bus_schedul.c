@@ -33,9 +33,33 @@
 // --- Local functions ---------------------------------------------------------
 
 /**
+ * Start sending of sleep command.
+ */
+BOOL bSendSleepCmd(sBus_t* psBus)
+{
+	uint8_t msg[8];
+
+    msg[0] = BUS_SYNCBYTE; 					// SY - Syncronization byte: 'Ü' = 0b10011010
+	msg[1] = psBus->sCfg.uOwnNodeAddress;	// AS - Address sender on bus 7bit
+	msg[2] = sizeof(msg)-3;                 // LE - Length of message from AR to CRCL
+	msg[3] = 0x00;                          // AR - Address receiver 7bit (Broadcast)
+	msg[4] = 0x00;                          // EA - Extended address 4bit sender in higher nibble, 4bit receiver in lower nibble.
+	msg[5] = SLEEPCOMMAND;                  // MD - Sleep-Command
+	//@TODO: Add CRC-calculation
+	msg[6] = 0x00;                          // CRCH - High byte of 16bit CRC
+	msg[7] = 0x00;                          // CRCL - Low byte of 16bit CRC
+	if( BUS__bPhySend(&psBus->sPhy, msg, sizeof msg) )
+	{
+		while( BUS__bPhySending(&psBus->sPhy) ) {}; // Wait till message is sent completely.
+		return TRUE;
+	}
+	return FALSE;
+}
+
+/**
  * Start sending of next token.
  */
-BOOL bSendNextTimeSlotToken(sBus_t* psBus, BOOL discovery)
+static BOOL bSendNextTimeSlotToken(sBus_t* psBus, BOOL discovery)
 {
     sNodeInfo_t* node;
 
@@ -92,7 +116,6 @@ BOOL BUS_bSchedulAddNode(sBus_t* psBus, uint8_t uNodeAddress)
         	found = TRUE;
         }
         else if (found) { // shift following elements to avoid gaps in list
-			LED_STATUS_ON;
         	psBus->asDiscoveryList[ii-1].uAddress = psBus->asDiscoveryList[ii].uAddress;
         	psBus->asDiscoveryList[ii-1].uErrCnt  = psBus->asDiscoveryList[ii].uErrCnt;
         }
@@ -184,40 +207,33 @@ BOOL bCurrNodeIsMe(sBus_t* psBus)
  */
 BOOL BUS_bScheduleAndGetMessage(sBus_t* psBus)
 {
-	static uint8_t 	busdiscovery = BUS_DISCOVERYLOOPS;
+	static uint8_t 	schedloopcnt = BUS_DISCOVERYLOOPS;
     BOOL			rc 			 = FALSE;
 
     switch (psBus->eState) {
-    case eBus_InitWait:
-    {
-    	psBus->bSchedDiscovery = TRUE;
-        if ((psBus->uDiscoverNode == BUS_MAXNODES) || (psBus->asDiscoveryList[psBus->uDiscoverNode].uAddress == 0)) {
-        	psBus->uDiscoverNode = 0;
-        	--busdiscovery;
-        }
-        // send token
-        if (bSendNextTimeSlotToken(psBus, psBus->bSchedDiscovery)) {
-            CLK_bTimerStart(&psBus->sNodeAnsTimeout, 100);
-            psBus->eState = eBus_SendingToken;
-        }
-        break;
-    }
+
     case eBus_Idle:
-    	psBus->bSchedDiscovery = FALSE;
-        // select next node
-        if ((psBus->uCurrentNode == BUS_MAXNODES) || (psBus->asNodeList[psBus->uCurrentNode].uAddress == 0)) {
-            psBus->uCurrentNode = 0;
-            psBus->bSchedDiscovery = TRUE;
-			if ((psBus->uDiscoverNode == BUS_MAXNODES) || (psBus->asDiscoveryList[psBus->uDiscoverNode].uAddress == 0)) {
-				psBus->uDiscoverNode = 0;
-			}
-        }
+		psBus->bSchedDiscovery = FALSE;
+    	if(eSched_Discovery==g_schedState) psBus->bSchedDiscovery = TRUE;
+    	else if ((psBus->uCurrentNode == BUS_MAXNODES) || (psBus->asNodeList[psBus->uCurrentNode].uAddress == 0))
+    	{ // if last node in active list is reached reset node-counter and switch to discovery-list
+    		psBus->uCurrentNode = 0;
+    		psBus->bSchedDiscovery = TRUE;
+    	}
+
+    	if((psBus->bSchedDiscovery) && ((psBus->uDiscoverNode == BUS_MAXNODES) || (psBus->asDiscoveryList[psBus->uDiscoverNode].uAddress == 0)))
+		{ // if last node in discovery list is reached reset node-counter
+    		psBus->uDiscoverNode = 0;
+    		if(schedloopcnt) --schedloopcnt;
+    	}
 
         // send token
-        if (bSendNextTimeSlotToken(psBus, psBus->bSchedDiscovery)) {
+        if (bSendNextTimeSlotToken(psBus, psBus->bSchedDiscovery))
+        {
             CLK_bTimerStart(&psBus->sNodeAnsTimeout, 50);
             psBus->eState = eBus_SendingToken;
         }
+        else LED_ERROR_ON;
         break;
 
     case eBus_SendingToken:
@@ -235,17 +251,30 @@ BOOL BUS_bScheduleAndGetMessage(sBus_t* psBus)
         	}
         }
         else {
-			//TODO CV: timeout and error handling, if token is not sent
+        	if (CLK_bTimerIsElapsed(&psBus->sNodeAnsTimeout))
+        	{
+        		vNodeError(psBus);
+        		// return to IDLE state
+        		psBus->eState = eBus_Idle;
+        		LED_ERROR_ON;
+        	}
 		}
         break;
+
+    case eBus_ReceivingPassive:
+    	// any message on the bus resets counter
+    	schedloopcnt = BUS_LOOPS_TILL_SLEEP;
+    	break;
 
     default:
         break;
     }
 
     rc = BUS__bTrpSendReceive(psBus);
+    if(rc) schedloopcnt = BUS_LOOPS_TILL_SLEEP;
 
     if (psBus->bSchedWaitingForAnswer) {
+    	BOOL recEnd = FALSE;
         if (psBus->bSchedMsgReceived) {
 			if (TRUE==psBus->bSchedDiscovery) {
 				if(BUS_bSchedulAddNode(psBus, psBus->auTokenMsg[1] & 0x7F)) {
@@ -255,25 +284,29 @@ BOOL BUS_bScheduleAndGetMessage(sBus_t* psBus)
 			}
             // TODO check node ID of received message and route eventually
         	//      to other line or net
-            psBus->bSchedMsgReceived = FALSE;
-            psBus->bSchedWaitingForAnswer = FALSE;
-            psBus->eState = eBus_Idle;
-			if (busdiscovery > 0) psBus->eState = eBus_InitWait;
-            if(TRUE != psBus->bSchedDiscovery) 	++psBus->uCurrentNode;
-			else 								++psBus->uDiscoverNode;
+			recEnd = TRUE;
 
         }
         else {
             if (CLK_bTimerIsElapsed(&psBus->sNodeAnsTimeout)) {
                 vNodeError(psBus);
                 // return to IDLE state
-                psBus->bSchedMsgReceived = FALSE;
-                psBus->bSchedWaitingForAnswer = FALSE;
-                psBus->eState = eBus_Idle;
-				if (busdiscovery > 0) psBus->eState = eBus_InitWait;
-				if(TRUE != psBus->bSchedDiscovery) 	++psBus->uCurrentNode;
-				else 								++psBus->uDiscoverNode;
+				recEnd = TRUE;
+				if(0 == schedloopcnt)
+				{   // if schedulerloopcount has reached zero ...
+					schedloopcnt = BUS_LOOPS_TILL_SLEEP;
+					if(eSched_Discovery==g_schedState)  g_schedState = eSched_Run;   // ... finish discovery
+					else 								g_schedState = eSched_Sleep; // ... initiate sleep-mode
+				}
             }
+        }
+        if(recEnd) { // receiving finished
+            psBus->bSchedMsgReceived = FALSE;
+            psBus->bSchedWaitingForAnswer = FALSE;
+            psBus->eState = eBus_Idle;
+            if(TRUE != psBus->bSchedDiscovery) 	++psBus->uCurrentNode;
+			else 								++psBus->uDiscoverNode;
+
         }
     }
     return rc;

@@ -49,6 +49,18 @@
     #define INTERRUPT_UART_TRANS USART_TX_vect
 #endif
 
+#if defined (__AVR_ATmega8__)	\
+ || defined (__AVR_ATmega88__)
+	#define CLOCKTIMERCONTROLREGISTERA TCCR1A
+	#define CLOCK_TCCRB TCCR1B
+	#define CLOCKSELECT0 CS10
+	#define CLOCKSELECT1 CS11
+	#define CLOCKSELECT2 CS12
+	#define CLOCK_OCRA_H OCR1AH
+	#define CLOCK_OCRA_L OCR1AL
+	#define CLOCKOUTPUTCOMPAREB_H OCR1BH
+	#define CLOCKOUTPUTCOMPAREB_L OCR1BL
+#endif
 
 // --- Type definitions --------------------------------------------------------
 
@@ -63,6 +75,14 @@
 // --- Module global functions -------------------------------------------------
 
 // --- Global functions --------------------------------------------------------
+extern void IR_DataRegisterEmpty_Enable(void);
+extern void IR_DataRegisterEmpty_Disable(void);
+extern void IR_TransmitComplete_Enable(void);
+extern void IR_TransmitComplete_Disable(void);
+extern void IR_ReceiveComplete_Enable(void);
+extern void IR_ReceiveComplete_Disable(void);
+extern void IR_OutputCompareMatchA_Enable(void);
+extern void IR_OutputCompareMatchA_Disable(void);
 
 
 #endif /* UCONTROLLER_H_ */

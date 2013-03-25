@@ -15,6 +15,7 @@
 #include <avr/interrupt.h>
 #include "prjtypes.h"
 #include "clock.h"
+#include "ucontroller.h"
 
 // --- Definitions -------------------------------------------------------------
 
@@ -61,12 +62,12 @@ BOOL bDeregisterTimer(sClkTimer_t* psTimer)
         }
         else if(found)
         {
-        	REGBIT_TIMSK &= ~(1<<REGBIT_OCIEA);  // disable interrupt
+        	IR_OutputCompareMatchA_Disable();  // disable interrupt
         	// shift following timers, to avoid gaps in the list.
         	g_asRunningTimers[ii-1] = g_asRunningTimers[ii];
         }
     }
-	REGBIT_TIMSK |= (1<<REGBIT_OCIEA); // enable interrupt
+    IR_OutputCompareMatchA_Enable(); // enable interrupt
     return found;
 }
 
@@ -110,11 +111,31 @@ void CLK_vInitialize(void)
     //                     fClk
     // fIrq = 2 * fOC  = --------- - 1
     //                    N*fOC
-    TCCR1B |= ((0<<CS12) | (1<<CS11) | (1<<CS10)); // set prescaler to 1/64 (N=64)
-    TCCR1B |= (1<<WGM12);                          // CTC mode (clear timer on compare match)
-    OCR1AH = (F_CPU/(64*CLOCK_TICKS_PER_SECOND) - 1) >> 8;
-    OCR1AL = (F_CPU/(64*CLOCK_TICKS_PER_SECOND) - 1) & 0x00FF;
-    REGBIT_TIMSK |= (1<<REGBIT_OCIEA);                          // enable output compare interrupt
+    CLOCK_TCCRB |= ((0<<CLOCKSELECT2) | (1<<CLOCKSELECT1) | (1<<CLOCKSELECT0)); // set prescaler to 1/64 (N=64)
+    CLOCK_TCCRB |= (1<<WGM12);                                                  // CTC mode (clear timer on compare match)
+    CLOCK_OCRA_H = (F_CPU/(64*CLOCK_TICKS_PER_SECOND) - 1) >> 8;
+    CLOCK_OCRA_L = (F_CPU/(64*CLOCK_TICKS_PER_SECOND) - 1) & 0x00FF;
+    IR_OutputCompareMatchA_Enable();                                            // enable output compare interrupt
+}
+
+/**
+ * Start/Stop Clock-Timer
+ * 
+ * @param[in] start
+ * boolean for starting/stopping the timer (TRUE = start)
+ */
+void CLK_vControl(BOOL start)
+{
+	static uint8_t tccr1b = 0;
+
+	if(start){
+		if(0==tccr1b) return;
+		CLOCK_TCCRB = tccr1b;
+	}
+	else{
+		tccr1b = CLOCK_TCCRB;
+		CLOCK_TCCRB &= ~((1<<CS12) | (1<<CS11) | (1<<CS10));
+	}
 }
 
 /**

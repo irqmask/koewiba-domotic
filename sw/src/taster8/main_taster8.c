@@ -25,6 +25,7 @@ static sBus_t      g_sBus;
 static sClkTimer_t g_sLedTimer;
 
 // --- Global variables --------------------------------------------------------
+eModuleState  g_moduleState = eMod_Running; //!< current State of the module
 
 // --- Module global variables -------------------------------------------------
 
@@ -65,6 +66,10 @@ int main(void)
             if (BUS_bReadMessage(&g_sBus, &sender, &msglen, msg)) {
                 // switch light?
                 // type bit-field?
+                if (msg[0] == SLEEPCOMMAND) {
+                	g_moduleState = eMod_Sleeping;
+					//@TODO: Hier muss die Sleep-Methode rein sobald die Hardware in der Lage ist den Controller wieder aufzuwecken.
+                }
                 if (msg[0] == 0x01) {
                     if (msg[2] & 0b00000001) LED_ERROR_ON;
                     else                     LED_ERROR_OFF;
@@ -77,6 +82,13 @@ int main(void)
             if (oldbutton != 0) {
                 if (light)  light = 0;
                 else        light = 1;
+                // Wakeup bus
+                if(eMod_Sleeping == g_moduleState)
+                {
+                	bSendWakeupByte(&g_sBus);
+                	g_moduleState = eMod_Running;
+                	BUS_vFlushBus(&g_sBus);
+                }
                 msg[0] = 0x01;
                 msg[1] = 1;
                 msg[2] = light;

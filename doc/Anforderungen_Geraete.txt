@@ -5,7 +5,7 @@ Hardwaremerkmale:
  - 8 Tasten
  - optional 8 LEDs zur Zustandsanzeige
  - Controller
- - RS845 Schnittstelle
+ - RS485 Schnittstelle
 
 
 Modul Raumtemperatursensor
@@ -34,7 +34,7 @@ Hardwaremerkmale:
  - Anschlussmöglichkeit für 1 (besser 2) Fensterkontakte und 1 (besser 2) Sabotagekontakte als individueller digitaler Eingang
  - Sensoren und Aktoren für Stellantrieb
  - Controller
- - RS845 Schnittstelle
+ - RS485 Schnittstelle
 
 Softwaremerkmale:
 TODO

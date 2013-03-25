@@ -12,6 +12,8 @@
 
 #include <avr/io.h>
 #include <avr/interrupt.h>
+#include <avr/sleep.h>
+#include <util/delay.h>
 
 #include "bus.h"
 #include "clock.h"
@@ -37,8 +39,19 @@ static sClkTimer_t 	g_sLedTimer;
 // --- Global variables --------------------------------------------------------
 
 // --- Module global variables -------------------------------------------------
+eSchedState  g_schedState = eSched_Discovery; //!< current State of the scheduler
 
 // --- Local functions ---------------------------------------------------------
+void IO_vInitialize(void)
+{
+    DDRB  |= ((0<<DDB7)   | (0<<DDB6)   | (1<<DDB5)   | (1<<DDB4)   | (0<<DDB3)   | (1<<DDB2)   | (1<<DDB1)   | (1<<DDB0)  );
+    DDRC  |= (              (0<<DDC6)   | (1<<DDC5)   | (1<<DDC4)   | (1<<DDC3)   | (1<<DDC2)   | (1<<DDC1)   | (1<<DDC0)  );
+    DDRD  |= ((0<<DDD7)   | (1<<DDD6)   | (0<<DDD5)   | (1<<DDD4)   | (1<<DDD3)   | (1<<DDD2)   | (1<<DDD1)   | (0<<DDD0)  );
+
+    PORTB |= ((1<<PORTB7) | (1<<PORTB6) | (0<<PORTB5) | (0<<PORTB4) | (1<<PORTB3) | (0<<PORTB2) | (0<<PORTB1) | (0<<PORTB0));
+    PORTC |= (              (1<<PORTC6) | (0<<PORTC5) | (0<<PORTC4) | (0<<PORTC3) | (0<<PORTC2) | (0<<PORTC1) | (0<<PORTC0));
+    PORTD |= ((1<<PORTD7) | (0<<PORTD6) | (1<<PORTD5) | (0<<PORTD4) | (0<<PORTD3) | (0<<PORTD2) | (0<<PORTD1) | (1<<PORTD0));
+}
 
 // --- Module global functions -------------------------------------------------
 
@@ -50,6 +63,7 @@ int main(void)
     uint16_t sender = 0;
     uint8_t msg[BUS_MAXMSGLEN];
 
+    IO_vInitialize();
     CLK_vInitialize();
     BUS_vConfigure(&g_sBus, 1); // configure a bus node with address 1
     BUS_vInitialize(&g_sBus, 0);// initialize bus on UART 0
@@ -60,10 +74,29 @@ int main(void)
     CLK_bTimerStart(&g_sLedTimer, 1000);
 
     while (1) {
-        if (BUS_bScheduleAndGetMessage(&g_sBus)) {
-            if (BUS_bReadMessage(&g_sBus, &sender, &msglen, msg)) {
-            }
-        }
+    	if (BUS_bScheduleAndGetMessage(&g_sBus)) {
+    		if (BUS_bReadMessage(&g_sBus, &sender, &msglen, msg))
+    		{
+
+    		}
+    	}
+    	else if(eSched_Sleep==g_schedState) {
+
+    		if(bSendSleepCmd(&g_sBus))
+    		{
+				CLK_vControl(FALSE); // disable clock-timer, otherwise
+				                     // irq will cause immediate wakeup.
+
+    			// sleep till byte is received.
+    			set_sleep_mode(SLEEP_MODE_IDLE);
+    			sleep_mode();
+
+    			_delay_ms(1); // wait for sys-clock becoming stable
+    			BUS_vFlushBus(&g_sBus); // Clean bus-buffer
+    			g_schedState = eSched_Run;
+    			CLK_vControl(TRUE); // enable clock-timer
+    		}
+    	}
 
         if (CLK_bTimerIsElapsed(&g_sLedTimer)) {
         	// TODO remove after debug

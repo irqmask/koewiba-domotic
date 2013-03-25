@@ -36,9 +36,27 @@
 
 #define BUS_MAX_ANSWERFAILS		5	//!< Maximum number a member's answer can be missing, before disconnecting.
 #define BUS_DISCOVERYLOOPS		3   //!< Number of discovery-loops till normal scheduling begins.
+#define BUS_LOOPS_TILL_SLEEP	20  //!< Number of discovery-loops till normal scheduling begins.
 
+#define SLEEPCOMMAND	0xF0	//<! Command to set subscribers in sleep-mode.
+#define WAKEUPBYTE 		0xFF	//<! Dummy-Byte that is send to the bus as wakeup-call for other subscribers.
 
 // --- Type definitions --------------------------------------------------------
+
+//! Possible states of the scheduler
+typedef enum schedstate {
+	eSched_Discovery,	//!< Scheduler is in discovery-mode (looking for nodes)
+	eSched_Run,			//!< Scheduler is normal mode
+	eSched_Sleep		//!< Scheduler is sleeping
+} eSchedState;
+extern eSchedState  g_schedState;
+
+//! Possible states of the subscriber
+typedef enum modulestate {
+	eMod_Running,	//!< Scheduler is normal mode
+	eMod_Sleeping	//!< Scheduler is sleeping
+} eModuleState;
+extern eModuleState  g_moduleState;
 
 //! Possible states of the bus, as seen by each node
 typedef enum busstate {
@@ -151,6 +169,8 @@ void    BUS_vConfigure              (sBus_t*        psBus,
 
 void    BUS_vInitialize             (sBus_t*        psBus,
                                      uint8_t        uUart);
+
+void    BUS_vFlushBus               (sBus_t*        psBus);
                                      
 BOOL    BUS_bGetMessage             (sBus_t*        psBus);
 
@@ -163,6 +183,10 @@ BOOL    BUS_bSendMessage            (sBus_t*        psBus,
                                      uint16_t       uReceiver, 
                                      uint8_t        uLen, 
                                      uint8_t*       puMsg);
+
+extern BOOL	bSendWakeupByte			(sBus_t* 		psBus);
+extern BOOL bSendSleepCmd			(sBus_t* 		psBus);
+
 
 #ifdef BUS_SCHEDULER
 BOOL    BUS_bSchedulAddNode         (sBus_t*        psBus,

@@ -35,7 +35,7 @@
 
 // --- Local functions ---------------------------------------------------------
 
-// Reset bus to eBus_InitWait state.
+// Reset bus to Idle state.
 void vResetBus(sBus_t* psBus)
 {
     psBus->eState = eBus_Idle;
@@ -50,6 +50,21 @@ void vCreateEmptyMessage(sBus_t* psBus)
     psBus->auEmptyMsg[1] = psBus->sCfg.uOwnNodeAddress & 0x007F; // local address on bus
     psBus->auEmptyMsg[2] = 0; // length
 }
+
+/**
+ * Start sending the wakeup-byte.
+ */
+BOOL bSendWakeupByte(sBus_t* psBus)
+{
+	uint8_t msg = WAKEUPBYTE;
+	if(BUS__bPhySend(&psBus->sPhy, &msg, 1))
+	{
+		while( BUS__bPhySending(&psBus->sPhy) ) {}; // Wait till message is sent completely.
+		return TRUE;
+	}
+	return FALSE;
+}
+
 
 // Receive and interpret data.
 BOOL bReceive(sBus_t* psBus)
@@ -73,15 +88,13 @@ BOOL bReceive(sBus_t* psBus)
         // 2. byte: check token byte
         } else if (psBus->sRecvMsg.uOverallLength == 1) {
             // token received?
-            if (u & 0x80) {
+            if (u & TOKENBIT) {
                 // is it me?
 				vResetBus(psBus); // byte collecting ends after token.
-                if ((u & 0x7F) == (psBus->sCfg.uOwnNodeAddress & 0x007f)) {
+                if ((u & ADDRMASK) == (psBus->sCfg.uOwnNodeAddress & 0x007f)) {
                     psBus->eState = eBus_GotToken;
-                    LED_STATUS_ON;
                 } else {
                     psBus->eState = eBus_Idle;
-                    LED_STATUS_OFF;
                 }
                 psBus->sRecvMsg.uOverallLength = 0;
                 psBus->sRecvMsg.uLength = 0;
@@ -118,14 +131,14 @@ BOOL bReceive(sBus_t* psBus)
             // 4. byte: AR - Address receiver 7bit
             } else if (psBus->sRecvMsg.uOverallLength == 3) {
                 // check correctness of receiver address
-                if (u & 0x80) {
+                if (u & TOKENBIT) {
                 	// bad receiver address. valid range is 0x00..0x7F
                     vResetBus(psBus);
                     break;
                 }
                 psBus->sRecvMsg.uReceiver = u;
-                // hello, is it me you are looking for?
-                if (u == (psBus->sCfg.uOwnNodeAddress & 0x007f)) {
+                // hello, is it me you are looking for (or broadcast-message)?
+                if ((0 == u) || (u == (psBus->sCfg.uOwnNodeAddress & 0x007f))) {
                     // nothing more to do here.
                 } else {
                     // we are not interested in this message
@@ -284,9 +297,20 @@ void BUS_vConfigure(sBus_t* psBus, uint16_t uNodeAddress)
  */
 void BUS_vInitialize(sBus_t* psBus, uint8_t uUart)
 {
-    psBus->eState = eBus_InitWait;
+    psBus->eState = eBus_Idle;
     vCreateEmptyMessage(psBus);
     BUS__vPhyInitialize(&psBus->sPhy, uUart);
+}
+
+/**
+ * Flushes phy-buffer and resets bus.
+ *
+ * @param[in]   psBus       Handle of the bus.
+ */
+void BUS_vFlushBus(sBus_t* psBus)
+{
+	BUS__uPhyFlush(&psBus->sPhy);
+	vResetBus(psBus);
 }
 
 /**
@@ -354,9 +378,9 @@ BOOL BUS_bReadMessage(sBus_t*  psBus,
  * @note Use BUS_bIsIdle() to check if message is successfully transmitted.
  */
 BOOL BUS_bSendMessage(sBus_t*    psBus,
-                        uint16_t   uReceiver,
-                        uint8_t    uLen,
-                        uint8_t*   puMsg)
+                      uint16_t   uReceiver,
+                      uint8_t    uLen,
+                      uint8_t*   puMsg)
 {
     do {
     	// check length of message to be sent.

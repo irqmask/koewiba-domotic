@@ -27,7 +27,10 @@
 #define BUS_INTERBYTE_TIMEOUT   (8 * BUS_BITTIME)
 
 //! synchronization byte every message begins with.
-#define BUS_SYNCBYTE            0b10011010
+#define BUS_SYNCBYTE    0b10011010
+
+#define TOKENBIT 0x80
+#define ADDRMASK ~(TOKENBIT)
 
 // --- Type definitions --------------------------------------------------------
 
@@ -93,6 +96,8 @@ uint8_t BUS__uPhyRead               (sBusPhy_t*     psPhy,
                                      
 BOOL    BUS__bPhyReadByte           (sBusPhy_t*     psPhy, 
                                      uint8_t*       puByte);
+
+void 	BUS__uPhyFlush				(sBusPhy_t* psPhy);
 
 // --- Global functions --------------------------------------------------------
 

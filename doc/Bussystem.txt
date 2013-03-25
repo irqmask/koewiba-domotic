@@ -196,3 +196,8 @@ Beispiel: 0x23, Registernummer, 32bit- Wert
 0x23 - Set Flash
 0x24 - End Flash
 
+Steuerkommandos (Typ 0xF0 - 0xFF)
+Format: Typ, spez. Parameter
+
+0xF0 - Sleep (legt den Bus schlafen)
+0xF5 - Reset (Teilnehmer soll über Los gehen)

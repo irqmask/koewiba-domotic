@@ -36,6 +36,40 @@
 #define UBRRVALH ((uint8_t)(UBRRVAL>>8))
 #define UBRRVALL ((uint8_t)UBRRVAL)
 
+
+inline void IR_DataRegisterEmpty_Enable(void)
+{
+	REGISTER_UCSRB |=  (1<<REGBIT_UDRIE);
+}
+inline void IR_DataRegisterEmpty_Disable(void)
+{
+	REGISTER_UCSRB &= ~(1<<REGBIT_UDRIE);
+}
+inline void IR_TransmitComplete_Enable(void)
+{
+	REGISTER_UCSRB |=  (1<<REGBIT_TXCIE);
+}
+inline void IR_TransmitComplete_Disable(void)
+{
+	REGISTER_UCSRB &= ~(1<<REGBIT_TXCIE);
+}
+inline void IR_ReceiveComplete_Enable(void)
+{
+	REGISTER_UCSRB |=  (1<<REGBIT_RXCIE);
+}
+inline void IR_ReceiveComplete_Disable(void)
+{
+	REGISTER_UCSRB &= ~(1<<REGBIT_RXCIE);
+}
+inline void IR_OutputCompareMatchA_Enable(void)
+{
+	REGBIT_TIMSK |=  (1<<REGBIT_OCIEA);
+}
+inline void IR_OutputCompareMatchA_Disable(void)
+{
+	REGBIT_TIMSK &= ~(1<<REGBIT_OCIEA);
+}
+
 // --- Type definitions --------------------------------------------------------
 
 // --- Local variables ---------------------------------------------------------
@@ -176,7 +210,7 @@ BOOL BUS__bPhySend(sBusPhy_t* psPhy, const uint8_t* puMsg, uint8_t uLen)
     if (psPhy->uUart == 0) {
         BUS__vPhyActivateSender(psPhy, TRUE);
         REGISTER_UDR = *psPhy->puSendPtr;   // send first byte
-        REGISTER_UCSRB |= (1<<REGBIT_UDRIE);      // enable data register empty interrupt
+        IR_DataRegisterEmpty_Enable(); // enable data register empty interrupt
     }
     return TRUE;
 }
@@ -190,7 +224,7 @@ BOOL BUS__bPhySend(sBusPhy_t* psPhy, const uint8_t* puMsg, uint8_t uLen)
  */
 BOOL BUS__bPhySending(sBusPhy_t* psPhy)
 {
-    return (psPhy->uFlags & e_uarttxflag);
+    return ((psPhy->uFlags & e_uarttxflag) || (0 < psPhy->uCurrentBytesToSend));
 }
 
 /**
@@ -253,6 +287,25 @@ BOOL BUS__bPhyReadByte(sBusPhy_t* psPhy, uint8_t *puByte)
 		psPhy->uFlags &= ~(e_uartrxflag);
 	}
 	return TRUE;
+}
+
+/**
+ * Flush all data from physical layer's input buffer.
+ *
+ * @param[in] psPhy
+ * Handle of bus physical layer.
+ */
+void BUS__uPhyFlush(sBusPhy_t* psPhy)
+{
+    uint8_t    n = 0;
+    sBusRec_t  *buffer = &psPhy->sRecvBuf;
+
+    for(n=0; n<sizeof(buffer->auBuf); ++n){
+    	buffer->auBuf[n] = 0;
+    }
+    buffer->uReadPos  = 0;
+    buffer->uWritePos = 0;
+    psPhy->uFlags &= ~(e_uartrxflag);
 }
 
 // --- Global functions --------------------------------------------------------

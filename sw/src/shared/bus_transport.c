@@ -298,6 +298,11 @@ void BUS_vConfigure(sBus_t* psBus, uint16_t uNodeAddress)
 void BUS_vInitialize(sBus_t* psBus, uint8_t uUart)
 {
     psBus->eState = eBus_Idle;
+#ifdef BUS_SCHEDULER
+    psBus->eModuleState = eSched_Discovery;
+#else
+    psBus->eModuleState = eMod_Running;
+#endif
     vCreateEmptyMessage(psBus);
     BUS__vPhyInitialize(&psBus->sPhy, uUart);
 }
@@ -383,6 +388,13 @@ BOOL BUS_bSendMessage(sBus_t*    psBus,
                       uint8_t*   puMsg)
 {
     do {
+        // Wakeup bus
+        if(eMod_Sleeping == psBus->eModuleState) {
+        	bSendWakeupByte(psBus);
+        	psBus->eModuleState = eMod_Running;
+        	BUS_vFlushBus(psBus);
+        }
+
     	// check length of message to be sent.
         if (uLen == 0 || uLen > BUS_MAXMSGLEN) {
         	break;
@@ -423,5 +435,16 @@ BOOL BUS_bIsIdle(sBus_t*       psBus)
     return (psBus->eState == eBus_Idle);
 }
 
+/**
+ * Set module into sleep mode.
+ *
+ * @param[in]   psBus       Handle of the bus.
+ */
+void BUS_vSleep(sBus_t*       psBus)
+{
+	psBus->eModuleState = eMod_Sleeping;
+	//@TODO: Hier muss die Sleep-Methode rein sobald die Hardware in der Lage ist den Controller wieder aufzuwecken.
+
+}
 /** @} */
 /** @} */

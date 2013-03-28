@@ -12,7 +12,7 @@
 
 #include <avr/io.h>
 #include <avr/interrupt.h>
-#include <avr/sleep.h>
+
 #include <util/delay.h>
 
 #include "bus.h"
@@ -39,7 +39,6 @@ static sClkTimer_t 	g_sLedTimer;
 // --- Global variables --------------------------------------------------------
 
 // --- Module global variables -------------------------------------------------
-eSchedState  g_schedState = eSched_Discovery; //!< current State of the scheduler
 
 // --- Local functions ---------------------------------------------------------
 void IO_vInitialize(void)
@@ -75,28 +74,11 @@ int main(void)
 
     while (1) {
     	if (BUS_bScheduleAndGetMessage(&g_sBus)) {
-    		if (BUS_bReadMessage(&g_sBus, &sender, &msglen, msg))
-    		{
-
+    		if (BUS_bReadMessage(&g_sBus, &sender, &msglen, msg)) {
+                // TODO do somesthing
     		}
     	}
-    	else if(eSched_Sleep==g_schedState) {
-
-    		if(bSendSleepCmd(&g_sBus))
-    		{
-				CLK_vControl(FALSE); // disable clock-timer, otherwise
-				                     // irq will cause immediate wakeup.
-
-    			// sleep till byte is received.
-    			set_sleep_mode(SLEEP_MODE_IDLE);
-    			sleep_mode();
-
-    			_delay_ms(1); // wait for sys-clock becoming stable
-    			BUS_vFlushBus(&g_sBus); // Clean bus-buffer
-    			g_schedState = eSched_Run;
-    			CLK_vControl(TRUE); // enable clock-timer
-    		}
-    	}
+    	else BUS_vScheduleCheckAndSetSleep(&g_sBus);
 
         if (CLK_bTimerIsElapsed(&g_sLedTimer)) {
         	// TODO remove after debug

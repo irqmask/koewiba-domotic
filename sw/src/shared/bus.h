@@ -43,20 +43,12 @@
 
 // --- Type definitions --------------------------------------------------------
 
-//! Possible states of the scheduler
-typedef enum schedstate {
-	eSched_Discovery,	//!< Scheduler is in discovery-mode (looking for nodes)
-	eSched_Run,			//!< Scheduler is normal mode
-	eSched_Sleep		//!< Scheduler is sleeping
-} eSchedState;
-extern eSchedState  g_schedState;
-
 //! Possible states of the subscriber
 typedef enum modulestate {
+	eSched_Discovery,	//!< Scheduler is in discovery-mode (looking for nodes)
 	eMod_Running,	//!< Scheduler is normal mode
 	eMod_Sleeping	//!< Scheduler is sleeping
-} eModuleState;
-extern eModuleState  g_moduleState;
+} eModState_t;
 
 //! Possible states of the bus, as seen by each node
 typedef enum busstate {
@@ -129,6 +121,7 @@ typedef struct nodeinfo {
 
 //! data of bus. used as handle for all public methods.
 typedef struct bus {
+	eModState_t		eModuleState;					//!< current state of the module.
     eBusState_t     eState;                         //!< current state of the bus.
     BOOL            bMsgReceived;                   //!< flag, stating that there is an unread message
     sBusCfg_t       sCfg;                           //!< configuration data.
@@ -184,8 +177,8 @@ BOOL    BUS_bSendMessage            (sBus_t*        psBus,
                                      uint8_t        uLen, 
                                      uint8_t*       puMsg);
 
-extern BOOL	bSendWakeupByte			(sBus_t* 		psBus);
-extern BOOL bSendSleepCmd			(sBus_t* 		psBus);
+//extern BOOL bSendWakeupByte       (sBus_t*        psBus);
+//extern BOOL bSendSleepCmd         (sBus_t*        psBus);
 
 
 #ifdef BUS_SCHEDULER
@@ -193,7 +186,10 @@ BOOL    BUS_bSchedulAddNode         (sBus_t*        psBus,
                                     uint8_t         uNodeAddress);
 
 BOOL    BUS_bScheduleAndGetMessage  (sBus_t*        psBus);
+void    BUS_vScheduleCheckAndSetSleep(sBus_t* psBus);
 #endif
+
+void    BUS_vSleep                   (sBus_t*       psBus);
                                      
 #endif /* _BUS_H_ */
 /** @} */

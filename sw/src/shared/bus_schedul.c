@@ -12,6 +12,7 @@
 
 // --- Include section ---------------------------------------------------------
 #include <avr/io.h>
+#include <avr/sleep.h>
 
 #include "bus.h"
 #include "bus_intern.h"
@@ -39,7 +40,7 @@ BOOL bSendSleepCmd(sBus_t* psBus)
 {
 	uint8_t msg[8];
 
-    msg[0] = BUS_SYNCBYTE; 					// SY - Syncronization byte: 'Ü' = 0b10011010
+    msg[0] = BUS_SYNCBYTE; 					// SY - Syncronization byte: 'ï¿½' = 0b10011010
 	msg[1] = psBus->sCfg.uOwnNodeAddress;	// AS - Address sender on bus 7bit
 	msg[2] = sizeof(msg)-3;                 // LE - Length of message from AR to CRCL
 	msg[3] = 0x00;                          // AR - Address receiver 7bit (Broadcast)
@@ -214,7 +215,7 @@ BOOL BUS_bScheduleAndGetMessage(sBus_t* psBus)
 
     case eBus_Idle:
 		psBus->bSchedDiscovery = FALSE;
-    	if(eSched_Discovery==g_schedState) psBus->bSchedDiscovery = TRUE;
+    	if(eSched_Discovery == psBus->eModuleState) psBus->bSchedDiscovery = TRUE;
     	else if ((psBus->uCurrentNode == BUS_MAXNODES) || (psBus->asNodeList[psBus->uCurrentNode].uAddress == 0))
     	{ // if last node in active list is reached reset node-counter and switch to discovery-list
     		psBus->uCurrentNode = 0;
@@ -271,7 +272,7 @@ BOOL BUS_bScheduleAndGetMessage(sBus_t* psBus)
     }
 
     rc = BUS__bTrpSendReceive(psBus);
-    if(rc) schedloopcnt = BUS_LOOPS_TILL_SLEEP;
+    if (rc) schedloopcnt = BUS_LOOPS_TILL_SLEEP;
 
     if (psBus->bSchedWaitingForAnswer) {
     	BOOL recEnd = FALSE;
@@ -292,25 +293,50 @@ BOOL BUS_bScheduleAndGetMessage(sBus_t* psBus)
                 vNodeError(psBus);
                 // return to IDLE state
 				recEnd = TRUE;
-				if(0 == schedloopcnt)
-				{   // if schedulerloopcount has reached zero ...
+				if (0 == schedloopcnt) { // if schedulerloopcount has reached zero ...
 					schedloopcnt = BUS_LOOPS_TILL_SLEEP;
-					if(eSched_Discovery==g_schedState)  g_schedState = eSched_Run;   // ... finish discovery
-					else 								g_schedState = eSched_Sleep; // ... initiate sleep-mode
+					if (eSched_Discovery == psBus->eModuleState) {
+					    psBus->eModuleState = eMod_Running;   // ... finish discovery
+					} else {
+					    psBus->eModuleState = eMod_Sleeping; // ... initiate sleep-mode
+					}
 				}
             }
         }
-        if(recEnd) { // receiving finished
+        if (recEnd) { // receiving finished
             psBus->bSchedMsgReceived = FALSE;
             psBus->bSchedWaitingForAnswer = FALSE;
             psBus->eState = eBus_Idle;
             if(TRUE != psBus->bSchedDiscovery) 	++psBus->uCurrentNode;
 			else 								++psBus->uDiscoverNode;
-
         }
     }
     return rc;
 }
 
+/**
+ * Check if schedule is in sleep mode and send sleep command to slaves.
+ *
+ * @param[in] psBus
+ * Handle of the bus.
+ */
+void BUS_vScheduleCheckAndSetSleep(sBus_t* psBus)
+{
+    if (eMod_Sleeping == psBus->eModuleState) {
+        if (bSendSleepCmd(psBus)) {
+            CLK_vControl(FALSE); // disable clock-timer, otherwise
+                                 // irq will cause immediate wakeup.
+
+            // sleep till byte is received.
+            set_sleep_mode(SLEEP_MODE_IDLE);
+            sleep_mode();
+
+            _delay_ms(1); // wait for sys-clock becoming stable
+            BUS_vFlushBus(psBus); // Clean bus-buffer
+            psBus->eModuleState = eMod_Running;
+            CLK_vControl(TRUE); // enable clock-timer
+        }
+    }
+}
 /** @} */
 /** @} */

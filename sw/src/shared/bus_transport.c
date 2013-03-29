@@ -154,12 +154,6 @@ BOOL bReceive(sBus_t* psBus)
                 
                 // check receiver address again
                 // TODO
-                
-            // receive data (5th byte till length + 3(SY+AS+LE) - 2(CRC))
-            } else if ((psBus->sRecvMsg.uOverallLength > 4) &&
-                       (psBus->sRecvMsg.uOverallLength < psBus->sRecvMsg.uLength + 3 - 2)) {
-                // save message data
-                psBus->sRecvMsg.auBuf[psBus->sRecvMsg.uOverallLength - 3 - 2] = u;
                            
             // N-1 th byte: CRCH - High byte of 16bit CRC
             } else if (psBus->sRecvMsg.uOverallLength == (psBus->sRecvMsg.uLength + 3 - 2)) {
@@ -176,12 +170,12 @@ BOOL bReceive(sBus_t* psBus)
 #endif
                     psBus->eState = eBus_Idle;
 					psBus->sRecvMsg.uOverallLength = 0;
+					break;
                 } else {
                     // invalid length of message
                     vResetBus(psBus);
                     break;
                 }
-                break;
                 
             } else {
                 // invalid length of message
@@ -190,6 +184,7 @@ BOOL bReceive(sBus_t* psBus)
             }
         }
 
+        psBus->sRecvMsg.auBuf[psBus->sRecvMsg.uOverallLength] = u;
         psBus->sRecvMsg.uOverallLength++;
         
         // passive receiving state, only count bytes till the end of the message 
@@ -361,7 +356,7 @@ BOOL BUS_bReadMessage(sBus_t*  psBus,
         *puSender   = psBus->sRecvMsg.uSender;
         
         while (len < psBus->sRecvMsg.uLength - 4) {
-            puMsg[len] = psBus->sRecvMsg.auBuf[len];
+            puMsg[len] = psBus->sRecvMsg.auBuf[len + 5];
             len ++;
         }
         // reset bus to IDLE state, so we are ready to receive the next message

@@ -63,7 +63,7 @@ int main(void)
     // 5 -> 1
     // 6 -> 2
 
-    BUS_vConfigure(&g_sBus, 3); // configure a bus node with address 2
+    BUS_vConfigure(&g_sBus, 0x0C); // configure a bus node with address X
     BUS_vInitialize(&g_sBus, 0);// initialize bus on UART 0
 
     vInitLedAndKeys();

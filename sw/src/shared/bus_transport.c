@@ -38,7 +38,7 @@
 // --- Local functions ---------------------------------------------------------
 
 // Reset bus to Idle state.
-void vResetBus(sBus_t* psBus)
+static void vResetBus(sBus_t* psBus)
 {
     psBus->eState = eBus_Idle;
     psBus->sRecvMsg.uOverallLength = 0;
@@ -46,17 +46,15 @@ void vResetBus(sBus_t* psBus)
 }
 
 // Create empty message depending on bus's configuration.
-void vCreateEmptyMessage(sBus_t* psBus)
+static void vCreateEmptyMessage(sBus_t* psBus)
 {
     psBus->auEmptyMsg[0] = BUS_SYNCBYTE; 
     psBus->auEmptyMsg[1] = psBus->sCfg.uOwnNodeAddress & 0x007F; // local address on bus
     psBus->auEmptyMsg[2] = 0; // length
 }
 
-/**
- * Start sending the wakeup-byte.
- */
-BOOL bSendWakeupByte(sBus_t* psBus)
+// Start sending the wakeup-byte.
+static BOOL bSendWakeupByte(sBus_t* psBus)
 {
 	uint8_t msg = WAKEUPBYTE;
 	if(BUS__bPhySend(&psBus->sPhy, &msg, 1))
@@ -67,9 +65,8 @@ BOOL bSendWakeupByte(sBus_t* psBus)
 	return FALSE;
 }
 
-
 // Receive and interpret data.
-BOOL bReceive(sBus_t* psBus)
+static BOOL bReceive(sBus_t* psBus)
 {
     uint16_t crc;
     uint8_t u;
@@ -152,22 +149,15 @@ BOOL bReceive(sBus_t* psBus)
             } else if (psBus->sRecvMsg.uOverallLength == 4) {
                 psBus->sRecvMsg.uSender |= (((uint16_t)u & 0x00F0) << 4);
                 psBus->sRecvMsg.uReceiver |= (((uint16_t)u & 0x000F) << 8);
-                
-                // check receiver address again
-                // TODO
+                // TODO check receiver address again
 
             // receive data (5th byte till length + 3(SY+AS+LE) - 2(CRC))
             } else if (psBus->sRecvMsg.uOverallLength > 4) {
-            	if(psBus->sRecvMsg.uOverallLength < psBus->sRecvMsg.uLength + 3 - 2) {
-            		// receive message data. do nothing. byte is stored below
-
-            		// N-1 th byte: CRCH - High byte of 16bit CRC
-            	}
-            	else if (psBus->sRecvMsg.uOverallLength == (psBus->sRecvMsg.uLength + 3 - 2)) {
+            	if (psBus->sRecvMsg.uOverallLength == (psBus->sRecvMsg.uLength + 3 - 2)) {
             		psBus->sRecvMsg.uCRC = u << 8;
             		// N th byte: CRCL - Low byte of 16bit CRC
-            	}
-            	else if (psBus->sRecvMsg.uOverallLength == (psBus->sRecvMsg.uLength + 3 - 1)) {
+
+            	} else if (psBus->sRecvMsg.uOverallLength == (psBus->sRecvMsg.uLength + 3 - 1)) {
             		psBus->sRecvMsg.uCRC |= u;
             		crc = CRC_uCalc16(&psBus->sRecvMsg.auBuf[0], psBus->sRecvMsg.uLength + 3 - 2);
             		if (crc == psBus->sRecvMsg.uCRC) {
@@ -239,6 +229,30 @@ static void vSend(sBus_t* psBus)
         psBus->sSendMsg.uOverallLength = 0;
         psBus->sSendMsg.uLength = 0;
     }
+}
+
+// Start sending of sleep command.
+static BOOL bSendSleepCmd(sBus_t* psBus)
+{
+    uint16_t crc;
+    uint8_t msg[8];
+
+    msg[0] = BUS_SYNCBYTE;                  // SY - Syncronization byte: 'ï¿½' = 0b10011010
+    msg[1] = psBus->sCfg.uOwnNodeAddress;   // AS - Address sender on bus 7bit
+    msg[2] = sizeof(msg) - 3;              // LE - Length of message from AR to CRCL
+    msg[3] = 0x00;                          // AR - Address receiver 7bit (Broadcast)
+    msg[4] = 0x00;                          // EA - Extended address 4bit sender in higher nibble, 4bit receiver in lower nibble.
+    msg[5] = SLEEPCOMMAND;                  // MD - Sleep-Command
+    crc = CRC_uCalc16(&msg[0], 6);
+    msg[6] = crc >> 8;
+    msg[7] = crc & 0xFF;
+
+    if( BUS__bPhySend(&psBus->sPhy, msg, sizeof msg) )
+    {
+        while( BUS__bPhySending(&psBus->sPhy) ) {}; // Wait till message is sent completely.
+        return TRUE;
+    }
+    return FALSE;
 }
 
 // --- Module global functions -------------------------------------------------
@@ -471,33 +485,7 @@ void BUS_vSleep(sBus_t*       psBus)
 	_delay_ms(1); // wait for sys-clock becoming stable
 	BUS_vFlushBus(psBus); // Clean bus-buffer
 	CLK_vControl(TRUE); // enable clock-timer
-
 }
 
-/**
- * Start sending of sleep command.
- */
-BOOL bSendSleepCmd(sBus_t* psBus)
-{
-	uint16_t crc;
-	uint8_t msg[8];
-
-    msg[0] = BUS_SYNCBYTE; 					// SY - Syncronization byte: 'Ü' = 0b10011010
-	msg[1] = psBus->sCfg.uOwnNodeAddress;	// AS - Address sender on bus 7bit
-	msg[2] = sizeof(msg)-3;                 // LE - Length of message from AR to CRCL
-	msg[3] = 0x00;                          // AR - Address receiver 7bit (Broadcast)
-	msg[4] = 0x00;                          // EA - Extended address 4bit sender in higher nibble, 4bit receiver in lower nibble.
-	msg[5] = SLEEPCOMMAND;                  // MD - Sleep-Command
-	crc = CRC_uCalc16(&msg[0], 6);
-	msg[6] = crc >> 8;
-	msg[7] = crc & 0xFF;
-
-	if( BUS__bPhySend(&psBus->sPhy, msg, sizeof msg) )
-	{
-		while( BUS__bPhySending(&psBus->sPhy) ) {}; // Wait till message is sent completely.
-		return TRUE;
-	}
-	return FALSE;
-}
 /** @} */
 /** @} */

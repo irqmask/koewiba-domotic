@@ -177,10 +177,6 @@ BOOL    BUS_bSendMessage            (sBus_t*        psBus,
                                      uint8_t        uLen, 
                                      uint8_t*       puMsg);
 
-//extern BOOL bSendWakeupByte       (sBus_t*        psBus);
-//extern BOOL bSendSleepCmd         (sBus_t*        psBus);
-
-
 #ifdef BUS_SCHEDULER
 BOOL    BUS_bSchedulAddNode         (sBus_t*        psBus,
                                     uint8_t         uNodeAddress);
@@ -190,7 +186,6 @@ void    BUS_vScheduleCheckAndSetSleep(sBus_t* psBus);
 #endif
 
 void    BUS_vSleep                   (sBus_t*       psBus);
-BOOL    bSendSleepCmd                (sBus_t*       psBus);
                                      
 #endif /* _BUS_H_ */
 /** @} */

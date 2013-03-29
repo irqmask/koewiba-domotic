@@ -231,30 +231,6 @@ static void vSend(sBus_t* psBus)
     }
 }
 
-// Start sending of sleep command.
-static BOOL bSendSleepCmd(sBus_t* psBus)
-{
-    uint16_t crc;
-    uint8_t msg[8];
-
-    msg[0] = BUS_SYNCBYTE;                  // SY - Syncronization byte: '�' = 0b10011010
-    msg[1] = psBus->sCfg.uOwnNodeAddress;   // AS - Address sender on bus 7bit
-    msg[2] = sizeof(msg) - 3;              // LE - Length of message from AR to CRCL
-    msg[3] = 0x00;                          // AR - Address receiver 7bit (Broadcast)
-    msg[4] = 0x00;                          // EA - Extended address 4bit sender in higher nibble, 4bit receiver in lower nibble.
-    msg[5] = SLEEPCOMMAND;                  // MD - Sleep-Command
-    crc = CRC_uCalc16(&msg[0], 6);
-    msg[6] = crc >> 8;
-    msg[7] = crc & 0xFF;
-
-    if( BUS__bPhySend(&psBus->sPhy, msg, sizeof msg) )
-    {
-        while( BUS__bPhySending(&psBus->sPhy) ) {}; // Wait till message is sent completely.
-        return TRUE;
-    }
-    return FALSE;
-}
-
 // --- Module global functions -------------------------------------------------
 
 /**
@@ -262,7 +238,7 @@ static BOOL bSendSleepCmd(sBus_t* psBus)
  *
  * @param[in]   psBus       Handle of the bus.
  *
- * @returns TRUE, if there is a pending received message, otherwise FALSE
+ * @returns TRUE, if there is a pending received message, otherwise FALSE.
  */
 BOOL BUS__bTrpSendReceive(sBus_t* psBus)
 {
@@ -294,6 +270,35 @@ BOOL BUS__bTrpSendReceive(sBus_t* psBus)
     }
     
     return psBus->bMsgReceived;
+}
+
+/**
+ * Start sending of sleep command.
+ *
+ * @param[in]   psBus       Handle of the bus.
+ *
+ * @returns TRUE, if the sleep command has been sent, otherwise FALSE.
+ */
+BOOL BUS__bSendSleepCmd(sBus_t* psBus)
+{
+    uint16_t crc;
+    uint8_t msg[8];
+
+    msg[0] = BUS_SYNCBYTE;                  // SY - Syncronization byte: '�' = 0b10011010
+    msg[1] = psBus->sCfg.uOwnNodeAddress;   // AS - Address sender on bus 7bit
+    msg[2] = sizeof(msg) - 3;              // LE - Length of message from AR to CRCL
+    msg[3] = 0x00;                          // AR - Address receiver 7bit (Broadcast)
+    msg[4] = 0x00;                          // EA - Extended address 4bit sender in higher nibble, 4bit receiver in lower nibble.
+    msg[5] = SLEEPCOMMAND;                  // MD - Sleep-Command
+    crc = CRC_uCalc16(&msg[0], 6);
+    msg[6] = crc >> 8;
+    msg[7] = crc & 0xFF;
+
+    if( BUS__bPhySend(&psBus->sPhy, msg, sizeof msg) ) {
+        while( BUS__bPhySending(&psBus->sPhy) ) {}; // Wait till message is sent completely.
+        return TRUE;
+    }
+    return FALSE;
 }
 
 // --- Global functions --------------------------------------------------------

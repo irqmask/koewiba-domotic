@@ -182,7 +182,8 @@ extcoff: $(TARGET).elf
 # Link: create ELF output file from object files.
 $(TARGET).elf: $(OBJ)
 	$(CC) $(ALL_CFLAGS) $(OBJ) --output $@ $(LDFLAGS)
-
+	$(SIZE) --format=avr --mcu=$(MCU) $@
+	
 
 # Compile: create object files from C source files.
 .c.o:

@@ -9,6 +9,7 @@ SRC = ../shared/bus_phy.c \
       ../shared/bus_schedul.c \
       ../shared/bus_transport.c \
       ../shared/clock.c \
+      ../shared/crc16.c \
       ../shared/led_debug.c \
       main_testscheduler.c
 
@@ -182,10 +183,10 @@ extcoff: $(TARGET).elf
 	$(NM) -n $< > $@
 
 
-
 # Link: create ELF output file from object files.
 $(TARGET).elf: $(OBJ)
 	$(CC) $(ALL_CFLAGS) $(OBJ) --output $@ $(LDFLAGS)
+	$(SIZE) --format=avr --mcu=$(MCU) $@
 
 
 # Compile: create object files from C source files.
@@ -201,7 +202,6 @@ $(TARGET).elf: $(OBJ)
 # Assemble: create object files from assembler source files.
 .S.o:
 	$(CC) -c $(ALL_ASFLAGS) $< -o $@
-
 
 
 # Target: clean project.
@@ -222,5 +222,3 @@ depend:
 	$(CC) -M -mmcu=$(MCU) $(CDEFS) $(CINCS) $(SRC) $(ASRC) >> $(MAKEFILE)
 
 .PHONY:	all build elf hex eep lss sym program coff extcoff clean depend
-
-

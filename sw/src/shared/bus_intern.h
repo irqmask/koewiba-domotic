@@ -67,6 +67,8 @@ typedef enum eCommMsgByteIndex {
 // transport layer
 BOOL    BUS__bTrpSendReceive        (sBus_t* psBus);
 
+BOOL    BUS__bSendSleepCmd          (sBus_t* psBus);
+
 // scheduler
 void    BUS__vSchedulConfigure      (sBus_t*        psBus);
 

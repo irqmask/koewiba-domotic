@@ -30,6 +30,7 @@ static sClkTimer_t g_sLedTimer;
 // --- Module global variables -------------------------------------------------
 
 // --- Local functions ---------------------------------------------------------
+
 void IO_vInitialize(void)
 {
     DDRB  |= ((0<<DDB7)   | (0<<DDB6)   | (1<<DDB5)   | (1<<DDB4)   | (0<<DDB3)   | (1<<DDB2)   | (1<<DDB1)   | (1<<DDB0)  );

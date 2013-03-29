@@ -8,6 +8,7 @@ TARGET = testprotocol
 SRC = ../shared/bus_phy.c \
       ../shared/bus_transport.c \
       ../shared/clock.c \
+      ../shared/crc16.c \
       ../shared/led_debug.c \
       main_testprotocol.c
 
@@ -181,10 +182,10 @@ extcoff: $(TARGET).elf
 	$(NM) -n $< > $@
 
 
-
 # Link: create ELF output file from object files.
 $(TARGET).elf: $(OBJ)
 	$(CC) $(ALL_CFLAGS) $(OBJ) --output $@ $(LDFLAGS)
+	$(SIZE) --format=avr --mcu=$(MCU) $@
 
 
 # Compile: create object files from C source files.

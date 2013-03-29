@@ -301,7 +301,7 @@ BOOL BUS_bScheduleAndGetMessage(sBus_t* psBus)
 void BUS_vScheduleCheckAndSetSleep(sBus_t* psBus)
 {
     if (eMod_Sleeping == psBus->eModuleState) {
-        if (bSendSleepCmd(psBus)) {
+        if (BUS__bSendSleepCmd(psBus)) {
             CLK_vControl(FALSE); // disable clock-timer, otherwise
                                  // irq will cause immediate wakeup.
 

@@ -361,7 +361,7 @@ BOOL BUS_bReadMessage(sBus_t*  psBus,
         *puSender   = psBus->sRecvMsg.uSender;
         
         while (len < psBus->sRecvMsg.uLength - 4) {
-            puMsg[len] = psBus->sRecvMsg.auBuf[len];
+            puMsg[len] = psBus->sRecvMsg.auBuf[5 + len];
             len ++;
         }
         // reset bus to IDLE state, so we are ready to receive the next message

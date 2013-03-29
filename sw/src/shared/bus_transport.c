@@ -176,7 +176,7 @@ static BOOL bReceive(sBus_t* psBus)
             			break;
             		}
 
-            	} else {
+            	} else if(psBus->sRecvMsg.uOverallLength >= psBus->sRecvMsg.uLength + 3) {
             		// invalid length of message
             		vResetBus(psBus);
             		break;

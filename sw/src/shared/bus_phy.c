@@ -69,6 +69,32 @@ inline void IR_OutputCompareMatchA_Disable(void)
 {
 	REGBIT_TIMSK &= ~(1<<REGBIT_OCIEA);
 }
+#if defined (__AVR_ATmega88__)
+inline void IR_PinChange2_Enable(void)
+{
+	PCICR  |=  (1<<PCIE2);
+}
+inline void IR_PinChange2_Disable(void)
+{
+	PCICR  &= ~(1<<PCIE2);
+}
+inline void IR_PinChange1_Enable(void)
+{
+	PCICR  |=  (1<<PCIE1);
+}
+inline void IR_PinChange1_Disable(void)
+{
+	PCICR  &= ~(1<<PCIE1);
+}
+inline void IR_PinChange0_Enable(void)
+{
+	PCICR  |=  (1<<PCIE0);
+}
+inline void IR_PinChange0_Disable(void)
+{
+	PCICR  &= ~(1<<PCIE0);
+}
+#endif
 
 // --- Type definitions --------------------------------------------------------
 

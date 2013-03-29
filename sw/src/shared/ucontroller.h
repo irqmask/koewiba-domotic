@@ -47,6 +47,7 @@
     #define INTERRUPT_USART_RXC  USART_RX_vect
     #define INTERRUPT_USART_UDRE USART_UDRE_vect
     #define INTERRUPT_UART_TRANS USART_TX_vect
+    #define INTERRUPT_PINCHANGE2 PCINT2_vect
 #endif
 
 #if defined (__AVR_ATmega8__)	\
@@ -83,6 +84,12 @@ extern void IR_ReceiveComplete_Enable(void);
 extern void IR_ReceiveComplete_Disable(void);
 extern void IR_OutputCompareMatchA_Enable(void);
 extern void IR_OutputCompareMatchA_Disable(void);
+extern void IR_PinChange2_Enable(void);
+extern void IR_PinChange2_Disable(void);
+extern void IR_PinChange1_Enable(void);
+extern void IR_PinChange1_Disable(void);
+extern void IR_PinChange0_Enable(void);
+extern void IR_PinChange0_Disable(void);
 
 
 #endif /* UCONTROLLER_H_ */

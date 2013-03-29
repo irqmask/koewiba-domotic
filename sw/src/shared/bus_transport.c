@@ -23,6 +23,7 @@
 // TODO remove after debug
 #include <util/delay.h>
 #include "led_debug.h"
+#include <avr/sleep.h>
 
 // --- Definitions -------------------------------------------------------------
 
@@ -156,42 +157,46 @@ BOOL bReceive(sBus_t* psBus)
                 // TODO
 
             // receive data (5th byte till length + 3(SY+AS+LE) - 2(CRC))
-            } else if ((psBus->sRecvMsg.uOverallLength > 4) &&
-                       (psBus->sRecvMsg.uOverallLength < psBus->sRecvMsg.uLength + 3 - 2)) {
-                // receive message data. do nothing. byte is stored below
-                           
-            // N-1 th byte: CRCH - High byte of 16bit CRC
-            } else if (psBus->sRecvMsg.uOverallLength == (psBus->sRecvMsg.uLength + 3 - 2)) {
-                psBus->sRecvMsg.uCRC = u << 8;
-                
-            // N th byte: CRCL - Low byte of 16bit CRC
-            } else if (psBus->sRecvMsg.uOverallLength == (psBus->sRecvMsg.uLength + 3 - 1)) {
-                psBus->sRecvMsg.uCRC |= u;
-                crc = CRC_uCalc16(&psBus->sRecvMsg.auBuf[0], psBus->sRecvMsg.uLength + 3 - 2);
-                if (crc == psBus->sRecvMsg.uCRC) {
-                    psBus->bMsgReceived = TRUE;
+            } else if (psBus->sRecvMsg.uOverallLength > 4) {
+            	if(psBus->sRecvMsg.uOverallLength < psBus->sRecvMsg.uLength + 3 - 2) {
+            		// receive message data. do nothing. byte is stored below
+
+            		// N-1 th byte: CRCH - High byte of 16bit CRC
+            	}
+            	else if (psBus->sRecvMsg.uOverallLength == (psBus->sRecvMsg.uLength + 3 - 2)) {
+            		psBus->sRecvMsg.uCRC = u << 8;
+            		// N th byte: CRCL - Low byte of 16bit CRC
+            	}
+            	else if (psBus->sRecvMsg.uOverallLength == (psBus->sRecvMsg.uLength + 3 - 1)) {
+            		psBus->sRecvMsg.uCRC |= u;
+            		crc = CRC_uCalc16(&psBus->sRecvMsg.auBuf[0], psBus->sRecvMsg.uLength + 3 - 2);
+            		if (crc == psBus->sRecvMsg.uCRC) {
+                		LED_ERROR_OFF;
+            			psBus->bMsgReceived = TRUE;
 #ifdef BUS_SCHEDULER
-                    psBus->bSchedMsgReceived = TRUE;
+            			psBus->bSchedMsgReceived = TRUE;
 #endif
-                    psBus->eState = eBus_Idle;
-					psBus->sRecvMsg.uOverallLength = 0;
-					break;
-                } else {
-                    // invalid length of message
-                    vResetBus(psBus);
-                    break;
-                }
-                
-            } else {
-                // invalid length of message
-                vResetBus(psBus);
-				break;
+            			psBus->eState = eBus_Idle;
+            			psBus->sRecvMsg.uOverallLength = 0;
+            			break;
+            		} else {
+            			// invalid length of message
+                		LED_ERROR_ON;
+            			vResetBus(psBus);
+            			break;
+            		}
+
+            	} else {
+            		// invalid length of message
+            		vResetBus(psBus);
+            		break;
+            	}
             }
         }
 
         psBus->sRecvMsg.auBuf[psBus->sRecvMsg.uOverallLength] = u;
         psBus->sRecvMsg.uOverallLength++;
-        
+
         // passive receiving state, only count bytes till the end of the message 
         // and then go back to eBus_Idle state.
         if (psBus->eState == eBus_ReceivingPassive) {
@@ -453,7 +458,46 @@ void BUS_vSleep(sBus_t*       psBus)
 {
 	psBus->eModuleState = eMod_Sleeping;
 	//@TODO: Hier muss die Sleep-Methode rein sobald die Hardware in der Lage ist den Controller wieder aufzuwecken.
+	CLK_vControl(FALSE); // disable clock-timer, otherwise
+	// irq will cause immediate wakeup.
 
+	// sleep till byte is received.
+	set_sleep_mode(SLEEP_MODE_IDLE);
+	sleep_mode();
+	if(BUS__bPhyDataReceived(&psBus->sPhy)) {
+		psBus->eModuleState = eMod_Running;
+	}
+
+	_delay_ms(1); // wait for sys-clock becoming stable
+	BUS_vFlushBus(psBus); // Clean bus-buffer
+	CLK_vControl(TRUE); // enable clock-timer
+
+}
+
+/**
+ * Start sending of sleep command.
+ */
+BOOL bSendSleepCmd(sBus_t* psBus)
+{
+	uint16_t crc;
+	uint8_t msg[8];
+
+    msg[0] = BUS_SYNCBYTE; 					// SY - Syncronization byte: 'Ü' = 0b10011010
+	msg[1] = psBus->sCfg.uOwnNodeAddress;	// AS - Address sender on bus 7bit
+	msg[2] = sizeof(msg)-3;                 // LE - Length of message from AR to CRCL
+	msg[3] = 0x00;                          // AR - Address receiver 7bit (Broadcast)
+	msg[4] = 0x00;                          // EA - Extended address 4bit sender in higher nibble, 4bit receiver in lower nibble.
+	msg[5] = SLEEPCOMMAND;                  // MD - Sleep-Command
+	crc = CRC_uCalc16(&msg[0], 6);
+	msg[6] = crc >> 8;
+	msg[7] = crc & 0xFF;
+
+	if( BUS__bPhySend(&psBus->sPhy, msg, sizeof msg) )
+	{
+		while( BUS__bPhySending(&psBus->sPhy) ) {}; // Wait till message is sent completely.
+		return TRUE;
+	}
+	return FALSE;
 }
 /** @} */
 /** @} */

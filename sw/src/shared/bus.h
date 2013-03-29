@@ -36,7 +36,7 @@
 
 #define BUS_MAX_ANSWERFAILS		5	//!< Maximum number a member's answer can be missing, before disconnecting.
 #define BUS_DISCOVERYLOOPS		3   //!< Number of discovery-loops till normal scheduling begins.
-#define BUS_LOOPS_TILL_SLEEP	20  //!< Number of discovery-loops till normal scheduling begins.
+#define BUS_LOOPS_TILL_SLEEP	50  //!< Number of discovery-loops till normal scheduling begins.
 
 #define SLEEPCOMMAND	0xF0	//<! Command to set subscribers in sleep-mode.
 #define WAKEUPBYTE 		0xFF	//<! Dummy-Byte that is send to the bus as wakeup-call for other subscribers.
@@ -190,6 +190,7 @@ void    BUS_vScheduleCheckAndSetSleep(sBus_t* psBus);
 #endif
 
 void    BUS_vSleep                   (sBus_t*       psBus);
+BOOL    bSendSleepCmd                (sBus_t*       psBus);
                                      
 #endif /* _BUS_H_ */
 /** @} */

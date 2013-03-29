@@ -33,29 +33,7 @@
 
 // --- Local functions ---------------------------------------------------------
 
-/**
- * Start sending of sleep command.
- */
-BOOL bSendSleepCmd(sBus_t* psBus)
-{
-	uint8_t msg[8];
 
-    msg[0] = BUS_SYNCBYTE; 					// SY - Syncronization byte: '�' = 0b10011010
-	msg[1] = psBus->sCfg.uOwnNodeAddress;	// AS - Address sender on bus 7bit
-	msg[2] = sizeof(msg)-3;                 // LE - Length of message from AR to CRCL
-	msg[3] = 0x00;                          // AR - Address receiver 7bit (Broadcast)
-	msg[4] = 0x00;                          // EA - Extended address 4bit sender in higher nibble, 4bit receiver in lower nibble.
-	msg[5] = SLEEPCOMMAND;                  // MD - Sleep-Command
-	//@TODO: Add CRC-calculation
-	msg[6] = 0x00;                          // CRCH - High byte of 16bit CRC
-	msg[7] = 0x00;                          // CRCL - Low byte of 16bit CRC
-	if( BUS__bPhySend(&psBus->sPhy, msg, sizeof msg) )
-	{
-		while( BUS__bPhySending(&psBus->sPhy) ) {}; // Wait till message is sent completely.
-		return TRUE;
-	}
-	return FALSE;
-}
 
 /**
  * Start sending of next token.
@@ -231,7 +209,7 @@ BOOL BUS_bScheduleAndGetMessage(sBus_t* psBus)
         // send token
         if (bSendNextTimeSlotToken(psBus, psBus->bSchedDiscovery))
         {
-            CLK_bTimerStart(&psBus->sNodeAnsTimeout, 50);
+            CLK_bTimerStart(&psBus->sNodeAnsTimeout, 30);
             psBus->eState = eBus_SendingToken;
         }
         else LED_ERROR_ON;
@@ -264,7 +242,7 @@ BOOL BUS_bScheduleAndGetMessage(sBus_t* psBus)
 
     case eBus_ReceivingPassive:
     	// any message on the bus resets counter
-    	schedloopcnt = BUS_LOOPS_TILL_SLEEP;
+    	if(eMod_Running == psBus->eModuleState) schedloopcnt = BUS_LOOPS_TILL_SLEEP;
     	break;
 
     default:

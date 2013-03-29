@@ -90,7 +90,7 @@ int main(void)
             }
         }
         // check timer
-        if (CLK_bTimerIsElapsed(&g_sLedTimer)) {
+      /*  if (CLK_bTimerIsElapsed(&g_sLedTimer)) {
             // TODO remove after debug
             if (light)  light = 0;
             else        light = 1;
@@ -102,7 +102,7 @@ int main(void)
             msglen = 4;
             BUS_bSendMessage(&g_sBus, 5, msglen, msg);
             CLK_bTimerStart(&g_sLedTimer, 100);
-        }
+        }*/
     }
     return 0;
 }

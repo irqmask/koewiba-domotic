@@ -18,6 +18,7 @@
 // --- Include section ---------------------------------------------------------
 
 #include "bus_intern.h"
+#include "crc16.h"
 
 // TODO remove after debug
 #include <util/delay.h>
@@ -69,6 +70,7 @@ BOOL bSendWakeupByte(sBus_t* psBus)
 // Receive and interpret data.
 BOOL bReceive(sBus_t* psBus)
 {
+    uint16_t crc;
     uint8_t u;
     BOOL    bytereceived;
     
@@ -166,16 +168,20 @@ BOOL bReceive(sBus_t* psBus)
             // N th byte: CRCL - Low byte of 16bit CRC
             } else if (psBus->sRecvMsg.uOverallLength == (psBus->sRecvMsg.uLength + 3 - 1)) {
                 psBus->sRecvMsg.uCRC |= u;
-                // TODO check CRC
-                if (1) {
+                crc = CRC_uCalc16(&psBus->sRecvMsg.auBuf[0], psBus->sRecvMsg.uLength + 3 - 2);
+                if (crc == psBus->sRecvMsg.uCRC) {
                     psBus->bMsgReceived = TRUE;
 #ifdef BUS_SCHEDULER
                     psBus->bSchedMsgReceived = TRUE;
 #endif
                     psBus->eState = eBus_Idle;
 					psBus->sRecvMsg.uOverallLength = 0;
-					break;
+                } else {
+                    // invalid length of message
+                    vResetBus(psBus);
+                    break;
                 }
+                break;
                 
             } else {
                 // invalid length of message
@@ -387,6 +393,8 @@ BOOL BUS_bSendMessage(sBus_t*    psBus,
                       uint8_t    uLen,
                       uint8_t*   puMsg)
 {
+    uint16_t crc;
+
     do {
         // Wakeup bus
         if(eMod_Sleeping == psBus->eModuleState) {
@@ -416,9 +424,10 @@ BOOL BUS_bSendMessage(sBus_t*    psBus,
         	psBus->sSendMsg.uLength++;
         	psBus->sSendMsg.uOverallLength++;
         }
-        // TODO calculate and send CRC
-        psBus->sSendMsg.auBuf[psBus->sSendMsg.uOverallLength++] = 0;
-        psBus->sSendMsg.auBuf[psBus->sSendMsg.uOverallLength++] = 0;
+        // calculate and send CRC
+        crc = CRC_uCalc16(&psBus->sSendMsg.auBuf[0], psBus->sSendMsg.uOverallLength);
+        psBus->sSendMsg.auBuf[psBus->sSendMsg.uOverallLength++] = crc >> 8;
+        psBus->sSendMsg.auBuf[psBus->sSendMsg.uOverallLength++] = crc & 0xFF;
         return TRUE;
     } while ( FALSE );
     return FALSE;

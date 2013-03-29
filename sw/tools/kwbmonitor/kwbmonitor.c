@@ -31,6 +31,7 @@
 #include <string.h>
 #include "PortableSerialLib.h"
 #include "systime.h"
+#include "crc16.h"
 
 //! (netto) length of the message
 #define BUS_MAXMSGLEN          16
@@ -112,7 +113,8 @@ void vThdInitBusHistory(sBusHistory_t* psBus)
 
 void vThdParseMessage(uint8_t uNewByte, sBusHistory_t* psBus)
 {
-    uint8_t i;
+    uint16_t calcedcrc = 0;
+    uint8_t i, crclen;
 
     enum {
         eMsgNothing,
@@ -181,6 +183,8 @@ void vThdParseMessage(uint8_t uNewByte, sBusHistory_t* psBus)
     } else if (psBus->uCurrMsgBytes == 3 + psBus->uExpectedLength - 1) {
         // CRC high byte
         psBus->uExpectedCRC |= (uNewByte & 0xFF);
+        crclen = 3 + psBus->uExpectedLength - 2;
+        calcedcrc = CRC_uCalc16(&psBus->auMessage[0], crclen);
         msgstatus = eMsgComplete;
     }
     psBus->uCurrMsgBytes++;
@@ -209,10 +213,10 @@ void vThdParseMessage(uint8_t uNewByte, sBusHistory_t* psBus)
         break;
     case eMsgComplete:
         printf("| MESSAGE");
-        if (psBus->uExpectedCRC != 0) {
-            printf(" BAD CRC\r\n");
+        if (psBus->uExpectedCRC != calcedcrc) {
+            printf("  BAD CRC %x %x %d\r\n", psBus->uExpectedCRC, calcedcrc, crclen);
         } else {
-            printf("\r\n");
+            printf(" GOOD CRC %x %x %d\r\n", psBus->uExpectedCRC, calcedcrc, crclen);
         }
         break;
     default:

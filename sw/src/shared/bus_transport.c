@@ -154,6 +154,11 @@ BOOL bReceive(sBus_t* psBus)
                 
                 // check receiver address again
                 // TODO
+
+            // receive data (5th byte till length + 3(SY+AS+LE) - 2(CRC))
+            } else if ((psBus->sRecvMsg.uOverallLength > 4) &&
+                       (psBus->sRecvMsg.uOverallLength < psBus->sRecvMsg.uLength + 3 - 2)) {
+                // receive message data. do nothing. byte is stored below
                            
             // N-1 th byte: CRCH - High byte of 16bit CRC
             } else if (psBus->sRecvMsg.uOverallLength == (psBus->sRecvMsg.uLength + 3 - 2)) {
@@ -356,7 +361,7 @@ BOOL BUS_bReadMessage(sBus_t*  psBus,
         *puSender   = psBus->sRecvMsg.uSender;
         
         while (len < psBus->sRecvMsg.uLength - 4) {
-            puMsg[len] = psBus->sRecvMsg.auBuf[len + 5];
+            puMsg[len] = psBus->sRecvMsg.auBuf[len];
             len ++;
         }
         // reset bus to IDLE state, so we are ready to receive the next message

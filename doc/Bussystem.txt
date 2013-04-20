@@ -41,7 +41,7 @@ Fehlersituationen:
    Jeder Sender muss innerhalb von 2Bytes Sendezeit auf das Token antworten, ansonsten wird nach einer Pause von einem
    weiteren Byte mit dem nächsten Token weitergemacht. Damit sieht es auf dem Bus so aus, wie eine neue Runde Kommunikation.
  * Der Master faellt aus:
-   Der Master kann mit einer Nachricht Stellvertreter ernennen. Wird innerhalb von 10Bytes Sendezeit kein Token empfangen, 
+   Der Master kann mit einer Nachricht Stellvertreter ernennen. Wird innerhalb von 10Bytes Sendezeit kein Token empfangen,
    uebernimmt der Vertreter das Takten des Busses.
 
 
@@ -124,7 +124,7 @@ Sonderfall:	Kölner Untersegmente
 Da aufgrund der Infrastruktur in den Kölner Altbauten ein Struktur mit einem Hauptstamm
 und max. 16(4Bit) Zweigen nicht ausreicht wird hier die Möglichkeit von Untersegmenten beschrieben:
 Im Stamm bleibt alles wie oben beschrieben. Die Router in den  Zweigen nehmen jedoch alle Nachrichten
-ihres Schedulers entgegen und leiten diese weiter in ihren Zweig, sofern die Adresse (7Bit) als 
+ihres Schedulers entgegen und leiten diese weiter in ihren Zweig, sofern die Adresse (7Bit) als
 'belegt' geführt ist. Als 'belegt' gelten hier alle Adressen, von welchen irgendwann einmal eine
 Nachricht auf den Bus gegeben wurde. Das Erkundungsverfahren entspricht dem oben genannten.
 Jeder Router zählt die Anzahl der Versuche eine Nachricht zuzustellen. Wird dreimal keine Antwort
@@ -138,7 +138,7 @@ des Hauptsegmentes jede Adresse nur einmal vergeben wird.
 High-Level Protocol
 -------------------------------
 
-Im High-Level Protocol sind die Formate der zu übertragenden Informationen festgelegt. Dabei wird 
+Im High-Level Protocol sind die Formate der zu übertragenden Informationen festgelegt. Dabei wird
 zwischen Allgemeingültigen Befehlen und Zustandsmeldungen, sowie applikationsspezifischen Befehlen und
 Zustandsmeldungen unterschieden. Befehle lösen beim Empfänger eine Aktion aus, Zustandsmeldungen
 können eine Aktion auslösen, müssen aber nicht.
@@ -189,12 +189,11 @@ Beispiel: 0x22, Registernummer, 16bit- Wert
 Beispiel: 0x23, Registernummer, 32bit- Wert
 
 
-0x21 - Set Register 8bit
-0x21, Registernummer, 8bit- Wert
 
-0x22 - Start Flash
-0x23 - Set Flash
-0x24 - End Flash
+0x30 - Start Flash
+0x31 - Set Flash
+0x32 - End Flash
+
 
 Steuerkommandos (Typ 0xF0 - 0xFF)
 Format: Typ, spez. Parameter

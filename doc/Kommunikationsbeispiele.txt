@@ -20,16 +20,16 @@ Registerbeschreibung
 +2 Z aktuelle Temperatur 16bit
 +3 Z Display Wert 1 (Solltemperatur)
 +4 Z Display Wert 2 (Isttemperatur)
-+5 K Bit 0.0 Modus 
-+6 K Bit 0.0 Empfänger 
++5 K Bit 0.0 Modus
++6 K Bit 0.0 Empfänger
 +7 K Bit 0.1 Modus = 1 (Ereignis bei steigender Flanke => schickt Zustandsmeldung Typ 0x01 Bitfeld)
-+8 K Bit 0.1 Empfänger = 3 
++8 K Bit 0.1 Empfänger = 3
 ...
 +11 K Bit 0.3 Modus = 3 (Dimmermodus)
-+12 K Bit 0.3 Empfänger = 5 
++12 K Bit 0.3 Empfänger = 5
 ...
-+x K Bit 0.7 Modus (0=Ereignis bei fallender Flanke, 1=Ereignis bei steigender Flanke, 2=Ereignis bei Zustandswechsel , 3=Dimmermodus, 
-+x K Bit 0.7 Empfänger 
++x K Bit 0.7 Modus (0=Ereignis bei fallender Flanke, 1=Ereignis bei steigender Flanke, 2=Ereignis bei Zustandswechsel , 3=Dimmermodus,
++x K Bit 0.7 Empfänger
 +x K Intervall Temperatursensor auslesen
 
 Mapping
@@ -82,3 +82,5 @@ Beispiel Taster Dimmer 1 kurz gedrückt:
 Lampe war vorher aus. Modul 2 weis das, weil es die Dimmerfunktion hat
 Modul 2 sendet Zustandsmeldung Typ 0x02, Kanalnummer, 8bit Wert an Modul 5
 Modul 5 empfängt Zustandsmeldung Typ 0x02 (8bit Wert) und schreibt den Wert auf Register 5 (Stellwert Dimmer)
+
+

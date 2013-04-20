@@ -1,0 +1,8 @@
+EEProm: EEPROM SPI 32K SO-8, 25LC256
+Prozessoren: ATMEGA88, ATMEGA324, ATTINY1634 (Bauform SOIC oder TQFP)
+Spannungswandler:
+Anschlüsse RS485&Power: WAGO
+Anschlüsse etc:WAGO
+Anschlüsse Power:
+Display Raumthermostat: Electronic Assembly LCD-Grafik 132x32, SPI, schw/weiß pos. EA DOGM132W-5, RS  758-8642
+Quarz 7,3728MHz

@@ -10,7 +10,7 @@ Hardwaremerkmale:
 
 Modul Raumtemperatursensor
 ---------------------------
-Misst und regelt die Temperatur in einem Zimmer. 
+Misst und regelt die Temperatur in einem Zimmer.
 Hardwaremerkmale:
  - Display
  - 3 Taster

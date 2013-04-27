@@ -1,0 +1,11 @@
+Auswahl Prozessor
+-----------------
+
+Kleine Module, Gartenbewässerung, Jalosie/Markiesenaktor
+ATMEGA88
+
+Taumtemperaturregelung, Heizungssteller
+ATMEGA164 / ATMEGA324
+
+Router, Bus Interface-Module
+ATtiny1634

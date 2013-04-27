@@ -7,12 +7,14 @@ Router - Verbindet mehrere Segmente der gleicher oder unterschiedlicher Topologi
 Anforderungen
 -------------
 Alle Netzteilnehmer koennen miteinander kommunizieren.
-Netzsegmente koennen Ueber Routercontroller miteinander verbunden werden.
+Netzsegmente koennen ueber Routercontroller miteinander verbunden werden.
 Alle Netzteilnehmer haben eine eindeutige Adresse.
 
 
 Netzaufbau
 ----------
+
+Die Kommunikationsgeschwindigkeit beträgt: 38400 baud, 8 Datenbits, keine Parität, 1 Stopbit
 
 Kommunikationsablauf:
 
@@ -21,17 +23,15 @@ Kommunikationsablauf:
 3) Der Master sendet das Token fuer den naechsten Sender.
 4) Der naechste Sender sendet seine Nachricht.
 5) Und so weiter.
-6) Wenn alle Teilnehmer angeprochen wurden, gibt es eine Pause von 3Bytes ms.
-7) Nach zehn Runden ohne Nachricht legt sich der Scheduler schlafen.
-8) Der Scheduler wacht auf sobald ein beliebiges Byte gesendet wurde (das Byte wird auf jeden Fall verworfen, da
-   es sein kann, daß das 'Weckbyte' von mehreren Sender gleichzeitig gesendet wird).
+6) Wenn alle Teilnehmer angeprochen wurden, gibt es eine Pause in der Länge entsprechend 3Bytes.
+7) Nach zehn Runden mit nur leeren Nachrichten legt sich der Scheduler schlafen. Wenn ein Slave nach einer Sekunde kein Byte mehr empfängt legt er sich auch schlafen.
+8) Der Scheduler und alle anderen Busteilnehmer wachen auf sobald ein beliebiges Byte gesendet wurde. Der Inhalt dieses Bytes wird nicht ausgewerfet und verworfen, da der korrekte Empfang nich garantiert ist und es sein kann, daß das 'Weckbyte' von mehreren Sender gleichzeitig gesendet wird).
 
 Teilnehmererkennung:
 
-Zu Beginn pollt der Scheduler alle auf dem Segment möglichen Adressen. Ist auf ein Token in drei aufeinenderfolgenden
-Runden nicht geantwortet worden, wird diese Adresse als 'nicht belegt' geführt.
-Nachdem das Segment erkundet ist werden jeweils alle belegten Adressen reihum gepollt und anschließend eine der nicht
-belegten Adressen.
+Zu Beginn pollt der Scheduler alle auf dem Segment möglichen Adressen. Ist auf ein Token in drei aufeinender folgenden
+Runden nicht geantwortet worden, wird diese Adresse als 'nicht belegt' geführt. Wird auf ein bisher nicht belegtes Token geantwortet, wird die Adresse sofort in die Liste der belegten Adressen verschoben.
+Nachdem das Segment erkundet ist werden jeweils alle belegten Adressen reihum abgefragt und anschließend eine der nicht belegten Adressen.
 Beisp.:  Adressen belegt: 1,7,9,15
 Polling: 1-7-9-15- 2 -1-7-9-15- 3 -1-7-9-15- 4 -1-7-...
 
@@ -87,26 +87,21 @@ Adressierung der Busteilnehmer:
 Damit dürfen keine zwei Teilnehmer mit identischen unteren 7bits der Adresse in einem Segment liegen.
 Die Adresse für Nachrichten an alle "Broadcasts" ist 0b0111 1111 1111 = 0x7FF.
 Die Adresse für Nachrichten an alle Teilnehmer eines Segments ist 0b0111 1111 = 0x7F.
-Der Busteilnehmer, welcher das Takten des Busses übernimmt, also der Master, hat die Adresse 0.
+Der Busteilnehmer, welcher das Takten des Busses übernimmt, also der Master, hat die Adresse 1.
 
 
+Routing
+-------
 
-Routing:
-
-An jeder Stelle, an welcher der Bus abzweigt kommt ein 'Router' zum Einsatz, der zwei serielle
-Schnittstellen besitzt. Auf dem übergeordneten Bus verhält sich der Router wie ein normaler
-Bus-Teilnehmer, der jedoch alle Nachrichten entgegennimmt, die sein Segment adressiert haben.
-Auf der anderen Seite fungiert er als Scheduler, der diese Nachrichten an die Teilnehmer in
-seinem Segment weiterleitet.
-Nachrichten aus dem Segment werden ohne Prüfung auf das übergeordnete Segment gegeben.
+An jeder Stelle, an welcher der Bus abzweigt kommt ein 'Router' zum Einsatz, der zwei serielle Schnittstellen besitzt. Auf dem übergeordneten Bus verhält sich der Router wie ein normaler Bus-Teilnehmer, der jedoch alle Nachrichten entgegennimmt, die sein Segment adressiert haben. Auf der anderen Seite fungiert er als Scheduler, der diese Nachrichten an die Teilnehmer in seinem Segment weiterleitet. Nachrichten aus dem Segment werden ohne Prüfung auf das übergeordnete Segment gegeben.
 
 0
 |
 | seg0
 |
-|		seg1				Beisp: 7=[07][x1]
+|      seg1              Beisp: 7=[07][x1]
 |
-1+00--	01----02---0	3----0	4----0	5----0	6-----07---...
+1+00-- 01----02---0	3----0	4----0	5----0	6-----07---...
 |
 |
 |		seg2
@@ -119,6 +114,7 @@ Nachrichten aus dem Segment werden ohne Prüfung auf das übergeordnete Segment ge
 .	|	|	|				[03,08,09,0A,0B,1A,1B][x2]
 .	|	|	|
 0F	0D	11	1A+00------1B--...
+
 
 Sonderfall:	Kölner Untersegmente
 Da aufgrund der Infrastruktur in den Kölner Altbauten ein Struktur mit einem Hauptstamm
@@ -133,6 +129,11 @@ sollte daher nach dem Einschalten eine "Here I am"-Nachricht als Broadcast auf d
 er einmal erkannt wird.
 WICHTIG: Bei der Konfiguration dieser Untersegmente muss peinlich darauf geachtet werden, daß innerhalb
 des Hauptsegmentes jede Adresse nur einmal vergeben wird.
+
+Da aufgrund der Infrastruktur in den Kölner Altbauten ein Struktur mit einem Hauptstamm und max. 16(4Bit) Zweigen nicht ausreicht wird hier die Möglichkeit von Untersegmenten beschrieben:
+Im Stamm bleibt alles wie oben beschrieben. Die Router in den  Zweigen nehmen jedoch alle Nachrichten ihres Schedulers entgegen und leiten diese weiter in ihren Zweig, sofern die Adresse (7Bit) als 'belegt' geführt ist. Als 'belegt' gelten hier alle Adressen, von welchen irgendwann einmal eine Nachricht auf den Bus gegeben wurde. Das Erkundungsverfahren entspricht dem oben genannten.
+Jeder Router zählt die Anzahl der Versuche eine Nachricht zuzustellen. Wird dreimal keine Antwort empfangen gilt diese Adresse auf dem Zweig als 'unbelegt'. Ein Teilnehmer in einem abgelegenen Zweig sollte daher nach dem Einschalten eine "Here I am"-Nachricht als Broadcast auf den Bus schicken, damit er einmal erkannt wird.
+WICHTIG: Bei der Konfiguration dieser Untersegmente muss peinlich darauf geachtet werden, daß innerhalb des Hauptsegmentes jede Adresse nur einmal vergeben wird.
 
 
 High-Level Protocol
@@ -173,6 +174,7 @@ Fordert Firmwareversionsstring an.
 0xXX - Set Version
 Gibt Firmwareversion an
 Beispiel: 0xXX, <Versionsstring max 10Byte>
+
 
 Registerbefehle: Für Konfigurations- und Debugzwecke
 

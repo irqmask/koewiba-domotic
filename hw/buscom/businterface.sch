@@ -1,4 +1,4 @@
-EESchema Schematic File Version 2  date So 05 Mai 2013 15:34:25 CEST
+EESchema Schematic File Version 2  date Mo 06 Mai 2013 01:49:40 CEST
 LIBS:ics_controller_atmel
 LIBS:ics_misc
 LIBS:ics_regulator

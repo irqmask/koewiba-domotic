@@ -1,4 +1,4 @@
-update=Fr 26 Apr 2013 12:55:19 CEST
+update=So 05 Mai 2013 13:15:54 CEST
 last_client=eeschema
 [general]
 version=1
@@ -25,17 +25,15 @@ TxtLar=120
 MSegLar=80
 WpenSer=10
 [pcbnew/libraries]
-LibName1=led
-LibName2=capacitors
+LibName1=aimtec
+LibName2=soic
 LibName3=conn_header
-LibName4=conn_misc
-LibName5=crystal
+LibName4=resistors
+LibName5=chips
 LibName6=diodes
-LibName7=resistors
-LibName8=aimtec
-LibName9=chips
-LibName10=soic
-LibDir=../kicadlibrary/02footprints
+LibName7=crystal
+LibName8=led
+LibDir=../kicadlibrary/02footprints;../../../00library/kicad/02footprints
 [cvpcb]
 version=1
 NetIExt=net
@@ -43,7 +41,7 @@ NetIExt=net
 EquName1=devcms
 [eeschema]
 version=1
-LibDir=kicadlibrary/01symbols
+LibDir=../kicadlibrary/01symbols
 NetFmt=1
 HPGLSpd=20
 HPGLDm=15
@@ -71,7 +69,11 @@ offY_E=0
 RptD_X=0
 RptD_Y=100
 RptLab=1
+SimCmd=
+UseNetN=0
 LabSize=60
+PrintMonochrome=1
+ShowSheetReferenceAndTitleBlock=1
 [eeschema/libraries]
 LibName1=ics_controller_atmel
 LibName2=ics_misc
@@ -80,3 +82,4 @@ LibName4=power
 LibName5=standard
 LibName6=connectors
 LibName7=ics_peripheral
+LibName8=display

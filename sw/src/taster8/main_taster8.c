@@ -42,6 +42,16 @@ void IO_vInitialize(void)
     PORTD |= ((1<<PORTD7) | (0<<PORTD6) | (1<<PORTD5) | (0<<PORTD4) | (0<<PORTD3) | (0<<PORTD2) | (0<<PORTD1) | (0<<PORTD0));
 }
 
+// Interpret message
+static void vInterpretMessage(uint8_t* puMsg, uint8_t uMsgLen)
+{
+    switch (puMsg[0]) {
+    case 0x
+    default:
+        break;
+    }
+}
+
 // --- Module global functions -------------------------------------------------
 
 // --- Global functions --------------------------------------------------------
@@ -64,7 +74,7 @@ int main(void)
     // 5 -> 1
     // 6 -> 2
 
-    BUS_vConfigure(&g_sBus, 0x0C); // configure a bus node with address X
+    BUS_vConfigure(&g_sBus, 0x0A); // configure a bus node with address X
     BUS_vInitialize(&g_sBus, 0);// initialize bus on UART 0
 
     vInitLedAndKeys();
@@ -103,7 +113,7 @@ int main(void)
                 msg[2] = light;
                 msg[3] = 0b00000001;
                 msglen = 4;
-                BUS_bSendMessage(&g_sBus, 11, msglen, msg);
+                BUS_bSendMessage(&g_sBus, 0xC, msglen, msg);
             }
         }
     }

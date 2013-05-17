@@ -1,4 +1,4 @@
-EESchema Schematic File Version 2  date Di 14 Mai 2013 01:23:35 CEST
+EESchema Schematic File Version 2  date Fr 17 Mai 2013 23:21:25 CEST
 LIBS:connectors
 LIBS:ics_controller_atmel
 LIBS:ics_regulator
@@ -13,7 +13,7 @@ EELAYER END
 $Descr A4 11700 8267
 Sheet 1 1
 Title ""
-Date "13 may 2013"
+Date "17 may 2013"
 Rev ""
 Comp ""
 Comment1 ""
@@ -21,6 +21,14 @@ Comment2 ""
 Comment3 ""
 Comment4 ""
 $EndDescr
+Text Label 7100 1350 0    60   ~ 0
+5V-1
+Text Label 8100 1350 0    60   ~ 0
+5V-2
+Text Label 7050 750  0    60   ~ 0
++24V-1
+Text Label 8000 750  0    60   ~ 0
++24V-2
 Connection ~ 6750 6850
 Wire Wire Line
 	6750 4050 7300 4050
@@ -702,14 +710,8 @@ F 3 "~" H 10900 1730 50  0001 L CNN
 	1    10800 1800
 	0    1    1    0   
 $EndComp
-Text Label 6850 1350 0    60   ~ 0
-+5V(Master)
-Text Label 8000 750  0    60   ~ 0
-+24V(Slave)
 Text Label 9800 6850 0    60   ~ 0
 GND2
-Text Label 6800 750  0    60   ~ 0
-+24V(Master)
 Text Notes 800  4350 0    60   ~ 0
 +24V(1)
 Text Notes 800  5250 0    60   ~ 0
@@ -722,8 +724,6 @@ Text Notes 10600 4650 0    60   ~ 0
 BUS-A
 Text Notes 10700 4350 0    60   ~ 0
 +24V(2)
-Text Label 8000 1350 0    60   ~ 0
-+5V(Slave)
 Text Label 4750 2250 0    60   ~ 0
 GND
 Text Label 5800 4450 0    50   ~ 0
@@ -933,7 +933,7 @@ L R R24
 U 1 1 51843C21
 P 7700 6850
 F 0 "R24" H 7650 6750 50  0000 L CNN
-F 1 "1" H 7675 6850 50  0000 L CNN
+F 1 "0" H 7675 6850 50  0000 L CNN
 F 2 "~" H 7825 6840 50  0001 L CNN
 F 3 "~" H 7825 6780 50  0001 L CNN
 	1    7700 6850
@@ -944,7 +944,7 @@ L R R1
 U 1 1 51843BE8
 P 7700 750
 F 0 "R1" H 7650 650 50  0000 L CNN
-F 1 "1" H 7675 750 50  0000 L CNN
+F 1 "0" H 7675 750 50  0000 L CNN
 F 2 "~" H 7825 740 50  0001 L CNN
 F 3 "~" H 7825 680 50  0001 L CNN
 	1    7700 750 
@@ -955,7 +955,7 @@ L R R2
 U 1 1 51843AFC
 P 7700 1350
 F 0 "R2" H 7650 1250 50  0000 L CNN
-F 1 "1" H 7675 1350 50  0000 L CNN
+F 1 "0" H 7675 1350 50  0000 L CNN
 F 2 "~" H 7825 1340 50  0001 L CNN
 F 3 "~" H 7825 1280 50  0001 L CNN
 	1    7700 1350

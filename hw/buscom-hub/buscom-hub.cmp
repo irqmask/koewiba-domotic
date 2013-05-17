@@ -1,4 +1,4 @@
-Cmp-Mod V01 Created by CvPCB (2010-03-14)-final date = Mo 13 Mai 2013 23:27:27 CEST
+Cmp-Mod V01 Created by CvPCB (2010-03-14)-final date = Fr 17 Mai 2013 23:45:49 CEST
 
 BeginCmp
 TimeStamp = /51843186;
@@ -8,14 +8,14 @@ IdModule  = SM0805;
 EndCmp
 
 BeginCmp
-TimeStamp = /518430B3;
+TimeStamp = /518424D0;
 Reference = C2;
 ValeurCmp = 100nF;
 IdModule  = SM0805;
 EndCmp
 
 BeginCmp
-TimeStamp = /518424D0;
+TimeStamp = /518430B3;
 Reference = C3;
 ValeurCmp = 100nF;
 IdModule  = SM0805;
@@ -89,6 +89,34 @@ TimeStamp = /5184C02B;
 Reference = F4;
 ValeurCmp = FUSE;
 IdModule  = SM1812;
+EndCmp
+
+BeginCmp
+TimeStamp = /5196A0DF;
+Reference = H1;
+ValeurCmp = HOLE;
+IdModule  = Hole_3mm;
+EndCmp
+
+BeginCmp
+TimeStamp = /5196A0EE;
+Reference = H2;
+ValeurCmp = HOLE;
+IdModule  = Hole_3mm;
+EndCmp
+
+BeginCmp
+TimeStamp = /5196A0F0;
+Reference = H3;
+ValeurCmp = HOLE;
+IdModule  = Hole_3mm;
+EndCmp
+
+BeginCmp
+TimeStamp = /5196A0F3;
+Reference = H4;
+ValeurCmp = HOLE;
+IdModule  = Hole_3mm;
 EndCmp
 
 BeginCmp

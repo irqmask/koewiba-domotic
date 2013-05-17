@@ -1,5 +1,5 @@
-update=Fr 17 Mai 2013 22:03:40 CEST
-last_client=pcbnew
+update=Fr 17 Mai 2013 23:45:37 CEST
+last_client=cvpcb
 [general]
 version=1
 [eeschema]
@@ -46,11 +46,6 @@ LibName5=power
 LibName6=standard
 LibName7=ics_peripheral
 LibName8=ics_opto
-[cvpcb]
-version=1
-NetIExt=net
-[cvpcb/libraries]
-EquName1=devcms
 [pcbnew]
 version=1
 PadDrlX=0
@@ -69,7 +64,6 @@ TxtLar=120
 MSegLar=60
 LastNetListRead=
 [pcbnew/libraries]
-LibDir=../kicadlibrary/02footprints;../kicadlibrary/02footprints
 LibName1=aimtec
 LibName2=capacitors
 LibName3=chips
@@ -78,3 +72,10 @@ LibName5=crystal
 LibName6=diodes
 LibName7=resistors
 LibName8=conn_misc
+LibName9=holes
+LibDir=../kicadlibrary/02footprints;../kicadlibrary/02footprints
+[cvpcb]
+version=1
+NetIExt=net
+[cvpcb/libraries]
+EquName1=devcms

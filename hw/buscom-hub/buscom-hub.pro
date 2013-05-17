@@ -1,4 +1,4 @@
-update=Fr 17 Mai 2013 21:27:58 CEST
+update=Fr 17 Mai 2013 22:03:40 CEST
 last_client=pcbnew
 [general]
 version=1
@@ -57,11 +57,6 @@ PadDrlX=0
 PadDimH=200
 PadDimV=450
 BoardThickness=630
-RouteTo=15
-RouteBo=0
-Segm45=1
-Racc45=1
-SgPcb45=1
 TxtPcbV=800
 TxtPcbH=600
 TxtModV=600
@@ -72,9 +67,9 @@ DrawLar=150
 EdgeLar=150
 TxtLar=120
 MSegLar=60
-WpenSer=10
+LastNetListRead=
 [pcbnew/libraries]
-LibDir=../kicadlibrary/02footprints
+LibDir=../kicadlibrary/02footprints;../kicadlibrary/02footprints
 LibName1=aimtec
 LibName2=capacitors
 LibName3=chips
@@ -82,3 +77,4 @@ LibName4=conn_header
 LibName5=crystal
 LibName6=diodes
 LibName7=resistors
+LibName8=conn_misc

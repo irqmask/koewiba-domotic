@@ -1,6 +1,6 @@
-update=Sa 11 Mai 2013 17:30:21 CEST
+update=Sa 18 Mai 2013 10:17:53 CEST
 version=1
-last_client=kicad
+last_client=pcbnew
 [eeschema]
 version=1
 LibDir=../kicadlibrary/01symbols
@@ -54,6 +54,8 @@ version=1
 NetIExt=net
 [cvpcb/libraries]
 EquName1=devcms
+[general]
+version=1
 [pcbnew]
 version=1
 PadDrlX=320
@@ -90,5 +92,3 @@ LibName14=switch_encoder
 LibName15=switch_misc
 LibName16=to
 LibName17=transformer
-[general]
-version=1

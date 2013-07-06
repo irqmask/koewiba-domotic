@@ -1,4 +1,4 @@
-EESchema Schematic File Version 2  date Sa 11 Mai 2013 12:24:20 CEST
+EESchema Schematic File Version 2  date Di 02 Jul 2013 07:38:50 CEST
 LIBS:connectors
 LIBS:display
 LIBS:encoder
@@ -22,7 +22,7 @@ $Descr A4 11700 8267
 encoding utf-8
 Sheet 2 2
 Title ""
-Date "11 may 2013"
+Date "2 jul 2013"
 Rev ""
 Comp ""
 Comment1 ""
@@ -147,19 +147,19 @@ Wire Wire Line
 Wire Wire Line
 	4200 5850 1000 5850
 $Comp
-L GND #PWR28
+L GND #PWR024
 U 1 1 517A5C83
 P 3350 3150
-F 0 "#PWR28" H 3350 3150 30  0001 C CNN
+F 0 "#PWR024" H 3350 3150 30  0001 C CNN
 F 1 "GND" H 3350 3080 30  0001 C CNN
 	1    3350 3150
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND #PWR27
+L GND #PWR025
 U 1 1 517A5C80
 P 3350 1850
-F 0 "#PWR27" H 3350 1850 30  0001 C CNN
+F 0 "#PWR025" H 3350 1850 30  0001 C CNN
 F 1 "GND" H 3350 1780 30  0001 C CNN
 	1    3350 1850
 	1    0    0    -1  
@@ -187,10 +187,10 @@ F 5 "~" H 3150 2730 50  0001 L CNN "Tolerance"
 	0    1    1    0   
 $EndComp
 $Comp
-L VCC #PWR26
+L VCC #PWR026
 U 1 1 517A5B06
 P 3150 1350
-F 0 "#PWR26" H 3150 1525 50  0001 C CNN
+F 0 "#PWR026" H 3150 1525 50  0001 C CNN
 F 1 "VCC" H 3150 1450 50  0000 C CNN
 	1    3150 1350
 	1    0    0    -1  
@@ -206,19 +206,19 @@ RXD
 Text HLabel 4300 4000 2    60   Input ~ 0
 TXD
 $Comp
-L GND #PWR24
+L GND #PWR027
 U 1 1 517A5A68
 P 1300 5950
-F 0 "#PWR24" H 1300 5950 30  0001 C CNN
+F 0 "#PWR027" H 1300 5950 30  0001 C CNN
 F 1 "GND" H 1300 5880 30  0001 C CNN
 	1    1300 5950
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND #PWR25
+L GND #PWR028
 U 1 1 517A5A11
 P 1800 2000
-F 0 "#PWR25" H 1800 2000 30  0001 C CNN
+F 0 "#PWR028" H 1800 2000 30  0001 C CNN
 F 1 "GND" H 1800 1930 30  0001 C CNN
 	1    1800 2000
 	1    0    0    -1  

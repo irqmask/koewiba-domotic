@@ -2,15 +2,15 @@
 # is public domain), believed to be neutral to any flavor of "make"
 # (GNU make, BSD make, SysV make)
 
-MCU = atmega88
+MCU = atmega324p
 FORMAT = ihex
 TARGET = testeep
-SRC = ../shared/eeprom_spi.c \
-      ../shared/uart.c \
+SRC = ../../shared/eeprom_spi.c \
+      ../../shared/uart.c \
       main_testeeprom.c
 
 
-ASRC = ../shared/queue.S
+ASRC = ../../shared/queue.S
 OPT = s
 
 # Name of this Makefile (used for "make depend").
@@ -32,8 +32,8 @@ CSTANDARD = -std=gnu99
 CDEFS = -DF_CPU=7372800
 
 # Place -I options here
-CINCS = -I../include \
-        -I../shared
+CINCS = -I../../include \
+        -I../../shared
 
 
 CDEBUG = -g$(DEBUG)

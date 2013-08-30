@@ -154,7 +154,7 @@ ISR(INTERRUPT_UART_TRANS)
 
 /**
  * Initialize data and hardware of bus's physical layer.
- * 
+ *
  * @param[in] psPhy		Handle of bus physical layer.
  * @param[in] uUart		Number of the UART. 0=first.
  */
@@ -163,7 +163,7 @@ void BUS__vPhyInitialize(sBusPhy_t* psPhy, uint8_t uUart)
     psPhy->uCurrentBytesToSend = 0;
     psPhy->uUart = uUart;
     psPhy->uFlags = 0;
-    
+
     // configure UART hardware
     if (psPhy->uUart == 0) {
         g_UART0Phy = psPhy;
@@ -173,7 +173,7 @@ void BUS__vPhyInitialize(sBusPhy_t* psPhy, uint8_t uUart)
         REGISTER_UCSRB |= ((1<<REGBIT_RXCIE) | (0<<REGBIT_UDRIE) | (1<<REGBIT_TXCIE) | (1<<REGBIT_RXEN) | (1<<REGBIT_TXEN));
         UART_DDR |= (UART_DRIVER | UART_RECVSTOP);
     }
-    
+
     // sender is initial off, receiver is always on.
     BUS__vPhyActivateSender(psPhy, FALSE);
     BUS__vPhyActivateReceiver(psPhy, TRUE);
@@ -271,7 +271,7 @@ BOOL BUS__bPhyDataReceived(sBusPhy_t* psPhy)
  * @param[in] psPhy
  * Handle of bus physical layer.
  * @param[out] puInBuf
- * Pointer to buffer where received data is copied to. It has at least to be as 
+ * Pointer to buffer where received data is copied to. It has at least to be as
  * big as the internal input buffer in physical layer.
  *
  * @returns Number of bytes read.
@@ -299,7 +299,7 @@ uint8_t BUS__uPhyRead(sBusPhy_t* psPhy, uint8_t *puInBuf)
  * @returns TRUE if a byte has been received, otherwise false.
  */
 BOOL BUS__bPhyReadByte(sBusPhy_t* psPhy, uint8_t *puByte)
-{   
+{
     sBusRec_t  *buffer = &psPhy->sRecvBuf;
 
     if (buffer->uWritePos == buffer->uReadPos) {

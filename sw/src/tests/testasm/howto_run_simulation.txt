@@ -1,0 +1,22 @@
+# HOWTO run simulation
+
+#simulation starten
+
+simulavr -g -P simulavr-disp -d <AVR-Prozessortyp>
+
+#gdb starten
+
+avr-gdb -tui
+
+(gdb) layout asm
+(gdb) file testasm.elf
+(gdb) targ rem :1212
+(gdb) load
+(gdb) b main
+(gdb) c
+
+
+
+GDB Commands
+c = Continue
+b <breakpoint> = Setze Breakpoint

@@ -1,0 +1,32 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Atmel Studio Solution File, Format Version 11.00
+Project("{54F91283-7BC4-4236-8FF9-10F437C3AD48}") = "testeeprom_atmega88", "testeeprom_atmega88\testeeprom_atmega88.cproj", "{9FD61DD4-F1D8-493A-9846-7DD0942E4151}"
+EndProject
+Project("{54F91283-7BC4-4236-8FF9-10F437C3AD48}") = "testeeprom_atmega324", "testeeprom_atmega324\testeeprom_atmega324.cproj", "{6F8F1962-2FA2-4E74-8E15-AB9464B56F83}"
+EndProject
+Project("{54F91283-7BC4-4236-8FF9-10F437C3AD48}") = "testeeprom_attiny1634", "testeeprom_attiny1634\testeeprom_attiny1634.cproj", "{4846A75E-A4ED-4986-9BB7-37B790DD9A7F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|AVR = Debug|AVR
+		Release|AVR = Release|AVR
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9FD61DD4-F1D8-493A-9846-7DD0942E4151}.Debug|AVR.ActiveCfg = Debug|AVR
+		{9FD61DD4-F1D8-493A-9846-7DD0942E4151}.Debug|AVR.Build.0 = Debug|AVR
+		{9FD61DD4-F1D8-493A-9846-7DD0942E4151}.Release|AVR.ActiveCfg = Release|AVR
+		{9FD61DD4-F1D8-493A-9846-7DD0942E4151}.Release|AVR.Build.0 = Release|AVR
+		{6F8F1962-2FA2-4E74-8E15-AB9464B56F83}.Debug|AVR.ActiveCfg = Debug|AVR
+		{6F8F1962-2FA2-4E74-8E15-AB9464B56F83}.Debug|AVR.Build.0 = Debug|AVR
+		{6F8F1962-2FA2-4E74-8E15-AB9464B56F83}.Release|AVR.ActiveCfg = Release|AVR
+		{6F8F1962-2FA2-4E74-8E15-AB9464B56F83}.Release|AVR.Build.0 = Release|AVR
+		{4846A75E-A4ED-4986-9BB7-37B790DD9A7F}.Debug|AVR.ActiveCfg = Debug|AVR
+		{4846A75E-A4ED-4986-9BB7-37B790DD9A7F}.Debug|AVR.Build.0 = Debug|AVR
+		{4846A75E-A4ED-4986-9BB7-37B790DD9A7F}.Release|AVR.ActiveCfg = Release|AVR
+		{4846A75E-A4ED-4986-9BB7-37B790DD9A7F}.Release|AVR.Build.0 = Release|AVR
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

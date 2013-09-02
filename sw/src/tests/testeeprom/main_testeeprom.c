@@ -91,7 +91,9 @@ int main ( void )
     // enable sender and receiver
     DDRD |= (1<<PD2);
     PORTD |= (1<<PD2);
-
+    DDRB |= (1<<PB0 | 1<<PB1);
+    PORTB &=~(1<<PB0 | 1<<PB1);
+    
 __RESTART:
     SPI_vMasterInitBlk();
     EEP_vInit();
@@ -100,17 +102,7 @@ __RESTART:
 
     UART_vPutString("\n\nEEProm Test Application\n");
     UART_vPutString("-------------------------\n");
-
-    while(1) {
-        raddr = UART_uReceive();
-        if (raddr & (1<<eUartFlag_NoData)) continue;
-        if (raddr & (1<<eUartFlag_BufOverrun)) {
-            UART_vPutString("OVERRUN!\n");
-        }
-        UART_vPutChar(raddr & 0x00FF);
-        //UART_vPutHex(raddr >> 8);
-    }
-        
+       
     // 1st test: Read EEPRom for the first time
     // ------------------------------------------------------------------------
 

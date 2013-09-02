@@ -29,7 +29,6 @@
 typedef struct uart {
     uint8_t                 auRecvQueue[UART_RECV_QUEUE_SIZE+QUEUE_HEADER_SIZE];
     uint8_t                 auSendQueue[UART_SEND_QUEUE_SIZE+QUEUE_HEADER_SIZE];
-    BOOL                    bIsBusy;
     uint8_t                 uStatus;
 } sUart_t;
 
@@ -57,8 +56,8 @@ static void vStartTransmission(void)
     val = QUE_uGet(sUart.auSendQueue);
     if (val >> 8) {
         REGISTER_UDR = val & 0x00FF;
-        sUart.bIsBusy = TRUE;
-    } else sUart.bIsBusy = FALSE;
+        REGISTER_UCSRB |= (1<<REGBIT_UDRIE);
+    }
 }
 
 #endif // UART_WITH_IRQ
@@ -82,7 +81,9 @@ ISR(INTERRUPT_USART_UDRE)
     val = QUE_uGet(sUart.auSendQueue);
     if (val >> 8) {
         REGISTER_UDR = val & 0x00FF;
-    } else sUart.bIsBusy = FALSE;
+    } else {
+        REGISTER_UCSRB &= ~(1<<REGBIT_UDRIE);
+    }
 }
 
 // Interrupt when a byte has been received by the UART
@@ -90,6 +91,11 @@ ISR(INTERRUPT_USART_RXC)
 {
     if (!QUE_uPut(sUart.auRecvQueue, REGISTER_UDR)) {
         sUart.uStatus |= (1<<(eUartFlag_BufOverrun-8));
+    }
+    // check framing error
+    if (REGISTER_UCSRA & (1<<REGBIT_FE)) {
+        REGISTER_UCSRA &= ~(1<<REGBIT_FE);
+        sUart.uStatus |= (1<<(eUartFlag_FramingError-8));
     }
 }
 
@@ -113,8 +119,8 @@ void            UART_vInit          (uint32_t       uBaud)
     REGISTER_UBRRH = (uint8_t)(UART_UBRR_CALC( uBaud, F_CPU ) >> 8);
     REGISTER_UBRRL = (uint8_t)UART_UBRR_CALC( uBaud, F_CPU );
 
-    // enable receiver and transmitter
-    REGISTER_UCSRB = (1<<RXC0) | (1<<UDRE0) | (1<<RXEN0) | (1<<TXEN0);
+    // enable receiver, receiver interrupt and transmitter
+    REGISTER_UCSRB = (1<<REGBIT_RXCIE) | (1<<REGBIT_RXEN) | (1<<REGBIT_TXEN);
 
     // set frame format: asynchronous 8N1
     REGISTER_UCSRC = (1 << UCSZ01) | (1 << UCSZ00);
@@ -122,7 +128,6 @@ void            UART_vInit          (uint32_t       uBaud)
     // Initialize queue and status variables
     QUE_vInit(sUart.auRecvQueue, sizeof(sUart.auRecvQueue));
     QUE_vInit(sUart.auSendQueue, sizeof(sUart.auSendQueue));
-    sUart.bIsBusy           = FALSE;
 }
 
 /**
@@ -132,7 +137,7 @@ void            UART_vInit          (uint32_t       uBaud)
  */
 BOOL            UART_bIsBusy        (void)
 {
-    return sUart.bIsBusy;
+    return REGISTER_UCSRB & (1<<REGBIT_UDRIE);
 }
 
 /**
@@ -151,7 +156,7 @@ void            UART_vTransmit      (uint8_t*               puSendBuf,
     while (uLength--) {
         do {
             enqueued = QUE_uPut(sUart.auSendQueue, *puSendBuf);
-            if (sUart.bIsBusy == FALSE) {
+            if (!UART_bIsBusy()) {
                 vStartTransmission();
             }
         } while (enqueued == FALSE);
@@ -192,7 +197,7 @@ void            UART_vPutChar       (char                   cChar)
     BOOL enqueued;
     do {
         enqueued = QUE_uPut(sUart.auSendQueue, cChar);
-        if (sUart.bIsBusy == FALSE) {
+        if (!UART_bIsBusy()) {
             vStartTransmission();
         }
     } while (enqueued == FALSE);

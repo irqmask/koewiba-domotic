@@ -7,8 +7,8 @@
 ;  r0, r1:           don't use!
 ;
 ; Function paramters (read from left to right)
-;  r25:r24 – 1st argument
-;  r23:r22 – 2nd argument
+;  r25:r24 - 1st argument
+;  r23:r22 - 2nd argument
 ;  r21:r20 - 3rd argument
 ;
 ; Function returncode
@@ -49,8 +49,8 @@ QUE_uPut:   mov     r31, r25    ; load queue pointer into Z
             clr     r24         ; returncode = 0
             ld      r18, Z      ; r18 = size of queue
             ; save SREG and disable interrupts
-            in      r20, _SFR_IO_ADDR(SREG) ;
-            cli                 ;
+            ;in      r20, _SFR_IO_ADDR(SREG) ;
+            ;cli                 ;
             ; load writeindex into r19, increase it and adjust it to queue size.
             ldd     r19, Z+1    ; r19 = writeindex
             inc     r19
@@ -70,7 +70,7 @@ QuPu1:      ldd     r18, Z+2    ; r18 = readindex
             st      Z, r22      ; store uVal
 
             inc     r24         ; returncode = 1
-QuPuF:      out     _SFR_IO_ADDR(SREG), R20   ; restore SREG
+QuPuF:      ;out     _SFR_IO_ADDR(SREG), R20   ; restore SREG
             ret
 
 
@@ -84,8 +84,8 @@ QUE_uGet:   mov     r31, r25    ; load queue pointer into Z
             mov     r30, r24
             clr     r25
             ; save SREG and disable interrupts
-            in r20, _SFR_IO_ADDR(SREG)
-            cli
+            ;in r20, _SFR_IO_ADDR(SREG)
+            ;cli
             ; get queue readindex and queue writeindex
             ldd     r18, Z+1    ; r18 = writeindex
             ldd     r19, Z+2    ; r19 = readindex
@@ -96,8 +96,8 @@ QUE_uGet:   mov     r31, r25    ; load queue pointer into Z
             mov     r20, r30
             mov     r21, r31
             add     r30, r19    ; load pointer to queue element...
-			adc     r31, r25    ; add carry bit. r25 is 0
-			adiw    r30, 3      ; ...and skip queue header
+            adc     r31, r25    ; add carry bit. r25 is 0
+            adiw    r30, 3      ; ...and skip queue header
             ld      r24, Z
             mov     r30, r20    ; restore r30
             mov     r31, r21    ; restore r31
@@ -111,5 +111,5 @@ QUE_uGet:   mov     r31, r25    ; load queue pointer into Z
 QuGe1:      std     Z+2, r19    ; store new readindex
             ; set flag, that a byte has been taken from the queue
             inc     r25         ; returncode = 1
-QuGeE:      out     _SFR_IO_ADDR(SREG), r20    ; restore SREG
+QuGeE:      ;out     _SFR_IO_ADDR(SREG), r20    ; restore SREG
             ret

@@ -49,7 +49,7 @@
  #define UART_WITH_IRQ          1
 
  #define UART_RECV_QUEUE_SIZE   32  //!< Size of the UART recv-queue.
- #define UART_SEND_QUEUE_SIZE   200  //!< Size of the UART send-queue.
+ #define UART_SEND_QUEUE_SIZE   32  //!< Size of the UART send-queue.
  #define UART_AUTOCR            1   //!< Automatically send a CR when a newline 
                                     //!< has been sent.
 #endif // UART_APPCONFIG
@@ -62,6 +62,8 @@ typedef enum {
     eUartFlag_NoData = 8,       //!< Receive buffer is empty
     eUartFlag_BufOverrun,       //!< Receive buffer is full, at least one byte
                                 //!< has been lost.
+    eUartFlag_FramingError,     //!< A framing error occurred, when a byte has 
+                                //!< been received.
     eUartFlag_Last
 } eUartFlags_t;
 

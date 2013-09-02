@@ -17,12 +17,7 @@
 
 // --- Include section ---------------------------------------------------------
 
-#ifdef HAS_PCBCONFIG_H
- #include "pcbconfig.h"
-#endif
-
 #include "prjtypes.h"
-#include "spi.h"
 
 // --- Definitions -------------------------------------------------------------
 

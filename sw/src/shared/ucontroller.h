@@ -34,7 +34,19 @@
  #define INTERRUPT_UART_TRANS   USART_TXC_vect
  #define INTERRUPT_SPI          SPI_STC_vect
 
+ // SPI
+ #define REG_SPCR0              SPCR
+ #define REG_SPDR0              SPDR
+ #define REG_SPSR0              SPSR
+ // SPCR
+ #define REGBIT_SPE0            SPE
+ #define REGBIT_MSTR0           MSTR
+ // SPSR
+ #define REGBIT_SPIF0           SPIF
+ #define REGBIT_SPI2X0          SPI2X
+
 #elif defined (__AVR_ATmega88__)
+// UART
  #define REGISTER_UCSRA         UCSR0A
  #define REGISTER_UCSRB         UCSR0B
  #define REGISTER_UCSRC         UCSR0C
@@ -53,6 +65,17 @@
  #define INTERRUPT_PINCHANGE2   PCINT2_vect
  #define INTERRUPT_SPI          SPI_STC_vect
 
+// SPI
+ #define REG_SPCR0              SPCR
+ #define REG_SPDR0              SPDR
+ #define REG_SPSR0              SPSR
+ // SPCR
+ #define REGBIT_SPE0            SPE
+ #define REGBIT_MSTR0           MSTR
+ // SPSR
+ #define REGBIT_SPIF0           SPIF
+ #define REGBIT_SPI2X0          SPI2X
+ 
 #elif defined (__AVR_ATmega324P__) || defined (__AVR_ATmega324A__)
  // definition of prozessor depending global settings
  // TODO CV: this part can be ported maybe to a makefile include
@@ -80,6 +103,17 @@
  #define INTERRUPT_UART_TRANS   USART0_TX_vect
  #define INTERRUPT_PINCHANGE2   PCINT2_vect
  #define INTERRUPT_SPI          SPI_STC_vect
+
+ // SPI
+ #define REG_SPCR0              SPCR0
+ #define REG_SPDR0              SPDR0
+ #define REG_SPSR0              SPSR0
+ // SPCR
+ #define REGBIT_SPE0            SPE0
+ #define REGBIT_MSTR0           MSTR0
+ // SPSR
+ #define REGBIT_SPIF0           SPIF0
+ #define REGBIT_SPI2X0          SPI2X0
 
 #endif
 

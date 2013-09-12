@@ -65,7 +65,7 @@ QuPu1:      ldd     r18, Z+2    ; r18 = readindex
             ldd     r18, Z+1    ; r18 = old writeindex
             std     Z+1, r19    ; store new writeindex
             add     r30, r18    ; load pointer to queue element...
-			adc     r31, r24	; add carry bit. r24 is 0
+            adc     r31, r24    ; add carry bit. r24 is 0
             adiw    r30, 3      ; ... and skip queue header
             st      Z, r22      ; store uVal
 

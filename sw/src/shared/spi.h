@@ -29,6 +29,7 @@
 #include <avr/io.h>
 
 #include "prjtypes.h"
+#include "ucontroller.h"
 
 #ifdef HAS_PCBCONFIG_H
  #include "pcbconfig.h"
@@ -128,9 +129,9 @@ inline void     SPI_vMasterInitBlk  (void)
     SPI_DDR_SCK |= (1 << SPI_SCK);
     SPI_DDR_SS |= (1 << SPI_SS);     // set DDR for slave select as output to guarantee SPI master mode
     SPI_PORT_SS |= (1 << SPI_SS);    // set slave select to 1 (slave disabled)
-    SPSR = (1 << SPI2X);
+    REG_SPSR0 = (1 << REGBIT_SPI2X0);
     // Enable SPI, Master, set clock rate fck/2
-    SPCR = (1 << SPE) | (1 << MSTR);
+    REG_SPCR0 = (1 << REGBIT_SPE0) | (1 << REGBIT_MSTR0);
 }
 
 
@@ -145,10 +146,10 @@ inline void     SPI_vMasterInitBlk  (void)
 inline uint8_t  SPI_uTransmitBlk    (uint8_t                uData )
 {
     // Start transmission
-    SPDR = uData;
+    REG_SPDR0 = uData;
     // Wait for transmission complete
-    while ( !((SPSR) & (1 << SPIF)) );
-    return SPDR; // SPDR contains received byte during transmission.
+    while ( !((REG_SPSR0) & (1 << REGBIT_SPIF0)) );
+    return REG_SPDR0; // SPDR contains received byte during transmission.
 }
 
 #endif // SPI_WITH_BLOCKING

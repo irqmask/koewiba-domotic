@@ -1,0 +1,20 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Atmel Studio Solution File, Format Version 11.00
+Project("{54F91283-7BC4-4236-8FF9-10F437C3AD48}") = "roomthermostate", "roomthermostate_atmega324\roomthermostate.cproj", "{C7F5E697-52E4-48D8-B29C-A46A0052F949}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|AVR = Debug|AVR
+		Release|AVR = Release|AVR
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C7F5E697-52E4-48D8-B29C-A46A0052F949}.Debug|AVR.ActiveCfg = Debug|AVR
+		{C7F5E697-52E4-48D8-B29C-A46A0052F949}.Debug|AVR.Build.0 = Debug|AVR
+		{C7F5E697-52E4-48D8-B29C-A46A0052F949}.Release|AVR.ActiveCfg = Release|AVR
+		{C7F5E697-52E4-48D8-B29C-A46A0052F949}.Release|AVR.Build.0 = Release|AVR
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

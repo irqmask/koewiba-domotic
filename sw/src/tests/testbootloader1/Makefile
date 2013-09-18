@@ -6,12 +6,12 @@ MCU = atmega324p
 FORMAT = ihex
 TARGET = testbootloader1
 
-SRC = ../shared/spi.c \
-      ../shared/eeprom_spi.c \
-      ../shared/uart.c \
+SRC = ../../shared/spi.c \
+      ../../shared/eeprom_spi.c \
+      ../../shared/uart.c \
       main_testbootloader1.c
 
-ASRC =
+ASRC = ../../shared/queue.S
 OPT = s
 
 # Name of this Makefile (used for "make depend").
@@ -30,11 +30,11 @@ DEBUG = stabs
 CSTANDARD = -std=gnu99
 
 # Place -D or -U options here
-CDEFS = -DF_CPU=7372800
+CDEFS = -DF_CPU=7372800 -DHAS_APPCONFIG_H
 
 # Place -I options here
-CINCS = -I../include \
-        -I../shared
+CINCS = -I../../include \
+        -I../../shared
 
 
 CDEBUG = -g$(DEBUG)

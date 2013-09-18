@@ -18,23 +18,24 @@
 #include <util/delay.h>
 #include <stdint.h>
 
-#include "modcfg_common.h"
+#include "moddefs_common.h"
 #include "eeprom_spi.h"
 #include "spi.h"
 #include "uart.h"
 
 // --- Definitions -------------------------------------------------------------
 
-#define XON                     17       /* XON Zeichen */
-#define XOFF                    19       /* XOFF Zeichen */
-#define START_SIGN              ':'      /* Hex-Datei Zeilenstartzeichen */
+#define XON                     17       
+#define XOFF                    19       
+#define START_SIGN              ':'      // HEX file start of line character
 
-/* Zustände des Bootloader-Programms */
+/* States of the HEX File loader */
 #define BOOT_STATE_EXIT         0
 #define BOOT_STATE_PARSER       1
 #define BOOT_STATE_IDLE         2
+#define BOOT_STATE_ERROR        3
 
-/* Zustände des Hex-File-Parsers */
+/* States of the HEX file parser */
 #define PARSER_STATE_START      0
 #define PARSER_STATE_SIZE       1
 #define PARSER_STATE_ADDRESS    2
@@ -104,7 +105,7 @@ int main ( void )
                     hex_buffer[5],
                     /* Intel-HEX Datenlänge */
                     hex_size = 0,
-                    /* Zähler für die empfangenen HEX-Daten einer Zeile */
+                    /* Zähler fuer die empfangenen HEX-Daten einer Zeile */
                     hex_data_cnt = 0,
                     /* Intel-HEX Recordtype */
                     hex_type = 0,
@@ -126,179 +127,182 @@ int main ( void )
 
     SPI_vMasterInitBlk();
     EEP_vInit();
+    DDRB |= (1<<PB0)|(1<<PB1);
+    sei();
 
     UART_vPutString("TESTApplication 111 download\n\r");
-    _delay_ms(2000);
+
 
     c = eeprom_read_byte((uint8_t*)MOD_eCfg_BldFlag);
     UART_vPutHex(c);
-    UART_vPutString("\n\r");
+    UART_vPutString("\n");
     do
     {
+        PORTB ^= (1<<PB0);
         c = UART_uReceive();
         if(!(c & (1<<eUartFlag_NoData))) {
-             /* Programmzustand: Parser */
-             if(boot_state == BOOT_STATE_PARSER)
-             {
-                  switch(parser_state)
-                  {
-                      /* Warte auf Zeilen-Startzeichen */
-                      case PARSER_STATE_START:
-                          if((uint8_t)c == START_SIGN)
-                          {
-                              UART_vPutChar(XOFF);
-                              parser_state = PARSER_STATE_SIZE;
-                              hex_cnt = 0;
-                              hex_check = 0;
-                              UART_vPutChar(XON);
-                          }
-                          break;
-                      /* Parse Datengröße */
-                      case PARSER_STATE_SIZE:
-                          hex_buffer[hex_cnt++] = (uint8_t)c;
-                          if(hex_cnt == 2)
-                          {
-                              UART_vPutChar(XOFF);
-                              parser_state = PARSER_STATE_ADDRESS;
-                              hex_cnt = 0;
-                              hex_size = (uint8_t)hex2num(hex_buffer, 2);
-                              hex_check += hex_size;
-                              UART_vPutChar(XON);
-                           }
-                           break;
-                      /* Parse Zieladresse */
-                      case PARSER_STATE_ADDRESS:
-                          hex_buffer[hex_cnt++] = (uint8_t)c;
-                          if(hex_cnt == 4)
-                          {
-                              UART_vPutChar(XOFF);
-                              parser_state = PARSER_STATE_TYPE;
-                              hex_cnt = 0;
-                              hex_addr = hex2num(hex_buffer, 4);
-                              hex_check += (uint8_t) hex_addr;
-                              hex_check += (uint8_t) (hex_addr >> 8);
-                              if(flash_page_flag)
-                              {
-                                  flash_page = hex_addr - hex_addr % SPM_PAGESIZE;
-                                  flash_page_flag = 0;
-                              }
-                              UART_vPutChar(XON);
-                           }
-                           break;
-                      /* Parse Zeilentyp */
-                      case PARSER_STATE_TYPE:
-                           hex_buffer[hex_cnt++] = (uint8_t)c;
-                           if(hex_cnt == 2)
-                           {
-                               UART_vPutChar(XOFF);
-                               hex_cnt = 0;
-                               hex_data_cnt = 0;
-                               hex_type = (uint8_t)hex2num(hex_buffer, 2);
-                               hex_check += hex_type;
-                               switch(hex_type)
-                               {
-                                   case 0: parser_state = PARSER_STATE_DATA; break;
-                                   case 1: parser_state = PARSER_STATE_CHECKSUM; break;
-                                   default: parser_state = PARSER_STATE_DATA; break;
-                               }
-                               UART_vPutChar(XON);
-                           }
-                           break;
-                      /* Parse Flash-Daten */
-                      case PARSER_STATE_DATA:
-                          hex_buffer[hex_cnt++] = (uint8_t)c;
-                          if(hex_cnt == 2)
-                          {
-                              UART_vPutChar(XOFF);
-                              UART_vPutChar('.');
-                              hex_cnt = 0;
-                              flash_data[flash_cnt] = (uint8_t)hex2num(hex_buffer, 2);
-                              hex_check += flash_data[flash_cnt];
-                              flash_cnt++;
-                              hex_data_cnt++;
-                              if(hex_data_cnt == hex_size)
-                              {
-                                  parser_state = PARSER_STATE_CHECKSUM;
-                                  hex_data_cnt=0;
-                                  hex_cnt = 0;
-                              }
-                              /* Puffer voll -> schreibe Page */
-                              if(flash_cnt == SPM_PAGESIZE)
-                              {
-                                  UART_vPutString("P\n\r");
-                                  _delay_ms(100);
-                                  EEP_uWrite((uint16_t)flash_page + MOD_eExtEEPAddr_AppStart,
-                                             SPM_PAGESIZE, flash_data);
-                                  for (uint8_t ii=0; ii<sizeof(flash_data); ii++)
-                                      flash_data[ii] = 0xFF;
-                                  flash_cnt = 0;
-                                  flash_page_flag = 1;
-                                  if (flash_page + SPM_PAGESIZE > flash_length) {
-                                      flash_length = flash_page + SPM_PAGESIZE;
-                                  }
-                              }
-                              UART_vPutChar(XON);
-                          }
-                          break;
-                      /* Parse Checksumme */
-                      case PARSER_STATE_CHECKSUM:
-                          hex_buffer[hex_cnt++] = (uint8_t)c;
-                          if(hex_cnt == 2)
-                          {
-                              UART_vPutChar(XOFF);
-                              hex_checksum = (uint8_t)hex2num(hex_buffer, 2);
-                              hex_check += hex_checksum;
-                              hex_check &= 0x00FF;
-                              /* Dateiende -> schreibe Restdaten */
-                              if(hex_type == 1)
-                              {
-                                  UART_vPutString("P\n\r");
-                                  _delay_ms(100);
-                                  EEP_uWrite((uint16_t)flash_page + MOD_eExtEEPAddr_AppStart, SPM_PAGESIZE, flash_data);
-                                  if (flash_page + SPM_PAGESIZE > flash_length) {
-                                      flash_length = flash_page + SPM_PAGESIZE;
-                                  }
-                                  boot_state = BOOT_STATE_EXIT;
-                              }
-                              /* Überprüfe Checksumme -> muss '0' sein */
-                              if(hex_check == 0) parser_state = PARSER_STATE_START;
-                              else parser_state = PARSER_STATE_ERROR;
-                              UART_vPutChar(XON);
-                          }
-                          break;
-                      /* Parserfehler (falsche Checksumme) */
-                      case PARSER_STATE_ERROR:
-                          UART_vPutString("#\n");
-                          break;
-                      default:
-                          break;
+            PORTB |= (1<<PB1);
+            /* Programmzustand: Parser */
+            if(boot_state == BOOT_STATE_PARSER) {
+                if (c & (1<<eUartFlag_BufOverrun)) {
+                   // UART_vPutString("OVR");
+                }
+                if (c & (1<<eUartFlag_FramingError)) {
+                    UART_vPutString("FRM");
+                }
+                UART_vPutChar(c);
+                switch(parser_state) {
+                /* Wait for line start character */
+                case PARSER_STATE_START:
+                    if ((uint8_t)c == START_SIGN) {
+                        UART_vPutChar(XOFF);
+                        parser_state = PARSER_STATE_SIZE;
+                        hex_cnt = 0;
+                        hex_check = 0;
+                        UART_vPutChar(XON);
                   }
-             }
-             /* Programmzustand: UART Kommunikation */
-             else if(boot_state != BOOT_STATE_PARSER)
-             {
-                 switch((uint8_t)c)
-                 {
-                     case 'p':
-                         boot_state = BOOT_STATE_PARSER;
-                         UART_vPutString("Programmiere das ext EEProm!\n\r");
-                         UART_vPutString("Kopiere die Hex-Datei und füge sie"
-                                   " hier ein (rechte Maustaste)\n\r");
-                         break;
-                     case 'q':
-                         boot_state = BOOT_STATE_EXIT;
-                         UART_vPutString("Verlasse die Applikation!\n\r");
-                         break;
-                     default:
-                         UART_vPutString("Du hast folgendes Zeichen gesendet: ");
-                         UART_vPutChar((unsigned char)c);
-                         UART_vPutString("\n\r");
-                         break;
-                 }
-             }
+                  break;
+                /* Parse length byte */
+                case PARSER_STATE_SIZE:
+                    hex_buffer[hex_cnt++] = (uint8_t)c;
+                    if (hex_cnt == 2) {
+                        UART_vPutChar(XOFF);
+                        parser_state = PARSER_STATE_ADDRESS;
+                        hex_cnt = 0;
+                        hex_size = (uint8_t)hex2num(hex_buffer, 2);
+                        hex_check += hex_size;
+                        UART_vPutChar(XON);
+                    }
+                    break;
+                /* Parse destination address */
+                case PARSER_STATE_ADDRESS:
+                    hex_buffer[hex_cnt++] = (uint8_t)c;
+                    if (hex_cnt == 4) {
+                        UART_vPutChar(XOFF);
+                        parser_state = PARSER_STATE_TYPE;
+                        hex_cnt = 0;
+                        hex_addr = hex2num(hex_buffer, 4);
+                        hex_check += (uint8_t) hex_addr;
+                        hex_check += (uint8_t) (hex_addr >> 8);
+                        if(flash_page_flag) {
+                            flash_page = hex_addr - hex_addr % SPM_PAGESIZE;
+                            flash_page_flag = 0;
+                        }
+                        UART_vPutChar(XON);
+                    }
+                    break;
+                /* Parse linetype */
+                case PARSER_STATE_TYPE:
+                    hex_buffer[hex_cnt++] = (uint8_t)c;
+                    if (hex_cnt == 2) {
+                        UART_vPutChar(XOFF);
+                        hex_cnt = 0;
+                        hex_data_cnt = 0;
+                        hex_type = (uint8_t)hex2num(hex_buffer, 2);
+                        hex_check += hex_type;
+                        switch(hex_type) {
+                        case 0: parser_state = PARSER_STATE_DATA; break;
+                        case 1: parser_state = PARSER_STATE_CHECKSUM; break;
+                        default: parser_state = PARSER_STATE_DATA; break;
+                        }
+                        UART_vPutChar(XON);
+                    }
+                   break;
+                /* Parse flash-data */
+                case PARSER_STATE_DATA:
+                    hex_buffer[hex_cnt++] = (uint8_t)c;
+                    if(hex_cnt == 2) {
+                        UART_vPutChar(XOFF);
+                        UART_vPutChar('.');
+                        hex_cnt = 0;
+                        flash_data[flash_cnt] = (uint8_t)hex2num(hex_buffer, 2);
+                        hex_check += flash_data[flash_cnt];
+                        flash_cnt++;
+                        hex_data_cnt++;
+                        if (hex_data_cnt == hex_size) {
+                            parser_state = PARSER_STATE_CHECKSUM;
+                            hex_data_cnt = 0;
+                            hex_cnt      = 0;
+                        }
+                        /* Buffer full -> save it to external EEProm */
+                        if (flash_cnt == SPM_PAGESIZE) {
+                            UART_vPutString("P\n");
+                            //_delay_ms(100);
+                            EEP_uWrite((uint16_t)flash_page + MOD_eExtEEPAddr_AppStart,
+                                       SPM_PAGESIZE, flash_data);
+                            for (uint8_t ii=0; ii<sizeof(flash_data); ii++)
+                                 flash_data[ii] = 0xFF;
+                            flash_cnt = 0;
+                            flash_page_flag = 1;
+                            if (flash_page + SPM_PAGESIZE > flash_length) {
+                                flash_length = flash_page + SPM_PAGESIZE;
+                            }
+                        }
+                        UART_vPutChar(XON);                      
+                    }
+                    break;
+                /* Parse checksum */
+                case PARSER_STATE_CHECKSUM:
+                    hex_buffer[hex_cnt++] = (uint8_t)c;
+                    if (hex_cnt == 2) {
+                        UART_vPutChar(XOFF);
+                        hex_checksum = (uint8_t)hex2num(hex_buffer, 2);
+                        hex_check += hex_checksum;
+                        hex_check &= 0x00FF;
+                        /* end of file? -> save rest to EEprom */
+                        if (hex_type == 1) {
+                            UART_vPutString("P\n");
+                            //_delay_ms(100);
+                            EEP_uWrite((uint16_t)flash_page + MOD_eExtEEPAddr_AppStart, SPM_PAGESIZE, flash_data);
+                            if (flash_page + SPM_PAGESIZE > flash_length) {
+                                flash_length = flash_page + SPM_PAGESIZE;
+                            }
+                            boot_state = BOOT_STATE_EXIT;
+                        }
+                        /* Check checksum -> has to be 0 */
+                        if (hex_check == 0) parser_state = PARSER_STATE_START;
+                        else parser_state = PARSER_STATE_ERROR;
+                        UART_vPutChar(XON);
+                    }
+                    break;
+                /* Parser error (wrong checksum) */
+                case PARSER_STATE_ERROR:
+                    UART_vPutString("#\n");
+                    boot_state = BOOT_STATE_ERROR;
+                    break;
+                default:
+                    break;
+                }
+            }
+            /* Programmzustand: UART Kommunikation */
+            else if (boot_state == BOOT_STATE_ERROR) {
+                if (c == 'R') {
+                    UART_vPutString("RESET!");
+                    boot_state = BOOT_STATE_IDLE;
+                }
+            } else if(boot_state != BOOT_STATE_PARSER) {
+                switch ((uint8_t)c) {
+                case 'p':
+                    boot_state = BOOT_STATE_PARSER;
+                    UART_vPutString("Programmiere das ext EEProm!\n\r");
+                    UART_vPutString("Kopiere die Hex-Datei und füge sie"
+                                    " hier ein (rechte Maustaste)\n");
+                    break;
+                case 'q':
+                    boot_state = BOOT_STATE_EXIT;
+                    UART_vPutString("Verlasse die Applikation!\n\r");
+                    break;
+                default:
+                    UART_vPutString("Du hast folgendes Zeichen gesendet: ");
+                    UART_vPutChar((unsigned char)c);
+                    UART_vPutString("\n");
+                    break;
+                }
+            }
         }
-    }
-    while(boot_state!=BOOT_STATE_EXIT);
+        PORTB &= ~(1<<PB1);
+
+    } while (boot_state != BOOT_STATE_EXIT);
 
     UART_vPutString("Calculate CRC... ");
 

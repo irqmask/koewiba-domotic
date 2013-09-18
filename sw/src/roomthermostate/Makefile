@@ -8,11 +8,10 @@ TARGET = roomthermostate_atmega324
 SRC = ../shared/disp_st7565.c \
       ../shared/gdisplay.c \
       ../shared/gdisplay_font8x8.c \
-      ../shared/uart.c \
       main_roomthermostate.c
 
 
-ASRC = ../shared/queue.S
+ASRC = 
 OPT = s
 
 # Name of this Makefile (used for "make depend").

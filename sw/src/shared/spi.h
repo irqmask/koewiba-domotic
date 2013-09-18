@@ -76,7 +76,7 @@
 #ifndef SPI_APPCONFIG
  #define SPI_APPCONFIG 1
  #define SPI_WITH_BLOCKING  1
- #define SPI_WITH_IRQ       0
+ #undef  SPI_WITH_IRQ
  #define SPI_QUEUE_SIZE     32  //!< Size of the SPI queue. Per defined slave an
                                 //!< overhead of 2 bytes is additionally used.
  #define SPI_NUM_SLAVES     2   //!< number of slaves connected to SPI. From 0

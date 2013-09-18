@@ -56,9 +56,9 @@
  */
 #ifndef GDISPLAY_APPCONFIG
  #define GDISPLAY_APPCONFIG 1
- #define GDISP_RAM_PAGES    5
- #define GDISP_WIDTH        100
- #define GDISP_HEIGHT       64
+ #define GDISP_RAM_PAGES    4
+ #define GDISP_WIDTH        132
+ #define GDISP_HEIGHT       32
 #endif // GDISPLAY_APPCONFIG
 /** @} */
 

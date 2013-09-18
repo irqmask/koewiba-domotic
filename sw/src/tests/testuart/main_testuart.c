@@ -8,12 +8,13 @@
  */ //---------------------------------------------------------------------------
 
 // --- Include section ---------------------------------------------------------
+
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <util/delay.h>
 #include <stdint.h>
 
-#include "bus_intern.h"
+#include "uart.h"
 
 // --- Definitions -------------------------------------------------------------
 
@@ -27,22 +28,11 @@
 
 // --- Local variables ---------------------------------------------------------
 
-sBusPhy_t   g_sBusPhy0;
-uint8_t     g_auTestMsg[] = "Hallo Bus!\n\r";
-
 // --- Global variables --------------------------------------------------------
 
 // --- Module global variables -------------------------------------------------
 
 // --- Local functions ---------------------------------------------------------
-
-/**
- * Toggle the test LED.
- */
-void vToggleLED(void)
-{
-    PORTD ^= LED_TEST;
-}
 
 // --- Module global functions -------------------------------------------------
 
@@ -50,49 +40,30 @@ void vToggleLED(void)
 
 int main(void)
 {
-    uint8_t buttonstatus    = 0,
-            sendchar        = 0;
-    BOOL    rc              = FALSE;
+    uint16_t val;
+    char cc;
 
-    DDRD |= (LED_TEST | LED_EXP);
-    DDRD &= ~(BTN_TEST);
-    PORTD |= BTN_TEST;              // set pull-up for button
-
-    // initialize physical layer of bus
-    BUS__vPhyInitialize(&g_sBusPhy0, 0);
-
+    DDRB |= (1<<PB0 | 1<<PB1);
+    UART_vInit(9600);
     sei();
 
-    _delay_ms(10);
-    PORTD |= LED_TEST;              // switch on test led
-
-
+    UART_vPutString("TESTUART\r");
+    UART_vPutString("--------\r");
+   
     while (1) {
-
-        // If test-button is pressed
-        if ((PIND & BTN_TEST) == 0) {
-            // Is this the first time, we are seeing a pressed button?
-            if (buttonstatus == FALSE) {
-                vToggleLED(); // toggle test-led
-                sendchar = TRUE;
-            }
-            buttonstatus = TRUE;
+        PORTB ^= (1<<PB0);
+        val = UART_uReceive();
+        if (val & (1<<eUartFlag_NoData)) {
+            continue;
         }
-        else {
-            buttonstatus = FALSE;
+        if (val & (1<<eUartFlag_BufOverrun)) {
+            UART_vPutString("OVR");
         }
-
-        // If the sendchar flag is set, send a char on the bus
-        if (TRUE == sendchar) {
-            sendchar = FALSE;
-            PORTD |= LED_EXP;       // switch EXP LED on
-            
-            // Initiate sending of test message
-            rc = BUS__bPhySend(&g_sBusPhy0, g_auTestMsg, sizeof(g_auTestMsg));
-                       
-            _delay_ms(500);
-            PORTD &= ~LED_EXP;      // switch EXP LED off
+        if (val & (1<<eUartFlag_FramingError)) {
+            UART_vPutString("FRM");
         }
+        cc = (char)(val & 0x00FF);
+        UART_vPutChar(val);
     }
 }
 

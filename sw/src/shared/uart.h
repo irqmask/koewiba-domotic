@@ -100,7 +100,7 @@ void            UART_vHexDump       (const uint8_t*         puArray,
                                      uint8_t                uSize);
 
 
-void            UART_vInitBlk       (void);
+void            UART_vInitBlk       (uint32_t               uBaud);
 
 uint16_t        UART_uReceiveBlk    (void);
 

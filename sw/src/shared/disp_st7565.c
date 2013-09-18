@@ -242,6 +242,7 @@ void            ST7565_vNOP         (void)
 
 void            ST7565_vInit        (void)
 {
+    // set port data directions and initial levels
     DISP_DDR_A0 |= (1<<DISP_A0);
     DISP_DDR_SS |= (1<<DISP_SS);
     DISP_DDR_RES |= (1<<DISP_RES);
@@ -255,7 +256,7 @@ void            ST7565_vInit        (void)
     _delay_us(1000);
     
     ST7565_vLCDBias(0);                 // bias 1/9   
-    ST7565_vADCSelect(FALSE);           // normal orientation
+    ST7565_vADCSelect(TRUE);            // reverse orientation
     ST7565_vCOMSelect(FALSE);           // 6 o'clock mode
     
     ST7565_vVoltageResistorRatio(3);    // set voltage regulator resistor ratio

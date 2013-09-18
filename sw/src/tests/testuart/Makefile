@@ -2,14 +2,14 @@
 # is public domain), believed to be neutral to any flavor of "make"
 # (GNU make, BSD make, SysV make)
 
-MCU = atmega88
+MCU = atmega324p
 FORMAT = ihex
 TARGET = testuart
-SRC = ../shared/bus_phy.c \
+SRC = ../../shared/uart.c \
       main_testuart.c
 
 
-ASRC =
+ASRC = ../../shared/queue.S
 OPT = s
 
 # Name of this Makefile (used for "make depend").
@@ -28,11 +28,11 @@ DEBUG = stabs
 CSTANDARD = -std=gnu99
 
 # Place -D or -U options here
-CDEFS = -DF_CPU=16000000
+CDEFS = -DF_CPU=7372800 -DHAS_APPCONFIG_H
 
 # Place -I options here
-CINCS = -I../include \
-        -I../shared
+CINCS = -I../../include \
+        -I../../shared
 
 
 CDEBUG = -g$(DEBUG)

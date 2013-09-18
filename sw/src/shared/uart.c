@@ -52,6 +52,7 @@ static void vStartTransmission(void)
 {
     uint16_t val = 0;
 
+
     // Start transmission
     val = QUE_uGet(sUart.auSendQueue);
     if (val >> 8) {
@@ -89,8 +90,14 @@ ISR(INTERRUPT_USART_UDRE)
 // Interrupt when a byte has been received by the UART
 ISR(INTERRUPT_USART_RXC)
 {
-    if (!QUE_uPut(sUart.auRecvQueue, REGISTER_UDR)) {
+    uint8_t val;
+
+    val = REGISTER_UDR;
+    if (!QUE_uPut(sUart.auRecvQueue, val)) {
         sUart.uStatus |= (1<<(eUartFlag_BufOverrun-8));
+       // UART_vPutHexBlk (sUart.auRecvQueue[0]);
+       // UART_vPutHexBlk (sUart.auRecvQueue[1]);
+       // UART_vPutHexBlk (sUart.auRecvQueue[2]);
     }
     // check framing error
     if (REGISTER_UCSRA & (1<<REGBIT_FE)) {
@@ -156,10 +163,9 @@ void            UART_vTransmit      (uint8_t*               puSendBuf,
     while (uLength--) {
         do {
             enqueued = QUE_uPut(sUart.auSendQueue, *puSendBuf);
-            if (!UART_bIsBusy()) {
-                vStartTransmission();
-            }
         } while (enqueued == FALSE);
+        
+        REGISTER_UCSRB |= (1<<REGBIT_UDRIE);
         puSendBuf++;
     }
 }
@@ -185,6 +191,26 @@ uint16_t        UART_uReceive       (void)
     return val;
 }
 
+uint8_t dumpindex = 0;
+uint8_t queuedump[32][2];
+
+void vDumpQueue(void)
+{
+    uint8_t currdi;
+    
+    currdi = dumpindex;
+    do {
+        UART_vPutCharBlk('\r');
+        UART_vPutHexBlk(queuedump[dumpindex][0]);
+        UART_vPutCharBlk(' ');
+        UART_vPutHexBlk(queuedump[dumpindex][1]);
+        
+        dumpindex++; if (dumpindex >= 32) dumpindex = 0;
+    } while (dumpindex != currdi);
+    UART_vPutCharBlk('\r');
+    UART_vPutCharBlk('\r');
+}
+
 /**
  * Puts a char into the queue. This function waits until there is enough space
  * in the queue.
@@ -197,11 +223,17 @@ void            UART_vPutChar       (char                   cChar)
     BOOL enqueued;
     do {
         enqueued = QUE_uPut(sUart.auSendQueue, cChar);
-        if (!UART_bIsBusy()) {
-            vStartTransmission();
-        }
+        queuedump[dumpindex][0] = sUart.auSendQueue[1]; // writeindex
+        queuedump[dumpindex++][1] = sUart.auSendQueue[2]; // readindex
+        if (dumpindex >= 32) dumpindex = 0;
+       // if (enqueued == FALSE) {
+         //   vDumpQueue();
+       // }
     } while (enqueued == FALSE);
-
+    REGISTER_UCSRB |= (1<<REGBIT_UDRIE);
+//    if (!UART_bIsBusy()) {
+  //      vStartTransmission();
+    //}
     #ifdef UART_AUTOCR
     if ( cChar == '\n' )
         UART_vPutChar('\r');

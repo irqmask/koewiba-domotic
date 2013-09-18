@@ -37,7 +37,8 @@ uint8_t* puCurrFont = NULL;
 
 inline void vPutChar(const char cChar)
 {
-    uint8_t index, width;
+    uint16_t index;
+    uint8_t  width;
     
     if (cChar >= 32 && cChar < 128) {
         // charindex * bytes per char + header

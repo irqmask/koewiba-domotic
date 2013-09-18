@@ -103,7 +103,8 @@
  #define INTERRUPT_UART_TRANS   USART0_TX_vect
  #define INTERRUPT_PINCHANGE2   PCINT2_vect
  #define INTERRUPT_SPI          SPI_STC_vect
-
+ 
+ #ifdef AVRSTUDIO6
  // SPI
  #define REG_SPCR0              SPCR0
  #define REG_SPDR0              SPDR0
@@ -114,7 +115,18 @@
  // SPSR
  #define REGBIT_SPIF0           SPIF0
  #define REGBIT_SPI2X0          SPI2X0
-
+ #else 
+// SPI
+ #define REG_SPCR0              SPCR
+ #define REG_SPDR0              SPDR
+ #define REG_SPSR0              SPSR
+ // SPCR
+ #define REGBIT_SPE0            SPE
+ #define REGBIT_MSTR0           MSTR
+ // SPSR
+ #define REGBIT_SPIF0           SPIF
+ #define REGBIT_SPI2X0          SPI2X
+ #endif
 #endif
 
 #if defined (__AVR_ATmega8__) || defined (__AVR_ATmega88__)

@@ -16,8 +16,8 @@
 
 // --- Include section ---------------------------------------------------------
 
-#include "config.h"
 #include "prjtypes.h"
+#include "ucontroller.h"
 #include "clock.h"
 
 // --- Definitions -------------------------------------------------------------

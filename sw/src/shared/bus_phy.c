@@ -36,7 +36,7 @@
 #define UBRRVALH ((uint8_t)(UBRRVAL>>8))
 #define UBRRVALL ((uint8_t)UBRRVAL)
 
-
+/*
 inline void IR_DataRegisterEmpty_Enable(void)
 {
 	REGISTER_UCSRB |=  (1<<REGBIT_UDRIE);
@@ -95,7 +95,7 @@ inline void IR_PinChange0_Disable(void)
 	PCICR  &= ~(1<<PCIE0);
 }
 #endif
-
+*/
 // --- Type definitions --------------------------------------------------------
 
 // --- Local variables ---------------------------------------------------------

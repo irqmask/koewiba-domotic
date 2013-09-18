@@ -42,12 +42,12 @@ inline void vPutChar(const char cChar)
     if (cChar >= 32 && cChar < 128) {
         // charindex * bytes per char + header
         index = cChar - 32;
-        index *= pgm_read_byte(puCurrFont[0]);
-        index += 3;
-        width = pgm_read_byte(puCurrFont[index++]);
+        index *= pgm_read_byte(&puCurrFont[0]);  // bytes per character
+        index += 3;                             // header size
+        width = pgm_read_byte(&puCurrFont[index++]);
         
         while (width--) {
-            ST7565_vWriteData(pgm_read_byte(puCurrFont[index++]));
+            ST7565_vWriteData(pgm_read_byte(&puCurrFont[index++]));
         }        
     }
     
@@ -104,7 +104,7 @@ void            GDISP_vPutText8x8   (const char*           pcText)
     char c;
     uint8_t first = 1;
     
-    while (c = *pcText++) {
+    while ((c = *pcText++) != '\0') {
         if (first) first = 0;
         else ST7565_vWriteData(0); // 1 pixel distance between chars
         vPutChar(c);
@@ -116,7 +116,7 @@ void            GDISP_vPutText8x8p   (const char*           pcTextPgm)
     char c;
     uint8_t first = 1;
     
-    while (c = pgm_read_byte(pcTextPgm++)) {
+    while ((c = pgm_read_byte(pcTextPgm++)) != '\0') {
         if (first) first = 0;
         else ST7565_vWriteData(0); // 1 pixel distance between chars
         vPutChar(c);

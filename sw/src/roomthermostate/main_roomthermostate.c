@@ -35,40 +35,67 @@
 
 // --- Local functions ---------------------------------------------------------
 
+void vDrawTemperature(void)
+{
+    GDISP_vGotoColLine(10, 1);
+    GDISP_vChooseFont(GDISP_auFont1_x24);
+    GDISP_vPutText("24,0");
+    GDISP_vChooseFont(GDISP_auSymbols_x24);
+    GDISP_vPutText("\32");
+    GDISP_vChooseFont(GDISP_auFont1_x24);
+    GDISP_vPutText("C");
+}
+
+void vDrawWindowOpened(void)
+{
+    GDISP_vGotoColLine(100, 1);
+    GDISP_vChooseFont(GDISP_auSymbols_x24);
+    GDISP_vPutText("\34");
+}
+
+void vDrawWindowClosed(void)
+{
+    GDISP_vGotoColLine(100, 1);
+    GDISP_vChooseFont(GDISP_auSymbols_x24);
+    GDISP_vPutText("\33");
+}
+
 // --- Module global functions -------------------------------------------------
 
 // --- Global functions --------------------------------------------------------
 
 int main(void)
 {
-    int8_t runner=0,incr=1;
-    
+    int8_t runner=0, incr=1;
+
     DDRC |= ((1<<PC3) | (1<<PC4));
     PORTC &= ~((1<<PC3) | (1<<PC4));
     SPI_vMasterInitBlk();
     GDISP_vInit();
-    GDISP_vGotoColPage(0,0);
-    GDISP_vPutText8x8   ("Hallo Welt!");
-    GDISP_vGotoColPage(0,1);
-    GDISP_vPutText8x8   ("!\"§$%&/()=");
-    GDISP_vGotoColPage(0,2);
-    GDISP_vPutText8x8   ("1234567890");
-    GDISP_vGotoColPage(0,3);
-    GDISP_vPutText8x8   ("@ABCDEFGHIJK");
-    GDISP_vGotoColPage(0,4);
-    GDISP_vPutText8x8   ("abcdef{}");
+    GDISP_vGotoColLine(0,0);
+    GDISP_vPutText("Hallo Welt!");
+    GDISP_vGotoColLine(0,1);
+    GDISP_vPutText("!\"§$%&/()=");
+    GDISP_vGotoColLine(0,2);
+    GDISP_vPutText("1234567890");
+    GDISP_vGotoColLine(0,3);
+    GDISP_vPutText("@ABCDEFGHIJK");
+    GDISP_vGotoColLine(0,4);
+    GDISP_vPutText("abcdef{}");
 
-    
+    vDrawTemperature();
+    vDrawWindowClosed();
+
     while (1) {
         PORTC |= (1<<PC3);
         PORTC &= ~(1<<PC4);
-
+        vDrawWindowOpened();
         GDISP_vBacklight(TRUE);
-        
+
         _delay_ms(250);
         PORTC |= (1<<PC4);
         PORTC &= ~(1<<PC3);
-
+        vDrawWindowClosed();
         GDISP_vBacklight(FALSE);
         _delay_ms(250);
         runner += incr;

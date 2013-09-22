@@ -44,7 +44,7 @@
 
 const uint8_t GDISP_auSymbols_x24[] PROGMEM = {
         // header
-        0x0E, 0x0D, 0x18,
+        40, 13, 24,
 
         // degree symbol
         0x0D,

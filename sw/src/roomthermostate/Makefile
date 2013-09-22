@@ -8,7 +8,8 @@ TARGET = roomthermostate_atmega324
 SRC = ../shared/disp_st7565.c \
       ../shared/gdisplay.c \
       ../shared/gdisplay_font_x8.c \
-      ../shared/gdisplay_font_x24.c \
+      ../shared/gdisplay_font_x16.c \
+      ../shared/gdisplay_symbols_x16.c \
       ../shared/gdisplay_symbols_x24.c \
       main_roomthermostate.c
 

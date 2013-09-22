@@ -3,13 +3,22 @@
  * @addtogroup GDISPLAY
  * @brief Contains a 8x8 font for a graphic display.
  *
- * Each character is GDISP_BYTES_PER_CHAR long. Each byte represents a column of
- * picels of a character.
- * The first byte is the char-width byte. For example the ! has a width of 1. 
+ * The following paragraph describes the format of the font data. At the
+ * beginning three bytes of a header describe the font format:
+ * 1st byte: Bytes per character
+ * 2nd byte: Width in pixels
+ * 3rd byte: Height in pixels
+ * 4th byte till end: character data.
+ *
+ * With the forth byte the character data begins. Every character begins with
+ * one length byte. it represents the width of the character in pixels. For
+ * example the ! has a width of 1.
+ * Then each byte represents a column of picels of a character. If the height is
+ * greater than one byte, all bytes of one column are consecutively.
  * The space between each char has to be added manually.
  *
  * @{
- * @file    gdisplay_font8x8.c
+ * @file    gdisplay_font_x8.c
  * @brief   Contains a 8x8 font for a graphic display.
  *
  * @author  Christian Verhalen
@@ -29,9 +38,9 @@
 
 // --- Global variables --------------------------------------------------------
 
-const uint8_t GDISP_auFont1_8x8[] PROGMEM = {
+const uint8_t GDISP_auFont1_x8[] PROGMEM = {
         0x09, 0x08, 0x08,
-        0x05, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,  // Code for char  
+        0x05, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,  // Code for char
         0x01, 0x5F, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,  // Code for char !
         0x03, 0x07, 0x00, 0x07, 0x00, 0x00, 0x00, 0x00, 0x00,  // Code for char "
         0x07, 0x10, 0x74, 0x1F, 0x14, 0x7C, 0x17, 0x04, 0x00,  // Code for char #

@@ -85,8 +85,8 @@ void    BUS__vPhyActivateReceiver   (sBusPhy_t*     psPhy,
 // TODO remove after debug
 void 	BUS__vDebugSend 			(uint8_t 		*data,
 									 uint8_t 		len);
-BOOL    BUS__bPhySend               (sBusPhy_t*     psPhy, 
-                                     const uint8_t* puMsg, 
+BOOL    BUS__bPhySend               (sBusPhy_t*     psPhy,
+                                     const uint8_t* puMsg,
                                      uint8_t        uLen);
 
 BOOL    BUS__bPhySending            (sBusPhy_t*     psPhy);
@@ -95,8 +95,8 @@ BOOL    BUS__bPhyDataReceived       (sBusPhy_t*     psPhy);
 
 uint8_t BUS__uPhyRead               (sBusPhy_t*     psPhy,
                                      uint8_t*       puInBuf);
-                                     
-BOOL    BUS__bPhyReadByte           (sBusPhy_t*     psPhy, 
+
+BOOL    BUS__bPhyReadByte           (sBusPhy_t*     psPhy,
                                      uint8_t*       puByte);
 
 void 	BUS__uPhyFlush				(sBusPhy_t* psPhy);

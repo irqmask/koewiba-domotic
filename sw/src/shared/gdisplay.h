@@ -70,7 +70,10 @@
 
 // --- Global variables --------------------------------------------------------
 
-extern uint8_t GDISP_auFont1_8x8[];
+extern uint8_t GDISP_auFont1_x8[];
+extern uint8_t GDISP_auFont1_x16[];
+extern uint8_t GDISP_auFont1_x24[];
+extern uint8_t GDISP_auSymbols_x24[];
 
 // --- Module global variables -------------------------------------------------
 
@@ -84,15 +87,17 @@ void            GDISP_vInit         (void);
 
 void            GDISP_vBacklight    (uint8_t                uLevel);
 
-void            GDISP_vGotoColPage  (uint8_t               uCol,
-                                     uint8_t               uPage);
-                                     
-void            GDISP_vPutText8x8   (const char*           pcText);
+void            GDISP_vChooseFont   (const uint8_t*         puFont);
 
-void            GDISP_vPutText8x8p  (const char*           pcText);   
-                                  
+void            GDISP_vGotoColLine  (uint8_t                uCol,
+                                     uint8_t                uPage);
+
+void            GDISP_vPutText      (const char*            pcText);
+
+void            GDISP_vPutTextp     (const char*            pcText);
+
 #endif // _GDISPLAY_H_
-/** 
- * @} 
+/**
+ * @}
  * @}
  */

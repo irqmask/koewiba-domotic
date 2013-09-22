@@ -130,7 +130,7 @@ typedef struct bus {
     sSndBusMsg_t    sSendMsg;                       //!< contains current message to be sent.
     uint8_t         auEmptyMsg[BUS_EMPTY_MSG_LEN];  //!< pre-compiled empty message.
     sClkTimer_t     sReceiveTimeout;                //!< receive timeout
-    
+
     // following data is only used by bus scheduler
 #ifdef BUS_SCHEDULER
     sNodeInfo_t     asNodeList[BUS_MAXNODES];       //!< list of configured nodes
@@ -157,24 +157,24 @@ typedef struct bus {
 
 // --- Global functions --------------------------------------------------------
 
-void    BUS_vConfigure              (sBus_t*        psBus, 
+void    BUS_vConfigure              (sBus_t*        psBus,
                                      uint16_t       uNodeAddress);
 
 void    BUS_vInitialize             (sBus_t*        psBus,
                                      uint8_t        uUart);
 
 void    BUS_vFlushBus               (sBus_t*        psBus);
-                                     
+
 BOOL    BUS_bGetMessage             (sBus_t*        psBus);
 
-BOOL    BUS_bReadMessage            (sBus_t*        psBus, 
-                                     uint16_t*      puSender, 
-                                     uint8_t*       puLen, 
+BOOL    BUS_bReadMessage            (sBus_t*        psBus,
+                                     uint16_t*      puSender,
+                                     uint8_t*       puLen,
                                      uint8_t*       puMsg);
-                                     
-BOOL    BUS_bSendMessage            (sBus_t*        psBus, 
-                                     uint16_t       uReceiver, 
-                                     uint8_t        uLen, 
+
+BOOL    BUS_bSendMessage            (sBus_t*        psBus,
+                                     uint16_t       uReceiver,
+                                     uint8_t        uLen,
                                      uint8_t*       puMsg);
 
 #ifdef BUS_SCHEDULER
@@ -186,6 +186,6 @@ void    BUS_vScheduleCheckAndSetSleep(sBus_t* psBus);
 #endif
 
 void    BUS_vSleep                   (sBus_t*       psBus);
-                                     
+
 #endif /* _BUS_H_ */
 /** @} */

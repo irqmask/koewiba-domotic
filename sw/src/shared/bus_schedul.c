@@ -112,7 +112,7 @@ static BOOL bSendNextTimeSlotToken(sBus_t* psBus, BOOL bDiscovery)
 {
     sNodeInfo_t* node;
 
-    if(TRUE != bDiscovery) 	node = &psBus->asNodeList[psBus->uCurrentNode];
+    if (TRUE != bDiscovery) node = &psBus->asNodeList[psBus->uCurrentNode];
     else 					node = &psBus->asDiscoveryList[psBus->uDiscoverNode];
 
     if (node->uAddress != 0) {
@@ -192,8 +192,8 @@ BOOL BUS_bScheduleAndGetMessage(sBus_t* psBus)
     case eBus_Idle:
 		psBus->bSchedDiscovery = FALSE;
     	if(eMod_Discovery == psBus->eModuleState) psBus->bSchedDiscovery = TRUE;
-    	else if ((psBus->uCurrentNode == BUS_MAXNODES) || (psBus->asNodeList[psBus->uCurrentNode].uAddress == 0))
-    	{ // if last node in active list is reached reset node-counter and switch to discovery-list
+    	else if ((psBus->uCurrentNode == BUS_MAXNODES) || 
+                 (psBus->asNodeList[psBus->uCurrentNode].uAddress == 0)) { // if last node in active list is reached reset node-counter and switch to discovery-list
     		psBus->uCurrentNode = 0;
     		psBus->bSchedDiscovery = TRUE;
     	}
@@ -226,8 +226,7 @@ BOOL BUS_bScheduleAndGetMessage(sBus_t* psBus)
         	}
         }
         else {
-        	if (CLK_bTimerIsElapsed(&psBus->sNodeAnsTimeout))
-        	{
+        	if (CLK_bTimerIsElapsed(&psBus->sNodeAnsTimeout)) {
         		vNodeError(psBus);
         		// return to IDLE state
         		psBus->eState = eBus_Idle;

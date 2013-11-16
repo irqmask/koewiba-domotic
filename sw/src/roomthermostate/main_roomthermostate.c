@@ -27,14 +27,22 @@
 
 static sBus_t      g_sBus;
 static sClkTimer_t g_sDisplayTimer;
+static uint16_t    g_uTempTarget;
 
 // --- Global variables --------------------------------------------------------
 
 // --- Module global variables -------------------------------------------------
 
 // --- Local functions ---------------------------------------------------------
+/*
+void vDrawTemp(uint16_t uTemperature)
+{
+    BOOL negative = FALSE;
+    
+    if (
+}*/
 
-void vDrawTemperature(void)
+void vDrawTemperatures(void)
 {
     GDISP_vGotoColLine(0, 1);
     GDISP_vChooseFont(GDISP_auFont1_x16);
@@ -67,6 +75,27 @@ void vDrawWindowClosed(void)
     GDISP_vPutText("!"); //33
 }
 
+// Interpret message
+static void vInterpretMessage(uint8_t* puMsg, uint8_t uMsgLen)
+{
+    switch (puMsg[0]) {
+    case CMD_eStateBitfield:
+        if (puMsg[2] & 0b00000001) g_uTempTarget += 50;
+        break;
+    case CMD_eSleep:
+        SLEEP_PinChange2_Enable();
+        BUS_vSleep(&g_sBus);
+        SLEEP_PinChange2_Disable();
+        break;
+    case CMD_eAck:
+    	g_sBus.eModuleState = eMod_Running;
+    
+    default:
+    	BUS_bSendAcknowledge(&g_sBus, g_sBus.sRecvMsg.uSender);
+        break;
+    }
+}
+
 // --- Module global functions -------------------------------------------------
 
 // --- Global functions --------------------------------------------------------
@@ -80,7 +109,7 @@ int main(void)
     
     CLK_vInitialize();
     
-    BUS_vConfigure(&g_sBus, 0x0F); // configure a bus node with address X
+    BUS_vConfigure(&g_sBus, 0x0E); // configure a bus node with address X
     BUS_vInitialize(&g_sBus, 0);// initialize bus on UART 0
     
     DDRC |= ((1<<PC3) | (1<<PC4));
@@ -88,6 +117,8 @@ int main(void)
     SPI_vMasterInitBlk();
       
     sei();
+    
+    g_uTempTarget = 1800;
     
     GDISP_vInit();
     GDISP_vGotoColLine(0,0);

@@ -88,7 +88,7 @@ int main(void)
     // 5 -> 1
     // 6 -> 2
 
-    BUS_vConfigure(&g_sBus, 3); // configure a bus node with address 2
+    BUS_vConfigure(&g_sBus, 0x0B); // configure a bus node with address 2
     BUS_vInitialize(&g_sBus, 0);// initialize bus on UART 0
 
     vInitLedAndKeys();
@@ -115,7 +115,7 @@ int main(void)
                 msg[2] = light;
                 msg[3] = 0b00000001;
                 msglen = 4;
-                BUS_bSendMessage(&g_sBus, 5, msglen, msg);
+                BUS_bSendMessage(&g_sBus, 0x0E, msglen, msg);
             }
         }
     }

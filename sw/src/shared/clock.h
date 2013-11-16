@@ -47,7 +47,7 @@ typedef struct clktimer {
 
 void CLK_vInitialize        (void);
 
-void CLK_vControl			(BOOL start);
+void CLK_vControl           (BOOL start);
 
 BOOL CLK_bTimerStart        (sClkTimer_t* psTimer, uint16_t uTicks);
 

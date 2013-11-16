@@ -18,6 +18,8 @@
 // --- Include section ---------------------------------------------------------
 
 #include "bus_intern.h"
+#include "cmddef_common.h"
+#include "clock.h"
 #include "crc16.h"
 
 // TODO remove after debug
@@ -289,7 +291,7 @@ BOOL BUS__bSendSleepCmd(sBus_t* psBus)
     msg[2] = sizeof(msg) - 3;               // LE - Length of message from AR to CRCL
     msg[3] = 0x00;                          // AR - Address receiver 7bit (Broadcast)
     msg[4] = 0x00;                          // EA - Extended address 4bit sender in higher nibble, 4bit receiver in lower nibble.
-    msg[5] = SLEEPCOMMAND;                  // MD - Sleep-Command
+    msg[5] = CMD_eSleep;                    // MD - Sleep-Command
     crc = CRC_uCalc16(&msg[0], 6);
     msg[6] = crc >> 8;
     msg[7] = crc & 0xFF;

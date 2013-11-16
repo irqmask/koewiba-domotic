@@ -5,7 +5,11 @@
 MCU = atmega324p
 FORMAT = ihex
 TARGET = roomthermostate_atmega324
-SRC = ../shared/disp_st7565.c \
+SRC = ../shared/bus_phy.c \
+      ../shared/bus_transport.c \
+      ../shared/clock.c \
+      ../shared/crc16.c \
+      ../shared/disp_st7565.c \
       ../shared/gdisplay.c \
       ../shared/gdisplay_font_x8.c \
       ../shared/gdisplay_font_x16.c \

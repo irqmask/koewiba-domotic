@@ -140,11 +140,11 @@ High-Level Protocol
 -------------------------------
 
 Im High-Level Protocol sind die Formate der zu übertragenden Informationen festgelegt. Dabei wird
-zwischen Allgemeingültigen Befehlen und Zustandsmeldungen, sowie applikationsspezifischen Befehlen und
+zwischen allgemeingültigen Befehlen und Zustandsmeldungen, sowie applikationsspezifischen Befehlen und
 Zustandsmeldungen unterschieden. Befehle lösen beim Empfänger eine Aktion aus, Zustandsmeldungen
 können eine Aktion auslösen, müssen aber nicht.
 
-Allgemeine Zustandsmeldungen (Typ 0x00 - 0x10)
+Allgemeine Zustandsmeldungen (Typ 0x00 - 0x10) (StateMsg)
 Format: Typ, Kanal, spez. Daten
 
 0x00 - Typenlos

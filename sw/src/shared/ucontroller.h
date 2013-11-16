@@ -45,6 +45,10 @@
  #define REGBIT_SPIF0           SPIF
  #define REGBIT_SPI2X0          SPI2X
 
+ // Timer1
+ #define REG_TIMER1_IRQMSK      TIMSK1
+ #define REGBIT_TIMER1_OCIEA    OCIE1A
+ 
 #elif defined (__AVR_ATmega88__)
 // UART
  #define REGISTER_UCSRA         UCSR0A
@@ -76,6 +80,10 @@
  #define REGBIT_SPIF0           SPIF
  #define REGBIT_SPI2X0          SPI2X
  
+ // Timer1
+ #define REG_TIMER1_IRQMSK      TIMSK1
+ #define REGBIT_TIMER1_OCIEA    OCIE1A
+ 
 #elif defined (__AVR_ATmega324P__) || defined (__AVR_ATmega324A__)
  // definition of prozessor depending global settings
  // TODO CV: this part can be ported maybe to a makefile include
@@ -86,6 +94,7 @@
  #define MAXSIZE_BOOTLOADER     0x0400
 
  // definition of processor specific registers
+ // UART0
  #define REGISTER_UCSRA         UCSR0A
  #define REGISTER_UCSRB         UCSR0B
  #define REGISTER_UCSRC         UCSR0C
@@ -101,11 +110,19 @@
  #define INTERRUPT_USART_RXC    USART0_RX_vect
  #define INTERRUPT_USART_UDRE   USART0_UDRE_vect
  #define INTERRUPT_UART_TRANS   USART0_TX_vect
+ 
+ // Sleepmodes
  #define INTERRUPT_PINCHANGE2   PCINT2_vect
+ 
+ // SPI0
  #define INTERRUPT_SPI          SPI_STC_vect
  
+ // Timer1
+ #define REG_TIMER1_IRQMSK      TIMSK1
+ #define REGBIT_TIMER1_OCIEA    OCIE1A
+ 
  #ifdef AVRSTUDIO6
- // SPI
+ // SPI0
  #define REG_SPCR0              SPCR0
  #define REG_SPDR0              SPDR0
  #define REG_SPSR0              SPSR0
@@ -129,16 +146,16 @@
  #endif
 #endif
 
-#if defined (__AVR_ATmega8__) || defined (__AVR_ATmega88__)
- #define CLOCKTIMERCONTROLREGISTERA TCCR1A
+#if defined (__AVR_ATmega8__) || defined (__AVR_ATmega88__) || defined (__AVR_ATmega324P__) || defined (__AVR_ATmega324A__)
+ #define CLOCK_TCCRA TCCR1A
  #define CLOCK_TCCRB TCCR1B
  #define CLOCKSELECT0 CS10
  #define CLOCKSELECT1 CS11
  #define CLOCKSELECT2 CS12
  #define CLOCK_OCRA_H OCR1AH
  #define CLOCK_OCRA_L OCR1AL
- #define CLOCKOUTPUTCOMPAREB_H OCR1BH
- #define CLOCKOUTPUTCOMPAREB_L OCR1BL
+ #define CLOCK_OCRB_H OCR1BH
+ #define CLOCK_OCRB_L OCR1BL
 #endif
 
 // --- Type definitions --------------------------------------------------------
@@ -163,8 +180,7 @@ extern void IR_ReceiveComplete_Enable(void);
 extern void IR_ReceiveComplete_Disable(void);
 extern void IR_OutputCompareMatchA_Enable(void);
 extern void IR_OutputCompareMatchA_Disable(void);
-extern void IR_PinChange2_Enable(void);
-extern void IR_PinChange2_Disable(void);
+
 extern void IR_PinChange1_Enable(void);
 extern void IR_PinChange1_Disable(void);
 extern void IR_PinChange0_Enable(void);

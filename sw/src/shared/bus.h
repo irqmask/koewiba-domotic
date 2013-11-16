@@ -39,7 +39,6 @@
 #define BUS_LOOPS_TILL_SLEEP	50  //!< Number of discovery-loops till normal scheduling begins.
 
 #define ACKCOMMAND	    0xF0	//<! ACK.
-#define SLEEPCOMMAND	0xFE	//<! Command to set subscribers in sleep-mode.
 #define WAKEUPBYTE 		0xFF	//<! Dummy-Byte that is send to the bus as wakeup-call for other subscribers.
 
 // --- Type definitions --------------------------------------------------------

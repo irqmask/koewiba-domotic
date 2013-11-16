@@ -209,7 +209,7 @@ BOOL BUS_bScheduleAndGetMessage(sBus_t* psBus)
         // send token
         if (bSendNextTimeSlotToken(psBus, psBus->bSchedDiscovery))
         {
-            CLK_bTimerStart(&psBus->sNodeAnsTimeout, 30);
+            CLK_bTimerStart(&psBus->sNodeAnsTimeout, CLOCK_MS_2_TICKS(30));
             psBus->eState = eBus_SendingToken;
         }
         else LED_ERROR_ON;

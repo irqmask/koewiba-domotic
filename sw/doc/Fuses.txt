@@ -1,24 +1,35 @@
-ATMEGA324P
-====================================================================
-Low Fuse:   0b11111111 = 0xFF
-              ^--------------- CKDIV8
-               ^-------------- CKOUT
-                ^------------- SUT1
-                 ^------------ SUT0
-                  ^----------- CKSEL3
-                   ^---------- CKSEL2
-                    ^--------- CKSEL1
-                     ^-------- CKSEL0
+Fuse Bytes auslesen mit AVR-Dude
+avrdude -p atmega324p -P usb -c avrisp2 -B 32 -U lfuse:r:lfuse.txt:h
+avrdude -p atmega324p -P usb -c avrisp2 -B 32 -U hfuse:r:hfuse.txt:h
+avrdude -p atmega324p -P usb -c avrisp2 -B 32 -U efuse:r:efuse.txt:h
 
-High Fuse:  0b11111111 = 0xFF
-              ^--------------- OCDEN
-               ^-------------- JTAGEN
-                ^------------- SPIEN
-                 ^------------ WDTON
-                  ^----------- EESAVE
-                   ^---------- BOOTSZ1
-                    ^--------- BOOTSZ0
-                     ^-------- BOOTRST
+Fuse Bytes programmieren mit AVR-Dude:
+avrdude -p atmega324p -P usb -c avrisp2 -B 32 -U lfuse:w:0xEC:m
+avrdude -p atmega324p -P usb -c avrisp2 -B 32 -U hfuse:w:0xDA:m
+avrdude -p atmega324p -P usb -c avrisp2 -B 32 -U efuse:w:0xFF:m
+
+
+ATMEGA324P (signature 1E 95 08)
+====================================================================
+Low Fuse:   0b11101100 = 0xEC
+              ^--------------- CKDIV8   1 = disabled
+               ^-------------- CKOUT    1 = disabled
+                ^------------- SUT1   
+                 ^------------ SUT0     10 = 
+                  ^----------- CKSEL3   1
+                   ^---------- CKSEL2   1
+                    ^--------- CKSEL1   0
+                     ^-------- CKSEL0   0 CKSEL3:0 = 1100 = Low power crystal oscillator 3-8MHz
+
+High Fuse:  0b11011010 = 0xDA
+              ^--------------- OCDEN    1 = disabled on-chip debugging
+               ^-------------- JTAGEN   1 = disabled JTAG programming
+                ^------------- SPIEN    0 = enabled SPI programming
+                 ^------------ WDTON    1 = disabled watchdog timer always on
+                  ^----------- EESAVE   1 = disabled EEProm memory preserve through chip erase
+                   ^---------- BOOTSZ1  0 
+                    ^--------- BOOTSZ0  1 = BOOTSZ1:0 = 01 = 1024 words for bootloader. appflash 0000-3BFF, bootflash 3C00-3FFF
+                     ^-------- BOOTRST  0 = Reset vector points to bootloader
 
 Ext. Fuse:  0b11111111 = 0xFF
               ^--------------- (unused)
@@ -26,7 +37,7 @@ Ext. Fuse:  0b11111111 = 0xFF
                 ^------------- (unused)
                  ^------------ (unused)
                   ^----------- (unused)
-                   ^---------- BODLEVEL2 no brown out detection
-                    ^--------- BODLEVEL1
-                     ^-------- BODLEVEL0
+                   ^---------- BODLEVEL2 1 
+                    ^--------- BODLEVEL1 1
+                     ^-------- BODLEVEL0 1 = 111 = no brown out detection
 

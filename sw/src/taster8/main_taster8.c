@@ -12,8 +12,10 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include "bus.h"
+#include "cmddef_common.h"
 #include "clock.h"
 #include "led_debug.h"
+#include "sleepmode.h"
 #include "ucontroller.h"
 
 // --- Definitions -------------------------------------------------------------
@@ -46,7 +48,15 @@ void IO_vInitialize(void)
 static void vInterpretMessage(uint8_t* puMsg, uint8_t uMsgLen)
 {
     switch (puMsg[0]) {
-    case 0x
+    case CMD_eStateBitfield:
+        if (puMsg[2] & 0b00000001) LED_STATUS_ON;
+        else  LED_STATUS_OFF;
+        break;
+    case CMD_eSleep:
+        SLEEP_PinChange2_Enable();
+        BUS_vSleep(&g_sBus);
+        SLEEP_PinChange2_Disable();
+        break;
     default:
         break;
     }
@@ -80,25 +90,13 @@ int main(void)
     vInitLedAndKeys();
     sei();
 
-    CLK_bTimerStart(&g_sLedTimer, 1000);
+    CLK_bTimerStart(&g_sLedTimer, CLOCK_MS_2_TICKS(1000));
 
     while (1) {
         // check for message and read it
         if (BUS_bGetMessage(&g_sBus)) {
             if (BUS_bReadMessage(&g_sBus, &sender, &msglen, msg)) {
-                // switch light?
-                // type bit-field?
-                if (msg[0] == SLEEPCOMMAND) {
-                	//LED_ERROR_ON;
-                	IR_PinChange2_Enable();
-                	BUS_vSleep(&g_sBus);
-                	IR_PinChange2_Disable();
-                	//LED_ERROR_OFF;
-                }
-                if (msg[0] == 0x01) {
-                    if (msg[2] & 0b00000001) LED_STATUS_ON;
-                    else                     LED_STATUS_OFF;
-                }
+                vInterpretMessage(msg, msglen);
             }
         }
         // check button
@@ -108,12 +106,12 @@ int main(void)
                 if (light)  light = 0;
                 else        light = 1;
 
-                msg[0] = 0x01;
+                msg[0] = CMD_eStateBitfield;
                 msg[1] = 1;
                 msg[2] = light;
                 msg[3] = 0b00000001;
                 msglen = 4;
-                BUS_bSendMessage(&g_sBus, 0xC, msglen, msg);
+                BUS_bSendMessage(&g_sBus, 0x0C, msglen, msg);
             }
         }
     }

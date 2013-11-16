@@ -1,19 +1,19 @@
 /**
- * @addtogroup MODCFG_COMMON
+ * @addtogroup MODDEF_COMMON
  * @brief Project global layout of the internal configuration storage.
  * The location of all general settings which apply to every module are defined
  * here. Mosty, depending on the procesor, this configuration area resides in
  * the controller's internal eeprom.
  *
  * @{
- * @file    modcfg_common.h
+ * @file    moddef_common.h
  * @brief   Project global layout of the internal configuration storage.
  *
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
 
-#ifndef _MODCFG_COMMON_H_
-#define _MODCFG_COMMON_H_
+#ifndef _MODDEF_COMMON_H_
+#define _MODDEF_COMMON_H_
 
 // --- Include section ---------------------------------------------------------
 
@@ -65,5 +65,5 @@ typedef enum {
 
 // --- Global functions --------------------------------------------------------
 
-#endif /* _MODCFG_COMMON_H_ */
+#endif /* _MODDEF_COMMON_H_ */
 /** @} */

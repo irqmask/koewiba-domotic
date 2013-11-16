@@ -242,7 +242,7 @@ BOOL BUS__bPhySend(sBusPhy_t* psPhy, const uint8_t* puMsg, uint8_t uLen)
     if (psPhy->uUart == 0) {
         BUS__vPhyActivateSender(psPhy, TRUE);
         REGISTER_UDR = *psPhy->puSendPtr;   // send first byte
-        IR_DataRegisterEmpty_Enable(); // enable data register empty interrupt
+        REGISTER_UCSRB |=  (1<<REGBIT_UDRIE); // enable data register empty interrupt
     }
     return TRUE;
 }

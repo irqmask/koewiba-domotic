@@ -1,38 +1,30 @@
 /**
- * @addtogroup CLOCK
- * @brief Public interface of system clock.
+ * @addtogroup SLEEPMODE
+ * @brief Public interface of sleepmode control.
  *
- * TODO: Detailed description of module.
+ * Sleepmode control.
  *
  * @{
- * @file    clock.h
- * @brief   System clock.
+ * @file    sleepmode.h
+ * @brief   Public interface of sleepmode control.
  *
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
 
-#ifndef _CLOCK_H_
-#define _CLOCK_H_
+#ifndef _SLEEPMODE_H_
+#define _SLEEPMODE_H_
 
 // --- Include section ---------------------------------------------------------
 
 #include "prjtypes.h"
+#include "ucontroller.h"
 
 // --- Definitions -------------------------------------------------------------
 
-#define CLOCK_NUM_TIMER         8
-#define CLOCK_TICKS_PER_SECOND  100
-
-//! Convert from milliseconds into ticks
-#define CLOCK_MS_2_TICKS(ms)    (uint8_t)((uint32_t)ms*CLOCK_TICKS_PER_SECOND/1000)
+#define SLEEP_PinChange2_Enable()   PCICR |= (1<<PCIE2);
+#define SLEEP_PinChange2_Disable()  PCICR &= ~(1<<PCIE2);
 
 // --- Type definitions --------------------------------------------------------
-
-//! Time-out timer runtime-data.
-typedef struct clktimer {
-    uint8_t     uIndex;         //!< index in clock table
-    volatile uint8_t uTicks;  //!< tick count down.
-} sClkTimer_t;
 
 // --- Local variables ---------------------------------------------------------
 
@@ -46,13 +38,5 @@ typedef struct clktimer {
 
 // --- Global functions --------------------------------------------------------
 
-void CLK_vInitialize        (void);
-
-void CLK_vControl			(BOOL start);
-
-BOOL CLK_bTimerStart        (sClkTimer_t* psTimer, uint8_t uTicks);
-
-BOOL CLK_bTimerIsElapsed    (sClkTimer_t* psTimer);
-
-#endif /* _CLOCK_H_ */
+#endif /* _SLEEPMODE_H_ */
 /** @} */

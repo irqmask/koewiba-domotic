@@ -10,14 +10,14 @@
 
 // --- Include section ---------------------------------------------------------
 #include <avr/io.h>
-#include <util/delay.h>
+#include <avr/interrupt.h>
 
-//#include "bus.h"
-//#include "clock.h"
+#include "bus.h"
+#include "clock.h"
 //#include "led_debug.h"
 #include "gdisplay.h"
 #include "spi.h"
-//#include "ucontroller.h"
+#include "ucontroller.h"
 
 // --- Definitions -------------------------------------------------------------
 
@@ -25,8 +25,8 @@
 
 // --- Local variables ---------------------------------------------------------
 
-//static sBus_t      g_sBus;
-//static sClkTimer_t g_sLedTimer;
+static sBus_t      g_sBus;
+static sClkTimer_t g_sDisplayTimer;
 
 // --- Global variables --------------------------------------------------------
 
@@ -74,10 +74,22 @@ void vDrawWindowClosed(void)
 int main(void)
 {
     int8_t runner=0, incr=1;
-
+    uint8_t msglen = 0;
+    uint8_t msg[BUS_MAXMSGLEN];
+    uint16_t sender = 0;
+    uint8_t displaystate=0;
+    
+    CLK_vInitialize();
+    
+    BUS_vConfigure(&g_sBus, 0x0F); // configure a bus node with address X
+    BUS_vInitialize(&g_sBus, 0);// initialize bus on UART 0
+    
     DDRC |= ((1<<PC3) | (1<<PC4));
     PORTC &= ~((1<<PC3) | (1<<PC4));
     SPI_vMasterInitBlk();
+      
+    sei();
+    
     GDISP_vInit();
     GDISP_vGotoColLine(0,0);
     GDISP_vPutText("aktuell");
@@ -89,20 +101,31 @@ int main(void)
     vDrawWindowClosed();
 
     GDISP_vChooseFont(GDISP_auFont1_x8);
-    GDISP_vGotoColLine(0,0);
+    GDISP_vGotoColLine(0,3);
     GDISP_vPutText("So 22.09.2013 21:45");
+    
+    CLK_bTimerStart(&g_sDisplayTimer, CLOCK_MS_2_TICKS(1000));
     while (1) {
-        _delay_ms(200);
-        PORTC |= (1<<PC3);
-        PORTC &= ~(1<<PC4);
-        vDrawWindowOpened();
-        GDISP_vBacklight(TRUE);
-
-        _delay_ms(200);
-        PORTC |= (1<<PC4);
-        PORTC &= ~(1<<PC3);
-        vDrawWindowClosed();
-        GDISP_vBacklight(FALSE);
+        if (BUS_bGetMessage(&g_sBus)) {
+            if (BUS_bReadMessage(&g_sBus, &sender, &msglen, msg)) {
+            }
+        }
+        if (CLK_bTimerIsElapsed(&g_sDisplayTimer)) {
+            if (displaystate != 0) {
+                displaystate = 0;
+                PORTC |= (1<<PC3);
+                PORTC &= ~(1<<PC4);
+                vDrawWindowOpened();
+                GDISP_vBacklight(TRUE);
+            } else {
+                displaystate = 1;
+                PORTC |= (1<<PC4);
+                PORTC &= ~(1<<PC3);
+                vDrawWindowClosed();
+                GDISP_vBacklight(FALSE);
+            }
+            CLK_bTimerStart(&g_sDisplayTimer, CLOCK_MS_2_TICKS(1000));
+        }
     }
     return 0;
 }

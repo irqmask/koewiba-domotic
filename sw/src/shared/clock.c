@@ -62,12 +62,12 @@ BOOL bDeregisterTimer(sClkTimer_t* psTimer)
         }
         else if(found)
         {
-        	IR_OutputCompareMatchA_Disable();  // disable interrupt
+        	REG_TIMER1_IRQMSK &= ~(1<<REGBIT_TIMER1_OCIEA); // disable OutputCompareMatchA interrupt
         	// shift following timers, to avoid gaps in the list.
         	g_asRunningTimers[ii-1] = g_asRunningTimers[ii];
         }
     }
-    IR_OutputCompareMatchA_Enable(); // enable interrupt
+    REG_TIMER1_IRQMSK |= (1<<REGBIT_TIMER1_OCIEA); // enable OutputCompareMatchA interrupt
     return found;
 }
 
@@ -80,9 +80,8 @@ ISR(TIMER1_COMPA_vect)
 
     for (ii=0; ii<CLOCK_NUM_TIMER; ii++) {
         if (g_asRunningTimers[ii] != NULL) {
-            if (g_asRunningTimers[ii]->uTicks <= 1) {
+            if (g_asRunningTimers[ii]->uTicks == 0) {
                 // time elapsed, de-register timer from list
-                g_asRunningTimers[ii]->uTicks = 0;
                 g_asRunningTimers[ii] = NULL;
             } else {
                 g_asRunningTimers[ii]->uTicks--;
@@ -111,11 +110,12 @@ void CLK_vInitialize(void)
     //                     fClk
     // fIrq = 2 * fOC  = --------- - 1
     //                    N*fOC
+    CLOCK_TCCRA = 0;
     CLOCK_TCCRB |= ((0<<CLOCKSELECT2) | (1<<CLOCKSELECT1) | (1<<CLOCKSELECT0)); // set prescaler to 1/64 (N=64)
     CLOCK_TCCRB |= (1<<WGM12);                                                  // CTC mode (clear timer on compare match)
     CLOCK_OCRA_H = (F_CPU/(64*CLOCK_TICKS_PER_SECOND) - 1) >> 8;
     CLOCK_OCRA_L = (F_CPU/(64*CLOCK_TICKS_PER_SECOND) - 1) & 0x00FF;
-    IR_OutputCompareMatchA_Enable();                                            // enable output compare interrupt
+    REG_TIMER1_IRQMSK |= (1<<REGBIT_TIMER1_OCIEA); // enable OutputCompareMatchA interrupt
 }
 
 /**
@@ -144,25 +144,19 @@ void CLK_vControl(BOOL start)
  * @param[in] psTimer
  * Pointer to timer structure.
  * @param[in] uTime
- * Time in milliseconds. Real timer resolution is defined by CLOCK_TICKS_PER_SECOND.
+ * Time in ticks. Convert from milliscons to ticks with 
+ * CLOCK_MS_2_TICKS macro.
  *
  * @returns TRUE, if timer has been started, otherwise FALSE.
  */
-BOOL CLK_bTimerStart(sClkTimer_t* psTimer, uint16_t uTime)
+BOOL CLK_bTimerStart(sClkTimer_t* psTimer, uint8_t uTicks)
 {
-    uint32_t tick;
-
     // check if timer is still running
     if (psTimer->uTicks != 0) {
         return FALSE;
     }
 
-    // calculate ticks (from milliseconds)
-    tick = uTime * (uint32_t)CLOCK_TICKS_PER_SECOND;
-    tick /= 1000;
-    if (tick == 0) tick = 1;
-
-    psTimer->uTicks = (uint16_t)tick;
+    psTimer->uTicks = uTicks;
     return bRegisterTimer(psTimer);
 }
 

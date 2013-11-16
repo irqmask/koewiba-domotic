@@ -166,15 +166,15 @@ static BOOL bReceive(sBus_t* psBus)
 #ifdef BUS_SCHEDULER
                         psBus->bSchedMsgReceived = TRUE;
 #endif
-                        psBus->eState = eBus_Idle;
-                        psBus->sRecvMsg.uOverallLength = 0;
-                        break;
-                    } else {
-                        // invalid length of message
-                        LED_ERROR_ON;
-                        vResetBus(psBus);
-                        break;
-                    }
+            			//psBus->eState = eBus_GotMessage;
+            			psBus->sRecvMsg.uOverallLength = 0;
+            			break;
+            		} else {
+            			// invalid length of message
+                		LED_ERROR_ON;
+            			vResetBus(psBus);
+            			break;
+            		}
 
                 } else if(psBus->sRecvMsg.uOverallLength >= psBus->sRecvMsg.uLength + 3) {
                     // invalid length of message
@@ -329,7 +329,7 @@ void BUS_vInitialize(sBus_t* psBus, uint8_t uUart)
 {
     psBus->eState = eBus_Idle;
 #ifdef BUS_SCHEDULER
-    psBus->eModuleState = eSched_Discovery;
+    psBus->eModuleState = eMod_Discovery;
 #else
     psBus->eModuleState = eMod_Running;
 #endif
@@ -448,6 +448,42 @@ BOOL BUS_bSendMessage(sBus_t*    psBus,
         	psBus->sSendMsg.uLength++;
         	psBus->sSendMsg.uOverallLength++;
         }
+        // calculate and send CRC
+        crc = CRC_uCalc16(&psBus->sSendMsg.auBuf[0], psBus->sSendMsg.uOverallLength);
+        psBus->sSendMsg.auBuf[psBus->sSendMsg.uOverallLength++] = crc >> 8;
+        psBus->sSendMsg.auBuf[psBus->sSendMsg.uOverallLength++] = crc & 0xFF;
+        psBus->eModuleState = eMod_AckWait;
+        return TRUE;
+    } while ( FALSE );
+    return FALSE;
+}
+
+/**
+ * Send a ACK-message.
+ *
+ * @param[in]   psBus       Handle of the bus.
+ *
+ * @returns TRUE, if the message has successfully been queued.
+ * @note Use BUS_bIsIdle() to check if message is successfully transmitted.
+ */
+BOOL BUS_bSendAcknowledge(sBus_t* psBus, uint16_t uReceiver)
+{
+    uint16_t crc;
+
+    do {
+        // prepare message header
+        psBus->sSendMsg.uOverallLength = 0;
+        psBus->sSendMsg.uLength = 0;
+        psBus->sSendMsg.auBuf[psBus->sSendMsg.uOverallLength++] = BUS_SYNCBYTE;
+        psBus->sSendMsg.auBuf[psBus->sSendMsg.uOverallLength++] = psBus->sCfg.uOwnNodeAddress & 0x007F;
+        psBus->sSendMsg.auBuf[psBus->sSendMsg.uOverallLength++] = 5;
+        psBus->sSendMsg.auBuf[psBus->sSendMsg.uOverallLength++] = uReceiver & 0x007F;
+        // EA - Extended address 4bit sender in higher nibble, 4bit receiver in lower nibble.
+        psBus->sSendMsg.auBuf[psBus->sSendMsg.uOverallLength++] =
+            (((uReceiver & 0x0F00) >> 8) |
+            ((psBus->sCfg.uOwnNodeAddress & 0x0F00) >> 4));
+        // copy data
+        psBus->sSendMsg.auBuf[psBus->sSendMsg.uOverallLength++] = ACKCOMMAND;
         // calculate and send CRC
         crc = CRC_uCalc16(&psBus->sSendMsg.auBuf[0], psBus->sSendMsg.uOverallLength);
         psBus->sSendMsg.auBuf[psBus->sSendMsg.uOverallLength++] = crc >> 8;

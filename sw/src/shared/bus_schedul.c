@@ -193,7 +193,7 @@ BOOL BUS_bScheduleAndGetMessage(sBus_t* psBus)
 
     case eBus_Idle:
 		psBus->bSchedDiscovery = FALSE;
-    	if(eSched_Discovery == psBus->eModuleState) psBus->bSchedDiscovery = TRUE;
+    	if(eMod_Discovery == psBus->eModuleState) psBus->bSchedDiscovery = TRUE;
     	else if ((psBus->uCurrentNode == BUS_MAXNODES) || (psBus->asNodeList[psBus->uCurrentNode].uAddress == 0))
     	{ // if last node in active list is reached reset node-counter and switch to discovery-list
     		psBus->uCurrentNode = 0;
@@ -273,7 +273,7 @@ BOOL BUS_bScheduleAndGetMessage(sBus_t* psBus)
 				recEnd = TRUE;
 				if (0 == schedloopcnt) { // if schedulerloopcount has reached zero ...
 					schedloopcnt = BUS_LOOPS_TILL_SLEEP;
-					if (eSched_Discovery == psBus->eModuleState) {
+					if (eMod_Discovery == psBus->eModuleState) {
 					    psBus->eModuleState = eMod_Running;   // ... finish discovery
 					} else {
 					    psBus->eModuleState = eMod_Sleeping; // ... initiate sleep-mode

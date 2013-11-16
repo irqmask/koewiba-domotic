@@ -16,8 +16,8 @@
 
 // --- Include section ---------------------------------------------------------
 
+#include "config.h"
 #include "prjtypes.h"
-#include "ucontroller.h"
 #include "clock.h"
 
 // --- Definitions -------------------------------------------------------------
@@ -38,16 +38,18 @@
 #define BUS_DISCOVERYLOOPS		3   //!< Number of discovery-loops till normal scheduling begins.
 #define BUS_LOOPS_TILL_SLEEP	50  //!< Number of discovery-loops till normal scheduling begins.
 
-#define SLEEPCOMMAND	0xF0	//<! Command to set subscribers in sleep-mode.
+#define ACKCOMMAND	    0xF0	//<! ACK.
+#define SLEEPCOMMAND	0xFE	//<! Command to set subscribers in sleep-mode.
 #define WAKEUPBYTE 		0xFF	//<! Dummy-Byte that is send to the bus as wakeup-call for other subscribers.
 
 // --- Type definitions --------------------------------------------------------
 
 //! Possible states of the subscriber
 typedef enum modulestate {
-	eSched_Discovery,	//!< Scheduler is in discovery-mode (looking for nodes)
-	eMod_Running,	//!< Scheduler is normal mode
-	eMod_Sleeping	//!< Scheduler is sleeping
+	eMod_Discovery,	//!< Scheduler is in discovery-mode (looking for nodes)
+	eMod_Running,	//!< Module is normal mode
+	eMod_Sleeping,	//!< Module is sleeping
+	eMod_AckWait	//!< Module is waiting for Acknowledge-Message
 } eModState_t;
 
 //! Possible states of the bus, as seen by each node
@@ -59,6 +61,7 @@ typedef enum busstate {
     eBus_ReceivingActive,   //!< We suggest the message is for us.
     eBus_ReceivingPassive,  //!< We receive byte but those are not for us.
     eBus_GotToken,          //!< We have got the bus token.
+    eBus_GotMessage,        //!< We have got a message.
     eBus_Sending,           //!< We are sending now our message.
     eBus_Last
 } eBusState_t;
@@ -176,6 +179,9 @@ BOOL    BUS_bSendMessage            (sBus_t*        psBus,
                                      uint16_t       uReceiver,
                                      uint8_t        uLen,
                                      uint8_t*       puMsg);
+
+BOOL    BUS_bSendAcknowledge        (sBus_t*        psBus,
+                                     uint16_t       uReceiver);
 
 #ifdef BUS_SCHEDULER
 BOOL    BUS_bSchedulAddNode         (sBus_t*        psBus,

@@ -1,10 +1,10 @@
 /**
  * @addtogroup ROOMTHERMOSTATE_PCBCONFIG
- * @brief PCB configuration of the roomthermostate application.
+ * @brief PCB configuration of the "roomthermostate" application.
  *
  * @{
  * @file    pcbconfig.h
- * @brief   PCB configuration of the roomthermostate application.
+ * @brief   PCB configuration of the "roomthermostate" application.
  *
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
@@ -16,6 +16,15 @@
 #include "prjtypes.h"
 
 // --- Definitions -------------------------------------------------------------
+
+#define BUS_PCBCONFIG 1
+#define BUS_DDR_ENASND  DDRD
+#define BUS_PORT_ENASND PORTD
+#define BUS_ENASND      PD2
+#define BUS_DDR_DISRCV  DDRD
+#define BUS_PORT_DISRCV PORTD
+#define BUS_DISRCV      PD3
+
 
 #define GDISPLAY_PCBCONFIG  1
 //! Defines the DDR of a port which contains the backlight LED signal.

@@ -5,12 +5,12 @@
 MCU = atmega88
 FORMAT = ihex
 TARGET = testscheduler
-SRC = ../shared/bus_phy.c \
-      ../shared/bus_schedul.c \
-      ../shared/bus_transport.c \
-      ../shared/clock.c \
-      ../shared/crc16.c \
-      ../shared/led_debug.c \
+SRC = ../../shared/bus_phy.c \
+      ../../shared/bus_schedul.c \
+      ../../shared/bus_transport.c \
+      ../../shared/clock.c \
+      ../../shared/crc16.c \
+      ../../shared/led_debug.c \
       main_testscheduler.c
 
 
@@ -33,17 +33,16 @@ DEBUG = stabs
 CSTANDARD = -std=gnu99
 
 # Place -D or -U options here
-CDEFS = -DF_CPU=16000000
+CDEFS = -DF_CPU=16000000 -DHAS_PCBCONFIG_H -DHAS_APPCONFIG_H
 
 # Place -I options here
-CINCS = -I../include \
-        -I../shared
-
+CINCS = -I../../include \
+        -I../../shared
 
 CDEBUG = -g$(DEBUG)
 CWARN = -Wall -Wstrict-prototypes
 CTUNING = -funsigned-char -funsigned-bitfields -fpack-struct -fshort-enums
-#CEXTRA = -Wa,-adhlns=$(<:.c=.lst)
+CEXTRA = -Wa,-adhlns=$(<:.c=.lst)
 CFLAGS = $(CDEBUG) $(CDEFS) $(CINCS) -O$(OPT) $(CWARN) $(CSTANDARD) $(CEXTRA)
 #ASFLAGS = -Wa,-adhlns=$(<:.S=.lst),-gstabs
 

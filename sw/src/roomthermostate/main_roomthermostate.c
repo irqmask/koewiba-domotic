@@ -73,7 +73,6 @@ void vDrawWindowClosed(void)
 
 int main(void)
 {
-    int8_t runner=0, incr=1;
     uint8_t msglen = 0;
     uint8_t msg[BUS_MAXMSGLEN];
     uint16_t sender = 0;

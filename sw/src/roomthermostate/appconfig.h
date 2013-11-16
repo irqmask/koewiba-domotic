@@ -1,16 +1,16 @@
 /**
- * @addtogroup TESTSCHEDULER
- * @brief Configuration of modules used in "testscheduler" project.
+ * @addtogroup TESTPROTOCOL
+ * @brief Configuration of modules used in "testprotocol" project.
  *
  * @{
  * @file    config.h
- * @brief   Configuration of modules used in testscheduler project.
+ * @brief   Configuration of modules used in "testprotocol" project.
  *
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
 
-#ifndef _CONFIG_H_
-#define _CONFIG_H_
+#ifndef _APPCONFIG_H_
+#define _APPCONFIG_H_
 
 // --- Include section ---------------------------------------------------------
 
@@ -18,7 +18,7 @@
 
 // --- Definitions -------------------------------------------------------------
 
-#define BUS_SCHEDULER 1	    //!< This program has scheduling capabilities.
+#undef BUS_SCHEDULER        //!< This program has no scheduling capabilities.
 
 // --- Type definitions --------------------------------------------------------
 
@@ -34,5 +34,5 @@
 
 // --- Global functions --------------------------------------------------------
 
-#endif /* _CONFIG_H_ */
+#endif /* _APPCONFIG_H_ */
 /** @} */

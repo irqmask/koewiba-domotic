@@ -81,7 +81,7 @@ ISR(TIMER1_COMPA_vect)
     for (ii=0; ii<CLOCK_NUM_TIMER; ii++) {
         if (g_asRunningTimers[ii] != NULL) {
             if (g_asRunningTimers[ii]->uTicks == 0) {
-                // time elapsed, de-register timer from list
+                // time elapsed, remove timer from list
                 g_asRunningTimers[ii] = NULL;
             } else {
                 g_asRunningTimers[ii]->uTicks--;
@@ -107,11 +107,12 @@ void CLK_vInitialize(void)
     }
 
     // initialize timer interrupt every 10th second (fOc = 10)
-    //                     fClk
-    // fIrq = 2 * fOC  = --------- - 1
-    //                    N*fOC
+    //                      F_CPU
+    // fIrq = 2 * fOC  = ------------
+    //                    N * (OC+1)
     CLOCK_TCCRA = 0;
-    CLOCK_TCCRB |= ((0<<CLOCKSELECT2) | (1<<CLOCKSELECT1) | (1<<CLOCKSELECT0)); // set prescaler to 1/64 (N=64)
+    CLOCK_TCCRB &= ~((1<<CLOCKSELECT2) | (1<<WGM13));
+    CLOCK_TCCRB |= ((1<<CLOCKSELECT1) | (1<<CLOCKSELECT0)); // set prescaler to 1/64 (N=64)
     CLOCK_TCCRB |= (1<<WGM12);                                                  // CTC mode (clear timer on compare match)
     CLOCK_OCRA_H = (F_CPU/(64*CLOCK_TICKS_PER_SECOND) - 1) >> 8;
     CLOCK_OCRA_L = (F_CPU/(64*CLOCK_TICKS_PER_SECOND) - 1) & 0x00FF;
@@ -129,7 +130,7 @@ void CLK_vControl(BOOL start)
 	static uint8_t tccr1b = 0;
 
 	if(start){
-		if(0==tccr1b) return;
+		if (0==tccr1b) return;
 		CLOCK_TCCRB = tccr1b;
 	}
 	else{
@@ -149,7 +150,7 @@ void CLK_vControl(BOOL start)
  *
  * @returns TRUE, if timer has been started, otherwise FALSE.
  */
-BOOL CLK_bTimerStart(sClkTimer_t* psTimer, uint8_t uTicks)
+BOOL CLK_bTimerStart(sClkTimer_t* psTimer, uint16_t uTicks)
 {
     // check if timer is still running
     if (psTimer->uTicks != 0) {

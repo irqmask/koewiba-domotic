@@ -41,6 +41,7 @@ static sClkTimer_t 	g_sLedTimer;
 // --- Module global variables -------------------------------------------------
 
 // --- Local functions ---------------------------------------------------------
+
 void IO_vInitialize(void)
 {
     DDRB  |= ((0<<DDB7)   | (0<<DDB6)   | (1<<DDB5)   | (1<<DDB4)   | (0<<DDB3)   | (1<<DDB2)   | (1<<DDB1)   | (1<<DDB0)  );
@@ -70,12 +71,12 @@ int main(void)
     vInitLedAndKeys();
     sei();
 
-    CLK_bTimerStart(&g_sLedTimer, 1000);
+    CLK_bTimerStart(&g_sLedTimer, CLOCK_MS_2_TICKS(100));
 
     while (1) {
     	if (BUS_bScheduleAndGetMessage(&g_sBus)) {
     		if (BUS_bReadMessage(&g_sBus, &sender, &msglen, msg)) {
-                // TODO do somesthing
+                // TODO do something
     		}
     	}
     	else BUS_vScheduleCheckAndSetSleep(&g_sBus);
@@ -83,7 +84,7 @@ int main(void)
         if (CLK_bTimerIsElapsed(&g_sLedTimer)) {
         	// TODO remove after debug
             LED_STATUS_TOGGLE;
-            CLK_bTimerStart(&g_sLedTimer, 1000);
+            CLK_bTimerStart(&g_sLedTimer, CLOCK_MS_2_TICKS(100));
         }
     }
     return 0;

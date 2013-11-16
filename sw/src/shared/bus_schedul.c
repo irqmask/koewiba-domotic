@@ -38,11 +38,11 @@
 /**
  * Start sending of next token.
  */
-static BOOL bSendNextTimeSlotToken(sBus_t* psBus, BOOL discovery)
+static BOOL bSendNextTimeSlotToken(sBus_t* psBus, BOOL bDiscovery)
 {
     sNodeInfo_t* node;
 
-    if(TRUE != discovery) 	node = &psBus->asNodeList[psBus->uCurrentNode];
+    if(TRUE != bDiscovery) 	node = &psBus->asNodeList[psBus->uCurrentNode];
     else 					node = &psBus->asDiscoveryList[psBus->uDiscoverNode];
 
     if (node->uAddress != 0) {
@@ -135,7 +135,7 @@ BOOL BUS_bSchedulRemNode(sBus_t* psBus, uint8_t uNodeAddress)
         	psBus->asNodeList[ii-1].uErrCnt = psBus->asNodeList[ii].uErrCnt;
         }
     }
-    if(found) { // add node to discovery-list
+    if (found) { // add node to discovery-list
 		psBus->asNodeList[BUS_MAXNODES-1].uAddress = 0; // delete last field, others were already shifted
 		psBus->asNodeList[BUS_MAXNODES-1].uErrCnt  = 0;
 		for (ii=0; ii<BUS_MAXNODES; ii++) {
@@ -207,12 +207,10 @@ BOOL BUS_bScheduleAndGetMessage(sBus_t* psBus)
     	}
 
         // send token
-        if (bSendNextTimeSlotToken(psBus, psBus->bSchedDiscovery))
-        {
+        if (bSendNextTimeSlotToken(psBus, psBus->bSchedDiscovery)) {
             CLK_bTimerStart(&psBus->sNodeAnsTimeout, CLOCK_MS_2_TICKS(30));
             psBus->eState = eBus_SendingToken;
-        }
-        else LED_ERROR_ON;
+        } else LED_ERROR_ON;
         break;
 
     case eBus_SendingToken:

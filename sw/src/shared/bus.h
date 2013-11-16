@@ -16,11 +16,38 @@
 
 // --- Include section ---------------------------------------------------------
 
-#include "config.h"
 #include "prjtypes.h"
 #include "clock.h"
 
+#ifdef HAS_PCBCONFIG_H
+ #include "pcbconfig.h"
+#endif
+#ifdef HAS_APPCONFIG_H
+ #include "appconfig.h"
+#endif
+
 // --- Definitions -------------------------------------------------------------
+
+#ifndef BUS_PCBCONFIG
+ #define BUS_PCBCONFIG      1
+ #define BUS_DDR_ENASND     DDRD
+ #define BUS_PORT_ENASND    PORTD
+ #define BUS_ENASND         PD2
+ #define BUS_DDR_DISRCV     DDRD
+ #define BUS_PORT_DISRCV    PORTD
+ #define BUS_DISRCV         PD3
+#endif
+
+/**
+ * @subsection BUS_APPCONFIG
+ * Configure bus modules. E.g. activate scheduling capabilities
+ * @{
+ */
+#ifndef BUS_APPCONFIG
+ #define BUS_APPCONFIG      1
+ #undef BUS_SCHEDULER
+#endif
+
 
 #define BUS_BAUDRATE           38400
 #define BUS_MAXMSGLEN          16

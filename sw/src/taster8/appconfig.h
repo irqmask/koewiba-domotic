@@ -1,18 +1,16 @@
 /**
- * @addtogroup CLOCK
- * @brief Public interface of system clock.
- *
- * TODO: Detailed description of module.
+ * @addtogroup TASTER8_APPCONFIG
+ * @brief Configuration of modules used in "taster8" project.
  *
  * @{
- * @file    clock.h
- * @brief   System clock.
+ * @file    appconfig.h
+ * @brief   Configuration of modules used in "taster8" project.
  *
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
 
-#ifndef _CLOCK_H_
-#define _CLOCK_H_
+#ifndef _APPCONFIG_H_
+#define _APPCONFIG_H_
 
 // --- Include section ---------------------------------------------------------
 
@@ -20,18 +18,9 @@
 
 // --- Definitions -------------------------------------------------------------
 
-#define CLOCK_NUM_TIMER         4
-#define CLOCK_TICKS_PER_SECOND  20
-
-//! Convert from milliseconds into ticks
-#define CLOCK_MS_2_TICKS(a)    (uint16_t)(a*CLOCK_TICKS_PER_SECOND/1000)
+#undef BUS_SCHEDULER        //!< This program has scheduling capabilities.
 
 // --- Type definitions --------------------------------------------------------
-
-//! Time-out timer runtime-data.
-typedef struct clktimer {
-    volatile uint16_t uTicks;  //!< tick count down.
-} sClkTimer_t;
 
 // --- Local variables ---------------------------------------------------------
 
@@ -45,13 +34,5 @@ typedef struct clktimer {
 
 // --- Global functions --------------------------------------------------------
 
-void CLK_vInitialize        (void);
-
-void CLK_vControl			(BOOL start);
-
-BOOL CLK_bTimerStart        (sClkTimer_t* psTimer, uint16_t uTicks);
-
-BOOL CLK_bTimerIsElapsed    (sClkTimer_t* psTimer);
-
-#endif /* _CLOCK_H_ */
+#endif /* _APPCONFIG_H_ */
 /** @} */

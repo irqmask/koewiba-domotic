@@ -1,16 +1,15 @@
 /**
- * @addtogroup TESTPROTOCOL
- * @brief Configuration of modules used in "testprotocol" project.
+ * @addtogroup TASTER8_PCBCONFIG
+ * @brief PCB configuration of the taster8 application.
  *
  * @{
- * @file    config.h
- * @brief   Configuration of modules used in "testprotocol" project.
+ * @file    pcbconfig.h
+ * @brief   PCB configuration of the taster8 application.
  *
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
-
-#ifndef _CONFIG_H_
-#define _CONFIG_H_
+#ifndef _PCBCONFIG_H_
+#define _PCBCONFIG_H_
 
 // --- Include section ---------------------------------------------------------
 
@@ -18,7 +17,13 @@
 
 // --- Definitions -------------------------------------------------------------
 
-#undef BUS_SCHEDULER        //!< This program has scheduling capabilities.
+#define BUS_PCBCONFIG 1
+#define BUS_DDR_ENASND  DDRD
+#define BUS_PORT_ENASND PORTD
+#define BUS_ENASND      PD2
+#define BUS_DDR_DISRCV  DDRD
+#define BUS_PORT_DISRCV PORTD
+#define BUS_DISRCV      PD3
 
 // --- Type definitions --------------------------------------------------------
 
@@ -34,5 +39,5 @@
 
 // --- Global functions --------------------------------------------------------
 
-#endif /* _CONFIG_H_ */
+#endif // _PCBCONFIG_H_
 /** @} */

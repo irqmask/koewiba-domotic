@@ -25,11 +25,11 @@
 
 // --- Definitions -------------------------------------------------------------
 
-#define UART_PORT               PORTD
-#define UART_INPORT             PIND
-#define UART_DDR                DDRD
-#define UART_DRIVER             0b00000100
-#define UART_RECVSTOP           0b00001000
+//#define UART_PORT               PORTD
+//#define UART_INPORT             PIND
+//#define UART_DDR                DDRD
+//#define UART_DRIVER             0b00000100
+//#define UART_RECVSTOP           0b00001000
 
 
 #define UBRRVAL ((uint16_t)(((F_CPU / (16.0 * BUS_BAUDRATE)) - 1.0) + 0.5))
@@ -177,7 +177,8 @@ void BUS__vPhyInitialize(sBusPhy_t* psPhy, uint8_t uUart)
         REGISTER_UBRRH = UBRRVALH;
         REGISTER_UBRRL = UBRRVALL;
         REGISTER_UCSRB |= ((1<<REGBIT_RXCIE) | (0<<REGBIT_UDRIE) | (1<<REGBIT_TXCIE) | (1<<REGBIT_RXEN) | (1<<REGBIT_TXEN));
-        UART_DDR |= (UART_DRIVER | UART_RECVSTOP);
+        BUS_DDR_ENASND |=(1<<BUS_ENASND);
+        BUS_DDR_DISRCV |=(1<<BUS_DISRCV);
     }
 
     // sender is initial off, receiver is always on.
@@ -196,10 +197,10 @@ void BUS__vPhyActivateSender(sBusPhy_t* psPhy, BOOL bActivate)
 {
     if (bActivate) {
         if(!sw_recvlisten) BUS__vPhyActivateReceiver(psPhy, FALSE);
-        UART_PORT |= UART_DRIVER;
+        BUS_PORT_ENASND |= (1<<BUS_ENASND);
     }
     else {
-        UART_PORT &= ~UART_DRIVER;
+        BUS_PORT_ENASND &= ~(1<<BUS_ENASND);        
         BUS__vPhyActivateReceiver(psPhy, TRUE);
     }
 }
@@ -214,10 +215,10 @@ void BUS__vPhyActivateSender(sBusPhy_t* psPhy, BOOL bActivate)
 void BUS__vPhyActivateReceiver(sBusPhy_t* psPhy, BOOL bActivate)
 {
     if (bActivate) {
-        UART_PORT &= ~UART_RECVSTOP;
+        BUS_PORT_DISRCV &= ~(1<<BUS_DISRCV);
     }
     else {
-        UART_PORT |= UART_RECVSTOP;
+        BUS_PORT_DISRCV |= (1<<BUS_DISRCV);
     }
 }
 

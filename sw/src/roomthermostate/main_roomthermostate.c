@@ -109,7 +109,7 @@ int main(void)
             if (BUS_bReadMessage(&g_sBus, &sender, &msglen, msg)) {
             }
         }
-        if (CLK_bTimerIsElapsed(&g_sDisplayTimer)) {
+        /*if (CLK_bTimerIsElapsed(&g_sDisplayTimer)) {
             if (displaystate != 0) {
                 displaystate = 0;
                 PORTC |= (1<<PC3);
@@ -124,7 +124,7 @@ int main(void)
                 GDISP_vBacklight(FALSE);
             }
             CLK_bTimerStart(&g_sDisplayTimer, CLOCK_MS_2_TICKS(1000));
-        }
+        }*/
     }
     return 0;
 }

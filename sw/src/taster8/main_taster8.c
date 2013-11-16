@@ -84,7 +84,7 @@ int main(void)
     // 5 -> 1
     // 6 -> 2
 
-    BUS_vConfigure(&g_sBus, 0x0A); // configure a bus node with address X
+    BUS_vConfigure(&g_sBus, 0x0B); // configure a bus node with address X
     BUS_vInitialize(&g_sBus, 0);// initialize bus on UART 0
 
     vInitLedAndKeys();

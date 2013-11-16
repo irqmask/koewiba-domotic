@@ -29,8 +29,8 @@ typedef enum {
 
     CMD_eFirstAppSpecific       = 0x40, //!< First application specific command
 
-    CMD_eSleep                  = 0xF0, //!< Send module into sleep mode.
-    CMD_eAck                    = 0xF5, //!< Acknowledge a message. (not a message)
+    CMD_eAck                    = 0xF0, //!< Send module into sleep mode.
+    CMD_eSleep                  = 0xF5, //!< Acknowledge a message. (not a message)
     CMD_eReset                  = 0xFE, //!< Reset module.
     CMD_eWakeupByte             = 0xFF, //!< Wakeup byte. (not a message)
 } CMD_eCommon_t;

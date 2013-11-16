@@ -18,7 +18,8 @@
 
 // --- Definitions -------------------------------------------------------------
 
-#define BUS_SCHEDULER 1	    //!< This program has scheduling capabilities.
+#define BUS_APPCONFIG   1
+#define BUS_SCHEDULER   1	    //!< This program has scheduling capabilities.
 
 // --- Type definitions --------------------------------------------------------
 

@@ -33,7 +33,7 @@ DEBUG = stabs
 CSTANDARD = -std=gnu99
 
 # Place -D or -U options here
-CDEFS = -DF_CPU=16000000 -DHAS_PCBCONFIG_H -DHAS_APPCONFIG_H
+CDEFS = -DF_CPU=16000000 -DHAS_APPCONFIG_H -DHAS_PCBCONFIG_H
 
 # Place -I options here
 CINCS = -I../../include \
@@ -42,7 +42,7 @@ CINCS = -I../../include \
 CDEBUG = -g$(DEBUG)
 CWARN = -Wall -Wstrict-prototypes
 CTUNING = -funsigned-char -funsigned-bitfields -fpack-struct -fshort-enums
-CEXTRA = -Wa,-adhlns=$(<:.c=.lst)
+#CEXTRA = -Wa,-adhlns=$(<:.c=.lst)
 CFLAGS = $(CDEBUG) $(CDEFS) $(CINCS) -O$(OPT) $(CWARN) $(CSTANDARD) $(CEXTRA)
 #ASFLAGS = -Wa,-adhlns=$(<:.S=.lst),-gstabs
 

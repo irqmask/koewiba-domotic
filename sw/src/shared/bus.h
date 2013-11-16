@@ -19,11 +19,11 @@
 #include "prjtypes.h"
 #include "clock.h"
 
-#ifdef HAS_PCBCONFIG_H
- #include "pcbconfig.h"
-#endif
 #ifdef HAS_APPCONFIG_H
  #include "appconfig.h"
+#endif
+#ifdef HAS_PCBCONFIG_H
+ #include "pcbconfig.h"
 #endif
 
 // --- Definitions -------------------------------------------------------------
@@ -210,9 +210,6 @@ BOOL    BUS_bSendAcknowledge        (sBus_t*        psBus,
                                      uint16_t       uReceiver);
 
 #ifdef BUS_SCHEDULER
-BOOL    BUS_bSchedulAddNode         (sBus_t*        psBus,
-                                    uint8_t         uNodeAddress);
-
 BOOL    BUS_bScheduleAndGetMessage  (sBus_t*        psBus);
 void    BUS_vScheduleCheckAndSetSleep(sBus_t* psBus);
 #endif

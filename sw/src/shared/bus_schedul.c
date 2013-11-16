@@ -33,49 +33,6 @@
 
 // --- Local functions ---------------------------------------------------------
 
-
-
-/**
- * Start sending of next token.
- */
-static BOOL bSendNextTimeSlotToken(sBus_t* psBus, BOOL bDiscovery)
-{
-    sNodeInfo_t* node;
-
-    if(TRUE != bDiscovery) 	node = &psBus->asNodeList[psBus->uCurrentNode];
-    else 					node = &psBus->asDiscoveryList[psBus->uDiscoverNode];
-
-    if (node->uAddress != 0) {
-        psBus->auTokenMsg[1] = node->uAddress | 0x80;
-        return BUS__bPhySend(&psBus->sPhy, psBus->auTokenMsg, BUS_TOKEN_MSG_LEN);
-    }
-    return FALSE;
-}
-
-// --- Module global functions -------------------------------------------------
-
-/**
- * Initialize scheduler functions.
- *
- * @param[in] psBus		Handle of the bus.
- */
-void BUS__vSchedulConfigure(sBus_t* psBus)
-{
-    uint8_t ii;
-
-    psBus->uCurrentNode  = 0;
-    psBus->uDiscoverNode = 0;
-    for (ii=0; ii<BUS_MAXNODES; ii++) {
-        psBus->asNodeList[ii].uAddress = 0;
-        psBus->asNodeList[ii].uErrCnt = 0;
-		psBus->asDiscoveryList[ii].uAddress = ii+1;
-    }
-    psBus->auTokenMsg[0] = BUS_SYNCBYTE;
-    psBus->auTokenMsg[1] = 0;
-}
-
-// --- Global functions --------------------------------------------------------
-
 /**
  * Add new node to scheduler list.
  *
@@ -149,6 +106,23 @@ BOOL BUS_bSchedulRemNode(sBus_t* psBus, uint8_t uNodeAddress)
 }
 
 /**
+ * Start sending of next token.
+ */
+static BOOL bSendNextTimeSlotToken(sBus_t* psBus, BOOL bDiscovery)
+{
+    sNodeInfo_t* node;
+
+    if(TRUE != bDiscovery) 	node = &psBus->asNodeList[psBus->uCurrentNode];
+    else 					node = &psBus->asDiscoveryList[psBus->uDiscoverNode];
+
+    if (node->uAddress != 0) {
+        psBus->auTokenMsg[1] = node->uAddress | 0x80;
+        return BUS__bPhySend(&psBus->sPhy, psBus->auTokenMsg, BUS_TOKEN_MSG_LEN);
+    }
+    return FALSE;
+}
+
+/**
  * Count node errors.
  */
 void vNodeError(sBus_t* psBus)
@@ -177,6 +151,30 @@ BOOL bCurrNodeIsMe(sBus_t* psBus)
     }
     return FALSE;
 }
+
+// --- Module global functions -------------------------------------------------
+
+/**
+ * Initialize scheduler functions.
+ *
+ * @param[in] psBus		Handle of the bus.
+ */
+void BUS__vSchedulConfigure(sBus_t* psBus)
+{
+    uint8_t ii;
+
+    psBus->uCurrentNode  = 0;
+    psBus->uDiscoverNode = 0;
+    for (ii=0; ii<BUS_MAXNODES; ii++) {
+        psBus->asNodeList[ii].uAddress = 0;
+        psBus->asNodeList[ii].uErrCnt = 0;
+		psBus->asDiscoveryList[ii].uAddress = ii+1;
+    }
+    psBus->auTokenMsg[0] = BUS_SYNCBYTE;
+    psBus->auTokenMsg[1] = 0;
+}
+
+// --- Global functions --------------------------------------------------------
 
 /**
  * Schedule nodes on bus.

@@ -1,10 +1,10 @@
 /**
  * @addtogroup TESTSCHEDULER_PCBCONFIG
- * @brief PCB configuration of the testscheduler application.
+ * @brief PCB configuration of the "testscheduler" application.
  *
  * @{
  * @file    pcbconfig.h
- * @brief   PCB configuration of the testscheduler application.
+ * @brief   PCB configuration of the "testscheduler" application.
  *
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------

@@ -50,14 +50,18 @@ static void vInterpretMessage(uint8_t* puMsg, uint8_t uMsgLen)
     switch (puMsg[0]) {
     case CMD_eStateBitfield:
         if (puMsg[2] & 0b00000001) LED_STATUS_ON;
-        else  LED_STATUS_OFF;
+        else                       LED_STATUS_OFF;
         break;
     case CMD_eSleep:
         SLEEP_PinChange2_Enable();
         BUS_vSleep(&g_sBus);
         SLEEP_PinChange2_Disable();
         break;
+    case CMD_eAck:
+    	g_sBus.eModuleState = eMod_Running;
+    
     default:
+    	BUS_bSendAcknowledge(&g_sBus, g_sBus.sRecvMsg.uSender);
         break;
     }
 }
@@ -84,7 +88,7 @@ int main(void)
     // 5 -> 1
     // 6 -> 2
 
-    BUS_vConfigure(&g_sBus, 0x0B); // configure a bus node with address X
+    BUS_vConfigure(&g_sBus, 3); // configure a bus node with address 2
     BUS_vInitialize(&g_sBus, 0);// initialize bus on UART 0
 
     vInitLedAndKeys();
@@ -111,7 +115,7 @@ int main(void)
                 msg[2] = light;
                 msg[3] = 0b00000001;
                 msglen = 4;
-                BUS_bSendMessage(&g_sBus, 0x0C, msglen, msg);
+                BUS_bSendMessage(&g_sBus, 5, msglen, msg);
             }
         }
     }

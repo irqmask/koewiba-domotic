@@ -46,7 +46,7 @@
  #define REGBIT_SPI2X0          SPI2X
 
  // Timer1
- #define REG_TIMER1_IRQMSK      TIMSK1
+ #define REG_TIMER1_IRQMSK      TIMSK
  #define REGBIT_TIMER1_OCIEA    OCIE1A
  
 #elif defined (__AVR_ATmega88__)

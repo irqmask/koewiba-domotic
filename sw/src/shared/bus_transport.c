@@ -58,7 +58,7 @@ static void vCreateEmptyMessage(sBus_t* psBus)
 // Start sending the wakeup-byte.
 static BOOL bSendWakeupByte(sBus_t* psBus)
 {
-	uint8_t msg = WAKEUPBYTE;
+	uint8_t msg = BUS_WAKEUPBYTE;
 	if(BUS__bPhySend(&psBus->sPhy, &msg, 1))
 	{
 		while( BUS__bPhySending(&psBus->sPhy) ) {}; // Wait till message is sent completely.
@@ -485,7 +485,7 @@ BOOL BUS_bSendAcknowledge(sBus_t* psBus, uint16_t uReceiver)
             (((uReceiver & 0x0F00) >> 8) |
             ((psBus->sCfg.uOwnNodeAddress & 0x0F00) >> 4));
         // copy data
-        psBus->sSendMsg.auBuf[psBus->sSendMsg.uOverallLength++] = ACKCOMMAND;
+        psBus->sSendMsg.auBuf[psBus->sSendMsg.uOverallLength++] = CMD_eAck;
         // calculate and send CRC
         crc = CRC_uCalc16(&psBus->sSendMsg.auBuf[0], psBus->sSendMsg.uOverallLength);
         psBus->sSendMsg.auBuf[psBus->sSendMsg.uOverallLength++] = crc >> 8;

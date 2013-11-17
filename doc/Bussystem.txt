@@ -59,10 +59,11 @@ TS - Token for next sender. MSB=1 lower 7bit = address of next sender.
 
 Nachricht:
 
-+--+--+--+--+--+---------+----+----+
-|SY|AS|LE|AR|EA|MD ... MD|CRCH|CRCL|
-+--+--+--+--+--+---------+----+----+
-SY - Syncronization byte: 'Ü' = 0b10011010
++--+--+--+--+--+---------+----+----+                 +---+
+|SY|AS|LE|AR|EA|MD ... MD|CRCH|CRCL|   vom Empfänger |ACK|
++--+--+--+--+--+---------+----+----+                 +---+
+
+SY - Syncronization byte: 'Ü' = 0b10011010 = 0x9A
 AS - Address sender on bus 7bit
 LE - Length of message from AR to CRCL
 AR - Address receiver 7bit
@@ -70,6 +71,20 @@ EA - Extended address 4bit sender in higher nibble, 4bit receiver in lower nibbl
 MD - Message data
 CRCH - High byte of 16bit CRC
 CRCL - Low byte of 16bit CRC
+
+
+Acknowledge / Not Acknowledge:
+
+Das Acknowledge oder Not Acknowledge wird vom Empänger einer Nachricht unmittelbar nach deren Erhalt gesendet. 
+Der Empfänger sendet "Acknowledge" / ACK , wenn er die Nachricht vollständig und fehlerfrei (CRCCheck) empfangen hat und an die Applikationsebene weiterreichen konnte.
+Der Empfänger sendet ein "Not Acknowledge" / NAK wenn er die Nachricht nicht fehlerfei empfangen konnte. Wenn der Sender ein NAK empfängt, wiederholt er das Senden der Nachricht. Wenn der Sender nach einer Wartezeit kein ACK oder NAK Byte empfängt, wiederholt er auch das Senden der Nachricht. Das Senden der Nachricht wird bis zu dreimal wiederholt. Empfängt der Sender ein ACK, kann er die gesendete Nachricht aus dem Sendespeicher entfernen.
+
++---+        +---+
+|ACK|  oder  |NAK|
++---+        +---+
+
+ACK - Character 0b00000110 = 0x06
+NAK - Character 0b00010101 = 0x15
 
 
 Leere Nachricht:

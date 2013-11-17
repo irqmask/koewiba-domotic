@@ -28,6 +28,11 @@
 
 // --- Definitions -------------------------------------------------------------
 
+/**
+ * @subsection BUS_PCBCONFIG
+ * Configure bus hardware. E.g. define pins used by physical layer.
+ * @{
+ */
 #ifndef BUS_PCBCONFIG
  #define BUS_PCBCONFIG      1
  #define BUS_DDR_ENASND     DDRD
@@ -37,6 +42,9 @@
  #define BUS_PORT_DISRCV    PORTD
  #define BUS_DISRCV         PD3
 #endif
+/**
+ * @}
+ */
 
 /**
  * @subsection BUS_APPCONFIG
@@ -47,9 +55,10 @@
  #define BUS_APPCONFIG      1
  #undef BUS_SCHEDULER
 #endif
+/**
+ * @}
+ */
 
-
-#define BUS_BAUDRATE           38400
 #define BUS_MAXMSGLEN          16
 //! length of message including header and footer
 #define BUS_MAXTOTALMSGLEN		(BUS_MAXMSGLEN + 7)
@@ -60,13 +69,6 @@
 #ifndef BUS_MAXNODES
 #define BUS_MAXNODES 16
 #endif
-
-#define BUS_MAX_ANSWERFAILS		5	//!< Maximum number a member's answer can be missing, before disconnecting.
-#define BUS_DISCOVERYLOOPS		3   //!< Number of discovery-loops till normal scheduling begins.
-#define BUS_LOOPS_TILL_SLEEP	50  //!< Number of discovery-loops till normal scheduling begins.
-
-#define ACKCOMMAND	    0xF0	//<! ACK.
-#define WAKEUPBYTE 		0xFF	//<! Dummy-Byte that is send to the bus as wakeup-call for other subscribers.
 
 // --- Type definitions --------------------------------------------------------
 

@@ -27,12 +27,12 @@ typedef enum {
     CMD_eState32bit             = 0x04, //!< Send 32bit state data.
     CMD_eStateDateTime          = 0x05, //!< Send date/time data.
 
-    CMD_eFirstAppSpecific       = 0x40, //!< First application specific command
+    CMD_eFirstAppSpecific       = 0x40, //!< First application specific command.
 
-    CMD_eAck                    = 0xF0, //!< Send module into sleep mode.
-    CMD_eSleep                  = 0xF5, //!< Acknowledge a message. (not a message)
+    CMD_eAck                    = 0xF0, //!< Acknowledge message.
+    CMD_eSleep                  = 0xF5, //!< Send module into sleep mode.
     CMD_eReset                  = 0xFE, //!< Reset module.
-    CMD_eWakeupByte             = 0xFF, //!< Wakeup byte. (not a message)
+
 } CMD_eCommon_t;
 
 // --- Local variables ---------------------------------------------------------

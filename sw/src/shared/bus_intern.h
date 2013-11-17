@@ -21,16 +21,25 @@
 
 // --- Definitions -------------------------------------------------------------
 
+#define BUS_BAUDRATE            38400
 #define BUS_BITTIME             10 //TODO
 #define BUS_INITWAIT_TIME       (24 * BUS_BITTIME)
 #define BUS_RECOVERY            (12 * BUS_BITTIME)
 #define BUS_INTERBYTE_TIMEOUT   (8 * BUS_BITTIME)
 
-//! synchronization byte every message begins with.
-#define BUS_SYNCBYTE    0b10011010
-
 #define TOKENBIT 0x80
 #define ADDRMASK ~(TOKENBIT)
+
+#define BUS_MAX_ANSWERFAILS		5	    //!< Maximum number a member's answer can be missing, before disconnecting.
+#define BUS_DISCOVERYLOOPS		3       //!< Number of discovery-loops till normal scheduling begins.
+#define BUS_LOOPS_TILL_SLEEP	50      //!< Number of discovery-loops till normal scheduling begins.
+
+#define BUS_ACKBYTE             0x06    //!< ACK.
+#define BUS_NAKBYTE             0x15    //!< NAK.
+#define BUS_SYNCBYTE            0x9A    //!< 0b10011010 synchronization byte 
+                                        //!< every message begins with.
+#define BUS_WAKEUPBYTE          0xFF    //!< Dummy-Byte that is send to the bus
+                                        //!< as wakeup-call for other subscribers.
 
 // --- Type definitions --------------------------------------------------------
 

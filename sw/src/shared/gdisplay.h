@@ -95,6 +95,8 @@ void            GDISP_vGotoColLine  (uint8_t                uCol,
 
 void            GDISP_vPutSpacer    (uint8_t                uHeight);
 
+void            GDISP_vPutChar      (const char             cChar);
+
 void            GDISP_vPutText      (const char*            pcText);
 
 void            GDISP_vPutTextp     (const char*            pcText);

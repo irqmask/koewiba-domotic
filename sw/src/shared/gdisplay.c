@@ -212,6 +212,21 @@ void            GDISP_vPutSpacer    (uint8_t                uHeight)
 }
 
 /**
+ * Put a character to the current drawing position.
+ *
+ * @param[in] cChar
+ * Character to display.
+ */
+void            GDISP_vPutChar      (const char             cChar)
+{
+    uint8_t height;
+
+    height = pgm_read_byte(&g_puCurrFont[2]);
+    
+    vPutChar(cChar, height, 1);
+}
+
+/**
  * Put a text to the current drawing position. Text resides in data memory.
  * @note Set the drawing position with GDISP_vGotoColLine().
  *

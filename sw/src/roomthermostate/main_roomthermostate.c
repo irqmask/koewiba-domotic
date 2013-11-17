@@ -13,9 +13,11 @@
 #include <avr/interrupt.h>
 
 #include "bus.h"
+#include "cmddef_common.h"
 #include "clock.h"
 //#include "led_debug.h"
 #include "gdisplay.h"
+#include "sleepmode.h"
 #include "spi.h"
 #include "ucontroller.h"
 
@@ -27,26 +29,62 @@
 
 static sBus_t      g_sBus;
 static sClkTimer_t g_sDisplayTimer;
-static uint16_t    g_uTempTarget;
+static uint16_t    g_uTargetTemp;
+static uint16_t    g_uCurrentTemp;
 
 // --- Global variables --------------------------------------------------------
 
 // --- Module global variables -------------------------------------------------
 
 // --- Local functions ---------------------------------------------------------
-/*
+
 void vDrawTemp(uint16_t uTemperature)
 {
-    BOOL negative = FALSE;
+    uint8_t byte;
+    BOOL firstdigit = FALSE;
     
-    if (
-}*/
+    if (uTemperature >= 27315) {
+        uTemperature -= 27315;
+        
+        byte = uTemperature / 10000;
+        if (byte > 0) {
+            uTemperature -= byte * 10000;
+            //GDISP_vPutChar(byte + 0x30);
+            //firstdigit = TRUE;
+        } else {
+            //GDISP_vPutChar(' ');
+        }
+        
+        byte = uTemperature / 1000;
+        if (byte > 0 || firstdigit) {
+            uTemperature -= byte * 1000;
+            GDISP_vPutChar(byte + 0x30);
+            firstdigit = TRUE;
+        } else {
+            GDISP_vPutChar(' ');
+        }
+
+        byte = uTemperature / 100;
+        if (byte > 0 || firstdigit) {
+            uTemperature -= byte * 100;
+            GDISP_vPutChar(byte + 0x30);
+            firstdigit = TRUE;
+        } else {
+            GDISP_vPutChar(' ');
+        }
+        GDISP_vPutChar(',');
+        byte = uTemperature / 10;
+        uTemperature -= byte * 10;
+        GDISP_vPutChar(byte + 0x30);
+    }
+}
 
 void vDrawTemperatures(void)
 {
     GDISP_vGotoColLine(0, 1);
     GDISP_vChooseFont(GDISP_auFont1_x16);
-    GDISP_vPutText("24,0");
+    vDrawTemp(g_uCurrentTemp);
+    //GDISP_vPutText("24,0");
     GDISP_vChooseFont(GDISP_auSymbols_x16);
     GDISP_vPutText(" "); //32
     GDISP_vChooseFont(GDISP_auFont1_x16);
@@ -54,7 +92,8 @@ void vDrawTemperatures(void)
     
     GDISP_vGotoColLine(61, 1);
     GDISP_vChooseFont(GDISP_auFont1_x16);
-    GDISP_vPutText("23,8");
+    vDrawTemp(g_uTargetTemp);
+    //GDISP_vPutText("23,8");
     GDISP_vChooseFont(GDISP_auSymbols_x16);
     GDISP_vPutText(" "); //32
     GDISP_vChooseFont(GDISP_auFont1_x16);
@@ -76,11 +115,17 @@ void vDrawWindowClosed(void)
 }
 
 // Interpret message
-static void vInterpretMessage(uint8_t* puMsg, uint8_t uMsgLen)
+static void vInterpretMessage(uint8_t* puMsg, uint8_t uMsgLen, uint8_t uSender)
 {
     switch (puMsg[0]) {
     case CMD_eStateBitfield:
-        if (puMsg[2] & 0b00000001) g_uTempTarget += 50;
+        if (uSender == 0x0B) {
+            g_uTargetTemp += 10;
+            vDrawTemperatures();
+        } else {
+            if (puMsg[2] & 0b00000001) vDrawWindowOpened();
+            else                       vDrawWindowClosed();
+        }
         break;
     case CMD_eSleep:
         SLEEP_PinChange2_Enable();
@@ -118,7 +163,8 @@ int main(void)
       
     sei();
     
-    g_uTempTarget = 1800;
+    g_uCurrentTemp = 27315 + 2200;
+    g_uTargetTemp = 27315 + 1800;
     
     GDISP_vInit();
     GDISP_vGotoColLine(0,0);
@@ -127,7 +173,7 @@ int main(void)
     GDISP_vGotoColLine(61,0);
     GDISP_vPutText("Soll");
 
-    vDrawTemperature();
+    vDrawTemperatures();
     vDrawWindowClosed();
 
     GDISP_vChooseFont(GDISP_auFont1_x8);
@@ -138,6 +184,7 @@ int main(void)
     while (1) {
         if (BUS_bGetMessage(&g_sBus)) {
             if (BUS_bReadMessage(&g_sBus, &sender, &msglen, msg)) {
+                vInterpretMessage(msg, msglen, sender);
             }
         }
         /*if (CLK_bTimerIsElapsed(&g_sDisplayTimer)) {

@@ -1,0 +1,37 @@
+# Set the Target build dirs
+# =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+BINDIR_DEBUG     = $(ROOTDIR)/bin/Debug
+BINDIR_RELEASE   = $(ROOTDIR)/bin/Release
+
+BUILDDIR_DEBUG   = $(ROOTDIR)/build/$(TARGET)/Debug/
+BUILDDIR_RELEASE = $(ROOTDIR)/build/$(TARGET)/Release/
+
+SRCDIR           = $(ROOTDIR)/src
+
+ELFFILE_DEBUG    = $(BINDIR_DEBUG)/$(TARGET).elf
+ELFFILE_RELEASE  = $(BINDIR_RELEASE)/$(TARGET).elf
+
+MAPFILE_DEBUG    = $(BINDIR_DEBUG)/$(TARGET).map
+MAPFILE_RELEASE  = $(BINDIR_RELEASE)/$(TARGET).map
+
+HEXFILE_DEBUG    = $(BINDIR_DEBUG)/$(TARGET).hex
+HEXFILE_RELEASE  = $(BINDIR_RELEASE)/$(TARGET).hex
+
+LSSFILE_DEBUG    = $(BINDIR_DEBUG)/$(TARGET).lss
+LSSFILE_RELEASE  = $(BINDIR_RELEASE)/$(TARGET).lss
+
+SYMFILE_DEBUG    = $(BINDIR_DEBUG)/$(TARGET).sym
+SYMFILE_RELEASE  = $(BINDIR_RELEASE)/$(TARGET).sym
+
+EEPFILE_DEBUG    = $(BINDIR_DEBUG)/$(TARGET).eep
+EEPFILE_RELEASE  = $(BINDIR_RELEASE)/$(TARGET).eep
+
+# Log file targets and dirs
+# =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+LOGDIR_DEBUG     = $(BUILDDIR_DEBUG)
+LOGFILE_DEBUG    = $(LOGDIR_DEBUG)/$(TARGET).log
+
+LOGDIR_RELEASE   = $(BUILDDIR_RELEASE)
+LOGFILE_RELEASE  = $(LOGDIR_RELEASE)/$(TARGET).log

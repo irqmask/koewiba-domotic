@@ -18,15 +18,15 @@
 #include <util/delay.h>
 #include <stdint.h>
 
-#include "moddefs_common.h"
+#include "moddef_common.h"
 #include "eeprom_spi.h"
 #include "spi.h"
 #include "uart.h"
 
 // --- Definitions -------------------------------------------------------------
 
-#define XON                     17       
-#define XOFF                    19       
+#define XON                     17
+#define XOFF                    19
 #define START_SIGN              ':'      // HEX file start of line character
 
 /* States of the HEX File loader */
@@ -238,7 +238,7 @@ int main ( void )
                                 flash_length = flash_page + SPM_PAGESIZE;
                             }
                         }
-                        UART_vPutChar(XON);                      
+                        UART_vPutChar(XON);
                     }
                     break;
                 /* Parse checksum */

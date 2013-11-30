@@ -183,7 +183,7 @@ extcoff: $(TARGET).elf
 $(TARGET).elf: $(OBJ)
 	$(CC) $(ALL_CFLAGS) $(OBJ) --output $@ $(LDFLAGS)
 	$(SIZE) --format=avr --mcu=$(MCU) $@
-	
+
 
 # Compile: create object files from C source files.
 .c.o:

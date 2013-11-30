@@ -16,7 +16,7 @@
 #include <util/delay.h>
 
 // include
-#include "moddefs_common.h"
+#include "moddef_common.h"
 #include "prjtypes.h"
 #include "ucontroller.h"
 
@@ -239,9 +239,9 @@ int main ( void )
     DDRB |= (1<<PB0 | 1<<PB1);              // output
     PORTB &= ~(1<<PB0 | 1<<PB1);            // output off
 
-    // TODO remove after test   
-    bCheckControllerID();   
-    
+    // TODO remove after test
+    bCheckControllerID();
+
     // check internal EEProm if a new application has to be flashed
     BLD_uStatus = eeprom_read_byte((uint8_t*)MOD_eCfg_BldFlag);
     if (BLD_uStatus & (1<<eBldFlagAppProgram)) {

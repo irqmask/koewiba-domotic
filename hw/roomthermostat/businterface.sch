@@ -1,4 +1,4 @@
-EESchema Schematic File Version 2  date Di 02 Jul 2013 07:38:50 CEST
+EESchema Schematic File Version 2  date Fr 01 Nov 2013 16:45:02 CET
 LIBS:connectors
 LIBS:display
 LIBS:encoder
@@ -22,7 +22,7 @@ $Descr A4 11700 8267
 encoding utf-8
 Sheet 2 2
 Title ""
-Date "2 jul 2013"
+Date "1 nov 2013"
 Rev ""
 Comp ""
 Comment1 ""
@@ -30,6 +30,16 @@ Comment2 ""
 Comment3 ""
 Comment4 ""
 $EndDescr
+$Comp
+L MAX487 U?
+U 1 1 5273CC68
+P 3150 4150
+F 0 "U?" H 2900 4550 50  0000 C CNN
+F 1 "MAX487" H 3350 3750 50  0000 C CNN
+F 2 "SSOP28" H 3000 3750 25  0001 C CNN
+	1    3150 4150
+	-1   0    0    -1  
+$EndComp
 Wire Wire Line
 	3150 1350 3150 3600
 Connection ~ 3150 1450
@@ -326,16 +336,6 @@ F 2 "MODULE" H 1800 1550 40  0001 C CNN
 F 3 "DOCUMENTATION" H 1800 1550 40  0001 C CNN
 	1    1800 1550
 	1    0    0    -1  
-$EndComp
-$Comp
-L MAX487 U7
-U 1 1 5155AE3E
-P 3150 4150
-F 0 "U7" H 3400 4550 60  0000 C CNN
-F 1 "MAX487" H 2950 3750 60  0000 C CNN
-F 2 "SSOP28" H 3000 4700 40  0001 C CNN
-	1    3150 4150
-	-1   0    0    -1  
 $EndComp
 $Comp
 L R R17

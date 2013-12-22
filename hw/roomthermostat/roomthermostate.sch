@@ -1,4 +1,4 @@
-EESchema Schematic File Version 2  date Di 02 Jul 2013 07:38:50 CEST
+EESchema Schematic File Version 2  date Fr 01 Nov 2013 16:45:02 CET
 LIBS:connectors
 LIBS:display
 LIBS:encoder
@@ -22,7 +22,7 @@ $Descr A4 11700 8267
 encoding utf-8
 Sheet 1 2
 Title "Room Thermosstate"
-Date "2 jul 2013"
+Date "1 nov 2013"
 Rev "1"
 Comp ""
 Comment1 "KoeWiBa Domotic"

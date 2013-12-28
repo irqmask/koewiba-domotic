@@ -2,7 +2,8 @@ MCU = atmega88
 FORMAT = ihex
 TARGET = testscheduler_atmega88
 
-ROOTDIR = $(shell pwd)/../../..
+ROOTDIR = $(subst \,/,$(shell pwd))/../../..
+
 include ../../../buildscripts/lib/lib_outputdirs.mk
 
 # C and assembler source files used in current project

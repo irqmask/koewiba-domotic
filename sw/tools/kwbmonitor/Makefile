@@ -7,12 +7,12 @@ TOOLPREFIX=
 
 PROJECT=kwbmonitor
 
-SRC_FILES += kwbmonitor.c systime.c crc16.c
+SRC_FILES += kwbmonitor.c KWBMonitorDisplay.c sysconsole.c systime.c crc16.c
 SRC_FILES += PortableSerialLib.c
 
-INCLUDES += -I./ -I../../src/shared -I../../src/include
+INCLUDES += -I./ -I../../src/shared -I../../src/include -I../../3rd_party/libsafec/include
 
-LIBS += -lpthread
+LIBS += -lpthread -lncurses -lsafec-1.0
 # LIBS += -lusb
 
 #OPTFLAGS = -Os -ffunction-sections -Wl,--gc-sections

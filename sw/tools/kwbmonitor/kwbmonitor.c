@@ -4,7 +4,6 @@
 #  ifndef _WIN32_WINNT            // Gibt an, dass Windows Vista die mindestens erforderliche Plattform ist.
 #    define _WIN32_WINNT 0x0600     // Ändern Sie den entsprechenden Wert, um auf andere Versionen von Windows abzuzielen.
 #  endif
-#  include <windows.h>
 #  define bool  int
 #  define true  (1==1)
 #  define false (1==0)
@@ -18,7 +17,7 @@
 #  include <pthread.h>
 #  include <unistd.h>
 #  include <stdbool.h>
-
+#  include "safe_str_lib.h"
 #  define ThreadFunc(name) void *name(void *p)
 #  define startThread(func)  do{                 \
                                pthread_t tid;   \
@@ -29,9 +28,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
 #include "PortableSerialLib.h"
+#include "sysconsole.h"
 #include "systime.h"
 #include "crc16.h"
+#include "KWBMonitorDisplay.h"
 
 //! (netto) length of the message
 #define BUS_MAXMSGLEN          16
@@ -55,7 +57,14 @@ PSerLibHandle_t g_sSerPort = PSL_NOPORT_HANDLE;
 sBusHistory_t   g_sBusHistory;
 
 
-void listPorts(void)
+const char* g_pcPortname = "COM1";
+uint32_t    g_uBaudrate = 38400;
+PSL_FlowControl_e g_eFlowControl = PSL_FC_none;
+
+bool g_bDisplayEmptyMessage = true;
+bool g_bDisplayTokenMessage = true;
+
+void vListPorts(void)
 {
     char buff[200];
     char* iterator = buff;
@@ -63,42 +72,25 @@ void listPorts(void)
 
     PSL_ErrorCodes_e ec = PSerLib_getAvailablePorts(buff, sizeof(buff), &n);
     if( ec != PSL_ERROR_none ) {
-        printf("error: %s\n", PSerLib_getErrorMessage(ec));
+        KWB__vDisplayPrintMessage("error: %s\n", PSerLib_getErrorMessage(ec));
         if(n>0) {
-            printf("Allthough i found %i devices:\n", n);
+            KWB__vDisplayPrintMessage("Allthough i found %i devices:\n", n);
         }
     } else {
-        printf("found %i devices:\n", n);
+        KWB__vDisplayPrintMessage("found %i devices:\n", n);
     }
     for( ; *iterator; iterator+=strlen(iterator)+1 )
     {
-        printf("%s\n",iterator);
+        KWB__vDisplayPrintMessage("%s\n",iterator);
     }
 }
 
-
-void printUsage(void)
-{
-    printf(
-        "kwbmonitor - KoeWiBa domotic bus monitor\n"
-        "\n"
-        "Usage:       kwbmonitor [Options] \n"
-        "Options:\n"
-        "  -p, --port arg           port to open\n"
-        "  -b, --baudrate arg       baud rate to use 'baud' shall be an integral number\n"
-        "  -fc, --flowcontrol arg   flow control to use. Possible values are:\n"
-        "                           none, xonxoff, rtscts\n"
-        "  --listports              lists all present ports and quits program\n"
-        "  --help                   shows this text and quits program\n"
-    );
-}
-
-float_t uCurrTimeDiff(sBusHistory_t* psBus)
+float_t fCurrTimeDiff(sBusHistory_t* psBus)
 {
     return (float_t)(psBus->uTimeCurrByte - psBus->uTimeStart) / 1000.0;
 }
 
-float_t uLastTimeDiff(sBusHistory_t* psBus)
+float_t fLastTimeDiff(sBusHistory_t* psBus)
 {
     return (float_t)(psBus->uTimeLastByte - psBus->uTimeStart) / 1000.0;
 }
@@ -113,8 +105,9 @@ void vThdInitBusHistory(sBusHistory_t* psBus)
 
 void vThdParseMessage(uint8_t uNewByte, sBusHistory_t* psBus)
 {
-    uint16_t calcedcrc = 0;
-    uint8_t i, crclen;
+    char        buffer[256], part[256];
+    uint16_t    calcedcrc = 0;
+    uint8_t     ii, crclen = 0;
 
     enum {
         eMsgNothing,
@@ -130,9 +123,10 @@ void vThdParseMessage(uint8_t uNewByte, sBusHistory_t* psBus)
     psBus->uTimeCurrByte = SYS_uGetTimeUSecs();
 
     if (psBus->uCurrMsgBytes == 0) {
-        printf("%9.1f | ", uCurrTimeDiff(psBus));
+        snprintf(buffer, sizeof(buffer)-1, "%9.1f | ", fCurrTimeDiff(psBus));
     }
-    printf("%02X ", uNewByte);
+    snprintf(part, sizeof(part-1), "%02X ", uNewByte);
+    strcat_s(buffer, sizeof(buffer)-1, part);
 
     // compute status of message
     if (psBus->uCurrMsgBytes == 0) {
@@ -194,7 +188,8 @@ void vThdParseMessage(uint8_t uNewByte, sBusHistory_t* psBus)
 
     // fill line
     if (msgstatus != eMsgNothing) {
-        for (i=0; i<(BUS_MAXTOTALMSGLEN-psBus->uCurrMsgBytes); i++) printf("   ");
+        for (ii=0; ii<(BUS_MAXTOTALMSGLEN-psBus->uCurrMsgBytes); ii++)
+            strcat_s(buffer, sizeof(buffer)-1, "   ");
         psBus->uCurrMsgBytes = 0;
     }
 
@@ -203,21 +198,26 @@ void vThdParseMessage(uint8_t uNewByte, sBusHistory_t* psBus)
     case eMsgNothing:
         break;
     case eMsgError:
-        printf("| ERR stray bytes\r\n");
+        strcat_s(buffer, sizeof(buffer)-1, "| ERR stray bytes\r\n");
+        printf("%s", buffer);
         break;
     case eMsgToken:
-        printf("| TOKEN\r\n");
+        strcat_s(buffer, sizeof(buffer)-1, "| TOKEN\r\n");
+        if (g_bDisplayTokenMessage) printf("%s", buffer);
         break;
     case eMsgEmpty:
-        printf("| EMPTY MESSAGE\r\n");
+        strcat_s(buffer, sizeof(buffer)-1, "| EMPTY MESSAGE\r\n");
+        if (g_bDisplayEmptyMessage) printf("%s", buffer);
         break;
     case eMsgComplete:
-        printf("| MESSAGE");
+        strcat_s(buffer, sizeof(buffer)-1, "| MESSAGE");
         if (psBus->uExpectedCRC != calcedcrc) {
-            printf("  BAD CRC %x %x %d\r\n", psBus->uExpectedCRC, calcedcrc, crclen);
+            snprintf(part, sizeof(part)-1, "  BAD CRC %x %x %d\r\n", psBus->uExpectedCRC, calcedcrc, crclen);
         } else {
-            printf(" GOOD CRC %x %x %d\r\n", psBus->uExpectedCRC, calcedcrc, crclen);
+            snprintf(part, sizeof(part)-1, " GOOD CRC %x %x %d\r\n", psBus->uExpectedCRC, calcedcrc, crclen);
         }
+        strcat_s(buffer, sizeof(buffer)-1, part);
+        printf("%s", buffer);
         break;
     default:
         break;
@@ -243,91 +243,129 @@ ThreadFunc(readerThread)
 }
 
 
+bool bParseCommandLine(int iArgC, char* pcArgV[])
+{
+    int ii;
+    bool commandlineerror = false;
+
+    for (ii=1; (ii<iArgC) && (!commandlineerror); ++ii) {
+        if (strcmp(pcArgV[ii], "--listports") == 0) {
+            vListPorts();
+            return false;
+
+        } else if (strcmp(pcArgV[ii], "--help") == 0) {
+            KWB__vDisplayPrintUsage();
+            return false;
+
+        } else if ((strcmp(pcArgV[ii], "-p") == 0) ||
+                   (strcmp(pcArgV[ii], "--port") == 0)) {
+            ++ii;
+            if (ii<iArgC) {
+                g_pcPortname = pcArgV[ii];
+            } else {
+                KWB__vDisplayPrintMessage("Missing Argument for '%s'\n", pcArgV[ii-1]);
+                commandlineerror = true;
+            }
+        } else if ((strcmp(pcArgV[ii], "-b") == 0) ||
+                   (strcmp(pcArgV[ii], "--baudrate") == 0)) {
+            ++ii;
+            if (ii<iArgC) {
+                g_uBaudrate = atoi(pcArgV[ii]);
+                if (g_uBaudrate == 0) {
+                    KWB__vDisplayPrintMessage("'%s' seems not to be a baud rate\n", pcArgV[ii]);
+                    commandlineerror = true;
+                }
+            } else {
+                KWB__vDisplayPrintMessage("Missing Argument for '%s'\n", pcArgV[ii-1]);
+                commandlineerror = true;
+            }
+        } else if ((strcmp(pcArgV[ii], "-fc") == 0) ||
+                   (strcmp(pcArgV[ii], "--flowcontrol") == 0 )) {
+            ++ii;
+            if (ii<iArgC) {
+                if (strcmp(pcArgV[ii], "none") == 0) {
+                    g_eFlowControl = PSL_FC_none;
+                } else if( strcmp(pcArgV[ii], "xonxoff") == 0) {
+                    g_eFlowControl = PSL_FC_xon_xoff;
+                } else if( strcmp(pcArgV[ii], "rtscts") == 0) {
+                    g_eFlowControl = PSL_FC_rts_cts;
+                } else {
+                    KWB__vDisplayPrintMessage("Unsupported flow control: '%s'\n", pcArgV[ii]);
+                    commandlineerror = true;
+                }
+            } else {
+                KWB__vDisplayPrintMessage("Missing Argument for '%s'\n", pcArgV[ii-1]);
+                commandlineerror = true;
+            }
+        } else {
+            KWB__vDisplayPrintMessage("Unkown parameter '%s'\n", pcArgV[ii]);
+            commandlineerror = true;
+        }
+    }
+
+    if (commandlineerror) {
+        KWB__vDisplayPrintMessage("wrong parameter specified\n\n");
+        KWB__vDisplayPrintUsage();
+        return false;
+    }
+    return true;
+}
+
 int main(int argc, char* argv[])
 {
-    int i;
-    bool cmdlineError=false;
-    const char* portname = "COM1";
-    int  baudrate = 38400;
-    PSL_ErrorCodes_e ec;
-    PSL_FlowControl_e flowControl = PSL_FC_none;
+    char cc;
+    PSL_ErrorCodes_e ec = PSL_ERROR_none;
 
     setbuf(stdout, NULL);       // disable buffering of stdout
 
-    for (i=1; (i<argc)&&(!cmdlineError); ++i) {
-        if (strcmp(argv[i], "--listports") == 0) {
-            listPorts();
-            return 0;
-        } else if (strcmp(argv[i], "--help") == 0) {
-            printUsage();
-            return 0;
-        } else if ((strcmp(argv[i], "-p") == 0) ||
-                   (strcmp(argv[i], "--port") == 0)) {
-            ++i;
-            if (i<argc) {
-                portname = argv[i];
-            } else {
-                printf("Missing Argument for '%s'\n", argv[i-1]);
-                cmdlineError = true;
-            }
-        } else if ((strcmp(argv[i], "-b") == 0) ||
-                   (strcmp(argv[i], "--baudrate") ==0 )) {
-            ++i;
-            if (i<argc) {
-                baudrate = atoi(argv[i]);
-                if (baudrate == 0) {
-                    printf("'%s' seems not to be a baud rate\n", argv[i]);
-                    cmdlineError = true;
-                }
-            } else {
-                printf("Missing Argument for '%s'\n", argv[i-1]);
-                cmdlineError = true;
-            }
-        } else if ((strcmp(argv[i], "-fc") == 0) ||
-                   (strcmp(argv[i], "--flowcontrol") ==0 )) {
-            ++i;
-            if (i<argc) {
-                if (strcmp(argv[i], "none") == 0) {
-                    flowControl = PSL_FC_none;
-                } else if( strcmp(argv[i], "xonxoff") == 0) {
-                    flowControl = PSL_FC_xon_xoff;
-                } else if( strcmp(argv[i], "rtscts") == 0) {
-                    flowControl = PSL_FC_rts_cts;
-                } else {
-                    printf("Unsupported flow control: '%s'\n", argv[i]);
-                    cmdlineError = true;
-                }
-            } else {
-                printf("Missing Argument for '%s'\n", argv[i-1]);
-                cmdlineError = true;
-            }
-        } else {
-            printf("unknown command line option: '%s'\n",argv[i]);
-            cmdlineError = true;
-        }
-    }
+    do {
+        KWB__vDisplayInit();
 
-    if (cmdlineError) {
-        printf("wrong parameter specified\n\n");
-        printUsage();
-        return 1;
-    }
+        if (!bParseCommandLine(argc, argv)) break;
 
-    ec = PSerLib_open(portname, &g_sSerPort);
-    if (ec == PSL_ERROR_none) {
-        ec = PSerLib_setParams(g_sSerPort, baudrate, PSL_DB_8, PSL_P_none, PSL_SB_1, flowControl);
+        ec = PSerLib_open(g_pcPortname, &g_sSerPort);
         if (ec == PSL_ERROR_none) {
-            startThread(&readerThread);
-            while(42) {
-                SYS_vSleepMs(1000);
+            ec = PSerLib_setParams(g_sSerPort, g_uBaudrate, PSL_DB_8, PSL_P_none, PSL_SB_1, g_eFlowControl);
+            if (ec == PSL_ERROR_none) {
+                startThread(&readerThread);
+                while(42) {
+                    cc = getch();
+                    switch (cc) {
+                    case 'e':
+                    case 'E':
+                        if (g_bDisplayEmptyMessage) {
+                            g_bDisplayEmptyMessage = false;
+                        } else {
+                            g_bDisplayEmptyMessage = true;
+                        }
+                        break;
+
+                    case 't':
+                    case 'T':
+                        if (g_bDisplayTokenMessage) {
+                            g_bDisplayTokenMessage = false;
+                        } else {
+                            g_bDisplayTokenMessage = true;
+                        }
+                        break;
+
+                    default:
+                        break;
+                    }
+
+                    SYS_vSleepMs(10);
+                }
             }
         }
-    }
 
-    if (ec != PSL_ERROR_none) {
-        printf("error: %s\n", PSerLib_getErrorMessage(ec));
-    }
+        if (ec != PSL_ERROR_none) {
+            KWB__vDisplayPrintMessage("error: %s\n", PSerLib_getErrorMessage(ec));
+        }
 
-    PSerLib_close(&g_sSerPort);
+        PSerLib_close(&g_sSerPort);
+    } while (0);
+    getch();
+    KWB__vDisplayClose();
+
     return ec == PSL_ERROR_none;
 }

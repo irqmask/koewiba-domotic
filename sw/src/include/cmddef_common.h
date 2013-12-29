@@ -27,6 +27,11 @@ typedef enum {
     CMD_eState32bit             = 0x04, //!< Send 32bit state data.
     CMD_eStateDateTime          = 0x05, //!< Send date/time data.
 
+    CMD_eRequestRegister        = 0x10, //!< Request register value.
+    CMD_eSetRegister8bit        = 0x12, //!< Set 8bit register value.
+    CMD_eSetRegister16bit       = 0x13, //!< Set 16bit register value.
+    CMD_eSetRegister32bit       = 0x14, //!< Set 32bit register value.
+
     CMD_eFirstAppSpecific       = 0x40, //!< First application specific command.
 
     CMD_eAck                    = 0xF0, //!< Acknowledge message.

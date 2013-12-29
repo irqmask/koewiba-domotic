@@ -11,10 +11,14 @@
 // --- Include section ---------------------------------------------------------
 #include <avr/io.h>
 #include <avr/interrupt.h>
-#include "bus.h"
+
 #include "cmddef_common.h"
+#include "moddef_common.h"
+
+#include "bus.h"
 #include "clock.h"
 #include "led_debug.h"
+#include "register.h"
 #include "sleepmode.h"
 #include "ucontroller.h"
 
@@ -45,24 +49,36 @@ void IO_vInitialize(void)
 }
 
 // Interpret message
-static void vInterpretMessage(uint8_t* puMsg, uint8_t uMsgLen)
+static void vInterpretMessage(sBus_t* psBus, uint8_t* puMsg, uint8_t uMsgLen, uint16_t uSender)
 {
-    switch (puMsg[0]) {
-    case CMD_eStateBitfield:
-        if (puMsg[2] & 0b00000001) LED_STATUS_ON;
-        else                       LED_STATUS_OFF;
-        break;
-    case CMD_eSleep:
-        SLEEP_PinChange2_Enable();
-        BUS_vSleep(&g_sBus);
-        SLEEP_PinChange2_Disable();
-        break;
-    case CMD_eAck:
-    	g_sBus.eModuleState = eMod_Running;
-    
-    default:
-    	BUS_bSendAcknowledge(&g_sBus, g_sBus.sRecvMsg.uSender);
-        break;
+    if (puMsg[0] <= CMD_eStateDateTime) {
+        // state messages
+        switch (puMsg[0]) {
+        case CMD_eStateBitfield:
+            if (puMsg[2] & 0b00000001) LED_STATUS_ON;
+            else                       LED_STATUS_OFF;
+            break;
+        }
+
+    } else if (puMsg[0] <= CMD_eSetRegister32bit) {
+        // register messages
+        REG_vDoCommand(psBus, puMsg, uMsgLen, uSender);
+
+    } else {
+        // system messages
+        switch (puMsg[0]) {
+        case CMD_eSleep:
+            SLEEP_PinChange2_Enable();
+            BUS_vSleep(&g_sBus);
+            SLEEP_PinChange2_Disable();
+            break;
+        case CMD_eAck:
+            g_sBus.eModuleState = eMod_Running;
+            break;
+        default:
+            BUS_bSendAcknowledge(psBus, uSender);
+            break;
+        }
     }
 }
 
@@ -77,6 +93,15 @@ int main(void)
     uint8_t msg[BUS_MAXMSGLEN];
     uint16_t sender = 0;
 
+    uint8_t registers[8] = {
+            MOD_eReg_ModuleID,
+            MOD_eReg_DeviceSignature0,
+            MOD_eReg_DeviceSignature1,
+            MOD_eReg_DeviceSignature2,
+            MOD_eReg_FirstAppSpecific,
+            MOD_eReg_FirstAppSpecific+1,
+            MOD_eReg_FirstAppSpecific+2
+    };
     IO_vInitialize();
     CLK_vInitialize();
 
@@ -92,22 +117,20 @@ int main(void)
         // check for message and read it
         if (BUS_bGetMessage(&g_sBus)) {
             if (BUS_bReadMessage(&g_sBus, &sender, &msglen, msg)) {
-                vInterpretMessage(msg, msglen);
+                vInterpretMessage(&g_sBus, msg, msglen, sender);
             }
         }
         // check button
         if ((PIND & BTN_TEST) ^ oldbutton) {
             oldbutton = PIND & BTN_TEST;
             if (oldbutton != 0) {
-                if (light)  light = 0;
-                else        light = 1;
+                light++;
+                if (light > 7) light = 0;
 
-                msg[0] = CMD_eStateBitfield;
-                msg[1] = 1;
-                msg[2] = light;
-                msg[3] = 0b00000001;
-                msglen = 4;
-                BUS_bSendMessage(&g_sBus, 0x0C, msglen, msg);
+                msg[0] = CMD_eRequestRegister;
+                msg[1] = registers[light];
+                msglen = 2;
+                BUS_bSendMessage(&g_sBus, 0x0E, msglen, msg);
             }
         }
     }

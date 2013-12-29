@@ -2,7 +2,7 @@
  * @addtogroup MODDEF_COMMON
  * @brief Project global layout of the internal configuration storage.
  * The location of all general settings which apply to every module are defined
- * here. Mosty, depending on the procesor, this configuration area resides in
+ * here. Mostly, depending on the processor, this configuration area resides in
  * the controller's internal eeprom.
  *
  * @{
@@ -24,24 +24,49 @@
 
 // --- Type definitions --------------------------------------------------------
 
+//! Common register storage layout which is used by all applications.
+typedef enum {
+    MOD_eReg_ModuleID,                  //!< Module ID as it appears on the bus.
+    MOD_eReg_BldFlag,                   //!< Storage for bootloader flags for
+                                        //!< next reboot will be reset by the
+                                        //!< bootloader.
+
+    MOD_eReg_FirstAppSpecific   = 16,
+    MOD_eReg_LastAppSpecific    = 229,
+    MOD_eReg_DeviceSignature0   = 230,  //!< 1st byte of device signature.
+    MOD_eReg_DeviceSignature1   = 231,  //!< 2nd byte of device signature.
+    MOD_eReg_DeviceSignature2   = 232,  //!< 3rd byte of device signature.
+    MOD_eReg_BoardID            = 233,  //!< Board ID.
+    MOD_eReg_AppID              = 234,  //!< Application ID.
+    MOD_eReg_AppVersionMajor    = 235,  //!< Application version major.
+    MOD_eReg_AppVersionMinor    = 236,  //!< Application version minor.
+    MOD_eReg_AppVersionBugfix   = 237   //!< Application version bug-fix.
+} MOD_eRegCommon_t;
+
 //! Common configuration storage layout which is used by all applications.
 //! Mostly, depending on the processor, this configuration area resides in the
 //! controller's internal eeprom.
 typedef enum {
     MOD_eCfg_ModuleID,                  //!< Module ID as it appears on the bus.
+    MOD_eCfg_ModuleIDLo = MOD_eCfg_ModuleID,  //!< Module ID low-byte as it
+                                        //!< appears on the bus.
+    MOD_eCfg_ModuleIDHigh,              //!< Module high-byte ID as it appears
+                                        //!< on the bus.
     MOD_eCfg_BldFlag,                   //!< Storage for bootloader flags for
                                         //!< next reboot will be reset by the
                                         //!< bootloader.
 
-    MOD_eCfg_FirstAppSpecific   = 16
+    MOD_eCfg_FirstAppSpecific   = 16,
 } MOD_eCfgCommon_t;
 
+//! Layout of external EEProm
 typedef enum {
     MOD_eExtEEPAddr_AppSize     = 0,
     MOD_eExtEEPAddr_AppCrc      = MOD_eExtEEPAddr_AppSize + MOD_LEN_APPSIZE,
     MOD_eExtEEPAddr_AppStart    = MOD_eExtEEPAddr_AppCrc + MOD_LEN_APPCRC,
 } MOD_eExtEEPAddr_t;
 
+//! Flags of bootloader as they appear in MOD_eCfg_BldFlag.
 typedef enum {
     eBldFlagNewSWProgrammed,
     eBldFlagCRCMismatch,

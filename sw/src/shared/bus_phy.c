@@ -16,8 +16,6 @@
 #include <avr/interrupt.h>
 #include "ucontroller.h"
 #include "bus_intern.h"
-// TODO remove after debug
-#include "led_debug.h"
 
 // --- Switches ----------------------------------------------------------------
 
@@ -177,8 +175,8 @@ void BUS__vPhyInitialize(sBusPhy_t* psPhy, uint8_t uUart)
         REGISTER_UBRRH = UBRRVALH;
         REGISTER_UBRRL = UBRRVALL;
         REGISTER_UCSRB |= ((1<<REGBIT_RXCIE) | (0<<REGBIT_UDRIE) | (1<<REGBIT_TXCIE) | (1<<REGBIT_RXEN) | (1<<REGBIT_TXEN));
-        BUS_DDR_ENASND |=(1<<BUS_ENASND);
-        BUS_DDR_DISRCV |=(1<<BUS_DISRCV);
+        BUS_DDR_ENASND |= (1<<BUS_ENASND);
+        BUS_DDR_DISRCV |= (1<<BUS_DISRCV);
     }
 
     // sender is initial off, receiver is always on.
@@ -200,7 +198,7 @@ void BUS__vPhyActivateSender(sBusPhy_t* psPhy, BOOL bActivate)
         BUS_PORT_ENASND |= (1<<BUS_ENASND);
     }
     else {
-        BUS_PORT_ENASND &= ~(1<<BUS_ENASND);        
+        BUS_PORT_ENASND &= ~(1<<BUS_ENASND);
         BUS__vPhyActivateReceiver(psPhy, TRUE);
     }
 }

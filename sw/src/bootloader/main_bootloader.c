@@ -140,17 +140,17 @@ BOOL bCheckControllerID (void)
     uint8_t sigbyte, eepcontent = 0;
 
     EEP_uRead(BLD_eExtEEPAddr_CtrlID + 0, 1, &eepcontent);
-    sigbyte = boot_signature_byte_get(0);
+    sigbyte = boot_signature_byte_get(ADDR_SIGNATURE_BYTE0);
     UART_vPutHex(sigbyte);
     //if (sigbyte != eepcontent) return FALSE;
 
     EEP_uRead(BLD_eExtEEPAddr_CtrlID + 1, 1, &eepcontent);
-    sigbyte = boot_signature_byte_get(1);
+    sigbyte = boot_signature_byte_get(ADDR_SIGNATURE_BYTE1);
     UART_vPutHex(sigbyte);
     //if (sigbyte != eepcontent) return FALSE;
 
     EEP_uRead(BLD_eExtEEPAddr_CtrlID + 2, 1, &eepcontent);
-    sigbyte = boot_signature_byte_get(2);
+    sigbyte = boot_signature_byte_get(ADDR_SIGNATURE_BYTE2);
     UART_vPutHex(sigbyte);
     //if (sigbyte != eepcontent) return FALSE;
 
@@ -243,7 +243,7 @@ int main ( void )
     bCheckControllerID();
 
     // check internal EEProm if a new application has to be flashed
-    BLD_uStatus = eeprom_read_byte((uint8_t*)MOD_eCfg_BldFlag);
+    BLD_uStatus = eeprom_read_byte((uint8_t*)MOD_eReg_BldFlag);
     if (BLD_uStatus & (1<<eBldFlagAppProgram)) {
         do {
             // check external EEProm
@@ -282,7 +282,7 @@ int main ( void )
             // to the application after bootloading.
             boot_rww_enable ();
             BLD_uStatus &= ~(1<<eBldFlagAppProgram);
-            eeprom_write_byte((uint8_t*)MOD_eCfg_BldFlag, BLD_uStatus);
+            eeprom_write_byte((uint8_t*)MOD_eReg_BldFlag, BLD_uStatus);
         } while ( FALSE );
 
     }

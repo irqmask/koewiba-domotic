@@ -3,8 +3,6 @@
  * @addtogroup BUS_INTERN
  * @brief Internal definitions for bus modules.
  *
- * TODO: Detailed description of module.
- *
  * @{
  * @file    bus_intern.h
  * @brief   Internal definitions for bus modules.

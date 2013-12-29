@@ -18,6 +18,8 @@ SRC = shared/bus_phy.c \
       shared/gdisplay_font_x16.c \
       shared/gdisplay_symbols_x16.c \
       shared/gdisplay_symbols_x24.c \
+      shared/register.c \
+      roomthermostate/appregister.c \
       roomthermostate/main_roomthermostate.c
 
 # Place -I options here

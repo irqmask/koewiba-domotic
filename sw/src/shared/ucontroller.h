@@ -49,6 +49,11 @@
  #define REG_TIMER1_IRQMSK      TIMSK
  #define REGBIT_TIMER1_OCIEA    OCIE1A
  
+ // Signature byte addresses. TODO check for this processor!
+ #define ADDR_SIGNATURE_BYTE0   0
+ #define ADDR_SIGNATURE_BYTE1   2
+ #define ADDR_SIGNATURE_BYTE2   4
+
 #elif defined (__AVR_ATmega88__)
 // UART
  #define REGISTER_UCSRA         UCSR0A
@@ -83,7 +88,13 @@
  // Timer1
  #define REG_TIMER1_IRQMSK      TIMSK1
  #define REGBIT_TIMER1_OCIEA    OCIE1A
- 
+
+ // Signature byte addresses. TODO check for this processor!
+ #define ADDR_SIGNATURE_BYTE0   0
+ #define ADDR_SIGNATURE_BYTE1   2
+ #define ADDR_SIGNATURE_BYTE2   4
+ #define SIGRD 5 // workaround for missing define in avr-headers
+
 #elif defined (__AVR_ATmega324P__) || defined (__AVR_ATmega324A__)
  // definition of prozessor depending global settings
  // TODO CV: this part can be ported maybe to a makefile include
@@ -144,7 +155,13 @@
  #define REGBIT_SPIF0           SPIF
  #define REGBIT_SPI2X0          SPI2X
  #endif
+
+ // Signature byte addresses.
+ #define ADDR_SIGNATURE_BYTE0   0
+ #define ADDR_SIGNATURE_BYTE1   2
+ #define ADDR_SIGNATURE_BYTE2   4
 #endif
+
 
 #if defined (__AVR_ATmega8__) || defined (__AVR_ATmega88__) || defined (__AVR_ATmega324P__) || defined (__AVR_ATmega324A__)
  #define CLOCK_TCCRA TCCR1A

@@ -10,6 +10,7 @@ NM               = avr-nm
 AVRDUDE          = avrdude
 REMOVE           = rm
 MV               = mv -f
+CAT              = cat
 
 # Make lists of source and object files
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -121,9 +122,11 @@ build_release: directories $(OBJ_RELEASE) $(ELFFILE_RELEASE) $(HEXFILE_RELEASE) 
 
 debug_done: $(ELFFILE_DEBUG)
 	@echo "    $(IDENT) [DONE]"
+	@$(CAT) $(LOGFILE_DEBUG)
 
 release_done: $(ELFFILE_RELEASE)
 	@echo "    $(IDENT) [DONE]"
+	@$(CAT) $(LOGFILE_RELEASE)
 
 all: build_debug
 

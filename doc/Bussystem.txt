@@ -75,7 +75,7 @@ CRCL - Low byte of 16bit CRC
 
 Acknowledge / Not Acknowledge:
 
-Das Acknowledge oder Not Acknowledge wird vom Empänger einer Nachricht unmittelbar nach deren Erhalt gesendet. 
+Das Acknowledge oder Not Acknowledge wird vom Empänger einer Nachricht unmittelbar nach deren Erhalt gesendet.
 Der Empfänger sendet "Acknowledge" / ACK , wenn er die Nachricht vollständig und fehlerfrei (CRCCheck) empfangen hat und an die Applikationsebene weiterreichen konnte.
 Der Empfänger sendet ein "Not Acknowledge" / NAK wenn er die Nachricht nicht fehlerfei empfangen konnte. Wenn der Sender ein NAK empfängt, wiederholt er das Senden der Nachricht. Wenn der Sender nach einer Wartezeit kein ACK oder NAK Byte empfängt, wiederholt er auch das Senden der Nachricht. Das Senden der Nachricht wird bis zu dreimal wiederholt. Empfängt der Sender ein ACK, kann er die gesendete Nachricht aus dem Sendespeicher entfernen.
 
@@ -160,7 +160,21 @@ Zustandsmeldungen unterschieden. Befehle lösen beim Empfänger eine Aktion aus, Z
 können eine Aktion auslösen, müssen aber nicht.
 
 Allgemeine Zustandsmeldungen (Typ 0x00 - 0x10) (StateMsg)
-Format: Typ, Kanal, spez. Daten
+Das Format der Nachricht und welche Eigenschaft sich hinter welchem Bit/Register verbirgt ist applikationsspezifisch. Zu jeder Applikation gehört eine Registertabelle, welche den Datentyp und den Zweck des Registers angibt.
+
+Beispiel Registertabelle:
+
+Reg   Type   Usage
+----+-------+------------------
+  0 | n/a   | reserved
+  1 |  8bit | Byte 0 of Bitfield: 8 Digital inputs on connector J12
+  2 | 16bit | Temperature of sensor 0
+  3 | 16bit | Temperature of sensor 1
+  4 | 16bit | Current desired temperature
+  5 | n/a   | reserved
+  6 | n/a   | reserved
+  7 | n/a   | reserved
+
 
 0x00 - Typenlos
 0x00, Daten
@@ -169,43 +183,58 @@ Format: Typ, Kanal, spez. Daten
 Beispiel: 0x01, Anzahl Bytes, Zustand Byte0, Änderung Byte0, Zustand Byte1, Änderung Byte1, ...
 
 0x02 - 8bit
-Beispiel: 0x02, Kanalnummer, 8bit Wert
+Beispiel: 0x02, Registernummer, 8bit Wert
 
 0x03 - 16bit
-Beispiel: 0x03, Kanalnummer, 16bit Wert (HighByte, LowByte)
+Beispiel: 0x03, Registernummer, 16bit Wert (HighByte, LowByte)
 
 0x04 - 32bit
-Beispiel: 0x04, Kanalnummer, 32bit Wert (HighByte, ..., LowByte)
+Beispiel: 0x04, Registernummer, 32bit Wert (HighByte, ..., LowByte)
 
 0x05 - Datum/Uhrzeit(UTC)
+
+
+Registerbefehle: Für Konfigurations- und Debugzwecke
+In Registern werden Eigenschaften der Applikation hinterlegt. Zum Beispiel die Moduladresse oder andere Konfigurationsparameter.
+Die Register können flüchtig oder nicht-flüchtig sein. Weiterhin können Register teilweise nur gelesen werden (Abfrage einer Version zum Beispiel). Hinter Registern können sich auch Variablen verbergen oder die oben beschriebenen Kanäle. Dies ist vor allem für Debugzwecke nützlich.
+Auch hier gehört zu jeder Applikation eine Registertabelle, welche den Datentyp, den Zweck des Registers und die Zugriffs- und Speichereigenschaften angibt.
+
+Beispiel Registertabelle:
+
+Reg   Type    Access   Usage
+----+-------+--------+---------
+  0 | 16bit | (e)r/w | Module address (11bit)
+  1 |  8bit | r      | Module software version
+
+r/w:    volatile read and write access. After a power cycle the content of this register is lost.
+r:      volatile read access. After a power cycle the content of this register may be lost.
+(e)r/w: non-volatile read and write access. The content is stored in the internal EEProm. A write access to this register writes directly to the EEProm.
+
+Schreibvorgänge auf Read-Only Register oder Register mit anderem Datentyp werden von der Software verhindert. Lesevorgänge auf Register mit einem anderen Datentyp sind zugelassen, liefern aber nur den lesbaren Teil des Registers zurück: Ein 32bit Lesebefehl auf ein 8bit Register gibt auch nur den 8bit Wert des Registers im untersten Byte des 32bit Wortes zurück. Ein 8bit Lesebefehk auf ein 32bit Register gibt nur das unterste Byte des 32bit Wortes zurück.
+
+0x10 - Request Register
+Beispiel: 0x10, Registernummer
+Das angesprochene Modul antwortet auf den Request Register Befehl mit einer State-Message 0x02 - 0x04
+
+0x12 - Set Register 8bit
+Beispiel: 0x12, Registernummer, 8bit- Wert
+
+0x13 - Set Register 16bit
+Beispiel: 0x13, Registernummer, 16bit- Wert
+
+0x14 - Set Register 32bit
+Beispiel: 0x14, Registernummer, 32bit- Wert
 
 
 Allgemeine Befehle (Typ 0x20 - 0x3F)
 Format: Typ, spez. Parameter
 
-0xXX - Reg Version
+0xXX - Request Version
 Fordert Firmwareversionsstring an.
 
 0xXX - Set Version
 Gibt Firmwareversion an
 Beispiel: 0xXX, <Versionsstring max 10Byte>
-
-
-Registerbefehle: Für Konfigurations- und Debugzwecke
-
-0x20 - Req Register
-Beispiel: 0x20, Registernummer
-
-0x21 - Set Register 8bit
-Beispiel: 0x21, Registernummer, 8bit- Wert
-
-0x22 - Set Register 16bit
-Beispiel: 0x22, Registernummer, 16bit- Wert
-
-0x23 - Set Register 32bit
-Beispiel: 0x23, Registernummer, 32bit- Wert
-
-
 
 0x30 - Start Flash
 0x31 - Set Flash
@@ -215,5 +244,6 @@ Beispiel: 0x23, Registernummer, 32bit- Wert
 Steuerkommandos (Typ 0xF0 - 0xFF)
 Format: Typ, spez. Parameter
 
-0xF0 - Sleep (legt den Bus schlafen)
-0xF5 - Reset (Teilnehmer soll über Los gehen)
+0xF0 - Acknowledge message
+0xF5 - Sleep (legt den Bus schlafen)
+0xFE - Reset (Teilnehmer soll über Los gehen)

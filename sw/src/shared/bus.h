@@ -70,6 +70,8 @@
 #define BUS_MAXNODES 16
 #endif
 
+#define BUS_BRDCSTADR   0x00 // Broadcastaddress
+
 // --- Type definitions --------------------------------------------------------
 
 //! Possible states of the subscriber
@@ -85,12 +87,15 @@ typedef enum busstate {
     eBus_InitWait,          //!< We are not synced on bus yet.
     eBus_Idle,              //!< Not sending and not receiving.
     eBus_SendingToken,      //!< Scheduler is sending the token.
+    eBus_SendingAck,        //!< We are sending now our ACK.
     eBus_ReceivingWait,     //!< Waiting for incoming message.
     eBus_ReceivingActive,   //!< We suggest the message is for us.
     eBus_ReceivingPassive,  //!< We receive byte but those are not for us.
     eBus_GotToken,          //!< We have got the bus token.
     eBus_GotMessage,        //!< We have got a message.
     eBus_Sending,           //!< We are sending now our message.
+    eBus_AckWaitReceiving,  //!< We are waiting for the ACK after receiving.
+    eBus_AckWaitSending,    //!< We are waiting for the ACK after sending.
     eBus_Last
 } eBusState_t;
 
@@ -141,6 +146,7 @@ typedef struct sndbusmsg {
     uint16_t        uReceiver;
     uint8_t         uLength;
     uint8_t         uOverallLength;
+    uint8_t         uRetries;       //!< number of send retries.
     auSndBuf_t      auBuf;          //!< message data including header, data and crc.
 } sSndBusMsg_t;
 
@@ -161,6 +167,7 @@ typedef struct bus {
     sSndBusMsg_t    sSendMsg;                       //!< contains current message to be sent.
     uint8_t         auEmptyMsg[BUS_EMPTY_MSG_LEN];  //!< pre-compiled empty message.
     sClkTimer_t     sReceiveTimeout;                //!< receive timeout
+    sClkTimer_t     sAckTimeout;                    //!< ack timeout
 
     // following data is only used by bus scheduler
 #ifdef BUS_SCHEDULER

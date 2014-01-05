@@ -176,7 +176,9 @@ void BUS__vPhyInitialize(sBusPhy_t* psPhy, uint8_t uUart)
         REGISTER_UBRRL = UBRRVALL;
         REGISTER_UCSRB |= ((1<<REGBIT_RXCIE) | (0<<REGBIT_UDRIE) | (1<<REGBIT_TXCIE) | (1<<REGBIT_RXEN) | (1<<REGBIT_TXEN));
         BUS_DDR_ENASND |= (1<<BUS_ENASND);
+#ifndef TXRXEN_COMBINED
         BUS_DDR_DISRCV |= (1<<BUS_DISRCV);
+#endif
     }
 
     // sender is initial off, receiver is always on.
@@ -212,12 +214,14 @@ void BUS__vPhyActivateSender(sBusPhy_t* psPhy, BOOL bActivate)
  */
 void BUS__vPhyActivateReceiver(sBusPhy_t* psPhy, BOOL bActivate)
 {
+#ifndef TXRXEN_COMBINED
     if (bActivate) {
         BUS_PORT_DISRCV &= ~(1<<BUS_DISRCV);
     }
     else {
         BUS_PORT_DISRCV |= (1<<BUS_DISRCV);
     }
+#endif
 }
 
 /**

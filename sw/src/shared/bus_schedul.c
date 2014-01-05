@@ -17,8 +17,6 @@
 #include "bus.h"
 #include "bus_intern.h"
 
-//TODO remove after debug
-#include "led_debug.h"
 #include <util/delay.h>
 
 // --- Definitions -------------------------------------------------------------
@@ -279,7 +277,7 @@ BOOL BUS_bScheduleAndGetMessage(sBus_t* psBus)
         if (recEnd) { // receiving finished
             psBus->bSchedMsgReceived = FALSE;
             psBus->bSchedWaitingForAnswer = FALSE;
-            psBus->eState = eBus_Idle;
+            if(eBus_AckWaitReceiving != psBus->eState) psBus->eState = eBus_Idle;
             if(TRUE != psBus->bSchedDiscovery) 	++psBus->uCurrentNode;
 			else 								++psBus->uDiscoverNode;
         }
@@ -311,5 +309,4 @@ void BUS_vScheduleCheckAndSetSleep(sBus_t* psBus)
         }
     }
 }
-/** @} */
 /** @} */

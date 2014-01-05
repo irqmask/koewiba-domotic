@@ -3,6 +3,8 @@
  * @addtogroup BUS_INTERN
  * @brief Internal definitions for bus modules.
  *
+ * TODO: Detailed description of module.
+ *
  * @{
  * @file    bus_intern.h
  * @brief   Internal definitions for bus modules.
@@ -24,11 +26,13 @@
 #define BUS_INITWAIT_TIME       (24 * BUS_BITTIME)
 #define BUS_RECOVERY            (12 * BUS_BITTIME)
 #define BUS_INTERBYTE_TIMEOUT   (8 * BUS_BITTIME)
+#define BUS_ACKTIMEOUT          30 // ms
 
 #define TOKENBIT 0x80
 #define ADDRMASK ~(TOKENBIT)
 
 #define BUS_MAX_ANSWERFAILS		5	    //!< Maximum number a member's answer can be missing, before disconnecting.
+#define BUS_MAX_MSGRETRIES		3	    //!< Maximum number of re-sending one message.
 #define BUS_DISCOVERYLOOPS		3       //!< Number of discovery-loops till normal scheduling begins.
 #define BUS_LOOPS_TILL_SLEEP	50      //!< Number of discovery-loops till normal scheduling begins.
 

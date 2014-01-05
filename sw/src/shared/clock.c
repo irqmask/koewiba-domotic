@@ -79,15 +79,11 @@ ISR(TIMER1_COMPA_vect)
     uint8_t ii;
 
     for (ii=0; ii<CLOCK_NUM_TIMER; ii++) {
-        if (g_asRunningTimers[ii] != NULL) {
-            if (g_asRunningTimers[ii]->uTicks == 0) {
-                // time elapsed, remove timer from list
+            if (g_asRunningTimers[ii] == NULL) continue;
+            if (--g_asRunningTimers[ii]->uTicks == 0) {
                 g_asRunningTimers[ii] = NULL;
-            } else {
-                g_asRunningTimers[ii]->uTicks--;
             }
         }
-    }
 }
 
 // --- Module global functions -------------------------------------------------
@@ -140,7 +136,7 @@ void CLK_vControl(BOOL start)
 }
 
 /**
- * Start a new count-down timer.
+ * (Re)Start a count-down timer.
  *
  * @param[in] psTimer
  * Pointer to timer structure.
@@ -148,17 +144,17 @@ void CLK_vControl(BOOL start)
  * Time in ticks. Convert from milliscons to ticks with 
  * CLOCK_MS_2_TICKS macro.
  *
- * @returns TRUE, if timer has been started, otherwise FALSE.
+ * @returns TRUE, if timer has been (re)started, otherwise FALSE.
  */
 BOOL CLK_bTimerStart(sClkTimer_t* psTimer, uint16_t uTicks)
 {
-    // check if timer is still running
-    if (psTimer->uTicks != 0) {
-        return FALSE;
-    }
-
-    psTimer->uTicks = uTicks;
-    return bRegisterTimer(psTimer);
+    // if timer is still running ...
+        if (psTimer->uTicks != 0) {
+            psTimer->uTicks = uTicks; // ... restart timer
+            return TRUE;
+        }
+        psTimer->uTicks = uTicks;
+        return bRegisterTimer(psTimer);
 }
 
 /**

@@ -21,6 +21,7 @@
 #include "cmddef_common.h"
 #include "clock.h"
 #include "crc16.h"
+#include "pcbconfig.h"
 
 // TODO remove after debug
 #include <util/delay.h>

@@ -28,25 +28,6 @@
 
 // --- Local functions ---------------------------------------------------------
 
-/**
- * Initialize LEDs and keys.
- */
-void vInitLedAndKeys(void)
-{
-    DDRD |= (LED_ERROR | LED_STATUS);
-    DDRD &= ~(BTN_TEST | BTN_EXP);
-
-    PORTD &= ~(LED_ERROR | LED_STATUS); // switch LEDs off.
-    PORTD |= (BTN_TEST | BTN_EXP);      // set pull-up for buttons
-
-#if defined (__AVR_ATmega88__)
-    // Pin-Change-Interrupt
-    PCICR  = ((0<<PCIE2) | (0<<PCIE1) | (0<<PCIE0)); //disable IR_PinChange2
-    PCMSK2 = ((1<<PCINT23) | (0<<PCINT22) | (1<<PCINT21) | (0<<PCINT20) | (0<<PCINT19) | (0<<PCINT18) | (0<<PCINT17) | (0<<PCINT16));
-    PCMSK1 = (               (0<<PCINT14) | (0<<PCINT13) | (0<<PCINT12) | (0<<PCINT11) | (0<<PCINT10) | (0<<PCINT9 ) | (0<<PCINT8 ));
-    PCMSK0 = ((0<<PCINT7 ) | (0<<PCINT6 ) | (0<<PCINT5 ) | (0<<PCINT4 ) | (0<<PCINT3 ) | (0<<PCINT2 ) | (0<<PCINT1 ) | (0<<PCINT0 ));
-#endif
-}
 
 /**
  * Toggle the status LED.

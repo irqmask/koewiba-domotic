@@ -21,7 +21,7 @@
 
 // --- Definitions -------------------------------------------------------------
 
-#define SLEEP_PinChange2_Enable()   PCICR |= (1<<PCIE2);
+#define SLEEP_PinChange2_Enable()   PCICR |=  (1<<PCIE2);
 #define SLEEP_PinChange2_Disable()  PCICR &= ~(1<<PCIE2);
 
 // --- Type definitions --------------------------------------------------------

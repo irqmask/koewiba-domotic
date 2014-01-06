@@ -54,7 +54,7 @@
  #define ADDR_SIGNATURE_BYTE1   2
  #define ADDR_SIGNATURE_BYTE2   4
 
-#elif defined (__AVR_ATmega88__)
+#elif defined (__AVR_ATmega88__) || defined (__AVR_ATmega88A__) || defined (__AVR_ATmega88P__)
 // UART
  #define REGISTER_UCSRA         UCSR0A
  #define REGISTER_UCSRB         UCSR0B
@@ -160,10 +160,60 @@
  #define ADDR_SIGNATURE_BYTE0   0
  #define ADDR_SIGNATURE_BYTE1   2
  #define ADDR_SIGNATURE_BYTE2   4
+ 
+#elif defined (__AVR_ATtiny1634__)
+ // definition of prozessor depending global settings
+ // TODO CV: this part can be ported maybe to a makefile include
+ #define STARTADDR_APPVECTORS   0x0000
+ #define STARTADDR_APPLICATION  0x003E
+ #define STARTADDR_BOOTLOADER   0x1700
+ #define MAXSIZE_APPLICATION    (STARTADDR_BOOTLOADER - STARTADDR_APPVECTORS)
+ #define MAXSIZE_BOOTLOADER     0x0400
+
+ // definition of processor specific registers
+ // UART0
+ #define REGISTER_UCSRA         UCSR0A
+ #define REGISTER_UCSRB         UCSR0B
+ #define REGISTER_UCSRC         UCSR0C
+ #define REGISTER_UDR           UDR0
+ #define REGISTER_UBRRH         UBRR0H
+ #define REGISTER_UBRRL         UBRR0L
+ #define REGBIT_RXCIE           RXCIE0
+ #define REGBIT_UDRIE           UDRIE0
+ #define REGBIT_TXCIE           TXCIE0
+ #define REGBIT_RXEN            RXEN0
+ #define REGBIT_TXEN            TXEN0
+ #define REGBIT_FE              FE0
+ #define INTERRUPT_USART_RXC    USART0_RX_vect
+ #define INTERRUPT_USART_UDRE   USART0_UDRE_vect
+ #define INTERRUPT_UART_TRANS   USART0_TX_vect
+
+ // Sleepmodes
+ #define INTERRUPT_PINCHANGE2   PCINT2_vect
+ 
+ // Timer
+ #define REG_TIMER1_IRQMSK      TIMSK
+ #define REGBIT_TIMER1_OCIEA    OCIE1A
+ 
+// SPI
+ #define REG_SPCR0              SPCR
+ #define REG_SPDR0              UDR0
+ #define REG_SPSR0              SPSR
+ // SPCR
+ #define REGBIT_SPE0            SPE
+ #define REGBIT_MSTR0           MSTR
+ // SPSR
+ #define REGBIT_SPIF0           SPIF
+ #define REGBIT_SPI2X0          SPI2X
 #endif
 
-
-#if defined (__AVR_ATmega8__) || defined (__AVR_ATmega88__) || defined (__AVR_ATmega324P__) || defined (__AVR_ATmega324A__)
+#if defined (__AVR_ATmega8__)    || \
+    defined (__AVR_ATmega88__)   || \
+    defined (__AVR_ATmega88A__)  || \
+    defined (__AVR_ATmega88P__)  || \
+    defined (__AVR_ATmega324P__) || \
+    defined (__AVR_ATmega324A__) || \
+    defined (__AVR_ATtiny1634__)
  #define CLOCK_TCCRA TCCR1A
  #define CLOCK_TCCRB TCCR1B
  #define CLOCKSELECT0 CS10

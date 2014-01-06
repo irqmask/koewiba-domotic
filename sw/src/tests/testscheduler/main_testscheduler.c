@@ -44,6 +44,7 @@ static sClkTimer_t 	g_sLedTimer;
 
 void IO_vInitialize(void)
 {
+#if defined (__AVR_ATmega88__) || defined (__AVR_ATmega88A__) || defined (__AVR_ATmega8__)
     DDRB  |= ((0<<DDB7)   | (0<<DDB6)   | (1<<DDB5)   | (1<<DDB4)   | (0<<DDB3)   | (1<<DDB2)   | (1<<DDB1)   | (1<<DDB0)  );
     DDRC  |= (              (0<<DDC6)   | (1<<DDC5)   | (1<<DDC4)   | (1<<DDC3)   | (1<<DDC2)   | (1<<DDC1)   | (1<<DDC0)  );
     DDRD  |= ((0<<DDD7)   | (1<<DDD6)   | (0<<DDD5)   | (1<<DDD4)   | (1<<DDD3)   | (1<<DDD2)   | (1<<DDD1)   | (0<<DDD0)  );
@@ -51,6 +52,15 @@ void IO_vInitialize(void)
     PORTB |= ((1<<PORTB7) | (1<<PORTB6) | (0<<PORTB5) | (0<<PORTB4) | (1<<PORTB3) | (0<<PORTB2) | (0<<PORTB1) | (0<<PORTB0));
     PORTC |= (              (1<<PORTC6) | (0<<PORTC5) | (0<<PORTC4) | (0<<PORTC3) | (0<<PORTC2) | (0<<PORTC1) | (0<<PORTC0));
     PORTD |= ((1<<PORTD7) | (0<<PORTD6) | (1<<PORTD5) | (0<<PORTD4) | (0<<PORTD3) | (0<<PORTD2) | (0<<PORTD1) | (1<<PORTD0));
+#elif defined (__AVR_ATtiny1634__)
+    DDRA  |= ((0<<DDRA7)  | (1<<DDRA6)  | (0<<DDRA5)  | (1<<DDRA4)  | (1<<DDRA3)  | (1<<DDRA2)  | (1<<DDRA1)  | (0<<DDRA0) );
+    DDRB  |= (                                                        (1<<DDRB3)  | (0<<DDRB2)  | (1<<DDRB1)  | (0<<DDRB0) );
+    DDRC  |= (                            (0<<DDRC5)  | (0<<DDRC4)  | (0<<DDRC3)  | (1<<DDRC2)  | (1<<DDRC1)  | (1<<DDRC0) );
+
+    PORTA |= ((1<<PORTA7) | (0<<PORTA6) | (0<<PORTA5) | (1<<PORTA4) | (1<<PORTA3) | (0<<PORTA2) | (0<<PORTA1) | (0<<PORTA0));
+    PORTB |= (                                                        (1<<PORTB3) | (0<<PORTB2) | (0<<PORTB1) | (0<<PORTB0));
+    PORTC |= (                            (0<<PORTC5) | (0<<PORTC4) | (0<<PORTC3) | (0<<PORTC2) | (0<<PORTC1) | (0<<PORTC0));
+#endif
 }
 
 // --- Module global functions -------------------------------------------------
@@ -71,7 +81,7 @@ int main(void)
     vInitLedAndKeys();
     sei();
 
-    CLK_bTimerStart(&g_sLedTimer, CLOCK_MS_2_TICKS(100));
+    CLK_bTimerStart(&g_sLedTimer, CLOCK_MS_2_TICKS(1000));
 
     while (1) {
     	if (BUS_bScheduleAndGetMessage(&g_sBus)) {
@@ -84,7 +94,7 @@ int main(void)
         if (CLK_bTimerIsElapsed(&g_sLedTimer)) {
         	// TODO remove after debug
             LED_STATUS_TOGGLE;
-            CLK_bTimerStart(&g_sLedTimer, CLOCK_MS_2_TICKS(100));
+            CLK_bTimerStart(&g_sLedTimer, CLOCK_MS_2_TICKS(1000));
         }
     }
     return 0;

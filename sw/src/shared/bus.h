@@ -215,7 +215,7 @@ BOOL    BUS_bSendMessage            (sBus_t*        psBus,
                                      uint8_t        uLen,
                                      uint8_t*       puMsg);
 
-BOOL    BUS_bSendAcknowledge        (sBus_t*        psBus,
+BOOL    BUS_bSendAckMessage         (sBus_t*        psBus,
                                      uint16_t       uReceiver);
 
 #ifdef BUS_SCHEDULER

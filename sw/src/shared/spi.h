@@ -121,19 +121,42 @@ typedef void (*SPI_EndSendFunc_t)(uint8_t uUserArg);
 /**
  * Initialize the SPI as master.
  */
+#if defined (__AVR_ATmega8__)    || \
+    defined (__AVR_ATmega88__)   || \
+    defined (__AVR_ATmega88A__)  || \
+    defined (__AVR_ATmega88P__)  || \
+    defined (__AVR_ATmega324P__) || \
+    defined (__AVR_ATmega324A__)
 inline void     SPI_vMasterInitBlk  (void)
 {
     // Set MOSI and SCK output, all others input
     SPI_DDR_MISO &= ~(1 << SPI_MISO);
-    SPI_DDR_MOSI |= (1 << SPI_MOSI);
-    SPI_DDR_SCK |= (1 << SPI_SCK);
-    SPI_DDR_SS |= (1 << SPI_SS);     // set DDR for slave select as output to guarantee SPI master mode
-    SPI_PORT_SS |= (1 << SPI_SS);    // set slave select to 1 (slave disabled)
-    REG_SPSR0 = (1 << REGBIT_SPI2X0);
+    SPI_DDR_MOSI |=  (1 << SPI_MOSI);
+    SPI_DDR_SCK  |=  (1 << SPI_SCK);
+    SPI_DDR_SS   |=  (1 << SPI_SS);    // set DDR for slave select as output to guarantee SPI master mode
+    SPI_PORT_SS  |=  (1 << SPI_SS);    // set slave select to 1 (slave disabled)
+    REG_SPSR0     =  (1 << REGBIT_SPI2X0);
     // Enable SPI, Master, set clock rate fck/2
-    REG_SPCR0 = (1 << REGBIT_SPE0) | (1 << REGBIT_MSTR0);
+    REG_SPCR0     =  (1 << REGBIT_SPE0) | (1 << REGBIT_MSTR0);
 }
 
+#elif defined (__AVR_ATtiny1634__)
+inline void     SPI_vMasterInitBlk  (void)
+{
+    UBRR0 = 0;
+    /* Setting the XCKn port pin as output, enables master mode. */
+    SPI_SCK_DDR |= (1<<SPI_SCK_PIN);
+    /* Set MSPI mode of operation and SPI data mode 0. */
+    UCSR0C = (1<<UMSEL01)|(1<<UMSEL00)|(0<<UCPHA0)|(0<<UCPOL0);
+    /* Enable receiver and transmitter. */
+    UCSR0B = (1<<RXEN0)|(1<<TXEN0);
+    /* Set baud rate. */
+    /* IMPORTANT: The Baud Rate must be set after the transmitter is enabled
+    */
+    UBRR0 = 0;
+    }
+}
+#endif
 
 /**
  * Simple blocking SPI transmission. The function returns when the byte has been

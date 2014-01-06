@@ -17,7 +17,6 @@
 
 #include "bus.h"
 #include "clock.h"
-#include "led_debug.h"
 #include "register.h"
 #include "sleepmode.h"
 #include "ucontroller.h"
@@ -48,6 +47,29 @@ void IO_vInitialize(void)
     PORTD |= ((1<<PORTD7) | (0<<PORTD6) | (1<<PORTD5) | (0<<PORTD4) | (0<<PORTD3) | (0<<PORTD2) | (0<<PORTD1) | (0<<PORTD0));
 }
 
+/**
+ * Initialize LEDs and keys.
+ */
+void vInitLedAndKeys(void)
+{
+    DDRD |= (LED_ERROR | LED_STATUS);
+    DDRD &= ~(BTN_TEST | BTN_EXP);
+
+    PORTD &= ~(LED_ERROR | LED_STATUS); // switch LEDs off.
+    PORTD |= (BTN_TEST | BTN_EXP);      // set pull-up for buttons
+
+#if defined (__AVR_ATmega8__)    || \
+    defined (__AVR_ATmega88__)   || \
+    defined (__AVR_ATmega88A__)  || \
+    defined (__AVR_ATmega88P__)
+    // Pin-Change-Interrupt
+    PCICR  = ((0<<PCIE2)   | (0<<PCIE1)   | (0<<PCIE0)); //disable IR_PinChange2
+    PCMSK2 = ((1<<PCINT23) | (0<<PCINT22) | (1<<PCINT21) | (0<<PCINT20) | (0<<PCINT19) | (0<<PCINT18) | (0<<PCINT17) | (0<<PCINT16));
+    PCMSK1 = (               (0<<PCINT14) | (0<<PCINT13) | (0<<PCINT12) | (0<<PCINT11) | (0<<PCINT10) | (0<<PCINT9 ) | (0<<PCINT8 ));
+    PCMSK0 = ((0<<PCINT7 ) | (0<<PCINT6 ) | (0<<PCINT5 ) | (0<<PCINT4 ) | (0<<PCINT3 ) | (0<<PCINT2 ) | (0<<PCINT1 ) | (0<<PCINT0 ));
+#endif
+}
+
 // Interpret message
 static void vInterpretMessage(sBus_t* psBus, uint8_t* puMsg, uint8_t uMsgLen, uint16_t uSender)
 {
@@ -76,7 +98,7 @@ static void vInterpretMessage(sBus_t* psBus, uint8_t* puMsg, uint8_t uMsgLen, ui
             g_sBus.eModuleState = eMod_Running;
             break;
         default:
-            BUS_bSendAcknowledge(psBus, uSender);
+            BUS_bSendAckMessage(psBus, uSender);
             break;
         }
     }
@@ -131,6 +153,20 @@ int main(void)
                 msg[1] = registers[light];
                 msglen = 2;
                 BUS_bSendMessage(&g_sBus, 0x0E, msglen, msg);
+            }
+        }
+        else if ((PIND & BTN_EXP) ^ oldbutton) {
+            oldbutton = PIND & BTN_EXP;
+            if (oldbutton != 0) {
+                if (light)  light = 0;
+                else        light = 1;
+
+                msg[0] = CMD_eStateBitfield;
+                msg[1] = 1;
+                msg[2] = light;
+                msg[3] = 0b00000001;
+                msglen = 4;
+                BUS_bSendMessage(&g_sBus, 0x03, msglen, msg);
             }
         }
     }

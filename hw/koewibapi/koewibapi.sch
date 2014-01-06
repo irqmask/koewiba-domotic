@@ -1,4 +1,4 @@
-EESchema Schematic File Version 2  date Fr 27 Dez 2013 21:16:19 CET
+EESchema Schematic File Version 2  date Do 02 Jan 2014 12:24:19 CET
 LIBS:connectors
 LIBS:power
 LIBS:display
@@ -15,7 +15,7 @@ $Descr A4 11700 8267
 encoding utf-8
 Sheet 1 3
 Title "KoeWiBaPi"
-Date "27 dec 2013"
+Date "2 jan 2014"
 Rev "1"
 Comp ""
 Comment1 "Baseboard für Raspberry PI in KoeWiBa Hausautomatisierung"
@@ -1916,7 +1916,7 @@ U 1 1 526EBEBD
 P 4050 1150
 F 0 "C5" H 4050 1025 50  0000 C CNN
 F 1 "1000uF" H 4050 1275 50  0000 C CNN
-F 4 "35V" H 4050 1340 50  0000 C CNN "Voltage"
+F 4 "25V" H 4050 1340 50  0000 C CNN "Voltage"
 F 5 "+-10%" H 4050 1405 50  0000 C CNN "Tolrance"
 	1    4050 1150
 	0    1    1    0   
@@ -1926,7 +1926,7 @@ L L L1
 U 1 1 526EBE7B
 P 3800 950
 F 0 "L1" H 3700 850 50  0000 L CNN
-F 1 "100uH" H 3700 1035 50  0000 L CNN
+F 1 "220uH" H 3700 1035 50  0000 L CNN
 	1    3800 950 
 	1    0    0    -1  
 $EndComp

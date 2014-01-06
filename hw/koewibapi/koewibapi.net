@@ -1,4 +1,4 @@
-# EESchema Netlist Version 1.1 created  Fr 27 Dez 2013 21:16:31 CET
+# EESchema Netlist Version 1.1 created  Do 02 Jan 2014 12:24:33 CET
 (
  ( /52B61D29 $noname  H7 HOLE {Lib=HOLE}
   (    1 ? )
@@ -350,7 +350,7 @@
   (    1 N-000085 )
   (    2 GND )
  )
- ( /526EBE7B $noname  L1 100uH {Lib=L}
+ ( /526EBE7B $noname  L1 220uH {Lib=L}
   (    1 N-000030 )
   (    2 N-000085 )
  )

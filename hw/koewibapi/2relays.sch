@@ -1,4 +1,4 @@
-EESchema Schematic File Version 2  date Fr 27 Dez 2013 21:16:19 CET
+EESchema Schematic File Version 2  date Do 02 Jan 2014 12:24:19 CET
 LIBS:connectors
 LIBS:power
 LIBS:display
@@ -15,7 +15,7 @@ $Descr A4 11700 8267
 encoding utf-8
 Sheet 3 3
 Title ""
-Date "27 dec 2013"
+Date "2 jan 2014"
 Rev ""
 Comp ""
 Comment1 ""

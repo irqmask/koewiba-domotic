@@ -121,12 +121,10 @@ build_release: SYMFILE = $(SYMFILE_RELEASE)
 build_release: directories $(OBJ_RELEASE) $(ELFFILE_RELEASE) $(HEXFILE_RELEASE) $(EEPFILE_RELEASE) release_done
 
 debug_done: $(ELFFILE_DEBUG)
-	@echo "    $(IDENT) [DONE]"
-	@$(CAT) $(LOGFILE_DEBUG)
+	@echo "    $(IDENT) [DONE]" | tee $(LOGFILE)
 
 release_done: $(ELFFILE_RELEASE)
-	@echo "    $(IDENT) [DONE]"
-	@$(CAT) $(LOGFILE_RELEASE)
+	@echo "    $(IDENT) [DONE]" | tee $(LOGFILE)
 
 all: build_debug
 
@@ -137,8 +135,8 @@ $(BUILDDIR_DEBUG)%.o $(BUILDDIR_RELEASE)%.o: %.c
 ifneq ($(BUILD_NIGHTLY),True)
 	@echo "    $(IDENT) [CC]         ===> $<"
 endif
-	@echo "$(CC) -mmcu=$(MCU) -c $(CFLAGS) $(INCDIRS) -o $@ $<" >> $(LOGFILE) 2>&1
-	@$(CC) -mmcu=$(MCU) -c $(CFLAGS) $(INCDIRS) -o $@ $< >> $(LOGFILE) 2>&1
+	@echo "$(CC) -mmcu=$(MCU) -c $(CFLAGS) $(INCDIRS) -o $@ $<" >> $(LOGFILE)
+	@$(CC) -mmcu=$(MCU) -c $(CFLAGS) $(INCDIRS) -o $@ $< 2>&1 | tee $(LOGFILE)
 
 # Assemble: create object files from assembler source files.
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -147,8 +145,8 @@ $(BUILDDIR_DEBUG)%.o $(BUILDDIR_RELEASE)%.o: %.S
 ifneq ($(BUILD_NIGHTLY),True)
 	@echo "    $(IDENT) [CC]         ===> $<"
 endif
-	@echo "$(CC) -mmcu=$(MCU) -c $(ASFLAGS) $(INCDIRS) -o $@ $<" >> $(LOGFILE) 2>&1
-	@$(CC) -mmcu=$(MCU) -c $(ASFLAGS) $(INCDIRS) -o $@ $< >> $(LOGFILE) 2>&1
+	@echo "$(CC) -mmcu=$(MCU) -c $(ASFLAGS) $(INCDIRS) -o $@ $<" >> $(LOGFILE)
+	@$(CC) -mmcu=$(MCU) -c $(ASFLAGS) $(INCDIRS) -o $@ $< 2>&1 | tee $(LOGFILE)
 
 
 # Link executable
@@ -158,9 +156,9 @@ $(ELFFILE_DEBUG) $(ELFFILE_RELEASE): $(SRC_FULL) $(LIBRARIES)
 ifneq ($(BUILD_NIGHTLY),True)
 	@echo "    $(IDENT) [LD]         ===> $@"
 endif
-	@echo "$(CC) -o $@ $(OBJFILES) $(LDFLAGS) " >> $(LOGFILE) 2>&1
-	@$(CC) -mmcu=$(MCU) -o $@ $(OBJFILES) $(LDFLAGS) >> $(LOGFILE) 2>&1
-	@$(SIZE) --format=avr --mcu=$(MCU) $@ >> $(LOGFILE) 2>&1
+	@echo "$(CC) -o $@ $(OBJFILES) $(LDFLAGS) " >> $(LOGFILE)
+	@$(CC) -mmcu=$(MCU) -o $@ $(OBJFILES) $(LDFLAGS) 2>&1 | tee $(LOGFILE)
+	@$(SIZE) --format=avr --mcu=$(MCU) $@ 2>&1 | tee $(LOGFILE)
 
 
 # several object-copy targets
@@ -170,17 +168,17 @@ endif
 ifneq ($(BUILD_NIGHTLY),True)
 	@echo "    $(IDENT) [OBJCOPYHEX] ===> $<"
 endif
-	@echo "$(OBJCOPY) -O $(FORMAT) -R .eeprom $< $@" >> $(LOGFILE) 2>&1
-	@$(OBJCOPY) -O $(FORMAT) -R .eeprom $< $@ >> $(LOGFILE) 2>&1
+	@echo "$(OBJCOPY) -O $(FORMAT) -R .eeprom $< $@" 2>&1 | tee $(LOGFILE)
+	@$(OBJCOPY) -O $(FORMAT) -R .eeprom $< $@ 2>&1 | tee $(LOGFILE)
 
 .elf.eep:
 ifneq ($(BUILD_NIGHTLY),True)
 	@echo "    $(IDENT) [OBJCOPYEEP] ===> $<"
 endif
 	@echo "-$(OBJCOPY) -j .eeprom --set-section-flags=.eeprom="alloc,load" \
-	--change-section-lma .eeprom=0 -O $(FORMAT) $< $@" >> $(LOGFILE) 2>&1
+	--change-section-lma .eeprom=0 -O $(FORMAT) $< $@" >> $(LOGFILE)
 	@-$(OBJCOPY) -j .eeprom --set-section-flags=.eeprom="alloc,load" \
-	--change-section-lma .eeprom=0 -O $(FORMAT) $< $@ >> $(LOGFILE) 2>&1
+	--change-section-lma .eeprom=0 -O $(FORMAT) $< $@ 2>&1 | tee $(LOGFILE)
 
 
 # Create extended listing file from ELF output file.
@@ -188,8 +186,8 @@ endif
 ifneq ($(BUILD_NIGHTLY),True)
 	@echo "    $(IDENT) [OBJDUMP]    ===> $<"
 endif
-	@echo "$(OBJDUMP) -h -S $< > $@" >> $(LOGFILE) 2>&1
-	@$(OBJDUMP) -h -S $< > $@ >> $(LOGFILE) 2>&1
+	@echo "$(OBJDUMP) -h -S $< > $@" >> $(LOGFILE)
+	@$(OBJDUMP) -h -S $< > $@ 2>&1 | tee $(LOGFILE)
 
 
 # Create a symbol table from ELF output file.
@@ -197,8 +195,8 @@ endif
 ifneq ($(BUILD_NIGHTLY),True)
 	@echo "    $(IDENT) [NM]         ===> $<"
 endif
-	@echo "$(NM) -n $< > $@" >> $(LOGFILE) 2>&1
-	@$(NM) -n $< > $@ >> $(LOGFILE) 2>&1
+	@echo "$(NM) -n $< > $@" >> $(LOGFILE)
+	@$(NM) -n $< > $@ 2>&1 | tee $(LOGFILE)
 
 
 # Convert ELF to COFF for use in debugging / simulating in AVR Studio or VMLAB.

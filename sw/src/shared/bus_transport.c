@@ -23,7 +23,6 @@
 #include "crc16.h"
 #include "pcbconfig.h"
 
-// TODO remove after debug
 #include <util/delay.h>
 #include <avr/sleep.h>
 

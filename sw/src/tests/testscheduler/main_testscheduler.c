@@ -78,7 +78,7 @@ int main(void)
     BUS_vConfigure(&g_sBus, 1); // configure a bus node with address 1
     BUS_vInitialize(&g_sBus, 0);// initialize bus on UART 0
 
-    vInitLedAndKeys();
+    //vInitLedAndKeys();
     sei();
 
     CLK_bTimerStart(&g_sLedTimer, CLOCK_MS_2_TICKS(1000));

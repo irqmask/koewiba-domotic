@@ -169,7 +169,6 @@ static void vInterpretMessage(sBus_t* psBus, uint8_t* puMsg, uint8_t uMsgLen, ui
             SLEEP_PinChange2_Disable();
             break;
         default:
-            BUS_bSendAcknowledge(psBus, uSender);
             break;
         }
     }

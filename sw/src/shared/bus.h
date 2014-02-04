@@ -37,10 +37,13 @@
  #define BUS_PCBCONFIG      1
  #define BUS_DDR_ENASND     DDRD
  #define BUS_PORT_ENASND    PORTD
- #define BUS_ENASND         PD2
+ #define BUS_ENASND         PD4
+ #define BUS_TXRX_COMBINED  1
  #define BUS_DDR_DISRCV     DDRD
  #define BUS_PORT_DISRCV    PORTD
- #define BUS_DISRCV         PD3
+ #define BUS_DISRCV         PD5
+ #define LED_ERROR_ON
+ #define LED_ERROR_OFF
 #endif
 /**
  * @}

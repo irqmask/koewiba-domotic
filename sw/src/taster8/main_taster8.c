@@ -28,7 +28,6 @@
 // --- Local variables ---------------------------------------------------------
 
 static sBus_t      g_sBus;
-static sClkTimer_t g_sLedTimer;
 
 // --- Global variables --------------------------------------------------------
 
@@ -110,7 +109,7 @@ static void vInterpretMessage(sBus_t* psBus, uint8_t* puMsg, uint8_t uMsgLen, ui
 
 int main(void)
 {
-	uint8_t light = 0, oldbutton = 0;
+	uint8_t light = 0, regidx = 0, buttons = 0, oldbuttons = 0, temp = 0;
     uint8_t msglen = 0;
     uint8_t msg[BUS_MAXMSGLEN];
     uint16_t sender = 0;
@@ -127,13 +126,13 @@ int main(void)
     IO_vInitialize();
     CLK_vInitialize();
 
-    BUS_vConfigure(&g_sBus, 0x0A); // configure a bus node with address 2
+    REG_vSetU16Register(MOD_eReg_ModuleID, 6);
+
+    BUS_vConfigure(&g_sBus, REG_uGetU16Register(MOD_eReg_ModuleID));
     BUS_vInitialize(&g_sBus, 0);// initialize bus on UART 0
 
     vInitLedAndKeys();
     sei();
-
-    CLK_bTimerStart(&g_sLedTimer, CLOCK_MS_2_TICKS(1000));
 
     while (1) {
         // check for message and read it
@@ -143,31 +142,28 @@ int main(void)
             }
         }
         // check button
-        if ((PIND & BTN_TEST) ^ oldbutton) {
-            oldbutton = PIND & BTN_TEST;
-            if (oldbutton != 0) {
-                light++;
-                if (light > 7) light = 0;
+        buttons = PIND & (BTN_TEST | BTN_EXP);
+        temp = buttons ^ oldbuttons;
+        oldbuttons = buttons;
+        if (buttons & BTN_TEST && temp & BTN_TEST) {
+            regidx++;
+            if (regidx > 7) regidx = 0;
 
-                msg[0] = CMD_eRequestRegister;
-                msg[1] = registers[light];
-                msglen = 2;
-                BUS_bSendMessage(&g_sBus, 0x0E, msglen, msg);
-            }
+            msg[0] = CMD_eRequestRegister;
+            msg[1] = registers[regidx];
+            msglen = 2;
+            BUS_bSendMessage(&g_sBus, 0x0E, msglen, msg);
         }
-        else if ((PIND & BTN_EXP) ^ oldbutton) {
-            oldbutton = PIND & BTN_EXP;
-            if (oldbutton != 0) {
-                if (light)  light = 0;
-                else        light = 1;
+        else if (buttons & BTN_EXP && temp & BTN_EXP) {
+            if (light)  light = 0;
+            else        light = 1;
 
-                msg[0] = CMD_eStateBitfield;
-                msg[1] = 1;
-                msg[2] = light;
-                msg[3] = 0b00000001;
-                msglen = 4;
-                BUS_bSendMessage(&g_sBus, 0x03, msglen, msg);
-            }
+            msg[0] = CMD_eStateBitfield;
+            msg[1] = 1;
+            msg[2] = light;
+            msg[3] = 0b00000001;
+            msglen = 4;
+            BUS_bSendMessage(&g_sBus, 0x05, msglen, msg);
         }
     }
     return 0;

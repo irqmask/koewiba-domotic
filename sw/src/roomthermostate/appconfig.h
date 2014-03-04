@@ -1,5 +1,6 @@
 /**
  * @addtogroup ROOMTHERMOSTATE
+ * @addtogroup ROOMTHERMOSTATE_APPCONFIG
  * @brief Configuration of modules used in "roomthermostate" project.
  *
  * @{
@@ -74,4 +75,5 @@ typedef enum appconfig {
 // --- Global functions --------------------------------------------------------
 
 #endif /* _APPCONFIG_H_ */
+/** @} */
 /** @} */

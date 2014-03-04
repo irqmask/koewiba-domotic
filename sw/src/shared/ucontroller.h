@@ -45,9 +45,19 @@
  #define REGBIT_SPIF0           SPIF
  #define REGBIT_SPI2X0          SPI2X
 
- // Timer1
+ // Timer 0,1 and 2
+ #define REG_TIMER0_IRQMSK      TIMSK
  #define REG_TIMER1_IRQMSK      TIMSK
+ #define REG_TIMER2_IRQMSK      TIMSK
+ #define REGBIT_TIMER0_TOIE     TOIE0
+ #define REGBIT_TIMER0_OCIEA    OCIE0A
+ #define REGBIT_TIMER0_OCIEB    OCIE0B
+ #define REGBIT_TIMER1_TOIE     TOIE1
  #define REGBIT_TIMER1_OCIEA    OCIE1A
+ #define REGBIT_TIMER1_OCIEB    OCIE1B
+ #define REGBIT_TIMER2_TOIE     TOIE2
+ #define REGBIT_TIMER2_OCIEA    OCIE2A
+ #define REGBIT_TIMER2_OCIEB    OCIE2B
  
  // Signature byte addresses. TODO check for this processor!
  #define ADDR_SIGNATURE_BYTE0   0
@@ -85,9 +95,19 @@
  #define REGBIT_SPIF0           SPIF
  #define REGBIT_SPI2X0          SPI2X
  
- // Timer1
+ // Timer 0,1 and 2
+ #define REG_TIMER0_IRQMSK      TIMSK0
  #define REG_TIMER1_IRQMSK      TIMSK1
+ #define REG_TIMER2_IRQMSK      TIMSK2
+ #define REGBIT_TIMER0_TOIE     TOIE0
+ #define REGBIT_TIMER0_OCIEA    OCIE0A
+ #define REGBIT_TIMER0_OCIEB    OCIE0B
+ #define REGBIT_TIMER1_TOIE     TOIE1
  #define REGBIT_TIMER1_OCIEA    OCIE1A
+ #define REGBIT_TIMER1_OCIEB    OCIE1B
+ #define REGBIT_TIMER2_TOIE     TOIE2
+ #define REGBIT_TIMER2_OCIEA    OCIE2A
+ #define REGBIT_TIMER2_OCIEB    OCIE2B
 
  // Signature byte addresses. TODO check for this processor!
  #define ADDR_SIGNATURE_BYTE0   0
@@ -128,10 +148,20 @@
  // SPI0
  #define INTERRUPT_SPI          SPI_STC_vect
  
- // Timer1
+ // Timer 0,1 and 2
+ #define REG_TIMER0_IRQMSK      TIMSK0
  #define REG_TIMER1_IRQMSK      TIMSK1
+ #define REG_TIMER2_IRQMSK      TIMSK2
+ #define REGBIT_TIMER0_TOIE     TOIE0
+ #define REGBIT_TIMER0_OCIEA    OCIE0A
+ #define REGBIT_TIMER0_OCIEB    OCIE0B
+ #define REGBIT_TIMER1_TOIE     TOIE1
  #define REGBIT_TIMER1_OCIEA    OCIE1A
- 
+ #define REGBIT_TIMER1_OCIEB    OCIE1B
+ #define REGBIT_TIMER2_TOIE     TOIE2
+ #define REGBIT_TIMER2_OCIEA    OCIE2A
+ #define REGBIT_TIMER2_OCIEB    OCIE2B
+
  #ifdef AVRSTUDIO6
  // SPI0
  #define REG_SPCR0              SPCR0
@@ -154,7 +184,7 @@
  // SPSR
  #define REGBIT_SPIF0           SPIF
  #define REGBIT_SPI2X0          SPI2X
- #endif
+ #endif // AVRSTUDIO6
 
  // Signature byte addresses.
  #define ADDR_SIGNATURE_BYTE0   0
@@ -191,10 +221,17 @@
  // Sleepmodes
  #define INTERRUPT_PINCHANGE2   PCINT2_vect
  
- // Timer
+ // Timer 0,1 and 2
+ #define REG_TIMER0_IRQMSK      TIMSK
  #define REG_TIMER1_IRQMSK      TIMSK
+ #define REG_TIMER2_IRQMSK      TIMSK
+ #define REGBIT_TIMER0_OCIEA    OCIE0A
+ #define REGBIT_TIMER0_OCIEB    OCIE0B
  #define REGBIT_TIMER1_OCIEA    OCIE1A
- 
+ #define REGBIT_TIMER1_OCIEB    OCIE1B
+ #define REGBIT_TIMER2_OCIEA    OCIE2A
+ #define REGBIT_TIMER2_OCIEB    OCIE2B
+
 // SPI
  #define REG_SPCR0              SPCR
  #define REG_SPDR0              UDR0
@@ -214,15 +251,36 @@
     defined (__AVR_ATmega324P__) || \
     defined (__AVR_ATmega324A__) || \
     defined (__AVR_ATtiny1634__)
- #define CLOCK_TCCRA TCCR1A
- #define CLOCK_TCCRB TCCR1B
- #define CLOCKSELECT0 CS10
- #define CLOCKSELECT1 CS11
- #define CLOCKSELECT2 CS12
- #define CLOCK_OCRA_H OCR1AH
- #define CLOCK_OCRA_L OCR1AL
- #define CLOCK_OCRB_H OCR1BH
- #define CLOCK_OCRB_L OCR1BL
+ #define REG_TIMER0_TCCRA       TCCR0A
+ #define REG_TIMER0_TCCRB       TCCR0B
+ #define REG_TIMER0_TCNT        TCNT0
+ #define REG_TIMER0_OCRA        OCR0A
+ #define REG_TIMER0_OCRB        OCR0B
+ #define REGBIT_TIMER0_WGM0     WGM00
+ #define REGBIT_TIMER0_WGM1     WGM01
+ #define REGBIT_TIMER0_WGM2     WGM02
+ #define REGBIT_TIMER0_CS0      CS00
+ #define REGBIT_TIMER0_CS1      CS01
+ #define REGBIT_TIMER0_CS2      CS02
+ #define INTERRUPT_TIMER0_COMPA TIMER0_COMPA_vect
+
+ #define REG_TIMER1_TCCRA       TCCR1A
+ #define REG_TIMER1_TCCRB       TCCR1B
+ #define REG_TIMER1_TCNT        TCNT1
+ #define REG_TIMER1_OCRA        OCR1A
+ #define REG_TIMER1_OCRA_H      OCR1AH
+ #define REG_TIMER1_OCRA_L      OCR1AL
+ #define REG_TIMER1_OCRB        OCR1B
+ #define REG_TIMER1_OCRB_H      OCR1BH
+ #define REG_TIMER1_OCRB_L      OCR1BL
+ #define REGBIT_TIMER1_WGM0     WGM10
+ #define REGBIT_TIMER1_WGM1     WGM11
+ #define REGBIT_TIMER1_WGM2     WGM12
+ #define REGBIT_TIMER1_WGM3     WGM13
+ #define REGBIT_TIMER1_CS0      CS10
+ #define REGBIT_TIMER1_CS1      CS11
+ #define REGBIT_TIMER1_CS2      CS12
+ #define INTERRUPT_TIMER1_COMPA TIMER1_COMPA_vect
 #endif
 
 // --- Type definitions --------------------------------------------------------

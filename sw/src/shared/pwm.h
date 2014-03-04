@@ -45,17 +45,21 @@
  */
 #ifndef PWM_PCBCONFIG
  #define PWM_PCBCONFIG      1
- #define PWM_CHN0_PORT      g_uPort
- #define PWM_CHN1_PORT      g_uPort
- #define PWM_CHN2_PORT      g_uPort
+ #define PWM_CHN0_PORT      PORTC
+ #define PWM_CHN1_PORT      PORTC
+ #define PWM_CHN2_PORT      PORTC
 
- #define PWM_CHN0_DDR       g_uDDR
- #define PWM_CHN1_DDR       g_uDDR
- #define PWM_CHN2_DDR       g_uDDR
+ #define PWM_CHN0_DDR       DDRC
+ #define PWM_CHN1_DDR       DDRC
+ #define PWM_CHN2_DDR       DDRC
 
  #define PWM_CHN0_PIN       0
  #define PWM_CHN1_PIN       1
  #define PWM_CHN2_PIN       2
+
+ #define PWMCOUNT           REG_TIMER1_TCNT
+ #define PWMCOMPARE         REG_TIMER1_OCRA
+ #define PWM_INTERRUPT      ISR(INTERRUPT_TIMER1_COMPA)
 #endif // PWM_PCBCONFIG
 /** @} */
 

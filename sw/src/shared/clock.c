@@ -74,7 +74,7 @@ BOOL bDeregisterTimer(sClkTimer_t* psTimer)
 /**
  * Timer interrupt. Increase clock and iterate through running timers list.
  */
-ISR(TIMER1_COMPA_vect)
+ISR(INTERRUPT_TIMER0_COMPA)
 {
     uint8_t ii;
 
@@ -102,17 +102,19 @@ void CLK_vInitialize(void)
         g_asRunningTimers[ii] = NULL;
     }
 
-    // initialize timer interrupt every 10th second (fOc = 10)
-    //                      F_CPU
-    // fIrq = 2 * fOC  = ------------
-    //                    N * (OC+1)
-    CLOCK_TCCRA = 0;
-    CLOCK_TCCRB &= ~((1<<CLOCKSELECT2) | (1<<WGM13));
-    CLOCK_TCCRB |= ((1<<CLOCKSELECT1) | (1<<CLOCKSELECT0)); // set prescaler to 1/64 (N=64)
-    CLOCK_TCCRB |= (1<<WGM12);                                                  // CTC mode (clear timer on compare match)
-    CLOCK_OCRA_H = (F_CPU/(64*CLOCK_TICKS_PER_SECOND) - 1) >> 8;
-    CLOCK_OCRA_L = (F_CPU/(64*CLOCK_TICKS_PER_SECOND) - 1) & 0x00FF;
-    REG_TIMER1_IRQMSK |= (1<<REGBIT_TIMER1_OCIEA); // enable OutputCompareMatchA interrupt
+    // initialize timer interrupt every 1/100th second (fOc = 50Hz)
+    //                      F_CPU          7372800Hz
+    // fIrq = 2 * fOC  = ------------ = --------------- = 100Hz
+    //                    N * (OC+1)     1024 * (71+1)
+    //
+    REG_TIMER0_OCRA = 71;
+    // No output waveform generation, CTC mode,
+    // select prescaler 1024 CS2..0 = 0b101
+    REG_TIMER0_TCCRA = (1<<REGBIT_TIMER0_WGM1);
+    REG_TIMER0_TCCRB = (1<<REGBIT_TIMER0_CS2 | 1<<REGBIT_TIMER0_CS0);
+
+    // enable OutputCompareMatchA interrupt
+    REG_TIMER0_IRQMSK |= (1<<REGBIT_TIMER0_OCIEA);
 }
 
 /**
@@ -127,11 +129,11 @@ void CLK_vControl(BOOL start)
 
 	if(start){
 		if (0==tccr1b) return;
-		CLOCK_TCCRB = tccr1b;
+		REG_TIMER0_TCCRB = tccr1b;
 	}
 	else{
-		tccr1b = CLOCK_TCCRB;
-		CLOCK_TCCRB &= ~((1<<CS12) | (1<<CS11) | (1<<CS10));
+		tccr1b = REG_TIMER0_TCCRB;
+		REG_TIMER0_TCCRB &= ~((1<<REGBIT_TIMER0_CS2) | (1<<REGBIT_TIMER0_CS1) | (1<<REGBIT_TIMER0_CS0));
 	}
 }
 

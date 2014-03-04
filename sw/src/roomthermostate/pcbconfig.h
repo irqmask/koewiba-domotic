@@ -1,4 +1,5 @@
 /**
+ * @addtogroup ROOMTHERMOSTATE
  * @addtogroup ROOMTHERMOSTATE_PCBCONFIG
  * @brief PCB configuration of the "roomthermostate" application.
  *
@@ -33,7 +34,7 @@
 #define DISP_PORT_LED  PORTD
 //! Defines the LED pin.
 #define DISP_LED       PD7
- 
+
 #define DISP_ST7565_PCBCONFIG  1
 //! Defines the DDR of a port which contains the slave select signal of the
 //! display.
@@ -54,13 +55,13 @@
 #define DISP_A0           PD6
 //! Defines the reset pin
 #define DISP_RES          PD5
- 
+
 #define UART_APPCONFIG 1
 #define  UART_WITH_BLOCKING 1
 #define UART_WITH_IRQ          1
 #define UART_RECV_QUEUE_SIZE   4  //!< Size of the UART recv-queue.
 #define UART_SEND_QUEUE_SIZE   4  //!< Size of the UART send-queue.
-#undef  UART_AUTOCR                //!< Don't send a CR when a newline 
+#undef  UART_AUTOCR                //!< Don't send a CR when a newline
 
 // --- Type definitions --------------------------------------------------------
 
@@ -77,4 +78,5 @@
 // --- Global functions --------------------------------------------------------
 
 #endif // _PCBCONFIG_H_
+/** @} */
 /** @} */

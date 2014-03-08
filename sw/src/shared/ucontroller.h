@@ -66,23 +66,23 @@
 
 #elif defined (__AVR_ATmega88__) || defined (__AVR_ATmega88A__) || defined (__AVR_ATmega88P__)
 // UART
- #define REGISTER_UCSRA         UCSR0A
- #define REGISTER_UCSRB         UCSR0B
- #define REGISTER_UCSRC         UCSR0C
- #define REGISTER_UDR           UDR0
- #define REGISTER_UBRRH         UBRR0H
- #define REGISTER_UBRRL         UBRR0L
- #define REGBIT_RXCIE           RXCIE0
- #define REGBIT_UDRIE           UDRIE0
- #define REGBIT_TXCIE           TXCIE0
- #define REGBIT_RXEN            RXEN0
- #define REGBIT_TXEN            TXEN0
- #define REGBIT_FE              FE0
- #define INTERRUPT_USART_RXC    USART_RX_vect
- #define INTERRUPT_USART_UDRE   USART_UDRE_vect
- #define INTERRUPT_UART_TRANS   USART_TX_vect
- #define INTERRUPT_PINCHANGE2   PCINT2_vect
- #define INTERRUPT_SPI          SPI_STC_vect
+ #define REGISTER_UCSRA0         UCSR0A
+ #define REGISTER_UCSRB0         UCSR0B
+ #define REGISTER_UCSRC0         UCSR0C
+ #define REGISTER_UDR0           UDR0
+ #define REGISTER_UBRRH0         UBRR0H
+ #define REGISTER_UBRRL0         UBRR0L
+ #define REGBIT_RXCIE            RXCIE0
+ #define REGBIT_UDRIE            UDRIE0
+ #define REGBIT_TXCIE            TXCIE0
+ #define REGBIT_RXEN             RXEN0
+ #define REGBIT_TXEN             TXEN0
+ #define REGBIT_FE               FE0
+ #define INTERRUPT_USART_RXC0    USART_RX_vect
+ #define INTERRUPT_USART_UDRE0   USART_UDRE_vect
+ #define INTERRUPT_UART_TRANS0   USART_TX_vect
+ #define INTERRUPT_PINCHANGE2    PCINT2_vect
+ #define INTERRUPT_SPI           SPI_STC_vect
 
 // SPI
  #define REG_SPCR0              SPCR
@@ -116,7 +116,7 @@
  #define SIGRD 5 // workaround for missing define in avr-headers
 
 #elif defined (__AVR_ATmega324P__) || defined (__AVR_ATmega324A__)
- // definition of prozessor depending global settings
+ // definition of processor depending global settings
  // TODO CV: this part can be ported maybe to a makefile include
  #define STARTADDR_APPVECTORS   0x0000
  #define STARTADDR_APPLICATION  0x003E
@@ -205,19 +205,48 @@
  #define REGISTER_UCSRA         UCSR0A
  #define REGISTER_UCSRB         UCSR0B
  #define REGISTER_UCSRC         UCSR0C
+ #define REGISTER_UCSRA0        UCSR0A
+ #define REGISTER_UCSRB0        UCSR0B
+ #define REGISTER_UCSRC0        UCSR0C
+ #define REGISTER_UCSRA1        UCSR1A
+ #define REGISTER_UCSRB1        UCSR1B
+ #define REGISTER_UCSRC1        UCSR1C
  #define REGISTER_UDR           UDR0
+ #define REGISTER_UDR0          UDR0
+ #define REGISTER_UDR1          UDR1
  #define REGISTER_UBRRH         UBRR0H
  #define REGISTER_UBRRL         UBRR0L
+ #define REGISTER_UBRRH0        UBRR0H
+ #define REGISTER_UBRRL0        UBRR0L
+ #define REGISTER_UBRRH1        UBRR1H
+ #define REGISTER_UBRRL1        UBRR1L
  #define REGBIT_RXCIE           RXCIE0
+ #define REGBIT_RXCIE0          RXCIE0
+ #define REGBIT_RXCIE1          RXCIE1
  #define REGBIT_UDRIE           UDRIE0
+ #define REGBIT_UDRIE0          UDRIE0
+ #define REGBIT_UDRIE1          UDRIE1
  #define REGBIT_TXCIE           TXCIE0
+ #define REGBIT_TXCIE0          TXCIE0
+ #define REGBIT_TXCIE1          TXCIE1
  #define REGBIT_RXEN            RXEN0
+ #define REGBIT_RXEN0           RXEN0
+ #define REGBIT_RXEN1           RXEN1
  #define REGBIT_TXEN            TXEN0
+ #define REGBIT_TXEN0           TXEN0
+ #define REGBIT_TXEN1           TXEN1
  #define REGBIT_FE              FE0
+ #define REGBIT_FE0             FE0
+ #define REGBIT_FE1             FE1
  #define INTERRUPT_USART_RXC    USART0_RX_vect
+ #define INTERRUPT_USART_RXC0   USART0_RX_vect
+ #define INTERRUPT_USART_RXC1   USART1_RX_vect
  #define INTERRUPT_USART_UDRE   USART0_UDRE_vect
+ #define INTERRUPT_USART_UDRE0  USART0_UDRE_vect
+ #define INTERRUPT_USART_UDRE1  USART1_UDRE_vect
  #define INTERRUPT_UART_TRANS   USART0_TX_vect
-
+ #define INTERRUPT_UART_TRANS0  USART0_TX_vect
+ #define INTERRUPT_UART_TRANS1  USART1_TX_vect
  // Sleepmodes
  #define INTERRUPT_PINCHANGE2   PCINT2_vect
  

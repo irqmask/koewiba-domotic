@@ -16,6 +16,7 @@
 #include <avr/interrupt.h>
 #include "ucontroller.h"
 #include "bus_intern.h"
+#include "pcbconfig.h"
 
 // --- Switches ----------------------------------------------------------------
 
@@ -99,6 +100,7 @@ inline void IR_PinChange0_Disable(void)
 // --- Local variables ---------------------------------------------------------
 
 sBusPhy_t* g_UART0Phy = NULL;
+sBusPhy_t* g_UART1Phy = NULL;
 
 // --- Global variables --------------------------------------------------------
 
@@ -107,16 +109,16 @@ sBusPhy_t* g_UART0Phy = NULL;
 // --- Local functions ---------------------------------------------------------
 
 /**
- * Received byte interrupt.
+ * Received byte interrupt 0.
  */
-ISR(INTERRUPT_USART_RXC)
+ISR(INTERRUPT_USART_RXC0)
 {
     uint8_t     data, fe;
     sBusRec_t   *buffer = &g_UART0Phy->sRecvBuf;
 
-    fe = (REGISTER_UCSRA & (1<<REGBIT_FE));
+    fe = (REGISTER_UCSRA0 & (1<<REGBIT_FE));
     // read data to clear interrupt flag
-    data = REGISTER_UDR;
+    data = REGISTER_UDR0;
 
     // framing error ?
     if(0 != fe) {
@@ -126,20 +128,20 @@ ISR(INTERRUPT_USART_RXC)
     if (buffer->uWritePos == (buffer->uReadPos-1+sizeof(buffer->auBuf)) % (sizeof(buffer->auBuf))) return;
     buffer->auBuf[buffer->uWritePos] = data;
     buffer->uWritePos = (buffer->uWritePos+1) % sizeof(buffer->auBuf);
-    if (fe) REGISTER_UCSRA &= ~(1<<REGBIT_FE); // Reset FrameError-Flag
+    if (fe) REGISTER_UCSRA0 &= ~(1<<REGBIT_FE); // Reset FrameError-Flag
     g_UART0Phy->uFlags |= e_uartrxflag;
 }
 
 /**
- * Data register empty interrupt.
+ * Data register empty interrupt 0.
  */
-ISR(INTERRUPT_USART_UDRE)
+ISR(INTERRUPT_USART_UDRE0)
 {
 	if (g_UART0Phy->uCurrentBytesToSend > 1) {
-    	REGISTER_UDR = *++g_UART0Phy->puSendPtr;
+    	REGISTER_UDR0 = *++g_UART0Phy->puSendPtr;
         g_UART0Phy->uCurrentBytesToSend--;
     } else {
-        REGISTER_UCSRB &= ~(1<<REGBIT_UDRIE);
+        REGISTER_UCSRB0 &= ~(1<<REGBIT_UDRIE);
         g_UART0Phy->uCurrentBytesToSend = 0;
     }
 }
@@ -147,7 +149,7 @@ ISR(INTERRUPT_USART_UDRE)
 /**
  * Transmit complete interrupt
  */
-ISR(INTERRUPT_UART_TRANS)
+ISR(INTERRUPT_UART_TRANS0)
 {
     BUS__vPhyActivateSender(g_UART0Phy, FALSE);
 #ifndef BUS_TXRX_COMBINED
@@ -156,6 +158,56 @@ ISR(INTERRUPT_UART_TRANS)
     g_UART0Phy->uFlags &= ~e_uarttxflag;
 
 }
+
+#if defined (__AVR_ATtiny1634__)
+/**
+ * Received byte interrupt 1.
+ */
+ISR(INTERRUPT_USART_RXC1)
+{
+    uint8_t     data, fe;
+    sBusRec_t   *buffer = &g_UART1Phy->sRecvBuf;
+
+    fe = (REGISTER_UCSRA1 & (1<<REGBIT_FE));
+    // read data to clear interrupt flag
+    data = REGISTER_UDR1;
+
+    // framing error ?
+    if(0 != fe) {
+        g_UART1Phy->uFlags |= e_uartrxerrflag;
+        return;
+    }
+    if (buffer->uWritePos == (buffer->uReadPos-1+sizeof(buffer->auBuf)) % (sizeof(buffer->auBuf))) return;
+    buffer->auBuf[buffer->uWritePos] = data;
+    buffer->uWritePos = (buffer->uWritePos+1) % sizeof(buffer->auBuf);
+    if (fe) REGISTER_UCSRA1 &= ~(1<<REGBIT_FE); // Reset FrameError-Flag
+    g_UART1Phy->uFlags |= e_uartrxflag;
+}
+
+/**
+ * Data register empty interrupt 0.
+ */
+ISR(INTERRUPT_USART_UDRE1)
+{
+	if (g_UART1Phy->uCurrentBytesToSend > 1) {
+    	REGISTER_UDR = *++g_UART1Phy->puSendPtr;
+        g_UART1Phy->uCurrentBytesToSend--;
+    } else {
+        REGISTER_UCSRB &= ~(1<<REGBIT_UDRIE);
+        g_UART1Phy->uCurrentBytesToSend = 0;
+    }
+}
+
+/**
+ * Transmit complete interrupt
+ */
+ISR(INTERRUPT_UART_TRANS1)
+{
+    BUS__vPhyActivateSender(g_UART1Phy, FALSE);
+    BUS__vPhyActivateReceiver(g_UART1Phy, TRUE);
+    g_UART1Phy->uFlags &= ~e_uarttxflag;
+}
+#endif
 
 // --- Module global functions -------------------------------------------------
 
@@ -175,14 +227,27 @@ void BUS__vPhyInitialize(sBusPhy_t* psPhy, uint8_t uUart)
     if (psPhy->uUart == 0) {
         g_UART0Phy = psPhy;
         // initialize UART
-        REGISTER_UBRRH = UBRRVALH;
-        REGISTER_UBRRL = UBRRVALL;
-        REGISTER_UCSRB |= ((1<<REGBIT_RXCIE) | (0<<REGBIT_UDRIE) | (1<<REGBIT_TXCIE) | (1<<REGBIT_RXEN) | (1<<REGBIT_TXEN));
-        BUS_DDR_ENASND |= (1<<BUS_ENASND);
-#ifndef BUS_TXRX_COMBINED
-        BUS_DDR_DISRCV |= (1<<BUS_DISRCV);
-#endif
+        REGISTER_UBRRH0  = UBRRVALH;
+        REGISTER_UBRRL0  = UBRRVALL;
+        REGISTER_UCSRB0 |= ((1<<REGBIT_RXCIE) | (0<<REGBIT_UDRIE) | (1<<REGBIT_TXCIE) | (1<<REGBIT_RXEN) | (1<<REGBIT_TXEN));
+        BUS_DDR_ENASND0 |= (1<<BUS_ENASND0);
+    #ifdef TXRXEN0_SEPERATE
+            BUS_DDR_DISRCV0 |= (1<<BUS_DISRCV0);
+    #endif
+     }
+#if defined (__AVR_ATtiny1634__)
+    else if (psPhy->uUart == 1) {
+        g_UART0Phy = psPhy;
+        // initialize UART
+        REGISTER_UBRRH1  = UBRRVALH;
+        REGISTER_UBRRL1  = UBRRVALL;
+        REGISTER_UCSRB1 |= ((1<<REGBIT_RXCIE) | (0<<REGBIT_UDRIE) | (1<<REGBIT_TXCIE) | (1<<REGBIT_RXEN) | (1<<REGBIT_TXEN));
+        BUS_DDR_ENASND1 |= (1<<BUS_ENASND1);
+    #ifdef TXRXEN1_SEPERATE
+            BUS_DDR_DISRCV1 |= (1<<BUS_DISRCV1);
+    #endif
     }
+#endif
 
     // sender is initial off, receiver is always on.
     BUS__vPhyActivateSender(psPhy, FALSE);
@@ -200,18 +265,19 @@ void BUS__vPhyInitialize(sBusPhy_t* psPhy, uint8_t uUart)
  */
 void BUS__vPhyActivateSender(sBusPhy_t* psPhy, BOOL bActivate)
 {
-    if (bActivate) {
-#ifndef BUS_TXRX_COMBINED
-        if(!sw_recvlisten) BUS__vPhyActivateReceiver(psPhy, FALSE);
-#endif
-        BUS_PORT_ENASND |= (1<<BUS_ENASND);
+    if((!sw_recvlisten) && bActivate) BUS__vPhyActivateReceiver(psPhy, FALSE);
+    if     (0==psPhy->uUart) {
+        if (bActivate)  BUS_PORT_ENASND0 |=  (1<<BUS_ENASND0);
+        else            BUS_PORT_ENASND0 &= ~(1<<BUS_ENASND0);
     }
-    else {
-        BUS_PORT_ENASND &= ~(1<<BUS_ENASND);
-#ifndef BUS_TXRX_COMBINED
-        BUS__vPhyActivateReceiver(psPhy, TRUE);
-#endif
+#ifdef BUS_PORT_ENASND1
+    else if(1==psPhy->uUart) {
+        if (bActivate)  BUS_PORT_ENASND1 |=  (1<<BUS_ENASND1);
+        else            BUS_PORT_ENASND1 &= ~(1<<BUS_ENASND1);
     }
+#endif
+
+    if((!sw_recvlisten) && !bActivate) BUS__vPhyActivateReceiver(psPhy, TRUE);
 }
 
 /**
@@ -221,17 +287,21 @@ void BUS__vPhyActivateSender(sBusPhy_t* psPhy, BOOL bActivate)
  * @param[in] bActivate
  * @returns TRUE: activate receiver, FALSE: deactivate receiver.
  */
-#ifndef BUS_TXRX_COMBINED
 void BUS__vPhyActivateReceiver(sBusPhy_t* psPhy, BOOL bActivate)
 {
-    if (bActivate) {
-        BUS_PORT_DISRCV &= ~(1<<BUS_DISRCV);
+#ifndef TXRXEN0_SEPERATE
+    if      (0 == psPhy->uUart) {
+        if (bActivate) BUS_PORT_DISRCV0 &= ~(1<<BUS_DISRCV0);
+        else           BUS_PORT_DISRCV0 |=  (1<<BUS_DISRCV0);
     }
-    else {
-        BUS_PORT_DISRCV |= (1<<BUS_DISRCV);
-    }
-}
 #endif
+#ifdef TXRXEN1_SEPERATE
+    else if (1 == psPhy->uUart) {
+        if (bActivate) BUS_PORT_DISRCV1 &= ~(1<<BUS_DISRCV1);
+        else           BUS_PORT_DISRCV1 |=  (1<<BUS_DISRCV1);
+    }
+#endif
+}
 
 /**
  * Send given number of data on the bus.
@@ -253,8 +323,8 @@ BOOL BUS__bPhySend(sBusPhy_t* psPhy, const uint8_t* puMsg, uint8_t uLen)
     psPhy->puSendPtr = puMsg;
     if (psPhy->uUart == 0) {
         BUS__vPhyActivateSender(psPhy, TRUE);
-        REGISTER_UDR = *psPhy->puSendPtr;   // send first byte
-        REGISTER_UCSRB |=  (1<<REGBIT_UDRIE); // enable data register empty interrupt
+        REGISTER_UDR0 = *psPhy->puSendPtr;   // send first byte
+        REGISTER_UCSRB0 |=  (1<<REGBIT_UDRIE); // enable data register empty interrupt
     }
     return TRUE;
 }

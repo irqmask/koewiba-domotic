@@ -218,6 +218,158 @@ static BOOL bReceive(sBus_t* psBus)
     return bytereceived;
 }
 
+
+// Receive and interpret data.
+static BOOL bHubReceive(sBus_t* psBus)
+{
+    uint16_t crc;
+    uint8_t u;
+    BOOL    bytereceived;
+
+    do {
+        if (!(bytereceived = BUS__bPhyDataReceived(&psBus->sPhy)) || psBus->bMsgReceived) {
+            break; // No byte received or message not retrieved.
+        }
+        BUS__bPhyReadByte(&psBus->sPhy, &u);
+
+        // 1. byte: check sync byte
+        if (psBus->sRecvMsg.uOverallLength == 0) {
+            if (u != BUS_SYNCBYTE) {
+                vResetBus(psBus);
+                break; // not the sync byte, wait for next byte
+            }
+
+        // 2. byte: check token byte
+        } else if (psBus->sRecvMsg.uOverallLength == 1) {
+            // token received?
+            if (u & TOKENBIT) {
+                // is it me?
+                if ((u & ADDRMASK) == (psBus->sCfg.uOwnNodeAddress & 0x007f)) {
+                    psBus->eState = eBus_GotToken;
+                } else {
+                    psBus->eState = eBus_Idle;
+                }
+                psBus->sRecvMsg.uOverallLength = 0;
+                psBus->sRecvMsg.uLength = 0;
+                break;
+            }
+            else {
+                // message received. save sender-address lower byte
+                psBus->sRecvMsg.uSender = u;
+                psBus->eState = eBus_ReceivingActive;
+            }
+        }
+
+        // active receiving state, receive and check message
+        // and then go back to eBus_Idle state.
+        if (psBus->eState == eBus_ReceivingActive) {
+            // 3. byte: LE - Length of message from AR to CRCL
+            if (psBus->sRecvMsg.uOverallLength == 2) {
+                // check correctness of length
+                if ((0==u)) {
+                    psBus->eState = eBus_Idle;
+                    psBus->sRecvMsg.uOverallLength = 0;
+#ifdef BUS_SCHEDULER
+                    psBus->bSchedMsgReceived = TRUE;
+#endif
+                    break;
+                }
+                else if (u > BUS_MAXBIGMSGLEN) {
+                    // length is zero or length is too big
+                    vResetBus(psBus); // wait for next message on bus
+                    break;
+                }
+                psBus->sRecvMsg.uLength = u;
+
+            // 4. byte: AR - Address receiver 7bit
+            } else if (psBus->sRecvMsg.uOverallLength == 3) {
+                // check correctness of receiver address
+                if (u & TOKENBIT) {
+                    // bad receiver address. valid range is 0x00..0x7F
+                    vResetBus(psBus);
+                    break;
+                }
+                psBus->sRecvMsg.uReceiver = u;
+#ifndef BUS_HUB
+                // hello, is it me you are looking for (or broadcast-message)?
+                if ((BUS_BRDCSTADR == u) || (u == (psBus->sCfg.uOwnNodeAddress & 0x007f))) {
+                    // nothing more to do here.
+                } else {
+                    // we are not interested in this message
+                    psBus->eState = eBus_ReceivingPassive;
+                }
+#endif
+
+            // 5. byte: EA - Extended address 4bit sender in higher nibble, 4bit receiver in lower nibble.
+            } else if (psBus->sRecvMsg.uOverallLength == 4) {
+                psBus->sRecvMsg.uSender |= (((uint16_t)u & 0x00F0) << 4);
+                psBus->sRecvMsg.uReceiver |= (((uint16_t)u & 0x000F) << 8);
+
+#ifdef BUS_HUB
+                // TODO check receiver address again
+                if((psBus->sRecvMsg.uReceiver != psBus->sCfg.uOwnExtAddress) && (psBus->sRecvMsg.uReceiver != 0x00)) {
+                    // we are not interested in this message
+                    psBus->eState = eBus_ReceivingPassive;
+                }
+#endif
+            // receive data (5th byte till length + 3(SY+AS+LE) - 2(CRC))
+            } else if (psBus->sRecvMsg.uOverallLength > 4) {
+                if (psBus->sRecvMsg.uOverallLength == (psBus->sRecvMsg.uLength + 3 - 2)) {
+                    psBus->sRecvMsg.uCRC = u << 8;
+                    // N th byte: CRCL - Low byte of 16bit CRC
+
+                } else if (psBus->sRecvMsg.uOverallLength == (psBus->sRecvMsg.uLength + 3 - 1)) {
+                    psBus->sRecvMsg.uCRC |= u;
+                    crc = CRC_uCalc16(&psBus->sRecvMsg.auBuf[0], psBus->sRecvMsg.uLength + 3 - 2);
+                    if (crc == psBus->sRecvMsg.uCRC) {
+                        LED_ERROR_OFF;
+                        psBus->bMsgReceived = TRUE;
+                        if(BUS_BRDCSTADR != psBus->sRecvMsg.uReceiver) {
+                            // Send ACK if it was not a broadcast-message.
+                            vSendAck(psBus);
+                        }
+#ifdef BUS_SCHEDULER
+                        psBus->bSchedMsgReceived = TRUE;
+#endif
+            			//psBus->eState = eBus_GotMessage;
+            			psBus->sRecvMsg.uOverallLength = 0;
+            			break;
+            		} else {
+            			// invalid length of message
+                		LED_ERROR_ON;
+            			vResetBus(psBus);
+            			break;
+            		}
+
+                } else if(psBus->sRecvMsg.uOverallLength >= psBus->sRecvMsg.uLength + 3) {
+                    // invalid length of message
+                    vResetBus(psBus);
+                    break;
+                }
+            }
+        }
+
+        psBus->sRecvMsg.auBuf[psBus->sRecvMsg.uOverallLength] = u;
+        psBus->sRecvMsg.uOverallLength++;
+
+        // passive receiving state, only count bytes till the end of the message
+        // and then go back to eBus_Idle state.
+        if (psBus->eState == eBus_ReceivingPassive) {
+            if (psBus->sRecvMsg.uOverallLength >= (psBus->sRecvMsg.uLength + 3 - 1)) {
+#ifdef BUS_SCHEDULER
+                psBus->bSchedMsgReceived = TRUE;
+#endif
+                vResetBus(psBus);
+                CLK_bTimerStart(&psBus->sAckTimeout, CLOCK_MS_2_TICKS(BUS_ACKTIMEOUT));
+                psBus->eState = eBus_AckWaitReceiving;
+            }
+        }
+
+    } while ( FALSE );
+
+    return bytereceived;
+}
+
 // Check if data had to be sent or otherwise send empty message.
 static void vInitiateSending(sBus_t* psBus)
 {
@@ -406,9 +558,6 @@ void BUS_vConfigure(sBus_t* psBus, uint16_t uNodeAddress)
 {
     psBus->sCfg.uOwnNodeAddress = uNodeAddress;
     vCreateEmptyMessage(psBus);
-#ifdef BUS_SCHEDULER
-    BUS__vSchedulConfigure(psBus);
-#endif
 }
 
 /**
@@ -421,11 +570,7 @@ void BUS_vInitialize(sBus_t* psBus, uint8_t uUart)
 {
     psBus->eState = eBus_Idle;
     psBus->sSendMsg.uRetries = 0;
-#ifdef BUS_SCHEDULER
-    psBus->eModuleState = eMod_Discovery;
-#else
     psBus->eModuleState = eMod_Running;
-#endif
     BUS__vPhyInitialize(&psBus->sPhy, uUart);
 }
 

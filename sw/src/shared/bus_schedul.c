@@ -39,27 +39,27 @@
  *
  * @returns TRUE if node has been successfully added, otherwise false.
  */
-BOOL BUS_bSchedulAddNode(sBus_t* psBus, uint8_t uNodeAddress)
+BOOL BUS_bSchedulAddNode(sSched_t* psSched, uint8_t uNodeAddress)
 {
     uint8_t ii    = 0;
     BOOL	found = FALSE;
 
     // search node in emptynode-list and remove it.
     for (ii=0; ii<BUS_MAXNODES; ii++) {
-        if (psBus->asDiscoveryList[ii].uAddress == uNodeAddress) {
+        if (psSched->asDiscoveryList[ii].uAddress == uNodeAddress) {
         	found = TRUE;
         }
         else if (found) { // shift following elements to avoid gaps in list
-        	psBus->asDiscoveryList[ii-1].uAddress = psBus->asDiscoveryList[ii].uAddress;
-        	psBus->asDiscoveryList[ii-1].uErrCnt  = psBus->asDiscoveryList[ii].uErrCnt;
+            psSched->asDiscoveryList[ii-1].uAddress = psSched->asDiscoveryList[ii].uAddress;
+            psSched->asDiscoveryList[ii-1].uErrCnt  = psSched->asDiscoveryList[ii].uErrCnt;
         }
     }
     if (found) { // add node to nodelist
-		psBus->asDiscoveryList[BUS_MAXNODES-1].uAddress = 0; // delete last field, others were already shifted
+        psSched->asDiscoveryList[BUS_MAXNODES-1].uAddress = 0; // delete last field, others were already shifted
 		for (ii=0; ii<BUS_MAXNODES; ii++) {
-			if (psBus->asNodeList[ii].uAddress == 0) {
-				psBus->asNodeList[ii].uAddress = uNodeAddress;
-				psBus->asNodeList[ii].uErrCnt = 0;
+			if (psSched->asNodeList[ii].uAddress == 0) {
+			    psSched->asNodeList[ii].uAddress = uNodeAddress;
+			    psSched->asNodeList[ii].uErrCnt = 0;
 				break;
 			}
 		}
@@ -75,7 +75,7 @@ BOOL BUS_bSchedulAddNode(sBus_t* psBus, uint8_t uNodeAddress)
  *
  * @returns TRUE if node has been successfully removed, otherwise false.
  */
-BOOL BUS_bSchedulRemNode(sBus_t* psBus, uint8_t uNodeAddress)
+BOOL BUS_bSchedulRemNode(sSched_t* psBus, uint8_t uNodeAddress)
 {
     uint8_t ii    = 0;
     BOOL	found = FALSE;
@@ -106,16 +106,16 @@ BOOL BUS_bSchedulRemNode(sBus_t* psBus, uint8_t uNodeAddress)
 /**
  * Start sending of next token.
  */
-static BOOL bSendNextTimeSlotToken(sBus_t* psBus, BOOL bDiscovery)
+static BOOL bSendNextTimeSlotToken(sBus_t* psBus, sSched_t* psSched, BOOL bDiscovery)
 {
     sNodeInfo_t* node;
 
-    if (TRUE != bDiscovery) node = &psBus->asNodeList[psBus->uCurrentNode];
-    else 					node = &psBus->asDiscoveryList[psBus->uDiscoverNode];
+    if (TRUE != bDiscovery) node = &psSched->asNodeList[psSched->uCurrentNode];
+    else 					node = &psSched->asDiscoveryList[psSched->uDiscoverNode];
 
     if (node->uAddress != 0) {
-        psBus->auTokenMsg[1] = node->uAddress | 0x80;
-        return BUS__bPhySend(&psBus->sPhy, psBus->auTokenMsg, BUS_TOKEN_MSG_LEN);
+        psSched->auTokenMsg[1] = node->uAddress | 0x80;
+        return BUS__bPhySend(&psBus->sPhy, psSched->auTokenMsg, BUS_TOKEN_MSG_LEN);
     }
     return FALSE;
 }
@@ -123,14 +123,14 @@ static BOOL bSendNextTimeSlotToken(sBus_t* psBus, BOOL bDiscovery)
 /**
  * Count node errors.
  */
-void vNodeError(sBus_t* psBus)
+void vNodeError(sSched_t* psSched)
 {
-	if (psBus->bSchedDiscovery) return;
-	if (psBus->asNodeList[psBus->uCurrentNode].uErrCnt < 255) {
-		psBus->asNodeList[psBus->uCurrentNode].uErrCnt++;
+	if (psSched->bSchedDiscovery) return;
+	if (psSched->asNodeList[psSched->uCurrentNode].uErrCnt < 255) {
+	    psSched->asNodeList[psSched->uCurrentNode].uErrCnt++;
 		// Remove node-address from scheduling-list after max number of missing answers.
-		if(BUS_MAX_ANSWERFAILS < psBus->asNodeList[psBus->uCurrentNode].uErrCnt) {
-			BUS_bSchedulRemNode(psBus, psBus->auTokenMsg[1] & 0x7F);
+		if(BUS_MAX_ANSWERFAILS < psSched->asNodeList[psSched->uCurrentNode].uErrCnt) {
+			BUS_bSchedulRemNode(psSched, psSched->auTokenMsg[1] & 0x7F);
 		}
 	}
 }
@@ -138,11 +138,11 @@ void vNodeError(sBus_t* psBus)
 /**
  * Check if current node is the scheduler node.
  */
-BOOL bCurrNodeIsMe(sBus_t* psBus)
+BOOL bCurrNodeIsMe(sBus_t* psBus, sSched_t* psSched)
 {
     sNodeInfo_t* node;
 
-    node = &psBus->asNodeList[psBus->uCurrentNode];
+    node = &psSched->asNodeList[psSched->uCurrentNode];
 
     if (node->uAddress == psBus->sCfg.uOwnNodeAddress) {
     	return TRUE;
@@ -157,19 +157,19 @@ BOOL bCurrNodeIsMe(sBus_t* psBus)
  *
  * @param[in] psBus		Handle of the bus.
  */
-void BUS__vSchedulConfigure(sBus_t* psBus)
+void BUS_vSchedulConfigure(sSched_t* psSched)
 {
     uint8_t ii;
 
-    psBus->uCurrentNode  = 0;
-    psBus->uDiscoverNode = 0;
+    psSched->uCurrentNode  = 0;
+    psSched->uDiscoverNode = 0;
     for (ii=0; ii<BUS_MAXNODES; ii++) {
-        psBus->asNodeList[ii].uAddress = 0;
-        psBus->asNodeList[ii].uErrCnt = 0;
-		psBus->asDiscoveryList[ii].uAddress = ii+1;
+        psSched->asNodeList[ii].uAddress = 0;
+        psSched->asNodeList[ii].uErrCnt = 0;
+        psSched->asDiscoveryList[ii].uAddress = ii+1;
     }
-    psBus->auTokenMsg[0] = BUS_SYNCBYTE;
-    psBus->auTokenMsg[1] = 0;
+    psSched->auTokenMsg[0] = BUS_SYNCBYTE;
+    psSched->auTokenMsg[1] = 0;
 }
 
 // --- Global functions --------------------------------------------------------
@@ -180,7 +180,7 @@ void BUS__vSchedulConfigure(sBus_t* psBus)
  * @param[in] psBus
  * Handle of the bus.
  */
-BOOL BUS_bScheduleAndGetMessage(sBus_t* psBus)
+BOOL BUS_bScheduleAndGetMessage(sBus_t* psBus, sSched_t* psSched )
 {
 	static uint8_t 	schedloopcnt = BUS_DISCOVERYLOOPS;
     BOOL			rc 			 = FALSE;
@@ -188,23 +188,23 @@ BOOL BUS_bScheduleAndGetMessage(sBus_t* psBus)
     switch (psBus->eState) {
 
     case eBus_Idle:
-		psBus->bSchedDiscovery = FALSE;
-    	if(eMod_Discovery == psBus->eModuleState) psBus->bSchedDiscovery = TRUE;
-    	else if ((psBus->uCurrentNode == BUS_MAXNODES) || 
-                 (psBus->asNodeList[psBus->uCurrentNode].uAddress == 0)) { // if last node in active list is reached reset node-counter and switch to discovery-list
-    		psBus->uCurrentNode = 0;
-    		psBus->bSchedDiscovery = TRUE;
+        psSched->bSchedDiscovery = FALSE;
+    	if(eMod_Discovery == psBus->eModuleState) psSched->bSchedDiscovery = TRUE;
+    	else if ((psSched->uCurrentNode == BUS_MAXNODES) ||
+                 (psSched->asNodeList[psSched->uCurrentNode].uAddress == 0)) { // if last node in active list is reached reset node-counter and switch to discovery-list
+    	    psSched->uCurrentNode = 0;
+    	    psSched->bSchedDiscovery = TRUE;
     	}
 
-    	if((psBus->bSchedDiscovery) && ((psBus->uDiscoverNode == BUS_MAXNODES) || (psBus->asDiscoveryList[psBus->uDiscoverNode].uAddress == 0)))
+    	if((psSched->bSchedDiscovery) && ((psSched->uDiscoverNode == BUS_MAXNODES) || (psSched->asDiscoveryList[psSched->uDiscoverNode].uAddress == 0)))
 		{ // if last node in discovery list is reached reset node-counter
-    		psBus->uDiscoverNode = 0;
+    	    psSched->uDiscoverNode = 0;
     		if(schedloopcnt) --schedloopcnt;
     	}
 
         // send token
-        if (bSendNextTimeSlotToken(psBus, psBus->bSchedDiscovery)) {
-            CLK_bTimerStart(&psBus->sNodeAnsTimeout, CLOCK_MS_2_TICKS(30));
+    	if (bSendNextTimeSlotToken(psBus, psSched, psSched->bSchedDiscovery)) {
+    	    CLK_bTimerStart(&psSched->sNodeAnsTimeout, CLOCK_MS_2_TICKS(30));
             psBus->eState = eBus_SendingToken;
         } else LED_ERROR_ON;
         break;
@@ -212,20 +212,20 @@ BOOL BUS_bScheduleAndGetMessage(sBus_t* psBus)
     case eBus_SendingToken:
         // wait for finished token sending
         if (!BUS__bPhySending(&psBus->sPhy)) {
-        	if (bCurrNodeIsMe(psBus)) {
+        	if (bCurrNodeIsMe(psBus, psSched)) {
         		// The scheduler cannot receive its own message,
         		// so we set the state to eBus_GotToken "manually".
         	    psBus->eState = eBus_GotToken;
         	}
         	else {
         		// Token has been sent, now wait for a message.
-                psBus->bSchedWaitingForAnswer = TRUE;
+        	    psSched->bSchedWaitingForAnswer = TRUE;
                 psBus->eState = eBus_ReceivingWait;
         	}
         }
         else {
-        	if (CLK_bTimerIsElapsed(&psBus->sNodeAnsTimeout)) {
-        		vNodeError(psBus);
+        	if (CLK_bTimerIsElapsed(&psSched->sNodeAnsTimeout)) {
+        		vNodeError(psSched);
         		// return to IDLE state
         		psBus->eState = eBus_Idle;
         		LED_ERROR_ON;
@@ -245,14 +245,14 @@ BOOL BUS_bScheduleAndGetMessage(sBus_t* psBus)
     rc = BUS__bTrpSendReceive(psBus);
     if (rc) schedloopcnt = BUS_LOOPS_TILL_SLEEP;
 
-    if (psBus->bSchedWaitingForAnswer) {
+    if (psSched->bSchedWaitingForAnswer) {
     	BOOL recEnd = FALSE;
         if (psBus->bSchedMsgReceived) {
-			if (TRUE==psBus->bSchedDiscovery) {
-				if(BUS_bSchedulAddNode(psBus, psBus->auTokenMsg[1] & 0x7F)) {
-					--psBus->uDiscoverNode; // re-establish last used index, because addresses were shifted.
+			if (TRUE==psSched->bSchedDiscovery) {
+				if(BUS_bSchedulAddNode(psSched, psSched->auTokenMsg[1] & 0x7F)) {
+					--psSched->uDiscoverNode; // re-establish last used index, because addresses were shifted.
 				}
-				psBus->bSchedDiscovery = FALSE;
+				psSched->bSchedDiscovery = FALSE;
 			}
             // TODO check node ID of received message and route eventually
         	//      to other line or net
@@ -260,8 +260,8 @@ BOOL BUS_bScheduleAndGetMessage(sBus_t* psBus)
 
         }
         else {
-            if (CLK_bTimerIsElapsed(&psBus->sNodeAnsTimeout)) {
-                vNodeError(psBus);
+            if (CLK_bTimerIsElapsed(&psSched->sNodeAnsTimeout)) {
+                vNodeError(psSched);
                 // return to IDLE state
 				recEnd = TRUE;
 				if (0 == schedloopcnt) { // if schedulerloopcount has reached zero ...
@@ -276,10 +276,10 @@ BOOL BUS_bScheduleAndGetMessage(sBus_t* psBus)
         }
         if (recEnd) { // receiving finished
             psBus->bSchedMsgReceived = FALSE;
-            psBus->bSchedWaitingForAnswer = FALSE;
+            psSched->bSchedWaitingForAnswer = FALSE;
             if(eBus_AckWaitReceiving != psBus->eState) psBus->eState = eBus_Idle;
-            if(TRUE != psBus->bSchedDiscovery) 	++psBus->uCurrentNode;
-			else 								++psBus->uDiscoverNode;
+            if(TRUE != psSched->bSchedDiscovery) 	++psSched->uCurrentNode;
+			else 								    ++psSched->uDiscoverNode;
         }
     }
     return rc;

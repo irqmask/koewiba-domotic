@@ -35,13 +35,13 @@
  */
 #ifndef BUS_PCBCONFIG
  #define BUS_PCBCONFIG      1
- #define BUS_DDR_ENASND     DDRD
- #define BUS_PORT_ENASND    PORTD
- #define BUS_ENASND         PD4
- #define BUS_TXRX_COMBINED  1
- #define BUS_DDR_DISRCV     DDRD
- #define BUS_PORT_DISRCV    PORTD
- #define BUS_DISRCV         PD5
+ #define BUS_DDR_ENASND0    DDRD
+ #define BUS_PORT_ENASND0   PORTD
+ #define BUS_ENASND0        PD4
+ #define BUS_TXRX_COMBINED0 1
+ #define BUS_DDR_DISRCV0    DDRD
+ #define BUS_PORT_DISRCV0   PORTD
+ #define BUS_DISRCV0        PD5
  #define LED_ERROR_ON
  #define LED_ERROR_OFF
 #endif
@@ -112,7 +112,8 @@ typedef enum busflags {
 
 //! configuration data of the bus
 typedef struct busconfig {
-    uint16_t        uOwnNodeAddress;    //!< address of node on bus.
+    uint8_t        uOwnNodeAddress;    //!< address of node on bus.
+    uint8_t        uOwnExtAddress;     //!< extensionaddress of node on bus.
 } sBusCfg_t;
 
 typedef uint8_t auRecBuf_t[BUS_MAXBIGMSGLEN];
@@ -163,17 +164,20 @@ typedef struct nodeinfo {
 typedef struct bus {
 	eModState_t		eModuleState;					//!< current state of the module.
     eBusState_t     eState;                         //!< current state of the bus.
-    BOOL            bMsgReceived;                   //!< flag, stating that there is an unread message
     sBusCfg_t       sCfg;                           //!< configuration data.
+    BOOL            bMsgReceived;                   //!< flag, stating that there is an unread message
+    BOOL            bSchedMsgReceived;              //!< flag, if any message has been received
+    BOOL            bMsgEnd;                        //!< flag, stating that a message is completed (used by scheduler)
     sBusPhy_t       sPhy;                           //!< physical layer data.
     sRcvBusMsg_t    sRecvMsg;                       //!< contains current received message.
     sSndBusMsg_t    sSendMsg;                       //!< contains current message to be sent.
     uint8_t         auEmptyMsg[BUS_EMPTY_MSG_LEN];  //!< pre-compiled empty message.
     sClkTimer_t     sReceiveTimeout;                //!< receive timeout
     sClkTimer_t     sAckTimeout;                    //!< ack timeout
+} sBus_t;
 
-    // following data is only used by bus scheduler
-#ifdef BUS_SCHEDULER
+// following data is only used by bus scheduler
+typedef struct sched {
     sNodeInfo_t     asNodeList[BUS_MAXNODES];       //!< list of configured nodes
     sNodeInfo_t     asDiscoveryList[BUS_MAXNODES];  //!< list of empty nodes
     uint8_t         uCurrentNode;                   //!< current processed node
@@ -181,10 +185,8 @@ typedef struct bus {
     uint8_t         auTokenMsg[BUS_TOKEN_MSG_LEN];  //!< pre-compiled token message.
     BOOL            bSchedDiscovery;                //!< bus-discovery mode.
     BOOL            bSchedWaitingForAnswer;         //!< flag, if scheduler is waiting for an answer
-    BOOL            bSchedMsgReceived;              //!< flag, if any message has been received
     sClkTimer_t     sNodeAnsTimeout;                //!< node answer timeout
-#endif
-} sBus_t;
+} sSched_t;
 
 // --- Local variables ---------------------------------------------------------
 
@@ -204,6 +206,8 @@ void    BUS_vConfigure              (sBus_t*        psBus,
 void    BUS_vInitialize             (sBus_t*        psBus,
                                      uint8_t        uUart);
 
+void    BUS_vSchedulConfigure       (sSched_t*      psSched);
+
 void    BUS_vFlushBus               (sBus_t*        psBus);
 
 BOOL    BUS_bGetMessage             (sBus_t*        psBus);
@@ -222,7 +226,8 @@ BOOL    BUS_bSendAckMessage         (sBus_t*        psBus,
                                      uint16_t       uReceiver);
 
 #ifdef BUS_SCHEDULER
-BOOL    BUS_bScheduleAndGetMessage  (sBus_t*        psBus);
+BOOL    BUS_bScheduleAndGetMessage  (sBus_t*        psBus,
+                                     sSched_t*      psSched);
 void    BUS_vScheduleCheckAndSetSleep(sBus_t* psBus);
 #endif
 

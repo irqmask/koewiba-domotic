@@ -236,9 +236,12 @@ Fordert Firmwareversionsstring an.
 Gibt Firmwareversion an
 Beispiel: 0xXX, <Versionsstring max 10Byte>
 
-0x30 - Start Flash
-0x31 - Set Flash
-0x32 - End Flash
+0x30 - Upload Firmware Start Frame 
+Start Frame sendet als Antwort die aktuelle Schreibadresse, mit der der Next Frame Befehl beginnen würde.
+0x31 - Upload Firmware Next Frame
+Next Frame sendet als Antwort die aktuelle Schreibadresse, mit der der nächste Next Frame Befehl beginnen würde.
+0x32 - Upload Firmware Last Frame
+Last Frame sendet als Antwort die Schreibadresse nach Abschluss der Schreibvorgägnge und den Registerbefehl mit der CRC16 Checksumme, aus dem externen EEProm.
 
 
 Steuerkommandos (Typ 0xF0 - 0xFF)

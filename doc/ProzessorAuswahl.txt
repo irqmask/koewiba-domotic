@@ -3,9 +3,15 @@ Auswahl Prozessor
 
 Kleine Module, Gartenbewässerung, Jalosie/Markiesenaktor
 ATMEGA88
+Chipselect externes EEProm: 	
 
 Taumtemperaturregelung, Heizungssteller
 ATMEGA164 / ATMEGA324
+Chipselect externes EEProm:     PB4 (Pin 44)
 
 Router, Bus Interface-Module
 ATtiny1634
+Chipselect externes EEProm: 	PB3 (Pin 18)
+RXEN2:                          PA2
+TXEN2:                          PA5
+Zweite serielle Schnittstelle: getrennte RXEN und TXEN, damit die serielle Schnittstelle komplett deaktiviert werden kann.

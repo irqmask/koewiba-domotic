@@ -96,6 +96,8 @@ build_debug: IDENT = "Debug: $(TARGET)"
 build_debug: CFLAGS += $(CFLAGS_DEBUG)
 build_debug: BINDIR = $(BINDIR_DEBUG)
 build_debug: BUILDDIR = $(BUILDDIR_DEBUG)
+build_debug: WBINDIR = $(WBINDIR_DEBUG)
+build_debug: WBUILDDIR = $(WBUILDDIR_DEBUG)
 build_debug: LOGFILE = $(LOGFILE_DEBUG)
 build_debug: OBJFILES = $(OBJ_DEBUG)
 build_debug: ELFFILE = $(ELFFILE_DEBUG)
@@ -112,6 +114,8 @@ build_release: IDENT = "Release: $(TARGET)"
 build_release: CFLAGS += $(CFLAGS_RELEASE)
 build_release: BINDIR = $(BINDIR_RELEASE)
 build_release: BUILDDIR = $(BUILDDIR_RELEASE)
+build_release: WBINDIR = $(WBINDIR_RELEASE)
+build_release: WBUILDDIR = $(WBUILDDIR_RELEASE)
 build_release: LOGFILE = $(LOGFILE_RELEASE)
 build_release: OBJFILES = $(OBJ_RELEASE)
 build_release: ELFFILE = $(ELFFILE_RELEASE)
@@ -219,8 +223,13 @@ extcoff: $(TARGET).elf
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 directories:
+ifeq ($(OS),Windows_NT)
+	-mkdir $(WBINDIR)
+	-mkdir $(WBUILDDIR)
+else
 	@mkdir -p $(BINDIR)
 	@mkdir -p $(BUILDDIR)
+endif
 
 
 # Target: clean project.

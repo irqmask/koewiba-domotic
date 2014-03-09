@@ -361,6 +361,13 @@ PSL_ErrorCodes_e PSerLib_readBinaryData( PSerLibHandle_t io_port,
 
 
 
+PSL_ErrorCodes_e PSerLib_GetPendingBytesToRead( PSerLibHandle_t io_port, 
+                                                int*            o_bytesToRead);
+
+void PSerLib_FlushReadWrite( PSerLibHandle_t io_port);
+
+PSL_ErrorCodes_e PSerLib_setBlocking(PSerLibHandle_t  io_port,
+                                     int i_blocking);
 #ifdef __cplusplus
 }
 #endif

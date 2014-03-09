@@ -18,14 +18,14 @@
 // --- Definitions -------------------------------------------------------------
 
 #define BUS_PCBCONFIG 1
-#define BUS_DDR_ENASND  DDRD
-#define BUS_PORT_ENASND PORTD
-#define BUS_ENASND      PD2
-#define BUS_DDR_DISRCV  DDRD
-#define BUS_PORT_DISRCV PORTD
-#define BUS_DISRCV      PD3
-#define SPI_SCK_DDR     PORTC
-#define SPI_SCK_PIN     PC1
+#define BUS_DDR_ENASND0     DDRD
+#define BUS_PORT_ENASND0    PORTD
+#define BUS_ENASND0         PD2
+#define BUS_DDR_DISRCV0     DDRD
+#define BUS_PORT_DISRCV0    PORTD
+#define BUS_DISRCV0         PD3
+#define SPI_SCK_DDR         PORTC
+#define SPI_SCK_PIN         PC1
 
 // Pin assignments of board keys and LEDs
 // Port D pin assignments

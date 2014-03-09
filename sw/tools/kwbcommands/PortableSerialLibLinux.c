@@ -138,7 +138,7 @@ PSL_ErrorCodes_e PSerLib_open(const char* i_portName, PSerLibHandle_t* o_handle)
     // the other side is
     // connected (some devices
     // don�t explicitly connect)
-    O_RDWR | O_NOCTTY
+    O_RDWR | O_NOCTTY | O_NDELAY
     );
   if(pi.port == -1)
   {
@@ -382,5 +382,30 @@ PSL_ErrorCodes_e PSerLib_readBinaryData( PSerLibHandle_t io_port,
   return PSL_ERROR_none;
 }
 
+/* ------------------------------------------------------------------------- */
+/* - support functions                                                     - */
+/* ------------------------------------------------------------------------- */
 
+PSL_ErrorCodes_e PSerLib_GetPendingBytesToRead( PSerLibHandle_t io_port, 
+                                                int*            o_bytesToRead)
+{
+  ioctl(io_port->port, FIONREAD, o_bytesToRead);
+  return PSL_ERROR_none;
+}
+
+void PSerLib_FlushReadWrite( PSerLibHandle_t io_port)
+{
+  tcflush(io_port->port, TCIOFLUSH);
+}
+
+PSL_ErrorCodes_e PSerLib_setBlocking(PSerLibHandle_t  io_port,
+                                     int i_blocking)
+{
+  if (i_blocking) {
+    fcntl(io_port->port, F_SETFL, 0);
+  } else {
+    fcntl(io_port->port, F_SETFL, FNDELAY);
+  }
+  return PSL_ERROR_none;
+}
 #endif

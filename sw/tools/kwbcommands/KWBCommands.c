@@ -116,7 +116,7 @@ ThreadFunc(readerThread)
 {
     while(g_bRunning) {
 	BUSCOMM_vDoCycle();
-        SYS_vSleepMs(1);
+        //SYS_vSleepMs(1);
     }
     return 0;
 }

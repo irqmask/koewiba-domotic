@@ -34,6 +34,7 @@
 // --- Local variables ---------------------------------------------------------
 
 static sBus_t 		g_sBus;
+static sSched_t		g_sSched;
 static sClkTimer_t 	g_sLedTimer;
 
 // --- Global variables --------------------------------------------------------
@@ -75,8 +76,10 @@ int main(void)
 
     IO_vInitialize();
     CLK_vInitialize();
+    BUS_vSchedulConfigure(&g_sSched);
     BUS_vConfigure(&g_sBus, 1); // configure a bus node with address 1
     BUS_vInitialize(&g_sBus, 0);// initialize bus on UART 0
+    g_sBus.eModuleState = eMod_Discovery;
 
     //vInitLedAndKeys();
     sei();
@@ -84,7 +87,7 @@ int main(void)
     CLK_bTimerStart(&g_sLedTimer, CLOCK_MS_2_TICKS(1000));
 
     while (1) {
-    	if (BUS_bScheduleAndGetMessage(&g_sBus)) {
+    	if (BUS_bScheduleAndGetMessage(&g_sBus, &g_sSched)) {
     		if (BUS_bReadMessage(&g_sBus, &sender, &msglen, msg)) {
                 // TODO do something
     		}

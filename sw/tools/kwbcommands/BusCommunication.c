@@ -71,7 +71,7 @@ void BUSCOMM_vDoCycle(void)
         message[1] = 1;
         message[2] = g_bLight2;
         message[3] = 0b00000001;
-        if (BUS_bSendMessage(&g_sBus, 21, 4, message)) {
+        if (BUS_bSendMessage(&g_sBus, 3, 4, message)) {
             if (g_bLight2) g_bLight2 = 0; else g_bLight2 = 1;
             g_uSendFlags &= ~(1<<2);
         }
@@ -81,7 +81,7 @@ void BUSCOMM_vDoCycle(void)
         message[1] = 1;
         message[2] = g_bLight3;
         message[3] = 0b00000001;
-        if (BUS_bSendMessage(&g_sBus, 22, 4, message)) {
+        if (BUS_bSendMessage(&g_sBus, 5, 4, message)) {
             if (g_bLight3) g_bLight3 = 0; else g_bLight3 = 1;
             g_uSendFlags &= ~(1<<3);
         }

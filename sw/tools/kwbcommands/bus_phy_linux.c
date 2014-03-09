@@ -12,6 +12,9 @@
 // --- Include section ---------------------------------------------------------
 
 #include <stdio.h>
+#include <termios.h>
+#include <unistd.h>
+#include <sys/ioctl.h>
 #include "bus_intern.h"
 #include "BusCommunication.h"
 
@@ -20,8 +23,6 @@
 // --- Type definitions --------------------------------------------------------
 
 // --- Local variables ---------------------------------------------------------
-
-const char g_acText[] = "Ich sände! Kreizkruzifixnochamal!!";
 
 // --- Global variables --------------------------------------------------------
 
@@ -37,6 +38,13 @@ static void vDebugHexOutput(uint8_t uData)
     if (count >= 16) {
         count = 0;
         printf("\n");
+    }
+}
+
+static void vDebugHexOutputLen(uint8_t* puData, uint8_t uLen)
+{
+    while (uLen--) {
+        vDebugHexOutput(*puData++);
     }
 }
 
@@ -72,15 +80,16 @@ void BUS__vPhyInitialize(sBusPhy_t* psPhy, uint8_t uUart)
         } else {
             printf("setParams succeeded\n");
         }
+        if (PSerLib_setBlocking(BUSCOMM__asDevices[uUart].psHandle, 0) != PSL_ERROR_none) {
+            printf("PSerLib_setBlocking failed.\n");
+            break;
+        }
+
         // sender is initial off, receiver is always on.
         BUS__vPhyActivateSender(psPhy, FALSE);
 #ifndef BUS_TXRX_COMBINED
         BUS__vPhyActivateReceiver(psPhy, TRUE);
 #endif
-        if (PSerLib_writeBinaryData(BUSCOMM__asDevices[uUart].psHandle, 
-                                    g_acText, sizeof(g_acText), NULL) != PSL_ERROR_none) {
-            printf("writeBinaryData failed!\n");
-        }
     } while ( FALSE );
 }
 
@@ -124,24 +133,27 @@ BOOL BUS__bPhySend(sBusPhy_t* psPhy, const uint8_t* puMsg, uint8_t uLen)
 {
     BOOL rc = TRUE;
 
-    if (psPhy->uCurrentBytesToSend != 0) {
-        return FALSE;
-    }
-    psPhy->uCurrentBytesToSend = uLen;
+    //if (psPhy->uCurrentBytesToSend != 0) {
+    //    return FALSE;
+    //}
+    //psPhy->uCurrentBytesToSend = uLen;
     psPhy->uFlags |= e_uarttxflag;
-    psPhy->puSendPtr = puMsg;
+    //psPhy->puSendPtr = puMsg;
 
     BUS__vPhyActivateSender(psPhy, TRUE);
     if (PSerLib_writeBinaryData(BUSCOMM__asDevices[psPhy->uUart].psHandle,
-                                puMsg, uLen, NULL) != PSL_ERROR_none) {
+                                puMsg, uLen, NULL) == PSL_ERROR_none) {
+        psPhy->uFlags &= ~e_uarttxflag;
+    } else {
+        printf("BUS__bPhySend error\n");
         rc = FALSE;
     }
+    vDebugHexOutputLen(puMsg, uLen);
 
     BUS__vPhyActivateSender(psPhy, FALSE);
 #ifndef BUS_TXRX_COMBINED
     BUS__vPhyActivateReceiver(psPhy, TRUE);
 #endif
-    if (rc) psPhy->uFlags &= ~e_uarttxflag;
     return rc;
 }
 
@@ -166,8 +178,11 @@ BOOL BUS__bPhySending(sBusPhy_t* psPhy)
  */
 BOOL BUS__bPhyDataReceived(sBusPhy_t* psPhy)
 {
-    //TODO ioctl
-    return TRUE;//(0 != (psPhy->uFlags & e_uartrxflag));
+    int bytes = 0;
+
+    PSerLib_GetPendingBytesToRead(BUSCOMM__asDevices[psPhy->uUart].psHandle, 
+                                  &bytes);
+    return (bytes != 0);
 }
 
 /**
@@ -197,7 +212,7 @@ BOOL BUS__bPhyReadByte(sBusPhy_t* psPhy, uint8_t *puByte)
  */
 void BUS__uPhyFlush(sBusPhy_t* psPhy)
 {
-    // TODO flush
+    PSerLib_FlushReadWrite(BUSCOMM__asDevices[psPhy->uUart].psHandle);
 }
 
 // --- Global functions --------------------------------------------------------

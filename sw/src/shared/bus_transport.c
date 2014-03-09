@@ -60,13 +60,12 @@ static void vCreateEmptyMessage(sBus_t* psBus)
 // Start sending the wakeup-byte.
 static BOOL bSendWakeupByte(sBus_t* psBus)
 {
-	uint8_t msg = BUS_WAKEUPBYTE;
-	if(BUS__bPhySend(&psBus->sPhy, &msg, 1))
-	{
-		while( BUS__bPhySending(&psBus->sPhy) ) {}; // Wait till message is sent completely.
-		return TRUE;
-	}
-	return FALSE;
+    uint8_t msg = BUS_WAKEUPBYTE;
+    if(BUS__bPhySend(&psBus->sPhy, &msg, 1)) {
+        while( BUS__bPhySending(&psBus->sPhy) ) {}; // Wait till message is sent completely.
+        return TRUE;
+    }
+    return FALSE;
 }
 
 // Send ACK-Byte.

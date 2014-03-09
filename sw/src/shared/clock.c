@@ -47,29 +47,6 @@ BOOL bRegisterTimer(sClkTimer_t* psTimer)
     return FALSE;
 }
 
-/**
- * Sign off timer in list.
- */
-BOOL bDeregisterTimer(sClkTimer_t* psTimer)
-{
-    uint8_t ii;
-    BOOL    found = FALSE;
-
-    for (ii=0; ii<CLOCK_NUM_TIMER; ii++) {
-        if (g_asRunningTimers[ii] == psTimer) {
-            g_asRunningTimers[ii] = NULL;
-            found = TRUE;
-        }
-        else if(found)
-        {
-        	REG_TIMER1_IRQMSK &= ~(1<<REGBIT_TIMER1_OCIEA); // disable OutputCompareMatchA interrupt
-        	// shift following timers, to avoid gaps in the list.
-        	g_asRunningTimers[ii-1] = g_asRunningTimers[ii];
-        }
-    }
-    REG_TIMER1_IRQMSK |= (1<<REGBIT_TIMER1_OCIEA); // enable OutputCompareMatchA interrupt
-    return found;
-}
 
 /**
  * Timer interrupt. Increase clock and iterate through running timers list.
@@ -79,11 +56,11 @@ ISR(INTERRUPT_TIMER0_COMPA)
     uint8_t ii;
 
     for (ii=0; ii<CLOCK_NUM_TIMER; ii++) {
-            if (g_asRunningTimers[ii] == NULL) continue;
-            if (--g_asRunningTimers[ii]->uTicks == 0) {
-                g_asRunningTimers[ii] = NULL;
-            }
+        if (g_asRunningTimers[ii] == NULL) continue;
+        if (--g_asRunningTimers[ii]->uTicks == 0) {
+            g_asRunningTimers[ii] = NULL;
         }
+    }
 }
 
 // --- Module global functions -------------------------------------------------
@@ -107,7 +84,7 @@ void CLK_vInitialize(void)
     // fIrq = 2 * fOC  = ------------ = --------------- = 100Hz
     //                    N * (OC+1)     1024 * (71+1)
     //
-    REG_TIMER0_OCRA = 71;
+    REG_TIMER0_OCRA = 141; // 71
     // No output waveform generation, CTC mode,
     // select prescaler 1024 CS2..0 = 0b101
     REG_TIMER0_TCCRA = (1<<REGBIT_TIMER0_WGM1);
@@ -123,18 +100,17 @@ void CLK_vInitialize(void)
  * @param[in] start
  * boolean for starting/stopping the timer (TRUE = start)
  */
-void CLK_vControl(BOOL start)
+void CLK_vControl(BOOL bStart)
 {
-	static uint8_t tccr1b = 0;
+    static uint8_t tccr1b = 0;
 
-	if(start){
-		if (0==tccr1b) return;
-		REG_TIMER0_TCCRB = tccr1b;
-	}
-	else{
-		tccr1b = REG_TIMER0_TCCRB;
-		REG_TIMER0_TCCRB &= ~((1<<REGBIT_TIMER0_CS2) | (1<<REGBIT_TIMER0_CS1) | (1<<REGBIT_TIMER0_CS0));
-	}
+    if (bStart) {
+        if (0==tccr1b) return;
+        REG_TIMER0_TCCRB = tccr1b;
+    } else {
+        tccr1b = REG_TIMER0_TCCRB;
+        REG_TIMER0_TCCRB &= ~((1<<REGBIT_TIMER0_CS2) | (1<<REGBIT_TIMER0_CS1) | (1<<REGBIT_TIMER0_CS0));
+    }
 }
 
 /**
@@ -151,12 +127,12 @@ void CLK_vControl(BOOL start)
 BOOL CLK_bTimerStart(sClkTimer_t* psTimer, uint16_t uTicks)
 {
     // if timer is still running ...
-        if (psTimer->uTicks != 0) {
-            psTimer->uTicks = uTicks; // ... restart timer
-            return TRUE;
-        }
-        psTimer->uTicks = uTicks;
-        return bRegisterTimer(psTimer);
+    if (psTimer->uTicks != 0) {
+        psTimer->uTicks = uTicks; // ... restart timer
+        return TRUE;
+    }
+    psTimer->uTicks = uTicks;
+    return bRegisterTimer(psTimer);
 }
 
 /**

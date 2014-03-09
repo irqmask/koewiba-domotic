@@ -22,6 +22,8 @@
 #include "spi.h"
 #include "ucontroller.h"
 
+#include "pcbconfig.h"
+
 // --- Definitions -------------------------------------------------------------
 
 // --- Type definitions --------------------------------------------------------
@@ -54,9 +56,9 @@ static void vInterpretMessage(sBus_t* psBus, uint8_t* puMsg, uint8_t uMsgLen, ui
             g_sBus.eModuleState = eMod_Running;
             break;
         case CMD_eSleep:
-            SLEEP_PinChange2_Enable();
+            SLEEP_vPinChange2_Enable();
             BUS_vSleep(psBus);
-            SLEEP_PinChange2_Disable();
+            SLEEP_vPinChange2_Disable();
             break;
         default:
             break;
@@ -74,10 +76,13 @@ int main(void)
     uint8_t msg[BUS_MAXMSGLEN];
     uint16_t sender = 0;
 
-    DDRC |= ((1<<PC3) | (1<<PC4));
-    PORTC &= ~((1<<PC3) | (1<<PC4));
+    sClkTimer_t pwm_demotimer;
+    uint8_t pwm_b = 0;
+    int8_t  pwm_b_incr = 1;
 
-    CLK_vInitialize();
+    DDRC |= ((1<<PC3) | (1<<PC4)); //??? TODO
+    DDRD |= LED_ERROR | LED_STATUS;
+    PORTC &= ~((1<<PC3) | (1<<PC4)); //??? TODO
 
     BUS_vConfigure(&g_sBus, REG_uGetU16Register(MOD_eReg_ModuleID)); // configure a bus node with address X
     BUS_vInitialize(&g_sBus, 0);// initialize bus on UART 0
@@ -88,11 +93,27 @@ int main(void)
     PWM_vInit();
     sei();
 
+    PWM_vSet(0,63);
+    PWM_vSet(1,128);
+    PWM_vSet(2,pwm_b);
+
+    CLK_bTimerStart(&pwm_demotimer, 10);
     while (1) {
         if (BUS_bGetMessage(&g_sBus)) {
             if (BUS_bReadMessage(&g_sBus, &sender, &msglen, msg)) {
                 vInterpretMessage(&g_sBus, msg, msglen, sender);
             }
+        }
+        if (CLK_bTimerIsElapsed(&pwm_demotimer)) {
+
+           // PWM_CHN0_PORT ^= (1<<PWM_CHN0_PIN);
+           // PWM_CHN0_PORT ^= (1<<PWM_CHN1_PIN);
+           // PWM_CHN0_PORT ^= (1<<PWM_CHN2_PIN);
+            if (pwm_b == 255) pwm_b_incr = -1;
+            if (pwm_b == 0) pwm_b_incr = 1;
+            pwm_b += pwm_b_incr;
+            //PWM_vSet(2,pwm_b);
+            CLK_bTimerStart(&pwm_demotimer, 10);
         }
     }
     return 0;

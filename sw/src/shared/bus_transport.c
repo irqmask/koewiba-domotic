@@ -17,14 +17,17 @@
 
 // --- Include section ---------------------------------------------------------
 
+#include "prjconf.h"
+
+#ifdef PRJCONF_UC_AVR
+#include <util/delay.h>
+#endif
+
 #include "bus_intern.h"
 #include "cmddef_common.h"
 #include "clock.h"
 #include "crc16.h"
-#include "pcbconfig.h"
-
-#include <util/delay.h>
-#include <avr/sleep.h>
+#include "sleepmode.h"
 
 // --- Definitions -------------------------------------------------------------
 
@@ -218,7 +221,7 @@ static BOOL bReceive(sBus_t* psBus)
     return bytereceived;
 }
 
-
+#ifdef BUS_HUB
 // Receive and interpret data.
 static BOOL bHubReceive(sBus_t* psBus)
 {
@@ -369,6 +372,7 @@ static BOOL bHubReceive(sBus_t* psBus)
 
     return bytereceived;
 }
+#endif
 
 // Check if data had to be sent or otherwise send empty message.
 static void vInitiateSending(sBus_t* psBus)
@@ -407,21 +411,16 @@ static void vAckWaitSending(sBus_t* psBus)
     uint8_t u;
 
     do {
-        if (!(bytereceived = BUS__bPhyDataReceived(&psBus->sPhy)) || psBus->bMsgReceived)
-        {
+        if (!(bytereceived = BUS__bPhyDataReceived(&psBus->sPhy)) || psBus->bMsgReceived) {
             break; // No byte received or message not retrieved.
         }
         BUS__bPhyReadByte(&psBus->sPhy, &u);
 
-        if (u == BUS_SYNCBYTE)
-        {
+        if (u == BUS_SYNCBYTE) {
             psBus->eState = eBus_ReceivingWait;
-        }
-        else
-        {
+        } else {
             // check ack byte
-            if (u == BUS_ACKBYTE)
-            {
+            if (u == BUS_ACKBYTE) {
                 psBus->sSendMsg.uRetries = 0;
             }
             vResetBus(psBus); // not the ack byte, wait for next byte
@@ -430,10 +429,7 @@ static void vAckWaitSending(sBus_t* psBus)
 
         psBus->sSendMsg.uOverallLength = 0;
         psBus->sSendMsg.uLength = 0;
-
-
     } while(FALSE);
-
 }
 
 static void vAckWaitReceiving(sBus_t* psBus)
@@ -446,21 +442,18 @@ static void vAckWaitReceiving(sBus_t* psBus)
             vResetBus(psBus);
             break;
         }
-        else if (!(bytereceived = BUS__bPhyDataReceived(&psBus->sPhy)) || psBus->bMsgReceived)
-        {
+        else if (!(bytereceived = BUS__bPhyDataReceived(&psBus->sPhy)) || 
+                 psBus->bMsgReceived) {
             break; // No byte received or message not retrieved.
         }
         BUS__bPhyReadByte(&psBus->sPhy, &u);
 
-        if (u == BUS_SYNCBYTE)
-        {
+        if (u == BUS_SYNCBYTE) {
             psBus->eState = eBus_ReceivingWait;
             psBus->sRecvMsg.auBuf[psBus->sRecvMsg.uOverallLength] = u;
             psBus->sRecvMsg.uOverallLength++;
             break;
-        }
-        else if (u == BUS_ACKBYTE)
-        {
+        } else if (u == BUS_ACKBYTE) {
             vResetBus(psBus);
             break; // not the sync byte, wait for next byte
         }
@@ -750,20 +743,19 @@ BOOL BUS_bIsIdle(sBus_t*       psBus)
 void BUS_vSleep(sBus_t*       psBus)
 {
 	psBus->eModuleState = eMod_Sleeping;
-	//@TODO: Hier muss die Sleep-Methode rein sobald die Hardware in der Lage ist den Controller wieder aufzuwecken.
 	CLK_vControl(FALSE); // disable clock-timer, otherwise
 	// irq will cause immediate wakeup.
 
 	// sleep till byte is received.
-	set_sleep_mode(SLEEP_MODE_IDLE);
-	sleep_mode();
+	SLEEP_vSetMode(SLEEP_MODE_IDLE);
+	SLEEP_vActivate();
 	if(BUS__bPhyDataReceived(&psBus->sPhy)) {
 		psBus->eModuleState = eMod_Running;
 	}
 
-	_delay_ms(1); // wait for sys-clock becoming stable
-	BUS_vFlushBus(psBus); // Clean bus-buffer
-	CLK_vControl(TRUE); // enable clock-timer
+	SLEEP_vDelayMS(1);      // wait for sys-clock becoming stable
+	BUS_vFlushBus(psBus);   // Clean bus-buffer
+	CLK_vControl(TRUE);     // enable clock-timer
 }
 
 /** @} */

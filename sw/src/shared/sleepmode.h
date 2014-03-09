@@ -16,14 +16,29 @@
 
 // --- Include section ---------------------------------------------------------
 
+#include "prjconf.h"
 #include "prjtypes.h"
 #include "ucontroller.h"
 
+#ifdef PRJCONF_UC_AVR
+#include <avr/sleep.h>
+#endif
+
 // --- Definitions -------------------------------------------------------------
 
-#define SLEEP_PinChange2_Enable()   PCICR |=  (1<<PCIE2);
-#define SLEEP_PinChange2_Disable()  PCICR &= ~(1<<PCIE2);
-
+#ifdef PRJCONF_UC_AVR
+#define SLEEP_vPinChange2_Enable()  PCICR |=  (1<<PCIE2)
+#define SLEEP_vPinChange2_Disable() PCICR &= ~(1<<PCIE2)
+#define SLEEP_vSetMode(m)           set_sleep_mode(m)
+#define SLEEP_vActivate()           sleep_mode()
+#define SLEEP_vDelayMS(t)           _delay_ms(t)
+#else
+#define SLEEP_vPinChange2_Enable()
+#define SLEEP_vPinChange2_Disable()
+#define SLEEP_vSetMode(m)
+#define SLEEP_vActivate()
+#define SLEEP_vDelayMS(t)
+#endif
 // --- Type definitions --------------------------------------------------------
 
 // --- Local variables ---------------------------------------------------------

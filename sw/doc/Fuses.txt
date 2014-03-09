@@ -106,3 +106,6 @@ Fuse Bytes programmieren mit AVR-Dude:
 avrdude -p atmega324p -P usb -c avrisp2 -B 32 -U lfuse:w:0xEC:m
 avrdude -p atmega324p -P usb -c avrisp2 -B 32 -U hfuse:w:0xD2:m
 avrdude -p atmega324p -P usb -c avrisp2 -B 32 -U efuse:w:0xFF:m
+
+EEProm Inhalt schreiben:
+avrdude -p atmega88 -P usb -c avrisp2 -B 32 -U eeprom:w:atmega88_address12.hex:i

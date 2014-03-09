@@ -20,7 +20,7 @@
 // --- Definitions -------------------------------------------------------------
 
 #define MOD_LEN_APPSIZE         4
-#define MOD_LEN_APPCRC          2
+#define MOD_LEN_APPCRC          4
 
 // --- Type definitions --------------------------------------------------------
 

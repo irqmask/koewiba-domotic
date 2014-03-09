@@ -126,8 +126,6 @@ int main(void)
     IO_vInitialize();
     CLK_vInitialize();
 
-    REG_vSetU16Register(MOD_eReg_ModuleID, 6);
-
     BUS_vConfigure(&g_sBus, REG_uGetU16Register(MOD_eReg_ModuleID));
     BUS_vInitialize(&g_sBus, 0);// initialize bus on UART 0
 
@@ -163,7 +161,7 @@ int main(void)
             msg[2] = light;
             msg[3] = 0b00000001;
             msglen = 4;
-            BUS_bSendMessage(&g_sBus, 0x05, msglen, msg);
+            BUS_bSendMessage(&g_sBus, 12, msglen, msg);
         }
     }
     return 0;

@@ -10,7 +10,12 @@
 
 // --- Include section ---------------------------------------------------------
 
+#include "prjconf.h"
+
+#ifdef PRJCONF_UC_AVR
 #include <avr/pgmspace.h>
+#endif
+#include "prjtypes.h"
 
 // --- Definitions -------------------------------------------------------------
 
@@ -18,7 +23,11 @@
 
 // --- Local variables ---------------------------------------------------------
 
+#ifdef PRJCONF_UC_AVR
 static const uint16_t g_auCRCTable[] PROGMEM = {
+#else
+static const uint16_t g_auCRCTable[] = {
+#endif
     0x0000, 0x1189, 0x2312, 0x329b, 0x4624, 0x57ad, 0x6536, 0x74bf,
     0x8c48, 0x9dc1, 0xaf5a, 0xbed3, 0xca6c, 0xdbe5, 0xe97e, 0xf8f7,
     0x1081, 0x0108, 0x3393, 0x221a, 0x56a5, 0x472c, 0x75b7, 0x643e,
@@ -74,7 +83,11 @@ uint16_t CRC_uCalc16(uint8_t* puData, uint8_t uLen)
     while (uLen--) {
         temp = *puData++ ^ (crc & 0xFF);
         crc >>= 8;
+#ifdef PRJCONF_UC_AVR
         crc ^= pgm_read_word(&g_auCRCTable[temp]);
+#else
+        crc ^= g_auCRCTable[temp];
+#endif
     }
     return crc;
 }

@@ -164,9 +164,9 @@ static void vInterpretMessage(sBus_t* psBus, uint8_t* puMsg, uint8_t uMsgLen, ui
             g_sBus.eModuleState = eMod_Running;
             break;
         case CMD_eSleep:
-            SLEEP_PinChange2_Enable();
+            SLEEP_vPinChange2_Enable();
             BUS_vSleep(psBus);
-            SLEEP_PinChange2_Disable();
+            SLEEP_vPinChange2_Disable();
             break;
         default:
             break;
@@ -189,7 +189,8 @@ int main(void)
 
     CLK_vInitialize();
     
-    BUS_vConfigure(&g_sBus, REG_uGetU16Register(MOD_eReg_ModuleID)); // configure a bus node with address X
+    // configure a bus node with address X
+    BUS_vConfigure(&g_sBus, REG_uGetU16Register(MOD_eReg_ModuleID)); 
     BUS_vInitialize(&g_sBus, 0);// initialize bus on UART 0
     
     SPI_vMasterInitBlk();

@@ -1,19 +1,15 @@
-#TOOLCHAINBASE=/home/freetz/freetz-trunk/toolchain/build/mipsel_gcc-4.5.3_uClibc-0.9.29/mipsel-linux-uclibc
-TOOLCHAINBASE=
 BINPATH=
-#$(TOOLCHAINBASE)/bin
-TOOLPREFIX=
-#/mipsel-linux-
 
-PROJECT=kwbmonitor
+PROJECT=kwbcommands
 
-SRC_FILES += kwbmonitor.c KWBMonitorDisplay.c sysconsole.c systime.c crc16.c
+SRC_FILES += BusCommunication.c bus_phy_linux.c clock_linux.c KWBCommands.c sysconsole.c systime.c 
 SRC_FILES += PortableSerialLib.c
+SRC_FILES += ../../src/shared/bus_transport.c
+SRC_FILES += ../../src/shared/crc16.c
 
 INCLUDES += -I./ -I../../src/shared -I../../src/include -I../../3rd_party/libsafec/include
 
 LIBS += -lpthread -lsafec-1.0
-# LIBS += -lusb
 
 #OPTFLAGS = -Os -ffunction-sections -Wl,--gc-sections
 OPTFLAGS = -Os -ffunction-sections -Wl,--gc-sections
@@ -31,7 +27,6 @@ LD=$(BINPATH)$(TOOLPREFIX)gcc
 OC=$(BINPATH)$(TOOLPREFIX)objcopy
 OD=$(BINPATH)$(TOOLPREFIX)objdump
 
-
 #CFLAGS=-pipe -Wall  $(OPTFLAGS) -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64
 CFLAGS=-pipe -Wall $(OPTFLAGS)
 
@@ -42,4 +37,4 @@ all:
 clean:
 	$(RM) -v $(PROJECT) *.o *.elf *.bin *.hex *~
 
-### EOF
+

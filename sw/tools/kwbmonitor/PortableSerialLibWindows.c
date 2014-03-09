@@ -22,6 +22,10 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#  define strcat_s(a,b,c) strcat(a,c) //dirty hack time, es ist dirty hack time...
+#  define sprintf_s snprintf
+#  define strcpy_s(a,b,c) strcpy(a,c)
+
 /* ========================================================================= */
 /* = internal port structure                                               = */
 /* ========================================================================= */
@@ -60,7 +64,7 @@ static const char* const c_flowcontrol[]={
 /* = helper functions                                                      = */
 /* ========================================================================= */
 
-static const char* PSerLib_getPlatformSpecificErrorMessage(PSL_ErrorCodes_e i_errorCode)
+const char* PSerLib_getPlatformSpecificErrorMessage(PSL_ErrorCodes_e i_errorCode)
 {
   static const char* c_errMsg[]={
     /* [PSL_ERROR_couldNotOpenRegistryKey      ] */ "Error opening registry key.",

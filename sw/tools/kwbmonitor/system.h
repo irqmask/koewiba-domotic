@@ -1,7 +1,7 @@
 #ifndef _SYSTEM_H_
 #define _SYSTEM_H_
 
-#ifdef _MSC_VER
+#ifdef _WIN32
 #define _SYS_WINDOWS_
 #else
 #define _SYS_LINUX_

@@ -1,6 +1,7 @@
 #include "system.h"
 
 #ifdef _SYS_WINDOWS_
+#  include <windows.h>
 #  ifndef _WIN32_WINNT            // Gibt an, dass Windows Vista die mindestens erforderliche Plattform ist.
 #    define _WIN32_WINNT 0x0600     // Ändern Sie den entsprechenden Wert, um auf andere Versionen von Windows abzuzielen.
 #  endif
@@ -12,7 +13,9 @@
 #  define startThread(func)  do{                 \
                                CreateThread(NULL, 0, (func), NULL, 0, NULL);\
                              }while(0);
-
+#  define strcat_s(a,b,c) strcat(a,c) //dirty hack time, es ist dirty hack time...
+#  define sprintf_s snprintf
+#  define strcpy_s(a,b,c) strcpy(a,c)
 #else
 #  include <pthread.h>
 #  include <unistd.h>
@@ -316,6 +319,7 @@ int main(int argc, char* argv[])
     char cc;
     PSL_ErrorCodes_e ec = PSL_ERROR_none;
 
+    printf("KWBMONITOR");
     setbuf(stdout, NULL);       // disable buffering of stdout
 
     do {

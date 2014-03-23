@@ -45,14 +45,8 @@
  */
 #ifndef PWM_PCBCONFIG
  #define PWM_PCBCONFIG      1
- #define PWM_CHN0_PORT      PORTC
- #define PWM_CHN1_PORT      PORTC
- #define PWM_CHN2_PORT      PORTC
-
- #define PWM_CHN0_DDR       DDRC
- #define PWM_CHN1_DDR       DDRC
- #define PWM_CHN2_DDR       DDRC
-
+ #define PWM_CHN_PORT       PORTC
+ #define PWM_CHN_DDR        DDRC
  #define PWM_CHN0_PIN       0
  #define PWM_CHN1_PIN       1
  #define PWM_CHN2_PIN       2
@@ -78,17 +72,6 @@
 
 // --- Type definitions --------------------------------------------------------
 
-//! PWM data type for counters
-typedef uint16_t PWM_uCounter_t;
-
-typedef struct {
-    PWM_uCounter_t  uCurrentPulseWidth;
-    PWM_uCounter_t  uInverseCurrentPulseWidth;
-
-    // irq runtime data
-    PWM_uCounter_t  uNextWakeUp;
-} sPWMChannel_t;
-
 // --- Local variables ---------------------------------------------------------
 
 // --- Global variables --------------------------------------------------------
@@ -105,7 +88,7 @@ void                PWM_vInit               (void);
 
 void                PWM_vSet                (uint8_t uChannel, uint8_t uValue);
 
-void                PWM_vOnIRQ              (void);
+void                PWM_vUpdate             (void);
 
 #endif // _PWM_H_
 /** @} */

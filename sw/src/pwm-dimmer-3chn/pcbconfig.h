@@ -19,12 +19,14 @@
 // --- Definitions -------------------------------------------------------------
 
 #define BUS_PCBCONFIG 1
-#define BUS_DDR_ENASND  DDRD
-#define BUS_PORT_ENASND PORTD
-#define BUS_ENASND      PD4
-#define BUS_TXRX_COMBINED 1
-//#define LED_ERROR_ON
-//#define LED_ERROR_OFF
+#define BUS_DDR_ENASND0     DDRD
+#define BUS_PORT_ENASND0    PORTD
+#define BUS_ENASND0         PD2
+#define BUS_DDR_DISRCV0     DDRD
+#define BUS_PORT_DISRCV0    PORTD
+#define BUS_DISRCV0         PD3
+#define SPI_SCK_DDR         PORTC
+#define SPI_SCK_PIN         PC1
 
 #define SPI_PCBCONFIG  1
 #define SPI_DDR_MOSI   DDRB
@@ -38,14 +40,8 @@
 #define SPI_SS         PC3
 
 #define PWM_PCBCONFIG      1
-#define PWM_CHN0_PORT      PORTC
-#define PWM_CHN1_PORT      PORTC
-#define PWM_CHN2_PORT      PORTC
-
-#define PWM_CHN0_DDR       DDRC
-#define PWM_CHN1_DDR       DDRC
-#define PWM_CHN2_DDR       DDRC
-
+#define PWM_CHN_PORT       PORTC
+#define PWM_CHN_DDR        DDRC
 #define PWM_CHN0_PIN       0
 #define PWM_CHN1_PIN       1
 #define PWM_CHN2_PIN       2

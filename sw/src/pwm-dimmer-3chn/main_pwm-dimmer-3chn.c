@@ -89,31 +89,34 @@ int main(void)
 
     SPI_vMasterInitBlk();
     //EEP_vInit();
-
     PWM_vInit();
-    sei();
 
-    PWM_vSet(0,63);
+    sei();
+    PWM_vSet(0,255);
     PWM_vSet(1,128);
     PWM_vSet(2,pwm_b);
-
+    PWM_vUpdate();
     CLK_bTimerStart(&pwm_demotimer, 10);
     while (1) {
+
         if (BUS_bGetMessage(&g_sBus)) {
             if (BUS_bReadMessage(&g_sBus, &sender, &msglen, msg)) {
                 vInterpretMessage(&g_sBus, msg, msglen, sender);
             }
         }
-        if (CLK_bTimerIsElapsed(&pwm_demotimer)) {
+        if (1) {//(CLK_bTimerIsElapsed(&pwm_demotimer)) {
 
            // PWM_CHN0_PORT ^= (1<<PWM_CHN0_PIN);
            // PWM_CHN0_PORT ^= (1<<PWM_CHN1_PIN);
            // PWM_CHN0_PORT ^= (1<<PWM_CHN2_PIN);
-            if (pwm_b == 255) pwm_b_incr = -1;
+            if (pwm_b == 254) pwm_b_incr = -1;
             if (pwm_b == 0) pwm_b_incr = 1;
             pwm_b += pwm_b_incr;
-            //PWM_vSet(2,pwm_b);
+            PWM_vSet(2,pwm_b);
+            PWM_vSet(1,~pwm_b);
+            PWM_vUpdate();
             CLK_bTimerStart(&pwm_demotimer, 10);
+            PORTD ^= LED_STATUS;
         }
     }
     return 0;

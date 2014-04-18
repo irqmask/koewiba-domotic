@@ -19,6 +19,7 @@ SRC = shared/bus_phy.c \
       shared/gdisplay_symbols_x16.c \
       shared/gdisplay_symbols_x24.c \
       shared/register.c \
+      shared/zagwire.c \
       roomthermostate/appregister.c \
       roomthermostate/main_roomthermostate.c
 

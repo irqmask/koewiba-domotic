@@ -22,6 +22,7 @@
 #include "sleepmode.h"
 #include "spi.h"
 #include "ucontroller.h"
+#include "zagwire.h"
 
 // --- Definitions -------------------------------------------------------------
 
@@ -30,7 +31,7 @@
 // --- Local variables ---------------------------------------------------------
 
 static sBus_t      g_sBus;
-static sClkTimer_t g_sDisplayTimer;
+static sClkTimer_t g_sAppTimer;
 static uint16_t    g_uTargetTemp;
 static uint16_t    g_uCurrentTemp;
 
@@ -182,24 +183,24 @@ int main(void)
 {
     uint8_t msglen = 0;
     uint8_t msg[BUS_MAXMSGLEN];
-    uint16_t sender = 0;
+    uint16_t sender = 0, val;
 
     DDRC |= ((1<<PC3) | (1<<PC4));
     PORTC &= ~((1<<PC3) | (1<<PC4));
 
     CLK_vInitialize();
     
+    REG_vSetU16Register(MOD_eReg_ModuleID, 0x000E);
+
     // configure a bus node with address X
     BUS_vConfigure(&g_sBus, REG_uGetU16Register(MOD_eReg_ModuleID)); 
     BUS_vInitialize(&g_sBus, 0);// initialize bus on UART 0
     
     SPI_vMasterInitBlk();
+    ZAGW_vInit();
       
     sei();
-    
-    g_uCurrentTemp = 27315 + 2200;
-    //g_uTargetTemp = 27315 + 1800; // = 29115 = 0x71BB
-    
+
     g_uTargetTemp = REG_uGetU16Register(APP_eReg_DesiredTempDay1);
 
     GDISP_vInit();
@@ -214,14 +215,28 @@ int main(void)
 
     GDISP_vChooseFont(GDISP_auFont1_x8);
     GDISP_vGotoColLine(0,3);
-   // GDISP_vPutText("Addr: ");
-   // vDrawHex16Value(g_sBus.sCfg.uOwnNodeAddress);
+    GDISP_vPutText("Addr: ");
+    vDrawHex16Value(g_sBus.sCfg.uOwnNodeAddress);
 
-    CLK_bTimerStart(&g_sDisplayTimer, CLOCK_MS_2_TICKS(1000));
+    CLK_bTimerStart(&g_sAppTimer, 100);
     while (1) {
         if (BUS_bGetMessage(&g_sBus)) {
             if (BUS_bReadMessage(&g_sBus, &sender, &msglen, msg)) {
                 vInterpretMessage(&g_sBus, msg, msglen, sender);
+            }
+        }
+        if (CLK_bTimerIsElapsed(&g_sAppTimer)) {
+            CLK_bTimerStart(&g_sAppTimer,10);
+            GDISP_vChooseFont(GDISP_auFont1_x8);
+            GDISP_vGotoColLine(0,3);
+            GDISP_vPutText("Temp: ");
+            if (ZAGW_uReceive()) {
+                val = ZAGW_uGetBits();
+                vDrawHex16Value(val);
+                g_uCurrentTemp = ZAGW_uGetTemperature();
+                vDrawTemperatures();
+            } else {
+                GDISP_vPutText("PERR");
             }
         }
     }

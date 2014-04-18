@@ -64,18 +64,16 @@ void IO_vInitialize(void)
 
 int main(void)
 {
-    uint8_t msglen = 0;
-    uint16_t sender = 0;
-    uint8_t msg[BUS_MAXMSGLEN];
+    uint8_t     msglen = 0;
+    uint16_t    sender = 0;
+    uint8_t     msg[BUS_MAXMSGLEN];
 
     IO_vInitialize();
     CLK_vInitialize();
-    sched_scheduler_configure(&g_sSched);
+    bus_scheduler_configure(&g_sSched);
     BUS_vConfigure(&g_sBus, 1); // configure a bus node with address 1
     BUS_vInitialize(&g_sBus, 0);// initialize bus on UART 0
-    g_sBus.eModuleState = eMod_Running; // start bus in running-mode
 
-    //PORTA |=   1<<PA0;
     sei();
 
     CLK_bTimerStart(&g_sLedTimer, CLOCK_MS_2_TICKS(1000));

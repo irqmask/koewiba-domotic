@@ -10,13 +10,17 @@
  *///---------------------------------------------------------------------------
 
 // --- Include section ---------------------------------------------------------
-#include <avr/io.h>
-#include <avr/sleep.h>
+
+#include "prjconf.h"
+
+#ifdef PRJCONF_UC_AVR
+# include <avr/io.h>
+# include <avr/sleep.h>
+# include <util/delay.h>
+#endif
 
 #include "bus.h"
 #include "bus_intern.h"
-
-#include <util/delay.h>
 
 // --- Definitions -------------------------------------------------------------
 
@@ -190,7 +194,7 @@ BOOL sched_current_node_is_me(sBus_t* psBus, sSched_t* psSched)
  *
  * @param[in] psSched       Handle of the scheduler-struct.
  */
-void sched_scheduler_configure(sSched_t* psSched)
+void bus_scheduler_configure(sSched_t* psSched)
 {
     uint8_t ii;
 
@@ -210,7 +214,7 @@ void sched_scheduler_configure(sSched_t* psSched)
 
 /**
  * Schedule nodes on bus.
- * 
+ *
  * @param[in] psBus         Handle of the bus.
  * @param[in] psSched       Handle of the scheduler-struct.
  * @returns                 TRUE if message was received, otherwise FALSE.

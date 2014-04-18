@@ -76,7 +76,7 @@ int main(void)
 
     IO_vInitialize();
     CLK_vInitialize();
-    BUS_vSchedulConfigure(&g_sSched);
+    bus_scheduler_configure(&g_sSched);
     BUS_vConfigure(&g_sBus, 1); // configure a bus node with address 1
     BUS_vInitialize(&g_sBus, 0);// initialize bus on UART 0
     g_sBus.eModuleState = eMod_Discovery;
@@ -87,12 +87,12 @@ int main(void)
     CLK_bTimerStart(&g_sLedTimer, CLOCK_MS_2_TICKS(1000));
 
     while (1) {
-    	if (BUS_bScheduleAndGetMessage(&g_sBus, &g_sSched)) {
+    	if (bus_schedule_and_get_message(&g_sBus, &g_sSched)) {
     		if (BUS_bReadMessage(&g_sBus, &sender, &msglen, msg)) {
                 // TODO do something
     		}
     	}
-    	else BUS_vScheduleCheckAndSetSleep(&g_sBus);
+    	else bus_schedule_check_and_set_sleep(&g_sBus);
 
         if (CLK_bTimerIsElapsed(&g_sLedTimer)) {
         	// TODO remove after debug

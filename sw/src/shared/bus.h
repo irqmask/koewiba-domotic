@@ -215,8 +215,6 @@ void    BUS_vConfigure                    (sBus_t*        psBus,
 void    BUS_vInitialize                   (sBus_t*        psBus,
                                            uint8_t        uUart);
 
-void    sched_scheduler_configure         (sSched_t*       psSched);
-
 void    BUS_vFlushBus                     (sBus_t*        psBus);
 
 BOOL    BUS_bGetMessage                   (sBus_t*        psBus);
@@ -235,8 +233,11 @@ BOOL    BUS_bSendAckMessage               (sBus_t*        psBus,
                                            uint16_t       uReceiver);
 
 #ifdef BUS_SCHEDULER
+void    bus_scheduler_configure             (sSched_t*      psSched);
+
 BOOL    bus_schedule_and_get_message      (sBus_t*        psBus,
                                            sSched_t*      psSched);
+
 void    bus_schedule_check_and_set_sleep  (sBus_t* psBus);
 #endif
 

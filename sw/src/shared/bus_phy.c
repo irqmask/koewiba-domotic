@@ -106,7 +106,7 @@ ISR(INTERRUPT_USART_RXC1)
     data = REGISTER_UDR1;
 
     // framing error ?
-    if(0 != fe) {
+    if (0 != fe) {
         g_UART1Phy->uFlags |= e_uartrxerrflag;
         return;
     }
@@ -198,8 +198,8 @@ void BUS__vPhyInitialize(sBusPhy_t* psPhy, uint8_t uUart)
  */
 void BUS__vPhyActivateSender(sBusPhy_t* psPhy, BOOL bActivate)
 {
-    if((!sw_recvlisten) && bActivate) BUS__vPhyActivateReceiver(psPhy, FALSE);
-    if     (0==psPhy->uUart) {
+    if ((!sw_recvlisten) && bActivate) BUS__vPhyActivateReceiver(psPhy, FALSE);
+    if (0==psPhy->uUart) {
         if (bActivate)  BUS_PORT_ENASND0 |=  (1<<BUS_ENASND0);
         else            BUS_PORT_ENASND0 &= ~(1<<BUS_ENASND0);
     }
@@ -210,7 +210,7 @@ void BUS__vPhyActivateSender(sBusPhy_t* psPhy, BOOL bActivate)
     }
 #endif
 
-    if((!sw_recvlisten) && !bActivate) BUS__vPhyActivateReceiver(psPhy, TRUE);
+    if ((!sw_recvlisten) && !bActivate) BUS__vPhyActivateReceiver(psPhy, TRUE);
 }
 
 /**
@@ -347,7 +347,7 @@ void BUS__uPhyFlush(sBusPhy_t* psPhy)
     uint8_t    n = 0;
     sBusRec_t  *buffer = &psPhy->sRecvBuf;
 
-    for(n=0; n<sizeof(buffer->auBuf); ++n){
+    for (n=0; n<sizeof(buffer->auBuf); ++n){
     	buffer->auBuf[n] = 0;
     }
     buffer->uReadPos  = 0;

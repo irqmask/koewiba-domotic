@@ -80,7 +80,7 @@ BOOL    BUS__bTrpSendReceive        (sBus_t* psBus);
 BOOL    BUS__bSendSleepCmd          (sBus_t* psBus);
 
 // scheduler
-void    BUS__vSchedulConfigure      (sSched_t*        psSched);
+void    sched_configure             (sSched_t*       psSched);
 
 // physical layer
 void    BUS__vPhyInitialize         (sBusPhy_t*     psPhy,

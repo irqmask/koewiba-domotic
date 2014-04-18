@@ -33,8 +33,7 @@
 
 #define BUS_MAX_ANSWERFAILS		5	    //!< Maximum number a member's answer can be missing, before disconnecting.
 #define BUS_MAX_MSGRETRIES		3	    //!< Maximum number of re-sending one message.
-#define BUS_DISCOVERYLOOPS		3       //!< Number of discovery-loops till normal scheduling begins.
-#define BUS_LOOPS_TILL_SLEEP	50      //!< Number of discovery-loops till normal scheduling begins.
+#define BUS_LOOPS_TILL_SLEEP	3       //!< Number of discovery-loops till going to sleep.
 
 #define BUS_ACKBYTE             0x06    //!< ACK.
 #define BUS_NAKBYTE             0x15    //!< NAK.

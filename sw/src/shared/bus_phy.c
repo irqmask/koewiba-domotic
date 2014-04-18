@@ -24,77 +24,10 @@
 
 // --- Definitions -------------------------------------------------------------
 
-//#define UART_PORT               PORTD
-//#define UART_INPORT             PIND
-//#define UART_DDR                DDRD
-//#define UART_DRIVER             0b00000100
-//#define UART_RECVSTOP           0b00001000
-
-
 #define UBRRVAL ((uint16_t)(((F_CPU / (16.0 * BUS_BAUDRATE)) - 1.0) + 0.5))
 #define UBRRVALH ((uint8_t)(UBRRVAL>>8))
 #define UBRRVALL ((uint8_t)UBRRVAL)
 
-/*
-inline void IR_DataRegisterEmpty_Enable(void)
-{
-	REGISTER_UCSRB |=  (1<<REGBIT_UDRIE);
-}
-inline void IR_DataRegisterEmpty_Disable(void)
-{
-	REGISTER_UCSRB &= ~(1<<REGBIT_UDRIE);
-}
-inline void IR_TransmitComplete_Enable(void)
-{
-	REGISTER_UCSRB |=  (1<<REGBIT_TXCIE);
-}
-inline void IR_TransmitComplete_Disable(void)
-{
-	REGISTER_UCSRB &= ~(1<<REGBIT_TXCIE);
-}
-inline void IR_ReceiveComplete_Enable(void)
-{
-	REGISTER_UCSRB |=  (1<<REGBIT_RXCIE);
-}
-inline void IR_ReceiveComplete_Disable(void)
-{
-	REGISTER_UCSRB &= ~(1<<REGBIT_RXCIE);
-}
-inline void IR_OutputCompareMatchA_Enable(void)
-{
-	REGBIT_TIMSK |=  (1<<REGBIT_OCIEA);
-}
-inline void IR_OutputCompareMatchA_Disable(void)
-{
-	REGBIT_TIMSK &= ~(1<<REGBIT_OCIEA);
-}
-#if defined (__AVR_ATmega88__)
-inline void IR_PinChange2_Enable(void)
-{
-	PCICR  |=  (1<<PCIE2);
-}
-inline void IR_PinChange2_Disable(void)
-{
-	PCICR  &= ~(1<<PCIE2);
-}
-inline void IR_PinChange1_Enable(void)
-{
-	PCICR  |=  (1<<PCIE1);
-}
-inline void IR_PinChange1_Disable(void)
-{
-	PCICR  &= ~(1<<PCIE1);
-}
-inline void IR_PinChange0_Enable(void)
-{
-	PCICR  |=  (1<<PCIE0);
-}
-inline void IR_PinChange0_Disable(void)
-{
-	PCICR  &= ~(1<<PCIE0);
-}
-#endif
-*/
 // --- Type definitions --------------------------------------------------------
 
 // --- Local variables ---------------------------------------------------------
@@ -290,13 +223,13 @@ void BUS__vPhyActivateSender(sBusPhy_t* psPhy, BOOL bActivate)
 void BUS__vPhyActivateReceiver(sBusPhy_t* psPhy, BOOL bActivate)
 {
 #ifdef TXRXEN0_SEPERATE
-    if      (0 == psPhy->uUart) {
+    if (0 == psPhy->uUart) {
         if (bActivate) BUS_PORT_DISRCV0 &= ~(1<<BUS_DISRCV0);
         else           BUS_PORT_DISRCV0 |=  (1<<BUS_DISRCV0);
     }
 #endif
 #ifdef TXRXEN1_SEPERATE
-    else if (1 == psPhy->uUart) {
+    if (1 == psPhy->uUart) {
         if (bActivate) BUS_PORT_DISRCV1 &= ~(1<<BUS_DISRCV1);
         else           BUS_PORT_DISRCV1 |=  (1<<BUS_DISRCV1);
     }

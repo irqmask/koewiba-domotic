@@ -60,12 +60,12 @@ static void vCreateEmptyMessage(sBus_t* psBus)
 // Start sending the wakeup-byte.
 static BOOL bSendWakeupByte(sBus_t* psBus)
 {
-    uint8_t msg = BUS_WAKEUPBYTE;
-    if(BUS__bPhySend(&psBus->sPhy, &msg, 1)) {
-        while( BUS__bPhySending(&psBus->sPhy) ) {}; // Wait till message is sent completely.
-        return TRUE;
-    }
-    return FALSE;
+	uint8_t msg = BUS_WAKEUPBYTE;
+	if (BUS__bPhySend(&psBus->sPhy, &msg, 1)) {
+		while( BUS__bPhySending(&psBus->sPhy) ) {}; // Wait till message is sent completely.
+		return TRUE;
+	}
+	return FALSE;
 }
 
 // Send ACK-Byte.
@@ -172,7 +172,6 @@ static BOOL bReceive(sBus_t* psBus)
                     psBus->sRecvMsg.uCRC |= u;
                     crc = CRC_uCalc16(&psBus->sRecvMsg.auBuf[0], psBus->sRecvMsg.uLength + 3 - 2);
                     if (crc == psBus->sRecvMsg.uCRC) {
-                        LED_ERROR_OFF;
                         psBus->bMsgReceived = TRUE;
                         if(BUS_BRDCSTADR != psBus->sRecvMsg.uReceiver) {
                             // Send ACK if it was not a broadcast-message.
@@ -186,7 +185,6 @@ static BOOL bReceive(sBus_t* psBus)
             			break;
             		} else {
             			// invalid length of message
-                		LED_ERROR_ON;
             			vResetBus(psBus);
             			break;
             		}
@@ -219,7 +217,7 @@ static BOOL bReceive(sBus_t* psBus)
 
     return bytereceived;
 }
-
+/*
 #ifdef BUS_HUB
 // Receive and interpret data.
 static BOOL bHubReceive(sBus_t* psBus)
@@ -372,6 +370,7 @@ static BOOL bHubReceive(sBus_t* psBus)
     return bytereceived;
 }
 #endif
+*/
 
 // Check if data had to be sent or otherwise send empty message.
 static void vInitiateSending(sBus_t* psBus)

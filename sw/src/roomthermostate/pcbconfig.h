@@ -19,10 +19,10 @@
 // --- Definitions -------------------------------------------------------------
 
 #define BUS_PCBCONFIG 1
-#define BUS_DDR_ENASND  DDRD
-#define BUS_PORT_ENASND PORTD
-#define BUS_ENASND      PD4
-#define BUS_TXRX_COMBINED 1
+#define BUS_DDR_ENASND0     DDRD
+#define BUS_PORT_ENASND0    PORTD
+#define BUS_ENASND0         PD4
+#undef  TXRXEN0_SEPERATE
 #define LED_ERROR_ON
 #define LED_ERROR_OFF
 

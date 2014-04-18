@@ -126,21 +126,21 @@
 
  // definition of processor specific registers
  // UART0
- #define REGISTER_UCSRA         UCSR0A
- #define REGISTER_UCSRB         UCSR0B
- #define REGISTER_UCSRC         UCSR0C
- #define REGISTER_UDR           UDR0
- #define REGISTER_UBRRH         UBRR0H
- #define REGISTER_UBRRL         UBRR0L
+ #define REGISTER_UCSRA0        UCSR0A
+ #define REGISTER_UCSRB0        UCSR0B
+ #define REGISTER_UCSRC0        UCSR0C
+ #define REGISTER_UDR0          UDR0
+ #define REGISTER_UBRRH0        UBRR0H
+ #define REGISTER_UBRRL0        UBRR0L
  #define REGBIT_RXCIE           RXCIE0
  #define REGBIT_UDRIE           UDRIE0
  #define REGBIT_TXCIE           TXCIE0
  #define REGBIT_RXEN            RXEN0
  #define REGBIT_TXEN            TXEN0
  #define REGBIT_FE              FE0
- #define INTERRUPT_USART_RXC    USART0_RX_vect
- #define INTERRUPT_USART_UDRE   USART0_UDRE_vect
- #define INTERRUPT_UART_TRANS   USART0_TX_vect
+ #define INTERRUPT_USART_RXC0   USART0_RX_vect
+ #define INTERRUPT_USART_UDRE0  USART0_UDRE_vect
+ #define INTERRUPT_UART_TRANS0  USART0_TX_vect
  
  // Sleepmodes
  #define INTERRUPT_PINCHANGE2   PCINT2_vect

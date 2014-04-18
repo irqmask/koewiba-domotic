@@ -16,7 +16,10 @@ FILE(WRITE ${CMAKE_CURRENT_BINARY_DIR}/kwb_unittests_version.h
 
 
 SET(kwb_unittests_SRCS
+    ../src/shared/bus_schedul.c
+    ../src/shared/bus_transport.c
     ../src/shared/pwm.c
+    testbussched.c
     testpwm.c
     register_tests.c
     main.c

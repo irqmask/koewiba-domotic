@@ -27,6 +27,8 @@
 
 // --- Type definitions --------------------------------------------------------
 
+typedef uint8_t uPWMCount_t;
+
 // --- Local variables ---------------------------------------------------------
 
 uint8_t g_bTableIndexMax = 1;
@@ -34,13 +36,13 @@ uint8_t g_bTableIndexMax = 1;
 // runtime data. If runtime data has to be changed, at first the data is changed
 // in the page which is currently not used by the ISR. After changing the table,
 // the tables are switched.
-uint16_t g_auTimerEvent1[PWM_NUM_CHANNELS+1];   //!< differences to next timer event (page A).
-uint16_t g_auTimerEvent2[PWM_NUM_CHANNELS+1];   //!< differences to next timer event (page B).
+uPWMCount_t g_auTimerEvent1[PWM_NUM_CHANNELS+1];   //!< differences to next timer event (page A).
+uPWMCount_t g_auTimerEvent2[PWM_NUM_CHANNELS+1];   //!< differences to next timer event (page B).
 
 uint8_t  g_auMask1[PWM_NUM_CHANNELS+1];         //!< mask of port bits to be cleared (page A).
 uint8_t  g_auMask2[PWM_NUM_CHANNELS+1];         //!< mask of port bits to be cleared (page B).
 
-uint16_t g_auPWMCounts[PWM_NUM_CHANNELS+1];     //!< Current channel setting in timer-counts and sorted.
+uPWMCount_t g_auPWMCounts[PWM_NUM_CHANNELS+1];     //!< Current channel setting in timer-counts and sorted.
 uint8_t  g_auPWMVal[PWM_NUM_CHANNELS];          //!< Current channel setting.
 
 volatile uint8_t g_uTableIndexMax = 1;         //!< Maximum table index. Initialize to 1!
@@ -48,40 +50,31 @@ volatile uint8_t g_uSync;                      //!< Flag: Update is now possible
 
 // Pointer to time- and mask-pages
 
-uint16_t *g_puISRTimerEvent = g_auTimerEvent1;  //!< Points to timing data for IRQ routine.
-uint16_t *g_puMainTimerEvent = g_auTimerEvent2; //!< Points to timing data for main routine.
+uPWMCount_t *g_puISRTimerEvent = g_auTimerEvent1;  //!< Points to timing data for IRQ routine.
+uPWMCount_t *g_puMainTimerEvent = g_auTimerEvent2; //!< Points to timing data for main routine.
 
 uint8_t *g_puISRMask        = g_auMask1;        //!< Points to mask data for IRQ routine.
 uint8_t *g_puMainMask       = g_auMask2;        //!< Points to mask data for main routine.
 
 #ifdef PRJCONF_UC_AVR
-const uint16_t        g_auPWMValues[256] PROGMEM = {
+const uPWMCount_t g_auPWMValues[256] PROGMEM = {
 #else
-const uint16_t g_auPWMValues[256] = {
+const uPWMCount_t g_auPWMValues[256] = {
 #endif
-        0, 256, 256, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512,
-        512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 768, 768,
-        768, 768, 768, 768, 768, 768, 768, 768, 768, 768, 768, 768, 768, 768,
-        1024, 1024, 1024, 1024, 1024, 1024, 1024, 1024, 1024, 1024, 1024, 1024,
-        1024, 1280, 1280, 1280, 1280, 1280, 1280, 1280, 1280, 1280, 1280, 1536,
-        1536, 1536, 1536, 1536, 1536, 1536, 1536, 1792, 1792, 1792, 1792, 1792,
-        1792, 1792, 2048, 2048, 2048, 2048, 2048, 2048, 2304, 2304, 2304, 2304,
-        2304, 2304, 2560, 2560, 2560, 2560, 2816, 2816, 2816, 2816, 2816, 3072,
-        3072, 3072, 3072, 3328, 3328, 3328, 3328, 3584, 3584, 3584, 3840, 3840,
-        3840, 3840, 4096, 4096, 4096, 4352, 4352, 4352, 4608, 4608, 4864, 4864,
-        4864, 5120, 5120, 5376, 5376, 5376, 5632, 5632, 5888, 5888, 6144, 6144,
-        6400, 6400, 6656, 6656, 6912, 6912, 7168, 7168, 7424, 7680, 7680, 7936,
-        7936, 8192, 8448, 8448, 8704, 8960, 9216, 9216, 9472, 9728, 9984, 9984,
-        10240, 10496, 10752, 11008, 11264, 11264, 11520, 11776, 12032, 12288,
-        12544, 12800, 13056, 13312, 13568, 13824, 14336, 14592, 14848, 15104,
-        15360, 15872, 16128, 16384, 16640, 17152, 17408, 17664, 18176, 18432,
-        18944, 19200, 19712, 19968, 20480, 20992, 21248, 21760, 22272, 22784,
-        23040, 23552, 24064, 24576, 25088, 25600, 26112, 26624, 27136, 27904,
-        28416, 28928, 29440, 30208, 30720, 31488, 32000, 32768, 33280, 34048,
-        34816, 35584, 36096, 36864, 37632, 38400, 39168, 40192, 40960, 41728,
-        42496, 43520, 44288, 45312, 46336, 47104, 48128, 49152, 50176, 51200,
-        52224, 53248, 54272, 55552, 56576, 57856, 58880, 60160, 61440, 62720,
-        64000, 65280, 65350 };
+        0, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+        2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4,
+        4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6, 6,
+        6, 6, 7, 7, 7, 7, 7, 7, 7, 8, 8, 8, 8, 8, 8, 9, 9, 9, 9, 9, 9, 10, 10,
+        10, 10, 11, 11, 11, 11, 11, 12, 12, 12, 12, 13, 13, 13, 13, 14, 14, 14,
+        15, 15, 15, 15, 16, 16, 16, 17, 17, 17, 18, 18, 19, 19, 19, 20, 20, 21,
+        21, 21, 22, 22, 23, 23, 24, 24, 25, 25, 26, 26, 27, 27, 28, 28, 29, 30,
+        30, 31, 31, 32, 33, 33, 34, 35, 36, 36, 37, 38, 39, 39, 40, 41, 42, 43,
+        44, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 56, 57, 58, 59, 60, 62,
+        63, 64, 65, 67, 68, 69, 71, 72, 74, 75, 77, 78, 80, 82, 83, 85, 87, 89,
+        90, 92, 94, 96, 98, 100, 102, 104, 106, 109, 111, 113, 115, 118, 120,
+        123, 125, 128, 130, 133, 136, 139, 141, 144, 147, 150, 153, 157, 160,
+        163, 166, 170, 173, 177, 181, 184, 188, 192, 196, 200, 204, 208, 212,
+        217, 221, 226, 230, 235, 240, 245, 250, 253, 255 };
 
 // --- Global variables --------------------------------------------------------
 
@@ -89,18 +82,19 @@ const uint16_t g_auPWMValues[256] = {
 
 // --- Local functions ---------------------------------------------------------
 
+// switch counter and mask data after update between irq and non-irq functions
 static void vSwitchPages(void)
 {
-    uint16_t* tmp_ptr16;
-    uint8_t* tmp_ptr8;
+    uPWMCount_t*    tmp_ptr_count;
+    uint8_t*        tmp_ptr_mask;
 
-    tmp_ptr16 = g_puISRTimerEvent;
+    tmp_ptr_count = g_puISRTimerEvent;
     g_puISRTimerEvent = g_puMainTimerEvent;
-    g_puMainTimerEvent = tmp_ptr16;
+    g_puMainTimerEvent = tmp_ptr_count;
 
-    tmp_ptr8 = g_puISRMask;
+    tmp_ptr_mask = g_puISRMask;
     g_puISRMask = g_puMainMask;
-    g_puMainMask = tmp_ptr8;
+    g_puMainMask = tmp_ptr_mask;
 }
 
 // --- Interrupts --------------------------------------------------------------
@@ -143,6 +137,10 @@ PWM_INTERRUPT
 
 // --- Global functions --------------------------------------------------------
 
+/**
+ * Initialize PWM data and hardware. Therefore the 8bit timer 2 is used and
+ * runs with about 100Hz.
+ */
 void PWM_vInit(void)
 {
     uint8_t channel;
@@ -151,10 +149,11 @@ void PWM_vInit(void)
     PWM_CHN_PORT |= ((1<<PWM_CHN0_PIN) | (1<<PWM_CHN1_PIN) | (1<<PWM_CHN2_PIN));
 
     // initialize timer 1 peripheral, normal-mode
-    REG_TIMER1_TCCRA = 0;
-    REG_TIMER1_TCCRB = (1<<REGBIT_TIMER1_CS0); // set prescaler to 1/1 (N=1)
+    REG_TIMER2_TCCRA = 0;
+    // set prescaler to 1/256 (N=256)
+    REG_TIMER2_TCCRB = (1<<REGBIT_TIMER2_CS2) | (1<<REGBIT_TIMER2_CS1);
     // enable timer 1 overflow A interrupt
-    REG_TIMER1_IRQMSK |= (1<<REGBIT_TIMER1_OCIEA);
+    REG_TIMER2_IRQMSK |= (1<<REGBIT_TIMER2_OCIEA);
 
     PWMCOMPARE = 0;
 
@@ -177,16 +176,25 @@ void PWM_vInit(void)
     }
 }
 
+/**
+ * Set PWM level for each channel.
+ *
+ * @param[in] uChannel      Channel number 0..2
+ * @param[in] uValue        Value 0..255
+ */
 void PWM_vSet(uint8_t uChannel, uint8_t uValue)
 {
     if (uChannel >= PWM_NUM_CHANNELS) return;
     g_auPWMVal[uChannel] = uValue;
 }
 
+/**
+ * Update PWM data with new duty-cycles for each channel.
+ */
 void PWM_vUpdate(void)
 {
-    uint16_t min, tmp_set;
-    uint8_t index, jj, kk, mask_bits_to_set, mask_current_bit;
+    uPWMCount_t min, tmp_set;
+    uint8_t     index, jj, kk, mask_bits_to_set, mask_current_bit;
 
     mask_bits_to_set = 0;
     mask_current_bit = 1;
@@ -194,10 +202,21 @@ void PWM_vUpdate(void)
     // this function implies that the channels are corresponding to bits of one
     // port. The port bits have to be continuous.
     for (index=1; index <= PWM_NUM_CHANNELS; index++) {
-        g_puMainMask[index] = ~mask_current_bit;
-        // copy PWM setting
-        g_auPWMCounts[index] = pgm_read_word(&g_auPWMValues[g_auPWMVal[index-1]]);
-        if (g_auPWMCounts[index] != 0) mask_bits_to_set |= mask_current_bit;
+        // special case: 100% duty-cycle
+        if (g_auPWMVal[index-1] == 255) {
+            g_puMainMask[index] = 255; // don't switch of anything
+            mask_bits_to_set |= mask_current_bit;
+            g_auPWMCounts[index] = PWM_MAX_COUNT / 2;
+        }
+        else if (g_auPWMVal[index-1] != 0) {
+            g_puMainMask[index] = ~mask_current_bit;
+            mask_bits_to_set |= mask_current_bit;
+            g_auPWMCounts[index] = pgm_read_word(&g_auPWMValues[g_auPWMVal[index-1]]);
+        }
+        else { // g_auPWMVal[index-1] == 0
+            g_puMainMask[index] = ~mask_current_bit;
+            g_auPWMCounts[index] = PWM_MAX_COUNT / 2;
+        }
         mask_current_bit <<= 1;
     }
     g_puMainMask[0] = mask_bits_to_set;
@@ -266,14 +285,22 @@ void PWM_vUpdate(void)
 
     // wait for sync
     g_uSync = 0;
+#ifdef PRJCONF_UC_AVR
     while (g_uSync == 0);
-
+#endif
     cli();
     vSwitchPages();
     g_uTableIndexMax = kk;
     sei();
 }
 
+/**
+ * Set new channel PWM value and update.
+ * PWM_vSet() and PWM_vUpdate() in one call.
+ *
+ * @param[in] uChannel      Channel number 0..2
+ * @param[in] uValue        Value 0..255
+ */
 void PWM_vSetAndUpdate(uint8_t uChannel, uint8_t uValue)
 {
     PWM_vSet(uChannel, uValue);

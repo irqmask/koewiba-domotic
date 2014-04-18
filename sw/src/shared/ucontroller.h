@@ -310,6 +310,22 @@
  #define REGBIT_TIMER1_CS1      CS11
  #define REGBIT_TIMER1_CS2      CS12
  #define INTERRUPT_TIMER1_COMPA TIMER1_COMPA_vect
+
+ #define REG_TIMER2_TCCRA       TCCR2A
+ #define REG_TIMER2_TCCRB       TCCR2B
+ #define REG_TIMER2_TCNT        TCNT2
+ #define REG_TIMER2_OCRA        OCR2A
+ #define REG_TIMER2_OCRB        OCR2B
+ #define REG_TIMER2_OCRB_H      OCR2BH
+ #define REG_TIMER2_OCRB_L      OCR2BL
+ #define REGBIT_TIMER2_WGM0     WGM20
+ #define REGBIT_TIMER2_WGM1     WGM21
+ #define REGBIT_TIMER2_WGM2     WGM22
+ #define REGBIT_TIMER2_WGM3     WGM23
+ #define REGBIT_TIMER2_CS0      CS20
+ #define REGBIT_TIMER2_CS1      CS21
+ #define REGBIT_TIMER2_CS2      CS22
+ #define INTERRUPT_TIMER2_COMPA TIMER2_COMPA_vect
 #endif
 
 // --- Type definitions --------------------------------------------------------

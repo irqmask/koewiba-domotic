@@ -152,7 +152,7 @@ ISR(INTERRUPT_USART_UDRE0)
 ISR(INTERRUPT_UART_TRANS0)
 {
     BUS__vPhyActivateSender(g_UART0Phy, FALSE);
-#ifndef BUS_TXRX_COMBINED
+#ifdef TXRXEN0_SEPERATE
     BUS__vPhyActivateReceiver(g_UART0Phy, TRUE);
 #endif
     g_UART0Phy->uFlags &= ~e_uarttxflag;
@@ -251,7 +251,7 @@ void BUS__vPhyInitialize(sBusPhy_t* psPhy, uint8_t uUart)
 
     // sender is initial off, receiver is always on.
     BUS__vPhyActivateSender(psPhy, FALSE);
-#ifndef BUS_TXRX_COMBINED
+#ifdef TXRXEN0_SEPERATE
     BUS__vPhyActivateReceiver(psPhy, TRUE);
 #endif
 }
@@ -289,7 +289,7 @@ void BUS__vPhyActivateSender(sBusPhy_t* psPhy, BOOL bActivate)
  */
 void BUS__vPhyActivateReceiver(sBusPhy_t* psPhy, BOOL bActivate)
 {
-#ifndef TXRXEN0_SEPERATE
+#ifdef TXRXEN0_SEPERATE
     if      (0 == psPhy->uUart) {
         if (bActivate) BUS_PORT_DISRCV0 &= ~(1<<BUS_DISRCV0);
         else           BUS_PORT_DISRCV0 |=  (1<<BUS_DISRCV0);

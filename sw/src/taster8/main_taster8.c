@@ -89,9 +89,9 @@ static void vInterpretMessage(sBus_t* psBus, uint8_t* puMsg, uint8_t uMsgLen, ui
         // system messages
         switch (puMsg[0]) {
         case CMD_eSleep:
-            SLEEP_PinChange2_Enable();
+            SLEEP_vPinChange2_Enable();
             BUS_vSleep(&g_sBus);
-            SLEEP_PinChange2_Disable();
+            SLEEP_vPinChange2_Disable();
             break;
         case CMD_eAck:
             g_sBus.eModuleState = eMod_Running;

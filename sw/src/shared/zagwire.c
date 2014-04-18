@@ -13,6 +13,7 @@
 
 #include <avr/io.h>
 #include <avr/interrupt.h>
+#include <util/delay.h>
 
 #include "prjtypes.h"
 #include "ucontroller.h"
@@ -38,17 +39,6 @@ uint8_t     g_uTemperatureStatus    = 0;
 // --- Module global functions -------------------------------------------------
 
 // --- Global functions --------------------------------------------------------
- #define ZAGW_DDR_EN    DDRB
- //! Defines the DDR of a port which contains the Zagwire data signal.
- #define ZAGW_DDR_DATA  DDRB
- //! Defines the PORT which contains the Zagwire enable signal.
- #define ZAGW_PORT_EN   PORTB
- //! Defines the PORT which contains the Zagwire data signal.
- #define ZAGW_PORT_DATA PORTB
- //! Defines the Zagwire enable pin (output).
- #define ZAGW_EN        PB7
- //! Defines the Zagwire data pin (input).
- #define ZAGW_DATA      PB4
 
 void            ZAGW_vInit          (void)
 {
@@ -60,14 +50,15 @@ void            ZAGW_vInit          (void)
     ZAGW_PORT_DATA &= ~(1<<ZAGW_DATA);
 
     g_uTemperatureStatus = 0;
+    g_uTemperatureBits = 0;
 }
 
 void            ZAGW_vStartReception(void)
 {
-    g_uTemperatureBits &= ~(1<<ZAGW_eNewValue);
+    g_uTemperatureStatus &= ~(1<<ZAGW_eNewValue);
 }
 
-uint8_t         ZAGW_vRunReception  (void)
+uint8_t         ZAGW_uReceive  (void)
 {
     uint8_t ii, retval, parity, temp_value1, temp_value2;
 
@@ -93,7 +84,7 @@ uint8_t         ZAGW_vRunReception  (void)
             while ((ZAGW_PIN_DATA & (1<<ZAGW_DATA)) != 0);
             _delay_us(60);
             if ((ZAGW_PIN_DATA & (1<<ZAGW_DATA)) != 0) {
-                temp_value1 |= 1<<(7-i);
+                temp_value1 |= 1<<(7-ii);
                 parity++;
             } else {
                 while ((ZAGW_PIN_DATA & (1<<ZAGW_DATA)) == 0);
@@ -128,7 +119,7 @@ uint8_t         ZAGW_vRunReception  (void)
             while ((ZAGW_PIN_DATA & (1<<ZAGW_DATA)) != 0);
             _delay_us(60);
             if ((ZAGW_PIN_DATA & (1<<ZAGW_DATA)) != 0) {
-                temp_value2 |= 1<<(7-i);
+                temp_value2 |= 1<<(7-ii);
                 parity++;
             } else {
                 while ((ZAGW_PIN_DATA & (1<<ZAGW_DATA)) == 0);
@@ -149,7 +140,6 @@ uint8_t         ZAGW_vRunReception  (void)
             break;
         }
 
-
         g_uTemperatureBits = (temp_value1 << 8) | temp_value2;
         g_uTemperatureStatus |= (1<<ZAGW_eNewValue);
     } while (FALSE);
@@ -160,16 +150,28 @@ uint8_t         ZAGW_vRunReception  (void)
     return retval;
 }
 
-uint16_t        ZAGW_uGetData       (void)
+uint16_t        ZAGW_uGetBits       (void)
 {
     return g_uTemperatureBits;
 }
 
-void            ZAGW_vConvData2Temp (uint16_t               uData,
-                                     uint8_t*               puTempInteger,
-                                     uint8_t*               puTempTens)
+uint16_t        ZAGW_uGetTemperature(void)
 {
+    uint32_t temp;
+    uint16_t digival, temperature;
 
+    digival = g_uTemperatureBits;
+
+    if (digival >= 767) digival += 1;
+
+    // rangecheck: digival = 0..2048
+    temp = (uint32_t)digival * 2500;
+    temp >>= 8;
+    // rangecheck: temp = 0..20000
+
+    temp += (27315 - 5000);
+    temperature = (uint16_t)temp;
+    return temperature;
 }
 
 /** @} */

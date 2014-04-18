@@ -31,7 +31,7 @@
     #define PRJCONF_LINUX
 #elif __APPLE__
     // Mac OS, not sure if this is covered by __posix__ and/or __unix__ though...
-    #define KWB_APPLE
+    #define PRJCONF_APPLE
 #elif defined (__AVR_ATmega8__)    || \
       defined (__AVR_ATmega88__)   || \
       defined (__AVR_ATmega88A__)  || \

@@ -79,8 +79,8 @@ int main(void)
     uint8_t pwm_r = 0, pwm_g = 127, pwm_b = 33;
     int8_t  pwm_r_incr = 2, pwm_g_incr = -1, pwm_b_incr = 3;
 
-    DDRD |= LED_ERROR | LED_STATUS;
-
+    DDRD |= (LED_ERROR | LED_STATUS);
+    REG_vSetU16Register(MOD_eReg_ModuleID,10);
     CLK_vInitialize();
     BUS_vConfigure(&g_sBus, REG_uGetU16Register(MOD_eReg_ModuleID)); // configure a bus node with address X
     BUS_vInitialize(&g_sBus, 0);// initialize bus on UART 0

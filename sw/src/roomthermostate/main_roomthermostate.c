@@ -157,7 +157,7 @@ static void vInterpretMessage(sBus_t* psBus, uint8_t* puMsg, uint8_t uMsgLen, ui
         }
     } else if (puMsg[0] <= CMD_eSetRegister32bit) {
         // register messages
-        REG_vDoCommand(psBus, puMsg, uMsgLen, uSender);
+        register_do_command(psBus, puMsg, uMsgLen, uSender);
     } else {
         // system messages
         switch (puMsg[0]) {
@@ -183,17 +183,18 @@ int main(void)
 {
     uint8_t msglen = 0;
     uint8_t msg[BUS_MAXMSGLEN];
-    uint16_t sender = 0, val;
+    uint16_t module_id = BUS_UNKNOWNADR, sender = 0, val;
 
     DDRC |= ((1<<PC3) | (1<<PC4));
     PORTC &= ~((1<<PC3) | (1<<PC4));
 
-    CLK_vInitialize();
+    clk_initialize();
     
-    REG_vSetU16Register(MOD_eReg_ModuleID, 0x000E);
+    register_set_u16(MOD_eReg_ModuleID, 0x000E);
 
     // configure a bus node with address X
-    bus_configure(&g_sBus, REG_uGetU16Register(MOD_eReg_ModuleID)); 
+    register_get(MOD_eReg_ModuleID, 0, &module_id);
+    bus_configure(&g_sBus, module_id);
     bus_initialize(&g_sBus, 0);// initialize bus on UART 0
     
     SPI_vMasterInitBlk();
@@ -201,7 +202,7 @@ int main(void)
       
     sei();
 
-    g_uTargetTemp = REG_uGetU16Register(APP_eReg_DesiredTempDay1);
+    register_get(APP_eReg_DesiredTempDay1, 0, &g_uTargetTemp);
 
     GDISP_vInit();
     GDISP_vGotoColLine(0,0);
@@ -218,15 +219,15 @@ int main(void)
     GDISP_vPutText("Addr: ");
     vDrawHex16Value(g_sBus.sCfg.uOwnNodeAddress);
 
-    CLK_bTimerStart(&g_sAppTimer, 100);
+    clk_timer_start(&g_sAppTimer, 100);
     while (1) {
         if (bus_get_message(&g_sBus)) {
             if (bus_read_message(&g_sBus, &sender, &msglen, msg)) {
                 vInterpretMessage(&g_sBus, msg, msglen, sender);
             }
         }
-        if (CLK_bTimerIsElapsed(&g_sAppTimer)) {
-            CLK_bTimerStart(&g_sAppTimer,10);
+        if (clk_timer_is_elapsed(&g_sAppTimer)) {
+            clk_timer_start(&g_sAppTimer,10);
             GDISP_vChooseFont(GDISP_auFont1_x8);
             GDISP_vGotoColLine(0,3);
             GDISP_vPutText("Temp: ");

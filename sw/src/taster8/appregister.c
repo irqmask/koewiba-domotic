@@ -121,6 +121,9 @@ BOOL        app_register_get        (uint8_t                uRegNo,
         index = uRegNo - APP_eReg_0_RemChn2;
         *(uint8_t*)pvValue = ram_reg_remote_chn_2[index];
     }
+    else {
+        return FALSE;
+    }
     return TRUE;
 }
 

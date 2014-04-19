@@ -1,14 +1,13 @@
 ﻿/**
- * @addtogroup ROOMTHERMOSTATE
- * @addtogroup APPREGISTER
- * @brief Channels and registers of application roomthermostate.
+ * @addtogroup REGISTER
+ * @brief Module to handle register read and write operations.
  *
  * Contains access functions for channels and registers for different data
  * types.
  *
  * @{
- * @file    appchannelregister.h
- * @brief   Channels and registers of application roomthermostate.
+ * @file    register.h
+ * @brief   Module to handle register read and write operations.
  *
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
@@ -29,6 +28,8 @@
 #include "bus.h"
 
 // --- Definitions -------------------------------------------------------------
+
+#define REG_MAX_MAPPINGS    32  //!< Maximum number of register mappings.
 
 // --- Type definitions --------------------------------------------------------
 
@@ -87,6 +88,11 @@ void        register_send_u32       (sBus_t*                psBus,
                                      uint16_t               uReceiver,
                                      uint8_t                uRegNo,
                                      uint32_t               uValue);
+
+BOOL        register_do_mapping     (uint16_t               uRemoteModuleAddr,
+                                     uint8_t                uRemoteRegister,
+                                     uint32_t               uValue);
+
 #endif // _REGISTER_H_
 /**
  * @}

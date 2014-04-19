@@ -74,12 +74,29 @@ void vInitLedAndKeys(void)
 // Interpret message received by taster8 application
 static void vInterpretMessage(sBus_t* psBus, uint8_t* puMsg, uint8_t uMsgLen, uint16_t uSender)
 {
+    uint32_t value;
     if (puMsg[0] <= CMD_eStateDateTime) {
         // state messages
         switch (puMsg[0]) {
         case CMD_eStateBitfield:
             if (puMsg[2] & 0b00000001) LED_STATUS_ON;
             else                       LED_STATUS_OFF;
+            break;
+        case CMD_eState8bit:
+            value = puMsg[2];
+            register_do_mapping(uSender, puMsg[1], value);
+            break;
+        case CMD_eState16bit:
+            value = puMsg[2];
+            value |= ((uint16_t)puMsg[3] << 8);
+            register_do_mapping(uSender, puMsg[1], value);
+            break;
+        case CMD_eState32bit:
+            value = puMsg[2];
+            value |= ((uint32_t)puMsg[3]<<8);
+            value |= ((uint32_t)puMsg[4]<<16);
+            value |= ((uint32_t)puMsg[5]<<24);
+            register_do_mapping(uSender, puMsg[1], value);
             break;
         }
 

@@ -119,15 +119,15 @@ BOOL bCheckCRC (uint32_t* puLength)
     *puLength = 0;
 
     // get length of the application
-    EEP_uRead(MOD_eExtEEPAddr_AppSize, 4, (uint8_t*)puLength);
+    eep_read(MOD_eExtEEPAddr_AppSize, 4, (uint8_t*)puLength);
     if (*puLength > EEPROM_SIZE) return FALSE;
 
     // read expected CRC value
-    EEP_uRead(MOD_eExtEEPAddr_AppCrc, 2, (uint8_t*)&crcexpected);
+    eep_read(MOD_eExtEEPAddr_AppCrc, 2, (uint8_t*)&crcexpected);
 
     // calculate CRC of EEProm content
     for (ii=0; ii<*puLength; ii++) {
-        EEP_uRead(MOD_eExtEEPAddr_AppStart, 1, &byte);
+        eep_read(MOD_eExtEEPAddr_AppStart, 1, &byte);
         crc = _crc16_update(crc, byte);
     }
     if (crc != crcexpected) return FALSE;
@@ -139,17 +139,17 @@ BOOL bCheckControllerID (void)
 {
     uint8_t sigbyte, eepcontent = 0;
 
-    EEP_uRead(BLD_eExtEEPAddr_CtrlID + 0, 1, &eepcontent);
+    eep_read(BLD_eExtEEPAddr_CtrlID + 0, 1, &eepcontent);
     sigbyte = boot_signature_byte_get(ADDR_SIGNATURE_BYTE0);
     UART_vPutHex(sigbyte);
     //if (sigbyte != eepcontent) return FALSE;
 
-    EEP_uRead(BLD_eExtEEPAddr_CtrlID + 1, 1, &eepcontent);
+    eep_read(BLD_eExtEEPAddr_CtrlID + 1, 1, &eepcontent);
     sigbyte = boot_signature_byte_get(ADDR_SIGNATURE_BYTE1);
     UART_vPutHex(sigbyte);
     //if (sigbyte != eepcontent) return FALSE;
 
-    EEP_uRead(BLD_eExtEEPAddr_CtrlID + 2, 1, &eepcontent);
+    eep_read(BLD_eExtEEPAddr_CtrlID + 2, 1, &eepcontent);
     sigbyte = boot_signature_byte_get(ADDR_SIGNATURE_BYTE2);
     UART_vPutHex(sigbyte);
     //if (sigbyte != eepcontent) return FALSE;
@@ -189,9 +189,9 @@ void vProgramFlash (uint32_t uAddr, uint32_t uLength)
 
         for (ii=0; ii<SPM_PAGESIZE; ii+=2) {
             // read a word and convert to litte endian
-            EEP_uRead(MOD_eExtEEPAddr_AppStart + uAddr + ii, 1, &temp);
+            eep_read(MOD_eExtEEPAddr_AppStart + uAddr + ii, 1, &temp);
             ww = temp;
-            EEP_uRead(MOD_eExtEEPAddr_AppStart + uAddr + ii + 1, 1, &temp);
+            eep_read(MOD_eExtEEPAddr_AppStart + uAddr + ii + 1, 1, &temp);
             ww |= temp << 8;
             boot_page_fill (uAddr + ii, ww);
 
@@ -229,7 +229,7 @@ int main ( void )
     // initialize UART and stdout stream
     UART_vInit();
     SPI_vMasterInitBlk();
-    EEP_vInit();
+    eep_initialize();
 
     // enable sender and receiver
     DDRD |= (1<<PD2);

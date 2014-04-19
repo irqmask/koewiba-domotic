@@ -1,10 +1,10 @@
 /**
  * @addtogroup REGISTER
- * @brief Common module for register handling.
+ * @brief Module to handle register read and write operations.
  *
  * @{
  * @file    register.h
- * @brief   Common module for register handling.
+ * @brief   Module to handle register read and write operations.
  *
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
@@ -148,6 +148,15 @@ BOOL        register_get            (uint8_t                uRegNo,
     return TRUE;
 }
 
+/**
+ * Set a register value.
+ *
+ * @param[in] uRegNo    Register number to write to.
+ * @param[in] uValue    Value to be set. (up to 32bit)
+ *
+ * @note If the value provided is greater than register width, e.g. uValue is
+ * 16bit, register is 8bit, only the lower byte of uValue is used.
+ */
 void        register_set            (uint8_t                uRegNo,
                                      uint32_t               uValue)
 {
@@ -195,7 +204,7 @@ void        register_set_u32        (uint8_t                uRegNo,
 /**
  * Command interpreter for register commands.
  */
-void        register_do_command (sBus_t*                psBus,
+void        register_do_command     (sBus_t*                psBus,
                                      uint8_t*               puMsg,
                                      uint8_t                uMsgLen,
                                      uint16_t               uSender)
@@ -230,8 +239,8 @@ void        register_do_command (sBus_t*                psBus,
         if (uMsgLen >= 6) {
             temp32 = puMsg[2];
             temp32 |= ((uint32_t)puMsg[3]<<8);
-            temp32 |= ((uint32_t)puMsg[3]<<16);
-            temp32 |= ((uint32_t)puMsg[3]<<24);
+            temp32 |= ((uint32_t)puMsg[4]<<16);
+            temp32 |= ((uint32_t)puMsg[5]<<24);
             register_set_u32(puMsg[1], temp32);
         }
         break;
@@ -317,6 +326,38 @@ void        register_send_u32       (sBus_t*                psBus,
     msg[4] = (uValue >> 16) & 0x000000FF;
     msg[5] = (uValue >> 24) & 0x000000FF;
     bus_send_message(psBus, uReceiver, sizeof(msg), msg);
+}
+
+/**
+ * Map incoming stated values to local registers.
+ *
+ * @param[in] uRemoteModuleAddr Module address of incoming state message.
+ * @param[in] uRemoteRegister   Module register of incoming state message.
+ * @param[in] uValue            Value to set.
+ *
+ * @returns TRUE, if a register mapping for the received address and value
+ *          was found.
+ */
+BOOL        register_do_mapping     (uint16_t               uRemoteModuleAddr,
+                                     uint8_t                uRemoteRegister,
+                                     uint32_t               uValue)
+{
+    uint16_t    addr;
+    uint8_t     ii, reg, target_reg;
+    BOOL        retval = FALSE;
+
+    for (ii=0; ii<REG_MAX_MAPPINGS; ii++) {
+        if (!register_get(APP_eReg_RemoteAddr00 + ii, 0, &addr)) continue;
+        if (addr == uRemoteModuleAddr) {
+            if (!register_get(APP_eReg_RemoteReg00 + ii, 0, &reg)) continue;
+            if (reg == uRemoteRegister) {
+                if (!register_get(APP_eReg_TargetReg00 + ii, 0, &target_reg)) continue;
+                register_set(target_reg, uValue);
+                retval = TRUE;
+            }
+        }
+    }
+    return retval;
 }
 
 /** @} */

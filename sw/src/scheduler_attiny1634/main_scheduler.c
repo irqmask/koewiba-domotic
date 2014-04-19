@@ -69,26 +69,26 @@ int main(void)
     uint8_t     msg[BUS_MAXMSGLEN];
 
     IO_vInitialize();
-    CLK_vInitialize();
+    clk_initialize();
     bus_scheduler_configure(&g_sSched);
-    BUS_vConfigure(&g_sBus, 1); // configure a bus node with address 1
-    BUS_vInitialize(&g_sBus, 0);// initialize bus on UART 0
+    bus_configure(&g_sBus, 1); // configure a bus node with address 1
+    bus_initialize(&g_sBus, 0);// initialize bus on UART 0
 
     sei();
 
-    CLK_bTimerStart(&g_sLedTimer, CLOCK_MS_2_TICKS(1000));
+    clk_timer_start(&g_sLedTimer, CLOCK_MS_2_TICKS(1000));
 
     while (1) {
     	if (bus_schedule_and_get_message(&g_sBus, &g_sSched)) {
-    		if (BUS_bReadMessage(&g_sBus, &sender, &msglen, msg)) {
+    		if (bus_read_message(&g_sBus, &sender, &msglen, msg)) {
                 // TODO do something
     		}
     	}
     	else bus_schedule_check_and_set_sleep(&g_sBus);
 
-        if (CLK_bTimerIsElapsed(&g_sLedTimer)) {
+        if (clk_timer_is_elapsed(&g_sLedTimer)) {
         	// TODO remove after debug
-            CLK_bTimerStart(&g_sLedTimer, CLOCK_MS_2_TICKS(1000));
+            clk_timer_start(&g_sLedTimer, CLOCK_MS_2_TICKS(1000));
         }
     }
     return 0;

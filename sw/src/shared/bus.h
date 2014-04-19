@@ -210,27 +210,27 @@ typedef struct schd {
 
 // --- Global functions --------------------------------------------------------
 
-void    BUS_vConfigure                    (sBus_t*        psBus,
+void    bus_configure                     (sBus_t*        psBus,
                                            uint16_t       uNodeAddress);
 
-void    BUS_vInitialize                   (sBus_t*        psBus,
+void    bus_initialize                    (sBus_t*        psBus,
                                            uint8_t        uUart);
 
-void    BUS_vFlushBus                     (sBus_t*        psBus);
+void    bus_flush_bus                     (sBus_t*        psBus);
 
-BOOL    BUS_bGetMessage                   (sBus_t*        psBus);
+BOOL    bus_get_message                   (sBus_t*        psBus);
 
-BOOL    BUS_bReadMessage                  (sBus_t*        psBus,
+BOOL    bus_read_message                  (sBus_t*        psBus,
                                            uint16_t*      puSender,
                                            uint8_t*       puLen,
                                            uint8_t*       puMsg);
 
-BOOL    BUS_bSendMessage                  (sBus_t*        psBus,
+BOOL    bus_send_message                  (sBus_t*        psBus,
                                            uint16_t       uReceiver,
                                            uint8_t        uLen,
                                            uint8_t*       puMsg);
 
-BOOL    BUS_bSendAckMessage               (sBus_t*        psBus,
+BOOL    bus_send_ack_message               (sBus_t*        psBus,
                                            uint16_t       uReceiver);
 
 #ifdef BUS_SCHEDULER
@@ -242,7 +242,7 @@ BOOL    bus_schedule_and_get_message      (sBus_t*        psBus,
 void    bus_schedule_check_and_set_sleep  (sBus_t* psBus);
 #endif
 
-void    BUS_vSleep                        (sBus_t*       psBus);
+void    bus_sleep                        (sBus_t*       psBus);
 
 #endif /* _BUS_H_ */
 /** @} */

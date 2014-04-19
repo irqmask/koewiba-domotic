@@ -37,13 +37,13 @@
 
 // --- Global functions --------------------------------------------------------
 
-void            QUE_vInit           (uint8_t*               puQueue,
-                                     uint8_t                uSize);
+void            que_init           (uint8_t*               puQueue,
+                                    uint8_t                uSize);
                                      
-uint8_t         QUE_uPut            (uint8_t*               puQueue, 
-                                     uint8_t                uVal);
+uint8_t         que_put            (uint8_t*               puQueue,
+                                    uint8_t                uVal);
                                      
-uint16_t        QUE_uGet            (uint8_t*               puQueue);
+uint16_t        que_get            (uint8_t*               puQueue);
 
 #endif /* _QUEUE_H_ */
 /** @} */

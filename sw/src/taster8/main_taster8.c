@@ -92,14 +92,14 @@ static void vInterpretMessage(sBus_t* psBus, uint8_t* puMsg, uint8_t uMsgLen, ui
         switch (puMsg[0]) {
         case CMD_eSleep:
             SLEEP_vPinChange2_Enable();
-            BUS_vSleep(&app_bus);
+            bus_sleep(psBus);
             SLEEP_vPinChange2_Disable();
             break;
         case CMD_eAck:
-            app_bus.eModuleState = eMod_Running;
+            psBus->eModuleState = eMod_Running;
             break;
         default:
-            BUS_bSendAckMessage(psBus, uSender);
+            bus_send_ack_message(psBus, uSender);
             break;
         }
     }
@@ -116,24 +116,58 @@ int main(void)
     uint16_t    module_id = 0, sender = 0;
 
     IO_vInitialize();
-    CLK_vInitialize();
+    clk_initialize();
 
     register_get(MOD_eReg_ModuleID, 0, &module_id);
-    BUS_vConfigure(&app_bus, module_id);
-    BUS_vInitialize(&app_bus, 0);// initialize bus on UART 0
+    bus_configure(&app_bus, module_id);
+    bus_initialize(&app_bus, 0);// initialize bus on UART 0
 
     vInitLedAndKeys();
     sei();
 
     while (1) {
         // check for message and read it
-        if (BUS_bGetMessage(&app_bus)) {
-            if (BUS_bReadMessage(&app_bus, &sender, &msglen, msg)) {
+        if (bus_get_message(&app_bus)) {
+            if (bus_read_message(&app_bus, &sender, &msglen, msg)) {
                 vInterpretMessage(&app_bus, msg, msglen, sender);
             }
         }
-
         app_check_keys();
+
+        // check button
+        buttons = PIND & (BTN_TEST | BTN_EXP);
+        temp = buttons ^ oldbuttons;
+        oldbuttons = buttons;
+        if ((buttons & BTN_TEST) && (temp & BTN_TEST)) {
+            /*
+            regidx++;
+            if (regidx > 7) regidx = 0;
+
+            msg[0] = CMD_eRequestRegister;
+            msg[1] = registers[regidx];
+            msglen = 2;
+            bus_send_message(&app_bus, 0x0E, msglen, msg);*/
+            if (light1)  light1 = 0;
+            else         light1 = 1;
+
+            msg[0] = CMD_eStateBitfield;
+            msg[1] = 1;
+            msg[2] = light1;
+            msg[3] = 0b00000001;
+            msglen = 4;
+            bus_send_message(&app_bus, 0x05, msglen, msg);
+        }
+        else if ((buttons & BTN_EXP) && (temp & BTN_EXP)) {
+            if (light2)  light2 = 0;
+            else         light2 = 1;
+
+            msg[0] = CMD_eStateBitfield;
+            msg[1] = 1;
+            msg[2] = light2;
+            msg[3] = 0b00000001;
+            msglen = 4;
+            bus_send_message(&app_bus, 0x03, msglen, msg);
+        }
     }
     return 0;
 }

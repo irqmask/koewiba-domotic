@@ -166,7 +166,7 @@ static void vInterpretMessage(sBus_t* psBus, uint8_t* puMsg, uint8_t uMsgLen, ui
             break;
         case CMD_eSleep:
             SLEEP_vPinChange2_Enable();
-            BUS_vSleep(psBus);
+            bus_sleep(psBus);
             SLEEP_vPinChange2_Disable();
             break;
         default:
@@ -193,8 +193,8 @@ int main(void)
     REG_vSetU16Register(MOD_eReg_ModuleID, 0x000E);
 
     // configure a bus node with address X
-    BUS_vConfigure(&g_sBus, REG_uGetU16Register(MOD_eReg_ModuleID)); 
-    BUS_vInitialize(&g_sBus, 0);// initialize bus on UART 0
+    bus_configure(&g_sBus, REG_uGetU16Register(MOD_eReg_ModuleID)); 
+    bus_initialize(&g_sBus, 0);// initialize bus on UART 0
     
     SPI_vMasterInitBlk();
     ZAGW_vInit();
@@ -220,8 +220,8 @@ int main(void)
 
     CLK_bTimerStart(&g_sAppTimer, 100);
     while (1) {
-        if (BUS_bGetMessage(&g_sBus)) {
-            if (BUS_bReadMessage(&g_sBus, &sender, &msglen, msg)) {
+        if (bus_get_message(&g_sBus)) {
+            if (bus_read_message(&g_sBus, &sender, &msglen, msg)) {
                 vInterpretMessage(&g_sBus, msg, msglen, sender);
             }
         }

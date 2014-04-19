@@ -83,7 +83,7 @@ const uPWMCount_t g_auPWMValues[256] = {
 // --- Local functions ---------------------------------------------------------
 
 // switch counter and mask data after update between irq and non-irq functions
-static void vSwitchPages(void)
+static void switch_pages(void)
 {
     uPWMCount_t*    tmp_ptr_count;
     uint8_t*        tmp_ptr_mask;
@@ -141,7 +141,7 @@ PWM_INTERRUPT
  * Initialize PWM data and hardware. Therefore the 8bit timer 2 is used and
  * runs with about 100Hz.
  */
-void PWM_vInit(void)
+void pwm_init(void)
 {
     uint8_t channel;
 
@@ -182,7 +182,7 @@ void PWM_vInit(void)
  * @param[in] uChannel      Channel number 0..2
  * @param[in] uValue        Value 0..255
  */
-void PWM_vSet(uint8_t uChannel, uint8_t uValue)
+void pwm_set(uint8_t uChannel, uint8_t uValue)
 {
     if (uChannel >= PWM_NUM_CHANNELS) return;
     g_auPWMVal[uChannel] = uValue;
@@ -191,7 +191,7 @@ void PWM_vSet(uint8_t uChannel, uint8_t uValue)
 /**
  * Update PWM data with new duty-cycles for each channel.
  */
-void PWM_vUpdate(void)
+void pwm_update(void)
 {
     uPWMCount_t min, tmp_set;
     uint8_t     index, jj, kk, mask_bits_to_set, mask_current_bit;
@@ -289,22 +289,22 @@ void PWM_vUpdate(void)
     while (g_uSync == 0);
 #endif
     cli();
-    vSwitchPages();
+    switch_pages();
     g_uTableIndexMax = kk;
     sei();
 }
 
 /**
  * Set new channel PWM value and update.
- * PWM_vSet() and PWM_vUpdate() in one call.
+ * pwm_set() and pwm_update() in one call.
  *
  * @param[in] uChannel      Channel number 0..2
  * @param[in] uValue        Value 0..255
  */
-void PWM_vSetAndUpdate(uint8_t uChannel, uint8_t uValue)
+void pwm_set_and_update(uint8_t uChannel, uint8_t uValue)
 {
-    PWM_vSet(uChannel, uValue);
-    PWM_vUpdate();
+    pwm_set(uChannel, uValue);
+    pwm_update();
 }
 
 /** @} */

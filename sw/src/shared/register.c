@@ -256,13 +256,12 @@ void        register_send_u8        (sBus_t*                psBus,
                                      uint8_t                uRegNo,
                                      uint8_t                uValue)
 {
-    BOOL bb;
     uint8_t msg[3];
 
     msg[0] = CMD_eState8bit;
     msg[1] = uRegNo;
     msg[2] = uValue;
-    bb = BUS_bSendMessage(psBus, 0x0a, sizeof(msg), msg);
+    bus_send_message(psBus, 0x0a, sizeof(msg), msg);
 }
 
 /**
@@ -282,14 +281,13 @@ void        register_send_u16       (sBus_t*                psBus,
                                      uint8_t                uRegNo,
                                      uint16_t               uValue)
 {
-    BOOL bb;
     uint8_t msg[4];
 
     msg[0] = CMD_eState16bit;
     msg[1] = uRegNo;
     msg[2] = uValue & 0x00FF;
     msg[3] = uValue >> 8;
-    bb = BUS_bSendMessage(psBus, uReceiver, sizeof(msg), msg);
+    bus_send_message(psBus, uReceiver, sizeof(msg), msg);
 }
 
 /**
@@ -309,7 +307,6 @@ void        register_send_u32       (sBus_t*                psBus,
                                      uint8_t                uRegNo,
                                      uint32_t               uValue)
 {
-    BOOL bb;
     uint8_t msg[6];
 
     msg[0] = CMD_eState32bit;
@@ -318,7 +315,7 @@ void        register_send_u32       (sBus_t*                psBus,
     msg[3] = (uValue >> 8) & 0x000000FF;
     msg[4] = (uValue >> 16) & 0x000000FF;
     msg[5] = (uValue >> 24) & 0x000000FF;
-    bb = BUS_bSendMessage(psBus, uReceiver, sizeof(msg), msg);
+    bus_send_message(psBus, uReceiver, sizeof(msg), msg);
 }
 
 /** @} */

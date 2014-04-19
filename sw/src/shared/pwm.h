@@ -85,11 +85,11 @@
 
 // --- Global functions --------------------------------------------------------
 
-void                PWM_vInit               (void);
+void                pwm_init               (void);
 
-void                PWM_vSet                (uint8_t uChannel, uint8_t uValue);
+void                pwm_set                (uint8_t uChannel, uint8_t uValue);
 
-void                PWM_vUpdate             (void);
+void                pwm_update             (void);
 
 #endif // _PWM_H_
 /** @} */

@@ -75,42 +75,42 @@ typedef enum eCommMsgByteIndex {
 // --- Module global functions -------------------------------------------------
 
 // transport layer
-BOOL    BUS__bTrpSendReceive        (sBus_t* psBus);
+BOOL    bus_trp_send_and_receive   (sBus_t* psBus);
 
-BOOL    BUS__bSendSleepCmd          (sBus_t* psBus);
+BOOL    bus_send_sleepcmd          (sBus_t* psBus);
 
 // scheduler
 void    sched_configure             (sSched_t*       psSched);
 
 // physical layer
-void    BUS__vPhyInitialize         (sBusPhy_t*     psPhy,
+void    bus_phy_initialize         (sBusPhy_t*     psPhy,
                                      uint8_t        uUart);
 
-void    BUS__vPhyActivateSender     (sBusPhy_t*     psPhy,
+void    bus_phy_activate_sender     (sBusPhy_t*     psPhy,
                                      BOOL           bActivate);
 
-void    BUS__vPhyActivateReceiver   (sBusPhy_t*     psPhy,
+void    bus_phy_activate_receiver   (sBusPhy_t*     psPhy,
                                      BOOL           bActivate);
 
 // TODO remove after debug
 void 	BUS__vDebugSend 			(uint8_t 		*data,
 									 uint8_t 		len);
                                      
-BOOL    BUS__bPhySend               (sBusPhy_t*     psPhy,
+BOOL    bus_phy_send               (sBusPhy_t*     psPhy,
                                      const uint8_t* puMsg,
                                      uint8_t        uLen);
 
-BOOL    BUS__bPhySending            (sBusPhy_t*     psPhy);
+BOOL    bus_phy_sending            (sBusPhy_t*     psPhy);
 
-BOOL    BUS__bPhyDataReceived       (sBusPhy_t*     psPhy);
+BOOL    bus_phy_data_received       (sBusPhy_t*     psPhy);
 
-uint8_t BUS__uPhyRead               (sBusPhy_t*     psPhy,
+uint8_t bus_phy_read               (sBusPhy_t*     psPhy,
                                      uint8_t*       puInBuf);
 
-BOOL    BUS__bPhyReadByte           (sBusPhy_t*     psPhy,
+BOOL    bus_phy_read_byte           (sBusPhy_t*     psPhy,
                                      uint8_t*       puByte);
 
-void 	BUS__uPhyFlush				(sBusPhy_t* psPhy);
+void 	bus_phy_flush				(sBusPhy_t* psPhy);
 
 // --- Global functions --------------------------------------------------------
 

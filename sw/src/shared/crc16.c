@@ -75,7 +75,7 @@ static const uint16_t g_auCRCTable[] = {
 /**
  * Calculate CRC16 checksum.
  */
-uint16_t CRC_uCalc16(uint8_t* puData, uint8_t uLen)
+uint16_t crc_calc16(uint8_t* puData, uint8_t uLen)
 {
     uint16_t crc = 0;
     uint8_t temp;

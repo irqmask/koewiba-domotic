@@ -42,8 +42,8 @@ int main(void)
 
     CLK_vInitialize();
 
-    BUS_vConfigure(&g_sBus, 3); // configure a bus node with address 2
-    BUS_vInitialize(&g_sBus, 0);// initialize bus on UART 0
+    bus_configure(&g_sBus, 3); // configure a bus node with address 2
+    bus_initialize(&g_sBus, 0);// initialize bus on UART 0
 
     vInitLedAndKeys();
     sei();
@@ -53,8 +53,8 @@ int main(void)
 
     while (1) {
         // check for message and read it
-        if (BUS_bGetMessage(&g_sBus)) {
-            if (BUS_bReadMessage(&g_sBus, &sender, &msglen, msg)) {
+        if (bus_get_message(&g_sBus)) {
+            if (bus_read_message(&g_sBus, &sender, &msglen, msg)) {
             }
         }
     }

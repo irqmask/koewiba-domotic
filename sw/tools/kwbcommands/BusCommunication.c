@@ -21,8 +21,8 @@ void BUSCOMM_vInit(uint8_t uUartIndex,
                     uint16_t uOwnAddress)
 {
     BUSCOMM_vSetUartDevice(uUartIndex, pcPathFilename);
-    BUS_vInitialize(&g_sBus, uUartIndex);
-    BUS_vConfigure(&g_sBus, uOwnAddress);
+    bus_initialize(&g_sBus, uUartIndex);
+    bus_configure(&g_sBus, uOwnAddress);
 }
 
 void BUSCOMM_vDoCycle(void)
@@ -34,8 +34,8 @@ void BUSCOMM_vDoCycle(void)
     BOOL rc = TRUE;
 
     //BUS__bPhyReadByte(&g_sBus.sPhy, &length);
-    if (BUS_bGetMessage(&g_sBus)) {
-        rc = BUS_bReadMessage(&g_sBus, &sender, &length, message);
+    if (bus_get_message(&g_sBus)) {
+        rc = bus_read_message(&g_sBus, &sender, &length, message);
     
         if (rc) {
             printf("Message from %d length %d: ", sender, length);
@@ -51,7 +51,7 @@ void BUSCOMM_vDoCycle(void)
         message[1] = 1;
         message[2] = g_bLight0;
         message[3] = 0b00000001;
-        if (BUS_bSendMessage(&g_sBus, 11, 4, message)) {
+        if (bus_send_message(&g_sBus, 11, 4, message)) {
             if (g_bLight0) g_bLight0 = 0; else g_bLight0 = 1;
             g_uSendFlags &= ~(1<<0);
         }
@@ -61,7 +61,7 @@ void BUSCOMM_vDoCycle(void)
         message[1] = 1;
         message[2] = g_bLight1;
         message[3] = 0b00000001;
-        if (BUS_bSendMessage(&g_sBus, 12, 4, message)) {
+        if (bus_send_message(&g_sBus, 12, 4, message)) {
             if (g_bLight1) g_bLight1 = 0; else g_bLight1 = 1;
             g_uSendFlags &= ~(1<<1);
         }
@@ -71,7 +71,7 @@ void BUSCOMM_vDoCycle(void)
         message[1] = 1;
         message[2] = g_bLight2;
         message[3] = 0b00000001;
-        if (BUS_bSendMessage(&g_sBus, 3, 4, message)) {
+        if (bus_send_message(&g_sBus, 3, 4, message)) {
             if (g_bLight2) g_bLight2 = 0; else g_bLight2 = 1;
             g_uSendFlags &= ~(1<<2);
         }
@@ -81,7 +81,7 @@ void BUSCOMM_vDoCycle(void)
         message[1] = 1;
         message[2] = g_bLight3;
         message[3] = 0b00000001;
-        if (BUS_bSendMessage(&g_sBus, 5, 4, message)) {
+        if (bus_send_message(&g_sBus, 5, 4, message)) {
             if (g_bLight3) g_bLight3 = 0; else g_bLight3 = 1;
             g_uSendFlags &= ~(1<<3);
         }

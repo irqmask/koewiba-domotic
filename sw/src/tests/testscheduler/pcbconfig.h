@@ -24,6 +24,8 @@
 #define BUS_DDR_DISRCV0     DDRD
 #define BUS_PORT_DISRCV0    PORTD
 #define BUS_DISRCV0         PD3
+#define TXRXEN0_SEPERATE    1
+
 #define SPI_SCK_DDR         PORTC
 #define SPI_SCK_PIN         PC1
 

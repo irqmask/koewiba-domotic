@@ -390,11 +390,11 @@ static void initiate_sending(sBus_t* psBus)
 }
 
 // Check if data has been sent.
-static void send(sBus_t* psBus)
+static void check_message_sent(sBus_t* psBus)
 {
     // data completely sent?
     if (bus_phy_sending(&psBus->sPhy) == TRUE) return;
-
+    // some retries left, then move to waiting for ack.
     if (0 < psBus->sSendMsg.uRetries) {
         psBus->sSendMsg.uRetries--;
         psBus->eState = eBus_AckWaitSending;
@@ -405,18 +405,19 @@ static void send(sBus_t* psBus)
 
 static void ack_wait_sending(sBus_t* psBus)
 {
-    BOOL    bytereceived = FALSE;
     uint8_t u;
 
     do {
-        if (!(bytereceived = bus_phy_data_received(&psBus->sPhy)) || psBus->bMsgReceived) {
+        if ( !(bus_phy_data_received(&psBus->sPhy)) ) {
             break; // No byte received or message not retrieved.
         }
         bus_phy_read_byte(&psBus->sPhy, &u);
 
         if (u == BUS_SYNCBYTE) {
+
             psBus->eState = eBus_ReceivingWait;
-        } else {
+        }
+        else {
             // check ack byte
             if (u == BUS_ACKBYTE) {
                 psBus->sSendMsg.uRetries = 0;
@@ -451,7 +452,8 @@ static void ack_wait_receiving(sBus_t* psBus)
             psBus->sRecvMsg.auBuf[psBus->sRecvMsg.uOverallLength] = u;
             psBus->sRecvMsg.uOverallLength++;
             break;
-        } else if (u == BUS_ACKBYTE) {
+        }
+        else if (u == BUS_ACKBYTE) {
             reset_bus(psBus);
             break; // not the sync byte, wait for next byte
         }
@@ -479,7 +481,7 @@ BOOL bus_trp_send_and_receive(sBus_t* psBus)
 
     case eBus_Sending:
         // message is currently being sent
-        send(psBus);
+        check_message_sent(psBus);
         break;
 
     case eBus_AckWaitSending:
@@ -753,7 +755,7 @@ void bus_sleep(sBus_t*       psBus)
 
 	SLEEP_vDelayMS(1);      // wait for sys-clock becoming stable
 	bus_flush_bus(psBus);   // Clean bus-buffer
-	clk_control(TRUE);     // enable clock-timer
+	clk_control(TRUE);      // enable clock-timer
 }
 
 /** @} */

@@ -192,6 +192,11 @@
  #define ADDR_SIGNATURE_BYTE2   4
  
 #elif defined (__AVR_ATtiny1634__)
+// Signature byte addresses. TODO check for this processor!
+ #define ADDR_SIGNATURE_BYTE0   0
+ #define ADDR_SIGNATURE_BYTE1   2
+ #define ADDR_SIGNATURE_BYTE2   4
+ #define SIGRD 5 // workaround for missing define in avr-headers
  // definition of prozessor depending global settings
  // TODO CV: this part can be ported maybe to a makefile include
  #define STARTADDR_APPVECTORS   0x0000

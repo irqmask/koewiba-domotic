@@ -33,7 +33,7 @@
 #define PWM_MAX_COUNT		255
 
 // prozessor dependent register and defines
-#define SLEEP_MODE_IDLE 1
+#define SLEEP_MODE_IDLE     1
 #define REGBIT_TIMER2_CS0   1
 #define REGBIT_TIMER2_CS1   2
 #define REGBIT_TIMER2_CS2   3

@@ -166,7 +166,7 @@ BOOL sched_send_next_timeslot_token(sBus_t* psBus, sSched_t* psSched)
     }
     psSched->auTokenMsg[1] = node | 0x80;
 
-    return BUS__bPhySend(&psBus->sPhy, psSched->auTokenMsg, BUS_TOKEN_MSG_LEN);
+    return bus_phy_send(&psBus->sPhy, psSched->auTokenMsg, BUS_TOKEN_MSG_LEN);
 }
 
 
@@ -229,14 +229,14 @@ BOOL bus_schedule_and_get_message(sBus_t* psBus, sSched_t* psSched )
         // send token
     	if (sched_send_next_timeslot_token(psBus, psSched)) {
 
-    	    CLK_bTimerStart(&psSched->sNodeAnsTimeout, CLOCK_MS_2_TICKS(100));
+    	    clk_timer_start(&psSched->sNodeAnsTimeout, CLOCK_MS_2_TICKS(50));
             psBus->eState = eBus_SendingToken;
         }
         break;
 
     case eBus_SendingToken:
         // wait for finished token sending
-        if (!BUS__bPhySending(&psBus->sPhy)) {
+        if (!bus_phy_sending(&psBus->sPhy)) {
         	if (sched_current_node_is_me(psBus, psSched)) {
         		// The scheduler cannot receive its own message,
         		// so we set the state to eBus_GotToken "manually".
@@ -248,7 +248,7 @@ BOOL bus_schedule_and_get_message(sBus_t* psBus, sSched_t* psSched )
                 psBus->eState = eBus_ReceivingWait;
         	}
         }
-        else if (CLK_bTimerIsElapsed(&psSched->sNodeAnsTimeout)) {
+        else if (clk_timer_is_elapsed(&psSched->sNodeAnsTimeout)) {
         	    sched_set_node_error(psSched, psSched->auTokenMsg[1] & 0x7F);
         		// return to IDLE state
         		psBus->eState = eBus_Idle;
@@ -265,7 +265,7 @@ BOOL bus_schedule_and_get_message(sBus_t* psBus, sSched_t* psSched )
         break;
     }
 
-    msg_received = BUS__bTrpSendReceive(psBus);
+    msg_received = bus_trp_send_and_receive(psBus);
     //if (msg_received) psSched->uSleepLoopCnt = BUS_LOOPS_TILL_SLEEP;
 
     if (psSched->bSchedWaitingForAnswer) {
@@ -280,7 +280,7 @@ BOOL bus_schedule_and_get_message(sBus_t* psBus, sSched_t* psSched )
 			receive_end = TRUE;
         }
         else {
-            if (CLK_bTimerIsElapsed(&psSched->sNodeAnsTimeout)) {
+            if (clk_timer_is_elapsed(&psSched->sNodeAnsTimeout)) {
                 if (!psSched->bSchedDiscovery) {
                     sched_set_node_error(psSched, psSched->auTokenMsg[1] & 0x7F);
                 }
@@ -311,8 +311,8 @@ BOOL bus_schedule_and_get_message(sBus_t* psBus, sSched_t* psSched )
 void bus_schedule_check_and_set_sleep(sBus_t* psBus)
 {
     if (eMod_Sleeping == psBus->eModuleState) {
-        if (BUS__bSendSleepCmd(psBus)) {
-            CLK_vControl(FALSE); // disable clock-timer, otherwise
+        if (bus_send_sleepcmd(psBus)) {
+            clk_control(FALSE); // disable clock-timer, otherwise
                                  // irq will cause immediate wakeup.
 
             // sleep till byte is received.
@@ -320,9 +320,9 @@ void bus_schedule_check_and_set_sleep(sBus_t* psBus)
             sleep_mode();
 
             _delay_ms(1); // wait for sys-clock becoming stable
-            BUS_vFlushBus(psBus); // Clean bus-buffer
+            bus_flush_bus(psBus); // Clean bus-buffer
             psBus->eModuleState = eMod_Running;
-            CLK_vControl(TRUE); // enable clock-timer
+            clk_control(TRUE); // enable clock-timer
         }
     }
 }

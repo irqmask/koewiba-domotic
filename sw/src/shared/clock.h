@@ -45,13 +45,13 @@ typedef struct clktimer {
 
 // --- Global functions --------------------------------------------------------
 
-void CLK_vInitialize        (void);
+void clk_initialize        (void);
 
-void CLK_vControl           (BOOL start);
+void clk_control           (BOOL start);
 
-BOOL CLK_bTimerStart        (sClkTimer_t* psTimer, uint16_t uTicks);
+BOOL clk_timer_start       (sClkTimer_t* psTimer, uint16_t uTicks);
 
-BOOL CLK_bTimerIsElapsed    (sClkTimer_t* psTimer);
+BOOL clk_timer_is_elapsed  (sClkTimer_t* psTimer);
 
 #endif /* _CLOCK_H_ */
 /** @} */

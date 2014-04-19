@@ -77,8 +77,8 @@ int main(void)
     IO_vInitialize();
     CLK_vInitialize();
     bus_scheduler_configure(&g_sSched);
-    BUS_vConfigure(&g_sBus, 1); // configure a bus node with address 1
-    BUS_vInitialize(&g_sBus, 0);// initialize bus on UART 0
+    bus_configure(&g_sBus, 1); // configure a bus node with address 1
+    bus_initialize(&g_sBus, 0);// initialize bus on UART 0
     g_sBus.eModuleState = eMod_Discovery;
 
     //vInitLedAndKeys();
@@ -88,7 +88,7 @@ int main(void)
 
     while (1) {
     	if (bus_schedule_and_get_message(&g_sBus, &g_sSched)) {
-    		if (BUS_bReadMessage(&g_sBus, &sender, &msglen, msg)) {
+    		if (bus_read_message(&g_sBus, &sender, &msglen, msg)) {
                 // TODO do something
     		}
     	}

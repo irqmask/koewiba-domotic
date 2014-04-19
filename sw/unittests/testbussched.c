@@ -12,12 +12,12 @@ const uint8_t g_uLoggingOn = 0;
 // Function stubs for bus_schedul.c and bus_transport.c
 //-----------------------------------------------------------------------------
 
-void    BUS__vPhyInitialize         (sBusPhy_t*     psPhy,
+void    bus_phy_initialize         (sBusPhy_t*     psPhy,
                                      uint8_t        uUart)
 {
 }
 
-BOOL    BUS__bPhySend               (sBusPhy_t*     psPhy,
+BOOL    bus_phy_send               (sBusPhy_t*     psPhy,
                                      const uint8_t* puMsg,
                                      uint8_t        uLen)
 {
@@ -25,29 +25,29 @@ BOOL    BUS__bPhySend               (sBusPhy_t*     psPhy,
 }
 
 
-BOOL    BUS__bPhySending            (sBusPhy_t*     psPhy)
+BOOL    bus_phy_sending            (sBusPhy_t*     psPhy)
 {
     return FALSE;
 }
 
-BOOL    BUS__bPhyDataReceived       (sBusPhy_t*     psPhy)
+BOOL    bus_phy_data_received       (sBusPhy_t*     psPhy)
 {
     return TRUE;
 }
 
-uint8_t BUS__uPhyRead               (sBusPhy_t*     psPhy,
+uint8_t bus_phy_read               (sBusPhy_t*     psPhy,
                                      uint8_t*       puInBuf)
 {
     return 1;
 }
 
-BOOL    BUS__bPhyReadByte           (sBusPhy_t*     psPhy,
+BOOL    bus_phy_read_byte           (sBusPhy_t*     psPhy,
                                      uint8_t*       puByte)
 {
     return TRUE;
 }
 
-void    BUS__uPhyFlush              (sBusPhy_t* psPhy)
+void    bus_phy_flush              (sBusPhy_t* psPhy)
 {
 }
 

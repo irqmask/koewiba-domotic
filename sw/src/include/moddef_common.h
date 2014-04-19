@@ -26,6 +26,7 @@
 
 //! Common register storage layout which is used by all applications.
 typedef enum {
+    MOD_eReg_Undefined,
     MOD_eReg_ModuleID,                  //!< Module ID as it appears on the bus.
     MOD_eReg_BldFlag,                   //!< Storage for bootloader flags for
                                         //!< next reboot will be reset by the

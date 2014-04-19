@@ -15,6 +15,8 @@ SRC = shared/bus_phy.c \
       shared/led_debug.c \
       shared/register.c \
       taster8/appregister.c \
+      taster8/application.c \
+      taster8/ledskeys.c \
       taster8/main_taster8.c
 
 # Place -I options here

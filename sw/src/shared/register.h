@@ -45,6 +45,8 @@ typedef enum regtype {
 
 // --- Global variables --------------------------------------------------------
 
+extern uint8_t register_eeprom_array[];
+
 // --- Module global variables -------------------------------------------------
 
 // --- Local functions ---------------------------------------------------------
@@ -53,40 +55,38 @@ typedef enum regtype {
 
 // --- Global functions --------------------------------------------------------
 
-uint8_t         REG_uGetU8Register      (uint8_t                uRegNo);
+BOOL        register_get            (uint8_t                uRegNo,
+                                     eRegType_t*            peRegType,
+                                     void*                  pvValue);
 
-uint16_t        REG_uGetU16Register     (uint8_t                uRegNo);
+void        register_set_u8         (uint8_t                uRegNo,
+                                     uint8_t                uValue);
 
-uint32_t        REG_uGetU32Register     (uint8_t                uRegNo);
+void        register_set_u16        (uint8_t                uRegNo,
+                                     uint16_t               uValue);
 
-void            REG_vSetU8Register      (uint8_t                uRegNo,
-                                         uint8_t                uValue);
+void        register_set_u32        (uint8_t                uRegNo,
+                                     uint32_t               uValue);
 
-void            REG_vSetU16Register     (uint8_t                uRegNo,
-                                         uint16_t               uValue);
+void        register_do_command     (sBus_t*                psBus,
+                                     uint8_t*               puMsg,
+                                     uint8_t                uMsgLen,
+                                     uint16_t               uSender);
 
-void            REG_vSetU32Register     (uint8_t                uRegNo,
-                                         uint32_t               uValue);
+void        register_send_u8        (sBus_t*                psBus,
+                                     uint16_t               uReceiver,
+                                     uint8_t                uRegNo,
+                                     uint8_t                uValue);
 
-void            REG_vDoCommand          (sBus_t*                psBus,
-                                         uint8_t*               puMsg,
-                                         uint8_t                uMsgLen,
-                                         uint16_t               uSender);
+void        register_send_u16       (sBus_t*                psBus,
+                                     uint16_t               uReceiver,
+                                     uint8_t                uRegNo,
+                                     uint16_t               uValue);
 
-void            REG_vSendStateU8        (sBus_t*                psBus,
-                                         uint16_t               uReceiver,
-                                         uint8_t                uRegNo,
-                                         uint8_t                uValue);
-
-void            REG_vSendStateU16       (sBus_t*                psBus,
-                                         uint16_t               uReceiver,
-                                         uint8_t                uRegNo,
-                                         uint16_t               uValue);
-
-void            REG_vSendStateU32       (sBus_t*                psBus,
-                                         uint16_t               uReceiver,
-                                         uint8_t                uRegNo,
-                                         uint32_t               uValue);
+void        register_send_u32       (sBus_t*                psBus,
+                                     uint16_t               uReceiver,
+                                     uint8_t                uRegNo,
+                                     uint32_t               uValue);
 #endif // _REGISTER_H_
 /**
  * @}

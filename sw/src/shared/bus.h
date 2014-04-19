@@ -62,17 +62,18 @@
  * @}
  */
 
-#define BUS_MAXMSGLEN          16
+#define BUS_MAXMSGLEN       16
 //! length of message including header and footer
-#define BUS_MAXTOTALMSGLEN		(BUS_MAXMSGLEN + 7)
-#define BUS_MAXBIGMSGLEN       (64 + 2)
-#define BUS_EMPTY_MSG_LEN      3
-#define BUS_TOKEN_MSG_LEN      2
+#define BUS_MAXTOTALMSGLEN  (BUS_MAXMSGLEN + 7)
+#define BUS_MAXBIGMSGLEN    (64 + 2)
+#define BUS_EMPTY_MSG_LEN   3
+#define BUS_TOKEN_MSG_LEN   2
 
-#define BUS_FIRSTNODE   0x01
-#define BUS_LASTNODE    0x7F
+#define BUS_FIRSTNODE       0x01
+#define BUS_LASTNODE        0x7F
 
-#define BUS_BRDCSTADR   0x00 // Broadcastaddress
+#define BUS_BRDCSTADR       0x0000  //!< global broadcast address.
+#define BUS_UNKNOWNADR      0xFFFF  //!< unknown address.
 
 // --- Type definitions --------------------------------------------------------
 

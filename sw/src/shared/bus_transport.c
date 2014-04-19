@@ -184,7 +184,7 @@ static BOOL receive(sBus_t* psBus)
             			psBus->sRecvMsg.uOverallLength = 0;
             			break;
             		} else {
-            			// invalid length of message
+            			// invalid crc of message
             			reset_bus(psBus);
             			break;
             		}

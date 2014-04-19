@@ -30,6 +30,8 @@ sBus_t  app_bus;
 
 // --- Module global functions -------------------------------------------------
 
+void        app_initialize_modes    (void);
+
 // --- Global functions --------------------------------------------------------
 
 void        app_initialize          (void);

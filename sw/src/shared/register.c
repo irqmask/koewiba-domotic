@@ -151,8 +151,8 @@ BOOL        register_get            (uint8_t                uRegNo,
 void        register_set            (uint8_t                uRegNo,
                                      uint32_t               uValue)
 {
-    uint16_t tempval16;
-    uint8_t tempval;
+    uint16_t    tempval16;
+    uint8_t     tempval;
 
     switch (uRegNo) {
     // registers saved in EEProm
@@ -167,6 +167,7 @@ void        register_set            (uint8_t                uRegNo,
 
     // registers in ROM/RAM
 
+    // application registers
     default:
         app_register_set(uRegNo, uValue);
         break;
@@ -261,7 +262,7 @@ void        register_send_u8        (sBus_t*                psBus,
     msg[0] = CMD_eState8bit;
     msg[1] = uRegNo;
     msg[2] = uValue;
-    bus_send_message(psBus, 0x0a, sizeof(msg), msg);
+    bus_send_message(psBus, uReceiver, sizeof(msg), msg);
 }
 
 /**

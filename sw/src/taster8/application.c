@@ -44,50 +44,22 @@ sBus_t  app_bus;
 
 // --- Local functions ---------------------------------------------------------
 
-void        initialize_modes        (void)
-{
-    uint8_t ii, mode, mask;
-
-    pressed_keys_mask = 0;
-    shortpressed_keys_mask = 0;
-    mode_0_mask = 0;
-    mode_1_mask = 0;
-    for (ii=0; ii<APP_NUM_KEYS; ii++) {
-        app_register_get(APP_eReg_0_Mode + ii, 0, &mode);
-        mask = 1 << ii;
-        switch (mode) {
-        case 0: // send state of the key (e.g. pressed, released)
-            mode_0_mask |= mask;
-            pressed_keys_mask |= mask;
-            break;
-        case 1: // send register on/off
-            mode_1_mask |= mask;
-            shortpressed_keys_mask |= mask;
-            break;
-        default:
-            // no action
-            break;
-        }
-    }
-}
-
 void        send_key_states         (uint8_t uPressedKeys,
                                      uint8_t uChangedKeys)
 {
     uint16_t target_moduleids[APP_NUM_KEYS*2], receiver;
-    uint8_t ii, regindex, msg[4], msglen, num_receiver;
+    uint8_t ii, msg[4], msglen, num_receiver;
 
     // build address list
     num_receiver = 0;
-    regindex = APP_eReg_0_RemoteAddr0;
     for (ii=0; ii<APP_NUM_KEYS; ii++) {
         if (((1<<ii) & uChangedKeys) == 0) continue;
         // first remote address of channel [ii]
-        if (!register_get(regindex++, 0, &receiver)) continue;
+        if (!register_get(APP_eReg_0_RemoteAddr0 + ii, 0, &receiver)) continue;
         if (receiver == BUS_UNKNOWNADR) continue;
         target_moduleids[num_receiver++] = receiver;
         // second remote address of channel [ii]
-        if (!register_get(regindex++, 0, &receiver)) continue;
+        if (!register_get(APP_eReg_0_RemoteAddr1 + ii, 0, &receiver)) continue;
         if (receiver == BUS_UNKNOWNADR) continue;
         target_moduleids[num_receiver++] = receiver;
     }
@@ -99,7 +71,7 @@ void        send_key_states         (uint8_t uPressedKeys,
         msg[2] = uPressedKeys;
         msg[3] = uChangedKeys;
         msglen = 4;
-        BUS_bSendMessage(&app_bus, target_moduleids[ii], msglen, msg);
+        bus_send_message(&app_bus, target_moduleids[ii], msglen, msg);
     }
 }
 
@@ -126,11 +98,11 @@ void        toggle_on_off           (uint8_t uPressedKeys)
         }
 
         register_set_u8(APP_eReg_0_TgtChn0 + ii, current_value);
-        if (register_get(APP_eReg_0_RemoteAddr0 + ii*2, 0, &receiver) &&
+        if (register_get(APP_eReg_0_RemoteAddr0 + ii, 0, &receiver) &&
             (receiver != BUS_UNKNOWNADR)) {
             register_send_u8(&app_bus, receiver, APP_eReg_0_TgtChn0 + ii, current_value);
         }
-        if (register_get(APP_eReg_0_RemoteAddr1 + ii*2, 0, &receiver) &&
+        if (register_get(APP_eReg_0_RemoteAddr1 + ii, 0, &receiver) &&
             (receiver != BUS_UNKNOWNADR)) {
             register_send_u8(&app_bus, receiver, APP_eReg_0_TgtChn0 + ii, current_value);
         }
@@ -139,6 +111,33 @@ void        toggle_on_off           (uint8_t uPressedKeys)
 
 // --- Module global functions -------------------------------------------------
 
+void        app_initialize_modes    (void)
+{
+    uint8_t ii, mode, mask;
+
+    pressed_keys_mask = 0;
+    shortpressed_keys_mask = 0;
+    mode_0_mask = 0;
+    mode_1_mask = 0;
+    for (ii=0; ii<APP_NUM_KEYS; ii++) {
+        app_register_get(APP_eReg_0_Mode + ii, 0, &mode);
+        mask = 1 << ii;
+        switch (mode) {
+        case 0: // send state of the key (e.g. pressed, released)
+            mode_0_mask |= mask;
+            pressed_keys_mask |= mask;
+            break;
+        case 1: // send register on/off
+            mode_1_mask |= mask;
+            shortpressed_keys_mask |= mask;
+            break;
+        default:
+            // no action
+            break;
+        }
+    }
+}
+
 // --- Global functions --------------------------------------------------------
 
 void    app_initialize          (void)
@@ -146,7 +145,7 @@ void    app_initialize          (void)
     uint8_t ii;
 
     old_pressed_keys = 0;
-    initialize_modes();
+    app_initialize_modes();
 
     for (ii=0; ii<APP_NUM_KEYS; ii++) {
         app_register_set(APP_eReg_0_LEDState + ii, 0);
@@ -154,7 +153,6 @@ void    app_initialize          (void)
         app_register_set(APP_eReg_0_RemChn1 + ii, 0);
         app_register_set(APP_eReg_0_RemChn2 + ii, 0);
     }
-
 }
 
 void    app_check_keys          (void)
@@ -208,16 +206,16 @@ void        app_factory_reset       (void)
     // delete register mapping lookup table
     size = APP_eReg_RemoteAddr31 - APP_eReg_RemoteAddr00 + 1;
     for (ii=0; ii<size; ii++) {
-        register_set_u16(APP_eReg_RemoteAddr00 + ii*3, BUS_UNKNOWNADR);
-        register_set_u8(APP_eReg_RemoteReg00 + ii*3, MOD_eReg_Undefined);
-        register_set_u8(APP_eReg_TargetReg00 + ii*3, MOD_eReg_Undefined);
+        register_set_u16(APP_eReg_RemoteAddr00 + ii, BUS_UNKNOWNADR);
+        register_set_u8(APP_eReg_RemoteReg00 + ii, MOD_eReg_Undefined);
+        register_set_u8(APP_eReg_TargetReg00 + ii, MOD_eReg_Undefined);
     }
 
     // reset mode register to mode 0 and reset send addresses.
     for (ii=0; ii<APP_NUM_KEYS; ii++) {
         register_set_u8(APP_eReg_0_Mode + ii, 0);
-        register_set_u16(APP_eReg_0_RemoteAddr0 + ii*2, BUS_UNKNOWNADR);
-        register_set_u16(APP_eReg_0_RemoteAddr1 + ii*2, BUS_UNKNOWNADR);
+        register_set_u16(APP_eReg_0_RemoteAddr0 + ii, BUS_UNKNOWNADR);
+        register_set_u16(APP_eReg_0_RemoteAddr1 + ii, BUS_UNKNOWNADR);
     }
 }
 

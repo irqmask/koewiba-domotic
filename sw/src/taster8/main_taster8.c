@@ -133,41 +133,6 @@ int main(void)
             }
         }
         app_check_keys();
-
-        // check button
-        buttons = PIND & (BTN_TEST | BTN_EXP);
-        temp = buttons ^ oldbuttons;
-        oldbuttons = buttons;
-        if ((buttons & BTN_TEST) && (temp & BTN_TEST)) {
-            /*
-            regidx++;
-            if (regidx > 7) regidx = 0;
-
-            msg[0] = CMD_eRequestRegister;
-            msg[1] = registers[regidx];
-            msglen = 2;
-            bus_send_message(&app_bus, 0x0E, msglen, msg);*/
-            if (light1)  light1 = 0;
-            else         light1 = 1;
-
-            msg[0] = CMD_eStateBitfield;
-            msg[1] = 1;
-            msg[2] = light1;
-            msg[3] = 0b00000001;
-            msglen = 4;
-            bus_send_message(&app_bus, 0x05, msglen, msg);
-        }
-        else if ((buttons & BTN_EXP) && (temp & BTN_EXP)) {
-            if (light2)  light2 = 0;
-            else         light2 = 1;
-
-            msg[0] = CMD_eStateBitfield;
-            msg[1] = 1;
-            msg[2] = light2;
-            msg[3] = 0b00000001;
-            msglen = 4;
-            bus_send_message(&app_bus, 0x03, msglen, msg);
-        }
     }
     return 0;
 }

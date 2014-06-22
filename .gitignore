@@ -27,3 +27,8 @@
 *.x86_64
 *.hex
 *.eep
+
+# Directories
+**/build
+**/CMakeFiles
+**/3rd_party/**

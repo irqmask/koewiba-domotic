@@ -17,6 +17,8 @@ FILE(WRITE ${CMAKE_CURRENT_BINARY_DIR}/kwb_unittests_version.h
 
 SET(kwb_unittests_SRCS
     ../src/shared/pwm.c
+    ../src/upload/ihex.c
+    testihex.c
     testpwm.c
     register_tests.c
     main.c

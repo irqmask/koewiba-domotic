@@ -1,19 +1,15 @@
 /**
- * @addtogroup QUEUE    
- * @brief Interrupt safe queue for syncronizing data.
- *
- * This module contains functions to initialize the queue, enqueue a byte or
- * dequeue a byte.
+ * @addtogroup TESTSCHEDULER_PCBCONFIG
+ * @brief PCB configuration of the "testscheduler" application.
  *
  * @{
- * @file    queue.h
- * @brief   Functions for queuing data.
+ * @file    pcbconfig.h
+ * @brief   PCB configuration of the "testscheduler" application.
  *
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
-
-#ifndef _QUEUE_H_
-#define _QUEUE_H_
+#ifndef _PCBCONFIG_H_
+#define _PCBCONFIG_H_
 
 // --- Include section ---------------------------------------------------------
 
@@ -21,7 +17,31 @@
 
 // --- Definitions -------------------------------------------------------------
 
-#define QUEUE_HEADER_SIZE 3
+#define BUS_PCBCONFIG 1
+
+#define TXRXEN1_SEPERATE 1
+
+#define BUS_DDR_ENASND0  DDRA
+#define BUS_DDR_ENASND1  DDRA
+#define BUS_DDR_DISRCV0  DDRA
+#define BUS_DDR_DISRCV1  DDRA
+#define BUS_PORT_ENASND0 PORTA
+#define BUS_PORT_ENASND1 PORTA
+#define BUS_PORT_DISRCV0 PORTA
+#define BUS_PORT_DISRCV1 PORTA
+#define BUS_ENASND0      PA6
+#define BUS_ENASND1      PA5
+#define BUS_DISRCV0      PA6
+#define BUS_DISRCV1      PA2
+
+#define LED_STATUS_ON
+#define LED_STATUS_OFF
+#define LED_STATUS_TOGGLE
+
+#define LED_ERROR_ON
+#define LED_ERROR_OFF
+#define LED_ERROR_TOGGLE
+
 
 // --- Type definitions --------------------------------------------------------
 
@@ -37,13 +57,5 @@
 
 // --- Global functions --------------------------------------------------------
 
-void            que_init           (uint8_t*               puQueue,
-                                    uint8_t                uSize);
-                                     
-uint8_t         que_put            (uint8_t*               puQueue,
-                                    uint8_t                uVal);
-                                     
-uint16_t        que_get            (uint8_t*               puQueue);
-
-#endif /* _QUEUE_H_ */
+#endif // _PCBCONFIG_H_
 /** @} */

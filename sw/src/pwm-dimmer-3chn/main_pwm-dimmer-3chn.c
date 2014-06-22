@@ -56,7 +56,7 @@ static void vInterpretMessage(sBus_t* psBus, uint8_t* puMsg, uint8_t uMsgLen, ui
             break;
         case CMD_eSleep:
             SLEEP_vPinChange2_Enable();
-            BUS_vSleep(psBus);
+            bus_sleep(psBus);
             SLEEP_vPinChange2_Disable();
             break;
         default:
@@ -79,13 +79,11 @@ int main(void)
     uint8_t pwm_r = 0, pwm_g = 127, pwm_b = 33;
     int8_t  pwm_r_incr = 2, pwm_g_incr = -1, pwm_b_incr = 3;
 
-    DDRC |= ((1<<PC3) | (1<<PC4)); //??? TODO
     DDRD |= LED_ERROR | LED_STATUS;
-    PORTC &= ~((1<<PC3) | (1<<PC4)); //??? TODO
 
     CLK_vInitialize();
-    BUS_vConfigure(&g_sBus, REG_uGetU16Register(MOD_eReg_ModuleID)); // configure a bus node with address X
-    BUS_vInitialize(&g_sBus, 0);// initialize bus on UART 0
+    bus_configure(&g_sBus, REG_uGetU16Register(MOD_eReg_ModuleID)); // configure a bus node with address X
+    bus_initialize(&g_sBus, 0);// initialize bus on UART 0
 
     SPI_vMasterInitBlk();
     //EEP_vInit();
@@ -97,28 +95,24 @@ int main(void)
     PWM_vSet(2,0);
     PWM_vUpdate();
     CLK_bTimerStart(&pwm_demotimer, 5);
-    while (1) {
 
-        if (BUS_bGetMessage(&g_sBus)) {
-            if (BUS_bReadMessage(&g_sBus, &sender, &msglen, msg)) {
+    while (1) {
+        if (bus_get_message(&g_sBus)) {
+            if (bus_read_message(&g_sBus, &sender, &msglen, msg)) {
                 vInterpretMessage(&g_sBus, msg, msglen, sender);
             }
         }
         if (CLK_bTimerIsElapsed(&pwm_demotimer)) {
+            if (pwm_r > 255-2) pwm_r_incr = -2;
+            if (pwm_r < 2) pwm_r_incr = 2;
+            if (pwm_g > 255-1) pwm_g_incr = -1;
+            if (pwm_g < 1) pwm_g_incr = 1;
+            if (pwm_b > 255-3) pwm_b_incr = -3;
+            if (pwm_b < 3) pwm_b_incr = 3;
 
-           // PWM_CHN0_PORT ^= (1<<PWM_CHN0_PIN);
-           // PWM_CHN0_PORT ^= (1<<PWM_CHN1_PIN);
-           // PWM_CHN0_PORT ^= (1<<PWM_CHN2_PIN);
-            if (pwm_r == 255) pwm_r_incr = -2;
-            if (pwm_r == 0) pwm_r_incr = 2;
-            if (pwm_g == 255) pwm_g_incr = -1;
-            if (pwm_g == 0) pwm_g_incr = 1;
-            if (pwm_b == 255) pwm_b_incr = -3;
-            if (pwm_b == 0) pwm_b_incr = 3;
-
-            PWM_vSet(1,pwm_r);
-            PWM_vSet(0,pwm_g);
-            PWM_vSet(2,pwm_b);
+            PWM_vSet(0, pwm_r);
+            PWM_vSet(1, pwm_g);
+            PWM_vSet(2, pwm_b);
             pwm_r += pwm_r_incr;
             pwm_g += pwm_g_incr;
             pwm_b += pwm_b_incr;

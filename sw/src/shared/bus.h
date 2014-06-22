@@ -69,9 +69,8 @@
 #define BUS_EMPTY_MSG_LEN      3
 #define BUS_TOKEN_MSG_LEN      2
 
-#ifndef BUS_MAXNODES
-#define BUS_MAXNODES 16
-#endif
+#define BUS_FIRSTNODE   0x01
+#define BUS_LASTNODE    0x7F
 
 #define BUS_BRDCSTADR   0x00 // Broadcastaddress
 
@@ -156,9 +155,16 @@ typedef struct sndbusmsg {
 
 //! contains all information about a node needed for scheduling.
 typedef struct nodeinfo {
-    uint16_t        uAddress;
-    uint16_t        uErrCnt;
+    uint8_t        uAddress;
+    uint8_t        uErrCnt;
 } sNodeInfo_t;
+
+//! contains a bitfield (each bit represents one node)
+typedef struct schednodes {
+    uint8_t        uAddress[16]; // Bitfield for 128 Nodes
+    uint8_t        uErrNode;     // Node in error-state
+    uint8_t        uErrCnt;      // error-count
+} sSchedNodes;
 
 //! data of bus. used as handle for all public methods.
 typedef struct bus {
@@ -176,12 +182,15 @@ typedef struct bus {
     sClkTimer_t     sAckTimeout;                    //!< ack timeout
 } sBus_t;
 
+
 // following data is only used by bus scheduler
-typedef struct sched {
-    sNodeInfo_t     asNodeList[BUS_MAXNODES];       //!< list of configured nodes
-    sNodeInfo_t     asDiscoveryList[BUS_MAXNODES];  //!< list of empty nodes
+typedef struct schd {
+    sSchedNodes     asNodeList;       //!< list of configured nodes
     uint8_t         uCurrentNode;                   //!< current processed node
     uint8_t         uDiscoverNode;                  //!< current discovery-address
+    uint8_t         uErrorNode;                     //!< current node-address in error-state
+    uint8_t         uErrorCount;                    //!< current error-count
+    uint8_t         uSleepLoopCnt;                  //!< count till going to sleep.
     uint8_t         auTokenMsg[BUS_TOKEN_MSG_LEN];  //!< pre-compiled token message.
     BOOL            bSchedDiscovery;                //!< bus-discovery mode.
     BOOL            bSchedWaitingForAnswer;         //!< flag, if scheduler is waiting for an answer
@@ -200,38 +209,39 @@ typedef struct sched {
 
 // --- Global functions --------------------------------------------------------
 
-void    BUS_vConfigure              (sBus_t*        psBus,
-                                     uint16_t       uNodeAddress);
+void    bus_configure                     (sBus_t*        psBus,
+                                           uint16_t       uNodeAddress);
 
-void    BUS_vInitialize             (sBus_t*        psBus,
-                                     uint8_t        uUart);
+void    bus_initialize                    (sBus_t*        psBus,
+                                           uint8_t        uUart);
 
-void    BUS_vSchedulConfigure       (sSched_t*      psSched);
+void    bus_flush_bus                     (sBus_t*        psBus);
 
-void    BUS_vFlushBus               (sBus_t*        psBus);
+BOOL    bus_get_message                   (sBus_t*        psBus);
 
-BOOL    BUS_bGetMessage             (sBus_t*        psBus);
+BOOL    bus_read_message                  (sBus_t*        psBus,
+                                           uint16_t*      puSender,
+                                           uint8_t*       puLen,
+                                           uint8_t*       puMsg);
 
-BOOL    BUS_bReadMessage            (sBus_t*        psBus,
-                                     uint16_t*      puSender,
-                                     uint8_t*       puLen,
-                                     uint8_t*       puMsg);
+BOOL    bus_send_message                  (sBus_t*        psBus,
+                                           uint16_t       uReceiver,
+                                           uint8_t        uLen,
+                                           uint8_t*       puMsg);
 
-BOOL    BUS_bSendMessage            (sBus_t*        psBus,
-                                     uint16_t       uReceiver,
-                                     uint8_t        uLen,
-                                     uint8_t*       puMsg);
-
-BOOL    BUS_bSendAckMessage         (sBus_t*        psBus,
-                                     uint16_t       uReceiver);
+BOOL    bus_send_ack_message               (sBus_t*        psBus,
+                                           uint16_t       uReceiver);
 
 #ifdef BUS_SCHEDULER
-BOOL    BUS_bScheduleAndGetMessage  (sBus_t*        psBus,
-                                     sSched_t*      psSched);
-void    BUS_vScheduleCheckAndSetSleep(sBus_t* psBus);
+void    bus_scheduler_configure             (sSched_t*      psSched);
+
+BOOL    bus_schedule_and_get_message      (sBus_t*        psBus,
+                                           sSched_t*      psSched);
+
+void    bus_schedule_check_and_set_sleep  (sBus_t* psBus);
 #endif
 
-void    BUS_vSleep                   (sBus_t*       psBus);
+void    bus_sleep                        (sBus_t*       psBus);
 
 #endif /* _BUS_H_ */
 /** @} */

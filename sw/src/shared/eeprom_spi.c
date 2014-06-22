@@ -68,7 +68,7 @@ enum eEEPCommands {
  * Initialize the EEProm.
  * Configure chip select pin and deactivate chip select.
  */
-void            EEP_vInit           (void)
+void eep_initialize(void)
 {
     EEP_CS_DDR |= (1<<EEP_CS);
     EEP_SPI_CS_DEACTIVATE;
@@ -78,17 +78,15 @@ void            EEP_vInit           (void)
  * Returns the masked Flag-Bit(s) if uFlagMask is not 0. Otherwise the whole status
  * register will be returned.
  */
-uint8_t         EEP_uCheckStatusReg (uint8_t                uFlagMask)
+uint8_t eep_check_statusregister(uint8_t uFlagMask)
 {
     uint8_t retval;
 
     EEP_SPI_CS_ACTIVATE;
     SPI_uTransmitBlk(eEEP_RDSR);
     SPI_uTransmitBlk(0);
-    if ( uFlagMask )
-        retval = (uFlagMask & SPDR);
-    else
-        retval = SPDR;
+    if ( uFlagMask ) retval = (uFlagMask & SPDR);
+    else             retval = SPDR;
     EEP_SPI_CS_DEACTIVATE;
     return retval;
 }
@@ -97,9 +95,9 @@ uint8_t         EEP_uCheckStatusReg (uint8_t                uFlagMask)
  * Reads uCount bytes from EEPROM beginning at address uEEPAddress into
  * puBuffer and returns the number of data, that was read.
  */
-uint16_t        EEP_uRead           (uint16_t               uEEPAddress,
-                                     uint16_t               uCount,
-                                     uint8_t*               puBuffer)
+uint16_t        eep_read           (uint16_t               uEEPAddress,
+                                    uint16_t               uCount,
+                                    uint8_t*               puBuffer)
 {
     uint16_t read = 0;
     uint8_t addressH = (0xFF00 & uEEPAddress) >> 8;
@@ -108,7 +106,7 @@ uint16_t        EEP_uRead           (uint16_t               uEEPAddress,
     if ( uEEPAddress + uCount > EEPROM_SIZE )
         return 0;
 
-    while (EEP_uCheckStatusReg(eEEP_WIP) != 0);
+    while (eep_check_statusregister(eEEP_WIP) != 0);
 
     EEP_SPI_CS_ACTIVATE;
     SPI_uTransmitBlk(eEEP_READ);
@@ -126,9 +124,9 @@ uint16_t        EEP_uRead           (uint16_t               uEEPAddress,
  * Writes uCount bytes from puBuffer into EEPROM beginning at address
  * uEEPAddress and returns the number of data, that was written.
  */
-uint16_t        EEP_uWrite          (uint16_t               uEEPAddress,
-                                     uint16_t               uCount,
-                                     const uint8_t*         puBuffer)
+uint16_t eep_write(uint16_t       uEEPAddress,
+                   uint16_t       uCount,
+                   const uint8_t* puBuffer)
 {
     uint8_t attempt = 3;
     uint16_t pos = 0, byteCnt = uCount;
@@ -140,13 +138,13 @@ uint16_t        EEP_uWrite          (uint16_t               uEEPAddress,
         uint8_t addressH = (0xFF00 & uEEPAddress) >> 8;
         uint8_t addressL = (0x00FF & uEEPAddress);
 
-        while ( EEP_uCheckStatusReg(eEEP_WIP) != 0);
+        while ( eep_check_statusregister(eEEP_WIP) != 0);
 
         EEP_SPI_CS_ACTIVATE;
         SPI_uTransmitBlk(eEEP_WREN);
         EEP_SPI_CS_DEACTIVATE;
 
-        if ( EEP_uCheckStatusReg(eEEP_WEL) ) {
+        if ( eep_check_statusregister(eEEP_WEL) ) {
             EEP_SPI_CS_ACTIVATE;
             attempt = 0;
             SPI_uTransmitBlk(eEEP_WRITE);

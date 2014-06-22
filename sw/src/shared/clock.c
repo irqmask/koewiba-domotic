@@ -34,7 +34,7 @@ volatile sClkTimer_t* g_asRunningTimers[CLOCK_NUM_TIMER];
 /**
  * Register timer in list.
  */
-BOOL bRegisterTimer(sClkTimer_t* psTimer)
+static BOOL register_timer(sClkTimer_t* psTimer)
 {
     uint8_t ii;
 
@@ -70,7 +70,7 @@ ISR(INTERRUPT_TIMER0_COMPA)
 /**
  * Initialize clock module. Reset data and start hardware timer.
  */
-void CLK_vInitialize(void)
+void clk_initialize(void)
 {
     uint8_t ii;
 
@@ -100,7 +100,7 @@ void CLK_vInitialize(void)
  * @param[in] start
  * boolean for starting/stopping the timer (TRUE = start)
  */
-void CLK_vControl(BOOL bStart)
+void clk_control(BOOL bStart)
 {
     static uint8_t tccr1b = 0;
 
@@ -124,7 +124,7 @@ void CLK_vControl(BOOL bStart)
  *
  * @returns TRUE, if timer has been (re)started, otherwise FALSE.
  */
-BOOL CLK_bTimerStart(sClkTimer_t* psTimer, uint16_t uTicks)
+BOOL clk_timer_start(sClkTimer_t* psTimer, uint16_t uTicks)
 {
     // if timer is still running ...
     if (psTimer->uTicks != 0) {
@@ -132,7 +132,7 @@ BOOL CLK_bTimerStart(sClkTimer_t* psTimer, uint16_t uTicks)
         return TRUE;
     }
     psTimer->uTicks = uTicks;
-    return bRegisterTimer(psTimer);
+    return register_timer(psTimer);
 }
 
 /**
@@ -143,7 +143,7 @@ BOOL CLK_bTimerStart(sClkTimer_t* psTimer, uint16_t uTicks)
  *
  * @returns TRUE, if time is over, otherwise false.
  */
-BOOL CLK_bTimerIsElapsed(sClkTimer_t* psTimer)
+BOOL clk_timer_is_elapsed(sClkTimer_t* psTimer)
 {
     if (psTimer->uTicks == 0) {
         return TRUE;

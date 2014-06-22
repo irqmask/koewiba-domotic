@@ -57,17 +57,17 @@
 
 // --- Global functions --------------------------------------------------------
 
-void            EEP_vInit           (void);
+void            eep_initialize           (void);
 
-uint8_t         EEP_uCheckStatusReg (uint8_t                uFlagMask);
+uint8_t         eep_check_statusregister (uint8_t        uFlagMask);
 
-uint16_t        EEP_uRead           (uint16_t               uEEPAddress,
-                                     uint16_t               uCount,
-                                     uint8_t*               puBuffer);
+uint16_t        eep_read                 (uint16_t       uEEPAddress,
+                                          uint16_t       uCount,
+                                          uint8_t*       puBuffer);
 
-uint16_t        EEP_uWrite          (uint16_t               uEEPAddress,
-                                     uint16_t               uCount,
-                                     const uint8_t*         puBuffer);
+uint16_t        eep_write                (uint16_t       uEEPAddress,
+                                          uint16_t       uCount,
+                                          const uint8_t* puBuffer);
 
 #endif /* _EEPROM_SPI_H_ */
 /** @} */

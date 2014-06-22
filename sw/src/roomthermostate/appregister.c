@@ -145,22 +145,28 @@ void REG__vSetRegister              (uint8_t                uRegNo,
         break;
 
     case APP_eReg_DesiredTempDay1:
-        //TODO CV: implement
+        tempval16 = (uint16_t)(uValue & 0x0000FFFF);
+        eeprom_write_word((uint16_t*)&g_uEEProm[APP_eCfg_DesiredTempDay1], tempval16);
         break;
     case APP_eReg_DesiredTempNight1:
-        //TODO CV: implement
+        tempval16 = (uint16_t)(uValue & 0x0000FFFF);
+        eeprom_write_word((uint16_t*)&g_uEEProm[APP_eReg_DesiredTempNight1], tempval16);
         break;
     case APP_eReg_DesiredTempDay2:
-        //TODO CV: implement
+        tempval16 = (uint16_t)(uValue & 0x0000FFFF);
+        eeprom_write_word((uint16_t*)&g_uEEProm[APP_eCfg_DesiredTempDay2], tempval16);
         break;
     case APP_eReg_DesiredTempNight2:
-        //TODO CV: implement
+        tempval16 = (uint16_t)(uValue & 0x0000FFFF);
+        eeprom_write_word((uint16_t*)&g_uEEProm[APP_eReg_DesiredTempNight2], tempval16);
         break;
     case APP_eReg_DesiredTempAway:
-        //TODO CV: implement
+        tempval16 = (uint16_t)(uValue & 0x0000FFFF);
+        eeprom_write_word((uint16_t*)&g_uEEProm[APP_eReg_DesiredTempAway], tempval16);
         break;
     case APP_eReg_DesiredTempWindowOpened:
-        //TODO CV: implement
+        tempval16 = (uint16_t)(uValue & 0x0000FFFF);
+        eeprom_write_word((uint16_t*)&g_uEEProm[APP_eReg_DesiredTempWindowOpened], tempval16);
         break;
 
     // registers in ROM/RAM

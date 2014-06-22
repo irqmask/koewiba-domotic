@@ -26,6 +26,7 @@
 #define BUS_DISRCV0         PD3
 #define SPI_SCK_DDR         PORTC
 #define SPI_SCK_PIN         PC1
+#define TXRXEN0_SEPERATE    1
 
 // Pin assignments of board keys and LEDs
 // Port D pin assignments

@@ -126,21 +126,21 @@
 
  // definition of processor specific registers
  // UART0
- #define REGISTER_UCSRA         UCSR0A
- #define REGISTER_UCSRB         UCSR0B
- #define REGISTER_UCSRC         UCSR0C
- #define REGISTER_UDR           UDR0
- #define REGISTER_UBRRH         UBRR0H
- #define REGISTER_UBRRL         UBRR0L
+ #define REGISTER_UCSRA0        UCSR0A
+ #define REGISTER_UCSRB0        UCSR0B
+ #define REGISTER_UCSRC0        UCSR0C
+ #define REGISTER_UDR0          UDR0
+ #define REGISTER_UBRRH0        UBRR0H
+ #define REGISTER_UBRRL0        UBRR0L
  #define REGBIT_RXCIE           RXCIE0
  #define REGBIT_UDRIE           UDRIE0
  #define REGBIT_TXCIE           TXCIE0
  #define REGBIT_RXEN            RXEN0
  #define REGBIT_TXEN            TXEN0
  #define REGBIT_FE              FE0
- #define INTERRUPT_USART_RXC    USART0_RX_vect
- #define INTERRUPT_USART_UDRE   USART0_UDRE_vect
- #define INTERRUPT_UART_TRANS   USART0_TX_vect
+ #define INTERRUPT_USART_RXC0   USART0_RX_vect
+ #define INTERRUPT_USART_UDRE0  USART0_UDRE_vect
+ #define INTERRUPT_UART_TRANS0  USART0_TX_vect
  
  // Sleepmodes
  #define INTERRUPT_PINCHANGE2   PCINT2_vect
@@ -192,6 +192,11 @@
  #define ADDR_SIGNATURE_BYTE2   4
  
 #elif defined (__AVR_ATtiny1634__)
+// Signature byte addresses. TODO check for this processor!
+ #define ADDR_SIGNATURE_BYTE0   0
+ #define ADDR_SIGNATURE_BYTE1   2
+ #define ADDR_SIGNATURE_BYTE2   4
+ #define SIGRD 5 // workaround for missing define in avr-headers
  // definition of prozessor depending global settings
  // TODO CV: this part can be ported maybe to a makefile include
  #define STARTADDR_APPVECTORS   0x0000
@@ -310,6 +315,22 @@
  #define REGBIT_TIMER1_CS1      CS11
  #define REGBIT_TIMER1_CS2      CS12
  #define INTERRUPT_TIMER1_COMPA TIMER1_COMPA_vect
+
+ #define REG_TIMER2_TCCRA       TCCR2A
+ #define REG_TIMER2_TCCRB       TCCR2B
+ #define REG_TIMER2_TCNT        TCNT2
+ #define REG_TIMER2_OCRA        OCR2A
+ #define REG_TIMER2_OCRB        OCR2B
+ #define REG_TIMER2_OCRB_H      OCR2BH
+ #define REG_TIMER2_OCRB_L      OCR2BL
+ #define REGBIT_TIMER2_WGM0     WGM20
+ #define REGBIT_TIMER2_WGM1     WGM21
+ #define REGBIT_TIMER2_WGM2     WGM22
+ #define REGBIT_TIMER2_WGM3     WGM23
+ #define REGBIT_TIMER2_CS0      CS20
+ #define REGBIT_TIMER2_CS1      CS21
+ #define REGBIT_TIMER2_CS2      CS22
+ #define INTERRUPT_TIMER2_COMPA TIMER2_COMPA_vect
 #endif
 
 // --- Type definitions --------------------------------------------------------

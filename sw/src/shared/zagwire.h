@@ -56,9 +56,9 @@
  //! Defines the input PORT which contains the Zagwire data signal.
  #define ZAGW_PIN_DATA  PINB
  //! Defines the Zagwire enable pin (output).
- #define ZAGW_EN        PB7
+ #define ZAGW_EN        PB1
  //! Defines the Zagwire data pin (input).
- #define ZAGW_DATA      PB4
+ #define ZAGW_DATA      PB2
 #endif // ZAGWIRE_PCBCONFIG
 /** @} */
 
@@ -95,13 +95,11 @@ void            ZAGW_vInit          (void);
 
 void            ZAGW_vStartReception(void);
 
-uint8_t         ZAGW_vRunReception  (void);
+uint8_t         ZAGW_uReceive       (void);
 
-uint16_t        ZAGW_uGetData       (void);
+uint16_t        ZAGW_uGetBits       (void);
 
-void            ZAGW_vConvData2Temp (uint16_t               uData,
-                                     uint8_t*               puTempInteger,
-                                     uint8_t*               puTempTens);
+uint16_t        ZAGW_uGetTemperature(void);
 
 #endif // _ZAGWIRE_H_
 /** @} */

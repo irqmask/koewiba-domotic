@@ -18,37 +18,39 @@
 
 // --- Definitions -------------------------------------------------------------
 
-#define BUS_PCBCONFIG 1
+#define BUS_PCBCONFIG       1
 #define BUS_DDR_ENASND0     DDRD
 #define BUS_PORT_ENASND0    PORTD
 #define BUS_ENASND0         PD2
 #define BUS_DDR_DISRCV0     DDRD
 #define BUS_PORT_DISRCV0    PORTD
 #define BUS_DISRCV0         PD3
+#define TXRXEN0_SEPERATE    1
+
 #define SPI_SCK_DDR         PORTC
 #define SPI_SCK_PIN         PC1
+#define SPI_PCBCONFIG       1
+#define SPI_DDR_MOSI        DDRB
+#define SPI_DDR_MISO        DDRB
+#define SPI_DDR_SCK         DDRB
+#define SPI_DDR_SS          DDRC
+#define SPI_PORT_SS         PORTC
+#define SPI_MOSI            PB3
+#define SPI_MISO            PB4
+#define SPI_SCK             PB5
+#define SPI_SS              PC3
 
-#define SPI_PCBCONFIG  1
-#define SPI_DDR_MOSI   DDRB
-#define SPI_DDR_MISO   DDRB
-#define SPI_DDR_SCK    DDRB
-#define SPI_DDR_SS     DDRC
-#define SPI_PORT_SS    PORTC
-#define SPI_MOSI       PB3
-#define SPI_MISO       PB4
-#define SPI_SCK        PB5
-#define SPI_SS         PC3
+#define PWM_PCBCONFIG       1
+#define PWM_CHN_PORT        PORTC
+#define PWM_CHN_DDR         DDRC
+#define PWM_CHN0_PIN        0
+#define PWM_CHN1_PIN        1
+#define PWM_CHN2_PIN        2
 
-#define PWM_PCBCONFIG      1
-#define PWM_CHN_PORT       PORTC
-#define PWM_CHN_DDR        DDRC
-#define PWM_CHN0_PIN       0
-#define PWM_CHN1_PIN       1
-#define PWM_CHN2_PIN       2
-
-#define PWMCOUNT           REG_TIMER1_TCNT
-#define PWMCOMPARE         REG_TIMER1_OCRA
-#define PWM_INTERRUPT      ISR(INTERRUPT_TIMER1_COMPA)
+#define PWMCOUNT            REG_TIMER2_TCNT
+#define PWMCOMPARE          REG_TIMER2_OCRA
+#define PWM_INTERRUPT       ISR(INTERRUPT_TIMER2_COMPA)
+#define PWM_MAX_COUNT       255
 
 // Port D pin assignments
 #define LED_STATUS      0b01000000  //!< Yellow status LED

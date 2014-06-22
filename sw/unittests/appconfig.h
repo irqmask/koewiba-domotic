@@ -60,6 +60,11 @@ typedef enum appconfig {
 
 #define PWM_LINEAR_TABLE
 
+
+// bus scheduler and transport special unittest gluecode and settings
+
+
+
 // --- Local variables ---------------------------------------------------------
 
 // --- Global variables --------------------------------------------------------

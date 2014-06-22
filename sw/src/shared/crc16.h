@@ -34,7 +34,7 @@
 
 // --- Global functions --------------------------------------------------------
 
-uint16_t CRC_uCalc16(uint8_t* puData, uint8_t uLen);
+uint16_t crc_calc16(uint8_t* puData, uint8_t uLen);
 
 #endif /* _CRC16_H_ */
 /** @} */

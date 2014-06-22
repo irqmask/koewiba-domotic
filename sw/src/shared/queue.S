@@ -19,7 +19,7 @@
 ; see for more details: http://gcc.gnu.org/wiki/avr-gcc#Register_Layout
 
 .text
-.global QUE_vInit, QUE_uPut, QUE_uGet
+.global que_init, que_put, que_get
 
 ; void QUE_vInit(uint8_t* puQueue, uint8_t uSize);
 ; Parameters:
@@ -27,7 +27,7 @@
 ;   r22       uSize
 ; Returns:
 ;   nothing
-QUE_vInit:  mov     r31, r25    ; load queue pointer into Z
+que_init:   mov     r31, r25    ; load queue pointer into Z
             mov     r30, r24
             mov     r18, r22
             subi    r18, 3      ; subtract queue header size
@@ -44,7 +44,7 @@ QUE_vInit:  mov     r31, r25    ; load queue pointer into Z
 ;   r22       uVal
 ; Returns:
 ;   r24       1: byte stored, otherwise 0
-QUE_uPut:   mov     r31, r25    ; load queue pointer into Z
+que_put:    mov     r31, r25    ; load queue pointer into Z
             mov     r30, r24
             clr     r24         ; returncode = 0
             ld      r18, Z      ; r18 = size of queue
@@ -80,7 +80,7 @@ QuPuF:      ;out     _SFR_IO_ADDR(SREG), R20   ; restore SREG
 ; Returns:
 ;   r25       1: byte read, otherwise 0
 ;   r24       byte which has been read, otherwise the content is undefined
-QUE_uGet:   mov     r31, r25    ; load queue pointer into Z
+que_get:    mov     r31, r25    ; load queue pointer into Z
             mov     r30, r24
             clr     r25
             ; save SREG and disable interrupts

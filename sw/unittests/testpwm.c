@@ -6,11 +6,28 @@
 
 #include "pwm.h"
 
-PWM_uCounter_t  g_uPWMCount;
-PWM_uCounter_t  g_uPWMCompare;
-uint8_t         g_uPort;
-uint8_t         g_uDDR;
-PWM_uCounter_t  g_auTimeChannelON[PWM_NUM_CHANNELS];
+uint8_t         g_uAvrTimer1_TCCRA  = 0;
+uint8_t         g_uAvrTimer1_TCCRB  = 0;
+uint8_t         g_uAvrTimer1_IRQMSK = 0;
+
+uint8_t         g_uPWMCount         = 0;
+uint8_t         g_uPWMCompare       = 0;
+uint8_t         g_uPort             = 0;
+uint8_t         g_uDDR              = 0;
+uint16_t        g_auTimeChannelON[PWM_NUM_CHANNELS];
+
+uint16_t pgm_read_word(uint16_t* puVal)
+{
+    return *puVal;
+}
+
+void cli(void)
+{
+}
+
+void sei(void)
+{
+}
 
 void vRunPWM (uint8_t uLoops)
 {
@@ -28,11 +45,11 @@ void vRunPWM (uint8_t uLoops)
         }
 
         // measure duty-cycle
-        if ((PWM_CHN0_PORT & (1<<PWM_CHN0_PIN)) &&
+        if ((PWM_CHN_PORT & (1<<PWM_CHN0_PIN)) &&
             (g_auTimeChannelON[0] < PWM_MAX_COUNT)) g_auTimeChannelON[0]++;
-        if ((PWM_CHN1_PORT & (1<<PWM_CHN1_PIN)) &&
+        if ((PWM_CHN_PORT & (1<<PWM_CHN1_PIN)) &&
             (g_auTimeChannelON[1] < PWM_MAX_COUNT)) g_auTimeChannelON[1]++;
-        if ((PWM_CHN2_PORT & (1<<PWM_CHN2_PIN)) &&
+        if ((PWM_CHN_PORT & (1<<PWM_CHN2_PIN)) &&
             (g_auTimeChannelON[2] < PWM_MAX_COUNT)) g_auTimeChannelON[2]++;
 
         if (PWMCOUNT==0) {
@@ -76,13 +93,14 @@ void PWMTEST_vTestAllDifferent(void)
     PWM_vSet(0,64);
     PWM_vSet(1,127);
     PWM_vSet(2,191);
+    PWM_vUpdate();
     vRunPWM(3);
-    //vPrintDutyCycle();
+    // vPrintDutyCycle();
 
     // test measured duty-cycle
-    CU_ASSERT_EQUAL(g_auTimeChannelON[0], 16641);
-    CU_ASSERT_EQUAL(g_auTimeChannelON[1], 32769);
-    CU_ASSERT_EQUAL(g_auTimeChannelON[2], 49152);
+    CU_ASSERT_EQUAL(g_auTimeChannelON[0], 6);
+    CU_ASSERT_EQUAL(g_auTimeChannelON[1], 20);
+    CU_ASSERT_EQUAL(g_auTimeChannelON[2], 72);
 }
 
 void PWMTEST_vTestAllOn(void)
@@ -90,8 +108,9 @@ void PWMTEST_vTestAllOn(void)
     PWM_vSet(0,255);
     PWM_vSet(1,255);
     PWM_vSet(2,255);
-    vRunPWM(3);
-    //vPrintDutyCycle();
+    PWM_vUpdate();
+    vRunPWM(2);
+    // vPrintDutyCycle();
 
     // test measured duty-cycle to be full-on
     CU_ASSERT_EQUAL(g_auTimeChannelON[0], PWM_MAX_COUNT);
@@ -104,8 +123,9 @@ void PWMTEST_vTestAllZero(void)
     PWM_vSet(0,0);
     PWM_vSet(1,0);
     PWM_vSet(2,0);
-    vRunPWM(3);
-    //vPrintDutyCycle();
+    PWM_vUpdate();
+    vRunPWM(2);
+    // vPrintDutyCycle();
 
     // test measured duty-cycle to be full-off
     CU_ASSERT_EQUAL(g_auTimeChannelON[0], 0);
@@ -118,8 +138,9 @@ void PWMTEST_vTest101(void)
     PWM_vSet(0,255);
     PWM_vSet(1,0);
     PWM_vSet(2,255);
-    vRunPWM(5);
-    //vPrintDutyCycle();
+    PWM_vUpdate();
+    vRunPWM(3);
+    // vPrintDutyCycle();
 
     // test measured duty-cycle to be full-on
     CU_ASSERT_EQUAL(g_auTimeChannelON[0], PWM_MAX_COUNT);
@@ -132,8 +153,9 @@ void PWMTEST_vTest010(void)
     PWM_vSet(0,0);
     PWM_vSet(1,255);
     PWM_vSet(2,0);
-    vRunPWM(5);
-    //vPrintDutyCycle();
+    PWM_vUpdate();
+    vRunPWM(3);
+    // vPrintDutyCycle();
 
     // test measured duty-cycle to be full-on
     CU_ASSERT_EQUAL(g_auTimeChannelON[0], 0);

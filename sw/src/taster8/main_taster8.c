@@ -17,6 +17,7 @@
 
 #include "bus.h"
 #include "clock.h"
+#include "pcbconfig.h"
 #include "register.h"
 #include "sleepmode.h"
 #include "ucontroller.h"
@@ -89,15 +90,15 @@ static void vInterpretMessage(sBus_t* psBus, uint8_t* puMsg, uint8_t uMsgLen, ui
         // system messages
         switch (puMsg[0]) {
         case CMD_eSleep:
-            SLEEP_PinChange2_Enable();
-            BUS_vSleep(&g_sBus);
-            SLEEP_PinChange2_Disable();
+            SLEEP_vPinChange2_Enable();
+            bus_sleep(&g_sBus);
+            SLEEP_vPinChange2_Disable();
             break;
         case CMD_eAck:
             g_sBus.eModuleState = eMod_Running;
             break;
         default:
-            BUS_bSendAckMessage(psBus, uSender);
+            bus_send_ack_message(psBus, uSender);
             break;
         }
     }
@@ -109,33 +110,25 @@ static void vInterpretMessage(sBus_t* psBus, uint8_t* puMsg, uint8_t uMsgLen, ui
 
 int main(void)
 {
-	uint8_t light = 0, regidx = 0, buttons = 0, oldbuttons = 0, temp = 0;
+	uint8_t light1 = 0, light2 = 0, buttons = 0, oldbuttons = 0, temp = 0;
     uint8_t msglen = 0;
     uint8_t msg[BUS_MAXMSGLEN];
     uint16_t sender = 0;
 
-    uint8_t registers[8] = {
-            MOD_eReg_ModuleID,
-            MOD_eReg_DeviceSignature0,
-            MOD_eReg_DeviceSignature1,
-            MOD_eReg_DeviceSignature2,
-            MOD_eReg_FirstAppSpecific,
-            MOD_eReg_FirstAppSpecific+1,
-            MOD_eReg_FirstAppSpecific+2
-    };
     IO_vInitialize();
-    CLK_vInitialize();
+    clk_initialize();
 
-    BUS_vConfigure(&g_sBus, REG_uGetU16Register(MOD_eReg_ModuleID));
-    BUS_vInitialize(&g_sBus, 0);// initialize bus on UART 0
+    //REG_vSetU16Register(MOD_eReg_ModuleID, 0x14);
+    bus_configure(&g_sBus, REG_uGetU16Register(MOD_eReg_ModuleID));
+    bus_initialize(&g_sBus, 0);// initialize bus on UART 0
 
     vInitLedAndKeys();
     sei();
 
     while (1) {
         // check for message and read it
-        if (BUS_bGetMessage(&g_sBus)) {
-            if (BUS_bReadMessage(&g_sBus, &sender, &msglen, msg)) {
+        if (bus_get_message(&g_sBus)) {
+            if (bus_read_message(&g_sBus, &sender, &msglen, msg)) {
                 vInterpretMessage(&g_sBus, msg, msglen, sender);
             }
         }
@@ -143,25 +136,35 @@ int main(void)
         buttons = PIND & (BTN_TEST | BTN_EXP);
         temp = buttons ^ oldbuttons;
         oldbuttons = buttons;
-        if (buttons & BTN_TEST && temp & BTN_TEST) {
+        if ((buttons & BTN_TEST) && (temp & BTN_TEST)) {
+            /*
             regidx++;
             if (regidx > 7) regidx = 0;
 
             msg[0] = CMD_eRequestRegister;
             msg[1] = registers[regidx];
             msglen = 2;
-            BUS_bSendMessage(&g_sBus, 0x0E, msglen, msg);
-        }
-        else if (buttons & BTN_EXP && temp & BTN_EXP) {
-            if (light)  light = 0;
-            else        light = 1;
+            bus_send_message(&g_sBus, 0x0E, msglen, msg);*/
+            if (light1)  light1 = 0;
+            else         light1 = 1;
 
             msg[0] = CMD_eStateBitfield;
             msg[1] = 1;
-            msg[2] = light;
+            msg[2] = light1;
             msg[3] = 0b00000001;
             msglen = 4;
-            BUS_bSendMessage(&g_sBus, 12, msglen, msg);
+            bus_send_message(&g_sBus, 0x05, msglen, msg);
+        }
+        else if ((buttons & BTN_EXP) && (temp & BTN_EXP)) {
+            if (light2)  light2 = 0;
+            else         light2 = 1;
+
+            msg[0] = CMD_eStateBitfield;
+            msg[1] = 1;
+            msg[2] = light2;
+            msg[3] = 0b00000001;
+            msglen = 4;
+            bus_send_message(&g_sBus, 0x03, msglen, msg);
         }
     }
     return 0;

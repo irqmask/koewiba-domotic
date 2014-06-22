@@ -29,7 +29,7 @@ void sei(void)
 {
 }
 
-void vRunPWM (uint8_t uLoops)
+void run_pwm (uint8_t uLoops)
 {
     PWMCOUNT    = 0;
     PWMCOMPARE  = 0;
@@ -80,7 +80,7 @@ void PWMTEST_vTestInit(void)
     g_auTimeChannelON[1] = 0;
     g_auTimeChannelON[2] = 0;
 
-    PWM_vInit();
+    pwm_init();
     // Test if all needed ports are configured as output
     CU_ASSERT((g_uDDR & 0b00000111) == 0b00000111);
     // Test if all needed outputs are switched off
@@ -90,11 +90,11 @@ void PWMTEST_vTestInit(void)
 
 void PWMTEST_vTestAllDifferent(void)
 {
-    PWM_vSet(0,64);
-    PWM_vSet(1,127);
-    PWM_vSet(2,191);
-    PWM_vUpdate();
-    vRunPWM(3);
+    pwm_set(0,64);
+    pwm_set(1,127);
+    pwm_set(2,191);
+    pwm_update();
+    run_pwm(3);
     // vPrintDutyCycle();
 
     // test measured duty-cycle
@@ -105,11 +105,11 @@ void PWMTEST_vTestAllDifferent(void)
 
 void PWMTEST_vTestAllOn(void)
 {
-    PWM_vSet(0,255);
-    PWM_vSet(1,255);
-    PWM_vSet(2,255);
-    PWM_vUpdate();
-    vRunPWM(2);
+    pwm_set(0,255);
+    pwm_set(1,255);
+    pwm_set(2,255);
+    pwm_update();
+    run_pwm(2);
     // vPrintDutyCycle();
 
     // test measured duty-cycle to be full-on
@@ -120,11 +120,11 @@ void PWMTEST_vTestAllOn(void)
 
 void PWMTEST_vTestAllZero(void)
 {
-    PWM_vSet(0,0);
-    PWM_vSet(1,0);
-    PWM_vSet(2,0);
-    PWM_vUpdate();
-    vRunPWM(2);
+    pwm_set(0,0);
+    pwm_set(1,0);
+    pwm_set(2,0);
+    pwm_update();
+    run_pwm(2);
     // vPrintDutyCycle();
 
     // test measured duty-cycle to be full-off
@@ -135,11 +135,11 @@ void PWMTEST_vTestAllZero(void)
 
 void PWMTEST_vTest101(void)
 {
-    PWM_vSet(0,255);
-    PWM_vSet(1,0);
-    PWM_vSet(2,255);
-    PWM_vUpdate();
-    vRunPWM(3);
+    pwm_set(0,255);
+    pwm_set(1,0);
+    pwm_set(2,255);
+    pwm_update();
+    run_pwm(3);
     // vPrintDutyCycle();
 
     // test measured duty-cycle to be full-on
@@ -150,11 +150,11 @@ void PWMTEST_vTest101(void)
 
 void PWMTEST_vTest010(void)
 {
-    PWM_vSet(0,0);
-    PWM_vSet(1,255);
-    PWM_vSet(2,0);
-    PWM_vUpdate();
-    vRunPWM(3);
+    pwm_set(0,0);
+    pwm_set(1,255);
+    pwm_set(2,0);
+    pwm_update();
+    run_pwm(3);
     // vPrintDutyCycle();
 
     // test measured duty-cycle to be full-on

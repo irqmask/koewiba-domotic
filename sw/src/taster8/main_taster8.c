@@ -1,10 +1,9 @@
 /**
- * @addtogroup TEST_PROTOCOL
+ * @addtogroup TASTER8
  *
  * @{
- * @file    main_testprotocol.c
- * @brief   TODO describe briefly.
- * @todo    describe file purpose
+ * @file    main_taster8.c
+ * @brief   main entry point of taster8 application.
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
 
@@ -12,12 +11,16 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 
+#include "appconfig.h"
+#include "pcbconfig.h"
+
 #include "cmddef_common.h"
 #include "moddef_common.h"
 
+#include "application.h"
 #include "bus.h"
 #include "clock.h"
-#include "pcbconfig.h"
+#include "prjtypes.h"
 #include "register.h"
 #include "sleepmode.h"
 #include "ucontroller.h"
@@ -27,8 +30,6 @@
 // --- Type definitions --------------------------------------------------------
 
 // --- Local variables ---------------------------------------------------------
-
-static sBus_t      g_sBus;
 
 // --- Global variables --------------------------------------------------------
 
@@ -70,9 +71,10 @@ void vInitLedAndKeys(void)
 #endif
 }
 
-// Interpret message
+// Interpret message received by taster8 application
 static void vInterpretMessage(sBus_t* psBus, uint8_t* puMsg, uint8_t uMsgLen, uint16_t uSender)
 {
+    uint32_t value;
     if (puMsg[0] <= CMD_eStateDateTime) {
         // state messages
         switch (puMsg[0]) {
@@ -80,22 +82,38 @@ static void vInterpretMessage(sBus_t* psBus, uint8_t* puMsg, uint8_t uMsgLen, ui
             if (puMsg[2] & 0b00000001) LED_STATUS_ON;
             else                       LED_STATUS_OFF;
             break;
+        case CMD_eState8bit:
+            value = puMsg[2];
+            register_do_mapping(uSender, puMsg[1], value);
+            break;
+        case CMD_eState16bit:
+            value = puMsg[2];
+            value |= ((uint16_t)puMsg[3] << 8);
+            register_do_mapping(uSender, puMsg[1], value);
+            break;
+        case CMD_eState32bit:
+            value = puMsg[2];
+            value |= ((uint32_t)puMsg[3]<<8);
+            value |= ((uint32_t)puMsg[4]<<16);
+            value |= ((uint32_t)puMsg[5]<<24);
+            register_do_mapping(uSender, puMsg[1], value);
+            break;
         }
 
     } else if (puMsg[0] <= CMD_eSetRegister32bit) {
         // register messages
-        REG_vDoCommand(psBus, puMsg, uMsgLen, uSender);
+        register_do_command(psBus, puMsg, uMsgLen, uSender);
 
     } else {
         // system messages
         switch (puMsg[0]) {
         case CMD_eSleep:
             SLEEP_vPinChange2_Enable();
-            bus_sleep(&g_sBus);
+            bus_sleep(psBus);
             SLEEP_vPinChange2_Disable();
             break;
         case CMD_eAck:
-            g_sBus.eModuleState = eMod_Running;
+            psBus->eModuleState = eMod_Running;
             break;
         default:
             bus_send_ack_message(psBus, uSender);
@@ -110,62 +128,28 @@ static void vInterpretMessage(sBus_t* psBus, uint8_t* puMsg, uint8_t uMsgLen, ui
 
 int main(void)
 {
-	uint8_t light1 = 0, light2 = 0, buttons = 0, oldbuttons = 0, temp = 0;
-    uint8_t msglen = 0;
-    uint8_t msg[BUS_MAXMSGLEN];
-    uint16_t sender = 0;
+    uint8_t     msglen = 0;
+    uint8_t     msg[BUS_MAXMSGLEN];
+    uint16_t    module_id = 0, sender = 0;
 
     IO_vInitialize();
     clk_initialize();
 
-    //REG_vSetU16Register(MOD_eReg_ModuleID, 0x14);
-    bus_configure(&g_sBus, REG_uGetU16Register(MOD_eReg_ModuleID));
-    bus_initialize(&g_sBus, 0);// initialize bus on UART 0
+    register_get(MOD_eReg_ModuleID, 0, &module_id);
+    bus_configure(&app_bus, module_id);
+    bus_initialize(&app_bus, 0);// initialize bus on UART 0
 
     vInitLedAndKeys();
     sei();
 
     while (1) {
         // check for message and read it
-        if (bus_get_message(&g_sBus)) {
-            if (bus_read_message(&g_sBus, &sender, &msglen, msg)) {
-                vInterpretMessage(&g_sBus, msg, msglen, sender);
+        if (bus_get_message(&app_bus)) {
+            if (bus_read_message(&app_bus, &sender, &msglen, msg)) {
+                vInterpretMessage(&app_bus, msg, msglen, sender);
             }
         }
-        // check button
-        buttons = PIND & (BTN_TEST | BTN_EXP);
-        temp = buttons ^ oldbuttons;
-        oldbuttons = buttons;
-        if ((buttons & BTN_TEST) && (temp & BTN_TEST)) {
-            /*
-            regidx++;
-            if (regidx > 7) regidx = 0;
-
-            msg[0] = CMD_eRequestRegister;
-            msg[1] = registers[regidx];
-            msglen = 2;
-            bus_send_message(&g_sBus, 0x0E, msglen, msg);*/
-            if (light1)  light1 = 0;
-            else         light1 = 1;
-
-            msg[0] = CMD_eStateBitfield;
-            msg[1] = 1;
-            msg[2] = light1;
-            msg[3] = 0b00000001;
-            msglen = 4;
-            bus_send_message(&g_sBus, 0x05, msglen, msg);
-        }
-        else if ((buttons & BTN_EXP) && (temp & BTN_EXP)) {
-            if (light2)  light2 = 0;
-            else         light2 = 1;
-
-            msg[0] = CMD_eStateBitfield;
-            msg[1] = 1;
-            msg[2] = light2;
-            msg[3] = 0b00000001;
-            msglen = 4;
-            bus_send_message(&g_sBus, 0x03, msglen, msg);
-        }
+        app_check_keys();
     }
     return 0;
 }

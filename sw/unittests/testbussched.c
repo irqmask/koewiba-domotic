@@ -63,30 +63,31 @@ void    _delay_ms                   (uint16_t       uMS)
 {
 }
 
-BOOL    CLK_bTimerIsElapsed         (sClkTimer_t* psTimer)
+BOOL    clk_timer_is_elapsed         (sClkTimer_t* psTimer)
 {
     return TRUE;
 }
 
-BOOL    CLK_bTimerStart             (sClkTimer_t* psTimer, uint16_t uTicks)
+BOOL    clk_timer_start             (sClkTimer_t* psTimer, uint16_t uTicks)
 {
     return TRUE;
 }
 
-void    CLK_vControl                (BOOL start)
+void    clk_control                (BOOL start)
 {
 }
 
-uint16_t CRC_uCalc16                (uint8_t* puData, uint8_t uLen)
+uint16_t crc_calc16                (uint8_t* puData, uint8_t uLen)
 {
     return 0x4242;
 }
 
-extern int8_t SCHED_GetNextNode(sSched_t* psSched, BOOL bDiscovery);
-extern BOOL SCHED_bSendNextTimeSlotToken(sBus_t* psBus, sSched_t* psSched, BOOL bDiscovery);
-extern void SCHED_SetNodeState(sSched_t* psSched, uint8_t uNodeAddress, BOOL bOnline);
+extern int8_t sched_get_next_node(sSched_t* psSched, BOOL bDiscovery);
+extern BOOL sched_send_next_time_slot_token(sBus_t* psBus, sSched_t* psSched, BOOL bDiscovery);
+extern void sched_set_node_state(sSched_t* psSched, uint8_t uNodeAddress, BOOL bOnline);
+extern void sched_set_node_error(sSched_t* psSched, uint8_t uNodeAddress);
 
-void vSetAllNodesPresent(sSched_t* psSched)
+void set_all_nodes_present(sSched_t* psSched)
 {
     int ii;
     for (ii=0; ii<sizeof(psSched->asNodeList.uAddress); ii++) {
@@ -94,7 +95,7 @@ void vSetAllNodesPresent(sSched_t* psSched)
     }
 }
 
-void vSetAllNodesMissing(sSched_t* psSched)
+void set_all_nodes_missing(sSched_t* psSched)
 {
     int ii;
     for (ii=0; ii<sizeof(psSched->asNodeList.uAddress); ii++) {
@@ -102,7 +103,7 @@ void vSetAllNodesMissing(sSched_t* psSched)
     }
 }
 
-void vLogNodeData(sSched_t* psSched, uint8_t uVal)
+void log_node_data(sSched_t* psSched, uint8_t uVal)
 {
     if (g_uLoggingOn)
         printf("\nSCHED_GetNextNode retval = %02X, current-node = %02X, discovery-node = %02X, discovery-mode = %d",
@@ -115,7 +116,7 @@ void vLogNodeData(sSched_t* psSched, uint8_t uVal)
 /**
  * Test finding next nodes if all nodes are missing.
  */
-void vTestAllNodesMissing(void)
+void test_all_nodes_missing(void)
 {
     sBus_t      sBus;
     sSched_t    sSched;
@@ -125,11 +126,11 @@ void vTestAllNodesMissing(void)
     sSched.uDiscoverNode = BUS_LASTNODE;
     sSched.uCurrentNode  = BUS_FIRSTNODE;
     sSched.bSchedDiscovery = FALSE;
-    vSetAllNodesMissing(&sSched);
+    set_all_nodes_missing(&sSched);
 
     // test first call
     val = sched_get_next_node(&sSched, FALSE);
-    vLogNodeData(&sSched, val);
+    log_node_data(&sSched, val);
     CU_ASSERT_EQUAL(val, BUS_FIRSTNODE);                        // First node returned
     CU_ASSERT_EQUAL(sSched.uCurrentNode, BUS_FIRSTNODE);        // No current node
     CU_ASSERT_EQUAL(sSched.uDiscoverNode, BUS_FIRSTNODE);       // Returned node is discovery node
@@ -137,7 +138,7 @@ void vTestAllNodesMissing(void)
 
     // test second call
     val = sched_get_next_node(&sSched, FALSE);
-    vLogNodeData(&sSched, val);
+    log_node_data(&sSched, val);
     CU_ASSERT_EQUAL(val, BUS_FIRSTNODE+1);                      // Second node returned
     CU_ASSERT_EQUAL(sSched.uCurrentNode, BUS_FIRSTNODE);        // No current node
     CU_ASSERT_EQUAL(sSched.uDiscoverNode, BUS_FIRSTNODE+1);     // Returned node is discovery node
@@ -146,12 +147,12 @@ void vTestAllNodesMissing(void)
     // iterate through all nodes in descoverymode until the node before the last node
     for (ii=BUS_FIRSTNODE+2; ii<=BUS_LASTNODE-1; ii++) {
         val = sched_get_next_node(&sSched, FALSE);
-        vLogNodeData(&sSched, val);
+        log_node_data(&sSched, val);
     }
 
     // test last call
     val = sched_get_next_node(&sSched, FALSE);
-    vLogNodeData(&sSched, val);
+    log_node_data(&sSched, val);
     CU_ASSERT_EQUAL(val, BUS_LASTNODE);                        // Last node returned
     CU_ASSERT_EQUAL(sSched.uCurrentNode, BUS_FIRSTNODE);       // No current node
     CU_ASSERT_EQUAL(sSched.uDiscoverNode, BUS_LASTNODE);       // Returned node is discovery node
@@ -159,7 +160,7 @@ void vTestAllNodesMissing(void)
 
     // test last call
     val = sched_get_next_node(&sSched, FALSE);
-    vLogNodeData(&sSched, val);
+    log_node_data(&sSched, val);
     CU_ASSERT_EQUAL(val, BUS_FIRSTNODE);                       // First node returned
     CU_ASSERT_EQUAL(sSched.uCurrentNode, BUS_FIRSTNODE);       // No current node
     CU_ASSERT_EQUAL(sSched.uDiscoverNode, BUS_FIRSTNODE);      // Returned node is discovery node
@@ -169,7 +170,7 @@ void vTestAllNodesMissing(void)
 /**
  * Test finding next nodes if all nodes are present.
  */
-void vTestAllNodesPresent(void)
+void test_all_nodes_present(void)
 {
     sBus_t      sBus;
     sSched_t    sSched;
@@ -179,11 +180,11 @@ void vTestAllNodesPresent(void)
     sSched.uDiscoverNode = BUS_FIRSTNODE;
     sSched.uCurrentNode  = BUS_LASTNODE;
     sSched.bSchedDiscovery = FALSE;
-    vSetAllNodesPresent(&sSched);
+    set_all_nodes_present(&sSched);
 
     // test first call
     val = sched_get_next_node(&sSched, FALSE);
-    vLogNodeData(&sSched, val);
+    log_node_data(&sSched, val);
     CU_ASSERT_EQUAL(val, BUS_FIRSTNODE);                        // First node returned
     CU_ASSERT_EQUAL(sSched.uCurrentNode, BUS_FIRSTNODE);        // Returned node is current node
     CU_ASSERT_EQUAL(sSched.uDiscoverNode, BUS_FIRSTNODE);
@@ -191,7 +192,7 @@ void vTestAllNodesPresent(void)
 
     // test second call
     val = sched_get_next_node(&sSched, FALSE);
-    vLogNodeData(&sSched, val);
+    log_node_data(&sSched, val);
     CU_ASSERT_EQUAL(val, BUS_FIRSTNODE+1);                      // Second node returned
     CU_ASSERT_EQUAL(sSched.uCurrentNode, BUS_FIRSTNODE+1);      // Returned node is current node
     CU_ASSERT_EQUAL(sSched.uDiscoverNode, BUS_FIRSTNODE);       //
@@ -200,12 +201,12 @@ void vTestAllNodesPresent(void)
     // iterate through all nodes in descoverymode until the node before the last node
     for (ii=BUS_FIRSTNODE+2; ii<=BUS_LASTNODE-1; ii++) {
         val = sched_get_next_node(&sSched, FALSE);
-        vLogNodeData(&sSched, val);
+        log_node_data(&sSched, val);
     }
 
     // test last call
     val = sched_get_next_node(&sSched, FALSE);
-    vLogNodeData(&sSched, val);
+    log_node_data(&sSched, val);
     CU_ASSERT_EQUAL(val, BUS_LASTNODE);                        // Last node returned
     CU_ASSERT_EQUAL(sSched.uCurrentNode, BUS_LASTNODE);        // Returned node is current node
     CU_ASSERT_EQUAL(sSched.uDiscoverNode, BUS_FIRSTNODE);      //
@@ -213,7 +214,7 @@ void vTestAllNodesPresent(void)
 
     // test last call + 1
     val = sched_get_next_node(&sSched, FALSE);
-    vLogNodeData(&sSched, val);
+    log_node_data(&sSched, val);
     CU_ASSERT_EQUAL(val, BUS_FIRSTNODE);                       // First node returned
     CU_ASSERT_EQUAL(sSched.uCurrentNode, BUS_FIRSTNODE);       // Returned node is current node
     CU_ASSERT_EQUAL(sSched.uDiscoverNode, BUS_FIRSTNODE);      //
@@ -224,7 +225,7 @@ void vTestAllNodesPresent(void)
  * Test finding next nodes if all nodes 0x01, 0x04, 0x08, 0x10, 0x20, 0x21,
  * 0x22 and 0x7F are present.
  */
-void vTestSomeNodesPresent(void)
+void test_some_nodes_present(void)
 {
     sBus_t      sBus;
     sSched_t    sSched;
@@ -235,7 +236,7 @@ void vTestSomeNodesPresent(void)
     sSched.uDiscoverNode = BUS_FIRSTNODE;
     sSched.uCurrentNode  = BUS_FIRSTNODE;
     sSched.bSchedDiscovery = TRUE;
-    vSetAllNodesMissing(&sSched);
+    set_all_nodes_missing(&sSched);
     sSched.asNodeList.uAddress[0] = 0b00010010; // node 0x01 and 0x04
     sSched.asNodeList.uAddress[1] = 0b00000001; // node 0x08
     sSched.asNodeList.uAddress[2] = 0b00000001; // node 0x10
@@ -244,7 +245,7 @@ void vTestSomeNodesPresent(void)
 
     // test first call
     val = sched_get_next_node(&sSched, FALSE);
-    vLogNodeData(&sSched, val);
+    log_node_data(&sSched, val);
     CU_ASSERT_EQUAL(val, BUS_FIRSTNODE);                        // First discovery node returned
     CU_ASSERT_EQUAL(sSched.uCurrentNode, BUS_FIRSTNODE);        // Returned node is current node
     CU_ASSERT_EQUAL(sSched.uDiscoverNode, BUS_FIRSTNODE);
@@ -252,35 +253,35 @@ void vTestSomeNodesPresent(void)
 
     // test second call
     val = sched_get_next_node(&sSched, FALSE);
-    vLogNodeData(&sSched, val);
+    log_node_data(&sSched, val);
     CU_ASSERT_EQUAL(val, 4);                                    // First present node returned
     CU_ASSERT_EQUAL(sSched.uCurrentNode, 4);                    // Returned node is current node
     CU_ASSERT_EQUAL(sSched.uDiscoverNode, BUS_FIRSTNODE);       // unchanged
     CU_ASSERT_EQUAL(sSched.bSchedDiscovery, FALSE);             // not in discovery mode
 
     val = sched_get_next_node(&sSched, FALSE);
-    vLogNodeData(&sSched, val);
+    log_node_data(&sSched, val);
     CU_ASSERT_EQUAL(val, 8);                                    // First present node returned
     CU_ASSERT_EQUAL(sSched.uCurrentNode, 8);                    // Returned node is current node
     CU_ASSERT_EQUAL(sSched.uDiscoverNode, BUS_FIRSTNODE);       // unchanged
     CU_ASSERT_EQUAL(sSched.bSchedDiscovery, FALSE);             // not in discovery mode
 
     val = sched_get_next_node(&sSched, FALSE);
-    vLogNodeData(&sSched, val);
+    log_node_data(&sSched, val);
     CU_ASSERT_EQUAL(val, 0x10);                                 // First present node returned
     CU_ASSERT_EQUAL(sSched.uCurrentNode, 0x10);                 // Returned node is current node
     CU_ASSERT_EQUAL(sSched.uDiscoverNode, BUS_FIRSTNODE);       // unchanged
     CU_ASSERT_EQUAL(sSched.bSchedDiscovery, FALSE);             // not in discovery mode
 
     val = sched_get_next_node(&sSched, FALSE);
-    vLogNodeData(&sSched, val);
+    log_node_data(&sSched, val);
     CU_ASSERT_EQUAL(val, 0x20);                                 // First present node returned
     CU_ASSERT_EQUAL(sSched.uCurrentNode, 0x20);                 // Returned node is current node
     CU_ASSERT_EQUAL(sSched.uDiscoverNode, BUS_FIRSTNODE);       // unchanged
     CU_ASSERT_EQUAL(sSched.bSchedDiscovery, FALSE);             // not in discovery mode
 
     val = sched_get_next_node(&sSched, FALSE);
-    vLogNodeData(&sSched, val);
+    log_node_data(&sSched, val);
     CU_ASSERT_EQUAL(val, 0x21);                                 // First present node returned
     CU_ASSERT_EQUAL(sSched.uCurrentNode, 0x21);                 // Returned node is current node
     CU_ASSERT_EQUAL(sSched.uDiscoverNode, BUS_FIRSTNODE);       // unchanged
@@ -288,21 +289,21 @@ void vTestSomeNodesPresent(void)
 
 
     val = sched_get_next_node(&sSched, FALSE);
-    vLogNodeData(&sSched, val);
+    log_node_data(&sSched, val);
     CU_ASSERT_EQUAL(val, 0x22);                                 // First present node returned
     CU_ASSERT_EQUAL(sSched.uCurrentNode, 0x22);                 // Returned node is current node
     CU_ASSERT_EQUAL(sSched.uDiscoverNode, BUS_FIRSTNODE);       // unchanged
     CU_ASSERT_EQUAL(sSched.bSchedDiscovery, FALSE);             // not in discovery mode
 
     val = sched_get_next_node(&sSched, FALSE);
-    vLogNodeData(&sSched, val);
+    log_node_data(&sSched, val);
     CU_ASSERT_EQUAL(val, 0x7F);                                 // First present node returned
     CU_ASSERT_EQUAL(sSched.uCurrentNode, 0x7F);                 // Returned node is current node
     CU_ASSERT_EQUAL(sSched.uDiscoverNode, BUS_FIRSTNODE);       // unchanged
     CU_ASSERT_EQUAL(sSched.bSchedDiscovery, FALSE);             // not in discovery mode
 
     val = sched_get_next_node(&sSched, FALSE);
-    vLogNodeData(&sSched, val);
+    log_node_data(&sSched, val);
     CU_ASSERT_EQUAL(val, BUS_FIRSTNODE+1);                      // First discovery node returned
     CU_ASSERT_EQUAL(sSched.uCurrentNode, BUS_FIRSTNODE);        // Returned node is current node
     CU_ASSERT_EQUAL(sSched.uDiscoverNode, BUS_FIRSTNODE+1);
@@ -311,12 +312,12 @@ void vTestSomeNodesPresent(void)
     // iterate through all nodes in discoverymode until the node before the last node
     for (ii=0; ii<=118*9+6; ii++) {
         val = sched_get_next_node(&sSched, FALSE);
-        vLogNodeData(&sSched, val);
+        log_node_data(&sSched, val);
     }
 
     // test last call
     val = sched_get_next_node(&sSched, FALSE);
-    vLogNodeData(&sSched, val);
+    log_node_data(&sSched, val);
     CU_ASSERT_EQUAL(val, BUS_LASTNODE);                        // First node returned
     CU_ASSERT_EQUAL(sSched.uCurrentNode, BUS_LASTNODE);        // Returned node is current node
     CU_ASSERT_EQUAL(sSched.uDiscoverNode, BUS_LASTNODE-1);     //
@@ -324,7 +325,7 @@ void vTestSomeNodesPresent(void)
 
     // test last call
     val = sched_get_next_node(&sSched, FALSE);
-    vLogNodeData(&sSched, val);
+    log_node_data(&sSched, val);
     CU_ASSERT_EQUAL(val, BUS_FIRSTNODE+1);                      // First node returned
     CU_ASSERT_EQUAL(sSched.uCurrentNode, BUS_FIRSTNODE);        // Returned node is current node
     CU_ASSERT_EQUAL(sSched.uDiscoverNode, BUS_FIRSTNODE+1);     //
@@ -332,7 +333,7 @@ void vTestSomeNodesPresent(void)
 
     // test last call
     val = sched_get_next_node(&sSched, FALSE);
-    vLogNodeData(&sSched, val);
+    log_node_data(&sSched, val);
     CU_ASSERT_EQUAL(val, BUS_FIRSTNODE);                        // First node returned
     CU_ASSERT_EQUAL(sSched.uCurrentNode, BUS_FIRSTNODE);        // Returned node is current node
     CU_ASSERT_EQUAL(sSched.uDiscoverNode, BUS_FIRSTNODE+1);     //
@@ -342,12 +343,12 @@ void vTestSomeNodesPresent(void)
 /**
  * Test setting nodes active and inactive.
  */
-void vTestSetNodeState(void)
+void test_set_node_state(void)
 {
     sSched_t sSched;
 
     // initialize test data
-    vSetAllNodesMissing(&sSched);
+    set_all_nodes_missing(&sSched);
 
     // run test
     sched_set_node_state(&sSched, BUS_FIRSTNODE, TRUE);
@@ -360,12 +361,12 @@ void vTestSetNodeState(void)
     CU_ASSERT_EQUAL(sSched.asNodeList.uAddress[15], 0b00000000);
 }
 
-void vTestSetNodeError(void)
+void test_set_node_error(void)
 {
     sSched_t sSched;
 
     // initialize test data
-    vSetAllNodesPresent(&sSched);
+    set_all_nodes_present(&sSched);
     sSched.uErrorNode = 0;
     sSched.uErrorCount = 0;
 
@@ -417,12 +418,10 @@ void vTestSetNodeError(void)
  * Test suite of bus-schudler tests.
  */
 CU_TestInfo TESTBUSSCHED_asTests[] = {
-    {"SCHED_GetNextNode: all nodes missing               ",  vTestAllNodesMissing    },
-    {"SCHED_GetNextNode: all nodes present               ",  vTestAllNodesPresent    },
-    {"SCHED_GetNextNode: some nodes present              ",  vTestSomeNodesPresent   },
-    {"SCHED_SetNodeState: set and reset nodes            ",  vTestSetNodeState       },
-    {"SCHED_vSetNodeError: test node going to error state",  vTestSetNodeError       },
+    {"SCHED_GetNextNode: all nodes missing               ",  test_all_nodes_missing  },
+    {"SCHED_GetNextNode: all nodes present               ",  test_all_nodes_present  },
+    {"SCHED_GetNextNode: some nodes present              ",  test_some_nodes_present },
+    {"SCHED_SetNodeState: set and reset nodes            ",  test_set_node_state     },
+    {"SCHED_vSetNodeError: test node going to error state",  test_set_node_error     },
     CU_TEST_INFO_NULL,
 };
-
-

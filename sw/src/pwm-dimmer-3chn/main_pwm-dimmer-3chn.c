@@ -47,7 +47,7 @@ static void vInterpretMessage(sBus_t* psBus, uint8_t* puMsg, uint8_t uMsgLen, ui
         }
     } else if (puMsg[0] <= CMD_eSetRegister32bit) {
         // register messages
-        REG_vDoCommand(psBus, puMsg, uMsgLen, uSender);
+        register_do_command(psBus, puMsg, uMsgLen, uSender);
     } else {
         // system messages
         switch (puMsg[0]) {
@@ -73,28 +73,29 @@ int main(void)
 {
     uint8_t msglen = 0;
     uint8_t msg[BUS_MAXMSGLEN];
-    uint16_t sender = 0;
+    uint16_t module_id = BUS_UNKNOWNADR, sender = 0;
 
     sClkTimer_t pwm_demotimer;
     uint8_t pwm_r = 0, pwm_g = 127, pwm_b = 33;
     int8_t  pwm_r_incr = 2, pwm_g_incr = -1, pwm_b_incr = 3;
 
-    DDRD |= LED_ERROR | LED_STATUS;
-
-    CLK_vInitialize();
-    bus_configure(&g_sBus, REG_uGetU16Register(MOD_eReg_ModuleID)); // configure a bus node with address X
+    DDRD |= (LED_ERROR | LED_STATUS);
+    register_set_u16(MOD_eReg_ModuleID, 10);
+    clk_initialize();
+    register_get(MOD_eReg_ModuleID, 0, &module_id);
+    bus_configure(&g_sBus, module_id);
     bus_initialize(&g_sBus, 0);// initialize bus on UART 0
 
     SPI_vMasterInitBlk();
     //EEP_vInit();
-    PWM_vInit();
+    pwm_init();
 
     sei();
-    PWM_vSet(0,0);
-    PWM_vSet(1,0);
-    PWM_vSet(2,0);
-    PWM_vUpdate();
-    CLK_bTimerStart(&pwm_demotimer, 5);
+    pwm_set(0,0);
+    pwm_set(1,0);
+    pwm_set(2,0);
+    pwm_update();
+    clk_timer_start(&pwm_demotimer, 5);
 
     while (1) {
         if (bus_get_message(&g_sBus)) {
@@ -102,7 +103,7 @@ int main(void)
                 vInterpretMessage(&g_sBus, msg, msglen, sender);
             }
         }
-        if (CLK_bTimerIsElapsed(&pwm_demotimer)) {
+        if (clk_timer_is_elapsed(&pwm_demotimer)) {
             if (pwm_r > 255-2) pwm_r_incr = -2;
             if (pwm_r < 2) pwm_r_incr = 2;
             if (pwm_g > 255-1) pwm_g_incr = -1;
@@ -110,14 +111,14 @@ int main(void)
             if (pwm_b > 255-3) pwm_b_incr = -3;
             if (pwm_b < 3) pwm_b_incr = 3;
 
-            PWM_vSet(0, pwm_r);
-            PWM_vSet(1, pwm_g);
-            PWM_vSet(2, pwm_b);
+            pwm_set(0, pwm_r);
+            pwm_set(1, pwm_g);
+            pwm_set(2, pwm_b);
             pwm_r += pwm_r_incr;
             pwm_g += pwm_g_incr;
             pwm_b += pwm_b_incr;
-            PWM_vUpdate();
-            CLK_bTimerStart(&pwm_demotimer, 5);
+            pwm_update();
+            clk_timer_start(&pwm_demotimer, 5);
         }
     }
     return 0;

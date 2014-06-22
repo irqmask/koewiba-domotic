@@ -146,7 +146,7 @@ void pwm_init(void)
     uint8_t channel;
 
     PWM_CHN_DDR |= ((1<<PWM_CHN0_PIN) | (1<<PWM_CHN1_PIN) | (1<<PWM_CHN2_PIN));
-    PWM_CHN_PORT |= ((1<<PWM_CHN0_PIN) | (1<<PWM_CHN1_PIN) | (1<<PWM_CHN2_PIN));
+    PWM_CHN_PORT &= ~((1<<PWM_CHN0_PIN) | (1<<PWM_CHN1_PIN) | (1<<PWM_CHN2_PIN));
 
     // initialize timer 1 peripheral, normal-mode
     REG_TIMER2_TCCRA = 0;

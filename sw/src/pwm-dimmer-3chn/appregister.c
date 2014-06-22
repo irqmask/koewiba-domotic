@@ -30,8 +30,6 @@
 
 // --- Local variables ---------------------------------------------------------
 
-uint8_t g_uEEProm[APP_eCfg_Last] EEMEM;
-
 // --- Global variables --------------------------------------------------------
 
 // --- Module global variables -------------------------------------------------
@@ -40,133 +38,89 @@ uint8_t g_uEEProm[APP_eCfg_Last] EEMEM;
 
 // --- Module global functions -------------------------------------------------
 
-uint32_t REG__uGetRegister              (uint8_t                uRegNo,
-                                         eRegType_t*         peRegType)
+BOOL        app_register_get        (uint8_t                uRegNo,
+                                     eRegType_t*            peRegType,
+                                     void*                  pvValue)
 {
-    uint32_t retval = 0;
-    eRegType_t regtype;
+    eRegType_t  regtype;
+    uint8_t index;
 
-    if (peRegType == NULL) {
-        peRegType = &regtype;
-    }
-    *peRegType = eRegType_Unkown;
+    if (peRegType == NULL) peRegType = &regtype;
+    if (pvValue == NULL) return FALSE;
+    *peRegType = eRegType_U8;
 
-    switch (uRegNo) {
     // registers saved in EEProm
-    case MOD_eReg_ModuleID:
-        retval = eeprom_read_word((uint16_t*)&g_uEEProm[MOD_eCfg_ModuleID]);
+    if (uRegNo >= APP_eReg_RemoteAddr00 && uRegNo <= APP_eReg_RemoteAddr31) {
+        index = (uRegNo - APP_eReg_RemoteAddr00) * 2;
+        index += APP_eCfg_RemoteAddr00;
+        *(uint16_t*)pvValue = eeprom_read_word((uint16_t*)&register_eeprom_array[index]);
         *peRegType = eRegType_U16;
-        break;
-    case MOD_eReg_BldFlag:
-        retval = eeprom_read_byte(&g_uEEProm[MOD_eCfg_BldFlag]);
-        *peRegType = eRegType_U8;
-        break;
-
-    //case no non-volatile parameters:
-    //    retval = eeprom_read_word((uint16_t*)&g_uEEProm[APP_eCfg_Dummy]);
-    //    *peRegType = eRegType_U16;
-    //    break;
-
+    }
+    else if (uRegNo >= APP_eReg_RemoteReg00 && uRegNo <= APP_eReg_RemoteReg31) {
+        index = uRegNo - APP_eReg_RemoteReg00;
+        index += APP_eCfg_RemoteReg00;
+        *(uint8_t*)pvValue = eeprom_read_byte(&register_eeprom_array[index]);
+    }
+    else if (uRegNo >= APP_eReg_TargetReg00 && uRegNo <= APP_eReg_TargetReg31) {
+        index = uRegNo - APP_eReg_TargetReg00;
+        index += APP_eCfg_TargetReg00;
+        *(uint8_t*)pvValue = eeprom_read_byte(&register_eeprom_array[index]);
+    }
+    else switch (uRegNo) {
+    // registers saved in EEProm
 
     // registers in ROM/RAM
-    case MOD_eReg_DeviceSignature0:
-        retval = boot_signature_byte_get(ADDR_SIGNATURE_BYTE0);
-        *peRegType = eRegType_U8;
-        break;
-    case MOD_eReg_DeviceSignature1:
-        retval = boot_signature_byte_get(ADDR_SIGNATURE_BYTE1);
-        *peRegType = eRegType_U8;
-        break;
-    case MOD_eReg_DeviceSignature2:
-        retval = boot_signature_byte_get(ADDR_SIGNATURE_BYTE2);
-        *peRegType = eRegType_U8;
-        break;
-    case MOD_eReg_BoardID:
-        //TODO CV: implement
-        *peRegType = eRegType_U8;
-        break;
-    case MOD_eReg_AppID:
-        //TODO CV: implement
-        *peRegType = eRegType_U8;
-        break;
-    case MOD_eReg_AppVersionMajor:
-        //TODO CV: implement
-        *peRegType = eRegType_U8;
-        break;
-    case MOD_eReg_AppVersionMinor:
-        //TODO CV: implement
-        *peRegType = eRegType_U8;
-        break;
-    case MOD_eReg_AppVersionBugfix:
-        //TODO CV: implement
-        *peRegType = eRegType_U8;
-        break;
 
     default:
-        // nothing (0) will be returned
+        return FALSE;
         break;
     }
-    return retval;
+    return TRUE;
 }
 
-void REG__vSetRegister              (uint8_t                uRegNo,
-                                        uint32_t               uValue)
+void        app_register_set        (uint8_t                uRegNo,
+                                     uint32_t               uValue)
 {
-    uint16_t tempval16;
-    uint8_t tempval;
+    uint16_t    tempval16;
+    uint8_t     tempval, index;
 
-    switch (uRegNo) {
+    tempval16 = (uint16_t)(uValue & 0x0000FFFF);
+    tempval = (uint8_t)(uValue & 0x000000FF);
+
     // registers saved in EEProm
-    case MOD_eReg_ModuleID:
-        tempval16 = (uint16_t)(uValue & 0x0000FFFF);
-        eeprom_write_word((uint16_t*)&g_uEEProm[MOD_eCfg_ModuleID], tempval16);
-        break;
-    case MOD_eReg_BldFlag:
-        tempval = (uint8_t)(uValue & 0x000000FF);
-        eeprom_write_byte(&g_uEEProm[MOD_eCfg_BldFlag], tempval);
-        break;
-
+    if (uRegNo >= APP_eReg_RemoteAddr00 && uRegNo <= APP_eReg_RemoteAddr31) {
+        index = (uRegNo - APP_eReg_RemoteAddr00) * 2;
+        index += APP_eCfg_RemoteAddr00;
+        eeprom_write_word((uint16_t*)&register_eeprom_array[index], tempval16);
+    }
+    else if (uRegNo >= APP_eReg_RemoteReg00 && uRegNo <= APP_eReg_RemoteReg31) {
+        index = uRegNo - APP_eReg_RemoteReg00;
+        index += APP_eCfg_RemoteReg00;
+        eeprom_write_byte(&register_eeprom_array[index], tempval);
+    }
+    else if (uRegNo >= APP_eReg_TargetReg00 && uRegNo <= APP_eReg_TargetReg31) {
+        index = uRegNo - APP_eReg_TargetReg00;
+        index += APP_eCfg_TargetReg00;
+        eeprom_write_byte(&register_eeprom_array[index], tempval);
+    }
+    else switch (uRegNo) {
+    // registers saved in EEProm
     case APP_eReg_PWMChn1:
         tempval = (uint8_t)(uValue & 0x000000FF);
-        PWM_vSet(0,tempval);
+        pwm_set(0,tempval);
         break;
     case APP_eReg_PWMChn2:
         tempval = (uint8_t)(uValue & 0x000000FF);
-        PWM_vSet(1,tempval);
+        pwm_set(1,tempval);
         break;
     case APP_eReg_PWMChn3:
         tempval = (uint8_t)(uValue & 0x000000FF);
-        PWM_vSet(2,tempval);
+        pwm_set(2,tempval);
         break;
 
     // registers in ROM/RAM
-    case MOD_eReg_DeviceSignature0:
-        // read only!
-        break;
-    case MOD_eReg_DeviceSignature1:
-        // read only!
-        break;
-    case MOD_eReg_DeviceSignature2:
-        // read only!
-        break;
-    case MOD_eReg_BoardID:
-        // read only!
-        break;
-    case MOD_eReg_AppID:
-        // read only!
-        break;
-    case MOD_eReg_AppVersionMajor:
-        // read only!
-        break;
-    case MOD_eReg_AppVersionMinor:
-        // read only!
-        break;
-    case MOD_eReg_AppVersionBugfix:
-        // read only!
-        break;
 
     default:
-        // nothing (0) will be returned
         break;
     }
 }

@@ -4,6 +4,7 @@ INCLUDE_DIRECTORIES (
     .
     ../src/include
     ../src/shared
+    ../src/upload
     ${CMAKE_CURRENT_BINARY_DIR}
 )
 

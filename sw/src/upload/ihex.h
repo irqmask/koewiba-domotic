@@ -19,7 +19,22 @@
 
 // --- Type definitions --------------------------------------------------------
 
-typedef (void)(*ihex_write_byte_func)(uint32_t uAddress, uint8_t uByte);
+typedef void (*ihex_write_byte_func)(uint32_t uAddress, uint8_t uByte);
+
+typedef enum {
+    e_ihex_eof = -1,
+    e_ihex_success = 0,
+    e_ihex_error_file_open = 100,
+    e_ihex_error_unexpected_char,
+    e_ihex_error_unexpected_eol,
+    e_ihex_error_unexpected_eof,
+    e_ihex_error_line_mark,
+    e_ihex_error_chars_at_eol,
+    e_ihex_error_invalid_rectype,
+    e_ihex_error_checksum,
+} eIHEX_Error;
+
+
 
 // --- Local variables ---------------------------------------------------------
 
@@ -35,6 +50,7 @@ typedef (void)(*ihex_write_byte_func)(uint32_t uAddress, uint8_t uByte);
 
 int32_t ihex_read_file (const char*             pcFilename,
                         uint32_t*               puStartAddress,
+                        uint32_t*               puFirstAddress,
                         uint32_t*               puLastAddress,
                         ihex_write_byte_func    pWriteByte);
 

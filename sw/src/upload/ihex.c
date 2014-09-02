@@ -44,6 +44,12 @@ typedef struct ihex_data {
     uint32_t        uLastAddress;
 } ihex_data_t;
 
+// temporary data, which is used by the simple memory-writer function
+typedef struct meminfo {
+    uint8_t* puPtr;
+    uint32_t uSize;
+} meminfo_t;
+
 // --- Local variables ---------------------------------------------------------
 
 // --- Global variables --------------------------------------------------------
@@ -128,7 +134,9 @@ static int32_t read_byte(FILE*                  psFile,
 // ----------------------------------------------------------------------------
 static int32_t read_data_rec(FILE*                  psFile,
                              ihex_data_t*           psMetaData,
-                             ihex_write_byte_func   pWriteByte)
+                             ihex_write_byte_func   pWriteByte,
+                             void*                  pvArg
+                            )
 {
     int32_t     retval = e_ihex_success;
     uint32_t    address, ii = 0;
@@ -151,7 +159,7 @@ static int32_t read_data_rec(FILE*                  psFile,
         psMetaData->uLineChkSum += byte;
         // store byte, if wanted
         if (pWriteByte != NULL) {
-            pWriteByte(address, byte);
+            pWriteByte(address, byte, pvArg);
         }
         ii++;
     }
@@ -282,7 +290,8 @@ static int32_t read_startlinearaddr_rec(FILE*                  psFile,
 // ----------------------------------------------------------------------------
 static int32_t read_line(FILE*                  psFile,
                          ihex_data_t*           psMetaData,
-                         ihex_write_byte_func   pWriteByte)
+                         ihex_write_byte_func   pWriteByte,
+                         void*                  pvArg)
 {
     int32_t     retval      = e_ihex_success;
     uint8_t     byte        = 0,
@@ -324,7 +333,7 @@ static int32_t read_line(FILE*                  psFile,
 
         switch (rectype) {
         case 0:
-            retval = read_data_rec(psFile, psMetaData, pWriteByte); break;
+            retval = read_data_rec(psFile, psMetaData, pWriteByte, pvArg); break;
         case 1:
             break; // nothing more
         case 2:
@@ -364,6 +373,17 @@ static int32_t read_line(FILE*                  psFile,
     return retval;
 }
 
+void write_byte_to_mem(uint32_t uAddress, uint8_t uByte, void* pvArg)
+{
+    meminfo_t* mem = pvArg;
+
+    if (mem != NULL) {
+        if (mem->puPtr && uAddress < mem->uSize) {
+            mem->puPtr[uAddress] = uByte;
+        }
+    }
+}
+
 // --- Module global functions -------------------------------------------------
 
 // --- Global functions --------------------------------------------------------
@@ -372,7 +392,8 @@ int32_t ihex_read_file (const char*             pcFilename,
                         uint32_t*               puStartAddress,
                         uint32_t*               puFirstAddress,
                         uint32_t*               puLastAddress,
-                        ihex_write_byte_func    pWriteByte)
+                        ihex_write_byte_func    pWriteByte,
+                        void*                   pvArg)
 {
     int32_t     retval;
     FILE*       handle;
@@ -395,7 +416,7 @@ int32_t ihex_read_file (const char*             pcFilename,
 
         // read the file line by line
         do {
-            retval = read_line(handle, &metadata, pWriteByte);
+            retval = read_line(handle, &metadata, pWriteByte, pvArg);
             line++;
         } while (retval == e_ihex_success);
 
@@ -416,4 +437,23 @@ int32_t ihex_read_file (const char*             pcFilename,
     return retval;
 }
 
+
+int32_t ihex_read_file_mem (const char*             pcFilename,
+                            uint32_t*               puStartAddress,
+                            uint32_t*               puFirstAddress,
+                            uint32_t*               puLastAddress,
+                            uint8_t*                puTargetMemory,
+                            uint32_t                uTargetMemorySize)
+{
+    meminfo_t mem;
+
+    mem.puPtr = puTargetMemory;
+    mem.uSize = uTargetMemorySize;
+
+    return ihex_read_file(pcFilename,
+                          puStartAddress,
+                          puFirstAddress,
+                          puLastAddress,
+                          write_byte_to_mem, &mem);
+}
 /** @} */

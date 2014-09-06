@@ -36,7 +36,6 @@ set (kwbrouter_SRCS
     ../shared/ioloop.c
     ../shared/message_bus.c
     ../shared/message_socket.c
-    ../shared/vbusd_client.c
     ../shared/vos.c
     ../../shared/bus_transport.c
     ../../shared/crc16.c

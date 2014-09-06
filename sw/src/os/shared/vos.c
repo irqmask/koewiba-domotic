@@ -15,7 +15,6 @@
 
 #include "sysserial.h"
 #include "syssocket.h"
-#include "vbusd_client.h"
 #include "vos.h"
 
 // --- Definitions -------------------------------------------------------------

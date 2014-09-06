@@ -106,6 +106,18 @@ sys_fd_t sys_socket_open_client_unix (const char* socketname)
     return fd;
 }
 
+sys_fd_t sys_socket_open_server_tcp (const char* socketaddress, uint16_t port)
+{
+    //TODO implement
+    return INVALID_FD;
+}
+
+sys_fd_t sys_socket_open_client_tcp (const char* socketaddress, uint16_t port)
+{
+    //TODO implement
+    return INVALID_FD;
+}
+
 void sys_socket_close (sys_fd_t fd)
 {
     close(fd);

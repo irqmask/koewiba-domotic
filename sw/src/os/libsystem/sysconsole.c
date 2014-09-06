@@ -1,18 +1,24 @@
-#include "system.h"
+
+#include "prjconf.h"
+
 #include <stdio.h>
 
-#ifdef _SYS_LINUX_
-#include <termios.h>
+#if defined (PRJCONF_UNIX) || \
+    defined (PRJCONF_POSIX) || \
+    defined (PRJCONF_LINUX)
+  #include <termios.h>
 #endif
 
 #include "sysconsole.h"
 
-#ifdef _SYS_LINUX_
+#if defined (PRJCONF_UNIX) || \
+    defined (PRJCONF_POSIX) || \
+    defined (PRJCONF_LINUX)
 
 static struct termios old, new;
 
 /* Initialize new terminal i/o settings */
-static void vInitTermios(int echo)
+static void init_termios(int echo)
 {
     tcgetattr(0, &old); /* grab old terminal i/o settings */
     new = old; /* make new settings same as old settings */
@@ -22,7 +28,7 @@ static void vInitTermios(int echo)
 }
 
 /* Restore old terminal i/o settings */
-static void vResetTermios(void)
+static void reset_termios(void)
 {
     tcsetattr(0, TCSANOW, &old);
 }
@@ -31,19 +37,21 @@ static void vResetTermios(void)
 static char getch_(int echo)
 {
     char ch;
-    vInitTermios(echo);
+    init_termios(echo);
     ch = getchar();
-    vResetTermios();
+    reset_termios();
     return ch;
 }
 
-/* Read 1 character without echo */
+/**
+ * Read 1 character without echo */
 char getch(void)
 {
     return getch_(0);
 }
 
-/* Read 1 character with echo */
+/**
+ * Read 1 character with echo */
 char getche(void)
 {
     return getch_(1);

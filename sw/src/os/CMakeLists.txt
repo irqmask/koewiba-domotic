@@ -6,5 +6,8 @@ project (KoeWiBa)
 
 add_subdirectory (libsystem)
 
+add_subdirectory (kwbmonitor)
 add_subdirectory (kwbrouter)
+add_subdirectory (kwbscheduler)
 add_subdirectory (kwbtest)
+add_subdirectory (vbusd)

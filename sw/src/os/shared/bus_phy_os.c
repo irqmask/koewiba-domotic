@@ -1,7 +1,7 @@
 /**
  * @addtogroup BUS
  * @addtogroup BUS_PHY_OS
- * @brief Physical layer of bus protocol for operating systems like Linux and 
+ * @brief Physical layer of bus protocol for operating systems like Linux and
  * Windows.
  *
  * @{
@@ -16,7 +16,7 @@
 
 #include "bus_intern.h"
 #include "message_bus.h"
-#include "sysserial.h"
+#include "vos.h"
 
 // --- Definitions -------------------------------------------------------------
 
@@ -30,10 +30,10 @@
 
 // --- Local functions ---------------------------------------------------------
 
-static void vDebugHexOutput(const uint8_t uData)
+static void debug_log_hex (const uint8_t byte)
 {
     static int count = 0;
-    printf("%02X ", uData);
+    printf("%02X ", byte);
     count++;
     if (count >= 16) {
         count = 0;
@@ -41,10 +41,10 @@ static void vDebugHexOutput(const uint8_t uData)
     }
 }
 
-static void vDebugHexOutputLen(const uint8_t* puData, uint8_t uLen)
+static void debug_log_hex_len (const uint8_t* data, uint8_t len)
 {
-    while (uLen--) {
-        vDebugHexOutput(*puData++);
+    while (len--) {
+        debug_log_hex(*data++);
     }
 }
 
@@ -53,22 +53,22 @@ static void vDebugHexOutputLen(const uint8_t* puData, uint8_t uLen)
 /**
  * Initialize data and hardware of bus's physical layer.
  *
- * @param[in] psPhy     Handle of bus physical layer.
- * @param[in] uUart     Number of the UART. 0=first.
+ * @param[in] phy       Handle of bus physical layer.
+ * @param[in] uart      Number of the UART. 0=first.
  */
-void bus_phy_initialize(sBusPhy_t* psPhy, uint8_t uUart)
+void bus_phy_initialize(sBusPhy_t* phy, uint8_t uart)
 {
-    psPhy->uCurrentBytesToSend = 0;
-    psPhy->uUart = uUart;
-    psPhy->uFlags = 0;
+    phy->uCurrentBytesToSend = 0;
+    phy->uUart = uart;
+    phy->uFlags = 0;
 
     do {
-        if (uUart >= BUSPHY_MAX_DEVICES) break;
+        if (uart >= BUSPHY_MAX_DEVICES) break;
 
         // sender is initial off, receiver is always on.
-        bus_phy_activate_sender(psPhy, FALSE);
+        bus_phy_activate_sender(phy, FALSE);
 #ifndef BUS_TXRX_COMBINED
-        bus_phy_activate_receiver(psPhy, TRUE);
+        bus_phy_activate_receiver(phy, TRUE);
 #endif
     } while ( FALSE );
 }
@@ -76,10 +76,10 @@ void bus_phy_initialize(sBusPhy_t* psPhy, uint8_t uUart)
 /**
  * Activate or deactivate bus's sender hardware (driver).
  *
- * @param[in] psPhy     Handle of bus physical layer.
- * @param[in] bActivate TRUE: activate sender, FALSE: deactivate sender.
+ * @param[in] phy       Handle of bus physical layer.
+ * @param[in] activate  TRUE: activate sender, FALSE: deactivate sender.
  */
-void bus_phy_activate_sender(sBusPhy_t* psPhy, BOOL bActivate)
+void bus_phy_activate_sender(sBusPhy_t* phy, BOOL activate)
 {
     // insert code for sender activation here, if needed.
 }
@@ -87,11 +87,11 @@ void bus_phy_activate_sender(sBusPhy_t* psPhy, BOOL bActivate)
 /**
  * Activate or deactivate bus's receiver hardware.
  *
- * @param[in] psPhy     Handle of bus physical layer.
- * @param[in] bActivate TRUE: activate receiver, FALSE: deactivate receiver.
+ * @param[in] phy       Handle of bus physical layer.
+ * @param[in] activate TRUE: activate receiver, FALSE: deactivate receiver.
  */
 #ifndef BUS_TXRX_COMBINED
-void bus_phy_activate_receiver(sBusPhy_t* psPhy, BOOL bActivate)
+void bus_phy_activate_receiver(sBusPhy_t* phy, BOOL activate)
 {
     // insert code for receiver activation here, if needed.
 }
@@ -101,13 +101,13 @@ void bus_phy_activate_receiver(sBusPhy_t* psPhy, BOOL bActivate)
  * Send given number of data on the bus.
  * Sending is initiated, if the previous sending process finished.
  *
- * @param[in] psPhy     Handle of bus physical layer.
- * @param[in] puMsg     Pointer to message to be sent.
- * @param[in] uLen      Length in bytes of mesage to be sent.
+ * @param[in] phy       Handle of bus physical layer.
+ * @param[in] msg       Pointer to message to be sent.
+ * @param[in] len       Length in bytes of mesage to be sent.
  *
  * @returns TRUE: sending successfully initiated, otherwise FALSE.
  */
-BOOL bus_phy_send(sBusPhy_t* psPhy, const uint8_t* puMsg, uint8_t uLen)
+BOOL bus_phy_send(sBusPhy_t* phy, const uint8_t* msg, uint8_t len)
 {
     BOOL rc = TRUE;
 
@@ -115,21 +115,21 @@ BOOL bus_phy_send(sBusPhy_t* psPhy, const uint8_t* puMsg, uint8_t uLen)
     //    return FALSE;
     //}
     //psPhy->uCurrentBytesToSend = uLen;
-    psPhy->uFlags |= e_uarttxflag;
+    phy->uFlags |= e_uarttxflag;
     //psPhy->puSendPtr = puMsg;
 
-    bus_phy_activate_sender(psPhy, TRUE);
-    if (sys_serial_send(msg_b_get_uart(psPhy->uUart), (void*)puMsg, uLen) == uLen) {
-        psPhy->uFlags &= ~e_uarttxflag;
+    bus_phy_activate_sender(phy, TRUE);
+    if (vos_send(msg_b_get_uart(phy->uUart), (void*)msg, len) == len) {
+        phy->uFlags &= ~e_uarttxflag;
     } else {
         printf("BUS__bPhySend error\n");
         rc = FALSE;
     }
-    vDebugHexOutputLen(puMsg, uLen);
+    debug_log_hex_len(msg, len);
 
-    bus_phy_activate_sender(psPhy, FALSE);
+    bus_phy_activate_sender(phy, FALSE);
 #ifndef BUS_TXRX_COMBINED
-    bus_phy_activate_receiver(psPhy, TRUE);
+    bus_phy_activate_receiver(phy, TRUE);
 #endif
     return rc;
 }
@@ -137,11 +137,11 @@ BOOL bus_phy_send(sBusPhy_t* psPhy, const uint8_t* puMsg, uint8_t uLen)
 /**
  * Checks if data is currently beeing sent.
  *
- * @param[in] psPhy     Handle of bus physical layer.
+ * @param[in] phy       Handle of bus physical layer.
  *
  * @returns TRUE:       sending in progress.
  */
-BOOL bus_phy_sending(sBusPhy_t* psPhy)
+BOOL bus_phy_sending(sBusPhy_t* phy)
 {
     return FALSE;
 }
@@ -149,29 +149,28 @@ BOOL bus_phy_sending(sBusPhy_t* psPhy)
 /**
  * Checks if data has been received.
  *
- * @param[in] psPhy     Handle of bus physical layer.
+ * @param[in] phy       Handle of bus physical layer.
  *
  * @returns TRUE: at least one byte is waiting in receive buffer.
  */
-BOOL bus_phy_data_received(sBusPhy_t* psPhy)
+BOOL bus_phy_data_received(sBusPhy_t* phy)
 {
-    return (sys_serial_get_pending(msg_b_get_uart(psPhy->uUart)) > 0);
+    return (vos_get_pending(msg_b_get_uart(phy->uUart)) > 0);
 }
 
 /**
  * Read a byte from the received bytes queue.
  *
- * @param[in] psPhy     Handle to bus's phsical layer
- * @param[out] puByte   Received byte. *puByte remains unchange if no byte has been received.
+ * @param[in] phy       Handle to bus's phsical layer
+ * @param[out] byte     Received byte. *puByte remains unchange if no byte has been received.
  *
  * @returns TRUE if a byte has been received, otherwise false.
  */
-BOOL bus_phy_read_byte(sBusPhy_t* psPhy, uint8_t *puByte)
+BOOL bus_phy_read_byte(sBusPhy_t* phy, uint8_t *byte)
 {
     BOOL rc = TRUE;
 
-    if (sys_serial_recv(msg_b_get_uart(psPhy->uUart),
-                        puByte, 1) != 1) {
+    if (vos_recv(msg_b_get_uart(phy->uUart), byte, 1) != 1) {
         rc = FALSE;
     }
     return rc;
@@ -180,16 +179,15 @@ BOOL bus_phy_read_byte(sBusPhy_t* psPhy, uint8_t *puByte)
 /**
  * Flush all data from physical layer's input buffer.
  *
- * @param[in] psPhy
+ * @param[in] phy
  * Handle of bus physical layer.
  */
-void bus_phy_flush(sBusPhy_t* psPhy)
+void bus_phy_flush(sBusPhy_t* phy)
 {
-    sys_serial_flush(msg_b_get_uart(psPhy->uUart));
+    vos_flush(msg_b_get_uart(phy->uUart));
 }
 
 // --- Global functions --------------------------------------------------------
 
 /** @} */
 /** @} */
-

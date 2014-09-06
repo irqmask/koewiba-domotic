@@ -22,6 +22,7 @@
 #include "ioloop.h"
 #include "message.h"
 #include "system.h"
+#include "vos.h"
 
 // --- Definitions -------------------------------------------------------------
 
@@ -31,11 +32,11 @@
 
 typedef struct msg_bus {
     uint16_t            own_address;
-    sys_fd_t            fd;
+    vos_t               vos;
     ioloop_t*           ioloop;
     msg_incom_func_t    incomming_handler;
     void*               incomming_arg;
-    
+
     sBus_t              bus;
 } msg_bus_t;
 
@@ -51,14 +52,16 @@ typedef struct msg_bus {
 
 // --- Global functions --------------------------------------------------------
 
-sys_fd_t msg_b_get_uart (uint8_t uart_index);
+vos_t* msg_b_get_uart (uint8_t uart_index);
 
 void msg_b_init (msg_bus_t* msg_bus, uint8_t uart_index);
 
-int msg_b_open (msg_bus_t*     msg_bus, 
-                ioloop_t*      ioloop, 
+int msg_b_open (msg_bus_t*     msg_bus,
+                ioloop_t*      ioloop,
                 uint16_t       own_address,
-                const char*    device);
+                bool           open_serial,
+                const char*    device_or_address,
+                int            baudrate_or_port);
 
 void msg_b_set_incomming_handler (msg_bus_t* msg_bus, msg_incom_func_t func, void* arg);
 

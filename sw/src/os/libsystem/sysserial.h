@@ -19,6 +19,10 @@
 
 #include "system.h"
 
+#include <stdbool.h>
+#include <stdint.h>
+#include <stdio.h>
+
 // --- Definitions -------------------------------------------------------------
 
 // --- Type definitions --------------------------------------------------------
@@ -106,7 +110,7 @@ sys_fd_t sys_serial_open (const char* device);
 
 void sys_serial_close (sys_fd_t fd);
 
-int sys_serial_set_params (sys_fd_t            fd, 
+int sys_serial_set_params (sys_fd_t            fd,
                            sys_ser_baudrate_t  baudrate,
                            sys_ser_databits_t  databits,
                            sys_ser_parity_t    parity,
@@ -120,7 +124,9 @@ void sys_serial_flush (sys_fd_t fd);
 
 size_t sys_serial_get_pending (sys_fd_t fd);
 
-int sys_serial_set_blocking (sys_fd_t fd, int blocking);
+void sys_serial_set_blocking (sys_fd_t fd, bool blocking);
+
+sys_ser_baudrate_t sys_serial_baudrate (int baudrate);
 
 #endif /* _SYSSERIAL_H_ */
 /** @} */

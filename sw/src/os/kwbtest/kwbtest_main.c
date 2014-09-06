@@ -47,6 +47,7 @@ void log_hexdump16 (uint8_t* data, uint16_t length)
         printf("%02X ", data[offset]);
         offset++;
     }
+    printf("\n");
 }
 
 static void handle_message(msg_t* message, void* arg)
@@ -69,7 +70,7 @@ int main (int argc, char* argv[])
 
     do {
         printf("\nkwbtest...\n");
-        ioloop_init (&mainloop);
+        ioloop_init(&mainloop);
 
         msg_s_init(&msg_socket);
         msg_s_set_incomming_handler(&msg_socket, handle_message, NULL);

@@ -123,7 +123,6 @@ static void msg_accept_endpoint (void* arg)
     msg_endpoint_t* ep = NULL;
 
     do {
-        printf("MSG ACCEPT ENDPOINT\n");
         ep = msg_new_endpoint(msg_socket, eMSG_EP_COMM);
         if (ep == NULL) break;
 
@@ -137,7 +136,7 @@ static void msg_accept_endpoint (void* arg)
         // register new connection to ioloop
         ioloop_register_fd(msg_socket->ioloop, ep->fd, eIOLOOP_EV_READ, msg_read, (void*)ep);
 
-        printf("MSG ACCEPT ENDPOINT END\n");
+        fprintf(stderr, "connection accepted\n");
 
     } while (0);
 }
@@ -279,9 +278,8 @@ msg_endpoint_t* msg_s_get_endpoint (msg_socket_t*   msg_socket,
     return ep;
 }
 
-void msg_s_send (msg_socket_t* msg_socket, msg_endpoint_t* recv_ep, msg_t* message)
+void msg_s_send (msg_endpoint_t* recv_ep, msg_t* message)
 {
-    assert(msg_socket != NULL);
     assert(recv_ep != NULL);
     assert(message != NULL);
 

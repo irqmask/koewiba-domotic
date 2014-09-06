@@ -74,8 +74,7 @@ msg_endpoint_t* msg_s_get_endpoint (msg_socket_t*   msg_socket,
                                     int             index,
                                     uint32_t        flags);
 
-void msg_s_send (msg_socket_t*      msg_socket,
-                 msg_endpoint_t*    recv_ep,
+void msg_s_send (msg_endpoint_t*    recv_ep,
                  msg_t*             message);
 
 #endif /* _MESSAGE_SOCKET_H_ */

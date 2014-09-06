@@ -4,6 +4,7 @@ INCLUDE_DIRECTORIES (
     .
     ../src/include
     ../src/shared
+    ../src/upload
     ${CMAKE_CURRENT_BINARY_DIR}
 )
 
@@ -19,7 +20,9 @@ SET(kwb_unittests_SRCS
     ../src/shared/bus_schedul.c
     ../src/shared/bus_transport.c
     ../src/shared/pwm.c
+    ../src/upload/ihex.c
     testbussched.c
+    testihex.c
     testpwm.c
     register_tests.c
     main.c

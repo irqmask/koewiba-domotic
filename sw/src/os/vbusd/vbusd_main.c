@@ -241,10 +241,14 @@ static int32_t byte_received (void* arg)
         if (client != current_client) {
             switch (client->type) {
             case eVBUSD_TYPE_SERIAL:
-                sys_serial_send(client->fd, bytes, len);
+                if (sys_serial_send(client->fd, bytes, len) != len) {
+                    perror("sys_serial_send");
+                }
                 break;
             case eVBUSD_TYPE_SOCKET:
-                sys_socket_send(client->fd, bytes, len);
+                if (sys_socket_send(client->fd, bytes, len) != len) {
+                    perror("sys_socket_send");
+                }
                 break;
             default:
                 break;
@@ -267,6 +271,7 @@ static int32_t accept_client (void* arg)
         }
 
         if ((fd = sys_socket_accept(clients->server_fd)) <= INVALID_FD) {
+            perror("accept_client");
             delete_client(client);
             break;
         }

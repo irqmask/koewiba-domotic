@@ -122,7 +122,7 @@ BOOL bus_phy_send(sBusPhy_t* phy, const uint8_t* msg, uint8_t len)
     if (vos_send(msg_b_get_uart(phy->uUart), (void*)msg, len) == len) {
         phy->uFlags &= ~e_uarttxflag;
     } else {
-        printf("BUS__bPhySend error\n");
+        perror("bus_phy_send");
         rc = FALSE;
     }
     debug_log_hex_len(msg, len);
@@ -171,6 +171,7 @@ BOOL bus_phy_read_byte(sBusPhy_t* phy, uint8_t *byte)
     BOOL rc = TRUE;
 
     if (vos_recv(msg_b_get_uart(phy->uUart), byte, 1) != 1) {
+        perror("bus_phy_read_byte");
         rc = FALSE;
     }
     return rc;

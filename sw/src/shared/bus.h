@@ -188,7 +188,29 @@ typedef struct bus {
 
 // --- Global functions --------------------------------------------------------
 
-void    bus_sleep                           (sBus_t*       psBus);
+void 	bus_configure						(sBus_t* 		psBus,
+											 uint16_t 		uNodeAddress);
+
+void 	bus_initialize						(sBus_t* 		psBus,
+											 uint8_t 	    uUart);
+
+void 	bus_flush_bus						(sBus_t* 		psBus);
+
+BOOL 	bus_get_message						(sBus_t* 		psBus);
+
+BOOL 	bus_read_message					(sBus_t*  		psBus,
+											 uint16_t* 		puSender,
+											 uint8_t* 		puLen,
+											 uint8_t* 		puMsg);
+
+BOOL 	bus_send_message					(sBus_t*    	psBus,
+                      	  	  	  	  	  	 uint16_t   	uReceiver,
+                      	  	  	  	  	  	 uint8_t    	uLen,
+                      	  	  	  	  	  	 uint8_t*   	puMsg);
+
+BOOL 	bus_is_idle							(sBus_t*        psBus);
+
+void    bus_sleep                           (sBus_t*      	psBus);
 
 #endif /* _BUS_H_ */
 /** @} */

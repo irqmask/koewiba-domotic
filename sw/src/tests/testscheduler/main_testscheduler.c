@@ -16,6 +16,7 @@
 #include <util/delay.h>
 
 #include "bus.h"
+#include "bus_scheduler.h"
 #include "clock.h"
 // TODO remove after debug
 #include "led_debug.h"

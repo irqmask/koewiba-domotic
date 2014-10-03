@@ -210,7 +210,7 @@ static void delete_client (vbusd_client_t* client)
     }
 }
 
-static void byte_received (void* arg)
+static int32_t byte_received (void* arg)
 {
     vbusd_client_t  *client, *current_client = (vbusd_client_t*)arg;
     vbusd_clients_t *clients = current_client->clients;
@@ -221,14 +221,14 @@ static void byte_received (void* arg)
     switch (current_client->type) {
     case eVBUSD_TYPE_SERIAL:
         if (sys_serial_recv(current_client->fd, bytes, len) < 0) {
-            return;
+            return 0;
         }
         break;
     case eVBUSD_TYPE_SOCKET:
         if ((rc = sys_socket_recv(current_client->fd, bytes, len)) != len) {
             // connection closed?
             if (rc == 0) vbusd_close_conn(current_client);
-            return;
+            return 0;
         }
         break;
     default:
@@ -252,9 +252,10 @@ static void byte_received (void* arg)
         }
         client = client->next;
     }
+    return 0;
 }
 
-static void accept_client (void* arg)
+static int32_t accept_client (void* arg)
 {
     vbusd_clients_t*    clients = (vbusd_clients_t*)arg;
     vbusd_client_t*     client;
@@ -275,6 +276,7 @@ static void accept_client (void* arg)
         ioloop_register_fd(clients->ioloop, fd, eIOLOOP_EV_READ, byte_received, client);
         fprintf(stderr, "vbusd socket connection accepted.\n");
     } while (0);
+    return 0;
 }
 
 static void vbusd_init (vbusd_clients_t*  clients, ioloop_t* ioloop)

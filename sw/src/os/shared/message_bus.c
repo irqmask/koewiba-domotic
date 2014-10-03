@@ -35,7 +35,7 @@ msg_bus_t* g_uarts[BUSPHY_MAX_DEVICES] = {
 
 // --- Local functions ---------------------------------------------------------
 
-static void msg_receive (void* arg)
+static int32_t msg_receive (void* arg)
 {
     msg_bus_t*  msg_bus = (msg_bus_t*)arg;
     msg_t       message;
@@ -54,6 +54,7 @@ static void msg_receive (void* arg)
             }
         }
     }
+    return 0;
 }
 
 // --- Module global functions -------------------------------------------------
@@ -74,7 +75,7 @@ void msg_b_init (msg_bus_t* msg_bus, uint8_t uart_index)
 {
     assert(msg_bus != NULL);
 
-    memset(&msg_bus, 0, sizeof(msg_bus_t));
+    memset(msg_bus, 0, sizeof(msg_bus_t));
 
     if (uart_index < BUSPHY_MAX_DEVICES) {
         g_uarts[uart_index] = msg_bus;

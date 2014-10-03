@@ -19,6 +19,7 @@
 #include <stdint.h>
 
 #include "bus.h"
+#include "bus_scheduler.h"
 #include "ioloop.h"
 #include "message.h"
 #include "system.h"
@@ -38,6 +39,7 @@ typedef struct msg_bus {
     void*               incomming_arg;
 
     sBus_t              bus;
+    sSched_t            scheduler;
 } msg_bus_t;
 
 // --- Local variables ---------------------------------------------------------

@@ -93,6 +93,8 @@ sys_thread_func (reader_thread)
         bytesread = vos_recv(&g_vos, &new_byte, 1);
         if (bytesread > 0) {
             monitor_parse_message(new_byte, &g_bus_history);
+        } else {
+            sys_sleep_ms(1);
         }
     }
     return 0;
@@ -236,7 +238,7 @@ int main(int argc, char* argv[])
                 break;
             }
 
-            SYS_vSleepMs(10);
+            sys_sleep_ms(10);
         }
 
         vos_close(&g_vos);

@@ -15,6 +15,9 @@
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
 
+ ///@todo remove printfs
+ ///@todo react on rerrors of send/receive function properly -> man pages
+ 
 // --- Include section ---------------------------------------------------------
 
 #include "prjconf.h"
@@ -33,6 +36,9 @@
   #include <unistd.h>
 #endif
 
+#include "message_bus.h"
+#include "bus_scheduler.h"
+#include "ioloop.h"
 #include "vos.h"
 #include "system.h"
 
@@ -47,11 +53,10 @@ typedef struct options {
     uint16_t    vbusd_port;
     bool        serial_device_set;
     bool        vbusd_address_set;
+    uint16_t    own_node_address;
 } options_t;
 
 // --- Local variables ---------------------------------------------------------
-
-static vos_t            g_vos;
 
 // --- Global variables --------------------------------------------------------
 
@@ -75,7 +80,9 @@ static void set_options (options_t*     options,
                          const char*    serial_device,
                          int            serial_baudrate,
                          const char*    vbusd_address,
-                         uint16_t       vbusd_port)
+                         uint16_t       vbusd_port,
+                         uint16_t       own_node_address
+                        )
 {
     memset(options, 0, sizeof(options_t));
 
@@ -87,6 +94,7 @@ static void set_options (options_t*     options,
         strcpy_s(options->vbusd_address, sizeof(options->vbusd_address), vbusd_address);
     }
     options->vbusd_port = vbusd_port;
+    options->own_node_address = own_node_address;
 }
 
 static bool parse_commandline_options (int          argc,
@@ -119,6 +127,9 @@ static bool parse_commandline_options (int          argc,
                 printf("vbusd port %s\n", optarg);
                 options->vbusd_port = atoi(optarg);
                 break;
+            case 'n':
+                options->own_node_address = atoi(optarg);
+                break;
             default:
                 rc = false;
                 break;
@@ -138,16 +149,44 @@ static bool validate_options (options_t* options)
         if (options->serial_device_set &&
             strnlen_s(options->serial_device, sizeof(options->serial_device)) < 2) {
             fprintf(stderr, "Invalid serial device path!\n");
-        break;
-            }
-            if (options->vbusd_address_set &&
-                strnlen_s(options->vbusd_address, sizeof(options->vbusd_address)) < 2) {
-                fprintf(stderr, "Invalid vbusd address!\n");
             break;
-                }
-                rc = true;
+        }
+        if (options->vbusd_address_set &&
+            strnlen_s(options->vbusd_address, sizeof(options->vbusd_address)) < 2) {
+            fprintf(stderr, "Invalid vbusd address!\n");
+            break;
+        }
+        if (options->own_node_address == 0 ||
+            options->own_node_address == 0xFF ||
+            options->own_node_address == 0xFFFF) {
+            fprintf(stderr, "Invalid own node address %d. It has to be 1..254, 256..65534\n",
+                    options->own_node_address);
+            break;
+        }
+        rc = true;
     } while (0);
     return rc;
+}
+
+void init_scheduling (msg_bus_t* busscheduler, uint16_t own_node_address)
+{
+    msg_b_init(busscheduler, 0);
+
+    bus_configure(&busscheduler->bus, own_node_address);
+    bus_initialize(&busscheduler->bus, 0);
+    bus_scheduler_configure(&busscheduler->scheduler);
+}
+
+int32_t do_scheduling (void* arg)
+{
+    uint16_t sender = 0;
+    uint8_t length = 0, message[BUS_MAXBIGMSGLEN];
+    msg_bus_t* busscheduler = (msg_bus_t*)arg;
+
+    if (bus_schedule_and_get_message(&busscheduler->bus, &busscheduler->scheduler)) {
+        bus_read_message(&busscheduler->bus, &sender, &length, message);
+    }
+    return clk_timers_next_expiration();
 }
 
 // --- Module global functions -------------------------------------------------
@@ -156,30 +195,43 @@ static bool validate_options (options_t* options)
 
 int main(int argc, char* argv[])
 {
-    char cc;
-    int rc = eERR_NONE;
-    options_t options;
+    char        cc;
+    int         rc = eERR_NONE;
+    options_t   options;
+    bool        end_application = false;
+    ioloop_t    mainloop;
+    msg_bus_t   busscheduler;
+
 
     printf("kwbscheduler");
     setbuf(stdout, NULL);       // disable buffering of stdout
 
     do {
-        set_options(&options, "", 38400, "/tmp/vbusd.usk", 0);
+        ioloop_init(&mainloop);
+        set_options(&options, "", 38400, "/tmp/vbusd.usk", 0, 1);
         if (!parse_commandline_options(argc, argv, &options) ||
             !validate_options(&options)) {
             print_usage();
             rc = eSYS_ERR_BAD_PARAMETER;
             break;
         }
-
+        init_scheduling(&busscheduler, options.own_node_address);
         if (options.serial_device_set) {
-            rc = vos_open_serial(&g_vos, options.serial_device, options.serial_baudrate);
+            rc = vos_open_serial(&busscheduler.vos, options.serial_device, options.serial_baudrate);
         } else {
-            rc = vos_open_vbusd(&g_vos, options.vbusd_address, options.vbusd_port);
+            rc = vos_open_vbusd(&busscheduler.vos, options.vbusd_address, options.vbusd_port);
         }
         if (rc != eERR_NONE) break;
 
-        vos_close(&g_vos);
+        // schedule on incomming bytes and after timer expiration
+        ioloop_register_fd(&mainloop, busscheduler.vos.fd, eIOLOOP_EV_READ, do_scheduling, &busscheduler);
+        ioloop_register_timer(&mainloop, 1000, true, eIOLOOP_EV_TIMER, do_scheduling, &busscheduler);
+
+        while (!end_application) {
+            ioloop_run_once(&mainloop);
+        }
+
+        vos_close(&busscheduler.vos);
     } while (0);
 
     return rc;

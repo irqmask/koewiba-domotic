@@ -37,7 +37,7 @@
 
 #define BUS_ACKBYTE             0x06    //!< ACK.
 #define BUS_NAKBYTE             0x15    //!< NAK.
-#define BUS_SYNCBYTE            0x9A    //!< 0b10011010 synchronization byte 
+#define BUS_SYNCBYTE            0x9A    //!< 0b10011010 synchronization byte
                                         //!< every message begins with.
 #define BUS_WAKEUPBYTE          0xFF    //!< Dummy-Byte that is send to the bus
                                         //!< as wakeup-call for other subscribers.
@@ -79,9 +79,6 @@ BOOL    bus_trp_send_and_receive   (sBus_t* psBus);
 
 BOOL    bus_send_sleepcmd          (sBus_t* psBus);
 
-// scheduler
-void    sched_configure             (sSched_t*       psSched);
-
 // physical layer
 void    bus_phy_initialize         (sBusPhy_t*     psPhy,
                                      uint8_t        uUart);
@@ -95,7 +92,7 @@ void    bus_phy_activate_receiver   (sBusPhy_t*     psPhy,
 // TODO remove after debug
 void 	BUS__vDebugSend 			(uint8_t 		*data,
 									 uint8_t 		len);
-                                     
+
 BOOL    bus_phy_send               (sBusPhy_t*     psPhy,
                                      const uint8_t* puMsg,
                                      uint8_t        uLen);

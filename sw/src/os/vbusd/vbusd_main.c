@@ -342,7 +342,7 @@ static int vbusd_open_serial (vbusd_clients_t*  clients,
         client->fd = fd;
         client->type = eVBUSD_TYPE_SERIAL;
 
-        ioloop_register_fd(ioloop, fd, eIOLOOP_EV_READ, byte_received, clients);
+        ioloop_register_fd(ioloop, fd, eIOLOOP_EV_READ, byte_received, client);
         fprintf(stderr, "vbusd serial connection opened.\n");
     } while (0);
     return rc;
@@ -402,6 +402,9 @@ int main (int argc, char* argv[])
     do {
         printf("\nvbusd...\n");
 
+        ioloop_init (&mainloop);
+        vbusd_init (&clients, &mainloop);
+
         // set default options for kwbrouter
         set_options(&options,
                     "",                 // no serial device, use vbusd as default
@@ -416,9 +419,6 @@ int main (int argc, char* argv[])
             rc = eSYS_ERR_BAD_PARAMETER;
             break;
         }
-
-        ioloop_init (&mainloop);
-        vbusd_init (&clients, &mainloop);
 
         if ((rc = vbusd_open_server(&clients,
                                     options.vbusd_address,

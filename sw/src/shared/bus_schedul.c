@@ -20,6 +20,7 @@
 #endif
 
 #include "bus.h"
+#include "bus_scheduler.h"
 #include "bus_intern.h"
 
 // --- Definitions -------------------------------------------------------------
@@ -227,9 +228,8 @@ BOOL bus_schedule_and_get_message(sBus_t* psBus, sSched_t* psSched )
 
     case eBus_Idle:
         // send token
-    	if (sched_send_next_timeslot_token(psBus, psSched)) {
-
-    	    clk_timer_start(&psSched->sNodeAnsTimeout, CLOCK_MS_2_TICKS(50));
+        if (sched_send_next_timeslot_token(psBus, psSched)) {
+            clk_timer_start(&psSched->sNodeAnsTimeout, CLOCK_MS_2_TICKS(50));
             psBus->eState = eBus_SendingToken;
         }
         break;
@@ -237,29 +237,29 @@ BOOL bus_schedule_and_get_message(sBus_t* psBus, sSched_t* psSched )
     case eBus_SendingToken:
         // wait for finished token sending
         if (!bus_phy_sending(&psBus->sPhy)) {
-        	if (sched_current_node_is_me(psBus, psSched)) {
-        		// The scheduler cannot receive its own message,
-        		// so we set the state to eBus_GotToken "manually".
-        	    psBus->eState = eBus_GotToken;
-        	}
-        	else {
-        		// Token has been sent, now wait for a message.
-        	    psSched->bSchedWaitingForAnswer = TRUE;
+            if (sched_current_node_is_me(psBus, psSched)) {
+                // The scheduler cannot receive its own message,
+                // so we set the state to eBus_GotToken "manually".
+                psBus->eState = eBus_GotToken;
+            }
+            else {
+                // Token has been sent, now wait for a message.
+                psSched->bSchedWaitingForAnswer = TRUE;
                 psBus->eState = eBus_ReceivingWait;
-        	}
+            }
         }
         else if (clk_timer_is_elapsed(&psSched->sNodeAnsTimeout)) {
-        	    sched_set_node_error(psSched, psSched->auTokenMsg[1] & 0x7F);
-        		// return to IDLE state
-        		psBus->eState = eBus_Idle;
-        		LED_ERROR_ON;
-		}
+                sched_set_node_error(psSched, psSched->auTokenMsg[1] & 0x7F);
+                // return to IDLE state
+                psBus->eState = eBus_Idle;
+                LED_ERROR_ON;
+        }
         break;
 
     case eBus_ReceivingPassive:
-    	// any message on the bus resets counter
-    	if (eMod_Running == psBus->eModuleState) psSched->uSleepLoopCnt = BUS_LOOPS_TILL_SLEEP;
-    	break;
+        // any message on the bus resets counter
+        if (eMod_Running == psBus->eModuleState) psSched->uSleepLoopCnt = BUS_LOOPS_TILL_SLEEP;
+        break;
 
     default:
         break;
@@ -269,15 +269,15 @@ BOOL bus_schedule_and_get_message(sBus_t* psBus, sSched_t* psSched )
     //if (msg_received) psSched->uSleepLoopCnt = BUS_LOOPS_TILL_SLEEP;
 
     if (psSched->bSchedWaitingForAnswer) {
-    	BOOL receive_end = FALSE;
+        BOOL receive_end = FALSE;
 
         if (psBus->bSchedMsgReceived) {
-			if (TRUE == psSched->bSchedDiscovery) {
-				sched_set_node_state(psSched, psSched->auTokenMsg[1] & 0x7F, TRUE);
-				psSched->bSchedDiscovery = FALSE;
-			}
-			else sched_reset_node_error(psSched, psSched->auTokenMsg[1] & 0x7F);
-			receive_end = TRUE;
+            if (TRUE == psSched->bSchedDiscovery) {
+                sched_set_node_state(psSched, psSched->auTokenMsg[1] & 0x7F, TRUE);
+                psSched->bSchedDiscovery = FALSE;
+            }
+            else sched_reset_node_error(psSched, psSched->auTokenMsg[1] & 0x7F);
+            receive_end = TRUE;
         }
         else {
             if (clk_timer_is_elapsed(&psSched->sNodeAnsTimeout)) {
@@ -286,11 +286,11 @@ BOOL bus_schedule_and_get_message(sBus_t* psBus, sSched_t* psSched )
                 }
                 psSched->bSchedDiscovery = FALSE;
                 // return to IDLE state
-				receive_end = TRUE;
-				if (0 == psSched->uSleepLoopCnt) { // if schedulerloopcount has reached zero ...
-					psSched->uSleepLoopCnt = BUS_LOOPS_TILL_SLEEP;
-					psBus->eModuleState = eMod_Sleeping; // ... initiate sleep-mode
-				}
+                receive_end = TRUE;
+                if (0 == psSched->uSleepLoopCnt) { // if schedulerloopcount has reached zero ...
+                    psSched->uSleepLoopCnt = BUS_LOOPS_TILL_SLEEP;
+                    psBus->eModuleState = eMod_Sleeping; // ... initiate sleep-mode
+                }
             }
         }
         if (receive_end) { // receiving finished
@@ -316,10 +316,12 @@ void bus_schedule_check_and_set_sleep(sBus_t* psBus)
                                  // irq will cause immediate wakeup.
 
             // sleep till byte is received.
+#ifdef PRJCONF_UC_AVR
             set_sleep_mode(SLEEP_MODE_IDLE);
             sleep_mode();
 
             _delay_ms(1); // wait for sys-clock becoming stable
+#endif
             bus_flush_bus(psBus); // Clean bus-buffer
             psBus->eModuleState = eMod_Running;
             clk_control(TRUE); // enable clock-timer

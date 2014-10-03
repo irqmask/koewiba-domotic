@@ -20,8 +20,6 @@
 
 #include "prjconf.h"
 
-#include <stdbool.h>
-
 #if defined (PRJCONF_UNIX) || \
     defined (PRJCONF_POSIX) || \
     defined (PRJCONF_LINUX)
@@ -29,6 +27,7 @@
 #elif defined (PRJCONF_WINDOWS)
 #endif
 
+#include "prjtypes.h"
 #include "system.h"
 
 // --- Definitions -------------------------------------------------------------
@@ -42,16 +41,20 @@ typedef enum {
     eIOLOOP_EV_TIMER
 } ioloop_event_type_t;
 
-typedef void (*ioloop_event_func_t)(void* arg);
+typedef int32_t (*ioloop_event_func_t)(void* arg);
 
 typedef struct ioloop_connection ioloop_connection_t;
 
+typedef struct ioloop_timer ioloop_timer_t;
+
 typedef struct ioloop {
     ioloop_connection_t*    first_conn;
+    ioloop_timer_t*         first_timer;
     bool                    update_required;
     sys_fd_t                highest_fd;
     fd_set                  read_fd_set;
     fd_set                  write_fd_set;
+    int32_t                 next_id;
 } ioloop_t;
 
 // --- Local variables ---------------------------------------------------------
@@ -76,6 +79,16 @@ void ioloop_register_fd (ioloop_t* ioloop,
 
 void ioloop_unregister_fd (ioloop_t* ioloop,
                            sys_fd_t fd);
+
+int32_t ioloop_register_timer (ioloop_t*            ioloop,
+                               uint16_t             interval_ticks,
+                               bool                 run_cyclic,
+                               ioloop_event_type_t  eventtype,
+                               ioloop_event_func_t  callback,
+                               void*                arg);
+
+void ioloop_unregister_timer (ioloop_t* ioloop,
+                              int32_t   id);
 
 int ioloop_run_once (ioloop_t* ioloop);
 

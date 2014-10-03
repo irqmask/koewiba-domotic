@@ -51,6 +51,10 @@ size_t sys_socket_send (sys_fd_t fd, void* buffer, size_t buffersize);
 
 size_t sys_socket_recv (sys_fd_t fd, void* buffer, size_t buffersize);
 
+void sys_socket_flush (sys_fd_t fd);
+
+size_t sys_socket_get_pending (sys_fd_t fd);
+
 int sys_socket_set_blocking (sys_fd_t fd, bool blocking);
 
 #endif /* _SYSSOCKET_H_ */

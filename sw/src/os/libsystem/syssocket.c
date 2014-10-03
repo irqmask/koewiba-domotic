@@ -17,8 +17,10 @@
     defined (PRJCONF_LINUX)
   #include <fcntl.h>
   #include <safe_lib.h>
+  #include <sys/ioctl.h>
   #include <sys/socket.h>
   #include <sys/un.h>
+  #include <termios.h>
   #include <unistd.h>
 #elif defined (PRJCONF_WINDOWS)
   #include <windows.h>
@@ -139,6 +141,19 @@ int sys_socket_recv (sys_fd_t fd, void* buffer, size_t buffersize)
 int sys_socket_send (sys_fd_t fd, void* buffer, size_t buffersize)
 {
     return send(fd, buffer, buffersize, 0);
+}
+
+void sys_socket_flush (sys_fd_t fd)
+{
+    tcflush(fd, TCIOFLUSH);
+}
+
+size_t sys_socket_get_pending (sys_fd_t fd)
+{
+    size_t pending_bytes = 0;
+
+    ioctl(fd, FIONREAD, &pending_bytes);
+    return pending_bytes;
 }
 
 void sys_socket_set_blocking (sys_fd_t fd, bool blocking)

@@ -147,7 +147,7 @@ void vos_flush (vos_t* vos)
         sys_serial_flush(vos->fd);
         break;
     case eVOS_IF_TYPE_VBUSD:
-        //TODO vbusd_flush(vos->fd, buf, bufsize);
+        sys_socket_flush(vos->fd);
         break;
     default:
         break;
@@ -163,8 +163,7 @@ size_t vos_get_pending (vos_t* vos)
         return sys_serial_get_pending(vos->fd);
         break;
     case eVOS_IF_TYPE_VBUSD:
-        //TODO return vbusd_get_pending(vos->fd, buf, bufsize);
-        return 0;
+        return sys_socket_get_pending(vos->fd);
         break;
     default:
         return 0;

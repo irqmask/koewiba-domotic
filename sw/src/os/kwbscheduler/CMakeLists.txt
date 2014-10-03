@@ -30,12 +30,14 @@ file (WRITE ${CMAKE_CURRENT_BINARY_DIR}/kwbscheduler_version.h
 set (kwbscheduler_SRCS
      kwbscheduler_main.c
      ../shared/bus_phy_os.c
-     ../../shared/bus_schedul.c
+     ../shared/clock_os.c
      ../shared/ioloop.c
+     ../shared/message_bus.c
      ../shared/vos.c
      ../../shared/bus_schedul.c
      ../../shared/bus_transport.c
-)
+     ../../shared/crc16.c
+     )
 
 # executable
 # ---------------------------------------------------------
@@ -61,3 +63,4 @@ else (WIN32)
 endif (WIN32)
 
 add_dependencies (kwbscheduler libsystem)
+#add_definitions (-DBUS_SCHEDULER)

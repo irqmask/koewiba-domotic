@@ -229,6 +229,7 @@ int main (int argc, char* argv[])
             break;
         }
 
+        msg_b_init(&msg_bus, 0);
         if (options.serial_device_set) {
             rc = msg_b_open(&msg_bus, &mainloop, options.own_node_address, true,
                             options.serial_device, options.serial_baudrate);

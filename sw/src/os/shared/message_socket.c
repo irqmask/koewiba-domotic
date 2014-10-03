@@ -90,34 +90,44 @@ static void msg_delete_endpoint (msg_socket_t* msg_socket, msg_endpoint_t* ep_to
     }
 }
 
-static void msg_read (void* arg)
+static int32_t msg_read (void* arg)
 {
     int             rc;
     msg_endpoint_t* ep = (msg_endpoint_t*)arg;
     msg_socket_t*   msg_socket = ep->msg_socket;
     msg_t           message;
 
+    do {
     // reveive message
     rc = sys_socket_recv(ep->fd, &message, sizeof(message));
-    if (rc == 0) {
-        // connection closed
-        msg_s_close_connection(msg_socket, ep);
-        fprintf(stderr, "connection closed\n");
-        return;
-    }
+        if (rc == 0) {
+            // connection closed
+            msg_s_close_connection(msg_socket, ep);
+            fprintf(stderr, "connection closed\n");
+            break;
+        }
 
-    if (rc != sizeof(message)) {
-        perror("invaid size of incomming message");
-        return;
-    }
+        if (rc != sizeof(message)) {
+            perror("invaid size of incomming message");
+            break;
+        }
 
-    // handle message
-    if (msg_socket->incomming_handler != NULL) {
-        msg_socket->incomming_handler(&message, msg_socket->incomming_arg);
-    }
+        // handle message
+        if (msg_socket->incomming_handler != NULL) {
+            msg_socket->incomming_handler(&message, msg_socket->incomming_arg);
+        }
+    } while (0);
+    return 0;
 }
 
-static void msg_accept_endpoint (void* arg)
+static void msg_ready_to_write (void* arg)
+{
+    static int count = 0;
+    msg_endpoint_t* ep = (msg_endpoint_t*)arg;
+    printf("fd %d is ready to write %d\n", ep->fd, count++);
+}
+
+static int32_t msg_accept_endpoint (void* arg)
 {
     msg_socket_t*   msg_socket = (msg_socket_t*)arg;
     msg_endpoint_t* ep = NULL;
@@ -135,10 +145,12 @@ static void msg_accept_endpoint (void* arg)
 
         // register new connection to ioloop
         ioloop_register_fd(msg_socket->ioloop, ep->fd, eIOLOOP_EV_READ, msg_read, (void*)ep);
+        //ioloop_register_fd(msg_socket->ioloop, ep->fd, eIOLOOP_EV_WRITE, msg_ready_to_write, (void*)ep);
 
         fprintf(stderr, "connection accepted\n");
 
     } while (0);
+    return 0;
 }
 
 // --- Module global functions -------------------------------------------------

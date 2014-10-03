@@ -14,6 +14,7 @@
 
 // --- Include section ---------------------------------------------------------
 
+#include <stdbool.h>
 #include <stdint.h>
 
 // --- Definitions -------------------------------------------------------------
@@ -29,6 +30,8 @@
 #ifndef NULL
 #define NULL ((void*)0)
 #endif
+
+#define CLOCK_TICKS_PER_SECOND 100
 
 // --- Type definitions --------------------------------------------------------
 

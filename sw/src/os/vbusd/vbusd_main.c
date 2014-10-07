@@ -267,6 +267,8 @@ static int32_t accept_client (void* arg)
         }
 
         if ((fd = sys_socket_accept(clients->server_fd)) <= INVALID_FD) {
+            perror("accept_client");
+            fprintf(stderr, "server_fd is %d fd is %d\n", clients->server_fd, fd);
             delete_client(client);
             break;
         }
@@ -303,6 +305,9 @@ static int vbusd_open_server (vbusd_clients_t*  clients,
             }
         } else {
             // TODO insert tcp code here
+            fprintf(stderr, "not implemented!");
+            rc = eSYS_ERR_SYSTEM;
+            break;
         }
         clients->server_fd = fd;
         ioloop_register_fd(clients->ioloop, fd, eIOLOOP_EV_READ, accept_client, clients);

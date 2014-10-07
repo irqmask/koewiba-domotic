@@ -172,4 +172,18 @@ size_t vos_get_pending (vos_t* vos)
     }
 }
 
+size_t vos_get_pending_send_bytes (vos_t* vos)
+{
+    assert(vos != NULL);
+
+    switch (vos->interface_type) {
+    case eVOS_IF_TYPE_SERIAL:
+    case eVOS_IF_TYPE_VBUSD:
+        break;
+    default:
+        return 0;
+    }
+}
+}
+
 /** @} */

@@ -126,7 +126,7 @@ void sys_socket_close (sys_fd_t fd)
 sys_fd_t sys_socket_accept (sys_fd_t server_fd)
 {
     struct sockaddr_un  sockinfo;
-    socklen_t           sockinfolen;
+    socklen_t           sockinfolen = sizeof(sockinfo);
 
     return accept (server_fd, (struct sockaddr *)&sockinfo, &sockinfolen);
 }

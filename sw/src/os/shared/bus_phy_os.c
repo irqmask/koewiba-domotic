@@ -143,7 +143,7 @@ BOOL bus_phy_send(sBusPhy_t* phy, const uint8_t* msg, uint8_t len)
  */
 BOOL bus_phy_sending(sBusPhy_t* phy)
 {
-    return FALSE;
+    return (vos_send_bytes_pending(msg_b_get_uart(phy->uUart)) == 0);
 }
 
 /**

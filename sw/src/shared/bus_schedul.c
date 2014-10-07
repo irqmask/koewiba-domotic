@@ -68,7 +68,7 @@ void sched_reset_node_error(sSched_t* psSched, uint8_t uNodeAddress)
          // search first present node, beginning at last present node + 1
          startnode = psSched->uCurrentNode;
          do {
-             // was last node a discovery node?
+             // was last node not a discovery node?
              if (!psSched->bSchedDiscovery && !secondrun) {
                  psSched->uCurrentNode++;
                  if (psSched->uCurrentNode > BUS_LASTNODE) {
@@ -77,7 +77,7 @@ void sched_reset_node_error(sSched_t* psSched, uint8_t uNodeAddress)
                  }
              }
              // test if node is available
-             nodebyte = psSched->asNodeList.uAddress[psSched->uCurrentNode / 8];
+             nodebyte = psSched->asNodeList.uAddress[psSched->uCurrentNode >> 3];
              nodebit  = psSched->uCurrentNode % 8;
              mask = (1<<nodebit);
              if ((nodebyte & mask) != 0) {
@@ -97,7 +97,7 @@ void sched_reset_node_error(sSched_t* psSched, uint8_t uNodeAddress)
                      if (psSched->uSleepLoopCnt) --psSched->uSleepLoopCnt;
                  }
                  // test if node is NOT available
-                 nodebyte = psSched->asNodeList.uAddress[psSched->uDiscoverNode / 8];
+                 nodebyte = psSched->asNodeList.uAddress[psSched->uDiscoverNode >> 3];
                  nodebit  = psSched->uDiscoverNode % 8;
                  mask = (1<<nodebit);
                  if ((nodebyte & mask) == 0) {
@@ -240,6 +240,7 @@ BOOL bus_schedule_and_get_message(sBus_t* psBus, sSched_t* psSched )
             if (sched_current_node_is_me(psBus, psSched)) {
                 // The scheduler cannot receive its own message,
                 // so we set the state to eBus_GotToken "manually".
+                sched_set_node_state(psSched, psBus->sCfg.uOwnNodeAddress, TRUE);
                 psBus->eState = eBus_GotToken;
             }
             else {
@@ -266,15 +267,14 @@ BOOL bus_schedule_and_get_message(sBus_t* psBus, sSched_t* psSched )
     }
 
     msg_received = bus_trp_send_and_receive(psBus);
-    //if (msg_received) psSched->uSleepLoopCnt = BUS_LOOPS_TILL_SLEEP;
 
     if (psSched->bSchedWaitingForAnswer) {
         BOOL receive_end = FALSE;
 
-        if (psBus->bSchedMsgReceived) {
+        if (psBus->msg_receive_state > eBUS_RECV_NOTHING) {
             if (TRUE == psSched->bSchedDiscovery) {
                 sched_set_node_state(psSched, psSched->auTokenMsg[1] & 0x7F, TRUE);
-                psSched->bSchedDiscovery = FALSE;
+                //psSched->bSchedDiscovery = FALSE;
             }
             else sched_reset_node_error(psSched, psSched->auTokenMsg[1] & 0x7F);
             receive_end = TRUE;
@@ -284,7 +284,7 @@ BOOL bus_schedule_and_get_message(sBus_t* psBus, sSched_t* psSched )
                 if (!psSched->bSchedDiscovery) {
                     sched_set_node_error(psSched, psSched->auTokenMsg[1] & 0x7F);
                 }
-                psSched->bSchedDiscovery = FALSE;
+               // psSched->bSchedDiscovery = FALSE;
                 // return to IDLE state
                 receive_end = TRUE;
                 if (0 == psSched->uSleepLoopCnt) { // if schedulerloopcount has reached zero ...
@@ -294,7 +294,11 @@ BOOL bus_schedule_and_get_message(sBus_t* psBus, sSched_t* psSched )
             }
         }
         if (receive_end) { // receiving finished
-            psBus->bSchedMsgReceived = FALSE;
+            // only reset message state if message is not to be read by
+            // bus_read_message()
+            if (psBus->msg_receive_state != eBUS_RECV_MESSAGE) {
+                psBus->msg_receive_state = eBUS_RECV_NOTHING;
+            }
             psSched->bSchedWaitingForAnswer = FALSE;
             if (eBus_AckWaitReceiving != psBus->eState) psBus->eState = eBus_Idle;
         }

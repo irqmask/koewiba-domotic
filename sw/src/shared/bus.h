@@ -56,7 +56,6 @@
  */
 #ifndef BUS_APPCONFIG
  #define BUS_APPCONFIG      1
- #undef BUS_SCHEDULER
 #endif
 /**
  * @}
@@ -101,6 +100,13 @@ typedef enum busstate {
     eBus_AckWaitSending,    //!< We are waiting for the ACK after sending.
     eBus_Last
 } eBusState_t;
+
+typedef enum bus_recv_state {
+    eBUS_RECV_NOTHING,
+    eBUS_RECV_EMPTY_MESSAGE,
+    eBUS_RECV_FOREIGN_MESSAGE,
+    eBUS_RECV_MESSAGE
+} msg_recv_state_t;
 
 typedef enum busflags {
     e_uartrxflag    = 0b00000001,
@@ -154,26 +160,18 @@ typedef struct sndbusmsg {
     auSndBuf_t      auBuf;          //!< message data including header, data and crc.
 } sSndBusMsg_t;
 
-//! contains all information about a node needed for scheduling.
-// typedef struct nodeinfo {
-//     uint8_t        uAddress;
-//     uint8_t        uErrCnt;
-// } sNodeInfo_t;
-
 //! data of bus. used as handle for all public methods.
 typedef struct bus {
-	eModState_t		eModuleState;					//!< current state of the module.
-    eBusState_t     eState;                         //!< current state of the bus.
-    sBusCfg_t       sCfg;                           //!< configuration data.
-    BOOL            bMsgReceived;                   //!< flag, stating that there is an unread message
-    BOOL            bSchedMsgReceived;              //!< flag, if any message has been received
-    BOOL            bMsgEnd;                        //!< flag, stating that a message is completed (used by scheduler)
-    sBusPhy_t       sPhy;                           //!< physical layer data.
-    sRcvBusMsg_t    sRecvMsg;                       //!< contains current received message.
-    sSndBusMsg_t    sSendMsg;                       //!< contains current message to be sent.
-    uint8_t         auEmptyMsg[BUS_EMPTY_MSG_LEN];  //!< pre-compiled empty message.
-    sClkTimer_t     sReceiveTimeout;                //!< receive timeout
-    sClkTimer_t     sAckTimeout;                    //!< ack timeout
+	eModState_t		    eModuleState;					//!< current state of the module.
+    eBusState_t         eState;                         //!< current state of the bus.
+    sBusCfg_t           sCfg;                           //!< configuration data.
+    msg_recv_state_t    msg_receive_state;              //!< stating if a message and what kind of message has been received.
+    sBusPhy_t           sPhy;                           //!< physical layer data.
+    sRcvBusMsg_t        sRecvMsg;                       //!< contains current received message.
+    sSndBusMsg_t        sSendMsg;                       //!< contains current message to be sent.
+    uint8_t             auEmptyMsg[BUS_EMPTY_MSG_LEN];  //!< pre-compiled empty message.
+    sClkTimer_t         sReceiveTimeout;                //!< receive timeout
+    sClkTimer_t         sAckTimeout;                    //!< ack timeout
 } sBus_t;
 
 // --- Local variables ---------------------------------------------------------

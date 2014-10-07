@@ -68,7 +68,7 @@ void vos_flush (vos_t* vos);
 
 size_t vos_get_pending (vos_t* vos);
 
-int vos_set_blocking (vos_t* vos, int blocking);
+size_t vos_get_pending_send_bytes (vos_t* vos);
 
 #endif /* _VOS_H_ */
 /** @} */

@@ -148,7 +148,15 @@ void sys_socket_flush (sys_fd_t fd)
     tcflush(fd, TCIOFLUSH);
 }
 
-size_t sys_socket_get_pending (sys_fd_t fd)
+size_t sys_socket_get_pending_sendq (sys_fd_t fd)
+{
+    size_t pending_bytes = 0;
+
+    ioctl(fd, TIOCOUTQ, &pending_bytes);
+    return pending_bytes;
+}
+
+size_t sys_socket_get_pending_recvq (sys_fd_t fd)
 {
     size_t pending_bytes = 0;
 

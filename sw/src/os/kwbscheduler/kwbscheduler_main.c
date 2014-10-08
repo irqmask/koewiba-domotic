@@ -17,7 +17,7 @@
 
  ///@todo remove printfs
  ///@todo react on rerrors of send/receive function properly -> man pages
- 
+
 // --- Include section ---------------------------------------------------------
 
 #include "prjconf.h"
@@ -225,7 +225,7 @@ int main(int argc, char* argv[])
 
         // schedule on incomming bytes and after timer expiration
         ioloop_register_fd(&mainloop, busscheduler.vos.fd, eIOLOOP_EV_READ, do_scheduling, &busscheduler);
-        ioloop_register_timer(&mainloop, 1000, true, eIOLOOP_EV_TIMER, do_scheduling, &busscheduler);
+        ioloop_register_timer(&mainloop, 10, true, eIOLOOP_EV_TIMER, do_scheduling, &busscheduler);
 
         while (!end_application) {
             ioloop_run_once(&mainloop);

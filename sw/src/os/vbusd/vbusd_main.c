@@ -307,7 +307,10 @@ static int vbusd_open_server (vbusd_clients_t*  clients,
                 break;
             }
         } else {
-            // TODO insert tcp code here
+            if ((fd = sys_socket_open_client_tcp(address, port)) <= INVALID_FD) {
+                rc = eSYS_ERR_SYSTEM;
+                break;
+            }
         }
         clients->server_fd = fd;
         ioloop_register_fd(clients->ioloop, fd, eIOLOOP_EV_READ, accept_client, clients);
@@ -342,6 +345,7 @@ static int vbusd_open_serial (vbusd_clients_t*  clients,
                                         eSYS_SER_SB_1)) != eERR_NONE) {
             sys_serial_close(fd);
             delete_client(client);
+            rc = eSYS_ERR_SYSTEM;
             break;
         }
         client->fd = fd;

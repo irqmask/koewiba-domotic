@@ -2,7 +2,8 @@
  * @addtogroup CLOCK
  * @brief Public interface of system clock.
  *
- * TODO: Detailed description of module.
+ * This module contains a clock for the current time (if configured in
+ * appconfig.h) and timer e.g. for timeout handling.
  *
  * @{
  * @file    clock.h

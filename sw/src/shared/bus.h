@@ -2,8 +2,6 @@
  * @addtogroup BUS
  * @brief Public interface of bus protocol.
  *
- * TODO: Detailed description of module.
- *
  * @{
  * @file    bus.h
  * @brief   Declaration of communication driver routines.
@@ -78,10 +76,8 @@
 
 //! Possible states of the subscriber
 typedef enum modulestate {
-	eMod_Discovery,	//!< Scheduler is in discovery-mode (looking for nodes)
 	eMod_Running,	//!< Module is normal mode
 	eMod_Sleeping,	//!< Module is sleeping
-	eMod_AckWait	//!< Module is waiting for Acknowledge-Message
 } eModState_t;
 
 //! Possible states of the bus, as seen by each node

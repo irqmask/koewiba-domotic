@@ -2,11 +2,12 @@
  * @addtogroup BUS
  * @addtogroup BUS_PHY
  * @brief Physical layer of bus protocol.
+ * This module contains the hardware dependent functions which are used by
+ * bus_transport.c and bus_scheduler.c.
  *
  * @{
  * @file    bus_phy.c
  * @brief   Physical layer of bus protocol.
- * @todo    describe file purpose
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
 

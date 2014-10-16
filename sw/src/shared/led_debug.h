@@ -1,12 +1,10 @@
 /**
- * @addtogroup BUS
- * @brief Public interface of bus protocol.
- *
- * TODO: Detailed description of module.
+ * @addtogroup DEBUG
+ * @brief   Debug output via LEDs.
  *
  * @{
  * @file    led_debug.h
- * @brief   Declaration of communication driver routines.
+ * @brief   Debug output via LEDs.
  *
  * @author  Robert Mueller
  *///---------------------------------------------------------------------------
@@ -41,7 +39,17 @@
 // --- Module global functions -------------------------------------------------
 
 // --- Global functions --------------------------------------------------------
-void vInitLedAndKeys(void);
 
+void dbg_toggle_status_LED (void);
+
+void dbg_status_LED_on (void);
+
+void dbg_status_LED_off (void);
+
+void dbg_toggle_error_LED (void);
+
+void dbg_error_LED_on (void);
+
+void dbg_error_LED_off (void);
 
 #endif /* LED_DEBUG_H_ */

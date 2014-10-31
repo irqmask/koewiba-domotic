@@ -75,15 +75,15 @@ void vDrawTemp(uint16_t uTemperature)
 {
     uint8_t byte;
     BOOL firstdigit = FALSE;
-    
+
     if (uTemperature >= 27315) {
         uTemperature -= 27315;
-        
+
         byte = uTemperature / 10000;
         if (byte > 0) {
             uTemperature -= byte * 10000;
         }
-        
+
         byte = uTemperature / 1000;
         if (byte > 0 || firstdigit) {
             uTemperature -= byte * 1000;
@@ -117,7 +117,7 @@ void vDrawTemperatures(void)
     GDISP_vPutText(" "); //32
     GDISP_vChooseFont(GDISP_auFont1_x16);
     GDISP_vPutText("C");
-    
+
     GDISP_vGotoColLine(61, 1);
     GDISP_vChooseFont(GDISP_auFont1_x16);
     vDrawTemp(g_uTargetTemp);
@@ -165,9 +165,9 @@ static void vInterpretMessage(sBus_t* psBus, uint8_t* puMsg, uint8_t uMsgLen, ui
             g_sBus.eModuleState = eMod_Running;
             break;
         case CMD_eSleep:
-            SLEEP_vPinChange2_Enable();
+            sleep_pinchange2_enable();
             bus_sleep(psBus);
-            SLEEP_vPinChange2_Disable();
+            sleep_pinchange2_disable();
             break;
         default:
             break;
@@ -189,17 +189,17 @@ int main(void)
     PORTC &= ~((1<<PC3) | (1<<PC4));
 
     clk_initialize();
-    
+
     register_set_u16(MOD_eReg_ModuleID, 0x000E);
 
     // configure a bus node with address X
     register_get(MOD_eReg_ModuleID, 0, &module_id);
     bus_configure(&g_sBus, module_id);
     bus_initialize(&g_sBus, 0);// initialize bus on UART 0
-    
+
     SPI_vMasterInitBlk();
     ZAGW_vInit();
-      
+
     sei();
 
     register_get(APP_eReg_DesiredTempDay1, 0, &g_uTargetTemp);

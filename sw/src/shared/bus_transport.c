@@ -97,7 +97,7 @@ static BOOL receive (sBus_t* psBus)
                 break; // not the sync byte, wait for next byte
             }
 
-        // 2. byte: check token byte
+        // 2. byte: check token or sender byte
         } else if (psBus->sRecvMsg.uOverallLength == 1) {
             // token received?
             if (u & TOKENBIT) {
@@ -112,11 +112,15 @@ static BOOL receive (sBus_t* psBus)
                 break;
             }
             else {
-                // message received. save sender-address lower byte
+                // message to be received. save sender-address lower byte
                 psBus->sRecvMsg.uSender = u;
                 psBus->eState = eBus_ReceivingActive;
             }
         }
+        //TODO CV TODO RM: for performance, insert else if here?
+        // If sender lower byte has been received OverallLength is 1
+        // and therefore nothing is to do until:
+        // psBus->sRecvMsg.auBuf[psBus->sRecvMsg.uOverallLength] = u;
 
         // active receiving state, receive and check message
         // and then go back to eBus_Idle state.
@@ -202,7 +206,7 @@ static BOOL receive (sBus_t* psBus)
             if (psBus->sRecvMsg.uOverallLength >= (psBus->sRecvMsg.uLength + 3 - 1)) {
                 psBus->msg_receive_state = eBUS_RECV_FOREIGN_MESSAGE;
                 reset_bus(psBus);
-                // TODO RM TODO CV: why wait for ack if it is not my message??
+                // wait for ACK of receiver of foreign message
                 clk_timer_start(&psBus->sAckTimeout, CLOCK_MS_2_TICKS(BUS_ACKTIMEOUT));
                 psBus->eState = eBus_AckWaitReceiving;
             }
@@ -238,51 +242,71 @@ static void check_message_sent (sBus_t* psBus)
     if (0 < psBus->sSendMsg.uRetries) {
         psBus->sSendMsg.uRetries--;
         psBus->eState = eBus_AckWaitSending;
+    } else {
+        // empty message has been sent
+        psBus->eState = eBus_Idle;
     }
-    else psBus->eState = eBus_Idle;
+
 }
 
-// TODO describe function
-static void ack_wait_sending (sBus_t* psBus)
+// Wait for an acknowledge byte after message has been sent
+static void wait_for_ack_after_sending (sBus_t* psBus)
 {
     uint8_t u;
+    BOOL    ack_received = FALSE;
 
     do {
-        if ( !(bus_phy_data_received(&psBus->sPhy)) ) {
+        if (!bus_phy_data_received(&psBus->sPhy)) {
             break; // No byte received.
         }
         bus_phy_read_byte(&psBus->sPhy, &u);
 
-        if (u == BUS_SYNCBYTE) {
-
+        switch (u) {
+        case BUS_SYNCBYTE:
+            // scheduler has already scheduled the next node
+            psBus->sRecvMsg.auBuf[0] = u;
+            psBus->sRecvMsg.uOverallLength = 1;
             psBus->eState = eBus_ReceivingWait;
-        }
-        else {
-            // check ack byte
-            if (u == BUS_ACKBYTE) {
-                psBus->sSendMsg.uRetries = 0;
-            }
-            reset_bus(psBus); // not the ack byte, wait for next byte
-        }
-        if(psBus->sSendMsg.uRetries != 0) break;
+            break;
 
-        psBus->sSendMsg.uOverallLength = 0;
-        psBus->sSendMsg.uLength = 0;
+        case BUS_ACKBYTE:
+            psBus->sSendMsg.uRetries = 0;
+            ack_received = TRUE;
+            reset_bus(psBus);
+            // TODO CV / TODO RM: notify application, that ACK byte has been received.
+            break;
+
+        default:
+            // not the ACK byte, reset bus and try again in the next round
+            reset_bus(psBus);
+            break;
+        }
+
+        // has message been acknowledged at all?
+        if (psBus->sSendMsg.uRetries == 0) {
+            // end sending message
+            psBus->sSendMsg.uOverallLength = 0;
+            psBus->sSendMsg.uLength = 0;
+            if (!ack_received) {
+                // TODO CV / TODO RM: notify application, that ACK byte has not
+                // been received.
+            }
+        }
     } while(FALSE);
 }
 
-// TODO describe function
-static void ack_wait_receiving (sBus_t* psBus)
+// wait until an ACK byte has been sent by the receiver of the foreign message
+static void wait_for_ack_passive (sBus_t* psBus)
 {
-    BOOL    bytereceived = FALSE;
     uint8_t u;
 
     do {
         if (clk_timer_is_elapsed(&psBus->sAckTimeout)) {
+            // timeout.
             reset_bus(psBus);
             break;
         }
-        else if (!(bytereceived = bus_phy_data_received(&psBus->sPhy)) || 
+        else if (!bus_phy_data_received(&psBus->sPhy) ||
                  psBus->msg_receive_state == eBUS_RECV_MESSAGE) {
             break; // No byte received or message not retrieved.
         }
@@ -290,18 +314,27 @@ static void ack_wait_receiving (sBus_t* psBus)
 
         if (u == BUS_SYNCBYTE) {
             psBus->eState = eBus_ReceivingWait;
-            psBus->sRecvMsg.auBuf[psBus->sRecvMsg.uOverallLength] = u;
-            psBus->sRecvMsg.uOverallLength++;
-            break;
+            psBus->sRecvMsg.auBuf[0] = u;
+            psBus->sRecvMsg.uOverallLength = 1;
         }
         else if (u == BUS_ACKBYTE) {
+            // ACK byte received, reset bus and wait for next token.
             reset_bus(psBus);
-            break; // not the sync byte, wait for next byte
         }
     } while(FALSE);
 }
 
 // --- Module global functions -------------------------------------------------
+
+/**
+ * Reset bus state.
+ *
+ * @param[in]   psBus       Handle of the bus.
+ */
+void bus_trp_reset (sBus_t* psBus)
+{
+    reset_bus(psBus);
+}
 
 /**
  * Manage sending and receiving of messages.
@@ -326,14 +359,22 @@ BOOL bus_trp_send_and_receive (sBus_t* psBus)
         break;
 
     case eBus_AckWaitSending:
-        ack_wait_sending(psBus);
+        wait_for_ack_after_sending(psBus);
         break;
 
     case eBus_AckWaitReceiving:
-        ack_wait_receiving(psBus);
+        wait_for_ack_passive(psBus);
         break;
 
     case eBus_InitWait:
+        if (bus_phy_data_received(&psBus->sPhy)) {
+            psBus->eState = eBus_Idle;
+            psBus->eModuleState = eMod_Running;
+        } else {
+            // wait until first byte is ready to be received
+            break;
+        }
+        // otherwise fall through to eBus_Idle state
     case eBus_Idle:
     case eBus_ReceivingWait:
     case eBus_ReceivingActive:
@@ -357,7 +398,7 @@ BOOL bus_trp_send_and_receive (sBus_t* psBus)
  *
  * @returns TRUE, if the sleep command has been sent, otherwise FALSE.
  */
-BOOL bus_send_sleepcmd (sBus_t* psBus)
+BOOL bus_trp_send_sleepcmd (sBus_t* psBus)
 {
     uint16_t crc;
     uint8_t msg[8];
@@ -400,12 +441,15 @@ void bus_configure (sBus_t* psBus, uint16_t uNodeAddress)
  * @param[in]   psBus       Handle of the bus.
  * @param[in]   uUart       Number of the UART. 0=first.
  */
-void bus_initialize(sBus_t* psBus, uint8_t uUart)
+void bus_initialize (sBus_t* psBus, uint8_t uUart)
 {
-    psBus->eState = eBus_Idle;
+    psBus->eState = eBus_InitWait;
     psBus->sSendMsg.uRetries = 0;
-    psBus->eModuleState = eMod_Running;
+    psBus->sSendMsg.uLength = 0;
+    psBus->sSendMsg.uOverallLength = 0;
+    psBus->eModuleState = eMod_Sleeping;
     bus_phy_initialize(&psBus->sPhy, uUart);
+    bus_flush_bus(psBus);
 }
 
 /**
@@ -450,7 +494,7 @@ BOOL bus_read_message (sBus_t*  psBus,
 
     do {
         // is there a new message pending?
-        if (psBus->msg_receive_state == eBUS_RECV_MESSAGE) {
+        if (psBus->msg_receive_state != eBUS_RECV_MESSAGE) {
             break;
         }
         *puSender   = psBus->sRecvMsg.uSender;
@@ -499,7 +543,9 @@ BOOL bus_send_message (sBus_t*    psBus,
         }
 
     	// check length of message to be sent.
-        if (uLen == 0 || uLen > BUS_MAXMSGLEN) {
+        if (uLen == 0 ||
+            uLen > BUS_MAXMSGLEN ||
+            psBus->sSendMsg.uOverallLength != 0) {
         	break;
         }
         // prepare message header
@@ -584,19 +630,22 @@ BOOL bus_is_idle (sBus_t*       psBus)
 void bus_sleep (sBus_t*       psBus)
 {
 	psBus->eModuleState = eMod_Sleeping;
-	clk_control(FALSE); // disable clock-timer, otherwise
-	// irq will cause immediate wakeup.
+    // disable clock-timer, otherwise IRQ will cause immediate wakeup.
+	clk_control(FALSE);
 
 	// sleep till byte is received.
-	SLEEP_vSetMode(SLEEP_MODE_IDLE);
-	SLEEP_vActivate();
-	if(bus_phy_data_received(&psBus->sPhy)) {
-		psBus->eModuleState = eMod_Running;
-	}
+	sleep_set_mode(SLEEP_MODE_IDLE);
+	sleep_activate();
 
-	SLEEP_vDelayMS(1);      // wait for sys-clock becoming stable
+	// ...sleeping... zzzZZZ
+
+	sleep_delay_ms(1);      // wait for sys-clock becoming stable
+
 	bus_flush_bus(psBus);   // Clean bus-buffer
 	clk_control(TRUE);      // enable clock-timer
+
+	// wait for first pending byte, then set module to running state
+	psBus->eState = eBus_InitWait;
 }
 
 /** @} */

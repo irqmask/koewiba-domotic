@@ -16,6 +16,7 @@
 #include <util/delay.h>
 
 #include "bus.h"
+#include "bus_scheduler.h"
 #include "clock.h"
 
 // --- Definitions -------------------------------------------------------------
@@ -37,7 +38,7 @@ static sClkTimer_t 	g_sLedTimer;
 
 // --- Local functions ---------------------------------------------------------
 
-void IO_vInitialize(void)
+void io_initialize (void)
 {
 #if defined (__AVR_ATmega88__) || defined (__AVR_ATmega88A__)
     DDRB  |= ((0<<DDB7)   | (0<<DDB6)   | (1<<DDB5)   | (1<<DDB4)   | (0<<DDB3)   | (1<<DDB2)   | (1<<DDB1)   | (1<<DDB0)  );
@@ -68,11 +69,10 @@ int main(void)
     uint16_t    sender = 0;
     uint8_t     msg[BUS_MAXMSGLEN];
 
-    IO_vInitialize();
+    io_initialize();
     clk_initialize();
-    bus_scheduler_configure(&g_sSched);
     bus_configure(&g_sBus, 1); // configure a bus node with address 1
-    bus_initialize(&g_sBus, 0);// initialize bus on UART 0
+    bus_scheduler_initialize(&g_sBus, &g_sSched, 0);// initialize bus on UART 0
 
     sei();
 

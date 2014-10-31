@@ -75,9 +75,11 @@ typedef enum eCommMsgByteIndex {
 // --- Module global functions -------------------------------------------------
 
 // transport layer
+void    bus_trp_reset              (sBus_t* psBus);
+
 BOOL    bus_trp_send_and_receive   (sBus_t* psBus);
 
-BOOL    bus_send_sleepcmd          (sBus_t* psBus);
+BOOL    bus_trp_send_sleepcmd      (sBus_t* psBus);
 
 // physical layer
 void    bus_phy_initialize         (sBusPhy_t*     psPhy,
@@ -88,10 +90,6 @@ void    bus_phy_activate_sender     (sBusPhy_t*     psPhy,
 
 void    bus_phy_activate_receiver   (sBusPhy_t*     psPhy,
                                      BOOL           bActivate);
-
-// TODO remove after debug
-void 	BUS__vDebugSend 			(uint8_t 		*data,
-									 uint8_t 		len);
 
 BOOL    bus_phy_send               (sBusPhy_t*     psPhy,
                                      const uint8_t* puMsg,

@@ -27,17 +27,17 @@
 // --- Definitions -------------------------------------------------------------
 
 #ifdef PRJCONF_UC_AVR
-#define SLEEP_vPinChange2_Enable()  PCICR |=  (1<<PCIE2)
-#define SLEEP_vPinChange2_Disable() PCICR &= ~(1<<PCIE2)
-#define SLEEP_vSetMode(m)           set_sleep_mode(m)
-#define SLEEP_vActivate()           sleep_mode()
-#define SLEEP_vDelayMS(t)           _delay_ms(t)
+#define sleep_pinchange2_enable()   PCICR |=  (1<<PCIE2)
+#define sleep_pinchange2_disable()  PCICR &= ~(1<<PCIE2)
+#define sleep_set_mode(m)           set_sleep_mode(m)
+#define sleep_activate()            sleep_mode()
+#define sleep_delay_ms(t)           _delay_ms(t)
 #else
-#define SLEEP_vPinChange2_Enable()
-#define SLEEP_vPinChange2_Disable()
-#define SLEEP_vSetMode(m)
-#define SLEEP_vActivate()
-#define SLEEP_vDelayMS(t)
+#define sleep_pinchange2_enable()
+#define sleep_pinchange2_disable()
+#define sleep_set_mode(m)
+#define sleep_activate()
+#define sleep_delay_ms(t)
 #endif
 // --- Type definitions --------------------------------------------------------
 

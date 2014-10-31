@@ -116,7 +116,7 @@ static void vInterpretMessage(sBus_t* psBus, uint8_t* puMsg, uint8_t uMsgLen, ui
             psBus->eModuleState = eMod_Running;
             break;
         default:
-            bus_send_ack_message(psBus, uSender);
+            //bus_send_ack_message(psBus, uSender);
             break;
         }
     }

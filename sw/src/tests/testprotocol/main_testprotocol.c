@@ -25,6 +25,7 @@
 
 //TODO remove after debug
 #include "led_debug.h"
+
 // --- Definitions -------------------------------------------------------------
 
 // --- Type definitions --------------------------------------------------------
@@ -70,17 +71,34 @@ static void init_LED_and_keys(void)
 #endif
 }
 
-static uint16_t get_receiver (void)
+// select a receiver address. selector is used to select between different
+// receivers per module.
+static uint16_t get_receiver (uint8_t selector)
 {
-    if (g_bus.sCfg.uOwnNodeAddress == 1) return 20;
-    if (g_bus.sCfg.uOwnNodeAddress == 20) return 1;
+    if (selector == 1) {
+        if (g_bus.sCfg.uOwnNodeAddress == 10) return 11;
+        if (g_bus.sCfg.uOwnNodeAddress == 11) return 12;
+        if (g_bus.sCfg.uOwnNodeAddress == 12) return 10;
 
-    if (g_bus.sCfg.uOwnNodeAddress == 11) return 12;
-    if (g_bus.sCfg.uOwnNodeAddress == 12) return 11;
+        if (g_bus.sCfg.uOwnNodeAddress == 3) return 5;
+        if (g_bus.sCfg.uOwnNodeAddress == 5) return 20;
+        if (g_bus.sCfg.uOwnNodeAddress == 20) return 3;
 
-    if (g_bus.sCfg.uOwnNodeAddress == 21) return 22;
-    if (g_bus.sCfg.uOwnNodeAddress == 22) return 21;
-    return 1;
+        if (g_bus.sCfg.uOwnNodeAddress == 21) return 22;
+        if (g_bus.sCfg.uOwnNodeAddress == 22) return 21;
+    } else if (selector == 2) {
+        if (g_bus.sCfg.uOwnNodeAddress == 10) return 0x0E; //14
+        if (g_bus.sCfg.uOwnNodeAddress == 11) return 5;
+        if (g_bus.sCfg.uOwnNodeAddress == 12) return 20;
+
+        if (g_bus.sCfg.uOwnNodeAddress == 3) return 0x0E;
+        if (g_bus.sCfg.uOwnNodeAddress == 5) return 11;
+        if (g_bus.sCfg.uOwnNodeAddress == 20) return 12;
+
+        if (g_bus.sCfg.uOwnNodeAddress == 21) return 22;
+        if (g_bus.sCfg.uOwnNodeAddress == 22) return 21;
+    }
+    return 0;
 }
 
 static void interpret_message (uint16_t sender, uint8_t msglen, uint8_t* msg)
@@ -107,6 +125,7 @@ static void interpret_message (uint16_t sender, uint8_t msglen, uint8_t* msg)
 
 static void check_buttons (void)
 {
+    uint16_t receiver;
     const uint8_t registers[8] = {0, 1, 2, 3, 4, 5, 6, 7};
     uint8_t temp, msglen, msg[8];
     static uint8_t regidx = 0, light = 0;
@@ -115,25 +134,33 @@ static void check_buttons (void)
     g_buttons = PIND & (BTN_TEST | BTN_EXP);
     temp = g_buttons ^ g_oldbuttons;
     g_oldbuttons = g_buttons;
+    receiver = 0;
     if ((g_buttons & BTN_TEST) && (temp & BTN_TEST)) {
-        regidx++;
-        if (regidx > 7) regidx = 0;
-
-        msg[0] = CMD_eRequestRegister;
-        msg[1] = registers[regidx];
-        msglen = 2;
-        bus_send_message(&g_bus, 0x0E, msglen, msg);
+        receiver = get_receiver(1);
     }
     else if ((g_buttons & BTN_EXP) && (temp & BTN_EXP)) {
-        if (light)  light = 0;
-        else        light = 1;
+        receiver = get_receiver(2);
+    }
 
-        msg[0] = CMD_eStateBitfield;
-        msg[1] = 1;
-        msg[2] = light;
-        msg[3] = 0b00000001;
-        msglen = 4;
-        bus_send_message(&g_bus, get_receiver(), msglen, msg);
+    if (receiver) {
+        if (receiver == 0x0E) {
+            regidx++;
+            if (regidx > 7) regidx = 0;
+
+            msg[0] = CMD_eRequestRegister;
+            msg[1] = registers[regidx];
+            msglen = 2;
+        } else {
+            if (light)  light = 0;
+            else        light = 1;
+
+            msg[0] = CMD_eStateBitfield;
+            msg[1] = 1;
+            msg[2] = light;
+            msg[3] = 0b00000001;
+            msglen = 4;
+        }
+        bus_send_message(&g_bus, receiver, msglen, msg);
     }
 }
 
@@ -148,7 +175,7 @@ int main(void)
     uint16_t sender = 0, module_id = 10;
 
     clk_initialize();
-
+    register_set_u16(MOD_eReg_ModuleID, 10);
     register_get(MOD_eReg_ModuleID, 0, &module_id);
     bus_configure(&g_bus, module_id);
     bus_initialize(&g_bus, 0);// initialize bus on UART 0

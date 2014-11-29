@@ -21,7 +21,8 @@
 // --- Definitions -------------------------------------------------------------
 
 #define BUS_APPCONFIG      1
-#undef BUS_SCHEDULER        //!< This program has no scheduling capabilities.
+#undef BUS_SCHEDULER            //!< This program has no scheduling capabilities.
+#define BUS_TX_QUEUE_SIZE 100   //! queue size for sending messages
 
 // --- Type definitions --------------------------------------------------------
 

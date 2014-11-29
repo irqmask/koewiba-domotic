@@ -54,6 +54,7 @@
  */
 #ifndef BUS_APPCONFIG
  #define BUS_APPCONFIG      1
+ #define BUS_TX_QUEUE_SIZE  100
 #endif
 /**
  * @}
@@ -150,11 +151,16 @@ typedef struct rcvbusmsg {
 //! data of message to be sent
 typedef struct sndbusmsg {
     uint16_t        uReceiver;
-    uint8_t         uLength;
     uint8_t         uOverallLength;
     uint8_t         uRetries;       //!< number of send retries.
     auSndBuf_t      auBuf;          //!< message data including header, data and crc.
 } sSndBusMsg_t;
+
+typedef struct queue {
+    uint8_t pread;
+    uint8_t pwrite;
+    uint8_t data[BUS_TX_QUEUE_SIZE];
+} queue_t;
 
 //! data of bus. used as handle for all public methods.
 typedef struct bus {
@@ -165,6 +171,7 @@ typedef struct bus {
     sBusPhy_t           sPhy;                           //!< physical layer data.
     sRcvBusMsg_t        sRecvMsg;                       //!< contains current received message.
     sSndBusMsg_t        sSendMsg;                       //!< contains current message to be sent.
+    queue_t             tx_queue;                       //!< transmit queue for outgoing messages.
     uint8_t             auEmptyMsg[BUS_EMPTY_MSG_LEN];  //!< pre-compiled empty message.
     sClkTimer_t         sReceiveTimeout;                //!< receive timeout
     sClkTimer_t         sAckTimeout;                    //!< ack timeout

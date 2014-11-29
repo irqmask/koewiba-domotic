@@ -32,8 +32,8 @@
 
 // --- Local variables ---------------------------------------------------------
 
-static sBus_t      g_bus;
-static sClkTimer_t g_LED_timer;
+static sBus_t       g_bus;
+static sClkTimer_t  g_LED_timer;
 static uint8_t      g_buttons = 0,
                     g_oldbuttons = 0;
 
@@ -125,7 +125,6 @@ static void interpret_message (uint16_t sender, uint8_t msglen, uint8_t* msg)
 
 static void check_buttons (void)
 {
-    uint16_t receiver;
     const uint8_t registers[8] = {0, 1, 2, 3, 4, 5, 6, 7};
     uint8_t temp, msglen, msg[8];
     static uint8_t regidx = 0, light = 0;
@@ -134,33 +133,26 @@ static void check_buttons (void)
     g_buttons = PIND & (BTN_TEST | BTN_EXP);
     temp = g_buttons ^ g_oldbuttons;
     g_oldbuttons = g_buttons;
-    receiver = 0;
     if ((g_buttons & BTN_TEST) && (temp & BTN_TEST)) {
-        receiver = get_receiver(1);
+        regidx++;
+        if (regidx > 7) regidx = 0;
+
+        msg[0] = CMD_eRequestRegister;
+        msg[1] = registers[regidx];
+        msglen = 2;
+        bus_send_message(&g_bus, get_receiver(1), msglen, msg);
     }
     else if ((g_buttons & BTN_EXP) && (temp & BTN_EXP)) {
-        receiver = get_receiver(2);
-    }
+        if (light)  light = 0;
+        else        light = 1;
 
-    if (receiver) {
-        if (receiver == 0x0E) {
-            regidx++;
-            if (regidx > 7) regidx = 0;
-
-            msg[0] = CMD_eRequestRegister;
-            msg[1] = registers[regidx];
-            msglen = 2;
-        } else {
-            if (light)  light = 0;
-            else        light = 1;
-
-            msg[0] = CMD_eStateBitfield;
-            msg[1] = 1;
-            msg[2] = light;
-            msg[3] = 0b00000001;
-            msglen = 4;
-        }
-        bus_send_message(&g_bus, receiver, msglen, msg);
+        msg[0] = CMD_eStateBitfield;
+        msg[1] = 1;
+        msg[2] = light;
+        msg[3] = 0b00000001;
+        msglen = 4;
+        bus_send_message(&g_bus, get_receiver(1), msglen, msg);
+        bus_send_message(&g_bus, get_receiver(2), msglen, msg);
     }
 }
 

@@ -40,8 +40,6 @@
  #define BUS_DDR_DISRCV0    DDRD
  #define BUS_PORT_DISRCV0   PORTD
  #define BUS_DISRCV0        PD5
- #define LED_ERROR_ON
- #define LED_ERROR_OFF
 #endif
 /**
  * @}

@@ -74,15 +74,26 @@ typedef enum eCommMsgByteIndex {
 
 // --- Module global functions -------------------------------------------------
 
+// queue
+void    bus_q_initialize            (queue_t *q);
+
+uint8_t bus_q_get_free              (queue_t *q);
+
+uint8_t bus_q_get_pending           (queue_t *q);
+
+void    bus_q_put_byte              (queue_t *q, uint8_t byte);
+
+uint8_t bus_q_get_byte              (queue_t *q);
+
 // transport layer
-void    bus_trp_reset              (sBus_t* psBus);
+void    bus_trp_reset               (sBus_t* psBus);
 
-BOOL    bus_trp_send_and_receive   (sBus_t* psBus);
+BOOL    bus_trp_send_and_receive    (sBus_t* psBus);
 
-BOOL    bus_trp_send_sleepcmd      (sBus_t* psBus);
+BOOL    bus_trp_send_sleepcmd       (sBus_t* psBus);
 
 // physical layer
-void    bus_phy_initialize         (sBusPhy_t*     psPhy,
+void    bus_phy_initialize          (sBusPhy_t*     psPhy,
                                      uint8_t        uUart);
 
 void    bus_phy_activate_sender     (sBusPhy_t*     psPhy,
@@ -91,15 +102,15 @@ void    bus_phy_activate_sender     (sBusPhy_t*     psPhy,
 void    bus_phy_activate_receiver   (sBusPhy_t*     psPhy,
                                      BOOL           bActivate);
 
-BOOL    bus_phy_send               (sBusPhy_t*     psPhy,
+BOOL    bus_phy_send                (sBusPhy_t*     psPhy,
                                      const uint8_t* puMsg,
                                      uint8_t        uLen);
 
-BOOL    bus_phy_sending            (sBusPhy_t*     psPhy);
+BOOL    bus_phy_sending             (sBusPhy_t*     psPhy);
 
 BOOL    bus_phy_data_received       (sBusPhy_t*     psPhy);
 
-uint8_t bus_phy_read               (sBusPhy_t*     psPhy,
+uint8_t bus_phy_read                (sBusPhy_t*     psPhy,
                                      uint8_t*       puInBuf);
 
 BOOL    bus_phy_read_byte           (sBusPhy_t*     psPhy,

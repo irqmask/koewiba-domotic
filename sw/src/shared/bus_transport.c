@@ -117,14 +117,9 @@ static BOOL receive (sBus_t* psBus)
                 psBus->eState = eBus_ReceivingActive;
             }
         }
-        //TODO CV TODO RM: for performance, insert else if here?
-        // If sender lower byte has been received OverallLength is 1
-        // and therefore nothing is to do until:
-        // psBus->sRecvMsg.auBuf[psBus->sRecvMsg.uOverallLength] = u;
-
         // active receiving state, receive and check message
         // and then go back to eBus_Idle state.
-        if (psBus->eState == eBus_ReceivingActive) {
+        else if (psBus->eState == eBus_ReceivingActive) {
             // 3. byte: LE - Length of message from AR to CRCL
             if (psBus->sRecvMsg.uOverallLength == 2) {
                 // check correctness of length

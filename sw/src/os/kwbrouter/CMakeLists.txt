@@ -38,6 +38,7 @@ set (kwbrouter_SRCS
     ../shared/message_socket.c
     ../shared/vos.c
     ../../shared/bus_transport.c
+    ../../shared/bus_tx_queue.c
     ../../shared/crc16.c
 )
 

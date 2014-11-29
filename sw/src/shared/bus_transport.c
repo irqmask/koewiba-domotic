@@ -262,13 +262,6 @@ static void wait_for_ack_after_sending (sBus_t* psBus)
         bus_phy_read_byte(&psBus->sPhy, &u);
 
         switch (u) {
-        case BUS_SYNCBYTE:
-            // scheduler has already scheduled the next node
-            psBus->sRecvMsg.auBuf[0] = u;
-            psBus->sRecvMsg.uOverallLength = 1;
-            psBus->eState = eBus_ReceivingWait;
-            break;
-
         case BUS_ACKBYTE:
             psBus->sSendMsg.uRetries = 0;
             ack_received = TRUE;
@@ -312,12 +305,7 @@ static void wait_for_ack_passive (sBus_t* psBus)
         }
         bus_phy_read_byte(&psBus->sPhy, &u);
 
-        if (u == BUS_SYNCBYTE) {
-            psBus->eState = eBus_ReceivingWait;
-            psBus->sRecvMsg.auBuf[0] = u;
-            psBus->sRecvMsg.uOverallLength = 1;
-        }
-        else if (u == BUS_ACKBYTE) {
+        if (u == BUS_ACKBYTE) {
             // ACK byte received, reset bus and wait for next token.
             reset_bus(psBus);
         }

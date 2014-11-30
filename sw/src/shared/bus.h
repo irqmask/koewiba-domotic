@@ -115,8 +115,10 @@ typedef enum busflags {
 
 //! configuration data of the bus
 typedef struct busconfig {
+    uint16_t       uOwnAddress;
     uint8_t        uOwnNodeAddress;    //!< address of node on bus.
     uint8_t        uOwnExtAddress;     //!< extensionaddress of node on bus.
+    bool           router_mode;
 } sBusCfg_t;
 
 typedef uint8_t auRecBuf_t[BUS_MAXBIGMSGLEN];
@@ -190,19 +192,29 @@ typedef struct bus {
 // --- Global functions --------------------------------------------------------
 
 void 	bus_configure						(sBus_t* 		psBus,
-											 uint16_t 		uNodeAddress);
+											uint16_t 		uNodeAddress);
 
 void 	bus_initialize						(sBus_t* 		psBus,
 											 uint8_t 	    uUart);
+
+void    bus_set_router_mode                 (sBus_t*        bus,
+                                             bool           router_mode);
 
 void 	bus_flush_bus						(sBus_t* 		psBus);
 
 BOOL 	bus_get_message						(sBus_t* 		psBus);
 
-BOOL 	bus_read_message					(sBus_t*  		psBus,
-											 uint16_t* 		puSender,
-											 uint8_t* 		puLen,
-											 uint8_t* 		puMsg);
+BOOL 	bus_read_message					(sBus_t*        psBus,
+											 uint16_t*      puSender,
+											 uint8_t*       puLen,
+										     uint8_t*       puMsg);
+
+BOOL    bus_read_message_verbose            (sBus_t*        psBus,
+                                             uint16_t*      puSender,
+                                             uint16_t*      puReceiver,
+                                             uint8_t*       puLen,
+                                             uint8_t*       puMsg,
+                                             uint16_t*      puCRC);
 
 BOOL 	bus_send_message					(sBus_t*    	psBus,
                       	  	  	  	  	  	 uint16_t   	uReceiver,

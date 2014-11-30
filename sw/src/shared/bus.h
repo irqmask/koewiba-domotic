@@ -52,6 +52,7 @@
  */
 #ifndef BUS_APPCONFIG
  #define BUS_APPCONFIG      1
+ #define BUS_TX_QUEUE_SIZE  100
 #endif
 /**
  * @}
@@ -112,8 +113,10 @@ typedef enum busflags {
 
 //! configuration data of the bus
 typedef struct busconfig {
+    uint16_t       uOwnAddress;
     uint8_t        uOwnNodeAddress;    //!< address of node on bus.
     uint8_t        uOwnExtAddress;     //!< extensionaddress of node on bus.
+    bool           router_mode;
 } sBusCfg_t;
 
 typedef uint8_t auRecBuf_t[BUS_MAXBIGMSGLEN];
@@ -148,11 +151,16 @@ typedef struct rcvbusmsg {
 //! data of message to be sent
 typedef struct sndbusmsg {
     uint16_t        uReceiver;
-    uint8_t         uLength;
     uint8_t         uOverallLength;
     uint8_t         uRetries;       //!< number of send retries.
     auSndBuf_t      auBuf;          //!< message data including header, data and crc.
 } sSndBusMsg_t;
+
+typedef struct queue {
+    uint8_t pread;
+    uint8_t pwrite;
+    uint8_t data[BUS_TX_QUEUE_SIZE];
+} queue_t;
 
 //! data of bus. used as handle for all public methods.
 typedef struct bus {
@@ -163,6 +171,7 @@ typedef struct bus {
     sBusPhy_t           sPhy;                           //!< physical layer data.
     sRcvBusMsg_t        sRecvMsg;                       //!< contains current received message.
     sSndBusMsg_t        sSendMsg;                       //!< contains current message to be sent.
+    queue_t             tx_queue;                       //!< transmit queue for outgoing messages.
     uint8_t             auEmptyMsg[BUS_EMPTY_MSG_LEN];  //!< pre-compiled empty message.
     sClkTimer_t         sReceiveTimeout;                //!< receive timeout
     sClkTimer_t         sAckTimeout;                    //!< ack timeout
@@ -181,19 +190,29 @@ typedef struct bus {
 // --- Global functions --------------------------------------------------------
 
 void 	bus_configure						(sBus_t* 		psBus,
-											 uint16_t 		uNodeAddress);
+											uint16_t 		uNodeAddress);
 
 void 	bus_initialize						(sBus_t* 		psBus,
 											 uint8_t 	    uUart);
+
+void    bus_set_router_mode                 (sBus_t*        bus,
+                                             bool           router_mode);
 
 void 	bus_flush_bus						(sBus_t* 		psBus);
 
 BOOL 	bus_get_message						(sBus_t* 		psBus);
 
-BOOL 	bus_read_message					(sBus_t*  		psBus,
-											 uint16_t* 		puSender,
-											 uint8_t* 		puLen,
-											 uint8_t* 		puMsg);
+BOOL 	bus_read_message					(sBus_t*        psBus,
+											 uint16_t*      puSender,
+											 uint8_t*       puLen,
+										     uint8_t*       puMsg);
+
+BOOL    bus_read_message_verbose            (sBus_t*        psBus,
+                                             uint16_t*      puSender,
+                                             uint16_t*      puReceiver,
+                                             uint8_t*       puLen,
+                                             uint8_t*       puMsg,
+                                             uint16_t*      puCRC);
 
 BOOL 	bus_send_message					(sBus_t*    	psBus,
                       	  	  	  	  	  	 uint16_t   	uReceiver,

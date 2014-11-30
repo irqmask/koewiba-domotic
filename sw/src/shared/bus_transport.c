@@ -57,7 +57,7 @@ static void create_empty_message(sBus_t* psBus)
     psBus->auEmptyMsg[2] = 0; // length
 }
 
-// Start sending the wakeup-byte.
+// Start sending the wake-up-byte.
 static BOOL send_wakeupbyte(sBus_t* psBus)
 {
 	uint8_t msg = BUS_WAKEUPBYTE;
@@ -117,14 +117,9 @@ static BOOL receive (sBus_t* psBus)
                 psBus->eState = eBus_ReceivingActive;
             }
         }
-        //TODO CV TODO RM: for performance, insert else if here?
-        // If sender lower byte has been received OverallLength is 1
-        // and therefore nothing is to do until:
-        // psBus->sRecvMsg.auBuf[psBus->sRecvMsg.uOverallLength] = u;
-
         // active receiving state, receive and check message
         // and then go back to eBus_Idle state.
-        if (psBus->eState == eBus_ReceivingActive) {
+        else if (psBus->eState == eBus_ReceivingActive) {
             // 3. byte: LE - Length of message from AR to CRCL
             if (psBus->sRecvMsg.uOverallLength == 2) {
                 // check correctness of length
@@ -152,7 +147,9 @@ static BOOL receive (sBus_t* psBus)
                 }
                 psBus->sRecvMsg.uReceiver = u;
                 // hello, is it me you are looking for (or broadcast-message)?
-                if ((BUS_BRDCSTADR == u) || (u == (psBus->sCfg.uOwnNodeAddress & 0x007f))) {
+                if ((psBus->sCfg.router_mode) ||
+                    (BUS_BRDCSTADR == u) ||
+                    (u == psBus->sCfg.uOwnNodeAddress)) {
                     // nothing more to do here.
                 } else {
                     // we are not interested in this message
@@ -176,7 +173,7 @@ static BOOL receive (sBus_t* psBus)
                     crc = crc_calc16(&psBus->sRecvMsg.auBuf[0], psBus->sRecvMsg.uLength + 3 - 2);
                     if (crc == psBus->sRecvMsg.uCRC) {
                         // message has been received correctly
-                        if(BUS_BRDCSTADR != psBus->sRecvMsg.uReceiver) {
+                        if(psBus->sCfg.uOwnAddress == psBus->sRecvMsg.uReceiver) {
                             // Send ACK if it was not a broadcast-message.
                             send_ack(psBus);
                         }
@@ -219,18 +216,55 @@ static BOOL receive (sBus_t* psBus)
 // Check if data had to be sent or otherwise send empty message.
 static void initiate_sending (sBus_t* psBus)
 {
+    uint16_t crc;
+    uint8_t* msg_buf;
+    uint8_t  q_msg_len, q_pending;
+
     psBus->eState = eBus_Sending;
-    // is there a pending message to be sent?
-    if (psBus->sSendMsg.uOverallLength != 0) {
+
+    // is there no old message to be re-sent?
+    if (psBus->sSendMsg.uRetries > 0) {
         // initiate sending of the message
         bus_phy_send(&psBus->sPhy,
-        		      psBus->sSendMsg.auBuf,
-        		      psBus->sSendMsg.uOverallLength);
+                     psBus->sSendMsg.auBuf,
+                     psBus->sSendMsg.uOverallLength);
     } else {
-        // send empty message
-        bus_phy_send(&psBus->sPhy, psBus->auEmptyMsg, BUS_EMPTY_MSG_LEN);
-    }
+        // is there a pending new message to be sent?
+        q_pending = bus_q_get_pending(&psBus->tx_queue);
+        // if overall-length is set, message is completely enqueued
+        if (q_pending > 0) {
+            q_msg_len = bus_q_get_byte(&psBus->tx_queue);
 
+            // check if read message length matches with the number of pending bytes
+            if (q_msg_len > q_pending) {
+                // the queue is corrupt
+                bus_q_initialize(&psBus->tx_queue);
+                // send empty message
+                bus_phy_send(&psBus->sPhy, psBus->auEmptyMsg, BUS_EMPTY_MSG_LEN);
+            }
+            psBus->sSendMsg.uOverallLength = q_msg_len;
+
+            // copy message from queue to send buffer
+            msg_buf = psBus->sSendMsg.auBuf;
+            while (q_msg_len--) {
+                *msg_buf++ = bus_q_get_byte(&psBus->tx_queue);
+            }
+
+            // calculate checksum and reset the retry counter
+            crc = crc_calc16(&psBus->sSendMsg.auBuf[0], psBus->sSendMsg.uOverallLength);
+            psBus->sSendMsg.auBuf[psBus->sSendMsg.uOverallLength++] = crc >> 8;
+            psBus->sSendMsg.auBuf[psBus->sSendMsg.uOverallLength++] = crc & 0xFF;
+            psBus->sSendMsg.uRetries = BUS_MAX_MSGRETRIES;
+
+            // initiate sending of the message
+            bus_phy_send(&psBus->sPhy,
+                         psBus->sSendMsg.auBuf,
+                         psBus->sSendMsg.uOverallLength);
+        } else {
+            // send empty message
+            bus_phy_send(&psBus->sPhy, psBus->auEmptyMsg, BUS_EMPTY_MSG_LEN);
+        }
+    }
 }
 
 // Check if data has been sent.
@@ -252,25 +286,25 @@ static void check_message_sent (sBus_t* psBus)
 // Wait for an acknowledge byte after message has been sent
 static void wait_for_ack_after_sending (sBus_t* psBus)
 {
-    uint8_t u;
+    uint8_t u = 0;
     BOOL    ack_received = FALSE;
 
     do {
-        if (!bus_phy_data_received(&psBus->sPhy)) {
+        if (!bus_phy_data_received(&psBus->sPhy) ||
+            !bus_phy_read_byte(&psBus->sPhy, &u)) {
             break; // No byte received.
         }
-        bus_phy_read_byte(&psBus->sPhy, &u);
 
         switch (u) {
         case BUS_ACKBYTE:
             psBus->sSendMsg.uRetries = 0;
             ack_received = TRUE;
-            reset_bus(psBus);
+            reset_bus(psBus); // go back to idle
             // TODO CV / TODO RM: notify application, that ACK byte has been received.
             break;
 
         default:
-            // not the ACK byte, reset bus and try again in the next round
+            // not the ACK byte, reset bus, go back to idle
             reset_bus(psBus);
             break;
         }
@@ -279,7 +313,6 @@ static void wait_for_ack_after_sending (sBus_t* psBus)
         if (psBus->sSendMsg.uRetries == 0) {
             // end sending message
             psBus->sSendMsg.uOverallLength = 0;
-            psBus->sSendMsg.uLength = 0;
             if (!ack_received) {
                 // TODO CV / TODO RM: notify application, that ACK byte has not
                 // been received.
@@ -295,7 +328,7 @@ static void wait_for_ack_passive (sBus_t* psBus)
 
     do {
         if (clk_timer_is_elapsed(&psBus->sAckTimeout)) {
-            // timeout.
+            // timeout. go back to idle
             reset_bus(psBus);
             break;
         }
@@ -308,6 +341,9 @@ static void wait_for_ack_passive (sBus_t* psBus)
         if (u == BUS_ACKBYTE) {
             // ACK byte received, reset bus and wait for next token.
             reset_bus(psBus);
+        } else {
+            // ACK not received, something else received.
+            // Also reset the bus and back to idle
         }
     } while(FALSE);
 }
@@ -363,6 +399,7 @@ BOOL bus_trp_send_and_receive (sBus_t* psBus)
             break;
         }
         // otherwise fall through to eBus_Idle state
+        // no break
     case eBus_Idle:
     case eBus_ReceivingWait:
     case eBus_ReceivingActive:
@@ -419,7 +456,10 @@ BOOL bus_trp_send_sleepcmd (sBus_t* psBus)
  */
 void bus_configure (sBus_t* psBus, uint16_t uNodeAddress)
 {
-    psBus->sCfg.uOwnNodeAddress = uNodeAddress;
+    psBus->sCfg.uOwnAddress = uNodeAddress;
+    psBus->sCfg.uOwnNodeAddress = uNodeAddress & 0x007F;
+    psBus->sCfg.uOwnExtAddress = (uNodeAddress >> 8) & 0x000F;
+    psBus->sCfg.router_mode = false;
     create_empty_message(psBus);
 }
 
@@ -433,11 +473,16 @@ void bus_initialize (sBus_t* psBus, uint8_t uUart)
 {
     psBus->eState = eBus_InitWait;
     psBus->sSendMsg.uRetries = 0;
-    psBus->sSendMsg.uLength = 0;
     psBus->sSendMsg.uOverallLength = 0;
     psBus->eModuleState = eMod_Sleeping;
     bus_phy_initialize(&psBus->sPhy, uUart);
     bus_flush_bus(psBus);
+    bus_q_initialize(&psBus->tx_queue);
+}
+
+void bus_set_router_mode (sBus_t* bus, bool router_mode)
+{
+    bus->sCfg.router_mode = router_mode;
 }
 
 /**
@@ -505,6 +550,52 @@ BOOL bus_read_message (sBus_t*  psBus,
 }
 
 /**
+ * Reads a pending message.
+ *
+ * @param[in]   psBus       Handle of the bus.
+ * @param[out]  puSender    Sender of the message.
+ * @param[out]  puReceiver  Receiver of the message.
+ * @param[out]  puLen       (Netto) Length of the message.
+ * @param[out]  puMsg       Received message.
+ * @param[out]  puCRC       CRC of the message.
+ *
+ * @returns TRUE, if a message has been received and.
+ */
+BOOL bus_read_message_verbose (sBus_t*   psBus,
+                               uint16_t* puSender,
+                               uint16_t* puReceiver,
+                               uint8_t*  puLen,
+                               uint8_t*  puMsg,
+                               uint16_t* puCRC)
+{
+    uint8_t len = 0;
+
+    do {
+        // is there a new message pending?
+        if (psBus->msg_receive_state != eBUS_RECV_MESSAGE) {
+            break;
+        }
+        *puSender   = psBus->sRecvMsg.uSender;
+        *puReceiver = psBus->sRecvMsg.uReceiver;
+        while (len < psBus->sRecvMsg.uLength - 4) {
+            puMsg[len] = psBus->sRecvMsg.auBuf[5 + len];
+            len ++;
+        }
+        // reset bus to IDLE state, so we are ready to receive the next message
+        psBus->msg_receive_state = eBUS_RECV_NOTHING;
+        psBus->sRecvMsg.uLength = 0;
+        psBus->sRecvMsg.uOverallLength = 0;
+        psBus->eState = eBus_Idle;
+
+        *puLen      = len;
+        *puCRC      = psBus->sRecvMsg.uCRC;
+        return TRUE;
+    } while ( FALSE );
+
+    return FALSE;
+}
+
+/**
  * Send a message.
  *
  * @param[in]   psBus       Handle of the bus.
@@ -520,10 +611,10 @@ BOOL bus_send_message (sBus_t*    psBus,
                        uint8_t    uLen,
                        uint8_t*   puMsg)
 {
-    uint16_t crc;
+    uint8_t  overall_msg_len;
 
     do {
-        // Wakeup bus
+        // wake-up bus
         if(eMod_Sleeping == psBus->eModuleState) {
         	send_wakeupbyte(psBus);
         	psBus->eModuleState = eMod_Running;
@@ -532,35 +623,38 @@ BOOL bus_send_message (sBus_t*    psBus,
 
     	// check length of message to be sent.
         if (uLen == 0 ||
-            uLen > BUS_MAXMSGLEN ||
-            psBus->sSendMsg.uOverallLength != 0) {
+            uLen > BUS_MAXMSGLEN) {
         	break;
         }
+
+        // check if there is enough free space in the send queue
+        // OVERALLLENGTH + SYNC + ADDR + LEN + RECV + EA + uLen
+        if (bus_q_get_free(&psBus->tx_queue) < uLen + 6) {
+            break;
+        }
+
+        // save length of message in queue
+        overall_msg_len = uLen + 5; //SYNC + ADDR + LEN + RECV + EA (without CRC)
+        bus_q_put_byte(&psBus->tx_queue, overall_msg_len);
+
         // prepare message header
-        psBus->sSendMsg.uOverallLength = 0;
-        psBus->sSendMsg.uLength = 0;
-        psBus->sSendMsg.auBuf[psBus->sSendMsg.uOverallLength++] = BUS_SYNCBYTE;
-        psBus->sSendMsg.auBuf[psBus->sSendMsg.uOverallLength++] = psBus->sCfg.uOwnNodeAddress & 0x007F;
-        psBus->sSendMsg.auBuf[psBus->sSendMsg.uOverallLength++] = uLen + 4;
-        psBus->sSendMsg.auBuf[psBus->sSendMsg.uOverallLength++] = uReceiver & 0x007F;
-        // EA - Extended address 4bit sender in higher nibble, 4bit receiver in lower nibble.
-        psBus->sSendMsg.auBuf[psBus->sSendMsg.uOverallLength++] =
-            (((uReceiver & 0x0F00) >> 8) |
-            ((psBus->sCfg.uOwnNodeAddress & 0x0F00) >> 4));
+        bus_q_put_byte(&psBus->tx_queue, BUS_SYNCBYTE);
+        bus_q_put_byte(&psBus->tx_queue, psBus->sCfg.uOwnNodeAddress & 0x007F);
+        bus_q_put_byte(&psBus->tx_queue, uLen + 4); // RECV + EA + 2byte CRC
+        bus_q_put_byte(&psBus->tx_queue, uReceiver & 0x007F);
+        // EA - Extended address 4bit sender in higher nibble, 4bit receiver
+        // in lower nibble.
+        bus_q_put_byte(&psBus->tx_queue, ((uReceiver & 0x0F00) >> 8) |
+                          ((psBus->sCfg.uOwnNodeAddress & 0x0F00) >> 4));
+
         // copy data
         while (uLen--) {
-        	psBus->sSendMsg.auBuf[psBus->sSendMsg.uOverallLength] = puMsg[psBus->sSendMsg.uLength];
-        	psBus->sSendMsg.uLength++;
-        	psBus->sSendMsg.uOverallLength++;
+            bus_q_put_byte(&psBus->tx_queue, *puMsg++);
         }
-        // calculate and send CRC
-        crc = crc_calc16(&psBus->sSendMsg.auBuf[0], psBus->sSendMsg.uOverallLength);
-        psBus->sSendMsg.auBuf[psBus->sSendMsg.uOverallLength++] = crc >> 8;
-        psBus->sSendMsg.auBuf[psBus->sSendMsg.uOverallLength++] = crc & 0xFF;
-        psBus->sSendMsg.uRetries = BUS_MAX_MSGRETRIES;
 
         return TRUE;
     } while ( FALSE );
+
     return FALSE;
 }
 
@@ -579,7 +673,6 @@ BOOL bus_send_ack_message (sBus_t* psBus, uint16_t uReceiver)
     do {
         // prepare message header
         psBus->sSendMsg.uOverallLength = 0;
-        psBus->sSendMsg.uLength = 0;
         psBus->sSendMsg.auBuf[psBus->sSendMsg.uOverallLength++] = BUS_SYNCBYTE;
         psBus->sSendMsg.auBuf[psBus->sSendMsg.uOverallLength++] = psBus->sCfg.uOwnNodeAddress & 0x007F;
         psBus->sSendMsg.auBuf[psBus->sSendMsg.uOverallLength++] = 5;

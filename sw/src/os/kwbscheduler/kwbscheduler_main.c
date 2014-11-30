@@ -173,8 +173,7 @@ void init_scheduling (msg_bus_t* busscheduler, uint16_t own_node_address)
     msg_b_init(busscheduler, 0);
 
     bus_configure(&busscheduler->bus, own_node_address);
-    bus_initialize(&busscheduler->bus, 0);
-    bus_scheduler_configure(&busscheduler->scheduler);
+    bus_scheduler_initialize(&busscheduler->bus, &busscheduler->scheduler, 0);
 }
 
 int32_t do_scheduling (void* arg)

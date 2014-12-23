@@ -58,7 +58,7 @@
  #define REGBIT_TIMER2_TOIE     TOIE2
  #define REGBIT_TIMER2_OCIEA    OCIE2A
  #define REGBIT_TIMER2_OCIEB    OCIE2B
- 
+
  // Signature byte addresses. TODO check for this processor!
  #define ADDR_SIGNATURE_BYTE0   0
  #define ADDR_SIGNATURE_BYTE1   2
@@ -94,7 +94,7 @@
  // SPSR
  #define REGBIT_SPIF0           SPIF
  #define REGBIT_SPI2X0          SPI2X
- 
+
  // Timer 0,1 and 2
  #define REG_TIMER0_IRQMSK      TIMSK0
  #define REG_TIMER1_IRQMSK      TIMSK1
@@ -141,13 +141,13 @@
  #define INTERRUPT_USART_RXC0   USART0_RX_vect
  #define INTERRUPT_USART_UDRE0  USART0_UDRE_vect
  #define INTERRUPT_UART_TRANS0  USART0_TX_vect
- 
+
  // Sleepmodes
  #define INTERRUPT_PINCHANGE2   PCINT2_vect
- 
+
  // SPI0
  #define INTERRUPT_SPI          SPI_STC_vect
- 
+
  // Timer 0,1 and 2
  #define REG_TIMER0_IRQMSK      TIMSK0
  #define REG_TIMER1_IRQMSK      TIMSK1
@@ -173,7 +173,7 @@
  // SPSR
  #define REGBIT_SPIF0           SPIF0
  #define REGBIT_SPI2X0          SPI2X0
- #else 
+ #else
 // SPI
  #define REG_SPCR0              SPCR
  #define REG_SPDR0              SPDR
@@ -190,7 +190,7 @@
  #define ADDR_SIGNATURE_BYTE0   0
  #define ADDR_SIGNATURE_BYTE1   2
  #define ADDR_SIGNATURE_BYTE2   4
- 
+
 #elif defined (__AVR_ATtiny1634__)
 // Signature byte addresses. TODO check for this processor!
  #define ADDR_SIGNATURE_BYTE0   0
@@ -254,7 +254,7 @@
  #define INTERRUPT_UART_TRANS1  USART1_TX_vect
  // Sleepmodes
  #define INTERRUPT_PINCHANGE2   PCINT2_vect
- 
+
  // Timer 0,1 and 2
  #define REG_TIMER0_IRQMSK      TIMSK
  #define REG_TIMER1_IRQMSK      TIMSK
@@ -346,20 +346,6 @@
 // --- Module global functions -------------------------------------------------
 
 // --- Global functions --------------------------------------------------------
-
-extern void IR_DataRegisterEmpty_Enable(void);
-extern void IR_DataRegisterEmpty_Disable(void);
-extern void IR_TransmitComplete_Enable(void);
-extern void IR_TransmitComplete_Disable(void);
-extern void IR_ReceiveComplete_Enable(void);
-extern void IR_ReceiveComplete_Disable(void);
-extern void IR_OutputCompareMatchA_Enable(void);
-extern void IR_OutputCompareMatchA_Disable(void);
-
-extern void IR_PinChange1_Enable(void);
-extern void IR_PinChange1_Disable(void);
-extern void IR_PinChange0_Enable(void);
-extern void IR_PinChange0_Disable(void);
 
 #endif /* _UCONTROLLER_H_ */
 /** @} */

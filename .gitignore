@@ -32,3 +32,9 @@
 **/build
 **/CMakeFiles
 **/3rd_party/**
+
+# Eclipse project files
+.project
+.cproject
+**/.settings
+

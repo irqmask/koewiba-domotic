@@ -2,10 +2,12 @@
  * @addtogroup CLOCK
  * @brief System clock.
  *
+ * This module contains a clock for the current time (if configured in
+ * appconfig.h) and timer e.g. for timeout handling.
+ *
  * @{
  * @file    clock.c
  * @brief   System clock.
- * @todo    describe file purpose
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
 
@@ -96,7 +98,7 @@ void clk_initialize(void)
 
 /**
  * Start/Stop Clock-Timer
- * 
+ *
  * @param[in] start
  * boolean for starting/stopping the timer (TRUE = start)
  */
@@ -119,7 +121,7 @@ void clk_control(BOOL bStart)
  * @param[in] psTimer
  * Pointer to timer structure.
  * @param[in] uTime
- * Time in ticks. Convert from milliscons to ticks with 
+ * Time in ticks. Convert from milliseconds to ticks with
  * CLOCK_MS_2_TICKS macro.
  *
  * @returns TRUE, if timer has been (re)started, otherwise FALSE.

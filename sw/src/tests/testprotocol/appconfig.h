@@ -1,11 +1,10 @@
 /**
- * @addtogroup ROOMTHERMOSTATE
- * @addtogroup ROOMTHERMOSTATE_APPCONFIG
- * @brief Configuration of modules used in "roomthermostate" project.
+ * @addtogroup TESTSCHEDULER_APPCONFIG
+ * @brief Configuration of modules used in "testscheduler" project.
  *
  * @{
  * @file    appconfig.h
- * @brief   Configuration of modules used in "roomthermostate" project.
+ * @brief   Configuration of modules used in "testscheduler" project.
  *
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
@@ -20,14 +19,14 @@
 
 // --- Definitions -------------------------------------------------------------
 
-#define BUS_APPCONFIG      1
-#undef BUS_SCHEDULER            //!< This program has no scheduling capabilities.
-#define BUS_TX_QUEUE_SIZE 100   //! queue size for sending messages
+#define BUS_APPCONFIG   1
+#define BUS_TX_QUEUE_SIZE 100
 
 // --- Type definitions --------------------------------------------------------
 
 //! Application specific layout of registers
 typedef enum appregisters {
+    // registers saved in EEProm
     APP_eReg_RemoteAddr00 = MOD_eReg_FirstAppSpecific, //!< Register mapping: remote address 0 (16bit)
     APP_eReg_RemoteAddr01,
     APP_eReg_RemoteAddr02,      //!< Register mapping: remote address 2 (16bit)
@@ -124,15 +123,7 @@ typedef enum appregisters {
     APP_eReg_TargetReg29,
     APP_eReg_TargetReg30,       //!< Register mapping: target register 30
     APP_eReg_TargetReg31,
-    APP_eReg_DesiredTempDay1,
-    APP_eReg_DesiredTempNight1,
-    APP_eReg_DesiredTempDay2,
-    APP_eReg_DesiredTempNight2,
-    APP_eReg_DesiredTempAway,
-    APP_eReg_DesiredTempWindowOpened,
-    APP_eReg_CurrentDesiredTemperature,
-    APP_eReg_CurrentTemperature,
-
+    // insert application specific registers here
     APP_eReg_Last
 } eRegisters_t;
 
@@ -298,24 +289,7 @@ typedef enum appconfig {
     APP_eCfg_TargetReg29,
     APP_eCfg_TargetReg30,
     APP_eCfg_TargetReg31,
-    APP_eCfg_DesiredTempDay1,
-    APP_eCfg_DesiredTempDay1Lo = APP_eCfg_DesiredTempDay1,
-    APP_eCfg_DesiredTempDay1High,
-    APP_eCfg_DesiredTempNight1,
-    APP_eCfg_DesiredTempNight1Lo = APP_eCfg_DesiredTempNight1,
-    APP_eCfg_DesiredTempNight1High,
-    APP_eCfg_DesiredTempDay2,
-    APP_eCfg_DesiredTempDay2Lo = APP_eCfg_DesiredTempDay2,
-    APP_eCfg_DesiredTempDay2High,
-    APP_eCfg_DesiredTempNight2,
-    APP_eCfg_DesiredTempNight2Lo = APP_eCfg_DesiredTempNight2,
-    APP_eCfg_DesiredTempNight2High,
-    APP_eCfg_DesiredTempAway,
-    APP_eCfg_DesiredTempAwayLo = APP_eCfg_DesiredTempAway,
-    APP_eCfg_DesiredTempAwayHigh,
-    APP_eCfg_DesiredTempWindowOpened,
-    APP_eCfg_DesiredTempWindowOpenedLo = APP_eCfg_DesiredTempWindowOpened,
-    APP_eCfg_DesiredTempWindowOpenedHigh,
+    // insert application specific configuration here
     APP_eCfg_Last
 } eConfiguration_t;
 
@@ -332,5 +306,4 @@ typedef enum appconfig {
 // --- Global functions --------------------------------------------------------
 
 #endif /* _APPCONFIG_H_ */
-/** @} */
 /** @} */

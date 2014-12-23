@@ -2,8 +2,6 @@
  * @addtogroup BUS
  * @brief Public interface of bus protocol.
  *
- * TODO: Detailed description of module.
- *
  * @{
  * @file    bus.h
  * @brief   Declaration of communication driver routines.
@@ -56,7 +54,7 @@
  */
 #ifndef BUS_APPCONFIG
  #define BUS_APPCONFIG      1
- #undef BUS_SCHEDULER
+ #define BUS_TX_QUEUE_SIZE  100
 #endif
 /**
  * @}
@@ -79,10 +77,8 @@
 
 //! Possible states of the subscriber
 typedef enum modulestate {
-	eMod_Discovery,	//!< Scheduler is in discovery-mode (looking for nodes)
 	eMod_Running,	//!< Module is normal mode
 	eMod_Sleeping,	//!< Module is sleeping
-	eMod_AckWait	//!< Module is waiting for Acknowledge-Message
 } eModState_t;
 
 //! Possible states of the bus, as seen by each node
@@ -102,6 +98,13 @@ typedef enum busstate {
     eBus_Last
 } eBusState_t;
 
+typedef enum bus_recv_state {
+    eBUS_RECV_NOTHING,
+    eBUS_RECV_EMPTY_MESSAGE,
+    eBUS_RECV_FOREIGN_MESSAGE,
+    eBUS_RECV_MESSAGE
+} msg_recv_state_t;
+
 typedef enum busflags {
     e_uartrxflag    = 0b00000001,
     e_uarttxflag    = 0b00000010,
@@ -112,8 +115,10 @@ typedef enum busflags {
 
 //! configuration data of the bus
 typedef struct busconfig {
+    uint16_t       uOwnAddress;
     uint8_t        uOwnNodeAddress;    //!< address of node on bus.
     uint8_t        uOwnExtAddress;     //!< extensionaddress of node on bus.
+    bool           router_mode;
 } sBusCfg_t;
 
 typedef uint8_t auRecBuf_t[BUS_MAXBIGMSGLEN];
@@ -148,32 +153,30 @@ typedef struct rcvbusmsg {
 //! data of message to be sent
 typedef struct sndbusmsg {
     uint16_t        uReceiver;
-    uint8_t         uLength;
     uint8_t         uOverallLength;
     uint8_t         uRetries;       //!< number of send retries.
     auSndBuf_t      auBuf;          //!< message data including header, data and crc.
 } sSndBusMsg_t;
 
-//! contains all information about a node needed for scheduling.
-// typedef struct nodeinfo {
-//     uint8_t        uAddress;
-//     uint8_t        uErrCnt;
-// } sNodeInfo_t;
+typedef struct queue {
+    uint8_t pread;
+    uint8_t pwrite;
+    uint8_t data[BUS_TX_QUEUE_SIZE];
+} queue_t;
 
 //! data of bus. used as handle for all public methods.
 typedef struct bus {
-	eModState_t		eModuleState;					//!< current state of the module.
-    eBusState_t     eState;                         //!< current state of the bus.
-    sBusCfg_t       sCfg;                           //!< configuration data.
-    BOOL            bMsgReceived;                   //!< flag, stating that there is an unread message
-    BOOL            bSchedMsgReceived;              //!< flag, if any message has been received
-    BOOL            bMsgEnd;                        //!< flag, stating that a message is completed (used by scheduler)
-    sBusPhy_t       sPhy;                           //!< physical layer data.
-    sRcvBusMsg_t    sRecvMsg;                       //!< contains current received message.
-    sSndBusMsg_t    sSendMsg;                       //!< contains current message to be sent.
-    uint8_t         auEmptyMsg[BUS_EMPTY_MSG_LEN];  //!< pre-compiled empty message.
-    sClkTimer_t     sReceiveTimeout;                //!< receive timeout
-    sClkTimer_t     sAckTimeout;                    //!< ack timeout
+	eModState_t		    eModuleState;					//!< current state of the module.
+    eBusState_t         eState;                         //!< current state of the bus.
+    sBusCfg_t           sCfg;                           //!< configuration data.
+    msg_recv_state_t    msg_receive_state;              //!< stating if a message and what kind of message has been received.
+    sBusPhy_t           sPhy;                           //!< physical layer data.
+    sRcvBusMsg_t        sRecvMsg;                       //!< contains current received message.
+    sSndBusMsg_t        sSendMsg;                       //!< contains current message to be sent.
+    queue_t             tx_queue;                       //!< transmit queue for outgoing messages.
+    uint8_t             auEmptyMsg[BUS_EMPTY_MSG_LEN];  //!< pre-compiled empty message.
+    sClkTimer_t         sReceiveTimeout;                //!< receive timeout
+    sClkTimer_t         sAckTimeout;                    //!< ack timeout
 } sBus_t;
 
 // --- Local variables ---------------------------------------------------------
@@ -189,19 +192,29 @@ typedef struct bus {
 // --- Global functions --------------------------------------------------------
 
 void 	bus_configure						(sBus_t* 		psBus,
-											 uint16_t 		uNodeAddress);
+											uint16_t 		uNodeAddress);
 
 void 	bus_initialize						(sBus_t* 		psBus,
 											 uint8_t 	    uUart);
+
+void    bus_set_router_mode                 (sBus_t*        bus,
+                                             bool           router_mode);
 
 void 	bus_flush_bus						(sBus_t* 		psBus);
 
 BOOL 	bus_get_message						(sBus_t* 		psBus);
 
-BOOL 	bus_read_message					(sBus_t*  		psBus,
-											 uint16_t* 		puSender,
-											 uint8_t* 		puLen,
-											 uint8_t* 		puMsg);
+BOOL 	bus_read_message					(sBus_t*        psBus,
+											 uint16_t*      puSender,
+											 uint8_t*       puLen,
+										     uint8_t*       puMsg);
+
+BOOL    bus_read_message_verbose            (sBus_t*        psBus,
+                                             uint16_t*      puSender,
+                                             uint16_t*      puReceiver,
+                                             uint8_t*       puLen,
+                                             uint8_t*       puMsg,
+                                             uint16_t*      puCRC);
 
 BOOL 	bus_send_message					(sBus_t*    	psBus,
                       	  	  	  	  	  	 uint16_t   	uReceiver,

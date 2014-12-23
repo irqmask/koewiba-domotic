@@ -272,6 +272,7 @@ static int32_t accept_client (void* arg)
 
         if ((fd = sys_socket_accept(clients->server_fd)) <= INVALID_FD) {
             perror("accept_client");
+            fprintf(stderr, "server_fd is %d fd is %d\n", clients->server_fd, fd);
             delete_client(client);
             break;
         }

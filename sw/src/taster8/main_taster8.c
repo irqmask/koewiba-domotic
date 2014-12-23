@@ -108,15 +108,15 @@ static void vInterpretMessage(sBus_t* psBus, uint8_t* puMsg, uint8_t uMsgLen, ui
         // system messages
         switch (puMsg[0]) {
         case CMD_eSleep:
-            SLEEP_vPinChange2_Enable();
+            sleep_pinchange2_enable();
             bus_sleep(psBus);
-            SLEEP_vPinChange2_Disable();
+            sleep_pinchange2_disable();
             break;
         case CMD_eAck:
             psBus->eModuleState = eMod_Running;
             break;
         default:
-            bus_send_ack_message(psBus, uSender);
+            //bus_send_ack_message(psBus, uSender);
             break;
         }
     }

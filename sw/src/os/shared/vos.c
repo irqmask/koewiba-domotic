@@ -160,14 +160,30 @@ size_t vos_get_pending (vos_t* vos)
 
     switch (vos->interface_type) {
     case eVOS_IF_TYPE_SERIAL:
-        return sys_serial_get_pending(vos->fd);
+        return sys_serial_get_pending_recvq(vos->fd);
         break;
     case eVOS_IF_TYPE_VBUSD:
-        return sys_socket_get_pending(vos->fd);
+        return sys_socket_get_pending_recvq(vos->fd);
         break;
     default:
         return 0;
         break;
+    }
+}
+
+size_t vos_get_pending_send_bytes (vos_t* vos)
+{
+    assert(vos != NULL);
+
+    switch (vos->interface_type) {
+    case eVOS_IF_TYPE_SERIAL:
+        return sys_serial_get_pending_sendq(vos->fd);
+        break;
+    case eVOS_IF_TYPE_VBUSD:
+        return sys_socket_get_pending_sendq(vos->fd);
+        break;
+    default:
+        return 0;
     }
 }
 

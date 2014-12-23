@@ -1,17 +1,18 @@
 /**
- * @addtogroup DEBUG
- * @brief   Debug output via LEDs.
+ * @addtogroup TASTER8
+ * @addtogroup APPLICATION
+ * @brief Interface of the business logic of the application taster8.
  *
  * @{
- * @file    led_debug.c
- * @brief   Debug output via LEDs.
- * @author  Robert Mueller
+ * @file    application.h
+ * @brief   Interface of the business logic of the application taster8.
+ *
+ * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
 
 // --- Include section ---------------------------------------------------------
-#include "led_debug.h"
-#include "ucontroller.h"
-#include <avr/interrupt.h>
+
+#include "register.h"
 
 // --- Definitions -------------------------------------------------------------
 
@@ -21,43 +22,27 @@
 
 // --- Global variables --------------------------------------------------------
 
+sBus_t  app_bus;
+
 // --- Module global variables -------------------------------------------------
 
 // --- Local functions ---------------------------------------------------------
 
-/**
- * Toggle the status LED.
- */
-void dbg_toggle_status_LED (void)
-{
-    PORTD ^= LED_STATUS;
-}
-
-void dbg_status_LED_on (void)
-{
-    PORTD |= LED_STATUS;
-}
-
-void dbg_status_LED_off (void)
-{
-    PORTD &= ~LED_STATUS;
-}
-
-void dbg_toggle_error_LED (void)
-{
-    PORTD ^= LED_ERROR;
-}
-
-void dbg_error_LED_on (void)
-{
-    PORTD |= LED_ERROR;
-}
-
-void dbg_error_LED_off (void)
-{
-    PORTD &= ~LED_ERROR;
-}
-
 // --- Module global functions -------------------------------------------------
 
+void        app_initialize_modes    (void);
+
 // --- Global functions --------------------------------------------------------
+
+void        app_initialize          (void);
+
+void        app_check_keys          (void);
+
+BOOL        app_register_get        (uint8_t                uRegNo,
+                                     eRegType_t*            peRegType,
+                                     void*                  pvValue);
+
+void        app_register_set        (uint8_t                uRegNo,
+                                     uint32_t               uValue);
+
+/** @} */

@@ -19,10 +19,11 @@
 
 // --- Definitions -------------------------------------------------------------
 
-#define BUS_APPCONFIG   1
-#undef BUS_SCHEDULER        //!< This program has scheduling capabilities.
+#define BUS_APPCONFIG       1
+#undef BUS_SCHEDULER            //!< This program has scheduling capabilities.
+#define BUS_TX_QUEUE_SIZE 100   //! queue size for sending messages
 
-#define APP_NUM_KEYS    8   //!< The keys application supports eight keys.
+#define APP_NUM_KEYS        8   //!< The keys application supports eight keys.
 
 //! Application specific layout of registers
 typedef enum appregisters {

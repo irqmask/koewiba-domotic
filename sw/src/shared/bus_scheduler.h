@@ -68,7 +68,9 @@ typedef struct schd {
 
 // --- Global functions --------------------------------------------------------
 
-void    bus_scheduler_configure             (sSched_t*      psSched);
+void    bus_scheduler_initialize            (sBus_t* psBus,
+                                             sSched_t* psSched,
+                                             uint8_t uUart);
 
 BOOL    bus_schedule_and_get_message        (sBus_t*        psBus,
                                              sSched_t*      psSched);

@@ -122,7 +122,9 @@ size_t sys_serial_recv (sys_fd_t fd, void* buf, size_t bufsize);
 
 void sys_serial_flush (sys_fd_t fd);
 
-size_t sys_serial_get_pending (sys_fd_t fd);
+size_t sys_serial_get_pending_sendq (sys_fd_t fd);
+
+size_t sys_serial_get_pending_recvq (sys_fd_t fd);
 
 void sys_serial_set_blocking (sys_fd_t fd, bool blocking);
 

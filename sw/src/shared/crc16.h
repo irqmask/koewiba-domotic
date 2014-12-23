@@ -2,8 +2,6 @@
  * @addtogroup CRC16
  * @brief 16bit cyclic redundancy check.
  *
- * TODO: Detailed description of module.
- *
  * @{
  * @file    crc16.h
  * @brief   16bit cyclic redundancy check.

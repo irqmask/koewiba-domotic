@@ -1,10 +1,10 @@
 /**
- * @addtogroup TASTER8_PCBCONFIG
- * @brief PCB configuration of the taster8 application.
+ * @addtogroup TESTSCHEDULER_PCBCONFIG
+ * @brief PCB configuration of the "testscheduler" application.
  *
  * @{
  * @file    pcbconfig.h
- * @brief   PCB configuration of the taster8 application.
+ * @brief   PCB configuration of the "testscheduler" application.
  *
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------

@@ -163,7 +163,7 @@ ifneq ($(BUILD_NIGHTLY),True)
 endif
 	@echo "$(CC) -o $@ $(OBJFILES) $(LDFLAGS) " >> $(LOGFILE)
 	@$(CC) -mmcu=$(MCU) -o $@ $(OBJFILES) $(LDFLAGS) 2>&1 | $(TEE) $(LOGFILE)
-	@$(SIZE) --format=avr --mcu=$(MCU) $@ 2>&1 | $(TEE) $(LOGFILE)
+	@$(SIZE) $@ 2>&1 | $(TEE) $(LOGFILE)
 
 
 # several object-copy targets

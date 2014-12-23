@@ -7,7 +7,7 @@ include_directories (
     ../include
     ../libsystem
     ../shared
-    ../3rd_party/jansson-2.6/src
+    ../3rd_party/jansson/src
     ${CMAKE_CURRENT_BINARY_DIR}
 )
 
@@ -38,6 +38,7 @@ set (kwbrouter_SRCS
     ../shared/message_socket.c
     ../shared/vos.c
     ../../shared/bus_transport.c
+    ../../shared/bus_tx_queue.c
     ../../shared/crc16.c
 )
 

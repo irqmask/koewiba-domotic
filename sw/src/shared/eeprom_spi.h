@@ -26,7 +26,12 @@
 
 // --- Definitions -------------------------------------------------------------
 
+#ifndef EEPROM_PCB_CONFIG
 #define __25LC256__
+#define EEP_CS_PORT  PORTB
+#define EEP_CS_DDR   DDRB
+#define EEP_CS       PB4
+#endif
 
 #if defined (__25LC640__)
 #define EEPROM_PAGESIZE   32

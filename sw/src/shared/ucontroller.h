@@ -267,9 +267,10 @@
  #define REGBIT_TIMER2_OCIEB    OCIE2B
 
 // SPI
- #define REG_SPCR0              SPCR
+ //#define REG_SPCR0              SPCR
  #define REG_SPDR0              UDR0
- #define REG_SPSR0              SPSR
+ #define REG_SPDR1              UDR1
+ //#define REG_SPSR0              SPSR
  // SPCR
  #define REGBIT_SPE0            SPE
  #define REGBIT_MSTR0           MSTR

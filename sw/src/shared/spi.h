@@ -40,6 +40,10 @@
 
 // --- Definitions -------------------------------------------------------------
 
+// UCSR0C is used twice (in uart- and spi-mode) and BIT_1 has different names (uart: UCPHA0   spi: UCSZ00).
+// This is not included in "avr/iotn1634" so it has to be defined at this point.
+#define UCPHA0 UCSZ00
+#define UCPHA1 UCSZ10
 /**
  * @subsection SPI_PCBCONFIG
  * Configure SPI Pinout.
@@ -127,6 +131,10 @@ typedef void (*SPI_EndSendFunc_t)(uint8_t uUserArg);
     defined (__AVR_ATmega88P__)  || \
     defined (__AVR_ATmega324P__) || \
     defined (__AVR_ATmega324A__)
+
+#define SPI0_TRANSMITION_COMPLETE    (REG_SPSR0) & (1 << REGBIT_SPIF0))
+#define SPI0_RECEPTION_COMPLETE      (REG_SPSR0) & (1 << REGBIT_SPIF0))
+
 inline void     SPI_vMasterInitBlk  (void)
 {
     // Set MOSI and SCK output, all others input
@@ -141,11 +149,18 @@ inline void     SPI_vMasterInitBlk  (void)
 }
 
 #elif defined (__AVR_ATtiny1634__)
-inline void     SPI_vMasterInitBlk  (void)
+
+#define SPI0_TRANSMITION_COMPLETE    (UCSR0A & (1<<UDRE0))
+#define SPI0_RECEPTION_COMPLETE      (UCSR0A & (1<<RXC0 ))
+
+#define SPI1_TRANSMITION_COMPLETE    (UCSR1A & (1<<UDRE1))
+#define SPI1_RECEPTION_COMPLETE      (UCSR1A & (1<<RXC1 ))
+
+inline void     SPI0_vMasterInitBlk  (void)
 {
     UBRR0 = 0;
     /* Setting the XCKn port pin as output, enables master mode. */
-    SPI_SCK_DDR |= (1<<SPI_SCK_PIN);
+    SPI0_SCK_DDR |= (1<<SPI0_SCK_PIN);
     /* Set MSPI mode of operation and SPI data mode 0. */
     UCSR0C = (1<<UMSEL01)|(1<<UMSEL00)|(0<<UCPHA0)|(0<<UCPOL0);
     /* Enable receiver and transmitter. */
@@ -158,21 +173,58 @@ inline void     SPI_vMasterInitBlk  (void)
 }
 #endif
 
+inline void     SPI1_vMasterInitBlk  (void)
+{
+    UBRR1 = 0;
+    /* Setting the XCKn port pin as output, enables master mode. */
+    SPI1_SCK_DDR |= (1<<SPI1_SCK_PIN);
+    /* Set MSPI mode of operation and SPI data mode 0. */
+    UCSR1C = (1<<UMSEL11)|(1<<UMSEL11)|(0<<UCPHA1)|(0<<UCPOL1);
+    /* Enable receiver and transmitter. */
+    UCSR1B = (1<<RXEN1)|(1<<TXEN1);
+    /* Set baud rate. */
+    /* IMPORTANT: The Baud Rate must be set after the transmitter is enabled
+    */
+    UBRR1 = 0;
+    }
+}
+#endif
+
 /**
  * Simple blocking SPI transmission. The function returns when the byte has been
  * sent.
  *
  * @param[in] uData
- * Byte to be sent over SPI.
+ * Byte to be sent over SPI0.
  * @returns Byte received through MISO line during transmission.
  */
-inline uint8_t  SPI_uTransmitBlk    (uint8_t                uData )
+inline uint8_t  SPI0_uTransmitBlk    (uint8_t                uData )
 {
     // Start transmission
     REG_SPDR0 = uData;
     // Wait for transmission complete
-    while ( !((REG_SPSR0) & (1 << REGBIT_SPIF0)) );
+
+    while ( !(SPI0_TRANSMITION_COMPLETE) );
     return REG_SPDR0; // SPDR contains received byte during transmission.
+}
+
+/**
+ * Simple blocking SPI transmission. The function returns when the byte has been
+ * sent.
+ *
+ * @param[in] uData
+ * Byte to be sent over SPI1.
+ * @returns Byte received through MISO line during transmission.
+ */
+inline uint8_t  SPI1_uTransmitBlk    (uint8_t                uData )
+{
+    // Start transmission
+    while ( !(SPI1_TRANSMITION_COMPLETE) );
+    REG_SPDR1 = uData;
+    // Wait for transmission complete
+
+    while ( !(SPI1_RECEPTION_COMPLETE) );
+    return REG_SPDR1; // SPDR contains received byte during transmission.
 }
 
 #endif // SPI_WITH_BLOCKING

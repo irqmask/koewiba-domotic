@@ -130,7 +130,7 @@ static BOOL receive (sBus_t* psBus)
                     psBus->msg_receive_state = eBUS_RECV_EMPTY_MESSAGE;
                     break;
                 }
-                else if (u > BUS_MAXBIGMSGLEN) {
+                else if (u > BUS_MAXRECVMSGLEN) {
                     // length is zero or length is too big
                     reset_bus(psBus); // wait for next message on bus
                     break;
@@ -178,13 +178,13 @@ static BOOL receive (sBus_t* psBus)
                             send_ack(psBus);
                         }
                         psBus->msg_receive_state = eBUS_RECV_MESSAGE;
-            			psBus->sRecvMsg.uOverallLength = 0;
-            			break;
-            		} else {
-            			// invalid crc of message
-            			reset_bus(psBus);
-            			break;
-            		}
+                        psBus->sRecvMsg.uOverallLength = 0;
+                        break;
+                    } else {
+                        // invalid crc of message
+                        reset_bus(psBus);
+                        break;
+                    }
 
                 } else if(psBus->sRecvMsg.uOverallLength >= psBus->sRecvMsg.uLength + 3) {
                     // invalid length of message
@@ -204,7 +204,7 @@ static BOOL receive (sBus_t* psBus)
                 psBus->msg_receive_state = eBUS_RECV_FOREIGN_MESSAGE;
                 reset_bus(psBus);
                 // wait for ACK of receiver of foreign message
-                clk_timer_start(&psBus->sAckTimeout, CLOCK_MS_2_TICKS(BUS_ACKTIMEOUT));
+                clk_timer_start(&psBus->sAckTimeout, CLOCK_MS_2_TICKS(BUS_ACK_TIMEOUT));
                 psBus->eState = eBus_AckWaitReceiving;
             }
         }
@@ -369,12 +369,12 @@ void bus_trp_reset (sBus_t* psBus)
  */
 BOOL bus_trp_send_and_receive (sBus_t* psBus)
 {
-	uint8_t bb = 0;
+    uint8_t bb = 0;
 
     switch (psBus->eState) {
     case eBus_GotToken:
         // initiate sending of message
-    	initiate_sending(psBus);
+        initiate_sending(psBus);
         break;
 
     case eBus_Sending:
@@ -405,10 +405,10 @@ BOOL bus_trp_send_and_receive (sBus_t* psBus)
     case eBus_ReceivingActive:
     case eBus_ReceivingPassive:
     default:
-    	// repeat receiving while queue is not empty
+        // repeat receiving while queue is not empty
         while (psBus->msg_receive_state != eBUS_RECV_MESSAGE && bb<2) {
-        	if (receive(psBus) == FALSE) break;
-        	bb++;
+            if (receive(psBus) == FALSE) break;
+            bb++;
         }
         break;
     }
@@ -492,8 +492,8 @@ void bus_set_router_mode (sBus_t* bus, bool router_mode)
  */
 void bus_flush_bus (sBus_t* psBus)
 {
-	bus_phy_flush(&psBus->sPhy);
-	reset_bus(psBus);
+    bus_phy_flush(&psBus->sPhy);
+    reset_bus(psBus);
 }
 
 /**
@@ -623,7 +623,7 @@ BOOL bus_send_message (sBus_t*    psBus,
 
     	// check length of message to be sent.
         if (uLen == 0 ||
-            uLen > BUS_MAXMSGLEN) {
+            uLen > BUS_MAXSENDMSGLEN) {
         	break;
         }
 

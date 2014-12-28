@@ -182,7 +182,7 @@ static void vInterpretMessage(sBus_t* psBus, uint8_t* puMsg, uint8_t uMsgLen, ui
 int main(void)
 {
     uint8_t msglen = 0;
-    uint8_t msg[BUS_MAXMSGLEN];
+    uint8_t msg[BUS_MAXRECVMSGLEN];
     uint16_t module_id = BUS_UNKNOWNADR, sender = 0, val;
 
     DDRC |= ((1<<PC3) | (1<<PC4));

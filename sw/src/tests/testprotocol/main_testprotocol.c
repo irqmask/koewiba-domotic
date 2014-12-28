@@ -163,7 +163,7 @@ static void check_buttons (void)
 int main(void)
 {
     uint8_t msglen = 0;
-    uint8_t msg[BUS_MAXMSGLEN];
+    uint8_t msg[BUS_MAXRECVMSGLEN];
     uint16_t sender = 0, module_id = 10;
 
     clk_initialize();

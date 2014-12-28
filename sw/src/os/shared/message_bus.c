@@ -44,13 +44,15 @@ static int32_t msg_receive (void* arg)
     if (bus_get_message(&msg_bus->bus)) {
         memset(&message, 0, sizeof(msg_t));
 
-        if (bus_read_message(&msg_bus->bus,
-                             &message.sender,
-                             message.data,
-                             &message.length)) {
+        if (bus_read_message_verbose(&msg_bus->bus,
+                                     &message.sender,
+                                     &message.receiver,
+                                     &message.length,
+                                     message.data,
+                                     &message.crc)) {
 
             if (msg_bus->incomming_handler != NULL) {
-                msg_bus->incomming_handler(&message,
+                msg_bus->incomming_handler(&message, &msg_bus,
                                            msg_bus->incomming_arg);
             }
         }

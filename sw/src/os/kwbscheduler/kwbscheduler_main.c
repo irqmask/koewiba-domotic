@@ -179,7 +179,7 @@ void init_scheduling (msg_bus_t* busscheduler, uint16_t own_node_address)
 int32_t do_scheduling (void* arg)
 {
     uint16_t sender = 0;
-    uint8_t length = 0, message[BUS_MAXBIGMSGLEN];
+    uint8_t length = 0, message[BUS_MAXRECVMSGLEN];
     msg_bus_t* busscheduler = (msg_bus_t*)arg;
 
     if (bus_schedule_and_get_message(&busscheduler->bus, &busscheduler->scheduler)) {
@@ -202,7 +202,7 @@ int main(int argc, char* argv[])
     msg_bus_t   busscheduler;
 
 
-    printf("kwbscheduler");
+    printf("kwbscheduler...\n");
     setbuf(stdout, NULL);       // disable buffering of stdout
 
     do {

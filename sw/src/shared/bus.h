@@ -54,20 +54,35 @@
  */
 #ifndef BUS_APPCONFIG
  #define BUS_APPCONFIG      1
+ //! size in bytes of the message transmit queue.
  #define BUS_TX_QUEUE_SIZE  100
+ //! maximum length of a message to be sent.
+ #define BUS_MAXSENDMSGLEN   16
+ //! maximum length of a message to be received.
+ #define BUS_MAXRECVMSGLEN   64 + 2
 #endif
 /**
  * @}
  */
 
-#define BUS_MAXMSGLEN       16
-//! length of message including header and footer
-#define BUS_MAXTOTALMSGLEN  (BUS_MAXMSGLEN + 7)
-#define BUS_MAXBIGMSGLEN    (64 + 2)
+//! length of send message buffer including message header and footer.
+#define BUS_MAXTOTALSENDMSGLEN  (BUS_MAXSENDMSGLEN + 7)
+//! length of receive message buffer including message header and footer.
+#define BUS_MAXTOTALRECVMSGLEN  (BUS_MAXRECVMSGLEN + 7)
+//! length of an empty message.
 #define BUS_EMPTY_MSG_LEN   3
+//! length of a token message (sent by bus-scheduler).
 #define BUS_TOKEN_MSG_LEN   2
 
+
+// check constitency of message buffers
+#if ((BUS_MAXTOTALSENDMSGLEN + 2) >= BUS_TX_QUEUE_SIZE)
+#error "Size of message to be sent is bigger than the send queue size! Queue buffer BUS_TX_QUEUE_SIZE has to be at least 10 bytes bigger than maximum send message size BUS_MAXSENDMSGLEN!"
+#endif
+
+//! first usable node address of a bus-node.
 #define BUS_FIRSTNODE       0x01
+//! last usable node address of a bus-node.
 #define BUS_LASTNODE        0x7F
 
 #define BUS_BRDCSTADR       0x0000  //!< global broadcast address.
@@ -83,18 +98,18 @@ typedef enum modulestate {
 
 //! Possible states of the bus, as seen by each node
 typedef enum busstate {
-    eBus_InitWait,          //!< We are not synced on bus yet.
-    eBus_Idle,              //!< Not sending and not receiving.
-    eBus_SendingToken,      //!< Scheduler is sending the token.
-    eBus_SendingAck,        //!< We are sending now our ACK.
-    eBus_ReceivingWait,     //!< Waiting for incoming message.
-    eBus_ReceivingActive,   //!< We suggest the message is for us.
-    eBus_ReceivingPassive,  //!< We receive byte but those are not for us.
-    eBus_GotToken,          //!< We have got the bus token.
-    eBus_GotMessage,        //!< We have got a message.
-    eBus_Sending,           //!< We are sending now our message.
-    eBus_AckWaitReceiving,  //!< We are waiting for the ACK after receiving.
-    eBus_AckWaitSending,    //!< We are waiting for the ACK after sending.
+    eBus_InitWait,          //!< 0 We are not synced on bus yet.
+    eBus_Idle,              //!< 1 Not sending and not receiving.
+    eBus_SendingToken,      //!< 2 Scheduler is sending the token.
+    eBus_SendingAck,        //!< 3 We are sending now our ACK.
+    eBus_ReceivingWait,     //!< 4 Waiting for incoming message.
+    eBus_ReceivingActive,   //!< 5 We suggest the message is for us.
+    eBus_ReceivingPassive,  //!< 6 We receive byte but those are not for us.
+    eBus_GotToken,          //!< 7 We have got the bus token.
+    eBus_GotMessage,        //!< 8 We have got a message.
+    eBus_Sending,           //!< 9 We are sending now our message.
+    eBus_AckWaitReceiving,  //!< 10 We are waiting for the ACK after receiving.
+    eBus_AckWaitSending,    //!< 11 We are waiting for the ACK after sending.
     eBus_Last
 } eBusState_t;
 
@@ -121,8 +136,8 @@ typedef struct busconfig {
     bool           router_mode;
 } sBusCfg_t;
 
-typedef uint8_t auRecBuf_t[BUS_MAXBIGMSGLEN];
-typedef uint8_t auSndBuf_t[BUS_MAXTOTALMSGLEN];
+typedef uint8_t auRecBuf_t[BUS_MAXTOTALRECVMSGLEN];
+typedef uint8_t auSndBuf_t[BUS_MAXTOTALSENDMSGLEN];
 
 //! common receive queue
 typedef struct recvbuf {
@@ -146,7 +161,7 @@ typedef struct rcvbusmsg {
     uint16_t        uReceiver;
     uint8_t         uLength;
     uint8_t         uOverallLength;
-    auSndBuf_t      auBuf;
+    auRecBuf_t      auBuf;
     uint16_t        uCRC;
 } sRcvBusMsg_t;
 
@@ -166,7 +181,7 @@ typedef struct queue {
 
 //! data of bus. used as handle for all public methods.
 typedef struct bus {
-	eModState_t		    eModuleState;					//!< current state of the module.
+    eModState_t         eModuleState;                   //!< current state of the module.
     eBusState_t         eState;                         //!< current state of the bus.
     sBusCfg_t           sCfg;                           //!< configuration data.
     msg_recv_state_t    msg_receive_state;              //!< stating if a message and what kind of message has been received.
@@ -191,23 +206,23 @@ typedef struct bus {
 
 // --- Global functions --------------------------------------------------------
 
-void 	bus_configure						(sBus_t* 		psBus,
-											uint16_t 		uNodeAddress);
+void    bus_configure                       (sBus_t*        psBus,
+                                             uint16_t       uNodeAddress);
 
-void 	bus_initialize						(sBus_t* 		psBus,
-											 uint8_t 	    uUart);
+void 	bus_initialize                      (sBus_t*        psBus,
+                                             uint8_t        uUart);
 
 void    bus_set_router_mode                 (sBus_t*        bus,
                                              bool           router_mode);
 
-void 	bus_flush_bus						(sBus_t* 		psBus);
+void 	bus_flush_bus                       (sBus_t*        psBus);
 
-BOOL 	bus_get_message						(sBus_t* 		psBus);
+BOOL 	bus_get_message                     (sBus_t*        psBus);
 
-BOOL 	bus_read_message					(sBus_t*        psBus,
-											 uint16_t*      puSender,
-											 uint8_t*       puLen,
-										     uint8_t*       puMsg);
+BOOL 	bus_read_message                    (sBus_t*        psBus,
+                                             uint16_t*      puSender,
+                                             uint8_t*       puLen,
+                                             uint8_t*       puMsg);
 
 BOOL    bus_read_message_verbose            (sBus_t*        psBus,
                                              uint16_t*      puSender,
@@ -216,12 +231,12 @@ BOOL    bus_read_message_verbose            (sBus_t*        psBus,
                                              uint8_t*       puMsg,
                                              uint16_t*      puCRC);
 
-BOOL 	bus_send_message					(sBus_t*    	psBus,
-                      	  	  	  	  	  	 uint16_t   	uReceiver,
-                      	  	  	  	  	  	 uint8_t    	uLen,
-                      	  	  	  	  	  	 uint8_t*   	puMsg);
+BOOL 	bus_send_message                    (sBus_t*        psBus,
+                                             uint16_t       uReceiver,
+                                             uint8_t        uLen,
+                                             uint8_t*       puMsg);
 
-BOOL 	bus_is_idle							(sBus_t*        psBus);
+BOOL 	bus_is_idle                         (sBus_t*        psBus);
 
 void    bus_sleep                           (sBus_t*      	psBus);
 

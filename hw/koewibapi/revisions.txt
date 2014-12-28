@@ -1,0 +1,8 @@
+Revision 1
+==============================================================================
+Known bugs:
+ - missing 10k pullup resistors on SDA and SCL (5V Slave-side)
+ - C4 has to be 22pF instead of 33pF (like stated in MCP23016 datasheet)
+ - connectors place behind screws
+ - raspberry screws or connector not exactly over J26
+

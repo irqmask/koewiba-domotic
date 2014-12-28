@@ -22,11 +22,9 @@
 // --- Definitions -------------------------------------------------------------
 
 #define BUS_BAUDRATE            38400
-#define BUS_BITTIME             10 //TODO
-#define BUS_INITWAIT_TIME       (24 * BUS_BITTIME)
-#define BUS_RECOVERY            (12 * BUS_BITTIME)
-#define BUS_INTERBYTE_TIMEOUT   (8 * BUS_BITTIME)
-#define BUS_ACKTIMEOUT          30 // ms
+#define BUS_MESSAGE_TIMEOUT     50      //!< Timeout in ms between sent token and complete received message.
+#define BUS_ACK_TIMEOUT         30      //!< Timeout in ms between sent message and acknowledge byte.
+
 
 #define TOKENBIT 0x80
 #define ADDRMASK ~(TOKENBIT)

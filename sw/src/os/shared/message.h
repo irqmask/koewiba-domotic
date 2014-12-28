@@ -20,13 +20,19 @@
 
 // --- Definitions -------------------------------------------------------------
 
+#if (BUS_MAXSENDMSGLEN > BUS_MAXRECVMSGLEN)
+ #define MAX_MSG_SIZE   BUS_MAXSENDMSGLEN
+#else
+ #define MAX_MSG_SIZE   BUS_MAXRECVMSGLEN
+#endif
+
 // --- Type definitions --------------------------------------------------------
 
 typedef struct msg {
     uint16_t    sender;
     uint16_t    receiver;
     uint8_t     length;
-    uint8_t     data[BUS_MAXBIGMSGLEN];
+    uint8_t     data[MAX_MSG_SIZE];
     uint16_t    crc;
 } msg_t;
 

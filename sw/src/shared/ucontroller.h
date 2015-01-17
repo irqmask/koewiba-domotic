@@ -138,9 +138,24 @@
  #define REGBIT_RXEN            RXEN0
  #define REGBIT_TXEN            TXEN0
  #define REGBIT_FE              FE0
+ #define REGBIT_UDRE            UDRE0
+ #define REGBIT_USBS            USBS0
+ #define REGBIT_UCSZ0           UCSZ00
+ #define REGBIT_UCSZ1           UCSZ01
+ #define REGBIT_UCSZ2           UCSZ02
  #define INTERRUPT_USART_RXC0   USART0_RX_vect
  #define INTERRUPT_USART_UDRE0  USART0_UDRE_vect
  #define INTERRUPT_UART_TRANS0  USART0_TX_vect
+
+ #define REGISTER_UCSRA1        UCSR1A
+ #define REGISTER_UCSRB1        UCSR1B
+ #define REGISTER_UCSRC1        UCSR1C
+ #define REGISTER_UDR1          UDR1
+ #define REGISTER_UBRRH1        UBRR1H
+ #define REGISTER_UBRRL1        UBRR1L
+ #define INTERRUPT_USART_RXC1   USART1_RX_vect
+ #define INTERRUPT_USART_UDRE1  USART1_UDRE_vect
+ #define INTERRUPT_UART_TRANS1  USART1_TX_vect
 
  // Sleepmodes
  #define INTERRUPT_PINCHANGE2   PCINT2_vect
@@ -228,6 +243,9 @@
  #define REGBIT_RXCIE           RXCIE0
  #define REGBIT_RXCIE0          RXCIE0
  #define REGBIT_RXCIE1          RXCIE1
+ #define REGBIT_UDRE            UDRE0
+ #define REGBIT_UDRE0           UDRE0
+ #define REGBIT_UDRE1           UDRE1
  #define REGBIT_UDRIE           UDRIE0
  #define REGBIT_UDRIE0          UDRIE0
  #define REGBIT_UDRIE1          UDRIE1
@@ -243,6 +261,14 @@
  #define REGBIT_FE              FE0
  #define REGBIT_FE0             FE0
  #define REGBIT_FE1             FE1
+ #define REGBIT_USBS0           USBS0
+ #define REGBIT_UCSZ02          UCSZ02
+ #define REGBIT_UCSZ01          UCSZ01
+ #define REGBIT_UCSZ00          UCSZ00
+ #define REGBIT_USBS1           USBS1
+ #define REGBIT_UCSZ12          UCSZ12
+ #define REGBIT_UCSZ11          UCSZ11
+ #define REGBIT_UCSZ10          UCSZ10
  #define INTERRUPT_USART_RXC    USART0_RX_vect
  #define INTERRUPT_USART_RXC0   USART0_RX_vect
  #define INTERRUPT_USART_RXC1   USART1_RX_vect

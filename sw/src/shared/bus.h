@@ -16,6 +16,7 @@
 
 #include "prjtypes.h"
 #include "clock.h"
+#include "queue.h"
 
 #ifdef HAS_APPCONFIG_H
  #include "appconfig.h"
@@ -126,6 +127,13 @@ typedef enum busflags {
     e_timeout       = 0b00010000
 } eBusFlags_t;
 
+//! Possible errors of the bus-sender.
+typedef enum errorcodes {
+    eBUSERR_NOERR = 0,   //!< Message successfully transferred into tx_queue.
+    eBUSERR_MSGSIZE,     //!< Message size exceeds buffer-size.
+    eBUSERR_QUEUESPACE,  //!< Insufficient queue-space - please wait!
+} eBusSendError_t;
+
 //! configuration data of the bus
 typedef struct busconfig {
     uint16_t       uOwnAddress;
@@ -170,12 +178,6 @@ typedef struct sndbusmsg {
     uint8_t         uRetries;       //!< number of send retries.
     auSndBuf_t      auBuf;          //!< message data including header, data and crc.
 } sSndBusMsg_t;
-
-typedef struct queue {
-    uint8_t pread;
-    uint8_t pwrite;
-    uint8_t data[BUS_TX_QUEUE_SIZE];
-} queue_t;
 
 //! data of bus. used as handle for all public methods.
 typedef struct bus {
@@ -237,6 +239,8 @@ BOOL 	bus_send_message                    (sBus_t*        psBus,
 BOOL 	bus_is_idle                         (sBus_t*        psBus);
 
 void    bus_sleep                           (sBus_t*      	psBus);
+
+BOOL    bus_send_wakeupbyte                 (sBus_t*        psBus);
 
 #endif /* _BUS_H_ */
 /** @} */

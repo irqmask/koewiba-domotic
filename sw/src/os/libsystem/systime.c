@@ -47,7 +47,8 @@ sys_time_t sys_time_get_usecs (void)
 
     gettimeofday(&timestamp, 0);
 
-    usecs = timestamp.tv_sec * 1000000;
+    usecs = timestamp.tv_sec;
+    usecs *= 1000000;
     usecs += timestamp.tv_usec;
     return usecs;
 }

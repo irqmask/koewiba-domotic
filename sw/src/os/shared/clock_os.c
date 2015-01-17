@@ -57,7 +57,7 @@ static uint16_t elapsed_ticks (sys_time_t starttime)
     curr = sys_time_get_usecs();
     if (curr < starttime) return 0;
     diff =  curr - starttime;
-    diff /= 1000; //convert to milliseconds;
+    diff /= 1000; // convert to milliseconds;
     diff /= (1000 / CLOCK_TICKS_PER_SECOND); // convert to ticks
     return (uint16_t) diff;
 }

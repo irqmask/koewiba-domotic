@@ -1,49 +1,34 @@
+/*
+ * queue.h
+ *
+ *  Created on: 28.12.2014
+ *      Author: mue
+ */
+
+#ifndef TX_QUEUE_H_
+#define TX_QUEUE_H_
+
 /**
- * @addtogroup QUEUE    
- * @brief Interrupt safe queue for syncronizing data.
- *
- * This module contains functions to initialize the queue, enqueue a byte or
- * dequeue a byte.
- *
+ * @subsection BUS_APPCONFIG
+ * Configure bus modules. E.g. activate scheduling capabilities
  * @{
- * @file    queue.h
- * @brief   Functions for queuing data.
- *
- * @author  Christian Verhalen
- *///---------------------------------------------------------------------------
+ */
+//! size in bytes of the message transmit queue.
+#define TX_QUEUE_SIZE  128
 
-#ifndef _QUEUE_H_
-#define _QUEUE_H_
+typedef struct queue {
+    uint8_t readpos;
+    uint8_t writepos;
+    uint8_t data[TX_QUEUE_SIZE];
+} queue_t;
 
-// --- Include section ---------------------------------------------------------
+#endif /* TX_QUEUE_H_ */
 
-#include "prjtypes.h"
+void    q_initialize  (queue_t *q);
+uint8_t q_get_free    (queue_t *q);
+uint8_t q_get_pending (queue_t *q);
+uint8_t q_read_byte   (queue_t *q, uint8_t pos);
+uint8_t q_get_byte    (queue_t *q);
+void    q_put_byte    (queue_t *q, uint8_t byte);
+void    q_flush_bytes (queue_t *q, uint8_t quantity);
 
-// --- Definitions -------------------------------------------------------------
-
-#define QUEUE_HEADER_SIZE 3
-
-// --- Type definitions --------------------------------------------------------
-
-// --- Local variables ---------------------------------------------------------
-
-// --- Global variables --------------------------------------------------------
-
-// --- Module global variables -------------------------------------------------
-
-// --- Local functions ---------------------------------------------------------
-
-// --- Module global functions -------------------------------------------------
-
-// --- Global functions --------------------------------------------------------
-
-void            que_init           (uint8_t*               puQueue,
-                                    uint8_t                uSize);
-                                     
-uint8_t         que_put            (uint8_t*               puQueue,
-                                    uint8_t                uVal);
-                                     
-uint16_t        que_get            (uint8_t*               puQueue);
-
-#endif /* _QUEUE_H_ */
-/** @} */

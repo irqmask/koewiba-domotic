@@ -38,9 +38,9 @@
 #define LED_STATUS_OFF
 #define LED_STATUS_TOGGLE
 
-#define LED_ERROR_ON
-#define LED_ERROR_OFF
-#define LED_ERROR_TOGGLE
+#define LED_ERROR_ON        PORTA |=  (1<<PA0)
+#define LED_ERROR_OFF       PORTA &= ~(1<<PA0)
+#define LED_ERROR_TOGGLE    PORTA ^=  (1<<PA0)
 
 
 // --- Type definitions --------------------------------------------------------

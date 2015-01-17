@@ -129,8 +129,10 @@ sys_fd_t sys_socket_accept (sys_fd_t server_fd)
 {
     struct sockaddr_un  sockinfo;
     socklen_t           sockinfolen = sizeof(sockinfo);
+    sys_fd_t            fd;
 
-    return accept (server_fd, (struct sockaddr *)&sockinfo, &sockinfolen);
+    fd = accept (server_fd, (struct sockaddr *)&sockinfo, &sockinfolen);
+    return fd;
 }
 
 int sys_socket_recv (sys_fd_t fd, void* buffer, size_t buffersize)
@@ -181,6 +183,31 @@ void sys_socket_set_blocking (sys_fd_t fd, bool blocking)
             break;
         }
     } while (0);
+}
+
+void sys_socket_get_name (sys_fd_t fd, char* address, size_t addr_len, uint16_t* port)
+{
+    union {
+        struct sockaddr  common;
+        struct sockaddr_un af_unix;
+    } sockinfo;
+
+    socklen_t len = sizeof(sockinfo);
+
+    if (getsockname(fd, (struct sockaddr *)&sockinfo, &len) == -1)
+        perror("getsockname");
+    else {
+        switch (sockinfo.common.sa_family) {
+        case AF_UNIX:
+            if (address != NULL) strcpy_s(address, addr_len, sockinfo.af_unix.sun_path);
+            if (port != NULL) *port = 0;
+            break;
+        case AF_INET:
+            break;
+        default:
+            break;
+        }
+    }
 }
 
 /** @} */

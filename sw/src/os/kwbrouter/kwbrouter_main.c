@@ -61,6 +61,20 @@ typedef struct options {
 
 // --- Local functions ---------------------------------------------------------
 
+static void handle_new_connection (char* address, uint16_t port, void* reference, void* arg)
+{
+    router_t*        router = (router_t*)arg;
+    printf("add route %s:%d ep 0x%x\n", address, port, (unsigned long long int)reference);
+    route_add(router, 1, 65525, address, port, eROUTE_TYPE_SOCKET, reference);
+}
+
+static void handle_incomming_msg (msg_t* message, void* reference, void* arg)
+{
+    router_t*        router = (router_t*)arg;
+    printf("message received.\n");
+    route_message(router, message, reference);
+}
+
 static void set_options (options_t*     options,
                          const char*    serial_device,
                          int            serial_baudrate,
@@ -202,6 +216,9 @@ int main (int argc, char* argv[])
     msg_endpoint_t* ep;
     msg_t           msg;
     router_t        router;
+    char*           address;
+    uint16_t        port;
+    bool            serial;
 
     do {
         printf("\nkwbrouter...\n");
@@ -222,31 +239,44 @@ int main (int argc, char* argv[])
             rc = eSYS_ERR_BAD_PARAMETER;
             break;
         }
-        ioloop_init (&mainloop);
+        ioloop_init(&mainloop);
+        route_init(&router);
 
+        // initialize network routing
         msg_s_init(&msg_socket);
         if ((rc = msg_s_open_server(&msg_socket, &mainloop, "/tmp/kwb.usk", 0)) != eERR_NONE) {
             break;
         }
+        msg_s_set_incomming_handler(&msg_socket, handle_incomming_msg, &router);
+        msg_s_set_newconnection_handler(&msg_socket, handle_new_connection, &router);
+        // add route for every client of unix socket
+        ep = msg_s_get_endpoint(&msg_socket, 0, eMSG_EP_COMM);
 
+        // initialize bus routing
         msg_b_init(&msg_bus, 0);
         if (options.serial_device_set) {
-            rc = msg_b_open(&msg_bus, &mainloop, options.own_node_address, true,
-                            options.serial_device, options.serial_baudrate);
+            address = options.serial_device;
+            port = options.serial_baudrate;
+            serial = true;
         } else {
-            rc = msg_b_open(&msg_bus, &mainloop, options.own_node_address, false,
-                            options.vbusd_address, options.vbusd_port);
+            address = options.vbusd_address;
+            port = options.vbusd_port;
+            serial = false;
         }
+        rc = msg_b_open(&msg_bus, &mainloop, options.own_node_address, serial,
+                        address, port);
         if (rc != eERR_NONE) break;
+        msg_b_set_incomming_handler(&msg_bus, handle_incomming_msg, &router);
+        route_add(&router, 1, 65535, address, port, eROUTE_TYPE_SERIAL, &msg_bus);
 
-        route_init(&router);
-        route_add(&router, 5, 10, "192.168.35.1", 5000, eROUTE_TYPE_SOCKET, NULL);
-        route_add(&router, 1, 10, "192.168.35.2", 5000, eROUTE_TYPE_SOCKET, NULL);
-        route_add(&router, 1, 10, "192.168.35.3", 5000, eROUTE_TYPE_SOCKET, NULL);
-        route_add(&router, 1, 65535, "/tmp/kwb.usk", 0, eROUTE_TYPE_SOCKET, NULL);
-        route_add(&router, 100, 10, "192.168.35.3", 4999, eROUTE_TYPE_SOCKET, NULL);
-        route_add(&router, 6, 11, "192.168.35.4", 5000, eROUTE_TYPE_SOCKET, NULL);
-        route_add(&router, 256, 511, "192.168.35.5", 50000, eROUTE_TYPE_SOCKET, NULL);
+
+        //route_add(&router, 5, 10, "192.168.35.1", 5000, eROUTE_TYPE_SOCKET, NULL);
+        //route_add(&router, 1, 10, "192.168.35.2", 5000, eROUTE_TYPE_SOCKET, NULL);
+        //route_add(&router, 1, 10, "192.168.35.3", 5000, eROUTE_TYPE_SOCKET, NULL);
+
+        //route_add(&router, 100, 10, "192.168.35.3", 4999, eROUTE_TYPE_SOCKET, NULL);
+        //route_add(&router, 6, 11, "192.168.35.4", 5000, eROUTE_TYPE_SOCKET, NULL);
+        //route_add(&router, 256, 511, "192.168.35.5", 50000, eROUTE_TYPE_SOCKET, NULL);
 
         msg.receiver = 15;
         msg.sender = 1;
@@ -264,11 +294,11 @@ int main (int argc, char* argv[])
         while (!end_application) {
             ioloop_run_once(&mainloop);
 
-            ep = msg_s_get_endpoint(&msg_socket, 0, 1<<eMSG_EP_COMM);
-            if (ep != NULL) {
-                msg_s_send(ep, &msg);
-                msg.sender++;
-            }
+            //ep = msg_s_get_endpoint(&msg_socket, 0, 1<<eMSG_EP_COMM);
+            //if (ep != NULL) {
+            //    msg_s_send(ep, &msg);
+            //    msg.sender++;
+            //}
         }
     } while (0);
     return rc;

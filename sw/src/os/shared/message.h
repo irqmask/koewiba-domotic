@@ -36,7 +36,7 @@ typedef struct msg {
     uint16_t    crc;
 } msg_t;
 
-typedef void (*msg_incom_func_t)(msg_t* message, void* arg);
+typedef void (*msg_incom_func_t)(msg_t* message, void* reference, void* arg);
 
 // --- Local variables ---------------------------------------------------------
 

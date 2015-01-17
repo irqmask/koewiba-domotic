@@ -160,7 +160,7 @@ int route_add (router_t*    router,
         route_insert(router, route);
     } while (0);
 
-    //route_inspect(router);
+    route_inspect(router);
     return rc;
 }
 
@@ -188,10 +188,10 @@ int route_message (router_t*    router,
             // route message
             switch (route->type) {
             case eROUTE_TYPE_SERIAL:
-                msg_b_send((msg_bus_t*)reference, message);
+                msg_b_send((msg_bus_t*)route->reference, message);
                 break;
             case eROUTE_TYPE_SOCKET:
-                msg_s_send((msg_endpoint_t*)reference, message);
+                msg_s_send((msg_endpoint_t*)route->reference, message);
                 break;
             }
         }

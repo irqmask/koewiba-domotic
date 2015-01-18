@@ -23,6 +23,7 @@
 #include <util/delay.h>
 #endif
 
+#include "appconfig.h"
 #include "bus_intern.h"
 #include "cmddef_common.h"
 #include "clock.h"
@@ -55,17 +56,6 @@ static void create_empty_message(sBus_t* psBus)
     psBus->auEmptyMsg[0] = BUS_SYNCBYTE;
     psBus->auEmptyMsg[1] = psBus->sCfg.uOwnNodeAddress & 0x007F; // local address on bus
     psBus->auEmptyMsg[2] = 0; // length
-}
-
-// Start sending the wake-up-byte.
-static BOOL send_wakeupbyte(sBus_t* psBus)
-{
-	uint8_t msg = BUS_WAKEUPBYTE;
-	if (bus_phy_send(&psBus->sPhy, &msg, 1)) {
-		while( bus_phy_sending(&psBus->sPhy) ) {}; // Wait till message is sent completely.
-		return TRUE;
-	}
-	return FALSE;
 }
 
 // Send ACK-Byte.
@@ -616,7 +606,7 @@ BOOL bus_send_message (sBus_t*    psBus,
     do {
         // wake-up bus
         if(eMod_Sleeping == psBus->eModuleState) {
-        	send_wakeupbyte(psBus);
+        	bus_send_wakeupbyte(psBus);
         	psBus->eModuleState = eMod_Running;
         	bus_flush_bus(psBus);
         }
@@ -693,6 +683,19 @@ BOOL bus_send_ack_message (sBus_t* psBus, uint16_t uReceiver)
 }
 
 /**
+ * Send a message.
+ *
+ * @param[in]   psBus      Handle of the bus.
+ * @param[in]   len        (Netto) Length of the message.
+ * @param[in]   recH/L     Receiver address (High/Low-Byte) of the message.
+ * @param[in]   *msg       message pointer.
+ *
+ * @returns TRUE, if the message has successfully been queued.
+ * @note Use bus_is_idle() to check if message is successfully transmitted.
+ */
+
+
+/**
  * Check if bus is in IDLE state.
  *
  * @param[in]   psBus       Handle of the bus.
@@ -727,6 +730,21 @@ void bus_sleep (sBus_t*       psBus)
 
 	// wait for first pending byte, then set module to running state
 	psBus->eState = eBus_InitWait;
+}
+
+/**
+ * Send the bus wake-up byte.
+ * @param[in]   psBus      Handle of the bus.
+ * @returns TRUE, if the wake-up byte has been sent otherwise FALSE.
+ */
+BOOL bus_send_wakeupbyte(sBus_t* psBus)
+{
+    uint8_t msg = BUS_WAKEUPBYTE;
+    if (bus_phy_send(&psBus->sPhy, &msg, 1)) {
+        while( bus_phy_sending(&psBus->sPhy) ) {}; // Wait till message is sent completely.
+        return TRUE;
+    }
+    return FALSE;
 }
 
 /** @} */

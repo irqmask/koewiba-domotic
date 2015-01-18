@@ -18,12 +18,9 @@
 #include "eeprom_spi.h"
 #include "prjtypes.h"
 #include "spi.h"
+#include "pcbconfig.h"
 
 // --- Definitions -------------------------------------------------------------
-
-#define EEP_CS_PORT  PORTB
-#define EEP_CS_DDR   DDRB
-#define EEP_CS       PB4
 
 #define EEP_SPI_CS_ACTIVATE   EEP_CS_PORT &= ~(1<<EEP_CS)
 #define EEP_SPI_CS_DEACTIVATE EEP_CS_PORT |=  (1<<EEP_CS)
@@ -85,8 +82,8 @@ uint8_t eep_check_statusregister(uint8_t uFlagMask)
     EEP_SPI_CS_ACTIVATE;
     SPI_uTransmitBlk(eEEP_RDSR);
     SPI_uTransmitBlk(0);
-    if ( uFlagMask ) retval = (uFlagMask & SPDR);
-    else             retval = SPDR;
+    if ( uFlagMask ) retval = (uFlagMask & REG_SPI_DATA);
+    else             retval = REG_SPI_DATA;
     EEP_SPI_CS_DEACTIVATE;
     return retval;
 }
@@ -114,7 +111,7 @@ uint16_t        eep_read           (uint16_t               uEEPAddress,
     SPI_uTransmitBlk(addressL);
     for ( read = 0; read < uCount; read++ ) {
         SPI_uTransmitBlk(0);
-        puBuffer[read] = SPDR;
+        puBuffer[read] = REG_SPI_DATA;
     }
     EEP_SPI_CS_DEACTIVATE;
     return read;

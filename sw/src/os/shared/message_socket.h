@@ -70,11 +70,16 @@ int msg_s_open_client (msg_socket_t*   msg_socket,
                        const char*     address,
                        uint16_t        port);
 
-void msg_s_close_connection (msg_socket_t* msg_socket, msg_endpoint_t* ep);
+void msg_s_close_connection (msg_socket_t* msg_socket,
+                             msg_endpoint_t* ep);
 
-void msg_s_set_newconnection_handler (msg_socket_t* msg_socket, msg_newconn_func_t func, void* arg);
+void msg_s_set_newconnection_handler (msg_socket_t* msg_socket,
+                                      msg_newconn_func_t func,
+                                      void* arg);
 
-void msg_s_set_incomming_handler (msg_socket_t* msg_socket, msg_incom_func_t func, void* arg);
+void msg_s_set_incomming_handler (msg_socket_t* msg_socket,
+                                  msg_incom_func_t func,
+                                  void* arg);
 
 msg_endpoint_t* msg_s_get_endpoint (msg_socket_t*   msg_socket,
                                     int             index,

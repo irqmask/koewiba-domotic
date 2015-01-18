@@ -14,18 +14,37 @@
 
 // --- Include section ---------------------------------------------------------
 
-#include <avr/io.h>
+#ifdef PRJCONF_UC_AVR
+ #include <avr/io.h>
+#endif
 
 // --- Definitions -------------------------------------------------------------
 
+#ifdef HAS_APPCONFIG_H
+#include "appconfig.h"
+#endif
+#ifdef HAS_PCBCONFIG_H
+#include "pcbconfig.h"
+#endif
+
+#ifndef LED_PCBCONFIG
 // Pin assignments of board keys and LEDs
 // Port D pin assignments
-#define LED_STATUS      0b01000000  //!< Yellow status LED
-#define LED_ERROR       0b00010000  //!< Red error LED
-#define BTN_TEST        0b00100000
-#define BTN_EXP         0b10000000
+ #define LED_STATUS      0b01000000  //!< Yellow status LED
+ #define LED_ERROR       0b00010000  //!< Red error LED
+ #define BTN_TEST        0b00100000
+ #define BTN_EXP         0b10000000
+#endif
 
-
+#ifdef PRJCONF_UC_AVR
+ #define LED_ERROR_ON        PORTA |=  LED_ERROR
+ #define LED_ERROR_OFF       PORTA &= ~LED_ERROR
+ #define LED_ERROR_TOGGLE    PORTA ^=  LED_ERROR
+#else
+ #define LED_ERROR_ON
+ #define LED_ERROR_OFF
+ #define LED_ERROR_TOGGLE
+#endif
 // --- Type definitions --------------------------------------------------------
 
 // --- Local variables ---------------------------------------------------------

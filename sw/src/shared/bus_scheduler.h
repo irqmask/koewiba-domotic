@@ -17,8 +17,9 @@
 // --- Include section ---------------------------------------------------------
 
 #include "bus.h"
-#include "prjtypes.h"
 #include "clock.h"
+#include "led_debug.h"
+#include "prjtypes.h"
 
 #ifdef HAS_APPCONFIG_H
  #include "appconfig.h"

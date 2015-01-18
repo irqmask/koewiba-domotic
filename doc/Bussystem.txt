@@ -45,6 +45,11 @@ Fehlersituationen:
    uebernimmt der Vertreter das Takten des Busses.
 
 
+Timing auf dem Bus
+-------------------------------
+Bei einer Geschwindigkeit von 38400 Baud hat ein Bit eine Dauer von 0,026ms. Ein Byte bestehend aus 8bit und 1 Startbit hat eine Dauer von 0,234ms.
+
+
 Nachrichtenformate auf dem Bus
 -------------------------------
 
@@ -155,7 +160,7 @@ High-Level Protocol
 -------------------------------
 
 Im High-Level Protocol sind die Formate der zu übertragenden Informationen festgelegt. Dabei wird
-zwischen allgemeingültigen Befehlen und Zustandsmeldungen, sowie applikationsspezifischen Befehlen und
+zwischen allgemein gültigen Befehlen und Zustandsmeldungen, sowie applikationsspezifischen Befehlen und
 Zustandsmeldungen unterschieden. Befehle lösen beim Empfänger eine Aktion aus, Zustandsmeldungen
 können eine Aktion auslösen, müssen aber nicht.
 
@@ -229,6 +234,24 @@ Beispiel: 0x14, Registernummer, 32bit- Wert
 Allgemeine Befehle (Typ 0x20 - 0x3F)
 Format: Typ, spez. Parameter
 
+0x20 - Block Start
+Starte Blockübertragung eines größeren Nachrichtenblocks, der nicht in eine Nachricht passt.
+Format: 0x20, Block-Typ, 32bit-Startadresse
+mit Block-Typ:
+ 0: nicht definiert
+ 1: internes EEProm
+ 2: externes EEProm
+ 3: langer String
+ 
+ 
+0x21 - Block Data
+Datenpaket einer Blockübertragung. Der Typ des Datenblocks muss vorher mit dem Befehl Block Start festgelegt worden sein. Der in diesem Befehl angegebene Offset ist relativ zur 32-bit Adresse aus dem Block Start Befehl.
+Format: 0x21, Offset (16bit Wert), Daten (1 bis 64Byte)
+
+0x22 - Block End
+Beendet die Blockübertragung und gibt den CRC16 des übertragenen Block zurück. Damit kann der Empfänger prüfen, ob die im Block übertragenen Daten fehlerfrei empfangen wurden-
+Format: 0x22, CRC16 (16bit Wert)
+
 0xXX - Request Version
 Fordert Firmwareversionsstring an.
 
@@ -236,12 +259,8 @@ Fordert Firmwareversionsstring an.
 Gibt Firmwareversion an
 Beispiel: 0xXX, <Versionsstring max 10Byte>
 
-0x30 - Upload Firmware Start Frame 
-Start Frame sendet als Antwort die aktuelle Schreibadresse, mit der der Next Frame Befehl beginnen würde.
-0x31 - Upload Firmware Next Frame
-Next Frame sendet als Antwort die aktuelle Schreibadresse, mit der der nächste Next Frame Befehl beginnen würde.
-0x32 - Upload Firmware Last Frame
-Last Frame sendet als Antwort die Schreibadresse nach Abschluss der Schreibvorgägnge und den Registerbefehl mit der CRC16 Checksumme, aus dem externen EEProm.
+
+Applikationsspezifische Befehle (Typ 0x40 - 0xEF)
 
 
 Steuerkommandos (Typ 0xF0 - 0xFF)

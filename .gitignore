@@ -42,6 +42,7 @@
 # Intermediate and backup files
 *.bak
 *.kdev4
+*_version.h
 
 # Other
 *.ps

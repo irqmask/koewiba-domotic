@@ -141,7 +141,7 @@ int sys_serial_set_params (sys_fd_t            fd,
             databits >= eSYS_SER_DB_LAST ||
             parity >= eSYS_SER_P_LAST ||
             stopbits >= eSYS_SER_SB_LAST) {
-            eSYS_ERR_BAD_PARAMETER;
+            eERR_BAD_PARAMETER;
             break;
         }
         sys_baudrate = c_baudrate[baudrate];

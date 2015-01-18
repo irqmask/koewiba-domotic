@@ -138,6 +138,7 @@ static int32_t msg_accept_endpoint (void* arg)
         ep = msg_new_endpoint(msg_socket, eMSG_EP_COMM);
         if (ep == NULL) break;
 
+        // get file descriptor of new client connection
         ep->fd = sys_socket_accept(msg_socket->well_known_fd);
         if (ep->fd <= INVALID_FD) {
             perror("server not accepting new endpoint");
@@ -145,6 +146,8 @@ static int32_t msg_accept_endpoint (void* arg)
             break;
         }
 
+        // get address and port of accepted connection and pass it to appications
+        // new connection handler.
         sys_socket_get_name(ep->fd, address, sizeof(address), &port);
         if (msg_socket->new_connection_handler != NULL) {
             msg_socket->new_connection_handler(address, port, ep, msg_socket->new_connection_arg);
@@ -192,7 +195,7 @@ int msg_s_open_server (msg_socket_t*   msg_socket,
         if (port == 0) {
             fd = sys_socket_open_server_unix(msg_socket->address);
             if (fd <= INVALID_FD) {
-                rc = eSYS_ERR_SYSTEM;
+                rc = eERR_SYSTEM;
                 break;
             }
             sys_socket_set_blocking(fd, false);
@@ -232,7 +235,7 @@ int msg_s_open_client (msg_socket_t*   msg_socket,
         if (port == 0) {
             fd = sys_socket_open_client_unix(msg_socket->address);
             if (fd <= INVALID_FD) {
-                rc = eSYS_ERR_SYSTEM;
+                rc = eERR_SYSTEM;
                 break;
             }
             sys_socket_set_blocking(fd, false);

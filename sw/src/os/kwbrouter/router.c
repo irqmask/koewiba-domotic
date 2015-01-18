@@ -34,7 +34,6 @@
 
 // --- Type definitions --------------------------------------------------------
 
-
 typedef struct route_entry {
     uint16_t        first_module_id;
     uint16_t        last_module_id;
@@ -145,7 +144,7 @@ int route_add (router_t*    router,
         }
 
         if ((route = route_new()) == NULL) {
-            rc = eSYS_ERR_SYSTEM;
+            rc = eERR_SYSTEM;
             break;
         }
         route->first_module_id = first_module_id;
@@ -197,7 +196,6 @@ int route_message (router_t*    router,
         }
         route = route->next_entry;
     }
-
 }
 
 /** @}

@@ -28,6 +28,11 @@
 
 // --- Type definitions --------------------------------------------------------
 
+typedef enum msg_error {
+    eMSG_ERR_SIZE = 500,
+    eMSG_ERR_BUSY,          // send or receive buffer full
+} msg_error_t;
+
 typedef struct msg {
     uint16_t    sender;
     uint16_t    receiver;
@@ -49,6 +54,8 @@ typedef void (*msg_incom_func_t)(msg_t* message, void* reference, void* arg);
 // --- Module global functions -------------------------------------------------
 
 // --- Global functions --------------------------------------------------------
+
+void msg_log (msg_t message);
 
 #endif /* _MESSAGE_H_ */
 /** @} */

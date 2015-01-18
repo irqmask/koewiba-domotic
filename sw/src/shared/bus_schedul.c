@@ -22,6 +22,7 @@
 #include "bus.h"
 #include "bus_scheduler.h"
 #include "bus_intern.h"
+#include "led_debug.h"
 
 // --- Definitions -------------------------------------------------------------
 

@@ -35,6 +35,7 @@
 #define BUS_DISRCV0      PB2
 //#define BUS_DISRCV1      PA2
 
+#define LED_PCBCONFIG 1
 // Outputs (LEDs)
 #define LED_ERROR           0b00100000  //!< Red error LED on PA5
 #define LED_ERROR_ON        PORTA |=  LED_ERROR

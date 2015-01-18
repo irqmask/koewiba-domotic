@@ -36,5 +36,13 @@
 # Eclipse project files
 .project
 .cproject
+.directory
 **/.settings
 
+# Intermediate and backup files
+*.bak
+*.kdev4
+
+# Other
+*.ps
+3rd_party

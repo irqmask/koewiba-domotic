@@ -304,12 +304,12 @@ static int vbusd_open_server (vbusd_clients_t*  clients,
     do {
         if (port == 0) {
             if ((fd = sys_socket_open_server_unix(address)) <= INVALID_FD) {
-                rc = eSYS_ERR_SYSTEM;
+                rc = eERR_SYSTEM;
                 break;
             }
         } else {
             if ((fd = sys_socket_open_client_tcp(address, port)) <= INVALID_FD) {
-                rc = eSYS_ERR_SYSTEM;
+                rc = eERR_SYSTEM;
                 break;
             }
         }
@@ -331,12 +331,12 @@ static int vbusd_open_serial (vbusd_clients_t*  clients,
 
     do {
         if ((client = new_client(clients)) == NULL) {
-            rc = eSYS_ERR_MALLOC;
+            rc = eERR_MALLOC;
             break;
         }
         if ((fd = sys_serial_open(device)) <= INVALID_FD) {
             delete_client(client);
-            rc = eSYS_ERR_SYSTEM;
+            rc = eERR_SYSTEM;
             break;
         }
 
@@ -346,7 +346,7 @@ static int vbusd_open_serial (vbusd_clients_t*  clients,
                                         eSYS_SER_SB_1)) != eERR_NONE) {
             sys_serial_close(fd);
             delete_client(client);
-            rc = eSYS_ERR_SYSTEM;
+            rc = eERR_SYSTEM;
             break;
         }
         client->fd = fd;
@@ -426,7 +426,7 @@ int main (int argc, char* argv[])
         if (parse_commandline_options(argc, argv, &options) == false ||
             validate_options(&options) == false) {
             print_usage();
-            rc = eSYS_ERR_BAD_PARAMETER;
+            rc = eERR_BAD_PARAMETER;
             break;
         }
 

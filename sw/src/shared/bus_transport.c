@@ -23,7 +23,6 @@
 #include <util/delay.h>
 #endif
 
-#include "appconfig.h"
 #include "bus_intern.h"
 #include "cmddef_common.h"
 #include "clock.h"
@@ -423,7 +422,7 @@ BOOL bus_trp_send_sleepcmd (sBus_t* psBus)
     msg[2] = sizeof(msg) - 3;               // LE - Length of message from AR to CRCL
     msg[3] = 0x00;                          // AR - Address receiver 7bit (Broadcast)
     msg[4] = 0x00;                          // EA - Extended address 4bit sender in higher nibble, 4bit receiver in lower nibble.
-    msg[5] = CMD_eSleep;                    // MD - Sleep-Command
+    msg[5] = eCMD_SLEEP;                    // MD - Sleep-Command
     crc = crc_calc16(&msg[0], 6);
     msg[6] = crc >> 8;
     msg[7] = crc & 0xFF;
@@ -672,7 +671,7 @@ BOOL bus_send_ack_message (sBus_t* psBus, uint16_t uReceiver)
             (((uReceiver & 0x0F00) >> 8) |
             ((psBus->sCfg.uOwnNodeAddress & 0x0F00) >> 4));
         // copy data
-        psBus->sSendMsg.auBuf[psBus->sSendMsg.uOverallLength++] = CMD_eAck;
+        psBus->sSendMsg.auBuf[psBus->sSendMsg.uOverallLength++] = eCMD_ACK;
         // calculate and send CRC
         crc = crc_calc16(&psBus->sSendMsg.auBuf[0], psBus->sSendMsg.uOverallLength);
         psBus->sSendMsg.auBuf[psBus->sSendMsg.uOverallLength++] = crc >> 8;

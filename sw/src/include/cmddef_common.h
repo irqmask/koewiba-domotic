@@ -21,7 +21,7 @@
 //! Common defined commands.
 typedef enum {
     eCMD_STATE_TYPELESS         = 0x00, //!< Send typeless state data.
-    eCMD_STATE_BITFIELS         = 0x01, //!< Send bitfield state data.
+    eCMD_STATE_BITFIELDS        = 0x01, //!< Send bitfield state data.
     eCMD_STATE_8BIT             = 0x02, //!< Send 8bit state data.
     eCMD_STATE_16BIT            = 0x03, //!< Send 16bit state data.
     eCMD_STATE_32BIT            = 0x04, //!< Send 32bit state data.

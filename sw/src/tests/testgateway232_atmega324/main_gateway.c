@@ -75,7 +75,7 @@ static void interpret_message (uint16_t sender, uint8_t msglen, uint8_t* msg)
 {
 
     switch (msg[0]) {
-    case CMD_eStateBitfield:
+    case eCMD_STATE_BITFIELDS:
         if (msglen < 2) break;
         /*
         if (msg[2] == 0) {
@@ -90,7 +90,7 @@ static void interpret_message (uint16_t sender, uint8_t msglen, uint8_t* msg)
         serial_phy_initiate_sending();
         */
         break;
-    case CMD_eSleep:
+    case eCMD_SLEEP:
         activate_wakeup_interrupt();
         bus_sleep(&g_sBus);
         deactivate_wakeup_interrupt();
@@ -130,7 +130,7 @@ static BOOL interpret_and_forward_message (sBus_t *psBus, sSerPhy_t *psSerial)
         psBus->sRecvMsg.uOverallLength = 0;
         psBus->eState = eBus_Idle;
 
-        if(CMD_eSleep == psBus->sRecvMsg.auBuf[5]) {
+        if(eCMD_SLEEP == psBus->sRecvMsg.auBuf[5]) {
             //sleep_pinchange2_enable();
             bus_sleep(psBus);
             //sleep_pinchange2_disable();

@@ -34,7 +34,9 @@
 // --- Local variables ---------------------------------------------------------
 
 sBusPhy_t* g_UART0Phy = NULL;
+#if defined (__AVR_ATtiny1634__) && defined (BUS_HUBMODE)
 sBusPhy_t* g_UART1Phy = NULL;
+#endif
 
 // --- Global variables --------------------------------------------------------
 
@@ -93,7 +95,7 @@ ISR(INTERRUPT_UART_TRANS0)
 
 }
 
-#if defined (__AVR_ATtiny1634__)
+#if defined (__AVR_ATtiny1634__) && defined (BUS_HUBMODE)
 /**
  * Received byte interrupt 1.
  */
@@ -169,7 +171,7 @@ void bus_phy_initialize(sBusPhy_t* psPhy, uint8_t uUart)
             BUS_DDR_DISRCV0 |= (1<<BUS_DISRCV0);
     #endif
      }
-#if defined (__AVR_ATtiny1634__)
+#if defined (__AVR_ATtiny1634__) && defined (BUS_HUBMODE)
     else if (psPhy->uUart == 1) {
         g_UART0Phy = psPhy;
         // initialize UART

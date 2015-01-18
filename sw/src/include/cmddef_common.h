@@ -20,25 +20,28 @@
 
 //! Common defined commands.
 typedef enum {
-    CMD_eStateTypeless          = 0x00, //!< Send typeless state data.
-    CMD_eStateBitfield          = 0x01, //!< Send bitfield state data.
-    CMD_eState8bit              = 0x02, //!< Send 8bit state data.
-    CMD_eState16bit             = 0x03, //!< Send 16bit state data.
-    CMD_eState32bit             = 0x04, //!< Send 32bit state data.
-    CMD_eStateDateTime          = 0x05, //!< Send date/time data.
+    eCMD_STATE_TYPELESS         = 0x00, //!< Send typeless state data.
+    eCMD_STATE_BITFIELS         = 0x01, //!< Send bitfield state data.
+    eCMD_STATE_8BIT             = 0x02, //!< Send 8bit state data.
+    eCMD_STATE_16BIT            = 0x03, //!< Send 16bit state data.
+    eCMD_STATE_32BIT            = 0x04, //!< Send 32bit state data.
+    eCMD_STATE_DATE_TIME        = 0x05, //!< Send date/time data.
 
-    CMD_eRequestRegister        = 0x10, //!< Request register value.
-    CMD_eSetRegister8bit        = 0x12, //!< Set 8bit register value.
-    CMD_eSetRegister16bit       = 0x13, //!< Set 16bit register value.
-    CMD_eSetRegister32bit       = 0x14, //!< Set 32bit register value.
+    eCMD_REQUEST_REG            = 0x10, //!< Request register value.
+    eCMD_SET_REG_8BIT           = 0x12, //!< Set 8bit register value.
+    eCMD_SET_REG_16BIT          = 0x13, //!< Set 16bit register value.
+    eCMD_SET_REG_32BIT          = 0x14, //!< Set 32bit register value.
 
-    CMD_eFirstAppSpecific       = 0x40, //!< First application specific command.
+    eCMD_BLOCK_START            = 0x20,
+    eCMD_BLOCK_DATA             = 0x21,
+    eCMD_BLOCK_END              = 0x22,
+    
+    eCMD_FIRST_APP_SPECIFIC     = 0x40, //!< First application specific command.
 
-    CMD_eAck                    = 0xF0, //!< Acknowledge message.
-    CMD_eSleep                  = 0xF5, //!< Send module into sleep mode.
-    CMD_eReset                  = 0xFE, //!< Reset module.
-
-} CMD_eCommon_t;
+    eCMD_ACK                    = 0xF0, //!< Acknowledge message.
+    eCMD_SLEEP                  = 0xF5, //!< Send module into sleep mode.
+    eCMD_RESET                  = 0xFE, //!< Reset module.
+} cmd_common_t;
 
 // --- Local variables ---------------------------------------------------------
 

@@ -153,14 +153,14 @@ BOOL            UART_bIsBusy        (void)
  *
  * @param[in] puSendBuf
  * Pointer to data to be sent.
- * @param[in] uLength
+ * @param[in] length
  * Length of data to be sent.
 */
 void            UART_vTransmit      (uint8_t*               puSendBuf,
-                                     uint8_t                uLength)
+                                     uint8_t                length)
 {
     BOOL enqueued;
-    while (uLength--) {
+    while (length--) {
         do {
             enqueued = QUE_uPut(sUart.auSendQueue, *puSendBuf);
         } while (enqueued == FALSE);

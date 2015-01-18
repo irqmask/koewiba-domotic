@@ -238,7 +238,7 @@ BOOL            SPI_bIsBusy         (void)
  * @param[out] puReceiveBuf
  * Optional pointer to receive buffer otherwise NULL. Attention, this buffer is
  * filled from an interrupt context!
- * @param[in] uLength
+ * @param[in] length
  * Length of data to be sent and received.
  * @param[in] fpBeforeTransmission
  * Optional pointer to function which is called before SPI transmission,
@@ -254,7 +254,7 @@ BOOL            SPI_bIsBusy         (void)
  */
 uint8_t         SPI_uTransmit       (uint8_t*               puSendBuf,
                                      uint8_t*               puReceiveBuf,
-                                     uint8_t                uLength,
+                                     uint8_t                length,
                                      SPI_StartSendFunc_t    fpBeforeTransmission,
                                      SPI_EndSendFunc_t      fpAfterTransmission,
                                      uint8_t                uUserArg)
@@ -263,16 +263,16 @@ uint8_t         SPI_uTransmit       (uint8_t*               puSendBuf,
     uint8_t temp_wr_idx;
 
     // check length
-    if (uLength > SPI_QUEUE_SIZE) return 0;
+    if (length > SPI_QUEUE_SIZE) return 0;
 
     // wait until there is enough space in the transmit queue
-    while (SPI_uQueueSpace() < uLength);
+    while (SPI_uQueueSpace() < length);
 
     // hold queue until full message is transmitted
     temp_wr_idx = uWriteIdx;
 
     // enqueue header
-    bEnqueue(&temp_wr_idx, uLength);
+    bEnqueue(&temp_wr_idx, length);
     bEnqueue(&temp_wr_idx, uUserArg);
     bEnqueue(&temp_wr_idx, (uint16_t)puReceiveBuf >> 8);
     bEnqueue(&temp_wr_idx, (uint16_t)puReceiveBuf & 0xFF);
@@ -281,7 +281,7 @@ uint8_t         SPI_uTransmit       (uint8_t*               puSendBuf,
     bEnqueue(&temp_wr_idx, (uint16_t)fpAfterTransmission >> 8);
     bEnqueue(&temp_wr_idx, (uint16_t)fpAfterTransmission & 0xFF);
     // enqueue data
-    for (enqueued=0; enqueued<uLength; enqueued++) {
+    for (enqueued=0; enqueued<length; enqueued++) {
         bEnqueue(&temp_wr_idx, puSendBuf[enqueued]);
     }
 

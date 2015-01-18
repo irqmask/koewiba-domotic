@@ -236,7 +236,7 @@ int main (int argc, char* argv[])
         if (parse_commandline_options(argc, argv, &options) == false ||
             validate_options(&options) == false) {
             print_usage();
-            rc = eSYS_ERR_BAD_PARAMETER;
+            rc = eERR_BAD_PARAMETER;
             break;
         }
         ioloop_init(&mainloop);
@@ -269,36 +269,9 @@ int main (int argc, char* argv[])
         msg_b_set_incomming_handler(&msg_bus, handle_incomming_msg, &router);
         route_add(&router, 1, 65535, address, port, eROUTE_TYPE_SERIAL, &msg_bus);
 
-
-        //route_add(&router, 5, 10, "192.168.35.1", 5000, eROUTE_TYPE_SOCKET, NULL);
-        //route_add(&router, 1, 10, "192.168.35.2", 5000, eROUTE_TYPE_SOCKET, NULL);
-        //route_add(&router, 1, 10, "192.168.35.3", 5000, eROUTE_TYPE_SOCKET, NULL);
-
-        //route_add(&router, 100, 10, "192.168.35.3", 4999, eROUTE_TYPE_SOCKET, NULL);
-        //route_add(&router, 6, 11, "192.168.35.4", 5000, eROUTE_TYPE_SOCKET, NULL);
-        //route_add(&router, 256, 511, "192.168.35.5", 50000, eROUTE_TYPE_SOCKET, NULL);
-
-        msg.receiver = 15;
-        msg.sender = 1;
-        msg.length = 8;
-        msg.data[0] = 'H';
-        msg.data[1] = 'a';
-        msg.data[2] = 'l';
-        msg.data[3] = 'l';
-        msg.data[4] = 'o';
-        msg.data[5] = 'M';
-        msg.data[6] = 's';
-        msg.data[7] = 'g';
-
         printf("entering mainloop...\n");
         while (!end_application) {
             ioloop_run_once(&mainloop);
-
-            //ep = msg_s_get_endpoint(&msg_socket, 0, 1<<eMSG_EP_COMM);
-            //if (ep != NULL) {
-            //    msg_s_send(ep, &msg);
-            //    msg.sender++;
-            //}
         }
     } while (0);
     return rc;

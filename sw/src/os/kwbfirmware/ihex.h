@@ -28,7 +28,7 @@ typedef void (*ihex_write_byte_func)(uint32_t address, uint8_t byte, void* arg);
 typedef enum {
     e_ihex_eof = -1,
     e_ihex_success = 0,
-    e_ihex_error_file_open = ERROR_USER1,
+    e_ihex_error_file_open = 200,
     e_ihex_error_unexpected_char,
     e_ihex_error_unexpected_eol,
     e_ihex_error_unexpected_eof,

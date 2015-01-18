@@ -215,8 +215,10 @@ static uint16_t ioloop_get_next_timeout (ioloop_t* ioloop)
     uint16_t now;
 
     // no timer registered? -> default value 1s
-    if (ioloop->first_timer == NULL) return 100;
-
+    if (ioloop->first_timer == NULL) {
+        return ioloop->default_timeout_ticks;
+    }
+    
     // get difference time to now from first registered timer
     now = ioloop_get_current_ticks();
     if (now > ioloop->first_timer->expiration_time) return 1;
@@ -262,6 +264,7 @@ void ioloop_init (ioloop_t* ioloop)
     assert(ioloop != NULL);
 
     memset(ioloop, 0, sizeof(ioloop_t));
+    ioloop->default_timeout_ticks = 100; // 100 * 1/100second
     ioloop->update_required = true;
 }
 
@@ -308,6 +311,14 @@ void ioloop_unregister_fd (ioloop_t* ioloop,
         conn = conn->next;
     }
     ioloop->update_required = true;
+}
+
+void ioloop_set_default_timeout (ioloop_t* ioloop,
+                                 uint16_t  timeout_ticks)
+{
+    assert(ioloop != NULL);
+    
+    ioloop->default_timeout_ticks = timeout_ticks;
 }
 
 int32_t ioloop_register_timer (ioloop_t*            ioloop,

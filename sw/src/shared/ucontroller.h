@@ -207,6 +207,11 @@
  #define ADDR_SIGNATURE_BYTE2   4
 
 #elif defined (__AVR_ATtiny1634__)
+ // UCSR0C is used twice (in uart- and spi-mode) and BIT_1 has different names (uart: UCPHA0   spi: UCSZ00).
+ // This is not included in "avr/iotn1634" so it has to be defined at this point.
+ #define UCPHA0 UCSZ00
+ #define UCPHA1 UCSZ10
+
 // Signature byte addresses. TODO check for this processor!
  #define ADDR_SIGNATURE_BYTE0   0
  #define ADDR_SIGNATURE_BYTE1   2
@@ -303,6 +308,7 @@
  // SPSR
  #define REGBIT_SPIF0           SPIF
  #define REGBIT_SPI2X0          SPI2X
+
 #endif
 
 #if defined (__AVR_ATmega8__)    || \

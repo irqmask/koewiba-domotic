@@ -37,27 +37,27 @@ static sBus_t      g_sBus;
 
 // --- Local functions ---------------------------------------------------------
 
-// Interpret message
-static void vInterpretMessage(sBus_t* psBus, uint8_t* puMsg, uint8_t uMsgLen, uint16_t uSender)
+// Interpret incomming messages
+static void interpret_message(sBus_t* bus, uint8_t* msg, uint8_t msg_len, uint16_t sender)
 {
-    if (puMsg[0] <= CMD_eStateDateTime) {
+    if (msg[0] <= eCMD_STATE_DATE_TIME) {
         // state messages
-        if (puMsg[0] == CMD_eStateBitfield) {
+        if (msg[0] == eCMD_STATE_BITFIELDS) {
 
         }
-    } else if (puMsg[0] <= CMD_eSetRegister32bit) {
+    } else if (msg[0] <= eCMD_SET_REG_32BIT) {
         // register messages
-        register_do_command(psBus, puMsg, uMsgLen, uSender);
+        register_do_command(bus, msg, msg_len, sender);
     } else {
         // system messages
-        switch (puMsg[0]) {
-        case CMD_eAck:
+        switch (msg[0]) {
+        case eCMD_ACK:
             g_sBus.eModuleState = eMod_Running;
             break;
-        case CMD_eSleep:
-            SLEEP_vPinChange2_Enable();
-            bus_sleep(psBus);
-            SLEEP_vPinChange2_Disable();
+        case eCMD_SLEEP:
+            sleep_pinchange2_enable();
+            bus_sleep(bus);
+            sleep_pinchange2_disable();
             break;
         default:
             break;
@@ -86,8 +86,8 @@ int main(void)
     bus_configure(&g_sBus, module_id);
     bus_initialize(&g_sBus, 0);// initialize bus on UART 0
 
-    SPI_vMasterInitBlk();
-    //EEP_vInit();
+    spi0_master_init_blk();
+    //eep_init();
     pwm_init();
 
     sei();
@@ -100,7 +100,7 @@ int main(void)
     while (1) {
         if (bus_get_message(&g_sBus)) {
             if (bus_read_message(&g_sBus, &sender, &msglen, msg)) {
-                vInterpretMessage(&g_sBus, msg, msglen, sender);
+                interpret_message(&g_sBus, msg, msglen, sender);
             }
         }
         if (clk_timer_is_elapsed(&pwm_demotimer)) {

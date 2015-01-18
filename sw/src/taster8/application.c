@@ -66,7 +66,7 @@ void        send_key_states         (uint8_t uPressedKeys,
 
     // send messages
     for (ii=0; ii<num_receiver; ii++) {
-        msg[0] = CMD_eStateBitfield;
+        msg[0] = eCMD_STATE_BITFIELDS;
         msg[1] = 1;
         msg[2] = uPressedKeys;
         msg[3] = uChangedKeys;

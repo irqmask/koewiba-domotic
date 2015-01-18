@@ -10,6 +10,7 @@ include ../../buildscripts/lib/lib_outputdirs.mk
 
 SRC = shared/bus_phy.c \
       shared/bus_transport.c \
+      shared/bus_tx_queue.c \
       shared/clock.c \
       shared/crc16.c \
       shared/eeprom_spi.c \

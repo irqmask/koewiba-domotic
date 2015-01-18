@@ -34,14 +34,14 @@
 #define BUS_DISRCV0      PA6
 #define BUS_DISRCV1      PA2
 
-#define LED_STATUS_ON
-#define LED_STATUS_OFF
-#define LED_STATUS_TOGGLE
+// Pin assignments of board keys and LEDs
+// Port D pin assignments
+#define LED_PCBCONFIG       1
+// not used #define LED_STATUS          0b01000000  //!< Yellow status LED
+#define LED_ERROR           0b00000001  //!< Red error LED
 
-#define LED_ERROR_ON        PORTA |=  (1<<PA0)
-#define LED_ERROR_OFF       PORTA &= ~(1<<PA0)
-#define LED_ERROR_TOGGLE    PORTA ^=  (1<<PA0)
-
+#define LED_STATUS_PORT     PORTA
+#define LED_ERROR_PORT      PORTA
 
 // --- Type definitions --------------------------------------------------------
 

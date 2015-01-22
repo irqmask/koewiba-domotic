@@ -16,6 +16,7 @@
 #include <util/delay.h>
 
 #include "bus.h"
+#include "bus_scheduler.h"
 #include "clock.h"
 // TODO remove after debug
 #include "led_debug.h"
@@ -43,7 +44,7 @@ static sClkTimer_t 	g_sLedTimer;
 
 // --- Local functions ---------------------------------------------------------
 
-void IO_vInitialize(void)
+void io_initialize (void)
 {
 #if defined (__AVR_ATmega88__) || defined (__AVR_ATmega88A__) || defined (__AVR_ATmega8__)
     DDRB  |= ((0<<DDB7)   | (0<<DDB6)   | (1<<DDB5)   | (1<<DDB4)   | (0<<DDB3)   | (1<<DDB2)   | (1<<DDB1)   | (1<<DDB0)  );
@@ -72,16 +73,13 @@ int main(void)
 {
     uint8_t msglen = 0;
     uint16_t sender = 0;
-    uint8_t msg[BUS_MAXMSGLEN];
+    uint8_t msg[BUS_MAXRECVMSGLEN];
 
-    IO_vInitialize();
+    io_initialize();
     clk_initialize();
-    bus_scheduler_configure(&g_sSched);
     bus_configure(&g_sBus, 1); // configure a bus node with address 1
-    bus_initialize(&g_sBus, 0);// initialize bus on UART 0
-    g_sBus.eModuleState = eMod_Discovery;
+    bus_scheduler_initialize(&g_sBus, &g_sSched, 0);// initialize bus on UART 0
 
-    //vInitLedAndKeys();
     sei();
 
     clk_timer_start(&g_sLedTimer, CLOCK_MS_2_TICKS(1000));
@@ -89,13 +87,12 @@ int main(void)
     while (1) {
     	if (bus_schedule_and_get_message(&g_sBus, &g_sSched)) {
     		if (bus_read_message(&g_sBus, &sender, &msglen, msg)) {
-                // TODO do something
+                // interpret incomming message for scheduler
     		}
     	}
     	else bus_schedule_check_and_set_sleep(&g_sBus);
 
         if (clk_timer_is_elapsed(&g_sLedTimer)) {
-        	// TODO remove after debug
             PORTD ^= LED_STATUS;
             clk_timer_start(&g_sLedTimer, CLOCK_MS_2_TICKS(1000));
         }

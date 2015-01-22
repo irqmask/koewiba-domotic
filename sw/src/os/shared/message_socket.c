@@ -90,43 +90,55 @@ static void msg_delete_endpoint (msg_socket_t* msg_socket, msg_endpoint_t* ep_to
     }
 }
 
-static void msg_read (void* arg)
+static int32_t msg_read (void* arg)
 {
     int             rc;
     msg_endpoint_t* ep = (msg_endpoint_t*)arg;
     msg_socket_t*   msg_socket = ep->msg_socket;
     msg_t           message;
 
+    do {
     // reveive message
     rc = sys_socket_recv(ep->fd, &message, sizeof(message));
-    if (rc == 0) {
-        // connection closed
-        msg_s_close_connection(msg_socket, ep);
-        fprintf(stderr, "connection closed\n");
-        return;
-    }
+        if (rc == 0) {
+            // connection closed
+            msg_s_close_connection(msg_socket, ep);
+            fprintf(stderr, "connection closed\n");
+            break;
+        }
 
-    if (rc != sizeof(message)) {
-        perror("invaid size of incomming message");
-        return;
-    }
+        if (rc != sizeof(message)) {
+            perror("invaid size of incomming message");
+            break;
+        }
 
-    // handle message
-    if (msg_socket->incomming_handler != NULL) {
-        msg_socket->incomming_handler(&message, msg_socket->incomming_arg);
-    }
+        // handle message
+        if (msg_socket->incomming_handler != NULL) {
+            msg_socket->incomming_handler(&message, ep, msg_socket->incomming_arg);
+        }
+    } while (0);
+    return 0;
 }
 
-static void msg_accept_endpoint (void* arg)
+static void msg_ready_to_write (void* arg)
+{
+    static int count = 0;
+    msg_endpoint_t* ep = (msg_endpoint_t*)arg;
+    printf("fd %d is ready to write %d\n", ep->fd, count++);
+}
+
+static int32_t msg_accept_endpoint (void* arg)
 {
     msg_socket_t*   msg_socket = (msg_socket_t*)arg;
     msg_endpoint_t* ep = NULL;
+    char address[256];
+    uint16_t port = 0;
 
     do {
-        printf("MSG ACCEPT ENDPOINT\n");
         ep = msg_new_endpoint(msg_socket, eMSG_EP_COMM);
         if (ep == NULL) break;
 
+        // get file descriptor of new client connection
         ep->fd = sys_socket_accept(msg_socket->well_known_fd);
         if (ep->fd <= INVALID_FD) {
             perror("server not accepting new endpoint");
@@ -134,12 +146,19 @@ static void msg_accept_endpoint (void* arg)
             break;
         }
 
+        // get address and port of accepted connection and pass it to appications
+        // new connection handler.
+        sys_socket_get_name(ep->fd, address, sizeof(address), &port);
+        if (msg_socket->new_connection_handler != NULL) {
+            msg_socket->new_connection_handler(address, port, ep, msg_socket->new_connection_arg);
+        }
+
         // register new connection to ioloop
         ioloop_register_fd(msg_socket->ioloop, ep->fd, eIOLOOP_EV_READ, msg_read, (void*)ep);
 
-        printf("MSG ACCEPT ENDPOINT END\n");
-
+        fprintf(stderr, "connection accepted from %s:%d\n", address, port);
     } while (0);
+    return 0;
 }
 
 // --- Module global functions -------------------------------------------------
@@ -176,7 +195,7 @@ int msg_s_open_server (msg_socket_t*   msg_socket,
         if (port == 0) {
             fd = sys_socket_open_server_unix(msg_socket->address);
             if (fd <= INVALID_FD) {
-                rc = eSYS_ERR_SYSTEM;
+                rc = eERR_SYSTEM;
                 break;
             }
             sys_socket_set_blocking(fd, false);
@@ -216,7 +235,7 @@ int msg_s_open_client (msg_socket_t*   msg_socket,
         if (port == 0) {
             fd = sys_socket_open_client_unix(msg_socket->address);
             if (fd <= INVALID_FD) {
-                rc = eSYS_ERR_SYSTEM;
+                rc = eERR_SYSTEM;
                 break;
             }
             sys_socket_set_blocking(fd, false);
@@ -244,6 +263,14 @@ void msg_s_close_connection (msg_socket_t* msg_socket, msg_endpoint_t* ep)
     ioloop_unregister_fd(msg_socket->ioloop, ep->fd);
     sys_socket_close (ep->fd);
     msg_delete_endpoint(msg_socket, ep);
+}
+
+void msg_s_set_newconnection_handler (msg_socket_t* msg_socket, msg_newconn_func_t func, void* arg)
+{
+    assert(msg_socket != NULL);
+
+    msg_socket->new_connection_handler = func;
+    msg_socket->new_connection_arg = arg;
 }
 
 void msg_s_set_incomming_handler (msg_socket_t* msg_socket, msg_incom_func_t func, void* arg)
@@ -279,9 +306,8 @@ msg_endpoint_t* msg_s_get_endpoint (msg_socket_t*   msg_socket,
     return ep;
 }
 
-void msg_s_send (msg_socket_t* msg_socket, msg_endpoint_t* recv_ep, msg_t* message)
+void msg_s_send (msg_endpoint_t* recv_ep, msg_t* message)
 {
-    assert(msg_socket != NULL);
     assert(recv_ep != NULL);
     assert(message != NULL);
 

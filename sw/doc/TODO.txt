@@ -1,0 +1,12 @@
+TODO  OS
+1. clock_os in kwb_router (message_bus) einbauen.
+2. Buffergrößen für Sende- und Empfangsbuffer trennen. OK
+3. printfs ausbauen und bus_transport.c einchecken OK
+4. Äquivalent zu "setserial low_latency" in bus_phy_os einbauen.
+5. Konzept zum Schalten der Send_Enable Leitung .
+6. Zeitstempel von systime in kwbmonitor fehlerhaft??
+
+
+Spendenkonto Wikimedia Foerdergesellschaft BIC BFSWDE33BER IBAN DE33 1002 0500 0001 1947 00
+
+

@@ -1,15 +1,13 @@
 #ifndef _SYSCONSOLE_H_
 #define _SYSCONSOLE_H_
 
-#include "system.h"
+#include "prjconf.h"
 
-#ifdef _SYS_WINDOWS_
-# include <conio.h>
-#endif
+#define sys_con_getch() getch()
 
-# define SYS_cGetChar getch()
-
-#ifdef _SYS_LINUX_
+#if defined (PRJCONF_UNIX) || \
+    defined (PRJCONF_POSIX) || \
+    defined (PRJCONF_LINUX)
 char getch(void);
 char getche(void);
 #endif

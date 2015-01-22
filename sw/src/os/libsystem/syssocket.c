@@ -17,8 +17,10 @@
     defined (PRJCONF_LINUX)
   #include <fcntl.h>
   #include <safe_lib.h>
+  #include <sys/ioctl.h>
   #include <sys/socket.h>
   #include <sys/un.h>
+  #include <termios.h>
   #include <unistd.h>
 #elif defined (PRJCONF_WINDOWS)
   #include <windows.h>
@@ -106,6 +108,18 @@ sys_fd_t sys_socket_open_client_unix (const char* socketname)
     return fd;
 }
 
+sys_fd_t sys_socket_open_server_tcp (const char* socketaddress, uint16_t port)
+{
+    //TODO implement
+    return INVALID_FD;
+}
+
+sys_fd_t sys_socket_open_client_tcp (const char* socketaddress, uint16_t port)
+{
+    //TODO implement
+    return INVALID_FD;
+}
+
 void sys_socket_close (sys_fd_t fd)
 {
     close(fd);
@@ -114,9 +128,11 @@ void sys_socket_close (sys_fd_t fd)
 sys_fd_t sys_socket_accept (sys_fd_t server_fd)
 {
     struct sockaddr_un  sockinfo;
-    socklen_t           sockinfolen;
+    socklen_t           sockinfolen = sizeof(sockinfo);
+    sys_fd_t            fd;
 
-    return accept (server_fd, (struct sockaddr *)&sockinfo, &sockinfolen);
+    fd = accept (server_fd, (struct sockaddr *)&sockinfo, &sockinfolen);
+    return fd;
 }
 
 int sys_socket_recv (sys_fd_t fd, void* buffer, size_t buffersize)
@@ -127,6 +143,27 @@ int sys_socket_recv (sys_fd_t fd, void* buffer, size_t buffersize)
 int sys_socket_send (sys_fd_t fd, void* buffer, size_t buffersize)
 {
     return send(fd, buffer, buffersize, 0);
+}
+
+void sys_socket_flush (sys_fd_t fd)
+{
+    tcflush(fd, TCIOFLUSH);
+}
+
+size_t sys_socket_get_pending_sendq (sys_fd_t fd)
+{
+    size_t pending_bytes = 0;
+
+    ioctl(fd, TIOCOUTQ, &pending_bytes);
+    return pending_bytes;
+}
+
+size_t sys_socket_get_pending_recvq (sys_fd_t fd)
+{
+    size_t pending_bytes = 0;
+
+    ioctl(fd, FIONREAD, &pending_bytes);
+    return pending_bytes;
 }
 
 void sys_socket_set_blocking (sys_fd_t fd, bool blocking)
@@ -146,6 +183,31 @@ void sys_socket_set_blocking (sys_fd_t fd, bool blocking)
             break;
         }
     } while (0);
+}
+
+void sys_socket_get_name (sys_fd_t fd, char* address, size_t addr_len, uint16_t* port)
+{
+    union {
+        struct sockaddr  common;
+        struct sockaddr_un af_unix;
+    } sockinfo;
+
+    socklen_t len = sizeof(sockinfo);
+
+    if (getsockname(fd, (struct sockaddr *)&sockinfo, &len) == -1)
+        perror("getsockname");
+    else {
+        switch (sockinfo.common.sa_family) {
+        case AF_UNIX:
+            if (address != NULL) strcpy_s(address, addr_len, sockinfo.af_unix.sun_path);
+            if (port != NULL) *port = 0;
+            break;
+        case AF_INET:
+            break;
+        default:
+            break;
+        }
+    }
 }
 
 /** @} */

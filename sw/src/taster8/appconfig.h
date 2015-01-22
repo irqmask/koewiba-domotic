@@ -19,10 +19,13 @@
 
 // --- Definitions -------------------------------------------------------------
 
-#define BUS_APPCONFIG   1
-#undef BUS_SCHEDULER        //!< This program has scheduling capabilities.
+#define BUS_APPCONFIG       1
+#undef BUS_SCHEDULER                //!< This program has no scheduling capabilities.
+#define BUS_TX_QUEUE_SIZE  100      //!< Size in bytes of the message transmit queue.
+#define BUS_MAXSENDMSGLEN   16      //!< Maximum length of a message to be sent.
+#define BUS_MAXRECVMSGLEN   64 + 2  //!< Maximum length of a message to be received.
 
-#define APP_NUM_KEYS    8   //!< The keys application supports eight keys.
+#define APP_NUM_KEYS        8   //!< The keys application supports eight keys.
 
 //! Application specific layout of registers
 typedef enum appregisters {

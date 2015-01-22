@@ -13,7 +13,7 @@
 
 #ifndef _SYSTIME_H_
 #define _SYSTIME_H_
- 
+
 // --- Include section ---------------------------------------------------------
 
 #include "prjconf.h"
@@ -25,17 +25,17 @@
     defined (PRJCONF_LINUX)
   #include <sys/time.h>
 #elif defined (PRJCONF_WINDOWS)
-  #include <windows.h>    
+  #include <windows.h>
 #endif
-  
+
 // --- Definitions -------------------------------------------------------------
 
 #if defined (PRJCONF_UNIX) || \
     defined (PRJCONF_POSIX) || \
     defined (PRJCONF_LINUX)
-  #define SYS_vSleepMs(x) do{usleep((x)*1000);}while(0)
+  #define sys_sleep_ms(x) do{usleep((x)*1000);}while(0)
 #elif defined (PRJCONF_WINDOWS)
-  #define SYS_vSleepMs(x) do{Sleep(x);}while(0)
+  #define sys_sleep_ms(x) do{Sleep(x);}while(0)
 #endif
 
 // --- Type definitions --------------------------------------------------------

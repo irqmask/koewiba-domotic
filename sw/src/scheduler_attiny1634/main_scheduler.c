@@ -15,7 +15,9 @@
 
 #include <util/delay.h>
 
+#include "pcbconfig.h"
 #include "bus.h"
+#include "bus_scheduler.h"
 #include "clock.h"
 
 // --- Definitions -------------------------------------------------------------
@@ -37,7 +39,7 @@ static sClkTimer_t 	g_sLedTimer;
 
 // --- Local functions ---------------------------------------------------------
 
-void IO_vInitialize(void)
+void io_initialize (void)
 {
 #if defined (__AVR_ATmega88__) || defined (__AVR_ATmega88A__)
     DDRB  |= ((0<<DDB7)   | (0<<DDB6)   | (1<<DDB5)   | (1<<DDB4)   | (0<<DDB3)   | (1<<DDB2)   | (1<<DDB1)   | (1<<DDB0)  );
@@ -49,12 +51,14 @@ void IO_vInitialize(void)
     PORTD |= ((1<<PORTD7) | (0<<PORTD6) | (1<<PORTD5) | (0<<PORTD4) | (0<<PORTD3) | (0<<PORTD2) | (0<<PORTD1) | (1<<PORTD0));
 #elif defined (__AVR_ATtiny1634__)
     DDRA  |= ((0<<DDRA7)  | (1<<DDRA6)  | (0<<DDRA5)  | (1<<DDRA4)  | (1<<DDRA3)  | (1<<DDRA2)  | (1<<DDRA1)  | (1<<DDRA0) );
-    DDRB  |= (                                                        (1<<DDRB3)  | (0<<DDRB2)  | (1<<DDRB1)  | (1<<DDRB0) );
-    DDRC  |= (                            (0<<DDRC5)  | (0<<DDRC4)  | (0<<DDRC3)  | (1<<DDRC2)  | (1<<DDRC1)  | (1<<DDRC0) );
+    PORTA |= ((0<<PORTA7) | (0<<PORTA6) | (0<<PORTA5) | (1<<PORTA4) | (1<<PORTA3) | (0<<PORTA2) | (0<<PORTA1) | (1<<PORTA0));
 
-    PORTA |= ((0<<PORTA7) | (0<<PORTA6) | (0<<PORTA5) | (1<<PORTA4) | (1<<PORTA3) | (0<<PORTA2) | (0<<PORTA1) | (0<<PORTA0));
+    DDRB  |= (                                                        (1<<DDRB3)  | (0<<DDRB2)  | (1<<DDRB1)  | (1<<DDRB0) );
     PORTB |= (                                                        (1<<PORTB3) | (0<<PORTB2) | (0<<PORTB1) | (0<<PORTB0));
+
+    DDRC  |= (                            (0<<DDRC5)  | (0<<DDRC4)  | (0<<DDRC3)  | (1<<DDRC2)  | (1<<DDRC1)  | (1<<DDRC0) );
     PORTC |= (                            (0<<PORTC5) | (0<<PORTC4) | (0<<PORTC3) | (0<<PORTC2) | (0<<PORTC1) | (0<<PORTC0));
+
 #endif
 }
 
@@ -66,13 +70,12 @@ int main(void)
 {
     uint8_t     msglen = 0;
     uint16_t    sender = 0;
-    uint8_t     msg[BUS_MAXMSGLEN];
+    uint8_t     msg[BUS_MAXRECVMSGLEN];
 
-    IO_vInitialize();
+    io_initialize();
     clk_initialize();
-    bus_scheduler_configure(&g_sSched);
     bus_configure(&g_sBus, 1); // configure a bus node with address 1
-    bus_initialize(&g_sBus, 0);// initialize bus on UART 0
+    bus_scheduler_initialize(&g_sBus, &g_sSched, 0);// initialize bus on UART 0
 
     sei();
 
@@ -89,6 +92,7 @@ int main(void)
         if (clk_timer_is_elapsed(&g_sLedTimer)) {
         	// TODO remove after debug
             clk_timer_start(&g_sLedTimer, CLOCK_MS_2_TICKS(1000));
+            LED_ERROR_TOGGLE;
         }
     }
     return 0;

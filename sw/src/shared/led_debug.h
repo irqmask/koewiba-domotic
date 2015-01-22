@@ -1,12 +1,10 @@
 /**
- * @addtogroup BUS
- * @brief Public interface of bus protocol.
- *
- * TODO: Detailed description of module.
+ * @addtogroup DEBUG
+ * @brief   Debug output via LEDs.
  *
  * @{
  * @file    led_debug.h
- * @brief   Declaration of communication driver routines.
+ * @brief   Debug output via LEDs.
  *
  * @author  Robert Mueller
  *///---------------------------------------------------------------------------
@@ -16,18 +14,47 @@
 
 // --- Include section ---------------------------------------------------------
 
-#include <avr/io.h>
+#ifdef PRJCONF_UC_AVR
+ #include <avr/io.h>
+#endif
 
 // --- Definitions -------------------------------------------------------------
 
+#ifdef HAS_APPCONFIG_H
+#include "appconfig.h"
+#endif
+#ifdef HAS_PCBCONFIG_H
+#include "pcbconfig.h"
+#endif
+
+#ifndef LED_PCBCONFIG
+#define LED_PCBBONFIG 1
 // Pin assignments of board keys and LEDs
 // Port D pin assignments
-#define LED_STATUS      0b01000000  //!< Yellow status LED
-#define LED_ERROR       0b00010000  //!< Red error LED
-#define BTN_TEST        0b00100000
-#define BTN_EXP         0b10000000
+ #define LED_STATUS      0b01000000  //!< Yellow status LED
+ #define LED_ERROR       0b00010000  //!< Red error LED
+ #define BTN_TEST        0b00100000
+ #define BTN_EXP         0b10000000
+#endif
 
+#ifdef PRJCONF_UC_AVR
+ #define LED_ERROR_ON        LED_ERROR_PORT |=  LED_ERROR
+ #define LED_ERROR_OFF       LED_ERROR_PORT &= ~LED_ERROR
+ #define LED_ERROR_TOGGLE    LED_ERROR_PORT ^=  LED_ERROR
 
+ #define LED_STATUS_ON       LED_STATUS_PORT |=  LED_STATUS
+ #define LED_STATUS_OFF      LED_STATUS_PORT &= ~LED_STATUS
+ #define LED_STATUS_TOGGLE   LED_STATUS_PORT ^=  LED_STATUS
+ 
+#else
+ #define LED_ERROR_ON
+ #define LED_ERROR_OFF
+ #define LED_ERROR_TOGGLE
+
+ #define LED_STATUS_ON
+ #define LED_STATUS_OFF
+ #define LED_STATUS_TOGGLE
+#endif
 // --- Type definitions --------------------------------------------------------
 
 // --- Local variables ---------------------------------------------------------
@@ -41,7 +68,17 @@
 // --- Module global functions -------------------------------------------------
 
 // --- Global functions --------------------------------------------------------
-void vInitLedAndKeys(void);
 
+void dbg_toggle_status_LED (void);
+
+void dbg_status_LED_on (void);
+
+void dbg_status_LED_off (void);
+
+void dbg_toggle_error_LED (void);
+
+void dbg_error_LED_on (void);
+
+void dbg_error_LED_off (void);
 
 #endif /* LED_DEBUG_H_ */

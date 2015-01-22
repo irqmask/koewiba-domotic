@@ -75,15 +75,15 @@ void vDrawTemp(uint16_t uTemperature)
 {
     uint8_t byte;
     BOOL firstdigit = FALSE;
-    
+
     if (uTemperature >= 27315) {
         uTemperature -= 27315;
-        
+
         byte = uTemperature / 10000;
         if (byte > 0) {
             uTemperature -= byte * 10000;
         }
-        
+
         byte = uTemperature / 1000;
         if (byte > 0 || firstdigit) {
             uTemperature -= byte * 1000;
@@ -117,7 +117,7 @@ void vDrawTemperatures(void)
     GDISP_vPutText(" "); //32
     GDISP_vChooseFont(GDISP_auFont1_x16);
     GDISP_vPutText("C");
-    
+
     GDISP_vGotoColLine(61, 1);
     GDISP_vChooseFont(GDISP_auFont1_x16);
     vDrawTemp(g_uTargetTemp);
@@ -142,32 +142,32 @@ void vDrawWindowClosed(void)
 }
 
 // Interpret message
-static void vInterpretMessage(sBus_t* psBus, uint8_t* puMsg, uint8_t uMsgLen, uint16_t uSender)
+static void interpret_message(sBus_t* bus, uint8_t* msg, uint8_t msg_len, uint16_t sender)
 {
-    if (puMsg[0] <= CMD_eStateDateTime) {
+    if (msg[0] <= eCMD_STATE_DATE_TIME) {
         // state messages
-        if (puMsg[0] == CMD_eStateBitfield) {
-            if (uSender == 0x0B) {
+        if (msg[0] == eCMD_STATE_BITFIELDS) {
+            if (sender == 0x0B) {
                 g_uTargetTemp += 10;
                 vDrawTemperatures();
             } else {
-                if (puMsg[2] & 0b00000001) vDrawWindowOpened();
-                else                       vDrawWindowClosed();
+                if (msg[2] & 0b00000001) vDrawWindowOpened();
+                else                     vDrawWindowClosed();
             }
         }
-    } else if (puMsg[0] <= CMD_eSetRegister32bit) {
+    } else if (msg[0] <= eCMD_SET_REG_32BIT) {
         // register messages
-        register_do_command(psBus, puMsg, uMsgLen, uSender);
+        register_do_command(bus, msg, msg_len, sender);
     } else {
         // system messages
-        switch (puMsg[0]) {
-        case CMD_eAck:
+        switch (msg[0]) {
+        case eCMD_ACK:
             g_sBus.eModuleState = eMod_Running;
             break;
-        case CMD_eSleep:
-            SLEEP_vPinChange2_Enable();
-            bus_sleep(psBus);
-            SLEEP_vPinChange2_Disable();
+        case eCMD_SLEEP:
+            sleep_pinchange2_enable();
+            bus_sleep(bus);
+            sleep_pinchange2_disable();
             break;
         default:
             break;
@@ -182,24 +182,24 @@ static void vInterpretMessage(sBus_t* psBus, uint8_t* puMsg, uint8_t uMsgLen, ui
 int main(void)
 {
     uint8_t msglen = 0;
-    uint8_t msg[BUS_MAXMSGLEN];
+    uint8_t msg[BUS_MAXRECVMSGLEN];
     uint16_t module_id = BUS_UNKNOWNADR, sender = 0, val;
 
     DDRC |= ((1<<PC3) | (1<<PC4));
     PORTC &= ~((1<<PC3) | (1<<PC4));
 
     clk_initialize();
-    
+
     register_set_u16(MOD_eReg_ModuleID, 0x000E);
 
     // configure a bus node with address X
     register_get(MOD_eReg_ModuleID, 0, &module_id);
     bus_configure(&g_sBus, module_id);
     bus_initialize(&g_sBus, 0);// initialize bus on UART 0
-    
-    SPI_vMasterInitBlk();
+
+    spi0_master_init_blk();
     ZAGW_vInit();
-      
+
     sei();
 
     register_get(APP_eReg_DesiredTempDay1, 0, &g_uTargetTemp);
@@ -223,7 +223,7 @@ int main(void)
     while (1) {
         if (bus_get_message(&g_sBus)) {
             if (bus_read_message(&g_sBus, &sender, &msglen, msg)) {
-                vInterpretMessage(&g_sBus, msg, msglen, sender);
+                interpret_message(&g_sBus, msg, msglen, sender);
             }
         }
         if (clk_timer_is_elapsed(&g_sAppTimer)) {

@@ -7,7 +7,7 @@ include_directories (
     ../include
     ../libsystem
     ../shared
-    ../3rd_party/jansson-2.6/src
+    ../3rd_party/jansson/src
     ${CMAKE_CURRENT_BINARY_DIR}
 )
 
@@ -30,12 +30,15 @@ file (WRITE ${CMAKE_CURRENT_BINARY_DIR}/kwbrouter_version.h
 
 set (kwbrouter_SRCS
     kwbrouter_main.c
+    router.c
     ../shared/bus_phy_os.c
     ../shared/clock_os.c
     ../shared/ioloop.c
     ../shared/message_bus.c
     ../shared/message_socket.c
+    ../shared/vos.c
     ../../shared/bus_transport.c
+    ../../shared/bus_tx_queue.c
     ../../shared/crc16.c
 )
 

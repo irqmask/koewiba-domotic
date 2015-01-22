@@ -14,6 +14,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #include <safe_lib.h>
 
@@ -47,13 +48,21 @@ void log_hexdump16 (uint8_t* data, uint16_t length)
         printf("%02X ", data[offset]);
         offset++;
     }
+    printf("\n");
 }
 
-static void handle_message(msg_t* message, void* arg)
+static void handle_message(msg_t* message, void* reference, void* arg)
 {
     printf("Message received: sender %d, receiver %d, len %d\n",
            message->sender, message->receiver, message->length);
     log_hexdump16(message->data, message->length);
+    if (message->data[0] == 1 && message->data[1] == 1) {
+        if (message->data[2] == 1) {
+            system("./relay_on.sh");
+        } else {
+            system("./relay_off.sh");
+        }
+    }
 }
 
 // --- Module global functions -------------------------------------------------
@@ -69,7 +78,7 @@ int main (int argc, char* argv[])
 
     do {
         printf("\nkwbtest...\n");
-        ioloop_init (&mainloop);
+        ioloop_init(&mainloop);
 
         msg_s_init(&msg_socket);
         msg_s_set_incomming_handler(&msg_socket, handle_message, NULL);

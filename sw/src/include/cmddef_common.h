@@ -35,13 +35,25 @@ typedef enum {
     eCMD_BLOCK_START            = 0x20,
     eCMD_BLOCK_DATA             = 0x21,
     eCMD_BLOCK_END              = 0x22,
+    eCMD_BLOCK_REJECT           = 0x23,
+    eCMD_BLOCK_RESET            = 0x24,
     
     eCMD_FIRST_APP_SPECIFIC     = 0x40, //!< First application specific command.
 
     eCMD_ACK                    = 0xF0, //!< Acknowledge message.
+    eCMD_NAK                    = 0xF2, //!< Not-Acknowledge message.
     eCMD_SLEEP                  = 0xF5, //!< Send module into sleep mode.
     eCMD_RESET                  = 0xFE, //!< Reset module.
 } cmd_common_t;
+
+//! destinations for block data.
+typedef enum {
+    eSTORAGE_NONE           = 0,
+    eSTORAGE_EEPROM_INT     = 1,
+    eSTORAGE_EEPROM_EXT     = 2,
+    eSTORAGE_DISPLAY        = 3
+} blkdata_destination_t;
+
 
 // --- Local variables ---------------------------------------------------------
 

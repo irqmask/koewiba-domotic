@@ -56,7 +56,7 @@
  //! size in bytes of the message transmit queue.
  #define BUS_TX_QUEUE_SIZE  100
  //! maximum length of a message to be sent.
- #define BUS_MAXSENDMSGLEN   16
+ #define BUS_MAXSENDMSGLEN   36
  //! maximum length of a message to be received.
  #define BUS_MAXRECVMSGLEN   64 + 2
 #endif

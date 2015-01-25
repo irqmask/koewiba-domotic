@@ -28,6 +28,7 @@
 #endif
 
 #ifndef LED_PCBCONFIG
+#define LED_PCBBONFIG 1
 // Pin assignments of board keys and LEDs
 // Port D pin assignments
  #define LED_STATUS      0b01000000  //!< Yellow status LED
@@ -37,13 +38,22 @@
 #endif
 
 #ifdef PRJCONF_UC_AVR
- #define LED_ERROR_ON        PORTA |=  LED_ERROR
- #define LED_ERROR_OFF       PORTA &= ~LED_ERROR
- #define LED_ERROR_TOGGLE    PORTA ^=  LED_ERROR
+ #define LED_ERROR_ON        LED_ERROR_PORT |=  LED_ERROR
+ #define LED_ERROR_OFF       LED_ERROR_PORT &= ~LED_ERROR
+ #define LED_ERROR_TOGGLE    LED_ERROR_PORT ^=  LED_ERROR
+
+ #define LED_STATUS_ON       LED_STATUS_PORT |=  LED_STATUS
+ #define LED_STATUS_OFF      LED_STATUS_PORT &= ~LED_STATUS
+ #define LED_STATUS_TOGGLE   LED_STATUS_PORT ^=  LED_STATUS
+ 
 #else
  #define LED_ERROR_ON
  #define LED_ERROR_OFF
  #define LED_ERROR_TOGGLE
+
+ #define LED_STATUS_ON
+ #define LED_STATUS_OFF
+ #define LED_STATUS_TOGGLE
 #endif
 // --- Type definitions --------------------------------------------------------
 

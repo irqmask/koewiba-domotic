@@ -88,7 +88,7 @@ static uint16_t get_receiver (uint8_t selector)
         if (g_bus.sCfg.uOwnNodeAddress == 22) return 21;
     } else if (selector == 2) {
         if (g_bus.sCfg.uOwnNodeAddress == 10) return 0x0E; //14
-        if (g_bus.sCfg.uOwnNodeAddress == 11) return 5;
+        if (g_bus.sCfg.uOwnNodeAddress == 11) return 0x02;
         if (g_bus.sCfg.uOwnNodeAddress == 12) return 20;
 
         if (g_bus.sCfg.uOwnNodeAddress == 3) return 0x0E;
@@ -105,7 +105,7 @@ static void interpret_message (uint16_t sender, uint8_t msglen, uint8_t* msg)
 {
 
     switch (msg[0]) {
-    case CMD_eStateBitfield:
+    case eCMD_STATE_BITFIELDS:
         if (msglen < 2) break;
         if (msg[2] != 0) {
             PORTD |= LED_STATUS;
@@ -113,7 +113,7 @@ static void interpret_message (uint16_t sender, uint8_t msglen, uint8_t* msg)
             PORTD &= ~LED_STATUS;
         }
         break;
-    case CMD_eSleep:
+    case eCMD_SLEEP:
         sleep_pinchange2_enable();
         bus_sleep(&g_bus);
         sleep_pinchange2_disable();
@@ -137,7 +137,7 @@ static void check_buttons (void)
         regidx++;
         if (regidx > 7) regidx = 0;
 
-        msg[0] = CMD_eRequestRegister;
+        msg[0] = eCMD_REQUEST_REG;
         msg[1] = registers[regidx];
         msglen = 2;
         bus_send_message(&g_bus, get_receiver(1), msglen, msg);
@@ -146,7 +146,7 @@ static void check_buttons (void)
         if (light)  light = 0;
         else        light = 1;
 
-        msg[0] = CMD_eStateBitfield;
+        msg[0] = eCMD_STATE_BITFIELDS;
         msg[1] = 1;
         msg[2] = light;
         msg[3] = 0b00000001;

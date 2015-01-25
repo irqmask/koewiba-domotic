@@ -20,6 +20,7 @@
 #include "application.h"
 #include "bus.h"
 #include "clock.h"
+#include "led_debug.h"
 #include "prjtypes.h"
 #include "register.h"
 #include "sleepmode.h"
@@ -51,7 +52,7 @@ void IO_vInitialize(void)
 /**
  * Initialize LEDs and keys.
  */
-void vInitLedAndKeys(void)
+void init_led_and_keys(void)
 {
     DDRD |= (LED_ERROR | LED_STATUS);
     DDRD &= ~(BTN_TEST | BTN_EXP);
@@ -72,48 +73,49 @@ void vInitLedAndKeys(void)
 }
 
 // Interpret message received by taster8 application
-static void vInterpretMessage(sBus_t* psBus, uint8_t* puMsg, uint8_t uMsgLen, uint16_t uSender)
+static void interpret_message(sBus_t* bus, uint8_t* msg, uint8_t msg_len, uint16_t sender)
 {
     uint32_t value;
-    if (puMsg[0] <= CMD_eStateDateTime) {
+    
+    if (msg[0] <= eCMD_STATE_DATE_TIME) {
         // state messages
-        switch (puMsg[0]) {
-        case CMD_eStateBitfield:
-            if (puMsg[2] & 0b00000001) LED_STATUS_ON;
+        switch (msg[0]) {
+        case eCMD_STATE_BITFIELDS:
+            if (msg[2] & 0b00000001) LED_STATUS_ON;
             else                       LED_STATUS_OFF;
             break;
-        case CMD_eState8bit:
-            value = puMsg[2];
-            register_do_mapping(uSender, puMsg[1], value);
+        case eCMD_STATE_8BIT:
+            value = msg[2];
+            register_do_mapping(sender, msg[1], value);
             break;
-        case CMD_eState16bit:
-            value = puMsg[2];
-            value |= ((uint16_t)puMsg[3] << 8);
-            register_do_mapping(uSender, puMsg[1], value);
+        case eCMD_STATE_16BIT:
+            value = msg[2];
+            value |= ((uint16_t)msg[3] << 8);
+            register_do_mapping(sender, msg[1], value);
             break;
-        case CMD_eState32bit:
-            value = puMsg[2];
-            value |= ((uint32_t)puMsg[3]<<8);
-            value |= ((uint32_t)puMsg[4]<<16);
-            value |= ((uint32_t)puMsg[5]<<24);
-            register_do_mapping(uSender, puMsg[1], value);
+        case eCMD_STATE_32BIT:
+            value = msg[2];
+            value |= ((uint32_t)msg[3]<<8);
+            value |= ((uint32_t)msg[4]<<16);
+            value |= ((uint32_t)msg[5]<<24);
+            register_do_mapping(sender, msg[1], value);
             break;
         }
 
-    } else if (puMsg[0] <= CMD_eSetRegister32bit) {
+    } else if (msg[0] <= eCMD_SET_REG_32BIT) {
         // register messages
-        register_do_command(psBus, puMsg, uMsgLen, uSender);
+        register_do_command(bus, msg, msg_len, sender);
 
     } else {
         // system messages
-        switch (puMsg[0]) {
-        case CMD_eSleep:
+        switch (msg[0]) {
+        case eCMD_SLEEP:
             sleep_pinchange2_enable();
-            bus_sleep(psBus);
+            bus_sleep(bus);
             sleep_pinchange2_disable();
             break;
-        case CMD_eAck:
-            psBus->eModuleState = eMod_Running;
+        case eCMD_ACK:
+            bus->eModuleState = eMod_Running;
             break;
         default:
             //bus_send_ack_message(psBus, uSender);
@@ -139,14 +141,14 @@ int main(void)
     bus_configure(&app_bus, module_id);
     bus_initialize(&app_bus, 0);// initialize bus on UART 0
 
-    vInitLedAndKeys();
+    init_led_and_keys();
     sei();
 
     while (1) {
         // check for message and read it
         if (bus_get_message(&app_bus)) {
             if (bus_read_message(&app_bus, &sender, &msglen, msg)) {
-                vInterpretMessage(&app_bus, msg, msglen, sender);
+                interpret_message(&app_bus, msg, msglen, sender);
             }
         }
         app_check_keys();

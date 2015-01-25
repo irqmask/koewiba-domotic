@@ -165,7 +165,7 @@ typedef struct busphy {
 typedef struct rcvbusmsg {
     uint16_t        uSender;
     uint16_t        uReceiver;
-    uint8_t         uLength;
+    uint8_t         length;
     uint8_t         uOverallLength;
     auRecBuf_t      auBuf;
     uint16_t        uCRC;

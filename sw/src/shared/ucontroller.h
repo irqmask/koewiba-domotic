@@ -261,14 +261,11 @@
  #define REGBIT_FE              FE0
  #define REGBIT_FE0             FE0
  #define REGBIT_FE1             FE1
- #define REGBIT_USBS0           USBS0
- #define REGBIT_UCSZ02          UCSZ02
- #define REGBIT_UCSZ01          UCSZ01
- #define REGBIT_UCSZ00          UCSZ00
- #define REGBIT_USBS1           USBS1
- #define REGBIT_UCSZ12          UCSZ12
- #define REGBIT_UCSZ11          UCSZ11
- #define REGBIT_UCSZ10          UCSZ10
+ #define REGBIT_UDRE            UDRE0
+ #define REGBIT_USBS            USBS0
+ #define REGBIT_UCSZ2           UCSZ02
+ #define REGBIT_UCSZ1           UCSZ01
+ #define REGBIT_UCSZ0           UCSZ00
  #define INTERRUPT_USART_RXC    USART0_RX_vect
  #define INTERRUPT_USART_RXC0   USART0_RX_vect
  #define INTERRUPT_USART_RXC1   USART1_RX_vect

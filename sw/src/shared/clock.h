@@ -51,6 +51,8 @@ void clk_control           (BOOL start);
 
 BOOL clk_timer_start       (sClkTimer_t* psTimer, uint16_t uTicks);
 
+BOOL clk_timer_stop        (sClkTimer_t* psTimer);
+
 BOOL clk_timer_is_elapsed  (sClkTimer_t* psTimer);
 
 uint16_t clk_timers_next_expiration (void);

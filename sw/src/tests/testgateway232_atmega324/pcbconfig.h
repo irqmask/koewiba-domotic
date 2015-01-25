@@ -6,6 +6,13 @@
  * @file    pcbconfig.h
  * @brief   PCB configuration of the "testscheduler" application.
  *
+ * @preliminary     for using the pcb in bus-mode the following connections have to be established:
+ *                  - connect CS (PB4) with PD0
+ *                  - connect HS (PB3) with PD1
+ *                  - connect serial interfaces TX line with PD2
+ *                  - connect serial interfaces RX line with PD3
+ *                  - connect serial interfaces CTS line with PD4
+ *
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
 #ifndef _PCBCONFIG_H_
@@ -22,13 +29,13 @@
 
 //#define TXRXEN1_SEPERATE 0
 
-#define BUS_DDR_ENASND0  DDRB
-#define BUS_DDR_ENASND1  DDRB
-#define BUS_DDR_DISRCV0  DDRB
-#define BUS_DDR_DISRCV1  DDRB
 #define BUS_PORT_ENASND0 PORTB
+#define BUS_DDR_ENASND0  DDRB
 #define BUS_PORT_DISRCV0 PORTB
+#define BUS_DDR_DISRCV0  DDRB
+//#define BUS_DDR_ENASND1  DDRB
 //#define BUS_PORT_ENASND1 PORTB
+//#define BUS_DDR_DISRCV1  DDRB
 //#define BUS_PORT_DISRCV1 PORTB
 #define BUS_ENASND0      PB2
 //#define BUS_ENASND1      PA5
@@ -42,9 +49,9 @@
 #define LED_ERROR_OFF       PORTA &= ~LED_ERROR
 #define LED_ERROR_TOGGLE    PORTA ^=  LED_ERROR
 
-#define SCOMM_PORTOUT       PORTB
-#define SCOMM_PORTIN        PINB
-#define SCOMM_CTS           PB0
+#define SCOMM_PORTOUT       PORTD
+#define SCOMM_PORTIN        PIND
+#define SCOMM_CTS           PD4
 
 // Inputs (Buttons)
 

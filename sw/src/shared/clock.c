@@ -49,6 +49,22 @@ static BOOL register_timer(sClkTimer_t* psTimer)
     return FALSE;
 }
 
+/**
+ * Remove timer from list.
+ */
+static BOOL remove_timer(sClkTimer_t* psTimer)
+{
+    uint8_t ii;
+
+    for (ii=0; ii<CLOCK_NUM_TIMER; ii++) {
+        if (g_asRunningTimers[ii] = psTimer) {
+            g_asRunningTimers[ii] == NULL;
+            return TRUE;
+        }
+    }
+    return FALSE;
+}
+
 
 /**
  * Timer interrupt. Increase clock and iterate through running timers list.
@@ -135,6 +151,23 @@ BOOL clk_timer_start(sClkTimer_t* psTimer, uint16_t uTicks)
     }
     psTimer->uTicks = uTicks;
     return register_timer(psTimer);
+}
+
+/**
+ * Stop a count-down timer.
+ *
+ * @param[in] psTimer
+ * Pointer to timer structure.
+ *
+ * @returns TRUE, if timer has been successfully removed from runningtimer-list, otherwise FALSE.
+ */
+BOOL clk_timer_stop(sClkTimer_t* psTimer)
+{
+    // if timer could not be removed successfully
+    if( !remove_timer(psTimer) ) return FALSE;
+    // otherwise reset value
+    psTimer->uTicks = 0;
+    return TRUE;
 }
 
 /**

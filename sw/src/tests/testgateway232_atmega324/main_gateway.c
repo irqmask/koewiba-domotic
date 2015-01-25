@@ -13,7 +13,6 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 
-#include "pcbconfig.h"
 
 #include "appconfig.h"
 #include "bus.h"
@@ -21,6 +20,7 @@
 #include "clock.h"
 #include "cmddef_common.h"
 #include "moddef_common.h"
+#include "pcbconfig.h"
 #include "register.h"
 #include "serialcomm.h"
 
@@ -46,7 +46,7 @@ static void IO_vInitialize(void)
     DDRA  |= ((0<<DDRA7) | (0<<DDRA6) | (0<<DDRA5) | (0<<DDRA4) | (0<<DDRA3) | (0<<DDRA2) | (0<<DDRA1) | (0<<DDRA0) );
     PORTA |= ((0<<PA7)   |  (0<<PA6)  |  (0<<PA5)  |  (0<<PA4)  |  (0<<PA3)  |  (0<<PA2)  |  (0<<PA1)  |  (0<<PA0)  );
 
-    DDRB  |= ((1<<DDRB7) | (0<<DDRB6) | (1<<DDRB5) | (0<<DDRB4) | (0<<DDRB3) | (1<<DDRB2) | (0<<DDRB1) | (1<<DDRB0) );
+    DDRB  |= ((1<<DDRB7) | (0<<DDRB6) | (1<<DDRB5) | (0<<DDRB4) | (0<<DDRB3) | (1<<DDRB2) | (0<<DDRB1) | (0<<DDRB0) );
     PORTB |= ((0<<PB7)   |  (0<<PB6)  |  (0<<PB5)  |  (0<<PB4)  |  (0<<PB3)  |  (0<<PB2)  |  (0<<PB1)  |  (0<<PB0)  );
 
     DDRC  |= ((0<<DDRC7) | (0<<DDRC6) | (0<<DDRC5) | (0<<DDRC4) | (0<<DDRC3) | (0<<DDRC2) | (0<<DDRC1) | (0<<DDRC0) );

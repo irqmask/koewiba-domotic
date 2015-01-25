@@ -69,8 +69,8 @@
  #define SPI0_DATA_REG   REG_SPDR0
 
  #if defined (__AVR_ATtiny1634__)
-  #define SPI0_TRANSMITION_COMPLETE    ((UCSR0A & (1<<UDRE0))
-  #define SPI0_RECEPTION_COMPLETE      ((UCSR0A & (1<<RXC0 ))
+  #define SPI0_TRANSMITION_COMPLETE    (UCSR0A & (1<<UDRE0))
+  #define SPI0_RECEPTION_COMPLETE      (UCSR0A & (1<<RXC0 ))
  #else // defined (__AVR_ATtiny1634__)
   #define SPI0_TRANSMITION_COMPLETE    ((REG_SPSR0) & (1 << REGBIT_SPIF0))
   #define SPI0_RECEPTION_COMPLETE      ((REG_SPSR0) & (1 << REGBIT_SPIF0))
@@ -100,8 +100,8 @@
   #define SPI1_SS         PB4
   //! data register of spi1 
   #define SPI1_DATA_REG   REG_SPDR1
-  #define SPI1_TRANSMITION_COMPLETE    ((UCSR1A & (1<<UDRE1))
-  #define SPI1_RECEPTION_COMPLETE      ((UCSR1A & (1<<RXC1 )) 
+  #define SPI1_TRANSMITION_COMPLETE    (UCSR1A & (1<<UDRE1))
+  #define SPI1_RECEPTION_COMPLETE      (UCSR1A & (1<<RXC1 ))
  #endif // SPI0_PCBCONFIG
 #endif // defined (__AVR_ATtiny1634__)
 

@@ -57,8 +57,8 @@ static BOOL remove_timer(sClkTimer_t* psTimer)
     uint8_t ii;
 
     for (ii=0; ii<CLOCK_NUM_TIMER; ii++) {
-        if (g_asRunningTimers[ii] = psTimer) {
-            g_asRunningTimers[ii] == NULL;
+        if (g_asRunningTimers[ii] == psTimer) {
+            g_asRunningTimers[ii] = NULL;
             return TRUE;
         }
     }

@@ -114,7 +114,7 @@ static BOOL interpret_and_forward_message (sBus_t *psBus, sSerPhy_t *psSerial)
             return FALSE;
         }
         sender   = psBus->sRecvMsg.uSender;
-        length   = psBus->sRecvMsg.uLength - 4;
+        length   = psBus->sRecvMsg.length - 4;
         q_put_byte(&psSerial->sSendQ, (uint8_t)((sender & 0xFF00)>>8));
         q_put_byte(&psSerial->sSendQ, (uint8_t)( sender & 0x00FF));
         q_put_byte(&psSerial->sSendQ, length);
@@ -126,7 +126,7 @@ static BOOL interpret_and_forward_message (sBus_t *psBus, sSerPhy_t *psSerial)
         serial_phy_initiate_sending(&g_sSerPhy);
         // reset bus to IDLE state, so we are ready to receive the next message
         psBus->msg_receive_state = eBUS_RECV_NOTHING;
-        psBus->sRecvMsg.uLength = 0;
+        psBus->sRecvMsg.length = 0;
         psBus->sRecvMsg.uOverallLength = 0;
         psBus->eState = eBus_Idle;
 

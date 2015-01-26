@@ -42,10 +42,12 @@ uint8_t q_get_pending (queue_t *q)
  *
  * @returns    TRUE if message was copied successful, otherwise FALSE (e.g. if queue is full).
  */
-void q_put_byte (queue_t *q, uint8_t byte)
+BOOL q_put_byte (queue_t *q, uint8_t byte)
 {
+    if ( !q_get_free(q) ) return FALSE;
     q->data[q->writepos] = byte;
     if (sizeof(q->data) <= ++q->writepos) q->writepos = 0;
+    return TRUE;
 }
 
 /**

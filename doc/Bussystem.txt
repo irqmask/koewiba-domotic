@@ -236,7 +236,7 @@ Format: Typ, spez. Parameter
 
 0x20 - Block Start
 Starte Blockübertragung eines größeren Nachrichtenblocks, der nicht in eine Nachricht passt.
-Format: 0x20, Block-Typ, 32bit-Startadresse
+Format: 0x20, Block-Typ, 32bit-Startadresse, 32bit-Gesamtgröße
 mit Block-Typ:
  0: nicht definiert
  1: internes EEProm

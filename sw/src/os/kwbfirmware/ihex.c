@@ -22,32 +22,32 @@
 // --- Type definitions --------------------------------------------------------
 
 typedef enum {
-    e_addressmode_segment,
-    e_addressmode_linear
+    eADDRESSMODE_SEGMENT,
+    eADDRESSMODE_LINEAR
 } e_addressmode_t;
 
-// temporary data, which is used during file parsing
+//! temporary data, which is used during file parsing
 typedef struct ihex_data {
     // temporary line data
-    uint8_t         uLineDataLength;
-    uint16_t        uLineOffset;    // line load offset
-    uint8_t         uLineChkSum;    // current checksum of a line
+    uint8_t         line_data_length;
+    uint16_t        line_offset;        //!< line load offset
+    uint8_t         line_checksum;      //!< current checksum of a line
 
     // data during parsing the whole files
-    e_addressmode_t eMode;
-    uint32_t        uGlobalOffset;
+    e_addressmode_t mode;
+    uint32_t        global_offset;
 
     // resulting data
-    uint32_t        uStartAddress;
-    e_addressmode_t eStartAddressMode;
-    uint32_t        uFirstAddress;
-    uint32_t        uLastAddress;
+    uint32_t        start_address;
+    e_addressmode_t start_address_mode;
+    uint32_t        first_address;
+    uint32_t        last_address;
 } ihex_data_t;
 
 // temporary data, which is used by the simple memory-writer function
 typedef struct meminfo {
-    uint8_t* puPtr;
-    uint32_t uSize;
+    uint8_t* ptr;
+    uint32_t size;
 } meminfo_t;
 
 // --- Local variables ---------------------------------------------------------
@@ -60,14 +60,14 @@ typedef struct meminfo {
 
 // read mark at the beginning of the line, which is the colon ':'
 // skip linefeed- or newline- characters which may occur during reading the file.
-// ----------------------------------------------------------------------------
-static int32_t read_mark(FILE*                  psFile)
+// -----------------------------------------------------------------------------
+static int32_t read_mark(FILE*                  file)
 {
     int32_t retval      = e_ihex_error_line_mark;
     char    markchar  = '\0';
 
     do {
-        if (fread(&markchar, sizeof(markchar), 1, psFile) == 1) {
+        if (fread(&markchar, sizeof(markchar), 1, file) == 1) {
             if (markchar == ':') {
                 retval = e_ihex_success;
                 break;
@@ -83,19 +83,19 @@ static int32_t read_mark(FILE*                  psFile)
 // read a nibble. if the read character dos not represent a hexadecimal number,
 // an error is returned,
 // ----------------------------------------------------------------------------
-static int32_t read_nibble(FILE*                  psFile,
-                           uint8_t*               puNibble)
+static int32_t read_nibble(FILE*                  file,
+                           uint8_t*               nibble)
 {
     int32_t retval      = e_ihex_success;
     char    nibblechar  = '\0';
 
-    if (fread(&nibblechar, sizeof(nibblechar), 1, psFile) == 1) {
+    if (fread(&nibblechar, sizeof(nibblechar), 1, file) == 1) {
         if (nibblechar >= '0' && nibblechar <= '9') {
-            *puNibble = nibblechar - '0';
+            *nibble = nibblechar - '0';
         } else if (nibblechar >= 'A' && nibblechar <= 'F') {
-            *puNibble = nibblechar - 'A' + 10;
+            *nibble = nibblechar - 'A' + 10;
         } else if (nibblechar >= 'a' && nibblechar <= 'f') {
-            *puNibble = nibblechar - 'a' + 10;
+            *nibble = nibblechar - 'a' + 10;
         } else if (nibblechar == '\r' || nibblechar == '\n') {
             retval = e_ihex_error_unexpected_eol;
         } else {
@@ -108,58 +108,58 @@ static int32_t read_nibble(FILE*                  psFile,
 }
 
 // read a byte, which is represented by to characters
-// ----------------------------------------------------------------------------
-static int32_t read_byte(FILE*                  psFile,
-                         uint8_t*               puByte)
+// -----------------------------------------------------------------------------
+static int32_t read_byte(FILE*                  file,
+                         uint8_t*               pbyte)
 {
     int32_t retval      = e_ihex_success;
     uint8_t nibble      = 0,
             byte        = 0;
 
     do {
-        if ((retval = read_nibble(psFile, &nibble)) != e_ihex_success) {
+        if ((retval = read_nibble(file, &nibble)) != e_ihex_success) {
             break;
         }
         byte = nibble << 4;
-        if ((retval = read_nibble(psFile, &nibble)) != e_ihex_success) {
+        if ((retval = read_nibble(file, &nibble)) != e_ihex_success) {
             break;
         }
         byte |= nibble & 0x0F;
-        *puByte = byte;
+        *pbyte = byte;
     } while (0);
     return retval;
 }
 
 // read record type 00: Data Record
 // ----------------------------------------------------------------------------
-static int32_t read_data_rec(FILE*                  psFile,
-                             ihex_data_t*           psMetaData,
-                             ihex_write_byte_func   pWriteByte,
-                             void*                  pvArg
+static int32_t read_data_rec(FILE*                  file,
+                             ihex_data_t*           meta_data,
+                             ihex_write_byte_func   write_byte_func,
+                             void*                  arg
                             )
 {
     int32_t     retval = e_ihex_success;
     uint32_t    address, ii = 0;
     uint8_t     byte;
 
-    while (psMetaData->uLineDataLength-- > 0) {
+    while (meta_data->line_data_length-- > 0) {
         // calculate address and store min/max
-        if (psMetaData->eMode == e_addressmode_linear) {
-            address = psMetaData->uGlobalOffset + psMetaData->uLineOffset + ii;
+        if (meta_data->mode == eADDRESSMODE_LINEAR) {
+            address = meta_data->global_offset + meta_data->line_offset + ii;
         } else {
-            address = (psMetaData->uLineOffset + ii) & 0x0000FFFF;
-            address += psMetaData->uGlobalOffset;
+            address = (meta_data->line_offset + ii) & 0x0000FFFF;
+            address += meta_data->global_offset;
         }
-        if (address < psMetaData->uFirstAddress) psMetaData->uFirstAddress = address;
-        if (address > psMetaData->uLastAddress) psMetaData->uLastAddress = address;
+        if (address < meta_data->first_address) meta_data->first_address = address;
+        if (address > meta_data->last_address) meta_data->last_address = address;
         // read byte
-        if ((retval = read_byte(psFile, &byte)) != e_ihex_success) {
+        if ((retval = read_byte(file, &byte)) != e_ihex_success) {
             break;
         }
-        psMetaData->uLineChkSum += byte;
+        meta_data->line_checksum += byte;
         // store byte, if wanted
-        if (pWriteByte != NULL) {
-            pWriteByte(address, byte, pvArg);
+        if (write_byte_func != NULL) {
+            write_byte_func(address, byte, arg);
         }
         ii++;
     }
@@ -168,130 +168,130 @@ static int32_t read_data_rec(FILE*                  psFile,
 
 // read record type 02: Extended Segment Address Record
 // ----------------------------------------------------------------------------
-static int32_t read_extsegaddr_rec(FILE*                  psFile,
-                                   ihex_data_t*           psMetaData)
+static int32_t read_extsegaddr_rec(FILE*                  file,
+                                   ihex_data_t*           meta_data)
 {
     int32_t     retval = e_ihex_success;
     uint16_t    usba;
     uint8_t     byte = 0;
 
     do {
-        if ((retval = read_byte(psFile, &byte)) != e_ihex_success) {
+        if ((retval = read_byte(file, &byte)) != e_ihex_success) {
             break;
         }
-        psMetaData->uLineChkSum += byte;
+        meta_data->line_checksum += byte;
         usba = byte << 8;
-        if ((retval = read_byte(psFile, &byte)) != e_ihex_success) {
+        if ((retval = read_byte(file, &byte)) != e_ihex_success) {
             break;
         }
-        psMetaData->uLineChkSum += byte;
+        meta_data->line_checksum += byte;
         usba |= byte;
-        psMetaData->uGlobalOffset = usba << 4;
-        psMetaData->eMode = e_addressmode_segment;
+        meta_data->global_offset = usba << 4;
+        meta_data->mode = eADDRESSMODE_SEGMENT;
     } while (0);
     return retval;
 }
 
 // read record type 03: Start Segment Address Record
 // ----------------------------------------------------------------------------
-static int32_t read_startsegaddr_rec(FILE*                  psFile,
-                                     ihex_data_t*           psMetaData)
+static int32_t read_startsegaddr_rec(FILE*                  file,
+                                     ihex_data_t*           meta_data)
 {
     int32_t retval = e_ihex_success;
     uint8_t byte = 0;
 
     do {
-        psMetaData->eStartAddressMode = e_addressmode_segment;
-        if ((retval = read_byte(psFile, &byte)) != e_ihex_success) {
+        meta_data->start_address_mode = eADDRESSMODE_SEGMENT;
+        if ((retval = read_byte(file, &byte)) != e_ihex_success) {
             break;
         }
-        psMetaData->uLineChkSum += byte;
-        psMetaData->uStartAddress = byte << 24;
-        if ((retval = read_byte(psFile, &byte)) != e_ihex_success) {
+        meta_data->line_checksum += byte;
+        meta_data->start_address = byte << 24;
+        if ((retval = read_byte(file, &byte)) != e_ihex_success) {
             break;
         }
-        psMetaData->uLineChkSum += byte;
-        psMetaData->uStartAddress |= byte << 16;
-        if ((retval = read_byte(psFile, &byte)) != e_ihex_success) {
+        meta_data->line_checksum += byte;
+        meta_data->start_address |= byte << 16;
+        if ((retval = read_byte(file, &byte)) != e_ihex_success) {
             break;
         }
-        psMetaData->uLineChkSum += byte;
-        psMetaData->uStartAddress |= byte << 8;
-        if ((retval = read_byte(psFile, &byte)) != e_ihex_success) {
+        meta_data->line_checksum += byte;
+        meta_data->start_address |= byte << 8;
+        if ((retval = read_byte(file, &byte)) != e_ihex_success) {
             break;
         }
-        psMetaData->uLineChkSum += byte;
-        psMetaData->uStartAddress |= byte;
+        meta_data->line_checksum += byte;
+        meta_data->start_address |= byte;
     } while (0);
     return retval;
 }
 
 // read record type 04: Extended Linear Address Record
 // ----------------------------------------------------------------------------
-static int32_t read_extlinearaddr_rec(FILE*                  psFile,
-                                      ihex_data_t*           psMetaData)
+static int32_t read_extlinearaddr_rec(FILE*                  file,
+                                      ihex_data_t*           meta_data)
 {
     int32_t retval = e_ihex_success;
     uint8_t byte = 0;
 
     do {
 
-        psMetaData->eMode = e_addressmode_linear;
-        if ((retval = read_byte(psFile, &byte)) != e_ihex_success) {
+        meta_data->mode = eADDRESSMODE_LINEAR;
+        if ((retval = read_byte(file, &byte)) != e_ihex_success) {
             break;
         }
-        psMetaData->uLineChkSum += byte;
-        psMetaData->uGlobalOffset = byte << 24;
-        if ((retval = read_byte(psFile, &byte)) != e_ihex_success) {
+        meta_data->line_checksum += byte;
+        meta_data->global_offset = byte << 24;
+        if ((retval = read_byte(file, &byte)) != e_ihex_success) {
             break;
         }
-        psMetaData->uLineChkSum += byte;
-        psMetaData->uGlobalOffset |= byte << 16;
-        psMetaData->uGlobalOffset &= 0xFFFF0000;
+        meta_data->line_checksum += byte;
+        meta_data->global_offset |= byte << 16;
+        meta_data->global_offset &= 0xFFFF0000;
     } while (0);
     return retval;
 }
 
 // read record type 05: Start Linear Address Record
 // ----------------------------------------------------------------------------
-static int32_t read_startlinearaddr_rec(FILE*                  psFile,
-                                        ihex_data_t*           psMetaData)
+static int32_t read_startlinearaddr_rec(FILE*                  file,
+                                        ihex_data_t*           meta_data)
 {
     int32_t retval = e_ihex_success;
     uint8_t byte = 0;
 
     do {
-        psMetaData->eStartAddressMode = e_addressmode_linear;
-        if ((retval = read_byte(psFile, &byte)) != e_ihex_success) {
+        meta_data->start_address_mode = eADDRESSMODE_LINEAR;
+        if ((retval = read_byte(file, &byte)) != e_ihex_success) {
             break;
         }
-        psMetaData->uLineChkSum += byte;
-        psMetaData->uStartAddress = byte << 24;
-        if ((retval = read_byte(psFile, &byte)) != e_ihex_success) {
+        meta_data->line_checksum += byte;
+        meta_data->start_address = byte << 24;
+        if ((retval = read_byte(file, &byte)) != e_ihex_success) {
             break;
         }
-        psMetaData->uLineChkSum += byte;
-        psMetaData->uStartAddress |= byte << 16;
-        if ((retval = read_byte(psFile, &byte)) != e_ihex_success) {
+        meta_data->line_checksum += byte;
+        meta_data->start_address |= byte << 16;
+        if ((retval = read_byte(file, &byte)) != e_ihex_success) {
             break;
         }
-        psMetaData->uLineChkSum += byte;
-        psMetaData->uStartAddress |= byte << 8;
-        if ((retval = read_byte(psFile, &byte)) != e_ihex_success) {
+        meta_data->line_checksum += byte;
+        meta_data->start_address |= byte << 8;
+        if ((retval = read_byte(file, &byte)) != e_ihex_success) {
             break;
         }
-        psMetaData->uLineChkSum += byte;
-        psMetaData->uStartAddress |= byte;
+        meta_data->line_checksum += byte;
+        meta_data->start_address |= byte;
     } while (0);
     return retval;
 }
 
 // read an entire line of the IHEX file and interpret it's content
 // ----------------------------------------------------------------------------
-static int32_t read_line(FILE*                  psFile,
-                         ihex_data_t*           psMetaData,
-                         ihex_write_byte_func   pWriteByte,
-                         void*                  pvArg)
+static int32_t read_line(FILE*                  file,
+                         ihex_data_t*           meta_data,
+                         ihex_write_byte_func   write_byte_func,
+                         void*                  arg)
 {
     int32_t     retval      = e_ihex_success;
     uint8_t     byte        = 0,
@@ -299,70 +299,70 @@ static int32_t read_line(FILE*                  psFile,
     char        lineendchar = '\0';
 
     do {
-        psMetaData->uLineDataLength = 0;
-        psMetaData->uLineOffset = 0;
-        psMetaData->uLineChkSum = 0;
+        meta_data->line_data_length = 0;
+        meta_data->line_offset = 0;
+        meta_data->line_checksum = 0;
         // read record mark, every line starts with
-        if ((retval = read_mark(psFile)) != e_ihex_success) {
+        if ((retval = read_mark(file)) != e_ihex_success) {
             break;
         }
 
         // read record length
-        if ((retval = read_byte(psFile, &psMetaData->uLineDataLength)) != e_ihex_success) {
+        if ((retval = read_byte(file, &meta_data->line_data_length)) != e_ihex_success) {
             break;
         }
-        psMetaData->uLineChkSum += psMetaData->uLineDataLength;
+        meta_data->line_checksum += meta_data->line_data_length;
 
         // read record offset
-        if ((retval = read_byte(psFile, &byte)) != e_ihex_success) {
+        if ((retval = read_byte(file, &byte)) != e_ihex_success) {
             break;
         }
-        psMetaData->uLineOffset = byte << 8;
-        psMetaData->uLineChkSum += byte;
-        if ((retval = read_byte(psFile, &byte)) != e_ihex_success) {
+        meta_data->line_offset = byte << 8;
+        meta_data->line_checksum += byte;
+        if ((retval = read_byte(file, &byte)) != e_ihex_success) {
             break;
         }
-        psMetaData->uLineOffset |= byte;
-        psMetaData->uLineChkSum += byte;
+        meta_data->line_offset |= byte;
+        meta_data->line_checksum += byte;
 
         // read record type
-        if ((retval = read_byte(psFile, &rectype)) != e_ihex_success) {
+        if ((retval = read_byte(file, &rectype)) != e_ihex_success) {
             break;
         }
-        psMetaData->uLineChkSum += rectype;
+        meta_data->line_checksum += rectype;
 
         switch (rectype) {
         case 0:
-            retval = read_data_rec(psFile, psMetaData, pWriteByte, pvArg); break;
+            retval = read_data_rec(file, meta_data, write_byte_func, arg); break;
         case 1:
             break; // nothing more
         case 2:
-            retval = read_extsegaddr_rec(psFile, psMetaData); break;
+            retval = read_extsegaddr_rec(file, meta_data); break;
         case 3:
-            retval = read_startsegaddr_rec(psFile, psMetaData); break;
+            retval = read_startsegaddr_rec(file, meta_data); break;
         case 4:
-            retval = read_extlinearaddr_rec(psFile, psMetaData); break;
+            retval = read_extlinearaddr_rec(file, meta_data); break;
         case 5:
-            retval = read_startlinearaddr_rec(psFile, psMetaData); break;
+            retval = read_startlinearaddr_rec(file, meta_data); break;
         default:
             retval = e_ihex_error_invalid_rectype;
             return retval;
         }
 
         // read line checksum
-        if ((retval = read_byte(psFile, &byte)) != e_ihex_success) {
+        if ((retval = read_byte(file, &byte)) != e_ihex_success) {
             break;
         }
-        psMetaData->uLineChkSum += byte;
+        meta_data->line_checksum += byte;
         // sum of checksum of data and checksum byte ate the line ending has
         // to be zero.
-        if (psMetaData->uLineChkSum != 0) {
+        if (meta_data->line_checksum != 0) {
             retval = e_ihex_error_checksum;
             break;
         }
 
         // read line ending
-        if (fread(&lineendchar, sizeof(lineendchar), 1, psFile) == 1) {
+        if (fread(&lineendchar, sizeof(lineendchar), 1, file) == 1) {
             if (lineendchar != '\n' && lineendchar != '\r') {
                 retval = e_ihex_error_chars_at_eol;
                 break;
@@ -373,13 +373,14 @@ static int32_t read_line(FILE*                  psFile,
     return retval;
 }
 
-void write_byte_to_mem(uint32_t uAddress, uint8_t uByte, void* pvArg)
+// helper function, which is used to read the IHEX file completely into memory.
+void write_byte_to_mem(uint32_t address, uint8_t byte, void* arg)
 {
-    meminfo_t* mem = pvArg;
+    meminfo_t* mem = arg;
 
     if (mem != NULL) {
-        if (mem->puPtr && uAddress < mem->uSize) {
-            mem->puPtr[uAddress] = uByte;
+        if (mem->ptr && address < mem->size) {
+            mem->ptr[address] = byte;
         }
     }
 }
@@ -388,12 +389,30 @@ void write_byte_to_mem(uint32_t uAddress, uint8_t uByte, void* pvArg)
 
 // --- Global functions --------------------------------------------------------
 
-int32_t ihex_read_file (const char*             pcFilename,
-                        uint32_t*               puStartAddress,
-                        uint32_t*               puFirstAddress,
-                        uint32_t*               puLastAddress,
-                        ihex_write_byte_func    pWriteByte,
-                        void*                   pvArg)
+/**
+ * Read an Intel Hex file. For each byte the write_byte_func() is caĺled.
+ * 
+ * @param[in]   filename        Path and filename of Intel HEX file.
+ * @param[out]  pstart_address  Address in target memory of the program entry 
+ *                              point.
+ * @param[out]  pfirst_address  First (lowest) address in target memory which 
+ *                              is filled by the IHEX file.
+ * @param[out]  plast_address   Last (highest) address in target memory which is
+ *                              filled by the IHEX file.
+ * @param[in]   write_byte_func Callback function which is called for every byte
+ *                              to by written @see ihex_write_byte_func for 
+ *                              details.
+ * @param[in]   arg             User defined argument which is passed to the 
+ *                              write_byte_func.
+ * 
+ * @returns     0 if the IHEX file has been successfully read in, otherwise false.
+ */
+int32_t ihex_read_file (const char*             filename,
+                        uint32_t*               pstart_address,
+                        uint32_t*               pfirst_address,
+                        uint32_t*               plast_address,
+                        ihex_write_byte_func    write_byte_func,
+                        void*                   arg)
 {
     int32_t     retval;
     FILE*       handle;
@@ -401,14 +420,14 @@ int32_t ihex_read_file (const char*             pcFilename,
     ihex_data_t metadata;
 
     do {
-        metadata.eMode = e_addressmode_linear;
-        metadata.uGlobalOffset = 0;
-        metadata.uFirstAddress = 0xFFFFFFFF;
-        metadata.uLastAddress = 0x00000000;
-        metadata.uStartAddress = 0x00000000;
+        metadata.mode = eADDRESSMODE_LINEAR;
+        metadata.global_offset = 0;
+        metadata.first_address = 0xFFFFFFFF;
+        metadata.last_address = 0x00000000;
+        metadata.start_address = 0x00000000;
 
         // try to open the file for reading
-        handle = fopen(pcFilename, "r");
+        handle = fopen(filename, "r");
         if (handle == NULL) {
             retval = e_ihex_error_file_open;
             break;
@@ -416,7 +435,7 @@ int32_t ihex_read_file (const char*             pcFilename,
 
         // read the file line by line
         do {
-            retval = read_line(handle, &metadata, pWriteByte, pvArg);
+            retval = read_line(handle, &metadata, write_byte_func, arg);
             line++;
         } while (retval == e_ihex_success);
 
@@ -426,9 +445,9 @@ int32_t ihex_read_file (const char*             pcFilename,
 
     // on success return metadata
     if (retval == e_ihex_success) {
-        if (puStartAddress != NULL) *puStartAddress = metadata.uStartAddress;
-        if (puFirstAddress != NULL) *puFirstAddress = metadata.uFirstAddress;
-        if (puLastAddress != NULL) *puLastAddress = metadata.uLastAddress;
+        if (pstart_address != NULL) *pstart_address = metadata.start_address;
+        if (pfirst_address != NULL) *pfirst_address = metadata.first_address;
+        if (plast_address != NULL) *plast_address = metadata.last_address;
     }
 
     // if file has been opened, close it
@@ -438,22 +457,40 @@ int32_t ihex_read_file (const char*             pcFilename,
 }
 
 
-int32_t ihex_read_file_mem (const char*             pcFilename,
-                            uint32_t*               puStartAddress,
-                            uint32_t*               puFirstAddress,
-                            uint32_t*               puLastAddress,
-                            uint8_t*                puTargetMemory,
-                            uint32_t                uTargetMemorySize)
+/**
+ * Read an Intel Hex file. For each byte the write_byte_func() is caĺled.
+ * 
+ * @param[in]   filename        Path and filename of Intel HEX file.
+ * @param[out]  pstart_address  Address in target memory of the program entry 
+ *                              point.
+ * @param[out]  pfirst_address  First (lowest) address in target memory which 
+ *                              is filled by the IHEX file.
+ * @param[out]  plast_address   Last (highest) address in target memory which is
+ *                              filled by the IHEX file.
+ * @param[in]   target_memory   Byte pointer to the target memory, into which 
+ *                              the IHEX file content is written.
+ * @param[in]   target_memory_size Size of target memory. If the size of the 
+ *                              IHEX file contnt exceeds the target memoy size, 
+ *                              the read process is stopped.
+ * 
+ * @returns     0 if the IHEX file has been successfully read in, otherwise false.
+ */
+int32_t ihex_read_file_mem (const char*             filename,
+                            uint32_t*               pstart_address,
+                            uint32_t*               pfirst_address,
+                            uint32_t*               plast_address,
+                            uint8_t*                target_memory,
+                            uint32_t                target_memory_size)
 {
     meminfo_t mem;
 
-    mem.puPtr = puTargetMemory;
-    mem.uSize = uTargetMemorySize;
+    mem.ptr = target_memory;
+    mem.size = target_memory_size;
 
-    return ihex_read_file(pcFilename,
-                          puStartAddress,
-                          puFirstAddress,
-                          puLastAddress,
+    return ihex_read_file(filename,
+                          pstart_address,
+                          pfirst_address,
+                          plast_address,
                           write_byte_to_mem, &mem);
 }
 /** @} */

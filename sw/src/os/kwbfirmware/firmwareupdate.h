@@ -19,17 +19,22 @@
 
 // --- Type definitions --------------------------------------------------------
 
+//! Firmware update process data structure.
 typedef struct firmwareupdate {
-    msg_serial_t    msg_serial;
-    char            filename[256];
-    uint16_t        module_address;
+    msg_serial_t    msg_serial;         //!< Handle of the serial connection.
+    char            filename[256];      //!< Path and filename to the IHEX file.
+    uint16_t        module_address;     //!< target module address.
     
-    uint8_t*        fw_memory;
-    uint32_t        fw_firstaddress;
-    uint32_t        fw_startaddress;
-    uint32_t        fw_size;
+    uint8_t*        fw_memory;          //!< Pointer to the memory block wich 
+                                        //!< contains the target module's firmware.
+    uint32_t        fw_firstaddress;    //!< First (lowest) address of the target
+                                        //!< module's firmware.
+    uint32_t        fw_startaddress;    //!< Program entry point of the target's 
+                                        //!< firmware.
+    uint32_t        fw_size;            //!< Size on bytes of the firmware.
     
-    uint32_t        curr_offset;
+    uint32_t        curr_offset;        //!< Current offset in fw_memory during 
+                                        //!< transmission.
 } firmwareupdate_t;
     
 // --- Local variables ---------------------------------------------------------

@@ -5,4 +5,5 @@ Known bugs:
  - C4 has to be 22pF instead of 33pF (like stated in MCP23016 datasheet)
  - connectors place behind screws
  - raspberry screws or connector not exactly over J26
+ - change informatics amplifier into voltage divider 5V -> 3.3V (R21 + R22)
 

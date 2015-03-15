@@ -11,14 +11,13 @@
 bool                g_display_empty_msg = true;
 bool                g_display_token_msg = true;
 
-static double current_time_difference (bus_history_t* history)
+static void current_time_difference (bus_history_t* history, int32_t* diff_ms, int32_t* remaining_us)
 {
-    return (double)(history->uTimeCurrByte - history->uTimeStart) / 1000.0;
-}
+    int32_t diff_us;
 
-static double last_time_difference (bus_history_t* history)
-{
-    return (double)(history->uTimeLastByte - history->uTimeStart) / 1000.0;
+    diff_us = (int32_t)(history->uTimeCurrByte - history->uTimeStart);
+    *diff_ms = diff_us / 1000;
+    *remaining_us = diff_us - (*diff_ms * 1000);
 }
 
 void monitor_init (bus_history_t* history)
@@ -34,7 +33,7 @@ void monitor_parse_message (uint8_t new_byte, bus_history_t* history)
     char        buffer[256], part[256];
     uint16_t    calcedcrc = 0;
     uint8_t     ii, crclen = 0;
-
+    int32_t     diff_ms = 0, remaining_us = 0;
     enum {
         eMsgNothing,
         eMsgError,
@@ -47,9 +46,9 @@ void monitor_parse_message (uint8_t new_byte, bus_history_t* history)
 
     history->uTimeLastByte = history->uTimeCurrByte;
     history->uTimeCurrByte = sys_time_get_usecs();
-
     if (history->uCurrMsgBytes == 0) {
-        snprintf(buffer, sizeof(buffer)-1, "%9.1f | ", current_time_difference(history));
+        current_time_difference(history, &diff_ms, &remaining_us);
+        snprintf(buffer, sizeof(buffer)-1, "%9d.%03d | ", diff_ms, remaining_us);
     }
     snprintf(part, sizeof(part-1), "%02X ", new_byte);
     strcat_s(buffer, sizeof(buffer)-1, part);

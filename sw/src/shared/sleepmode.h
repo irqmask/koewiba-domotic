@@ -29,6 +29,9 @@
 #ifdef PRJCONF_UC_AVR
 #define sleep_pinchange2_enable()   PCICR |=  (1<<PCIE2)
 #define sleep_pinchange2_disable()  PCICR &= ~(1<<PCIE2)
+// future use
+//#define sleep_pinchange2_enable()   PINCHGIR_REGISTER |=  PCIE_BITS
+//#define sleep_pinchange2_disable()  PINCHGIR_REGISTER &= ~PCIE_BITS
 #define sleep_set_mode(m)           set_sleep_mode(m)
 #define sleep_activate()            sleep_mode()
 #define sleep_delay_ms(t)           _delay_ms(t)

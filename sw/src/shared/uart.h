@@ -86,7 +86,7 @@ uint8_t         UART_uSendQueueSpace(void);
 BOOL            UART_bIsBusy        (void);
 
 void            UART_vTransmit      (uint8_t*               puSendBuf,
-                                     uint8_t                uLength);
+                                     uint8_t                length);
 
 uint16_t        UART_uReceive       (void);
 

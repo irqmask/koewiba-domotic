@@ -45,7 +45,7 @@ int vos_open_serial (vos_t* vos, const char* device, int baudrate)
 
         vos->fd = sys_serial_open(device);
         if (vos->fd <= INVALID_FD) {
-            rc = eSYS_ERR_INVALID_FD;
+            rc = eERR_INVALID_FD;
             break;
         }
 
@@ -78,7 +78,7 @@ int vos_open_vbusd (vos_t* vos, const char* address, uint16_t port)
             vos->fd = sys_socket_open_client_tcp(address, port);
         }
         if (vos->fd <= INVALID_FD) {
-            rc = eSYS_ERR_INVALID_FD;
+            rc = eERR_INVALID_FD;
             break;
         }
 

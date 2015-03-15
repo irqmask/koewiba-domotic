@@ -214,19 +214,19 @@ void        register_do_command     (sBus_t*                psBus,
 
     // check command
     switch (puMsg[0]) {
-    case CMD_eRequestRegister:
+    case eCMD_REQUEST_REG:
         // Format: <Command><Registernumber>
         if (uMsgLen >= 2) {
             answer_register_request(psBus, puMsg[1], uSender);
         }
         break;
-    case CMD_eSetRegister8bit:
+    case eCMD_SET_REG_8BIT:
         // Format: <Command><Registernumber><Value>
         if (uMsgLen >= 3) {
             register_set_u8   (puMsg[1], puMsg[2]);
         }
         break;
-    case CMD_eSetRegister16bit:
+    case eCMD_SET_REG_16BIT:
         // Format: <Command><Registernumber><LowValue><HighValue>
         if (uMsgLen >= 4) {
             temp16 = puMsg[2];
@@ -234,7 +234,7 @@ void        register_do_command     (sBus_t*                psBus,
             register_set_u16(puMsg[1], temp16);
         }
         break;
-    case CMD_eSetRegister32bit:
+    case eCMD_SET_REG_32BIT:
         // Format: <Command><Registernumber><LowLowValue><LowValue><HighValue><HighHighValue>
         if (uMsgLen >= 6) {
             temp32 = puMsg[2];
@@ -268,7 +268,7 @@ void        register_send_u8        (sBus_t*                psBus,
 {
     uint8_t msg[3];
 
-    msg[0] = CMD_eState8bit;
+    msg[0] = eCMD_STATE_8BIT;
     msg[1] = uRegNo;
     msg[2] = uValue;
     bus_send_message(psBus, uReceiver, sizeof(msg), msg);
@@ -293,7 +293,7 @@ void        register_send_u16       (sBus_t*                psBus,
 {
     uint8_t msg[4];
 
-    msg[0] = CMD_eState16bit;
+    msg[0] = eCMD_STATE_16BIT;
     msg[1] = uRegNo;
     msg[2] = uValue & 0x00FF;
     msg[3] = uValue >> 8;
@@ -319,7 +319,7 @@ void        register_send_u32       (sBus_t*                psBus,
 {
     uint8_t msg[6];
 
-    msg[0] = CMD_eState32bit;
+    msg[0] = eCMD_STATE_32BIT;
     msg[1] = uRegNo;
     msg[2] = uValue & 0x000000FF;
     msg[3] = (uValue >> 8) & 0x000000FF;

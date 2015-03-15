@@ -114,7 +114,7 @@ static int32_t msg_read (void* arg)
 
         // handle message
         if (msg_socket->incomming_handler != NULL) {
-            msg_socket->incomming_handler(&message, msg_socket->incomming_arg);
+            msg_socket->incomming_handler(&message, ep, msg_socket->incomming_arg);
         }
     } while (0);
     return 0;
@@ -131,11 +131,14 @@ static int32_t msg_accept_endpoint (void* arg)
 {
     msg_socket_t*   msg_socket = (msg_socket_t*)arg;
     msg_endpoint_t* ep = NULL;
+    char address[256];
+    uint16_t port = 0;
 
     do {
         ep = msg_new_endpoint(msg_socket, eMSG_EP_COMM);
         if (ep == NULL) break;
 
+        // get file descriptor of new client connection
         ep->fd = sys_socket_accept(msg_socket->well_known_fd);
         if (ep->fd <= INVALID_FD) {
             perror("server not accepting new endpoint");
@@ -143,12 +146,17 @@ static int32_t msg_accept_endpoint (void* arg)
             break;
         }
 
+        // get address and port of accepted connection and pass it to appications
+        // new connection handler.
+        sys_socket_get_name(ep->fd, address, sizeof(address), &port);
+        if (msg_socket->new_connection_handler != NULL) {
+            msg_socket->new_connection_handler(address, port, ep, msg_socket->new_connection_arg);
+        }
+
         // register new connection to ioloop
         ioloop_register_fd(msg_socket->ioloop, ep->fd, eIOLOOP_EV_READ, msg_read, (void*)ep);
-        //ioloop_register_fd(msg_socket->ioloop, ep->fd, eIOLOOP_EV_WRITE, msg_ready_to_write, (void*)ep);
 
-        fprintf(stderr, "connection accepted\n");
-
+        fprintf(stderr, "connection accepted from %s:%d\n", address, port);
     } while (0);
     return 0;
 }
@@ -187,7 +195,7 @@ int msg_s_open_server (msg_socket_t*   msg_socket,
         if (port == 0) {
             fd = sys_socket_open_server_unix(msg_socket->address);
             if (fd <= INVALID_FD) {
-                rc = eSYS_ERR_SYSTEM;
+                rc = eERR_SYSTEM;
                 break;
             }
             sys_socket_set_blocking(fd, false);
@@ -227,7 +235,7 @@ int msg_s_open_client (msg_socket_t*   msg_socket,
         if (port == 0) {
             fd = sys_socket_open_client_unix(msg_socket->address);
             if (fd <= INVALID_FD) {
-                rc = eSYS_ERR_SYSTEM;
+                rc = eERR_SYSTEM;
                 break;
             }
             sys_socket_set_blocking(fd, false);
@@ -255,6 +263,14 @@ void msg_s_close_connection (msg_socket_t* msg_socket, msg_endpoint_t* ep)
     ioloop_unregister_fd(msg_socket->ioloop, ep->fd);
     sys_socket_close (ep->fd);
     msg_delete_endpoint(msg_socket, ep);
+}
+
+void msg_s_set_newconnection_handler (msg_socket_t* msg_socket, msg_newconn_func_t func, void* arg)
+{
+    assert(msg_socket != NULL);
+
+    msg_socket->new_connection_handler = func;
+    msg_socket->new_connection_arg = arg;
 }
 
 void msg_s_set_incomming_handler (msg_socket_t* msg_socket, msg_incom_func_t func, void* arg)

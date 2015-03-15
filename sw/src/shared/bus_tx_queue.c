@@ -20,18 +20,18 @@ void bus_q_initialize(queue_t *q)
     uint8_t     n;
 
     for (n=0; n<BUS_TX_QUEUE_SIZE; ++n) q->data[n] = 0;
-    q->pwrite = 0;
-    q->pread  = 0;
+    q->writepos = 0;
+    q->readpos  = 0;
 }
 
 uint8_t bus_q_get_free (queue_t *q)
 {
-    return (BUS_TX_QUEUE_SIZE - 1 + q->pread - q->pwrite) % BUS_TX_QUEUE_SIZE;
+    return (BUS_TX_QUEUE_SIZE - 1 + q->readpos - q->writepos) % BUS_TX_QUEUE_SIZE;
 }
 
 uint8_t bus_q_get_pending (queue_t *q)
 {
-    return (BUS_TX_QUEUE_SIZE + q->pwrite - q->pread) % BUS_TX_QUEUE_SIZE;
+    return (BUS_TX_QUEUE_SIZE + q->writepos - q->readpos) % BUS_TX_QUEUE_SIZE;
 }
 
 /**
@@ -44,8 +44,8 @@ uint8_t bus_q_get_pending (queue_t *q)
  */
 void bus_q_put_byte (queue_t *q, uint8_t byte)
 {
-    q->data[q->pwrite++] = byte;
-    if (BUS_TX_QUEUE_SIZE <= q->pwrite) q->pwrite = 0;
+    q->data[q->writepos++] = byte;
+    if (BUS_TX_QUEUE_SIZE <= q->writepos) q->writepos = 0;
 }
 
 /**
@@ -62,9 +62,9 @@ uint8_t bus_q_get_byte (queue_t *q)
 {
     uint8_t byte;
 
-    byte = q->data[q->pread];
-    q->pread++;
-    q->pread %= BUS_TX_QUEUE_SIZE;
+    byte = q->data[q->readpos];
+    q->readpos++;
+    q->readpos %= BUS_TX_QUEUE_SIZE;
 
     return byte;
 }

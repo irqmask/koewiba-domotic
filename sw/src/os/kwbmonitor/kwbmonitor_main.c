@@ -201,7 +201,7 @@ int main(int argc, char* argv[])
     int rc = eERR_NONE;
     options_t options;
 
-    printf("kwbmonitor");
+    printf("kwbmonitor...\n");
     setbuf(stdout, NULL);       // disable buffering of stdout
 
     do {
@@ -209,7 +209,7 @@ int main(int argc, char* argv[])
         if (!parse_commandline_options(argc, argv, &options) ||
             !validate_options(&options)) {
             print_usage();
-            rc = eSYS_ERR_BAD_PARAMETER;
+            rc = eERR_BAD_PARAMETER;
             break;
         }
 

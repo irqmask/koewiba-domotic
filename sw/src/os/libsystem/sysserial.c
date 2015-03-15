@@ -141,7 +141,7 @@ int sys_serial_set_params (sys_fd_t            fd,
             databits >= eSYS_SER_DB_LAST ||
             parity >= eSYS_SER_P_LAST ||
             stopbits >= eSYS_SER_SB_LAST) {
-            eSYS_ERR_BAD_PARAMETER;
+            eERR_BAD_PARAMETER;
             break;
         }
         sys_baudrate = c_baudrate[baudrate];
@@ -155,6 +155,7 @@ int sys_serial_set_params (sys_fd_t            fd,
         }
 
         memset(&settings, 0, sizeof(settings));
+        tcgetattr(fd, &settings);
         settings.c_cflag = sys_databits | sys_parity | sys_stopbits | CLOCAL | CREAD;
         settings.c_iflag = IGNPAR;
         settings.c_oflag = 0;
@@ -162,9 +163,9 @@ int sys_serial_set_params (sys_fd_t            fd,
         settings.c_cc[VMIN]  = 1;     // block until n bytes are received
         settings.c_cc[VTIME] = 0;     // no timeout
 
-        if ((tcsetattr(fd, TCSANOW, &settings)  < 0) ||
-            (cfsetispeed(&settings, sys_baudrate) < 0) ||
-            (cfsetospeed(&settings, sys_baudrate) < 0)) {
+        if ((cfsetispeed(&settings, sys_baudrate) < 0) ||
+            (cfsetospeed(&settings, sys_baudrate) < 0) ||
+            (tcsetattr(fd, TCSANOW, &settings)  < 0)) {
             rc = eSYS_ERR_SER_CONFIGURE;
         }
     } while (0);

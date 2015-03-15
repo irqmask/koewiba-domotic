@@ -37,12 +37,8 @@
 
 typedef enum {
     eSYS_ERR_NONE = eERR_NONE,
-    eSYS_ERR_BAD_PARAMETER = 200,
-    eSYS_ERR_INVALID_FD,
-    eSYS_ERR_SYSTEM,
-    eSYS_ERR_MALLOC,
     
-    eSYS_ERR_SER_UNSUPPORTED,
+    eSYS_ERR_SER_UNSUPPORTED = 200,
     eSYS_ERR_SER_CONFIGURE,
 } sys_errors_t;
 

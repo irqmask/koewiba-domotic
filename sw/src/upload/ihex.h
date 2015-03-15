@@ -23,12 +23,12 @@ extern "C" {
 
 // --- Type definitions --------------------------------------------------------
 
-typedef void (*ihex_write_byte_func)(uint32_t uAddress, uint8_t uByte, void* pvArg);
+typedef void (*ihex_write_byte_func)(uint32_t address, uint8_t byte, void* arg);
 
 typedef enum {
     e_ihex_eof = -1,
     e_ihex_success = 0,
-    e_ihex_error_file_open = 100,
+    e_ihex_error_file_open = ERROR_USER1,
     e_ihex_error_unexpected_char,
     e_ihex_error_unexpected_eol,
     e_ihex_error_unexpected_eof,
@@ -36,7 +36,7 @@ typedef enum {
     e_ihex_error_chars_at_eol,
     e_ihex_error_invalid_rectype,
     e_ihex_error_checksum,
-} eIHEX_Error;
+} ihex_error_t;
 
 
 
@@ -52,19 +52,19 @@ typedef enum {
 
 // --- Global functions --------------------------------------------------------
 
-int32_t ihex_read_file (const char*             pcFilename,
-                        uint32_t*               puStartAddress,
-                        uint32_t*               puFirstAddress,
-                        uint32_t*               puLastAddress,
-                        ihex_write_byte_func    pWriteByte,
-                        void*                   pvArg);
+int32_t ihex_read_file (const char*             filename,
+                        uint32_t*               start_address,
+                        uint32_t*               first_address,
+                        uint32_t*               last_address,
+                        ihex_write_byte_func    write_byte_func,
+                        void*                   arg);
 
-int32_t ihex_read_file_mem (const char*             pcFilename,
-                            uint32_t*               puStartAddress,
-                            uint32_t*               puFirstAddress,
-                            uint32_t*               puLastAddress,
-                            uint8_t*                puTargetMemory,
-                            uint32_t                uTargetMemorySize);
+int32_t ihex_read_file_mem (const char*         filename,
+                            uint32_t*           start_address,
+                            uint32_t*           first_address,
+                            uint32_t*           last_address,
+                            uint8_t*            target_memory,
+                            uint32_t            target_memory_size);
 
 #ifdef __cplusplus
 }

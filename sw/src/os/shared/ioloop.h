@@ -55,6 +55,7 @@ typedef struct ioloop {
     fd_set                  read_fd_set;
     fd_set                  write_fd_set;
     int32_t                 next_id;
+    uint16_t                default_timeout_ticks;
 } ioloop_t;
 
 // --- Local variables ---------------------------------------------------------
@@ -79,6 +80,9 @@ void ioloop_register_fd (ioloop_t* ioloop,
 
 void ioloop_unregister_fd (ioloop_t* ioloop,
                            sys_fd_t fd);
+
+void ioloop_set_default_timeout (ioloop_t* ioloop,
+                                 uint16_t  timeout_ticks);
 
 int32_t ioloop_register_timer (ioloop_t*            ioloop,
                                uint16_t             interval_ticks,

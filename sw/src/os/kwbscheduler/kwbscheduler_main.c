@@ -17,7 +17,7 @@
 
  ///@todo remove printfs
  ///@todo react on rerrors of send/receive function properly -> man pages
- 
+
 // --- Include section ---------------------------------------------------------
 
 #include "prjconf.h"
@@ -171,7 +171,8 @@ static bool validate_options (options_t* options)
 void init_scheduling (msg_bus_t* busscheduler, uint16_t own_node_address)
 {
     msg_b_init(busscheduler, 0);
-
+    
+    clk_initialize();
     bus_configure(&busscheduler->bus, own_node_address);
     bus_scheduler_initialize(&busscheduler->bus, &busscheduler->scheduler, 0);
 }
@@ -179,7 +180,7 @@ void init_scheduling (msg_bus_t* busscheduler, uint16_t own_node_address)
 int32_t do_scheduling (void* arg)
 {
     uint16_t sender = 0;
-    uint8_t length = 0, message[BUS_MAXBIGMSGLEN];
+    uint8_t length = 0, message[BUS_MAXRECVMSGLEN];
     msg_bus_t* busscheduler = (msg_bus_t*)arg;
 
     if (bus_schedule_and_get_message(&busscheduler->bus, &busscheduler->scheduler)) {
@@ -202,7 +203,7 @@ int main(int argc, char* argv[])
     msg_bus_t   busscheduler;
 
 
-    printf("kwbscheduler");
+    printf("kwbscheduler...\n");
     setbuf(stdout, NULL);       // disable buffering of stdout
 
     do {
@@ -211,7 +212,7 @@ int main(int argc, char* argv[])
         if (!parse_commandline_options(argc, argv, &options) ||
             !validate_options(&options)) {
             print_usage();
-            rc = eSYS_ERR_BAD_PARAMETER;
+            rc = eERR_BAD_PARAMETER;
             break;
         }
         init_scheduling(&busscheduler, options.own_node_address);
@@ -224,7 +225,7 @@ int main(int argc, char* argv[])
 
         // schedule on incomming bytes and after timer expiration
         ioloop_register_fd(&mainloop, busscheduler.vos.fd, eIOLOOP_EV_READ, do_scheduling, &busscheduler);
-        ioloop_register_timer(&mainloop, 1000, true, eIOLOOP_EV_TIMER, do_scheduling, &busscheduler);
+        ioloop_register_timer(&mainloop, 10, true, eIOLOOP_EV_TIMER, do_scheduling, &busscheduler);
 
         while (!end_application) {
             ioloop_run_once(&mainloop);

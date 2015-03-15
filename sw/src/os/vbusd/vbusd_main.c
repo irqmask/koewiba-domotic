@@ -241,10 +241,14 @@ static int32_t byte_received (void* arg)
         if (client != current_client) {
             switch (client->type) {
             case eVBUSD_TYPE_SERIAL:
-                sys_serial_send(client->fd, bytes, len);
+                if (sys_serial_send(client->fd, bytes, len) != len) {
+                    perror("sys_serial_send");
+                }
                 break;
             case eVBUSD_TYPE_SOCKET:
-                sys_socket_send(client->fd, bytes, len);
+                if (sys_socket_send(client->fd, bytes, len) != len) {
+                    perror("sys_socket_send");
+                }
                 break;
             default:
                 break;
@@ -300,14 +304,14 @@ static int vbusd_open_server (vbusd_clients_t*  clients,
     do {
         if (port == 0) {
             if ((fd = sys_socket_open_server_unix(address)) <= INVALID_FD) {
-                rc = eSYS_ERR_SYSTEM;
+                rc = eERR_SYSTEM;
                 break;
             }
         } else {
-            // TODO insert tcp code here
-            fprintf(stderr, "not implemented!");
-            rc = eSYS_ERR_SYSTEM;
-            break;
+            if ((fd = sys_socket_open_client_tcp(address, port)) <= INVALID_FD) {
+                rc = eERR_SYSTEM;
+                break;
+            }
         }
         clients->server_fd = fd;
         ioloop_register_fd(clients->ioloop, fd, eIOLOOP_EV_READ, accept_client, clients);
@@ -327,12 +331,12 @@ static int vbusd_open_serial (vbusd_clients_t*  clients,
 
     do {
         if ((client = new_client(clients)) == NULL) {
-            rc = eSYS_ERR_MALLOC;
+            rc = eERR_MALLOC;
             break;
         }
         if ((fd = sys_serial_open(device)) <= INVALID_FD) {
             delete_client(client);
-            rc = eSYS_ERR_SYSTEM;
+            rc = eERR_SYSTEM;
             break;
         }
 
@@ -342,6 +346,7 @@ static int vbusd_open_serial (vbusd_clients_t*  clients,
                                         eSYS_SER_SB_1)) != eERR_NONE) {
             sys_serial_close(fd);
             delete_client(client);
+            rc = eERR_SYSTEM;
             break;
         }
         client->fd = fd;
@@ -421,7 +426,7 @@ int main (int argc, char* argv[])
         if (parse_commandline_options(argc, argv, &options) == false ||
             validate_options(&options) == false) {
             print_usage();
-            rc = eSYS_ERR_BAD_PARAMETER;
+            rc = eERR_BAD_PARAMETER;
             break;
         }
 

@@ -21,15 +21,17 @@ Hardwaremerkmale:
  - RS845 Schnittstelle
 
 Softwaremerkmale:
- - Konfiguration im EEProm
- - Wochentagabhängige und Zeitabhängige RT Regelung
+ - autarke Ist-Temperatur und Uhrzeit- Datumsanzeige, wenn nicht am Bus
+ - Wochentagabhängige und Zeitabhängige RT Vorgaben
  - Temperatursensor (intern/extern/von anderem Busteilnehmer) auswählbar
  - Fensterkontakt(e) (extern/von anderem Busteilnehmer) auswählbar
+ - Register-Konfiguration im EEProm
 
 
 Modul Heizungssteller
 ---------------------------
 Hardwaremerkmale:
+ - interner Temperatursensor
  - optionaler Anschluss für externen Temperatursensor
  - Anschlussmöglichkeit für 1 (besser 2) Fensterkontakte und 1 (besser 2) Sabotagekontakte als individueller digitaler Eingang
  - Sensoren und Aktoren für Stellantrieb
@@ -38,3 +40,20 @@ Hardwaremerkmale:
 
 Softwaremerkmale:
 TODO
+ - Ohne Bussystem autarke Bedienung möglich
+ - Register-Konfiguration im EEProm
+
+Modul Jalosiesteuerung
+Hardwaremerkmale:
+ - Display
+ - Tasten zum Öffnen und Schiessen
+ - Controller
+ - RS485 Schnittstelle
+
+Softwaremerkmale
+ - Ohne Bussystem autarke Bedienung möglich
+ - Einstellbarer (oberer und) unterer Endanschlag
+ - Uhrzeit mit automatischer Sommer- Winterzeit Umschaltung. Intern UTC
+ - Cosmic-Programme: Steuerung der Öffnungs- und Schliesszeitpunkte durch Sonnenauf- und untergangszeitpunkte je nach Datum
+ - Abblend-Programme: Steuerung von zusätzlichen Öffnungs- und Schliesszeitpunkten zu bestimmten Tageszeiten.
+ - Register-Konfiguration im EEProm

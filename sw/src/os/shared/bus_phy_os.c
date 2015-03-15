@@ -46,6 +46,7 @@ static void debug_log_hex_len (const uint8_t* data, uint8_t len)
     while (len--) {
         debug_log_hex(*data++);
     }
+    fflush(stdout);
 }
 
 // --- Module global functions -------------------------------------------------
@@ -143,7 +144,7 @@ BOOL bus_phy_send(sBusPhy_t* phy, const uint8_t* msg, uint8_t len)
  */
 BOOL bus_phy_sending(sBusPhy_t* phy)
 {
-    return (vos_get_pending_send_bytes(msg_b_get_uart(phy->uUart)) == 0);
+    return (vos_get_pending_send_bytes(msg_b_get_uart(phy->uUart)) != 0);
 }
 
 /**

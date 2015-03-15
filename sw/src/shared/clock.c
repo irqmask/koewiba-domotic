@@ -43,6 +43,24 @@ static BOOL register_timer(sClkTimer_t* psTimer)
     for (ii=0; ii<CLOCK_NUM_TIMER; ii++) {
         if (g_asRunningTimers[ii] == NULL) {
             g_asRunningTimers[ii] = psTimer;
+            psTimer->active = TRUE;
+            return TRUE;
+        }
+    }
+    return FALSE;
+}
+
+/**
+ * Remove timer from list.
+ */
+static BOOL remove_timer(sClkTimer_t* psTimer)
+{
+    uint8_t ii;
+
+    psTimer->active = FALSE;
+    for (ii=0; ii<CLOCK_NUM_TIMER; ii++) {
+        if (g_asRunningTimers[ii] == psTimer) {
+            g_asRunningTimers[ii] = NULL;
             return TRUE;
         }
     }
@@ -138,6 +156,23 @@ BOOL clk_timer_start(sClkTimer_t* psTimer, uint16_t uTicks)
 }
 
 /**
+ * Stop a count-down timer.
+ *
+ * @param[in] psTimer
+ * Pointer to timer structure.
+ *
+ * @returns TRUE, if timer has been successfully removed from runningtimer-list, otherwise FALSE.
+ */
+BOOL clk_timer_stop(sClkTimer_t* psTimer)
+{
+    // if timer could not be removed successfully
+    if( !remove_timer(psTimer) ) return FALSE;
+    // otherwise reset value
+    psTimer->uTicks = 0;
+    return TRUE;
+}
+
+/**
  * Check if timer elapsed.
  *
  * @param[in] psTimer
@@ -153,5 +188,19 @@ BOOL clk_timer_is_elapsed(sClkTimer_t* psTimer)
         return FALSE;
     }
 }
+
+
+/**
+ * Check if timer is running.
+ *
+ * @param[in] psTimer
+ * Pointer to timer structure.
+ *
+ * @returns TRUE, if timer is running, otherwise false.
+ */
+BOOL clk_timer_is_running(sClkTimer_t* psTimer)
+{
+    return (psTimer->active);
+};
 
 /** @} */

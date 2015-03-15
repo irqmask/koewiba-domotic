@@ -22,6 +22,7 @@
 #include "bus.h"
 #include "bus_scheduler.h"
 #include "bus_intern.h"
+#include "led_debug.h"
 
 // --- Definitions -------------------------------------------------------------
 
@@ -239,7 +240,7 @@ BOOL bus_schedule_and_get_message (sBus_t* psBus, sSched_t* psSched )
     case eBus_Idle:
         // send token
         if (sched_send_next_timeslot_token(psBus, psSched)) {
-            clk_timer_start(&psSched->sNodeAnsTimeout, CLOCK_MS_2_TICKS(50));
+            clk_timer_start(&psSched->sNodeAnsTimeout, CLOCK_MS_2_TICKS(BUS_MESSAGE_TIMEOUT));
             psBus->eState = eBus_SendingToken;
         }
         break;

@@ -17,12 +17,12 @@
 // --- Definitions -------------------------------------------------------------
 
 #if defined (__AVR_ATmega8__)
- #define REGISTER_UCSRA         UCSRA
- #define REGISTER_UCSRB         UCSRB
- #define REGISTER_UCSRC         UCSRC
- #define REGISTER_UDR           UDR
- #define REGISTER_UBRRH         UBRRH
- #define REGISTER_UBRRL         UBRRL
+ #define REGISTER_UCSRA0        UCSRA
+ #define REGISTER_UCSRB0        UCSRB
+ #define REGISTER_UCSRC0        UCSRC
+ #define REGISTER_UDR0          UDR
+ #define REGISTER_UBRRH0        UBRRH
+ #define REGISTER_UBRRL0        UBRRL
  #define REGBIT_RXCIE           RXCIE
  #define REGBIT_UDRIE           UDRIE
  #define REGBIT_TXCIE           TXCIE

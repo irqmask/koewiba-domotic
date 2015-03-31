@@ -32,41 +32,39 @@
 
 // --- Local functions ---------------------------------------------------------
 
-
-
-
-void vDoMiscTests(void)
+void do_misc_tests (void)
 {
-    typedef union {
+    typedef union
+    {
         uint32_t u32Bit;
         uint16_t u16Bit;
         uint8_t auArray[4];
     } multival_t;
     multival_t val;
 
-    UART_vPutString("\nAVR Endianess Test\n");
-    UART_vPutString("32bit Value 0x12345678 in array ");
+    uart_put_string_blk("\nAVR Endianess Test\n");
+    uart_put_string_blk("32bit Value 0x12345678 in array ");
     val.u32Bit = 0x12345678;
-    UART_vPutHex(val.auArray[0]);
-    UART_vPutChar(' ');
-    UART_vPutHex(val.auArray[1]);
-    UART_vPutChar(' ');
-    UART_vPutHex(val.auArray[2]);
-    UART_vPutChar(' ');
-    UART_vPutHex(val.auArray[3]);
-    UART_vPutChar('\n');
+    uart_put_hex8_blk(val.auArray[0]);
+    uart_put_char_blk(' ');
+    uart_put_hex8_blk(val.auArray[1]);
+    uart_put_char_blk(' ');
+    uart_put_hex8_blk(val.auArray[2]);
+    uart_put_char_blk(' ');
+    uart_put_hex8_blk(val.auArray[3]);
+    uart_put_char_blk('\n');
 
-    UART_vPutString("16bit Value 0x1234     in array ");
+    uart_put_string_blk("16bit Value 0x1234     in array ");
     val.u32Bit = 0;
     val.u16Bit = 0x1234;
-    UART_vPutHex(val.auArray[0]);
-    UART_vPutChar(' ');
-    UART_vPutHex(val.auArray[1]);
-    UART_vPutChar(' ');
-    UART_vPutHex(val.auArray[2]);
-    UART_vPutChar(' ');
-    UART_vPutHex(val.auArray[3]);
-    UART_vPutChar('\n');
+    uart_put_hex8_blk(val.auArray[0]);
+    uart_put_char_blk(' ');
+    uart_put_hex8_blk(val.auArray[1]);
+    uart_put_char_blk(' ');
+    uart_put_hex8_blk(val.auArray[2]);
+    uart_put_char_blk(' ');
+    uart_put_hex8_blk(val.auArray[3]);
+    uart_put_char_blk('\n');
 
 }
 
@@ -74,104 +72,104 @@ void vDoMiscTests(void)
 
 // --- Global functions --------------------------------------------------------
 
-int main ( void )
+int main (void)
 {
     uint8_t ii, temp;
     uint16_t raddr = 0, written;
 
     // testpattern
-    const uint8_t arrayii[] = {0xDE,0xAD,0xBE,0xEF,0,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16};
-    uint8_t inversearrayii[sizeof(arrayii)] = {0x00, 0x01, 0x02, 0x04, 0x08};
+    const uint8_t arrayii[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0, 2, 3, 4, 5, 6, 7, 8,
+            9, 10, 11, 12, 13, 14, 15, 16 };
+    uint8_t inversearrayii[sizeof(arrayii)] = { 0x00, 0x01, 0x02, 0x04, 0x08 };
 
     // disable all interrupts
     cli();
 
     // initialize UART, SPI and EEProm
-    UART_vInit(9600);
+    uart_init_blk(9600);
     // enable sender and receiver
-    DDRD |= (1<<PD2);
-    PORTD |= (1<<PD2);
-    DDRB |= (1<<PB0 | 1<<PB1);
-    PORTB &=~(1<<PB0 | 1<<PB1);
-    
+    DDRD |= (1 << PD2);
+    PORTD |= (1 << PD2);
+    DDRB |= (1 << PB0 | 1 << PB1);
+    PORTB &= ~(1 << PB0 | 1 << PB1);
+
 __RESTART:
-    SPI_vMasterInitBlk();
-    EEP_vInit();
+    spi0_master_init_blk();
+    eep_initialize();
 
     sei();
 
-    UART_vPutString("\n\nEEProm Test Application\n");
-    UART_vPutString("-------------------------\n");
-       
+    uart_put_string_blk("\n\nEEProm Test Application\n");
+    uart_put_string_blk("-------------------------\n");
+
     // 1st test: Read EEPRom for the first time
     // ------------------------------------------------------------------------
 
-    UART_vPutString("\n1. Read current EEProm content:\n");
-    for (raddr=0; raddr<sizeof(arrayii); raddr++) {
-        EEP_uRead(raddr,1,&temp);
-        UART_vPutHex(temp);
-        if (raddr>1 && (raddr+1)%16==0) {
-            UART_vPutChar('\n');
+    uart_put_string_blk("\n1. Read current EEProm content:\n");
+    for (raddr = 0; raddr < sizeof(arrayii); raddr++) {
+        eep_read(raddr, 1, &temp);
+        uart_put_hex8_blk(temp);
+        if (raddr > 1 && (raddr + 1) % 16 == 0) {
+            uart_put_char_blk('\n');
         } else {
-            UART_vPutChar(' ');
+            uart_put_char_blk(' ');
         }
     }
-    if (raddr%16) UART_vPutChar('\n');
+    if (raddr % 16) uart_put_char_blk('\n');
 
     // 2nd test: Write testpattern into the EEPRom.
     // ------------------------------------------------------------------------
-    UART_vPutString("\n2. Fill EEProm 1st time:\n");
-    UART_vHexDump(&arrayii[0], sizeof(arrayii));
-    written = EEP_uWrite(0, sizeof(arrayii),&arrayii[0]);
-    UART_vPutString("...done.\n");
-
+    uart_put_string_blk("\n2. Fill EEProm 1st time:\n");
+    uart_hex_dump_blk(&arrayii[0], sizeof(arrayii));
+    written = eep_write(0, sizeof(arrayii), &arrayii[0]);
+    uart_put_string_blk("...done.\n");
 
     // 3rd test: Read EEPRom again
     // ------------------------------------------------------------------------
-    UART_vPutString("\n3. Read current EEProm content after 1st write:\n");
-    for (raddr=0; raddr<sizeof(arrayii); raddr++) {
-        EEP_uRead(raddr,1,&temp);
-        UART_vPutHex(temp);
-        if (raddr>1 && (raddr+1)%16==0) {
-            UART_vPutChar('\n');
+    uart_put_string_blk("\n3. Read current EEProm content after 1st write:\n");
+    for (raddr = 0; raddr < sizeof(arrayii); raddr++) {
+        eep_read(raddr, 1, &temp);
+        uart_put_hex8_blk(temp);
+        if (raddr > 1 && (raddr + 1) % 16 == 0) {
+            uart_put_char_blk('\n');
         } else {
-            UART_vPutChar(' ');
+            uart_put_char_blk(' ');
         }
     }
-    if (raddr%16) UART_vPutChar('\n');
-
+    if (raddr % 16) uart_put_char_blk('\n');
 
     // 4th test: Write inverse pattern to EEPRom.
     // ------------------------------------------------------------------------
-    UART_vPutString("\n4. Fill EEProm 2nd time with inverse pattern:\n");
+    uart_put_string_blk("\n4. Fill EEProm 2nd time with inverse pattern:\n");
     // create inverse testpattern
-    for (ii=0; ii<sizeof(arrayii); ii++) {
+    for (ii = 0; ii < sizeof(arrayii); ii++) {
         inversearrayii[ii] = ~arrayii[ii];
     }
-    UART_vHexDump(&inversearrayii[0], sizeof(inversearrayii));
-    written = EEP_uWrite(0, sizeof(inversearrayii),&inversearrayii[0]);
-    UART_vPutString("...done.\n");
+    uart_hex_dump_blk(&inversearrayii[0], sizeof(inversearrayii));
+    written = eep_write(0, sizeof(inversearrayii), &inversearrayii[0]);
+    uart_put_string_blk("...done.\n");
 
     // 5th test: Read EEPRom again
     // ------------------------------------------------------------------------
-    UART_vPutString("\n5. Read current EEProm content after 2nd write:\n");
-    for (raddr=0; raddr<sizeof(inversearrayii); raddr++) {
-        EEP_uRead(raddr,1,&temp);
-        UART_vPutHex(temp);
-        if (raddr>1 && (raddr+1)%16==0) {
-            UART_vPutChar('\n');
+    uart_put_string_blk("\n5. Read current EEProm content after 2nd write:\n");
+    for (raddr = 0; raddr < sizeof(inversearrayii); raddr++) {
+        eep_read(raddr, 1, &temp);
+        uart_put_hex8_blk(temp);
+        if (raddr > 1 && (raddr + 1) % 16 == 0) {
+            uart_put_char_blk('\n');
         } else {
-            UART_vPutChar(' ');
+            uart_put_char_blk(' ');
         }
     }
-    if (raddr%16) UART_vPutChar('\n');
+    if (raddr % 16) uart_put_char_blk('\n');
 
-    vDoMiscTests();
+    do_misc_tests();
 
-    UART_vPutString("\n\nApplication halted. Restart with key \"R\"\n");
+    uart_put_string_blk("\n\nApplication halted. Restart with key \"R\"\n");
     while (1) {
-        temp = (UART_uReceive() & 0x00FF);
-        if (temp == 'R') goto __RESTART; // too lazy to do a while loop with all it's braces...
+        temp = (uart_get_char_blk() & 0x00FF);
+        if (temp == 'R') goto __RESTART;
+        // too lazy to do a while loop with all it's braces...
     }
     return 0;
 }

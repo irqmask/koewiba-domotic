@@ -64,9 +64,9 @@ enum eep_commands {
  * Initialize the EEProm.
  * Configure chip select pin and deactivate chip select.
  */
-void eep_initialize(void)
+void eep_initialize (void)
 {
-    EEP_CS_DDR |= (1<<EEP_CS);
+    EEP_CS_DDR |= (1 << EEP_CS);
     EEP_SPI_CS_DEACTIVATE;
 }
 
@@ -77,15 +77,15 @@ void eep_initialize(void)
  * @param[in] flag_mask Mask of flags to be checked
  * @returns Checked flags. 
  */
-uint8_t eep_check_statusregister(uint8_t flag_mask)
+uint8_t eep_check_statusregister (uint8_t flag_mask)
 {
     uint8_t retval;
 
     EEP_SPI_CS_ACTIVATE;
     spi0_transmit_blk(eEEP_RDSR);
     spi0_transmit_blk(0);
-    if ( flag_mask ) retval = (flag_mask & SPI0_DATA_REG);
-    else             retval = SPI0_DATA_REG;
+    if (flag_mask) retval = (flag_mask & SPI0_DATA_REG);
+    else retval = SPI0_DATA_REG;
     EEP_SPI_CS_DEACTIVATE;
     return retval;
 }
@@ -99,16 +99,13 @@ uint8_t eep_check_statusregister(uint8_t flag_mask)
  * @param[out]    buffer        Pointer to transmit buffer.
  * @returns     Number of read bytes.
  */
-uint16_t        eep_read           (uint16_t               eep_address,
-                                    uint16_t               count,
-                                    uint8_t*               buffer)
+uint16_t eep_read (uint16_t eep_address, uint16_t count, uint8_t* buffer)
 {
     uint16_t read = 0;
     uint8_t addressH = (0xFF00 & eep_address) >> 8;
     uint8_t addressL = (0x00FF & eep_address);
 
-    if ( eep_address + count > EEPROM_SIZE )
-        return 0;
+    if (eep_address + count > EEPROM_SIZE) return 0;
 
     while (eep_check_statusregister(eEEP_WIP) != 0);
 
@@ -116,7 +113,7 @@ uint16_t        eep_read           (uint16_t               eep_address,
     spi0_transmit_blk(eEEP_READ);
     spi0_transmit_blk(addressH);
     spi0_transmit_blk(addressL);
-    for ( read = 0; read < count; read++ ) {
+    for (read = 0; read < count; read++) {
         spi0_transmit_blk(0);
         buffer[read] = SPI0_DATA_REG;
     }
@@ -133,37 +130,34 @@ uint16_t        eep_read           (uint16_t               eep_address,
  * @param[in]     buffer        Pointer to transmit buffer.
  * @returns     Number of transmitted bytes.
  */
-uint16_t eep_write(uint16_t       eep_address,
-                   uint16_t       count,
-                   const uint8_t* buffer)
+uint16_t eep_write (uint16_t eep_address, uint16_t count, const uint8_t* buffer)
 {
     uint8_t attempt = 3;
     uint16_t pos = 0, byteCnt = count;
 
-    if ( eep_address + count > EEPROM_SIZE )
-        return 0;
+    if (eep_address + count > EEPROM_SIZE) return 0;
 
-    while ( 0 < attempt-- ) {
+    while (0 < attempt--) {
         uint8_t addressH = (0xFF00 & eep_address) >> 8;
         uint8_t addressL = (0x00FF & eep_address);
 
-        while ( eep_check_statusregister(eEEP_WIP) != 0);
+        while (eep_check_statusregister(eEEP_WIP) != 0);
 
         EEP_SPI_CS_ACTIVATE;
         spi0_transmit_blk(eEEP_WREN);
         EEP_SPI_CS_DEACTIVATE;
 
-        if ( eep_check_statusregister(eEEP_WEL) ) {
+        if (eep_check_statusregister(eEEP_WEL)) {
             EEP_SPI_CS_ACTIVATE;
             attempt = 0;
             spi0_transmit_blk(eEEP_WRITE);
             spi0_transmit_blk(addressH);
             spi0_transmit_blk(addressL);
-            while ( byteCnt-- ) {
+            while (byteCnt--) {
                 spi0_transmit_blk(buffer[pos++]);
                 eep_address++;
                 // Page-Check:
-                if ( (0 == eep_address % EEPROM_PAGESIZE) && (0 < byteCnt) ) {
+                if ((0 == eep_address % EEPROM_PAGESIZE) && (0 < byteCnt)) {
                     attempt = 3;
                     break;
                 }

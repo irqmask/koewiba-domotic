@@ -5,7 +5,10 @@
  * Contains functions to send and receive data over the UART interface.
  *
  * Supports appconfig.h for individual settings depending on the application.
- *
+ * Supports pcbconfig.h to choose which UART of the controller is used. If the
+ * controller supports only one uart, uart0 is used as default, otherwise the
+ * second uart is used as default.
+ * @todo set uart controller default registers for pcbconfig.h.
  * @{
  * @file    uart.h
  * @brief   UART driver.
@@ -45,14 +48,18 @@
  */
 #ifndef UART_APPCONFIG
  #define UART_APPCONFIG 1
- #undef  UART_WITH_BLOCKING
- #define UART_WITH_IRQ          1
+ #define UART_WITH_BLOCKING     1
+ #undef UART_WITH_IRQ
 
  #define UART_RECV_QUEUE_SIZE   32  //!< Size of the UART recv-queue.
  #define UART_SEND_QUEUE_SIZE   32  //!< Size of the UART send-queue.
- #define UART_AUTOCR            1   //!< Automatically send a CR when a newline 
+ #define UART_AUTOCR            1   //!< Automatically send a CR when a newline
                                     //!< has been sent.
 #endif // UART_APPCONFIG
+
+//TODO CV: enable "UART_WITH_IRQ" when uart_with_irq_is_functional_again
+#undef UART_WITH_IRQ
+
 /** @} */
 
 // --- Type definitions --------------------------------------------------------
@@ -62,7 +69,7 @@ typedef enum {
     eUartFlag_NoData = 8,       //!< Receive buffer is empty
     eUartFlag_BufOverrun,       //!< Receive buffer is full, at least one byte
                                 //!< has been lost.
-    eUartFlag_FramingError,     //!< A framing error occurred, when a byte has 
+    eUartFlag_FramingError,     //!< A framing error occurred, when a byte has
                                 //!< been received.
     eUartFlag_Last
 } eUartFlags_t;
@@ -79,39 +86,39 @@ typedef enum {
 
 // --- Global functions --------------------------------------------------------
 
-void            UART_vInit          (uint32_t               uBaud);
+void            uart_init           (uint32_t               baudrate);
 
-uint8_t         UART_uSendQueueSpace(void);
+//TODO CV: remove? uint8_t         uart_space_in_send_q(void);
 
-BOOL            UART_bIsBusy        (void);
+BOOL            uart_is_busy        (void);
 
-void            UART_vTransmit      (uint8_t*               puSendBuf,
+void            uart_transmit       (uint8_t*               data,
                                      uint8_t                length);
 
-uint16_t        UART_uReceive       (void);
+void            uart_put_char       (char                   single_char);
 
-void            UART_vPutChar       (char                   cChar);
+void            uart_put_string     (const char*            string);
 
-void            UART_vPutString     (const char*            pcString);
+void            uart_put_hex8       (uint8_t                value);
 
-void            UART_vPutHex        (uint8_t                uValue);
+void            uart_hex_dump       (const uint8_t*         data,
+                                     uint8_t                length);
 
-void            UART_vHexDump       (const uint8_t*         puArray,
-                                     uint8_t                uSize);
+uint16_t        uart_get_char       (void);
 
 
-void            UART_vInitBlk       (uint32_t               uBaud);
+void            uart_init_blk       (uint32_t               baudrate);
 
-uint16_t        UART_uReceiveBlk    (void);
+void            uart_put_char_blk   (char                   single_char);
 
-void            UART_vPutCharBlk    (char                   cChar);
+void            uart_put_hex8_blk   (uint8_t                value);
 
-void            UART_vPutHexBlk     (uint8_t                uValue);
+void            uart_put_string_blk (const char*            string);
 
-void            UART_vPutStringBlk  (const char*            pcChar);
+void            uart_hex_dump_blk   (const uint8_t*         data,
+                                     uint8_t                length);
 
-void            UART_vHexDumpBlk    (const uint8_t*         puArray,
-                                     uint8_t                uSize);
+char            uart_get_char_blk   (void);
 
 #endif // _UART_H_
 /** @} */

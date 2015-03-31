@@ -1,12 +1,23 @@
-TODO  OS
-1. clock_os in kwb_router (message_bus) einbauen.
-2. Buffergrößen für Sende- und Empfangsbuffer trennen. OK
-3. printfs ausbauen und bus_transport.c einchecken OK
-4. Äquivalent zu "setserial low_latency" in bus_phy_os einbauen.
-5. Konzept zum Schalten der Send_Enable Leitung .
-6. Zeitstempel von systime in kwbmonitor fehlerhaft??
+TODO allgemein
+- TODO ins Wiki überführen
+- Doku Hardware-Guidelines (Gemeinsame Anforderungen an alle Module, bzw Modulgruppe oder eines Prozessortyps z.B. EEPRom Anschlüsse, verwendeter UART, RS485 select, etc)
+
+TODO OS
+- clock_os in kwb_router (message_bus) einbauen.
+- Äquivalent zu "setserial low_latency" in bus_phy_os einbauen.
+- Konzept zum Schalten der Send_Enable Leitung .
+- Zeitstempel von systime in kwbmonitor fehlerhaft??
+- Unit-Tests reaktivieren
+
+- Buffergrößen für Sende- und Empfangsbuffer trennen. OK
+- printfs ausbauen und bus_transport.c einchecken OK
 
 
-Spendenkonto Wikimedia Foerdergesellschaft BIC BFSWDE33BER IBAN DE33 1002 0500 0001 1947 00
-
+TODO AVR
+- Firmware Upgrade Konzept ausarbeiten, inkl. Schreiben von internem EEProm und Fehlerbehandlungen.
+- *.lst Files im Build-Ordner, nicht SRC Odner generieren
+- Festlegung von festen Code-Bereichen pro Prozessortyp für Versionsnummern und String. Entsprechende appversion.c in alle Projekte einfügen.
+- Abklären, was mit ucontroller.h passieren soll. Besser ohne und defines in pcbconfig.h? Vorteil-> Passt besser zu Unit-tests.
+- Coding-Guidelines anwenden
+- Konzept mit mehreren UARTs und SPIs implementieren. Erstmal für den Debug-UART
 

@@ -252,10 +252,13 @@ Format: 0x21, Offset (16bit Wert), Daten (1 bis 64Byte)
 Beendet die Blockübertragung und gibt den CRC16 des übertragenen Block zurück. Damit kann der Empfänger prüfen, ob die im Block übertragenen Daten fehlerfrei empfangen wurden-
 Format: 0x22, CRC16 (16bit Wert)
 
-0xXX - Request Version
+0x23 - Block Info
+Sendet Informationen über den soeben übertragenen Block an den Block Absender.
+
+0x24 - Request Version
 Fordert Firmwareversionsstring an.
 
-0xXX - Set Version
+0x25 - State Version
 Gibt Firmwareversion an
 Beispiel: 0xXX, <Versionsstring max 10Byte>
 

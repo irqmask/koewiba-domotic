@@ -31,13 +31,19 @@
 
 // --- Definitions -------------------------------------------------------------
 
+#if defined (__AVR_ATmega324P__) || defined (__AVR_ATmega324A__) || defined (__AVR_ATtiny1634__)
+ #define HAS_UART1              1
+#else
+ #undef HAS_UART1
+#endif
+
 /**
  * @subsection UART_PCBCONFIG
  * Configure UART pins and registers.
  * @{
  */
 #ifndef UART_PCBCONFIG
- #define UART_PCBCONFIG  1
+ #define UART_PCBCONFIG         1
 #endif // UART_PCBCONFIG
 /** @} */
 
@@ -51,6 +57,17 @@
  #define UART_WITH_BLOCKING     1
  #undef UART_WITH_IRQ
 
+// Use UART1 in case of ATmega324 or ATtiny1634, otherwise use UART0
+ #ifdef HAS_UART1
+  #ifdef __AVR_ATtiny1634__
+   #define UART_DEFAULT_PORT    0
+  #else
+   #define UART_DEFAULT_PORT    1
+  #endif
+ #else
+  #define UART_DEFAULT_PORT     0
+ #endif
+
  #define UART_RECV_QUEUE_SIZE   32  //!< Size of the UART recv-queue.
  #define UART_SEND_QUEUE_SIZE   32  //!< Size of the UART send-queue.
  #define UART_AUTOCR            1   //!< Automatically send a CR when a newline
@@ -61,6 +78,22 @@
 #undef UART_WITH_IRQ
 
 /** @} */
+
+#if UART_DEFAULT_PORT == 0
+ #define uart_init_blk       uart_init_blk0
+ #define uart_put_char_blk   uart_put_char_blk0
+ #define uart_put_hex8_blk   uart_put_hex8_blk0
+ #define uart_put_string_blk uart_put_string_blk0
+ #define uart_hex_dump_blk   uart_hex_dump_blk0
+ #define uart_get_char_blk   uart_get_char_blk0
+#else
+ #define uart_init_blk       uart_init_blk1
+ #define uart_put_char_blk   uart_put_char_blk1
+ #define uart_put_hex8_blk   uart_put_hex8_blk1
+ #define uart_put_string_blk uart_put_string_blk1
+ #define uart_hex_dump_blk   uart_hex_dump_blk1
+ #define uart_get_char_blk   uart_get_char_blk1
+#endif
 
 // --- Type definitions --------------------------------------------------------
 
@@ -88,8 +121,6 @@ typedef enum {
 
 void            uart_init           (uint32_t               baudrate);
 
-//TODO CV: remove? uint8_t         uart_space_in_send_q(void);
-
 BOOL            uart_is_busy        (void);
 
 void            uart_transmit       (uint8_t*               data,
@@ -106,19 +137,35 @@ void            uart_hex_dump       (const uint8_t*         data,
 
 uint16_t        uart_get_char       (void);
 
+// UART functions for UART0 (blocking)
+void            uart_init_blk0      (uint32_t               baudrate);
 
-void            uart_init_blk       (uint32_t               baudrate);
+void            uart_put_char_blk0  (char                   single_char);
 
-void            uart_put_char_blk   (char                   single_char);
+void            uart_put_hex8_blk0  (uint8_t                value);
 
-void            uart_put_hex8_blk   (uint8_t                value);
+void            uart_put_string_blk0(const char*            string);
 
-void            uart_put_string_blk (const char*            string);
-
-void            uart_hex_dump_blk   (const uint8_t*         data,
+void            uart_hex_dump_blk0  (const uint8_t*         data,
                                      uint8_t                length);
 
-char            uart_get_char_blk   (void);
+char            uart_get_char_blk0  (void);
+
+#ifdef HAS_UART1
+// UART functions for UART1 (blocking)
+void            uart_init_blk1      (uint32_t               baudrate);
+
+void            uart_put_char_blk1  (char                   single_char);
+
+void            uart_put_hex8_blk1  (uint8_t                value);
+
+void            uart_put_string_blk1(const char*            string);
+
+void            uart_hex_dump_blk1  (const uint8_t*         data,
+                                     uint8_t                length);
+
+char            uart_get_char_blk1  (void);
+#endif
 
 #endif // _UART_H_
 /** @} */

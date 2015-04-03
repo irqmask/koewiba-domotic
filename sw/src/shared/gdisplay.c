@@ -27,9 +27,9 @@
 
 // --- Local variables ---------------------------------------------------------
 
-const uint8_t* g_puCurrFont   = NULL;
-uint8_t g_uCurrCol      = 0;
-uint8_t g_uCurrPage     = 0;
+const uint8_t*  g_current_font      = NULL;
+uint8_t         g_current_column    = 0;
+uint8_t         g_current_page      = 0;
 
 // --- Global variables --------------------------------------------------------
 
@@ -40,74 +40,74 @@ uint8_t g_uCurrPage     = 0;
 /**
  * Draw a char at the current column and line.
  */
-static void vPutChar(const char cChar, uint8_t uHeight, uint8_t uSpace)
+static void put_char(const char single_char, uint8_t height, uint8_t space)
 {
     uint16_t indexchar, index;
     uint8_t  width, colsleft;
 
-    if (cChar >= 32 && cChar < 128) {
+    if (single_char >= 32 && single_char < 128) {
         // charindex * bytes per char + header
-        indexchar = cChar - 32;
+        indexchar = single_char - 32;
         // bytes per character
-        indexchar *= pgm_read_byte(&g_puCurrFont[0]);
+        indexchar *= pgm_read_byte(&g_current_font[0]);
         // add header size
         indexchar += 3;
-        width = pgm_read_byte(&g_puCurrFont[indexchar++]);
+        width = pgm_read_byte(&g_current_font[indexchar++]);
         // calculate number of bytes per columns
-        uHeight >>= 3;
+        height >>= 3;
 
         index = indexchar;
         colsleft = width;
         // draw first line of the character
         while (colsleft--) {
-            ST7565_vWriteData(pgm_read_byte(&g_puCurrFont[index]));
-            index += uHeight;
+            st7565_write_data(pgm_read_byte(&g_current_font[index]));
+            index += height;
         }
         // space between chars
-        for (colsleft=0; colsleft<uSpace; colsleft++) {
-            ST7565_vWriteData(0);
+        for (colsleft=0; colsleft<space; colsleft++) {
+            st7565_write_data(0);
         }
         // character is at least 2 lines high?
-        if (uHeight >= 2) {
+        if (height >= 2) {
             // next 8 lines
-            ST7565_vPageAddr(g_uCurrPage + 1);
-            ST7565_vColumnAddr(g_uCurrCol);
+            st7565_page_addr(g_current_page + 1);
+            st7565_column_addr(g_current_column);
             // reset index and width
             index = indexchar + 1;
             colsleft = width;
             // draw next 8 lines
             while (colsleft--) {
-                ST7565_vWriteData(pgm_read_byte(&g_puCurrFont[index]));
-                index += uHeight;
+                st7565_write_data(pgm_read_byte(&g_current_font[index]));
+                index += height;
             }
             // space between chars
-            for (colsleft=0; colsleft<uSpace; colsleft++) {
-                ST7565_vWriteData(0);
+            for (colsleft=0; colsleft<space; colsleft++) {
+                st7565_write_data(0);
             }            
         }
         // character is at least 3 lines high?
-        if (uHeight >= 3) {
+        if (height >= 3) {
             // next 8 lines, reset column
-            ST7565_vPageAddr(g_uCurrPage + 2);
-            ST7565_vColumnAddr(g_uCurrCol);
+            st7565_page_addr(g_current_page + 2);
+            st7565_column_addr(g_current_column);
             // reset index and width
             index = indexchar + 2;
             colsleft = width;
             // draw next 8 lines
             while (colsleft--) {
-                ST7565_vWriteData(pgm_read_byte(&g_puCurrFont[index]));
-                index += uHeight;
+                st7565_write_data(pgm_read_byte(&g_current_font[index]));
+                index += height;
             }
             // space between chars
-            for (colsleft=0; colsleft<uSpace; colsleft++) {
-                ST7565_vWriteData(0);
+            for (colsleft=0; colsleft<space; colsleft++) {
+                st7565_write_data(0);
             }
         }
         // refresh current column count
-        g_uCurrCol += width;
-        g_uCurrCol += uSpace;
+        g_current_column += width;
+        g_current_column += space;
         // leave current page unchanged
-        ST7565_vPageAddr(g_uCurrPage);
+        st7565_page_addr(g_current_page);
     }
 }
 
@@ -119,7 +119,7 @@ static void vPutChar(const char cChar, uint8_t uHeight, uint8_t uSpace)
  * Initialize the graphical display. The visible site of the display will be
  * cleared.
  */
-void            GDISP_vInit         (void)
+void gdisp_initialize (void)
 {
     uint8_t ii, page;
 
@@ -127,36 +127,36 @@ void            GDISP_vInit         (void)
     DISP_DDR_LED   |= (1<<DISP_LED);
     // backlight off
     DISP_PORT_LED  &= ~(1<<DISP_LED);
-    ST7565_vInit();
-    g_puCurrFont    = GDISP_auFont1_x8;
+    st7565_initialize();
+    g_current_font    = gdisp_font1_x8;
 
     // clear display ram
     for (page=0; page<GDISP_RAM_PAGES; page++) {
-        ST7565_vPageAddr(page);
-        ST7565_vColumnAddr(0);
+        st7565_page_addr(page);
+        st7565_column_addr(0);
         for (ii=0; ii<GDISP_WIDTH; ii++)
-            ST7565_vWriteData(0);
+            st7565_write_data(0);
     }
     // set cursor to 0,0
-    ST7565_vPageAddr(0);
-    g_uCurrPage = 0;
-    ST7565_vColumnAddr(0);
-    g_uCurrCol = 0;
+    st7565_page_addr(0);
+    g_current_page = 0;
+    st7565_column_addr(0);
+    g_current_column = 0;
 
     // set start line to the beginning of the display ram
-    ST7565_vStartLine(0);
+    st7565_start_line(0);
 }
 
 /**
  * Control the display's backlight.
  * Currently it will only be switched on or off.
  *
- * @param[in] uLevel
+ * @param[in] level
  * Display brightness (if digital 0=backlight off >0 backlight on.
  */
-void            GDISP_vBacklight    (uint8_t                uLevel)
+void gdisp_backlight (uint8_t level)
 {
-    if (uLevel) {
+    if (level) {
         DISP_PORT_LED |= (1<<DISP_LED);
     } else {
         DISP_PORT_LED  &= ~(1<<DISP_LED);
@@ -172,76 +172,76 @@ void            GDISP_vBacklight    (uint8_t                uLevel)
  * @param[in] uLine
  * Line to select.
  */
-void            GDISP_vGotoColLine  (uint8_t                uCol,
-                                     uint8_t                uLine)
+void gdisp_goto_col_line (uint8_t   col,
+                          uint8_t   line)
 {
-    ST7565_vPageAddr(uLine);
-    g_uCurrPage = uLine;
-    ST7565_vColumnAddr(uCol);
-    g_uCurrCol = uCol;
+    st7565_page_addr(line);
+    g_current_page = line;
+    st7565_column_addr(col);
+    g_current_column = col;
 }
 
 /**
  * Select the font, which will be used for the next GDISP_vPutText calls.
  *
- * @param[in] puFont
+ * @param[in] font
  * Pointer to font data.
  */
-void            GDISP_vChooseFont   (const uint8_t*         puFont)
+void gdisp_choose_font (const uint8_t* font)
 {
-    if (puFont != NULL) {
-        g_puCurrFont = puFont;
+    if (font != NULL) {
+        g_current_font = font;
     }
 }
 
-void            GDISP_vPutSpacer    (uint8_t                uHeight)
+void gdisp_put_spacer (uint8_t height)
 {  
-    ST7565_vWriteData(0); // 1 pixel
-    if (uHeight > 8) {
-        ST7565_vPageAddr(g_uCurrPage + 1);
-        ST7565_vColumnAddr(g_uCurrCol);
-        ST7565_vWriteData(0); // second line
+    st7565_write_data(0); // 1 pixel
+    if (height > 8) {
+        st7565_page_addr(g_current_page + 1);
+        st7565_column_addr(g_current_column);
+        st7565_write_data(0); // second line
     }
-    if (uHeight > 16) {
-        ST7565_vPageAddr(g_uCurrPage + 2);
-        ST7565_vColumnAddr(g_uCurrCol);
-        ST7565_vWriteData(0); // third line
+    if (height > 16) {
+        st7565_page_addr(g_current_page + 2);
+        st7565_column_addr(g_current_column);
+        st7565_write_data(0); // third line
     }
-    g_uCurrCol++;
-    ST7565_vPageAddr(g_uCurrPage);
+    g_current_column++;
+    st7565_page_addr(g_current_page);
 }
 
 /**
  * Put a character to the current drawing position.
  *
- * @param[in] cChar
+ * @param[in] single_char
  * Character to display.
  */
-void            GDISP_vPutChar      (const char             cChar)
+void gdisp_put_char (const char single_char)
 {
     uint8_t height;
 
-    height = pgm_read_byte(&g_puCurrFont[2]);
+    height = pgm_read_byte(&g_current_font[2]);
     
-    vPutChar(cChar, height, 1);
+    put_char(single_char, height, 1);
 }
 
 /**
  * Put a text to the current drawing position. Text resides in data memory.
  * @note Set the drawing position with GDISP_vGotoColLine().
  *
- * @param[in] pcText
+ * @param[in] text
  * Pointer to null terminated text in data memory.
  */
-void            GDISP_vPutText      (const char*            pcText)
+void gdisp_put_text (const char* text)
 {
     char c;
     uint8_t height;
 
-    height = pgm_read_byte(&g_puCurrFont[2]);
+    height = pgm_read_byte(&g_current_font[2]);
     
-    while ((c = *pcText++) != '\0') {
-        vPutChar(c, height, 1);
+    while ((c = *text++) != '\0') {
+        put_char(c, height, 1);
     }
 }
 
@@ -249,18 +249,18 @@ void            GDISP_vPutText      (const char*            pcText)
  * Put a text to the current drawing position. Text resides in program memory.
  * @note Set the drawing position with GDISP_vGotoColLine().
  *
- * @param[in] pcText
+ * @param[in] text
  * Pointer to null terminated text in program memory.
  */
-void            GDISP_vPutTextp      (const char*           pcTextPgm)
+void gdisp_put_textp (const char* text)
 {
     char c;
     uint8_t height;
 
-    height = pgm_read_byte(&g_puCurrFont[2]);
+    height = pgm_read_byte(&g_current_font[2]);
     
-    while ((c = pgm_read_byte(pcTextPgm++)) != '\0') {
-        vPutChar(c, height, 1);
+    while ((c = pgm_read_byte(text++)) != '\0') {
+        put_char(c, height, 1);
     }
 }
 

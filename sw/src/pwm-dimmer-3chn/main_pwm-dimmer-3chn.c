@@ -29,7 +29,7 @@
 
 // --- Local variables ---------------------------------------------------------
 
-static sBus_t      g_sBus;
+static sBus_t      g_bus;
 
 // --- Global variables --------------------------------------------------------
 
@@ -38,7 +38,7 @@ static sBus_t      g_sBus;
 // --- Local functions ---------------------------------------------------------
 
 // Interpret incomming messages
-static void interpret_message(sBus_t* bus, uint8_t* msg, uint8_t msg_len, uint16_t sender)
+static void interpret_message (sBus_t* bus, uint8_t* msg, uint8_t msg_len, uint16_t sender)
 {
     if (msg[0] <= eCMD_STATE_DATE_TIME) {
         // state messages
@@ -52,7 +52,7 @@ static void interpret_message(sBus_t* bus, uint8_t* msg, uint8_t msg_len, uint16
         // system messages
         switch (msg[0]) {
         case eCMD_ACK:
-            g_sBus.eModuleState = eMod_Running;
+            g_bus.eModuleState = eMod_Running;
             break;
         case eCMD_SLEEP:
             sleep_pinchange2_enable();
@@ -83,10 +83,10 @@ int main(void)
     register_set_u16(MOD_eReg_ModuleID, 10);
     clk_initialize();
     register_get(MOD_eReg_ModuleID, 0, &module_id);
-    bus_configure(&g_sBus, module_id);
-    bus_initialize(&g_sBus, 0);// initialize bus on UART 0
+    bus_configure(&g_bus, module_id);
+    bus_initialize(&g_bus, 0);// initialize bus on UART 0
 
-    spi0_master_init_blk();
+    spi_master_init_blk();
     //eep_init();
     pwm_init();
 
@@ -98,9 +98,9 @@ int main(void)
     clk_timer_start(&pwm_demotimer, 5);
 
     while (1) {
-        if (bus_get_message(&g_sBus)) {
-            if (bus_read_message(&g_sBus, &sender, &msglen, msg)) {
-                interpret_message(&g_sBus, msg, msglen, sender);
+        if (bus_get_message(&g_bus)) {
+            if (bus_read_message(&g_bus, &sender, &msglen, msg)) {
+                interpret_message(&g_bus, msg, msglen, sender);
             }
         }
         if (clk_timer_is_elapsed(&pwm_demotimer)) {

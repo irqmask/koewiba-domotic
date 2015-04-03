@@ -1,0 +1,4 @@
+avr35: attiny1634
+avr4: atmega8, atmega88
+avr5: atmega16, atmega32, atmega168, atmega169, atmega324, atmega328
+

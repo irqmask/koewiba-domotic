@@ -279,14 +279,13 @@ uint16_t uart_get_char (void)
 #ifdef UART_WITH_BLOCKING
 
 /**
- * Initialize UART 8N1 without interrupts.
+ * Initialize UART 0 8N1 without interrupts.
  *
  * @param[in] baudrate
  * Baudrate to configure.
  */
-void uart_init_blk ( uint32_t baudrate )
+void uart_init_blk0 ( uint32_t baudrate )
 {
-    // 9600 Baud 8N1
     REGISTER_UCSRB0 = (1 << TXEN0) | (1 << RXEN0);  // UART TX und RX einschalten
     REGISTER_UCSRC0 = (1 << UCSZ01) | (1 << UCSZ00); // Asynchron 8N1
 
@@ -295,13 +294,13 @@ void uart_init_blk ( uint32_t baudrate )
 }
 
 /**
- * Send a char over the UART. Before sending a char, this function waits until
+ * Send a char over the UART 0. Before sending a char, this function waits until
  * the UART is ready to send the next char.
  *
  * @param[in] single_char
  * Character to send.
  */
-void uart_put_char_blk ( char single_char )
+void uart_put_char_blk0 ( char single_char )
 {
     if ( single_char == '\n' )
         uart_put_char_blk('\r');
@@ -317,10 +316,10 @@ void uart_put_char_blk ( char single_char )
  * @param[in] string
  * String to send. String has to be terminated with a null character.
  */
-void uart_put_string_blk ( const char *string )
+void uart_put_string_blk0 ( const char *string )
 {
     while ( *string != '\0' ) {
-        uart_put_char_blk(*string++);
+        uart_put_char_blk0(*string++);
     }
 }
 
@@ -332,10 +331,10 @@ void uart_put_string_blk ( const char *string )
  * @param[in] value
  * Byte-value to convert into hex and to be sent.
  */
-void uart_put_hex8_blk (uint8_t value)
+void uart_put_hex8_blk0 (uint8_t value)
 {
-    uart_put_char_blk(val2hex(value >> 4));
-    uart_put_char_blk(val2hex(value & 0x0F));
+    uart_put_char_blk0(val2hex(value >> 4));
+    uart_put_char_blk0(val2hex(value & 0x0F));
 }
 
 /**
@@ -348,21 +347,20 @@ void uart_put_hex8_blk (uint8_t value)
  * @param[in] length
  * Size in bytes of the memory region.
  */
-void uart_hex_dump_blk ( const uint8_t *data, uint8_t length)
+void uart_hex_dump_blk0 ( const uint8_t *data, uint8_t length)
 {
     uint8_t ii;
 
     for (ii=0; ii<length; ii++) {
-        uart_put_hex8_blk(data[ii]);
+        uart_put_hex8_blk0(data[ii]);
         if (ii>1 && (ii+1)%16==0) {
-            uart_put_char_blk('\n');
+            uart_put_char_blk0('\n');
         } else {
-            uart_put_char_blk(' ');
+            uart_put_char_blk0(' ');
         }
     }
-    if (ii%16) uart_put_char_blk('\n');
+    if (ii%16) uart_put_char_blk0('\n');
 }
-
 
 /**
  * If there is a received char in the UART, whis function will return it. If no
@@ -370,7 +368,7 @@ void uart_hex_dump_blk ( const uint8_t *data, uint8_t length)
  *
  * @returns Received char, otherwise zero.
  */
-char uart_get_char_blk ( void )
+char uart_get_char_blk0 ( void )
 {
     // is char available?
     if ( !(REGISTER_UCSRA0 & (1 << RXC0)) ) {
@@ -381,6 +379,109 @@ char uart_get_char_blk ( void )
     return REGISTER_UDR0;
 }
 
+#ifdef HAS_UART1
+/**
+ * Initialize UART 1 8N1 without interrupts.
+ *
+ * @param[in] baudrate
+ * Baudrate to configure.
+ */
+void uart_init_blk1 ( uint32_t baudrate )
+{
+    REGISTER_UCSRB1 = (1 << TXEN1) | (1 << RXEN1);  // UART TX und RX einschalten
+    REGISTER_UCSRC1 = (1 << UCSZ11) | (1 << UCSZ10); // Asynchron 8N1
+
+    REGISTER_UBRRH1 = (uint8_t)(UART_UBRR_CALC( baudrate, F_CPU ) >> 8);
+    REGISTER_UBRRL1 = (uint8_t)UART_UBRR_CALC( baudrate, F_CPU );
+}
+
+/**
+ * Send a char over the UART 0. Before sending a char, this function waits until
+ * the UART is ready to send the next char.
+ *
+ * @param[in] single_char
+ * Character to send.
+ */
+void uart_put_char_blk1 ( char single_char )
+{
+    if ( single_char == '\n' )
+        uart_put_char_blk1('\r');
+
+    loop_until_bit_is_set(REGISTER_UCSRA1, UDRE1);
+    REGISTER_UDR1 = single_char;
+}
+
+/**
+ * Sends a string over the UART. Before sending a char, this function waits until
+ * the UART is ready to send the next char.
+ *
+ * @param[in] string
+ * String to send. String has to be terminated with a null character.
+ */
+void uart_put_string_blk1 ( const char *string )
+{
+    while ( *string != '\0' ) {
+        uart_put_char_blk1(*string++);
+    }
+}
+
+/**
+ * Sends a hexadecimal representation of a byte over the UART. Before each
+ * character is sent, this function waits until the UART is ready to send
+ * the next char.
+ *
+ * @param[in] value
+ * Byte-value to convert into hex and to be sent.
+ */
+void uart_put_hex8_blk1 (uint8_t value)
+{
+    uart_put_char_blk1(val2hex(value >> 4));
+    uart_put_char_blk1(val2hex(value & 0x0F));
+}
+
+/**
+ * Sends a hexadecimal dump of a memory region queued over the UART.
+ * Before each character is sent, this function waits until the UART is ready
+ * to send the next char.
+ *
+ * @param[in] data
+ * Byte-pointer to memory region.
+ * @param[in] length
+ * Size in bytes of the memory region.
+ */
+void uart_hex_dump_blk1 ( const uint8_t *data, uint8_t length)
+{
+    uint8_t ii;
+
+    for (ii=0; ii<length; ii++) {
+        uart_put_hex8_blk1(data[ii]);
+        if (ii>1 && (ii+1)%16==0) {
+            uart_put_char_blk1('\n');
+        } else {
+            uart_put_char_blk1(' ');
+        }
+    }
+    if (ii%16) uart_put_char_blk1('\n');
+}
+
+/**
+ * If there is a received char in the UART, whis function will return it. If no
+ * char has been received the null-character is received.
+ *
+ * @returns Received char, otherwise zero.
+ */
+char uart_get_char_blk1 ( void )
+{
+    // is char available?
+    if ( !(REGISTER_UCSRA1 & (1 << RXC1)) ) {
+        // return NUL character if nothing has been received
+        return '\0';
+    }
+    // return received char
+    return REGISTER_UDR1;
+}
+
+#endif // HAS_UART1
 #endif // UART_WITH_BLOCKING
 
 /** @} */

@@ -45,65 +45,27 @@
  * Configure SPI Pinout.
  * @{
  */
-#ifndef SPI0_PCBCONFIG
- #define SPI0_PCBCONFIG  1
+#ifndef SPI_PCBCONFIG
+ #define SPI_PCBCONFIG  1
  //! Defines the DDR of a port which contains the MOSI signal.
- #define SPI0_DDR_MOSI   DDRB
+ #define SPI_DDR_MOSI   DDRB
  //! Defines the DDR of a port which contains the MISO signal.
- #define SPI0_DDR_MISO   DDRB
+ #define SPI_DDR_MISO   DDRB
  //! Defines the DDR of a port which contains the SCK signal.
- #define SPI0_DDR_SCK    DDRB
+ #define SPI_DDR_SCK    DDRB
  //! Defines the DDR of a port which contains the standard slave select signal.
- #define SPI0_DDR_SS     DDRB
+ #define SPI_DDR_SS     DDRB
  //! Defines the PORT which contains the standard slave select signal.
- #define SPI0_PORT_SS    PORTB
+ #define SPI_PORT_SS    PORTB
  //! Defines the MOSI pin.
- #define SPI0_MOSI       PB5
+ #define SPI_MOSI       PB5
  //! Defines the MISO pin.
- #define SPI0_MISO       PB6
+ #define SPI_MISO       PB6
  //! Defines the SCK pin.
- #define SPI0_SCK        PB7
+ #define SPI_SCK        PB7
  //! Defines the SS (slave select) pin.
- #define SPI0_SS         PB4
- //! data register of spi0 
- #define SPI0_DATA_REG   REG_SPDR0
-
- #if defined (__AVR_ATtiny1634__)
-  #define SPI0_TRANSMITION_COMPLETE    (UCSR0A & (1<<UDRE0))
-  #define SPI0_RECEPTION_COMPLETE      (UCSR0A & (1<<RXC0 ))
- #else // defined (__AVR_ATtiny1634__)
-  #define SPI0_TRANSMITION_COMPLETE    ((REG_SPSR0) & (1 << REGBIT_SPIF0))
-  #define SPI0_RECEPTION_COMPLETE      ((REG_SPSR0) & (1 << REGBIT_SPIF0))
- #endif // defined (__AVR_ATtiny1634__)
-#endif // SPI0_PCBCONFIG
-
-#if defined (__AVR_ATtiny1634__)
- #ifndef SPI1_PCBCONFIG
-  #define SPI1_PCBCONFIG  1
-  //! Defines the DDR of a port which contains the MOSI signal.
-  #define SPI1_DDR_MOSI   DDRB
-  //! Defines the DDR of a port which contains the MISO signal.
-  #define SPI1_DDR_MISO   DDRB
-  //! Defines the DDR of a port which contains the SCK signal.
-  #define SPI1_DDR_SCK    DDRB
-  //! Defines the DDR of a port which contains the standard slave select signal.
-  #define SPI1_DDR_SS     DDRB
-  //! Defines the PORT which contains the standard slave select signal.
-  #define SPI1_PORT_SS    PORTB
-  //! Defines the MOSI pin.
-  #define SPI1_MOSI       PB5
-  //! Defines the MISO pin.
-  #define SPI1_MISO       PB6
-  //! Defines the SCK pin.
-  #define SPI1_SCK        PB7
-  //! Defines the SS (slave select) pin.
-  #define SPI1_SS         PB4
-  //! data register of spi1 
-  #define SPI1_DATA_REG   REG_SPDR1
-  #define SPI1_TRANSMITION_COMPLETE    (UCSR1A & (1<<UDRE1))
-  #define SPI1_RECEPTION_COMPLETE      (UCSR1A & (1<<RXC1 ))
- #endif // SPI0_PCBCONFIG
-#endif // defined (__AVR_ATtiny1634__)
+ #define SPI_SS         PB4
+#endif // SPI_PCBCONFIG
 
 /** @} */
 
@@ -122,6 +84,15 @@
                                 //!< up to 8 slaves can be configured.
 #endif // SPI_APPCONFIG
 /** @} */
+
+#define SPI_DATA_REG                REG_SPDR0
+#if defined (__AVR_ATtiny1634__)
+#define SPI_TRANSMITION_COMPLETE    (UCSR0A & (1<<UDRE0))
+#define SPI_RECEPTION_COMPLETE      (UCSR0A & (1<<RXC0 ))
+#else // defined (__AVR_ATtiny1634__)
+#define SPI_TRANSMITION_COMPLETE    ((REG_SPSR0) & (1 << REGBIT_SPIF0))
+#define SPI_RECEPTION_COMPLETE      ((REG_SPSR0) & (1 << REGBIT_SPIF0))
+#endif // defined (__AVR_ATtiny1634__)
 
 // --- Type definitions --------------------------------------------------------
 
@@ -167,14 +138,14 @@ typedef void (*spi_end_send_func_t)(uint8_t arg);
     defined (__AVR_ATmega324P__) || \
     defined (__AVR_ATmega324A__)    
 
-inline void     spi0_master_init_blk  (void)
+inline void     spi_master_init_blk  (void)
 {
     // Set MOSI and SCK output, all others input
-    SPI0_DDR_MISO &= ~(1 << SPI0_MISO);
-    SPI0_DDR_MOSI |=  (1 << SPI0_MOSI);
-    SPI0_DDR_SCK  |=  (1 << SPI0_SCK);
-    SPI0_DDR_SS   |=  (1 << SPI0_SS);    // set DDR for slave select as output to guarantee SPI master mode
-    SPI0_PORT_SS  |=  (1 << SPI0_SS);    // set slave select to 1 (slave disabled)
+    SPI_DDR_MISO &= ~(1 << SPI_MISO);
+    SPI_DDR_MOSI |=  (1 << SPI_MOSI);
+    SPI_DDR_SCK  |=  (1 << SPI_SCK);
+    SPI_DDR_SS   |=  (1 << SPI_SS);    // set DDR for slave select as output to guarantee SPI master mode
+    SPI_PORT_SS  |=  (1 << SPI_SS);    // set slave select to 1 (slave disabled)
     REG_SPSR0     =  (1 << REGBIT_SPI2X0);
     // Enable SPI, Master, set clock rate fck/2
     REG_SPCR0     =  (1 << REGBIT_SPE0) | (1 << REGBIT_MSTR0);
@@ -183,28 +154,13 @@ inline void     spi0_master_init_blk  (void)
 
 #if defined (__AVR_ATtiny1634__)
 
-inline void     spi0_master_init_blk  (void)
-{
-    UBRR0 = 0;
-    /* Setting the XCKn port pin as output, enables master mode. */
-    SPI0_SCK_DDR |= (1<<SPI0_SCK_PIN);
-    /* Set MSPI mode of operation and SPI data mode 0. */
-    UCSR0C = (1<<UMSEL01)|(1<<UMSEL00)|(0<<UCPHA0)|(0<<UCPOL0);
-    /* Enable receiver and transmitter. */
-    UCSR0B = (1<<RXEN0)|(1<<TXEN0);
-    /* Set baud rate. */
-    /* IMPORTANT: The Baud Rate must be set after the transmitter is enabled
-    */
-    UBRR0 = 0;
-}
-
-inline void     spi1_master_init_blk  (void)
+inline void     spi_master_init_blk  (void)
 {
     UBRR1 = 0;
     /* Setting the XCKn port pin as output, enables master mode. */
-    SPI1_SCK_DDR |= (1<<SPI1_SCK_PIN);
+    DDRC |= (1<<PC1);
     /* Set MSPI mode of operation and SPI data mode 0. */
-    UCSR1C = (1<<UMSEL11)|(1<<UMSEL11)|(0<<UCPHA1)|(0<<UCPOL1);
+    UCSR1C = (1<<UMSEL11)|(1<<UMSEL10)|(0<<UCPHA1)|(0<<UCPOL1);
     /* Enable receiver and transmitter. */
     UCSR1B = (1<<RXEN1)|(1<<TXEN1);
     /* Set baud rate. */
@@ -212,6 +168,7 @@ inline void     spi1_master_init_blk  (void)
     */
     UBRR1 = 0;
 }
+
 #endif // defined (__AVR_ATtiny1634__)
 
 /**
@@ -222,34 +179,14 @@ inline void     spi1_master_init_blk  (void)
  * Byte to be sent over SPI0.
  * @returns Byte received through MISO line during transmission.
  */
-inline uint8_t  spi0_transmit_blk    (uint8_t                data )
+inline uint8_t  spi_transmit_blk    (uint8_t                data )
 {
     // Start transmission
-    SPI0_DATA_REG = data;
+    SPI_DATA_REG = data;
     // Wait for transmission complete
-    while ( !(SPI0_TRANSMITION_COMPLETE) );
-    return SPI0_DATA_REG; // SPDR contains received byte during transmission.
+    while ( !(SPI_TRANSMITION_COMPLETE) );
+    return SPI_DATA_REG; // SPDR contains received byte during transmission.
 }
-
-#if defined (__AVR_ATtiny1634__)
-/**
- * Simple blocking SPI transmission. The function returns when the byte has been
- * sent.
- *
- * @param[in] data
- * Byte to be sent over SPI1.
- * @returns Byte received through MISO line during transmission.
- */
-inline uint8_t  spi1_transmit_blk    (uint8_t                data )
-{
-    // Start transmission
-    while ( !(SPI1_TRANSMITION_COMPLETE) );
-    SPI1_DATA_REG = data;
-    // Wait for transmission complete
-    while ( !(SPI1_RECEPTION_COMPLETE) );
-    return SPI1_DATA_REG; // SPDR contains received byte during transmission.
-}
-#endif // defined (__AVR_ATtiny1634__)
 
 #endif // SPI_WITH_BLOCKING
 

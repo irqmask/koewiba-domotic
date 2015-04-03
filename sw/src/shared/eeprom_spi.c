@@ -82,10 +82,10 @@ uint8_t eep_check_statusregister (uint8_t flag_mask)
     uint8_t retval;
 
     EEP_SPI_CS_ACTIVATE;
-    spi0_transmit_blk(eEEP_RDSR);
-    spi0_transmit_blk(0);
-    if (flag_mask) retval = (flag_mask & SPI0_DATA_REG);
-    else retval = SPI0_DATA_REG;
+    spi_transmit_blk(eEEP_RDSR);
+    spi_transmit_blk(0);
+    if (flag_mask) retval = (flag_mask & SPI_DATA_REG);
+    else retval = SPI_DATA_REG;
     EEP_SPI_CS_DEACTIVATE;
     return retval;
 }
@@ -110,12 +110,12 @@ uint16_t eep_read (uint16_t eep_address, uint16_t count, uint8_t* buffer)
     while (eep_check_statusregister(eEEP_WIP) != 0);
 
     EEP_SPI_CS_ACTIVATE;
-    spi0_transmit_blk(eEEP_READ);
-    spi0_transmit_blk(addressH);
-    spi0_transmit_blk(addressL);
+    spi_transmit_blk(eEEP_READ);
+    spi_transmit_blk(addressH);
+    spi_transmit_blk(addressL);
     for (read = 0; read < count; read++) {
-        spi0_transmit_blk(0);
-        buffer[read] = SPI0_DATA_REG;
+        spi_transmit_blk(0);
+        buffer[read] = SPI_DATA_REG;
     }
     EEP_SPI_CS_DEACTIVATE;
     return read;
@@ -144,17 +144,17 @@ uint16_t eep_write (uint16_t eep_address, uint16_t count, const uint8_t* buffer)
         while (eep_check_statusregister(eEEP_WIP) != 0);
 
         EEP_SPI_CS_ACTIVATE;
-        spi0_transmit_blk(eEEP_WREN);
+        spi_transmit_blk(eEEP_WREN);
         EEP_SPI_CS_DEACTIVATE;
 
         if (eep_check_statusregister(eEEP_WEL)) {
             EEP_SPI_CS_ACTIVATE;
             attempt = 0;
-            spi0_transmit_blk(eEEP_WRITE);
-            spi0_transmit_blk(addressH);
-            spi0_transmit_blk(addressL);
+            spi_transmit_blk(eEEP_WRITE);
+            spi_transmit_blk(addressH);
+            spi_transmit_blk(addressL);
             while (byteCnt--) {
-                spi0_transmit_blk(buffer[pos++]);
+                spi_transmit_blk(buffer[pos++]);
                 eep_address++;
                 // Page-Check:
                 if ((0 == eep_address % EEPROM_PAGESIZE) && (0 < byteCnt)) {

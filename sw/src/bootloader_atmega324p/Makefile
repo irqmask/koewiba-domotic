@@ -27,7 +27,7 @@ LOCAL_ASFLAGS =
 # $3C00 - $3FFF
 # so the beginning of the bootloader is at byteaddress 2*$3C00 = $7800
 # size of the bootloader is 1024 words = 2048 bytes
-LOCAL_LDFLAGS = -Ttext=0x7800
+LOCAL_LDFLAGS = -T ../avr/include/avr5_kwb.x -Ttext=0x7800 
 
 include ../../buildscripts/lib/lib_build_avr.mk
 include ../../buildscripts/lib/lib_program_avr.mk

@@ -74,7 +74,7 @@ void do_misc_tests (void)
 
 int main (void)
 {
-    uint8_t ii, temp;
+    uint8_t ii, temp, read_ok = 0;
     uint16_t raddr = 0, written;
 
     // testpattern
@@ -87,20 +87,22 @@ int main (void)
 
     // initialize UART, SPI and EEProm
     uart_init_blk(9600);
-    // enable sender and receiver
-    DDRD |= (1 << PD2);
-    PORTD |= (1 << PD2);
-    DDRB |= (1 << PB0 | 1 << PB1);
-    PORTB &= ~(1 << PB0 | 1 << PB1);
 
 __RESTART:
-    spi0_master_init_blk();
-    eep_initialize();
-
-    sei();
-
+#ifdef __AVR_ATtiny1634__
+    // enable sender
+    DDRA |= (1 << PA6);
+    PORTA |= (1 << PA6);
+#endif
     uart_put_string_blk("\n\nEEProm Test Application\n");
     uart_put_string_blk("-------------------------\n");
+
+    spi_master_init_blk();
+    uart_put_string_blk("SPI Init done.\n");
+    eep_initialize();
+    uart_put_string_blk("EEP Init done.\n");
+    sei();
+
 
     // 1st test: Read EEPRom for the first time
     // ------------------------------------------------------------------------
@@ -126,8 +128,10 @@ __RESTART:
 
     // 3rd test: Read EEPRom again
     // ------------------------------------------------------------------------
+    read_ok = 1;
     uart_put_string_blk("\n3. Read current EEProm content after 1st write:\n");
     for (raddr = 0; raddr < sizeof(arrayii); raddr++) {
+        if (temp != arrayii[raddr]) read_ok = 0;
         eep_read(raddr, 1, &temp);
         uart_put_hex8_blk(temp);
         if (raddr > 1 && (raddr + 1) % 16 == 0) {
@@ -137,6 +141,8 @@ __RESTART:
         }
     }
     if (raddr % 16) uart_put_char_blk('\n');
+    if (read_ok == 1) uart_put_string_blk("...done.\n");
+    else uart_put_string_blk("..failed.\n");
 
     // 4th test: Write inverse pattern to EEPRom.
     // ------------------------------------------------------------------------
@@ -151,10 +157,12 @@ __RESTART:
 
     // 5th test: Read EEPRom again
     // ------------------------------------------------------------------------
+    read_ok = 1;
     uart_put_string_blk("\n5. Read current EEProm content after 2nd write:\n");
     for (raddr = 0; raddr < sizeof(inversearrayii); raddr++) {
         eep_read(raddr, 1, &temp);
         uart_put_hex8_blk(temp);
+        if (temp != inversearrayii[raddr]) read_ok = 0;
         if (raddr > 1 && (raddr + 1) % 16 == 0) {
             uart_put_char_blk('\n');
         } else {
@@ -162,11 +170,19 @@ __RESTART:
         }
     }
     if (raddr % 16) uart_put_char_blk('\n');
+    if (read_ok == 1) uart_put_string_blk("...done.\n");
+    else uart_put_string_blk("..failed.\n");
+
 
     do_misc_tests();
 
     uart_put_string_blk("\n\nApplication halted. Restart with key \"R\"\n");
     while (1) {
+#ifdef __AVR_ATtiny1634__
+    // enable receiver / disable sender
+    PORTA &= ~(1 << PA6);
+#endif
+
         temp = (uart_get_char_blk() & 0x00FF);
         if (temp == 'R') goto __RESTART;
         // too lazy to do a while loop with all it's braces...

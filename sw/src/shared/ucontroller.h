@@ -119,7 +119,7 @@
  // definition of processor depending global settings
  // TODO CV: this part can be ported maybe to a makefile include
  #define STARTADDR_APPVECTORS   0x0000
- #define STARTADDR_APPLICATION  0x003E
+ #define STARTADDR_VERSIONINFO  0x007C
  #define STARTADDR_BOOTLOADER   0x1700
  #define MAXSIZE_APPLICATION    (STARTADDR_BOOTLOADER - STARTADDR_APPVECTORS)
  #define MAXSIZE_BOOTLOADER     0x0400
@@ -220,7 +220,7 @@
  // definition of prozessor depending global settings
  // TODO CV: this part can be ported maybe to a makefile include
  #define STARTADDR_APPVECTORS   0x0000
- #define STARTADDR_APPLICATION  0x003E
+ #define STARTADDR_VERSIONINFO  0x0070
  #define STARTADDR_BOOTLOADER   0x1700
  #define MAXSIZE_APPLICATION    (STARTADDR_BOOTLOADER - STARTADDR_APPVECTORS)
  #define MAXSIZE_BOOTLOADER     0x0400

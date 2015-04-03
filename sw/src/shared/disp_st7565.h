@@ -87,48 +87,48 @@
 
 // --- Global functions --------------------------------------------------------
 
-void            ST7565_vDispOn      (BOOL                   bOn);
+void            st7565_display_on   (BOOL                   on);
 
-void            ST7565_vStartLine   (uint8_t                uStartLine);
+void            st7565_start_line   (uint8_t                start_line);
 
-void            ST7565_vPageAddr    (uint8_t                uPageAddress);
+void            st7565_page_addr    (uint8_t                page_address);
 
-void            ST7565_vColumnAddr  (uint8_t                uColumnAddress);
+void            st7565_column_addr  (uint8_t                column_address);
 
-void            ST7565_vWriteData   (uint8_t                uData);
+void            st7565_write_data   (uint8_t                data);
 
-void            ST7565_vADCSelect   (BOOL                   bReverse);
+void            st7565_adc_select   (BOOL                   reverse);
 
-void            ST7565_vDispReverse (BOOL                   bReverse);
+void            st7565_disp_reverse (BOOL                   reverse);
 
-void            ST7565_vDispAllPixel(BOOL                   bAllPixOn);
+void            st7565_disp_all_pixel(BOOL                  all_pixel_on);
 
-void            ST7565_vLCDBias     (uint8_t                uBias);
+void            st7565_lcd_bias     (uint8_t                bias);
 
-void            ST7565_vReset       (void);
+void            st7565_reset        (void);
 
-void            ST7565_vCOMSelect   (BOOL                   bReverse);
+void            st7565_com_select   (BOOL                   reverse);
 
-void            ST7565_vPowerCtrl   (BOOL                   bBooster,
-                                     BOOL                   bVoltageRegulator,
-                                     BOOL                   bVoltageFollower);
+void            st7565_power_ctrl   (BOOL                   booster,
+                                     BOOL                   voltage_regulator,
+                                     BOOL                   voltage_follower);
 
-void            ST7565_vVoltageResistorRatio
-                                    (uint8_t                uRatio);
+void            st7565_voltage_resistor_ratio
+                                    (uint8_t                ratio);
 
-void            ST7565_vElVolumeRegSet
-                                    (uint8_t                uLevel);
+void            st7565_el_volume_reg_set
+                                    (uint8_t                level);
 
-void            ST7565_vStaticIndicatorRegSet
-                                    (BOOL                   bOn,
-                                     uint8_t                uState);
+void            st7565_static_indicator_reg_set
+                                    (BOOL                   on,
+                                     uint8_t                state);
 
-void            ST7565_vBoosterRatioRegSet
-                                    (uint8_t                uLevel);
+void            st7565_booster_ratio_reg_set
+                                    (uint8_t                level);
 
-void            ST7565_vNOP         (void);
+void            st7565_nop          (void);
 
-void            ST7565_vInit        (void);
+void            st7565_initialize   (void);
 
 #endif // _DISP_ST7565_H_
 /** 

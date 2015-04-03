@@ -30,10 +30,10 @@
 
 // --- Local variables ---------------------------------------------------------
 
-static sBus_t      g_sBus;
-static sClkTimer_t g_sAppTimer;
-static uint16_t    g_uTargetTemp;
-static uint16_t    g_uCurrentTemp;
+static sBus_t      g_bus;
+static sClkTimer_t g_app_timer;
+static uint16_t    g_target_temp;
+static uint16_t    g_current_temp;
 
 // --- Global variables --------------------------------------------------------
 
@@ -41,118 +41,118 @@ static uint16_t    g_uCurrentTemp;
 
 // --- Local functions ---------------------------------------------------------
 
-void vDrawNibble(uint8_t uNibble)
+void draw_nibble (uint8_t nibble)
 {
-    uNibble &= 0x0F;
-    if (uNibble > 9) {
-        uNibble -= 10;
-        uNibble += 'A';
+    nibble &= 0x0F;
+    if (nibble > 9) {
+        nibble -= 10;
+        nibble += 'A';
     } else {
-        uNibble += '0';
+        nibble += '0';
     }
-    GDISP_vPutChar(uNibble);
+    gdisp_put_char(nibble);
 }
 
-void vDrawHex8Value(uint8_t uVal)
+void draw_hex8_value (uint8_t value)
 {
-    GDISP_vPutChar('0');
-    GDISP_vPutChar('x');
-    vDrawNibble(uVal >> 4);
-    vDrawNibble(uVal & 0x0F);
+    gdisp_put_char('0');
+    gdisp_put_char('x');
+    draw_nibble(value >> 4);
+    draw_nibble(value & 0x0F);
 }
 
-void vDrawHex16Value(uint16_t uVal)
+void draw_hex16_value (uint16_t value)
 {
-    GDISP_vPutChar('0');
-    GDISP_vPutChar('x');
-    vDrawNibble((uVal >> 12) & 0x000F);
-    vDrawNibble((uVal >> 8) & 0x000F);
-    vDrawNibble((uVal >> 4) & 0x000F);
-    vDrawNibble(uVal & 0x000F);
+    gdisp_put_char('0');
+    gdisp_put_char('x');
+    draw_nibble((value >> 12) & 0x000F);
+    draw_nibble((value >> 8) & 0x000F);
+    draw_nibble((value >> 4) & 0x000F);
+    draw_nibble(value & 0x000F);
 }
 
-void vDrawTemp(uint16_t uTemperature)
+void draw_temp (uint16_t temperature)
 {
     uint8_t byte;
     BOOL firstdigit = FALSE;
 
-    if (uTemperature >= 27315) {
-        uTemperature -= 27315;
+    if (temperature >= 27315) {
+        temperature -= 27315;
 
-        byte = uTemperature / 10000;
+        byte = temperature / 10000;
         if (byte > 0) {
-            uTemperature -= byte * 10000;
+            temperature -= byte * 10000;
         }
 
-        byte = uTemperature / 1000;
+        byte = temperature / 1000;
         if (byte > 0 || firstdigit) {
-            uTemperature -= byte * 1000;
-            GDISP_vPutChar(byte + 0x30);
+            temperature -= byte * 1000;
+            gdisp_put_char(byte + 0x30);
             firstdigit = TRUE;
         } else {
-            GDISP_vPutChar(' ');
+            gdisp_put_char(' ');
         }
 
-        byte = uTemperature / 100;
+        byte = temperature / 100;
         if (byte > 0 || firstdigit) {
-            uTemperature -= byte * 100;
-            GDISP_vPutChar(byte + 0x30);
+            temperature -= byte * 100;
+            gdisp_put_char(byte + 0x30);
             firstdigit = TRUE;
         } else {
-            GDISP_vPutChar(' ');
+            gdisp_put_char(' ');
         }
-        GDISP_vPutChar(',');
-        byte = uTemperature / 10;
-        uTemperature -= byte * 10;
-        GDISP_vPutChar(byte + 0x30);
+        gdisp_put_char(',');
+        byte = temperature / 10;
+        temperature -= byte * 10;
+        gdisp_put_char(byte + 0x30);
     }
 }
 
-void vDrawTemperatures(void)
+void draw_temperatures (void)
 {
-    GDISP_vGotoColLine(0, 1);
-    GDISP_vChooseFont(GDISP_auFont1_x16);
-    vDrawTemp(g_uCurrentTemp);
-    GDISP_vChooseFont(GDISP_auSymbols_x16);
-    GDISP_vPutText(" "); //32
-    GDISP_vChooseFont(GDISP_auFont1_x16);
-    GDISP_vPutText("C");
+    gdisp_goto_col_line(0, 1);
+    gdisp_choose_font(gdisp_font1_x16);
+    draw_temp(g_current_temp);
+    gdisp_choose_font(gdisp_symbols_x16);
+    gdisp_put_text(" "); //32
+    gdisp_choose_font(gdisp_font1_x16);
+    gdisp_put_text("C");
 
-    GDISP_vGotoColLine(61, 1);
-    GDISP_vChooseFont(GDISP_auFont1_x16);
-    vDrawTemp(g_uTargetTemp);
-    GDISP_vChooseFont(GDISP_auSymbols_x16);
-    GDISP_vPutText(" "); //32
-    GDISP_vChooseFont(GDISP_auFont1_x16);
-    GDISP_vPutText("C");
+    gdisp_goto_col_line(61, 1);
+    gdisp_choose_font(gdisp_font1_x16);
+    draw_temp(g_target_temp);
+    gdisp_choose_font(gdisp_symbols_x16);
+    gdisp_put_text(" "); //32
+    gdisp_choose_font(gdisp_font1_x16);
+    gdisp_put_text("C");
 }
 
-void vDrawWindowOpened(void)
+void draw_window_opened (void)
 {
-    GDISP_vGotoColLine(118, 0);
-    GDISP_vChooseFont(GDISP_auSymbols_x24);
-    GDISP_vPutText("\""); //34
+    gdisp_goto_col_line(118, 0);
+    gdisp_choose_font(gdisp_symbols_x24);
+    gdisp_put_text("\""); //34
 }
 
-void vDrawWindowClosed(void)
+void draw_window_closed (void)
 {
-    GDISP_vGotoColLine(118, 0);
-    GDISP_vChooseFont(GDISP_auSymbols_x24);
-    GDISP_vPutText("!"); //33
+    gdisp_goto_col_line(118, 0);
+    gdisp_choose_font(gdisp_symbols_x24);
+    gdisp_put_text("!"); //33
 }
 
 // Interpret message
-static void interpret_message(sBus_t* bus, uint8_t* msg, uint8_t msg_len, uint16_t sender)
+static void interpret_message (sBus_t* bus, uint8_t* msg, uint8_t msg_len, uint16_t sender)
 {
     if (msg[0] <= eCMD_STATE_DATE_TIME) {
         // state messages
         if (msg[0] == eCMD_STATE_BITFIELDS) {
             if (sender == 0x0B) {
-                g_uTargetTemp += 10;
-                vDrawTemperatures();
+                g_target_temp += 10;
+                draw_temperatures();
             } else {
-                if (msg[2] & 0b00000001) vDrawWindowOpened();
-                else                     vDrawWindowClosed();
+                if (msg[2] & 0b00000001) draw_window_opened();
+                else                     draw_window_closed();
             }
         }
     } else if (msg[0] <= eCMD_SET_REG_32BIT) {
@@ -162,7 +162,7 @@ static void interpret_message(sBus_t* bus, uint8_t* msg, uint8_t msg_len, uint16
         // system messages
         switch (msg[0]) {
         case eCMD_ACK:
-            g_sBus.eModuleState = eMod_Running;
+            g_bus.eModuleState = eMod_Running;
             break;
         case eCMD_SLEEP:
             sleep_pinchange2_enable();
@@ -179,7 +179,7 @@ static void interpret_message(sBus_t* bus, uint8_t* msg, uint8_t msg_len, uint16
 
 // --- Global functions --------------------------------------------------------
 
-int main(void)
+int main (void)
 {
     uint8_t msglen = 0;
     uint8_t msg[BUS_MAXRECVMSGLEN];
@@ -194,50 +194,50 @@ int main(void)
 
     // configure a bus node with address X
     register_get(MOD_eReg_ModuleID, 0, &module_id);
-    bus_configure(&g_sBus, module_id);
-    bus_initialize(&g_sBus, 0);// initialize bus on UART 0
+    bus_configure(&g_bus, module_id);
+    bus_initialize(&g_bus, 0);// initialize bus on UART 0
 
-    spi0_master_init_blk();
+    spi_master_init_blk();
     ZAGW_vInit();
 
     sei();
 
-    register_get(APP_eReg_DesiredTempDay1, 0, &g_uTargetTemp);
+    register_get(APP_eReg_DesiredTempDay1, 0, &g_target_temp);
 
-    GDISP_vInit();
-    GDISP_vGotoColLine(0,0);
-    GDISP_vPutText("aktuell");
+    gdisp_initialize();
+    gdisp_goto_col_line(0,0);
+    gdisp_put_text("aktuell");
 
-    GDISP_vGotoColLine(61,0);
-    GDISP_vPutText("Soll");
+    gdisp_goto_col_line(61,0);
+    gdisp_put_text("Soll");
 
-    vDrawTemperatures();
-    vDrawWindowClosed();
+    draw_temperatures();
+    draw_window_closed();
 
-    GDISP_vChooseFont(GDISP_auFont1_x8);
-    GDISP_vGotoColLine(0,3);
-    GDISP_vPutText("Addr: ");
-    vDrawHex16Value(g_sBus.sCfg.uOwnNodeAddress);
+    gdisp_choose_font(gdisp_font1_x8);
+    gdisp_goto_col_line(0,3);
+    gdisp_put_text("Addr: ");
+    draw_hex16_value(g_bus.sCfg.uOwnNodeAddress);
 
-    clk_timer_start(&g_sAppTimer, 100);
+    clk_timer_start(&g_app_timer, 100);
     while (1) {
-        if (bus_get_message(&g_sBus)) {
-            if (bus_read_message(&g_sBus, &sender, &msglen, msg)) {
-                interpret_message(&g_sBus, msg, msglen, sender);
+        if (bus_get_message(&g_bus)) {
+            if (bus_read_message(&g_bus, &sender, &msglen, msg)) {
+                interpret_message(&g_bus, msg, msglen, sender);
             }
         }
-        if (clk_timer_is_elapsed(&g_sAppTimer)) {
-            clk_timer_start(&g_sAppTimer,10);
-            GDISP_vChooseFont(GDISP_auFont1_x8);
-            GDISP_vGotoColLine(0,3);
-            GDISP_vPutText("Temp: ");
+        if (clk_timer_is_elapsed(&g_app_timer)) {
+            clk_timer_start(&g_app_timer,10);
+            gdisp_choose_font(gdisp_font1_x8);
+            gdisp_goto_col_line(0,3);
+            gdisp_put_text("Temp: ");
             if (ZAGW_uReceive()) {
                 val = ZAGW_uGetBits();
-                vDrawHex16Value(val);
-                g_uCurrentTemp = ZAGW_uGetTemperature();
-                vDrawTemperatures();
+                draw_hex16_value(val);
+                g_current_temp = ZAGW_uGetTemperature();
+                draw_temperatures();
             } else {
-                GDISP_vPutText("PERR");
+                gdisp_put_text("PERR");
             }
         }
     }

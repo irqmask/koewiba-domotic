@@ -42,7 +42,7 @@
 // FontName : Symbols13x24
 // FontSize : 13 x 24
 
-const uint8_t GDISP_auSymbols_x24[] PROGMEM = {
+const uint8_t gdisp_symbols_x24[] PROGMEM = {
         // header
         40, 13, 24,
 

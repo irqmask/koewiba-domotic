@@ -30,20 +30,14 @@
 #define UART_UBRR_CALC(BAUD_,FREQ_) ((FREQ_)/((BAUD_)*16L)-1)
 #define UART_BAUD_RATE 9600
 
-#define BLD_LEN_CONTROLLERID    4
-#define BLD_LEN_BOARDID         2
-#define BLD_LEN_BOARDREV        1
-#define BLD_LEN_APPID           2
-#define BLD_LEN_APPVER          2
-
 // --- Type definitions --------------------------------------------------------
 
 typedef enum {
-    BLD_eExtEEPAddr_CtrlID      = MOD_eExtEEPAddr_AppStart + STARTADDR_APPLICATION,
-    BLD_eExtEEPAddr_BoardID     = BLD_eExtEEPAddr_CtrlID + BLD_LEN_CONTROLLERID,
-    BLD_eExtEEPAddr_BoardRev    = BLD_eExtEEPAddr_BoardID + BLD_LEN_BOARDID,
-    BLD_eExtEEPAddr_AppID       = BLD_eExtEEPAddr_BoardRev + BLD_LEN_BOARDREV,
-    BLD_eExtEEPAddr_AppVer      = BLD_eExtEEPAddr_AppID + BLD_LEN_APPID,
+    BLD_eExtEEPAddr_CtrlID      = MOD_eExtEEPAddr_AppStart + STARTADDR_VERSIONINFO,
+    BLD_eExtEEPAddr_BoardID     = BLD_eExtEEPAddr_CtrlID + MOD_LEN_CONTROLLERID,
+    BLD_eExtEEPAddr_BoardRev    = BLD_eExtEEPAddr_BoardID + MOD_LEN_BOARDID,
+    BLD_eExtEEPAddr_AppID       = BLD_eExtEEPAddr_BoardRev + MOD_LEN_BOARDREV,
+    BLD_eExtEEPAddr_AppVer      = BLD_eExtEEPAddr_AppID + MOD_LEN_APPID,
 } bld_ext_eep_addr_t;
 
 // --- Local variables ---------------------------------------------------------
@@ -228,7 +222,7 @@ int main ( void )
 
     // initialize UART and stdout stream
     uart_init();
-    spi0_master_init_blk();
+    spi_master_init_blk();
     eep_initialize();
 
     // enable sender and receiver

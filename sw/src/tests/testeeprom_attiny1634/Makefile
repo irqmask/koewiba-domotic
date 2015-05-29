@@ -1,6 +1,6 @@
-MCU = atmega324p
+MCU = attiny1634
 FORMAT = ihex
-TARGET = testeeprom_atmega324p
+TARGET = testeeprom_attiny1634
 
 ROOTDIR = $(subst \,/,$(shell pwd))/../../..
 include ../../../buildscripts/lib/lib_outputdirs.mk
@@ -18,7 +18,7 @@ INCDIRS = -I. \
           -I../../shared
 
 
-LOCAL_CFLAGS = -DF_CPU=7372800
+LOCAL_CFLAGS = -DF_CPU=7372800 -DHAS_PCBCONFIG_H
 LOCAL_ASFLAGS =
 LOCAL_LDFLAGS =
 

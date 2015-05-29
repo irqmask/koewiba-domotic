@@ -38,209 +38,205 @@
 
 // --- Global functions --------------------------------------------------------
 
-void            ST7565_vDispOn      (BOOL                   bOn)
+void st7565_display_on (BOOL on)
 {
     DISP_PORT_A0 &= ~(1<<DISP_A0);
     DISP_PORT_SS &= ~(1<<DISP_SS);
-    if (bOn) {
-        spi0_transmit_blk(0b10101111);
+    if (on) {
+        spi_transmit_blk(0b10101111);
     } else {
-        spi0_transmit_blk(0b10101110);
+        spi_transmit_blk(0b10101110);
     }        
     DISP_PORT_SS |= (1<<DISP_SS);
 }
 
-void            ST7565_vStartLine   (uint8_t                uStartLine)
+void st7565_start_line (uint8_t start_line)
 {
-    uStartLine &= 0b00111111;
+    start_line &= 0b00111111;
     
     DISP_PORT_A0 &= ~(1<<DISP_A0);
     DISP_PORT_SS &= ~(1<<DISP_SS);
-    spi0_transmit_blk(0b01000000 | uStartLine);
+    spi_transmit_blk(0b01000000 | start_line);
     DISP_PORT_SS |= (1<<DISP_SS);
 }
 
-void            ST7565_vPageAddr    (uint8_t                uPageAddress)
+void st7565_page_addr (uint8_t page_address)
 {
-    uPageAddress &= 0b00001111;
+    page_address &= 0b00001111;
     
     DISP_PORT_A0 &= ~(1<<DISP_A0);
     DISP_PORT_SS &= ~(1<<DISP_SS);
-    spi0_transmit_blk(0b10110000 | uPageAddress);
+    spi_transmit_blk(0b10110000 | page_address);
     DISP_PORT_SS |= (1<<DISP_SS);
 }
 
-void            ST7565_vColumnAddr  (uint8_t                uColumnAddress)
+void st7565_column_addr (uint8_t column_address)
 {
     DISP_PORT_A0 &= ~(1<<DISP_A0);
     DISP_PORT_SS &= ~(1<<DISP_SS);
-    spi0_transmit_blk(0b00010000 | (uColumnAddress >> 4));
+    spi_transmit_blk(0b00010000 | (column_address >> 4));
     DISP_PORT_SS |= (1<<DISP_SS);
     DISP_PORT_SS &= ~(1<<DISP_SS);
-    spi0_transmit_blk(uColumnAddress & 0x0F);
+    spi_transmit_blk(column_address & 0x0F);
     DISP_PORT_SS |= (1<<DISP_SS);
 }
 
-void            ST7565_vWriteData   (uint8_t                uData)
+void st7565_write_data (uint8_t data)
 {
     DISP_PORT_A0 |= (1<<DISP_A0);
     DISP_PORT_SS &= ~(1<<DISP_SS);
-    spi0_transmit_blk(uData);
+    spi_transmit_blk(data);
     DISP_PORT_SS |= (1<<DISP_SS);
 }
 
-void            ST7565_vADCSelect   (BOOL                   bReverse)
+void st7565_adc_select (BOOL reverse)
 {
     DISP_PORT_A0 &= ~(1<<DISP_A0);
     DISP_PORT_SS &= ~(1<<DISP_SS);
-    if (bReverse) {
-        spi0_transmit_blk(0b10100001);
+    if (reverse) {
+        spi_transmit_blk(0b10100001);
     } else {
-        spi0_transmit_blk(0b10100000);
+        spi_transmit_blk(0b10100000);
     }
     DISP_PORT_SS |= (1<<DISP_SS);
 }
 
-void            ST7565_vDispReverse (BOOL                   bReverse)
+void st7565_disp_reverse (BOOL reverse)
 {
     DISP_PORT_A0 &= ~(1<<DISP_A0);
     DISP_PORT_SS &= ~(1<<DISP_SS);
-    if (bReverse) {
-        spi0_transmit_blk(0b10100111);
+    if (reverse) {
+        spi_transmit_blk(0b10100111);
     } else {
-        spi0_transmit_blk(0b10100110);
+        spi_transmit_blk(0b10100110);
     }
     DISP_PORT_SS |= (1<<DISP_SS);
 }
 
-void            ST7565_vDispAllPixel(BOOL                   bAllPixOn)
+void st7565_disp_all_pixel (BOOL all_pixel_on)
 {
     DISP_PORT_A0 &= ~(1<<DISP_A0);
     DISP_PORT_SS &= ~(1<<DISP_SS);
-    if (bAllPixOn) {
-        spi0_transmit_blk(0b10100101);
+    if (all_pixel_on) {
+        spi_transmit_blk(0b10100101);
     } else {
-        spi0_transmit_blk(0b10100100);
+        spi_transmit_blk(0b10100100);
     }
     DISP_PORT_SS |= (1<<DISP_SS);
 }
 
-void            ST7565_vLCDBias     (uint8_t                uBias)
+void st7565_lcd_bias (uint8_t bias)
 {
-    uBias &= 0b00000001;
+    bias &= 0b00000001;
     
     DISP_PORT_A0 &= ~(1<<DISP_A0);
     DISP_PORT_SS &= ~(1<<DISP_SS);
-    spi0_transmit_blk(0b10100010 | uBias);
+    spi_transmit_blk(0b10100010 | bias);
     DISP_PORT_SS |= (1<<DISP_SS);
 }
 
-void            ST7565_vReset       (void)
+void st7565_reset (void)
 {
     DISP_PORT_A0 &= ~(1<<DISP_A0);
     DISP_PORT_SS &= ~(1<<DISP_SS);
-    spi0_transmit_blk(0b11100010);
+    spi_transmit_blk(0b11100010);
     DISP_PORT_SS |= (1<<DISP_SS);
 }
     
-void            ST7565_vCOMSelect   (BOOL                   bReverse)
+void st7565_com_select (BOOL reverse)
 {
     DISP_PORT_A0 &= ~(1<<DISP_A0);
     DISP_PORT_SS &= ~(1<<DISP_SS);
-    if (bReverse) {
-        spi0_transmit_blk(0b11001000);
+    if (reverse) {
+        spi_transmit_blk(0b11001000);
     } else {
-        spi0_transmit_blk(0b11000000);
+        spi_transmit_blk(0b11000000);
     }
     DISP_PORT_SS |= (1<<DISP_SS);
 }
 
-void            ST7565_vPowerCtrl   (BOOL                   bBooster,
-                                     BOOL                   bVoltageRegulator,
-                                     BOOL                   bVoltageFollower)
+void st7565_power_ctrl (BOOL booster,
+                        BOOL voltage_regulator,
+                        BOOL voltage_follower)
 {
    uint8_t val;
    
    val = 0b00101000;
-   if (bBooster) val |= 0b00000100;
-   if (bVoltageRegulator) val |= 0b00000010;
-   if (bVoltageFollower) val |= 0b00000001;
+   if (booster) val |= 0b00000100;
+   if (voltage_regulator) val |= 0b00000010;
+   if (voltage_follower) val |= 0b00000001;
    
     DISP_PORT_A0 &= ~(1<<DISP_A0);
     DISP_PORT_SS &= ~(1<<DISP_SS);
-    spi0_transmit_blk(val);
+    spi_transmit_blk(val);
     DISP_PORT_SS |= (1<<DISP_SS);
 }
 
-void            ST7565_vVoltageResistorRatio
-                                    (uint8_t                uRatio)
+void st7565_voltage_resistor_ratio (uint8_t ratio)
 {
-    uRatio &= 0b00000111;
+    ratio &= 0b00000111;
     DISP_PORT_A0 &= ~(1<<DISP_A0);
     DISP_PORT_SS &= ~(1<<DISP_SS);
-    spi0_transmit_blk(0b00100000 | uRatio);
+    spi_transmit_blk(0b00100000 | ratio);
     DISP_PORT_SS |= (1<<DISP_SS);
 }
 
-void            ST7565_vElVolumeRegSet
-                                    (uint8_t                uLevel)
+void st7565_el_volume_reg_set (uint8_t level)
 {
     DISP_PORT_A0 &= ~(1<<DISP_A0);
     // electronic volume mode set
     DISP_PORT_SS &= ~(1<<DISP_SS);
-    spi0_transmit_blk(0b10000001);
+    spi_transmit_blk(0b10000001);
     DISP_PORT_SS |= (1<<DISP_SS);
     // electronic volume register set
-    uLevel &= 0b00111111;
+    level &= 0b00111111;
     DISP_PORT_SS &= ~(1<<DISP_SS);
-    spi0_transmit_blk(uLevel);
+    spi_transmit_blk(level);
     DISP_PORT_SS |= (1<<DISP_SS);
 }
 
-void            ST7565_vStaticIndicatorRegSet
-                                    (BOOL                   bOn,
-                                     uint8_t                uState)
+void st7565_static_indicator_reg_set (BOOL      on,
+                                      uint8_t   state)
 {
     DISP_PORT_A0 &= ~(1<<DISP_A0);
     // static indicator
     DISP_PORT_SS &= ~(1<<DISP_SS);
-    if (bOn) {
-        spi0_transmit_blk(0b10101101);
+    if (on) {
+        spi_transmit_blk(0b10101101);
     } else {
-        spi0_transmit_blk(0b10101100);
+        spi_transmit_blk(0b10101100);
     }
     DISP_PORT_SS |= (1<<DISP_SS);
     // static indicator state
-    uState &= 0b00000011;
+    state &= 0b00000011;
     DISP_PORT_SS &= ~(1<<DISP_SS);
-    spi0_transmit_blk(uState);
+    spi_transmit_blk(state);
     DISP_PORT_SS |= (1<<DISP_SS);
 }
 
-void            ST7565_vBoosterRatioRegSet
-                                    (uint8_t                uLevel)
+void st7565_booster_ratio_reg_set (uint8_t level)
 {
     DISP_PORT_A0 &= ~(1<<DISP_A0);
     // booster ratio mode set
     DISP_PORT_SS &= ~(1<<DISP_SS);
-    spi0_transmit_blk(0b11111000);
+    spi_transmit_blk(0b11111000);
     DISP_PORT_SS |= (1<<DISP_SS);
     // booster ratio register set
-    uLevel &= 0b00000011;
+    level &= 0b00000011;
     DISP_PORT_SS &= ~(1<<DISP_SS);
-    spi0_transmit_blk(uLevel);
+    spi_transmit_blk(level);
     DISP_PORT_SS |= (1<<DISP_SS);
 }
 
-void            ST7565_vNOP         (void)
+void st7565_nop (void)
 {
     DISP_PORT_A0 &= ~(1<<DISP_A0);
     DISP_PORT_SS &= ~(1<<DISP_SS);
-    spi0_transmit_blk(0b11100011);
+    spi_transmit_blk(0b11100011);
     DISP_PORT_SS |= (1<<DISP_SS);    
 }
 
-void            ST7565_vInit        (void)
+void st7565_initialize (void)
 {
     // set port data directions and initial levels
     DISP_DDR_A0 |= (1<<DISP_A0);
@@ -255,17 +251,17 @@ void            ST7565_vInit        (void)
     DISP_PORT_RES |= (1<<DISP_RES);
     _delay_us(1000);
     
-    ST7565_vLCDBias(0);                 // bias 1/9   
-    ST7565_vADCSelect(TRUE);            // reverse orientation
-    ST7565_vCOMSelect(FALSE);           // 6 o'clock mode
+    st7565_lcd_bias(0);                 // bias 1/9   
+    st7565_adc_select(TRUE);            // reverse orientation
+    st7565_com_select(FALSE);           // 6 o'clock mode
     
-    ST7565_vVoltageResistorRatio(3);    // set voltage regulator resistor ratio
-    ST7565_vElVolumeRegSet(0x1F);       // set volume mode register
+    st7565_voltage_resistor_ratio(3);   // set voltage regulator resistor ratio
+    st7565_el_volume_reg_set(0x1F);     // set volume mode register
 
-    ST7565_vPowerCtrl(TRUE, TRUE, TRUE);// power control mode: all features on
+    st7565_power_ctrl(TRUE, TRUE, TRUE);// power control mode: all features on
 
-    ST7565_vDispReverse(FALSE);         // display mode positive
-    ST7565_vStaticIndicatorRegSet(TRUE, 0); // switch indicator off, no blinking
-    ST7565_vDispOn(TRUE);               // switch display on  
+    st7565_disp_reverse(FALSE);         // display mode positive
+    st7565_static_indicator_reg_set(TRUE, 0); // switch indicator off, no blinking
+    st7565_display_on(TRUE);            // switch display on  
 }
 /** @} */

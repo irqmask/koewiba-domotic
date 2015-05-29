@@ -62,7 +62,7 @@
 #endif // GDISPLAY_APPCONFIG
 /** @} */
 
-#define GDISP_vPutText8x8P(__str) GDISP_vPutText8x8p(PSTR(__str))
+#define gdisp_put_text_8x8P(__str) gdisp_put_text_8x8p(PSTR(__str))
 
 // --- Type definitions --------------------------------------------------------
 
@@ -70,11 +70,11 @@
 
 // --- Global variables --------------------------------------------------------
 
-extern const uint8_t GDISP_auFont1_x8[];
-extern const uint8_t GDISP_auFont1_x16[];
-extern const uint8_t GDISP_auFont1_x24[];
-extern const uint8_t GDISP_auSymbols_x16[];
-extern const uint8_t GDISP_auSymbols_x24[];
+extern const uint8_t gdisp_font1_x8[];
+extern const uint8_t gdisp_font1_x16[];
+extern const uint8_t gdisp_font1_x24[];
+extern const uint8_t gdisp_symbols_x16[];
+extern const uint8_t gdisp_symbols_x24[];
 
 // --- Module global variables -------------------------------------------------
 
@@ -84,22 +84,22 @@ extern const uint8_t GDISP_auSymbols_x24[];
 
 // --- Global functions --------------------------------------------------------
 
-void            GDISP_vInit         (void);
+void            gdisp_initialize    (void);
 
-void            GDISP_vBacklight    (uint8_t                uLevel);
+void            gdisp_backlight     (uint8_t                level);
 
-void            GDISP_vChooseFont   (const uint8_t*         puFont);
+void            gdisp_choose_font   (const uint8_t*         font);
 
-void            GDISP_vGotoColLine  (uint8_t                uCol,
-                                     uint8_t                uPage);
+void            gdisp_goto_col_line (uint8_t                col,
+                                     uint8_t                page);
 
-void            GDISP_vPutSpacer    (uint8_t                uHeight);
+void            gdisp_put_spacer    (uint8_t                height);
 
-void            GDISP_vPutChar      (const char             cChar);
+void            gdisp_put_char      (const char             single_char);
 
-void            GDISP_vPutText      (const char*            pcText);
+void            gdisp_put_text      (const char*            text);
 
-void            GDISP_vPutTextp     (const char*            pcText);
+void            gdisp_put_textp     (const char*            text);
 
 #endif // _GDISPLAY_H_
 /**

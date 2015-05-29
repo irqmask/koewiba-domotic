@@ -22,6 +22,12 @@
 #define MOD_LEN_APPSIZE         4
 #define MOD_LEN_APPCRC          4
 
+#define MOD_LEN_CONTROLLERID    4
+#define MOD_LEN_BOARDID         2
+#define MOD_LEN_BOARDREV        1
+#define MOD_LEN_APPID           2
+#define MOD_LEN_APPVER          2
+
 // --- Type definitions --------------------------------------------------------
 
 //! Common register storage layout which is used by all applications.

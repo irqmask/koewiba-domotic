@@ -26,10 +26,12 @@
 
 // --- Definitions -------------------------------------------------------------
 
-#define MAX_SERIAL_MSG_SIZE (3 + MAX_MSG_SIZE * 2 + 1)
+//! Maximum size of serial message: 
+//! [16bit receiver] + [8bit length] + [message data] + NL + 0
+//! 4 + 2 + MAX_MSG_SIZE * 2 + 1 + 1
+#define MAX_SERIAL_MSG_SIZE (6 + MAX_MSG_SIZE * 2 + 2)
 
 // --- Type definitions --------------------------------------------------------
-
 
 typedef void (*msg_newconn_func_t)(char* address, uint16_t port, void* reference, void* arg);
 
@@ -40,8 +42,14 @@ typedef struct msg_serial {
     int                 baudrate;
     msg_incom_func_t    incomming_handler;
     void*               incomming_arg;
-    char                incomming_buffer;
     
+    // buffer for incomming messages
+    char                incomming_buffer[MAX_SERIAL_MSG_SIZE*2];
+    msg_t               incomming_message;
+    uint8_t             incomming_state;
+    uint8_t             incomming_num_received;
+    
+    // buffer for outgoing messages
     char                ser_data[MAX_SERIAL_MSG_SIZE];
     size_t              ser_data_length;
     size_t              ser_data_written;  

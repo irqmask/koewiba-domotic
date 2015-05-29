@@ -30,13 +30,18 @@
 
 // --- Type definitions --------------------------------------------------------
 
+/**
+ * Structure of kwbfirmware runtime options.
+ */
 typedef struct options {
-    char        serial_device[256];
-    int         serial_baudrate;
-    char        router_address[256];
-    uint16_t    router_port;
-    bool        serial_device_set;
-    bool        router_address_set;
+    char        serial_device[256]; //!< Device of serial connection to RS232 gateway.
+    int         serial_baudrate;    //!< Baudrate of serial connection to RS232 gateway.
+    char        router_address[256];//!< Address of kwbrouter server.
+    uint16_t    router_port;        //!< Port number of kwbrouter server.
+    bool        serial_device_set;  //!< Flag: if set, serial device has been 
+                                    //!< configured in the command line options.
+    bool        router_address_set; //!< Flag: is set, router address has been 
+                                    //!< configured in the command line options.
     char        filename[256];
     uint16_t    node_address;
 } options_t;
@@ -49,6 +54,18 @@ typedef struct options {
 
 // --- Local functions ---------------------------------------------------------
 
+/**
+ * Set kwbfirmware run options via function call.
+ * Function can be used to set default parameters.
+ * 
+ * @param[out]  options         Stucture where options are stored in.
+ * @param[in]   serial_device   Device of serial connection to RS232 gateway.
+ * @param[in]   serial_baudrate Baudrate of serial connection to RS232 gateway.
+ * @param[in]   router_address  Address of kwbrouter server.
+ * @param[in]   router_port     Port number of kwbrouter server.
+ * @param[in]   node_address    Address of node of which the firmware will be 
+ *                              updated.
+ */
 static void set_options (options_t*     options,
                          const char*    serial_device,
                          int            serial_baudrate,
@@ -69,6 +86,17 @@ static void set_options (options_t*     options,
     options->node_address = node_address;
 }
 
+/**
+ * Read command line options and save results in options.
+ * 
+ * @param[in]   argc    Count of command line options.
+ * @param[in]   argv    Command line arguments.
+ * @param[out]  options Stucture where options are stored in.
+ * 
+ * @returns true, if command line options have been parsed successfully or no 
+ *          options have been read (in this case, default parameters will be 
+ *          used).
+ */
 static bool parse_commandline_options (int argc, char* argv[], options_t* options)
 {
     bool                    rc = true;
@@ -111,7 +139,13 @@ static bool parse_commandline_options (int argc, char* argv[], options_t* option
     return rc;
 }
 
-static bool validate_options(options_t* options)
+/**
+ * Validate kwbfirmware runtime options.
+ * 
+ * @param[in,out]   options Structure where options are stored in.
+ * @returns         true if options are constient and usable, otherwise false.
+ */
+ static bool validate_options(options_t* options)
 {
     bool    rc = false,
             serial_device_set = false,
@@ -140,6 +174,9 @@ static bool validate_options(options_t* options)
     return rc;
 }
 
+/**
+ * Print usage notes to command prompt.
+ */
 static void print_usage (void)
 {
     printf("\nUsage:\n");
@@ -157,6 +194,13 @@ static void print_usage (void)
 
 // --- Global functions --------------------------------------------------------
 
+/**
+ * main entry point of kwbfirmware.
+ * 
+ * @param[in]   argc    Number of command line arguments.
+ * @param[in]   argv    List of command line arguments.
+ * @returns     0 if firmware has been updated in target node successfully.
+ */ 
 int main (int argc, char* argv[])
 {
     int                 rc = eERR_NONE;

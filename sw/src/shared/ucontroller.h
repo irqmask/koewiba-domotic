@@ -17,12 +17,12 @@
 // --- Definitions -------------------------------------------------------------
 
 #if defined (__AVR_ATmega8__)
- #define REGISTER_UCSRA         UCSRA
- #define REGISTER_UCSRB         UCSRB
- #define REGISTER_UCSRC         UCSRC
- #define REGISTER_UDR           UDR
- #define REGISTER_UBRRH         UBRRH
- #define REGISTER_UBRRL         UBRRL
+ #define REGISTER_UCSRA0        UCSRA
+ #define REGISTER_UCSRB0        UCSRB
+ #define REGISTER_UCSRC0        UCSRC
+ #define REGISTER_UDR0          UDR
+ #define REGISTER_UBRRH0        UBRRH
+ #define REGISTER_UBRRL0        UBRRL
  #define REGBIT_RXCIE           RXCIE
  #define REGBIT_UDRIE           UDRIE
  #define REGBIT_TXCIE           TXCIE
@@ -119,7 +119,7 @@
  // definition of processor depending global settings
  // TODO CV: this part can be ported maybe to a makefile include
  #define STARTADDR_APPVECTORS   0x0000
- #define STARTADDR_APPLICATION  0x003E
+ #define STARTADDR_VERSIONINFO  0x007C
  #define STARTADDR_BOOTLOADER   0x1700
  #define MAXSIZE_APPLICATION    (STARTADDR_BOOTLOADER - STARTADDR_APPVECTORS)
  #define MAXSIZE_BOOTLOADER     0x0400
@@ -220,7 +220,7 @@
  // definition of prozessor depending global settings
  // TODO CV: this part can be ported maybe to a makefile include
  #define STARTADDR_APPVECTORS   0x0000
- #define STARTADDR_APPLICATION  0x003E
+ #define STARTADDR_VERSIONINFO  0x0070
  #define STARTADDR_BOOTLOADER   0x1700
  #define MAXSIZE_APPLICATION    (STARTADDR_BOOTLOADER - STARTADDR_APPVECTORS)
  #define MAXSIZE_BOOTLOADER     0x0400

@@ -23,6 +23,13 @@ extern "C" {
 
 // --- Type definitions --------------------------------------------------------
 
+/** 
+ * Write byte callback function type. A function with this interface is called 
+ * every time a byte has to be written into target memory.
+ * @param[in]   address     Address in target memory.
+ * @param[in]   byte        Byte to be written.
+ * @param[in]   arg         User defined argument.
+ */ 
 typedef void (*ihex_write_byte_func)(uint32_t address, uint8_t byte, void* arg);
 
 typedef enum {

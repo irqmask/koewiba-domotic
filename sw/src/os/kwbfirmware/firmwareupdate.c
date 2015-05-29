@@ -45,6 +45,12 @@
 
 // --- Local functions ---------------------------------------------------------
 
+/**
+ * Write a memory block as hexadecimal dump to a log file.
+ * 
+ * @param[in]   data    Pointer to data.
+ * @param[in]   length  Length in byte of memory to be logged.
+ */
 void log_hexdump16 (uint8_t* data, uint16_t length)
 {
     uint16_t offset = 0;
@@ -62,6 +68,15 @@ void log_hexdump16 (uint8_t* data, uint16_t length)
     printf("\n");
 }
 
+/**
+ * Send a block start message to the target node. The block start message 
+ * contains the block-type and the first address in the target memory. 
+ * 
+ * @param[in]   fwu     Pointer to firmware update process data.
+ * 
+ * @returns     eERR_NONE if message has been sent successfully, otherwise 
+ *              errorcode.
+ */
 static int send_block_start_message (firmwareupdate_t* fwu)
 {
     int rc = eERR_NONE;
@@ -84,6 +99,19 @@ static int send_block_start_message (firmwareupdate_t* fwu)
     return rc;
 }
 
+/**
+ * Send a block data message to the target node. The block data message 
+ * contains an offset in the target memory and up to 32 byte of data. 
+ * 
+ * @param[in]   fwu     Pointer to firmware update process data.
+ * 
+ * @returns     eRUNNING if message has been sent successfully and there is 
+ *              remaining data to be transmitted.
+ * @returns     eERR_NONE if message has been sent successfully and all of the
+ *              firmware data has been transmitted.
+ * @returns     Otherwise, if an error occurs in a subroutine, the error-code is
+ *              returned.
+ */
 static int send_block_data_message (firmwareupdate_t* fwu)
 {
     int         rc = eRUNNING;
@@ -141,6 +169,17 @@ static int send_block_data_message (firmwareupdate_t* fwu)
     return rc;
 }
 
+/**
+ * Send a block end message to the target node. The block end message 
+ * contains the checksum of the sent data. The target node is expected to 
+ * calculate a checksum by itself and compare it to the checksum sent with the 
+ * block end message. 
+ * 
+ * @param[in]   fwu     Pointer to firmware update process data.
+ * 
+ * @returns     eERR_NONE if message has been sent successfully, otherwise 
+ *              errorcode.
+ */
 static int send_block_end_message (firmwareupdate_t* fwu)
 {
     int rc = eERR_NONE;
@@ -165,6 +204,20 @@ static int send_block_end_message (firmwareupdate_t* fwu)
 
 // --- Global functions --------------------------------------------------------
 
+/**
+ * Initialize the firmware update process runtime data, establish a connection 
+ * to the target node (bus, rs232 or network) and register the communication 
+ * device at the ioloop module.
+ * @note Currently only the connection over a RS232 gateway is supported.
+ *
+ * @param[in,out]   fwu         Pointer to firmware update process data.
+ * @param[in]       ioloop      Pointer to ioloop handler.
+ * @param[in]       device      Serial connection device.
+ * @param[in]       baudrate    Baudrate of serial connection.
+ *
+ * @returns         0 if firmware update runtime data and environment is 
+ *                  successfully initialized.
+ */ 
 int firmware_update_init (firmwareupdate_t* fwu,
                           ioloop_t*         ioloop,
                           const char*       device,
@@ -186,11 +239,24 @@ int firmware_update_init (firmwareupdate_t* fwu,
     return rc;
 }
 
+/**
+ * Start a firmware update process.
+ * 
+ * @param[in,out]   fwu             Pointer to firmware update process data.
+ * @param[in]       filename        Path and filename of IHEX file to be sent to
+ *                                  the target node.
+ * @param[in]       module_address  Module address of the target node.
+ * 
+ * @returns         eERR_NONE if the firmware update process has successfully 
+ *                  been started.
+ * @returns         eERR_MALLOC if the memory is not sufficient to load the 
+ *                  IHEX file.
+ */
 int firmware_update_start (firmwareupdate_t*    fwu,
                            const char*          filename,
                            uint16_t             module_address)
 {
-    int rc = 0;
+    int rc = eERR_NONE;
     uint32_t target_last_addr;
 
     assert(fwu != NULL);
@@ -245,6 +311,17 @@ int firmware_update_start (firmwareupdate_t*    fwu,
     return rc;
 }
 
+/**
+ * Run the firmware update process. This function has to be called as long as 
+ * eRUNNING is returned.
+ * 
+ * @param[in,out]   fwu             Pointer to firmware update process data.
+ * 
+ * @returns         eRUNNING if the firmware is still beening transmitted.
+ * @returns         eERR_NONE if the firmware has been transmitted completely.
+ * @returns         Otherwise, if an error occurs in a subroutine, the errorcode
+ *                  is returned.
+ */
 int firmware_update_run (firmwareupdate_t* fwu)
 {
     int rc = eERR_NONE;
@@ -257,6 +334,12 @@ int firmware_update_run (firmwareupdate_t* fwu)
     return rc;
 }
 
+/**
+ * Close and end the firmware update process. Also the connection to the target 
+ * node is closed.
+ * 
+ * @param[in,out]   fwu             Pointer to firmware update process data.
+ */
 void firmware_update_close (firmwareupdate_t* fwu)
 {
     assert(fwu != NULL);

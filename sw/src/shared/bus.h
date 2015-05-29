@@ -58,7 +58,7 @@
  //! maximum length of a message to be sent.
  #define BUS_MAXSENDMSGLEN   36
  //! maximum length of a message to be received.
- #define BUS_MAXRECVMSGLEN   64 + 2
+ #define BUS_MAXRECVMSGLEN   (64 + 3)
 #endif
 /**
  * @}
@@ -132,6 +132,7 @@ typedef enum errorcodes {
     eBUSERR_NOERR = 0,   //!< Message successfully transferred into tx_queue.
     eBUSERR_MSGSIZE,     //!< Message size exceeds buffer-size.
     eBUSERR_QUEUESPACE,  //!< Insufficient queue-space - please wait!
+    eBUSERR_UNEXPECTED,
 } eBusSendError_t;
 
 //! configuration data of the bus

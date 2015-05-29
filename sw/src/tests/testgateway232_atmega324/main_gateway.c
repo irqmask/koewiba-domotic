@@ -43,16 +43,16 @@ static sSerPhy_t    g_sSerPhy;
 
 static void IO_vInitialize(void)
 {
-    DDRA  |= ((0<<DDRA7) | (0<<DDRA6) | (0<<DDRA5) | (0<<DDRA4) | (0<<DDRA3) | (0<<DDRA2) | (0<<DDRA1) | (0<<DDRA0) );
+    DDRA  |= ((0<<DDA7) | (0<<DDA6) | (0<<DDA5) | (0<<DDA4) | (0<<DDA3) | (0<<DDA2) | (0<<DDA1) | (0<<DDA0) );
     PORTA |= ((0<<PA7)   |  (0<<PA6)  |  (0<<PA5)  |  (0<<PA4)  |  (0<<PA3)  |  (0<<PA2)  |  (0<<PA1)  |  (0<<PA0)  );
 
-    DDRB  |= ((1<<DDRB7) | (0<<DDRB6) | (1<<DDRB5) | (0<<DDRB4) | (0<<DDRB3) | (1<<DDRB2) | (0<<DDRB1) | (0<<DDRB0) );
+    DDRB  |= ((1<<DDB7) | (0<<DDB6) | (1<<DDB5) | (0<<DDB4) | (0<<DDB3) | (1<<DDB2) | (0<<DDB1) | (0<<DDB0) );
     PORTB |= ((0<<PB7)   |  (0<<PB6)  |  (0<<PB5)  |  (0<<PB4)  |  (0<<PB3)  |  (0<<PB2)  |  (0<<PB1)  |  (0<<PB0)  );
 
-    DDRC  |= ((0<<DDRC7) | (0<<DDRC6) | (0<<DDRC5) | (0<<DDRC4) | (0<<DDRC3) | (0<<DDRC2) | (0<<DDRC1) | (0<<DDRC0) );
+    DDRC  |= ((0<<DDC7) | (0<<DDC6) | (0<<DDC5) | (0<<DDC4) | (0<<DDC3) | (0<<DDC2) | (0<<DDC1) | (0<<DDC0) );
     PORTC |= ((0<<PC7)   |  (0<<PC6)  |  (0<<PC5)  |  (0<<PC4)  |  (0<<PC3)  |  (0<<PC2)  |  (0<<PC1)  |  (0<<PC0)  );
 
-    DDRD  |= ((0<<DDRD7) | (0<<DDRD6) | (0<<DDRD5) | (1<<DDRD4) | (0<<DDRD3) | (0<<DDRD2) | (0<<DDRD1) | (0<<DDRD0) );
+    DDRD  |= ((0<<DDD7) | (0<<DDD6) | (0<<DDD5) | (1<<DDD4) | (0<<DDD3) | (0<<DDD2) | (0<<DDD1) | (0<<DDD0) );
     PORTD |= ((0<<PD7)   |  (0<<PD6)  |  (0<<PD5)  |  (0<<PD4)  |  (0<<PD3)  |  (0<<PD2)  |  (0<<PD1)  |  (0<<PD0)  );
 }
 

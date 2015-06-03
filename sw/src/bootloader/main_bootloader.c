@@ -89,7 +89,7 @@ void uart_put_string ( const char *string )
     }
 }
 
-static void uart_hex_dump ( const uint8_t *array, uint8_t size)
+/*static void uart_hex_dump ( const uint8_t *array, uint8_t size)
 {
     uint8_t ii;
 
@@ -102,7 +102,7 @@ static void uart_hex_dump ( const uint8_t *array, uint8_t size)
         }
     }
     if (ii%16) uart_put_char('\n');
-}
+}*/
 
 BOOL check_crc (uint32_t* length)
 {
@@ -171,12 +171,14 @@ void program_flash (uint32_t address, uint32_t length)
     uint16_t ii, ww;
     uint8_t temp;
 
+    // wait until eventually running write cycles of internal eeprom are
+    // finished.
     eeprom_busy_wait ();
 
     do {
-
+        // erase flash page and wait until the memory is erased.
         boot_page_erase (address);
-        boot_spm_busy_wait ();      /* Wait until the memory is erased. */
+        boot_spm_busy_wait ();
 
         // only copy full 16bit words to flash memory
         if (length % 2) length--;
@@ -192,8 +194,10 @@ void program_flash (uint32_t address, uint32_t length)
             length -= 2;
             if (length == 0) break;
         }
-        boot_page_write (address);     /* Store buffer in flash page.      */
-        boot_spm_busy_wait();       /* Wait until the memory is written.*/
+        // store buffer in flash page and wait until the memory is written.
+        boot_page_write (address);
+        boot_spm_busy_wait();
+        // one flash page has been written
         address += SPM_PAGESIZE;
     } while (length > 0);
 }
@@ -214,14 +218,15 @@ int main ( void )
     // move interrupt vector table to bootloader section
     tempSREG = SREG;
     temp = MCUCR;
-    MCUCR = temp | (1 << IVCE); // needed to unlock IVSEL
-    MCUCR = temp | (1 << IVSEL); // set IVSEL (within 4 cycles)
+    MCUCR = temp | (1 << IVCE);     // needed to unlock IVSEL
+    MCUCR = temp | (1 << IVSEL);    // set IVSEL (within 4 cycles)
     SREG = tempSREG;
 
     bld_status = 0;
 
     // initialize UART and stdout stream
     uart_init();
+    // initialize external SPI eeprom
     spi_master_init_blk();
     eep_initialize();
 
@@ -272,7 +277,7 @@ int main ( void )
             // flash new application
             program_flash(0, length);
             bld_status |= (1 << eBldFlagNewSWProgrammed);
-            // Reenable RWW-section again. We need this if we want to jump back
+            // re-enable RWW-section again. We need this if we want to jump back
             // to the application after bootloading.
             boot_rww_enable ();
             bld_status &= ~(1<<eBldFlagAppProgram);

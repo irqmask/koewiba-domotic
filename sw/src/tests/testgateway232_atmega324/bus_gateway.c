@@ -1,16 +1,27 @@
-/*
- * bus_gateway.c
+/**
+ * @addtogroup BUS_GATEWAY
+ * @brief Gateway to transmit messages from bus to serial line and vice versa.
  *
- *  Created on: 17.01.2015
- *      Author: robert mueller
- */
+ * @{
+ * @file    bus_gateway.c
+ * @brief   Gateway to transmit messages from bus to serial line and vice versa.
+
+ * @author  Robert Mueller, Christian Verhalen
+ *///---------------------------------------------------------------------------
+
+// --- Include section ---------------------------------------------------------
 
 #include <avr/io.h>
 
 #include "appconfig.h"
 #include "bus_intern.h"
+#include "cmddef_common.h"
 #include "queue.h"
 #include "serialcomm.h"
+
+// --- Definitions -------------------------------------------------------------
+
+// --- Type definitions --------------------------------------------------------
 
 typedef enum bgw_state {
     eBGW_IDLE = 0,
@@ -19,12 +30,20 @@ typedef enum bgw_state {
     eBGW_ERROR
 } bgw_state_t;
 
+// --- Local variables ---------------------------------------------------------
+
 static bgw_state_t  g_curr_state;
 static uint8_t      g_curr_recv_h;
 static uint8_t      g_curr_recv_l;
 static uint8_t      g_curr_len;
 
-static void debug_sendval8 (scomm_phy_t* phy, uint8_t val)
+// --- Global variables --------------------------------------------------------
+
+// --- Module global variables -------------------------------------------------
+
+// --- Local functions ---------------------------------------------------------
+
+/*static void debug_sendval8 (scomm_phy_t* phy, uint8_t val)
 {
     uint8_t nibble;
 
@@ -42,17 +61,7 @@ static void debug_sendval8 (scomm_phy_t* phy, uint8_t val)
     }
     q_put_byte(&phy->sendQ, '\n');
     serial_phy_initiate_sending(phy);
-}
-
-static void debug_sendtrap (scomm_phy_t* phy)
-{
-    q_put_byte(&phy->sendQ, 'T');
-    q_put_byte(&phy->sendQ, 'R');
-    q_put_byte(&phy->sendQ, 'A');
-    q_put_byte(&phy->sendQ, 'P');
-    q_put_byte(&phy->sendQ, '\n');
-    serial_phy_initiate_sending(phy);
-}
+}*/
 
 static BOOL convert_nibbles_to_byte (uint8_t nibble_h, uint8_t nibble_l, uint8_t* byte)
 {
@@ -80,6 +89,24 @@ static BOOL convert_nibbles_to_byte (uint8_t nibble_h, uint8_t nibble_l, uint8_t
     }
     *byte |= nibble_l;
     return TRUE;
+}
+
+static void convert_and_enqueue_byte (queue_t *q, uint8_t byte)
+{
+    uint8_t nibble;
+
+    nibble = byte >> 4;
+    if (nibble < 10) {
+        q_put_byte(q, nibble + '0');
+    } else {
+        q_put_byte(q, nibble + 'A' - 10);
+    }
+    nibble = byte & 0x0F;
+    if (nibble < 10) {
+        q_put_byte(q, nibble + '0');
+    } else {
+        q_put_byte(q, nibble + 'A' - 10);
+    }
 }
 
 static bgw_state_t bgw_send_message_to_bus (sBus_t* bus, scomm_phy_t* rs232_phy)
@@ -135,6 +162,18 @@ static bgw_state_t bgw_send_message_to_bus (sBus_t* bus, scomm_phy_t* rs232_phy)
     return eBGW_IDLE;
 }
 
+// --- Module global functions -------------------------------------------------
+
+// --- Global functions --------------------------------------------------------
+
+/**
+ * Receive a message on a serial line and forward it to the bus.
+ * This is implemented as a state-macine and this function has to be called
+ * periodically.
+ *
+ * @param[in] bus       Handle of bus.
+ * @param[in] rs232_phy Handle of serial line.
+ */
 void bgw_forward_serial_msg (sBus_t* bus, scomm_phy_t* rs232_phy)
 {
     uint8_t nibble_h, nibble_l, num_bytes;
@@ -169,15 +208,12 @@ void bgw_forward_serial_msg (sBus_t* bus, scomm_phy_t* rs232_phy)
             }
             q_flush_bytes(&rs232_phy->recvQ, 6);
             g_curr_state = eBGW_WAIT_COMPLETE;
-            debug_sendtrap(rs232_phy);
-            debug_sendval8(rs232_phy, g_curr_len);
         }
         break;
 
     case eBGW_WAIT_COMPLETE:
         // wait until complete message incuding newline is in the queue
         if (q_get_pending(&rs232_phy->recvQ) >= ((g_curr_len<<1) + 1)) {
-
             g_curr_state = eBGW_RECV;
         }
         break;
@@ -194,7 +230,6 @@ void bgw_forward_serial_msg (sBus_t* bus, scomm_phy_t* rs232_phy)
         while (num_bytes--) {
             if (q_get_byte(&rs232_phy->recvQ) == '\n') {
                 g_curr_state = eBGW_IDLE;
-                LED_STATUS_TOGGLE;
                 break;
             }
         }
@@ -203,37 +238,51 @@ void bgw_forward_serial_msg (sBus_t* bus, scomm_phy_t* rs232_phy)
     serial_phy_check_q_level(rs232_phy);
 }
 
-/*
-BOOL busgateway_forward_serial_message (scomm_phy_t* phy, sBus_t *bus)
+/**
+ * Forward a message from bus to serial line.
+ *
+ * @param[in] Handle to bus.
+ * @param[in] Handle to serial line.
+ *
+ * @returns TURE, if message was correctly read from bus and sent to serial
+ * line transmit buffer.
+ */
+BOOL bgw_forward_bus_msg (sBus_t *bus, scomm_phy_t *serial)
 {
-    uint8_t receiver_h = 0, receiver_l = 0, len = 0;
+    uint8_t  len = 0;
+    uint8_t  length = 0;
+    uint16_t sender = 0;
 
-    BOOL    ret;
+    do {
+        // is there a new message pending?
+        if (bus->msg_receive_state != eBUS_RECV_MESSAGE) {
+            return FALSE;
+        }
+        sender   = bus->sRecvMsg.uSender;
+        length   = bus->sRecvMsg.length - 4;
+        // create message header on serial send queue
+        convert_and_enqueue_byte(&serial->sendQ, (uint8_t)((sender & 0xFF00)>>8));
+        convert_and_enqueue_byte(&serial->sendQ, (uint8_t)( sender & 0x00FF));
+        convert_and_enqueue_byte(&serial->sendQ, length);
+        // convert and copy message data
+        while (len < length) {
+            convert_and_enqueue_byte(&serial->sendQ, bus->sRecvMsg.auBuf[5 + len]);
+            len ++;
+        }
+        // finally end message with a newline char.
+        q_put_byte(&serial->sendQ, '\n');
+        serial_phy_initiate_sending(serial);
+        // reset bus to IDLE state, so we are ready to receive the next message
+        bus->msg_receive_state = eBUS_RECV_NOTHING;
+        bus->sRecvMsg.length = 0;
+        bus->sRecvMsg.uOverallLength = 0;
+        bus->eState = eBus_Idle;
 
-    // read receiver high byte
-    receiver_h = q_read_byte(&phy->recvQ, num_read++);
-    // read receiver low byte
-    receiver_l = q_read_byte(&phy->recvQ, num_read++);
-    // read length byte
-    len = q_read_byte(&phy->recvQ, num_read++);
-
-    // check length of message
-    if ((q_get_pending(&phy->recvQ) < len+3) ||
-        0 == len ||
-        len > BUS_MAXSENDMSGLEN) {
-        serial_phy_discard_messages(phy); // discard complete write buffer
-        return FALSE;
-    }
-
-    ret = busgateway_send_message(bus, receiver_h, receiver_l, len, &phy->recvQ, &num_read);
-    // if queue had temporary not enough space, the message remains in
-    // serial input-queue, otherwise it has to be removed.
-    if (ret == TRUE) {
-        // message sent or to be discarded
-        serial_phy_finish_message(phy, num_read);
-    }
-    // if (ret == FALSE): message remains in receive queue. Try again later.
-
-    return FALSE;
+        if (eCMD_SLEEP == bus->sRecvMsg.auBuf[5]) {
+            //sleep_pinchange2_enable();
+            bus_sleep(bus);
+            //sleep_pinchange2_disable();
+        }
+    } while ( FALSE );
+    return TRUE;
 }
-*/

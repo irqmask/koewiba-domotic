@@ -1,6 +1,6 @@
 /**
- * @addtogroup TESTSCHEDULER_PCBCONFIG
- * @brief PCB configuration of the "testscheduler" application.
+ * @addtogroup TESTGATEWAY_PCBCONFIG
+ * @brief PCB configuration of the "testgateway" application.
  *
  * @{
  * @file    pcbconfig.h
@@ -11,7 +11,7 @@
  *                  - connect HS (PB3) with PD1
  *                  - connect serial interfaces TX line with PD2
  *                  - connect serial interfaces RX line with PD3
- *                  - connect serial interfaces CTS line with PD4
+ *                  - connect serial interfaces CTS line with PD5
  *
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------

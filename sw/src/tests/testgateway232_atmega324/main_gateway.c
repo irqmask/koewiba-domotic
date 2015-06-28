@@ -1,8 +1,8 @@
 /**
- * @addtogroup TEST_PROTOCOL
+ * @addtogroup TEST_GATEWAY
  *
  * @{
- * @file    main_testprotocol.c
+ * @file    main_gateway.c
  * @brief   TODO describe briefly.
  * @todo    describe file purpose
  * @author  Christian Verhalen

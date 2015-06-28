@@ -94,6 +94,14 @@ typedef enum sys_ser_stopbits {
     eSYS_SER_SB_LAST
 } sys_ser_stopbits_t;
 
+//! Constants for configuring the data flow control.
+typedef enum sys_ser_flowctrl {
+    eSYS_SER_FC_NONE = 0,
+    eSYS_SER_FC_HW,
+    eSYS_SER_FC_XONXOFF,
+    eSYS_SER_FC_LAST
+} sys_ser_flowctrl_t;
+
 // --- Local variables ---------------------------------------------------------
 
 // --- Global variables --------------------------------------------------------
@@ -114,7 +122,8 @@ int sys_serial_set_params (sys_fd_t            fd,
                            sys_ser_baudrate_t  baudrate,
                            sys_ser_databits_t  databits,
                            sys_ser_parity_t    parity,
-                           sys_ser_stopbits_t  stopbits);
+                           sys_ser_stopbits_t  stopbits,
+                           sys_ser_flowctrl_t  flowcontrol);
 
 size_t sys_serial_send (sys_fd_t fd, void* buf, size_t bufsize);
 

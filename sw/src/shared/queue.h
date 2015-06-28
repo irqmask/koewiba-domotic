@@ -13,23 +13,22 @@
  * Configure bus modules. E.g. activate scheduling capabilities
  * @{
  */
-//! size in bytes of the message transmit queue.
-#define TX_QUEUE_SIZE  128
 
 typedef struct queue {
-    uint8_t readpos;
-    uint8_t writepos;
-    uint8_t data[TX_QUEUE_SIZE];
+    uint16_t readpos;
+    uint16_t writepos;
+    uint16_t size;
+    uint8_t* data;
 } queue_t;
 
 
-void    q_initialize  (queue_t *q);
+void    q_initialize  (queue_t *q, uint8_t* data, uint16_t size);
 uint8_t q_get_free    (queue_t *q);
 uint8_t q_get_pending (queue_t *q);
-uint8_t q_read_byte   (queue_t *q, uint8_t pos);
+uint8_t q_read_byte   (queue_t *q, uint16_t pos);
 uint8_t q_get_byte    (queue_t *q);
 BOOL    q_put_byte    (queue_t *q, uint8_t byte);
-void    q_flush_bytes (queue_t *q, uint8_t quantity);
-
+void    q_flush_bytes (queue_t *q, uint16_t quantity);
+void    q_flush_all   (queue_t *q);
 
 #endif /* QUEUE_H_ */

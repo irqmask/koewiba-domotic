@@ -36,8 +36,8 @@ set (kwbscheduler_SRCS
      ../shared/vos.c
      ../../shared/bus_schedul.c
      ../../shared/bus_transport.c
-     ../../shared/bus_tx_queue.c
      ../../shared/crc16.c
+     ../../shared/queue.c
      )
 
 # executable

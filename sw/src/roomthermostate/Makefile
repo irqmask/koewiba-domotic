@@ -10,7 +10,6 @@ include ../../buildscripts/lib/lib_outputdirs.mk
 
 SRC = shared/bus_phy.c \
       shared/bus_transport.c \
-      shared/bus_tx_queue.c \
       shared/clock.c \
       shared/crc16.c \
       shared/disp_st7565.c \
@@ -19,6 +18,7 @@ SRC = shared/bus_phy.c \
       shared/gdisplay_font_x16.c \
       shared/gdisplay_symbols_x16.c \
       shared/gdisplay_symbols_x24.c \
+      shared/queue.c \
       shared/register.c \
       shared/zagwire.c \
       roomthermostate/appregister.c \

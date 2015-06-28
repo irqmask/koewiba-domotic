@@ -9,9 +9,8 @@
 #define BUS_GATEWAY_H_
 
 #include "bus.h"
-#include "queue.h"
+#include "serialcomm.h"
 
-BOOL    busgateway_forward_serial_message   (queue_t    *psRecQ,
-                                             sBus_t     *psBus  );
+void bgw_forward_serial_msg (sBus_t* bus, scomm_phy_t* phy);
 
 #endif /* BUS_GATEWAY_H_ */

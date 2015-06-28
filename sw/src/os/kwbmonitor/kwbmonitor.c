@@ -30,7 +30,7 @@ void monitor_init (bus_history_t* history)
 
 void monitor_parse_message (uint8_t new_byte, bus_history_t* history)
 {
-    char        buffer[256], part[256];
+    char        buffer[1024], part[256];
     uint16_t    calcedcrc = 0;
     uint8_t     ii, crclen = 0;
     int32_t     diff_ms = 0, remaining_us = 0;
@@ -113,7 +113,7 @@ void monitor_parse_message (uint8_t new_byte, bus_history_t* history)
 
     // fill line
     if (msgstatus != eMsgNothing) {
-        for (ii=0; ii<(BUS_MAXTOTALMSGLEN-history->uCurrMsgBytes); ii++)
+        for (ii=0; ii<(MAX_DISPLAYLEN-history->uCurrMsgBytes); ii++)
             strcat_s(buffer, sizeof(buffer)-1, "   ");
         history->uCurrMsgBytes = 0;
     }

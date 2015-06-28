@@ -20,10 +20,16 @@
 // --- Definitions -------------------------------------------------------------
 
 //! (netto) length of the message
-#define BUS_MAXMSGLEN          16
+#define BUS_MAXMSGLEN          64
 
 //! length of message including header and footer
 #define BUS_MAXTOTALMSGLEN      (BUS_MAXMSGLEN + 7)
+
+#if BUS_MAXTOTALMSGLEN > 32
+#define MAX_DISPLAYLEN 32
+#else
+#define BUS_MAXTOTALMSGLEN 32
+#endif
 
 // --- Type definitions --------------------------------------------------------
 

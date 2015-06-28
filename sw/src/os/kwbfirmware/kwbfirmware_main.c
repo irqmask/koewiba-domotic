@@ -38,9 +38,9 @@ typedef struct options {
     int         serial_baudrate;    //!< Baudrate of serial connection to RS232 gateway.
     char        router_address[256];//!< Address of kwbrouter server.
     uint16_t    router_port;        //!< Port number of kwbrouter server.
-    bool        serial_device_set;  //!< Flag: if set, serial device has been 
+    bool        serial_device_set;  //!< Flag: if set, serial device has been
                                     //!< configured in the command line options.
-    bool        router_address_set; //!< Flag: is set, router address has been 
+    bool        router_address_set; //!< Flag: is set, router address has been
                                     //!< configured in the command line options.
     char        filename[256];
     uint16_t    node_address;
@@ -57,13 +57,13 @@ typedef struct options {
 /**
  * Set kwbfirmware run options via function call.
  * Function can be used to set default parameters.
- * 
+ *
  * @param[out]  options         Stucture where options are stored in.
  * @param[in]   serial_device   Device of serial connection to RS232 gateway.
  * @param[in]   serial_baudrate Baudrate of serial connection to RS232 gateway.
  * @param[in]   router_address  Address of kwbrouter server.
  * @param[in]   router_port     Port number of kwbrouter server.
- * @param[in]   node_address    Address of node of which the firmware will be 
+ * @param[in]   node_address    Address of node of which the firmware will be
  *                              updated.
  */
 static void set_options (options_t*     options,
@@ -88,13 +88,13 @@ static void set_options (options_t*     options,
 
 /**
  * Read command line options and save results in options.
- * 
+ *
  * @param[in]   argc    Count of command line options.
  * @param[in]   argv    Command line arguments.
  * @param[out]  options Stucture where options are stored in.
- * 
- * @returns true, if command line options have been parsed successfully or no 
- *          options have been read (in this case, default parameters will be 
+ *
+ * @returns true, if command line options have been parsed successfully or no
+ *          options have been read (in this case, default parameters will be
  *          used).
  */
 static bool parse_commandline_options (int argc, char* argv[], options_t* options)
@@ -141,7 +141,7 @@ static bool parse_commandline_options (int argc, char* argv[], options_t* option
 
 /**
  * Validate kwbfirmware runtime options.
- * 
+ *
  * @param[in,out]   options Structure where options are stored in.
  * @returns         true if options are constient and usable, otherwise false.
  */
@@ -196,11 +196,11 @@ static void print_usage (void)
 
 /**
  * main entry point of kwbfirmware.
- * 
+ *
  * @param[in]   argc    Number of command line arguments.
  * @param[in]   argv    List of command line arguments.
  * @returns     0 if firmware has been updated in target node successfully.
- */ 
+ */
 int main (int argc, char* argv[])
 {
     int                 rc = eERR_NONE;
@@ -210,7 +210,7 @@ int main (int argc, char* argv[])
     firmwareupdate_t    firmware;
 
     do {
-        printf("\nkwbfirmware...\n");
+        printf("\nkwbfirmware... %d\n",'M');
 
         // set default options for kwbrouter
         set_options(&options,
@@ -218,7 +218,7 @@ int main (int argc, char* argv[])
                     57600,              // baudrate, if not given
                     "/tmp/kwbr.usk",    // default address of vbusd socket
                     0,                  // port 0: use unix sockets
-                    2);                 // own node address
+                    0x0e);                 // own node address
         // parse and validate commandline options
         if (parse_commandline_options(argc, argv, &options) == false ||
             validate_options(&options) == false) {
@@ -246,6 +246,7 @@ int main (int argc, char* argv[])
                     end_application = true;
                 }
             }
+            sys_sleep_ms(500);
         }
         firmware_update_close(&firmware);
     } while (0);

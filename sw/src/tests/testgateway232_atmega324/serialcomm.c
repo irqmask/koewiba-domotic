@@ -1,14 +1,21 @@
-/*
- * serialcomm.c
+/**
+ * @addtogroup BUSGATEWAY
+ * @brief Serial line driver for receiving and sending of messages.
  *
- *  Created on: 28.12.2014
- *      Author: robert mueller
+ * IMPORTANT: Dependent on the controller used for serialcomm the receive-queue
+ * is not as huge as the computers serial buffer is. Hence it is important to
+ * reduce the block-size of bytes that will be send by the computers serial
+ * interface. Please choose 64 Byte and set flow control to 'hardware',
+ * otherwise it will not work properly.
  *
- *   IMPORTANT: Dependent on the controller used for serialcomm the receive-queue is not as huge
- *   as the computers serial buffer is. Hence it is important to reduce the block-size of bytes
- *   that will be send by the computers serial interface.
- *   Please choose 64 Byte and set flow control to 'hardware', otherwise it will not work properly.
- */
+ * @{
+ * @file    serialcomm.c
+ * @brief   Serial line driver for receiving and sending of messages.
+ *
+ * @author  Robert Mueller, Christian Verhalen
+ *///---------------------------------------------------------------------------
+
+// --- Include section ---------------------------------------------------------
 
 #include <avr/io.h>
 #include <avr/interrupt.h>
@@ -36,12 +43,6 @@
 
 // uart1 phy data
 static scomm_phy_t  *g_uart1phy = NULL;
-// state of reception of nibbles: 1=waiting for high nibble, 0=waiting for low nibble
-//static uint8_t      g_uart1_nibble = 1;
-//static uint8_t      g_uart1_curr_data = 0;
-uint8_t g_received = 0;
-uint8_t g_received_to_report = 0;
-uint8_t new_msg = 1;
 
 // --- Global variables --------------------------------------------------------
 
@@ -86,36 +87,6 @@ ISR (INTERRUPT_USART_RXC1)
         q->writepos %= q->size;
     }
 }
-
-/*    if (nibble >= '0' && nibble <= '9') {
-        nibble -= '0';
-    } else if (nibble >= 'a' && nibble <= 'f') {
-        nibble -= ('a' - 10);
-    } else if (nibble >= 'A' && nibble <= 'F') {
-        nibble -= ('A' - 10);
-    } else {
-        // set data error, lower nibble expected instead of new line
-        g_uart1phy->flags |= eSCOMM_DTAERR_FL;
-        q_rewind(&g_uart1phy->recvQ); // discard current message
-        LED_ERROR_ON;
-        g_uart1_nibble = 1; // discard current byte
-        return;
-    }
-
-    // don't convert if old data error occurred. we wait for newline.
-    if (g_uart1phy->flags & eSCOMM_DTAERR_FL) return;
-
-    // convert nibble to byte
-    if (g_uart1_nibble == 1) {
-        g_uart1_curr_data = nibble << 4;
-        g_uart1_nibble = 0;
-        return;
-    }
-    g_uart1_curr_data |= nibble;
-    g_uart1_nibble = 1;
-
-    LED_STATUS_TOGGLE;
-}*/
 
 /**
  * Data register empty interrupt 1.
@@ -188,6 +159,7 @@ BOOL serial_phy_initiate_sending (scomm_phy_t* phy)
     return TRUE;
 }
 
+/** */
 void serial_phy_check_q_level (scomm_phy_t* phy)
 {
     queue_t *q = &phy->recvQ;
@@ -198,79 +170,3 @@ void serial_phy_check_q_level (scomm_phy_t* phy)
         clear_cts_pin();
     }
 }
-
-/**
- * Checks if data has been received.
- *
- * @param[in] phy     Handle of bus physical layer.
- *
- * @returns TRUE:   at least one byte is waiting in receive buffer.
- */
-/*BOOL serial_phy_data_received(scomm_phy_t* phy)
-{
-    return (0 != (phy->flags & eSCOMM_RECV_BYTE_FL));
-}*/
-
-/**
- * Checks if a message has been received.
- *
- * @param[in] phy     Handle of bus physical layer.
- *
- * @returns TRUE:       the entire message is received.
- *          FALSE:      we have to wait for further bytes.
- */
-/*BOOL serial_phy_msg_received (scomm_phy_t* phy)
-{
-    if (new_msg) {
-        new_msg = 0;
-        q_put_byte(&phy->sendQ, g_received_to_report);
-        serial_phy_initiate_sending(phy);
-    }
-    // Nothing (new) received, then return.
-    if (TRUE != serial_phy_data_received(phy)) return FALSE;
-
-    // If CTS is true, reset the Received-Flag, otherwise it is necessary to poll this function periodical
-    // to obtain information about the queue regaining sufficient space again.
-    if (!cts_state()) {
-        phy->flags &= ~eSCOMM_RECV_BYTE_FL; // reset RX flag.
-    } else if ((3*sizeof(phy->recvQ.data)/4) < q_get_free(&phy->recvQ) ) {
-        // set 'ClearToSend' true
-        clear_cts_pin();
-    }
-    // check error flags and assert error LED
-    if (phy->flags & (eSCOMM_QFULL_FL | eSCOMM_FRAMEERR_FL | eSCOMM_DTAERR_FL)) {
-        phy->flags &= ~(eSCOMM_QFULL_FL | eSCOMM_FRAMEERR_FL);
-
-    }
-    // check if at least a message with one byte has been received
-    // real message size is here still unknown
-    if ((phy->flags & eSCOMM_RECV_NL_FL) != 0) {
-        if (3 > q_get_pending(&phy->recvQ)) {
-            serial_phy_discard_messages(phy);
-            return FALSE;
-        }
-    }
-    return TRUE;
-}*/
-
-/*
-void serial_phy_discard_messages (scomm_phy_t* phy)
-{
-    q_flush_all(&phy->recvQ);
-    phy->flags &= ~eSCOMM_RECV_NL_FL;
-    if ((3*sizeof(phy->recvQ.data)/4) < q_get_free(&phy->recvQ) ) {
-        // set 'ClearToSend' true
-        clear_cts_pin();
-    }
-}
-
-void serial_phy_finish_message (scomm_phy_t* phy, uint8_t num_bytes)
-{
-    q_flush_bytes(&phy->recvQ, num_bytes);
-    phy->flags &= ~eSCOMM_RECV_NL_FL;
-    if ((3*sizeof(phy->recvQ.data)/4) < q_get_free(&phy->recvQ) ) {
-        // set 'ClearToSend' true
-        clear_cts_pin();
-    }
-}
-*/

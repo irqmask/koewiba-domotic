@@ -1,14 +1,27 @@
 /**
- * serialcomm.h
+ * @addtogroup BUSGATEWAY
+ * @brief Serial line driver for receiving and sending of messages.
  *
- *  Created on: 28.12.2014
- *      Author: robert mueller
- */
-
+ * @{
+ * @file    serialcomm.h
+ * @brief   Serial line driver for receiving and sending of messages.
+ *
+ * @author  Robert Mueller
+ *///---------------------------------------------------------------------------
 #ifndef _SERIALCOMM_H_
 #define _SERIALCOMM_H_
 
+// --- Include section ---------------------------------------------------------
+
 #include "queue.h"
+
+// --- Definitions -------------------------------------------------------------
+
+#define set_cts_pin()   (SCOMM_PORTOUT |= (1<<SCOMM_CTS))
+#define clear_cts_pin() (SCOMM_PORTOUT &= ~(1<<SCOMM_CTS))
+#define cts_state()     (SCOMM_PORTIN & (1<<SCOMM_CTS))
+
+// --- Type definitions --------------------------------------------------------
 
 //! serial status flags set by irq and cleared by application
 typedef enum scomm_flags {
@@ -30,17 +43,21 @@ typedef struct serialphy {
     uint8_t         send_q_data[200];
 } scomm_phy_t;
 
+// --- Local variables ---------------------------------------------------------
+
 // --- Global variables --------------------------------------------------------
 
-#define set_cts_pin()   (SCOMM_PORTOUT |= (1<<SCOMM_CTS))
-#define clear_cts_pin() (SCOMM_PORTOUT &= ~(1<<SCOMM_CTS))
-#define cts_state()     (SCOMM_PORTIN & (1<<SCOMM_CTS))
+// --- Module global variables -------------------------------------------------
+
+// --- Local functions ---------------------------------------------------------
+
+// --- Module global functions -------------------------------------------------
+
+// --- Global functions --------------------------------------------------------
 
 void scomm_initialize_uart1         (scomm_phy_t *phy);
 BOOL serial_phy_initiate_sending    (scomm_phy_t *phy);
-void serial_phy_check_q_level       (scomm_phy_t* phy);
-//BOOL serial_phy_msg_received        (scomm_phy_t *phy);
-//void serial_phy_discard_messages    (scomm_phy_t* phy);
-//void serial_phy_finish_message      (scomm_phy_t* phy, uint8_t num_bytes);
+void serial_phy_check_q_level       (scomm_phy_t *phy);
 
-#endif /* _SERIALCOMM_H_ */
+#endif // _SERIALCOMM_H_
+/** @} */

@@ -1,65 +1,63 @@
-/*
- * serialcomm.h
+/**
+ * @addtogroup BUSGATEWAY
+ * @brief Serial line driver for receiving and sending of messages.
  *
- *  Created on: 28.12.2014
- *      Author: robert mueller
- */
+ * @{
+ * @file    serialcomm.h
+ * @brief   Serial line driver for receiving and sending of messages.
+ *
+ * @author  Robert Mueller
+ *///---------------------------------------------------------------------------
+#ifndef _SERIALCOMM_H_
+#define _SERIALCOMM_H_
 
-#ifndef SERIALCOMM_H_
-#define SERIALCOMM_H_
+// --- Include section ---------------------------------------------------------
 
 #include "queue.h"
 
-typedef enum serialflags {
-    e_scommrxflag    = 0b00000001,
-    e_scommtxflag    = 0b00000010,
-    e_scommrxerrflag = 0b00000100,
-    e_scommtxerrflag = 0b00001000,
-    e_scommtimeout   = 0b00010000,
-    e_scommspacelow  = 0b00100000
-} eSerialFlags_t;
+// --- Definitions -------------------------------------------------------------
 
-//! serial receive queue
-typedef struct serialBuf {
-    uint8_t         uReadPos;
-    uint8_t         uWritePos;
-    uint8_t         auBuf[100];
-} sQueue_t;
+#define set_cts_pin()   (SCOMM_PORTOUT |= (1<<SCOMM_CTS))
+#define clear_cts_pin() (SCOMM_PORTOUT &= ~(1<<SCOMM_CTS))
+#define cts_state()     (SCOMM_PORTIN & (1<<SCOMM_CTS))
 
-//! serial receive structure
-typedef struct serialMsg {
-    uint8_t         uReceiver;
-    uint8_t         uLength;
-    sQueue_t        queue;
-} sSerMsg_t;
+// --- Type definitions --------------------------------------------------------
+
+//! serial status flags set by irq and cleared by application
+typedef enum scomm_flags {
+    eSCOMM_RECV_BYTE_FL = 0b00000001, // pending data in receive queue
+    eSCOMM_RECV_NL_FL   = 0b00000010,
+    eSCOMM_FRAMEERR_FL  = 0b00000100, // Receive framing error
+    eSCOMM_DTAERR_FL    = 0b00001000, // Data error (non hex char received)
+    eSCOMM_QFULL_FL     = 0b00010000, // Receive queue full
+    eSCOMM_TX_FL        = 0b00100000, // Currently transmitting
+} scomm_flags_t;
 
 //! data of the physical layer
 typedef struct serialphy {
-    uint8_t         uUart;
-    eSerialFlags_t  uFlags;
-    queue_t        sRecvQ;
-    queue_t        sSendQ;
-} sSerPhy_t;
+    uint8_t         uart;
+    scomm_flags_t   flags;
+    queue_t         recvQ;
+    uint8_t         recv_q_data[200];
+    queue_t         sendQ;
+    uint8_t         send_q_data[200];
+} scomm_phy_t;
+
+// --- Local variables ---------------------------------------------------------
 
 // --- Global variables --------------------------------------------------------
-extern sSerMsg_t   g_sSCom; // Serial-Communication
 
-inline void set_cts_pin(void)
-{
-    SCOMM_PORTOUT |= (1<<SCOMM_CTS);
-};
-inline void clear_cts_pin(void)
-{
-    SCOMM_PORTOUT &= ~(1<<SCOMM_CTS);
-};
-inline bool cts_state(void)
-{
-    return SCOMM_PORTIN & (1<<SCOMM_CTS);
-};
+// --- Module global variables -------------------------------------------------
 
+// --- Local functions ---------------------------------------------------------
 
-void scomm_initialize_uart1     (sSerPhy_t *psPhy);
-BOOL serial_phy_initiate_sending(sSerPhy_t *psPhy);
-BOOL serial_phy_msg_received    (sSerPhy_t* psPhy);
+// --- Module global functions -------------------------------------------------
 
-#endif /* SERIALCOMM_H_ */
+// --- Global functions --------------------------------------------------------
+
+void scomm_initialize_uart1         (scomm_phy_t *phy);
+BOOL serial_phy_initiate_sending    (scomm_phy_t *phy);
+void serial_phy_check_q_level       (scomm_phy_t *phy);
+
+#endif // _SERIALCOMM_H_
+/** @} */

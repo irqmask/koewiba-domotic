@@ -219,15 +219,17 @@ static void initiate_sending (sBus_t* psBus)
                      psBus->sSendMsg.uOverallLength);
     } else {
         // is there a pending new message to be sent?
-        q_pending = bus_q_get_pending(&psBus->tx_queue);
+        q_pending = q_get_pending(&psBus->tx_queue);
         // if overall-length is set, message is completely enqueued
         if (q_pending > 0) {
-            q_msg_len = bus_q_get_byte(&psBus->tx_queue);
+            q_msg_len = q_get_byte(&psBus->tx_queue);
 
             // check if read message length matches with the number of pending bytes
             if (q_msg_len > q_pending) {
                 // the queue is corrupt
-                bus_q_initialize(&psBus->tx_queue);
+                q_initialize(&psBus->tx_queue,
+                             psBus->tx_queue_data,
+                             sizeof(psBus->tx_queue_data));
                 // send empty message
                 bus_phy_send(&psBus->sPhy, psBus->auEmptyMsg, BUS_EMPTY_MSG_LEN);
             }
@@ -236,7 +238,7 @@ static void initiate_sending (sBus_t* psBus)
             // copy message from queue to send buffer
             msg_buf = psBus->sSendMsg.auBuf;
             while (q_msg_len--) {
-                *msg_buf++ = bus_q_get_byte(&psBus->tx_queue);
+                *msg_buf++ = q_get_byte(&psBus->tx_queue);
             }
 
             // calculate checksum and reset the retry counter
@@ -466,7 +468,9 @@ void bus_initialize (sBus_t* psBus, uint8_t uUart)
     psBus->eModuleState = eMod_Sleeping;
     bus_phy_initialize(&psBus->sPhy, uUart);
     bus_flush_bus(psBus);
-    bus_q_initialize(&psBus->tx_queue);
+    q_initialize(&psBus->tx_queue,
+                 psBus->tx_queue_data,
+                 sizeof(psBus->tx_queue_data));
 }
 
 void bus_set_router_mode (sBus_t* bus, bool router_mode)
@@ -618,27 +622,27 @@ BOOL bus_send_message (sBus_t*    psBus,
 
         // check if there is enough free space in the send queue
         // OVERALLLENGTH + SYNC + ADDR + LEN + RECV + EA + uLen
-        if (bus_q_get_free(&psBus->tx_queue) < uLen + 6) {
+        if (q_get_free(&psBus->tx_queue) < uLen + 6) {
             break;
         }
 
         // save length of message in queue
         overall_msg_len = uLen + 5; //SYNC + ADDR + LEN + RECV + EA (without CRC)
-        bus_q_put_byte(&psBus->tx_queue, overall_msg_len);
+        q_put_byte(&psBus->tx_queue, overall_msg_len);
 
         // prepare message header
-        bus_q_put_byte(&psBus->tx_queue, BUS_SYNCBYTE);
-        bus_q_put_byte(&psBus->tx_queue, psBus->sCfg.uOwnNodeAddress & 0x007F);
-        bus_q_put_byte(&psBus->tx_queue, uLen + 4); // RECV + EA + 2byte CRC
-        bus_q_put_byte(&psBus->tx_queue, uReceiver & 0x007F);
+        q_put_byte(&psBus->tx_queue, BUS_SYNCBYTE);
+        q_put_byte(&psBus->tx_queue, psBus->sCfg.uOwnNodeAddress & 0x007F);
+        q_put_byte(&psBus->tx_queue, uLen + 4); // RECV + EA + 2byte CRC
+        q_put_byte(&psBus->tx_queue, uReceiver & 0x007F);
         // EA - Extended address 4bit sender in higher nibble, 4bit receiver
         // in lower nibble.
-        bus_q_put_byte(&psBus->tx_queue, ((uReceiver & 0x0F00) >> 8) |
+        q_put_byte(&psBus->tx_queue, ((uReceiver & 0x0F00) >> 8) |
                           ((psBus->sCfg.uOwnNodeAddress & 0x0F00) >> 4));
 
         // copy data
         while (uLen--) {
-            bus_q_put_byte(&psBus->tx_queue, *puMsg++);
+            q_put_byte(&psBus->tx_queue, *puMsg++);
         }
 
         return TRUE;

@@ -72,17 +72,6 @@ typedef enum eCommMsgByteIndex {
 
 // --- Module global functions -------------------------------------------------
 
-// queue
-void    bus_q_initialize            (queue_t *q);
-
-uint8_t bus_q_get_free              (queue_t *q);
-
-uint8_t bus_q_get_pending           (queue_t *q);
-
-void    bus_q_put_byte              (queue_t *q, uint8_t byte);
-
-uint8_t bus_q_get_byte              (queue_t *q);
-
 // transport layer
 void    bus_trp_reset               (sBus_t* psBus);
 

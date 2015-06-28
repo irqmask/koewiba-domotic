@@ -21,8 +21,8 @@
 
 #define BUS_APPCONFIG       1
 #define BUS_TX_QUEUE_SIZE   100
-#define BUS_MAXSENDMSGLEN   16      //!< Maximum length of a message to be sent.
-#define BUS_MAXRECVMSGLEN   64 + 2  //!< Maximum length of a message to be received.
+#define BUS_MAXSENDMSGLEN   64 + 3   //!< Maximum length of a message to be sent.
+#define BUS_MAXRECVMSGLEN   64 + 3  //!< Maximum length of a message to be received.
 
 // --- Type definitions --------------------------------------------------------
 

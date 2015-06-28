@@ -56,7 +56,7 @@
  //! size in bytes of the message transmit queue.
  #define BUS_TX_QUEUE_SIZE  100
  //! maximum length of a message to be sent.
- #define BUS_MAXSENDMSGLEN   36
+ #define BUS_MAXSENDMSGLEN   (64 + 3)
  //! maximum length of a message to be received.
  #define BUS_MAXRECVMSGLEN   (64 + 3)
 #endif
@@ -190,6 +190,7 @@ typedef struct bus {
     sRcvBusMsg_t        sRecvMsg;                       //!< contains current received message.
     sSndBusMsg_t        sSendMsg;                       //!< contains current message to be sent.
     queue_t             tx_queue;                       //!< transmit queue for outgoing messages.
+    uint8_t             tx_queue_data[100];             //!< transmit queue data storage.
     uint8_t             auEmptyMsg[BUS_EMPTY_MSG_LEN];  //!< pre-compiled empty message.
     sClkTimer_t         sReceiveTimeout;                //!< receive timeout
     sClkTimer_t         sAckTimeout;                    //!< ack timeout

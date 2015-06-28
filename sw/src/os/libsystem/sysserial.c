@@ -127,20 +127,23 @@ int sys_serial_set_params (sys_fd_t            fd,
                            sys_ser_baudrate_t  baudrate,
                            sys_ser_databits_t  databits,
                            sys_ser_parity_t    parity,
-                           sys_ser_stopbits_t  stopbits)
+                           sys_ser_stopbits_t  stopbits,
+                           sys_ser_flowctrl_t  flowcontrol)
 {
     int             rc = eSYS_ERR_NONE;
     int             sys_baudrate;
     int             sys_databits;
     int             sys_parity;
     int             sys_stopbits;
+    int             sys_flowcontrol;
     struct termios  settings;
 
     do {
         if (baudrate >= eSYS_SER_BR_LAST ||
             databits >= eSYS_SER_DB_LAST ||
             parity >= eSYS_SER_P_LAST ||
-            stopbits >= eSYS_SER_SB_LAST) {
+            stopbits >= eSYS_SER_SB_LAST ||
+            flowcontrol >= eSYS_SER_FC_LAST) {
             eERR_BAD_PARAMETER;
             break;
         }
@@ -149,6 +152,16 @@ int sys_serial_set_params (sys_fd_t            fd,
         sys_parity = c_parity[parity];
         sys_stopbits = c_stopbits[stopbits];
 
+        // convert flow control parameter to system parameter
+        switch (flowcontrol) {
+        case eSYS_SER_FC_HW:
+            sys_flowcontrol = CRTSCTS;
+            break;
+        default:
+            sys_flowcontrol = 0;
+            break;
+        }
+
         if (sys_baudrate < 0 ||sys_databits < 0 || sys_parity < 0 || sys_stopbits < 0) {
             eSYS_ERR_SER_UNSUPPORTED;
             break;
@@ -156,7 +169,7 @@ int sys_serial_set_params (sys_fd_t            fd,
 
         memset(&settings, 0, sizeof(settings));
         tcgetattr(fd, &settings);
-        settings.c_cflag = sys_databits | sys_parity | sys_stopbits | CLOCAL | CREAD;
+        settings.c_cflag = sys_databits | sys_parity | sys_stopbits | sys_flowcontrol | CLOCAL | CREAD;
         settings.c_iflag = IGNPAR;
         settings.c_oflag = 0;
         settings.c_lflag = 0;

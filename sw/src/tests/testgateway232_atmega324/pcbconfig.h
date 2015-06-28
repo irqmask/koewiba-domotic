@@ -24,23 +24,16 @@
 
 // --- Definitions -------------------------------------------------------------
 
-// KoeWib-Bus
+// KoeWiba-Bus
 #define BUS_PCBCONFIG 1
 
-//#define TXRXEN1_SEPERATE 0
+#define BUS_PORT_ENASND0 PORTD
+#define BUS_DDR_ENASND0  DDRD
+#define BUS_PORT_DISRCV0 PORTD
+#define BUS_DDR_DISRCV0  DDRD
 
-#define BUS_PORT_ENASND0 PORTB
-#define BUS_DDR_ENASND0  DDRB
-#define BUS_PORT_DISRCV0 PORTB
-#define BUS_DDR_DISRCV0  DDRB
-//#define BUS_DDR_ENASND1  DDRB
-//#define BUS_PORT_ENASND1 PORTB
-//#define BUS_DDR_DISRCV1  DDRB
-//#define BUS_PORT_DISRCV1 PORTB
-#define BUS_ENASND0      PB2
-//#define BUS_ENASND1      PA5
-#define BUS_DISRCV0      PB2
-//#define BUS_DISRCV1      PA2
+#define BUS_ENASND0      PD4
+#define BUS_DISRCV0      PD4
 
 #define LED_PCBCONFIG 1
 // Outputs (LEDs)
@@ -49,9 +42,14 @@
 #define LED_ERROR_OFF       PORTA &= ~LED_ERROR
 #define LED_ERROR_TOGGLE    PORTA ^=  LED_ERROR
 
+#define LED_STATUS          0b00010000  //!< Red error LED on PA5
+#define LED_STATUS_ON       PORTA |=  LED_STATUS
+#define LED_STATUS_OFF      PORTA &= ~LED_STATUS
+#define LED_STATUS_TOGGLE   PORTA ^=  LED_STATUS
+
 #define SCOMM_PORTOUT       PORTD
 #define SCOMM_PORTIN        PIND
-#define SCOMM_CTS           PD4
+#define SCOMM_CTS           PD5
 
 // Inputs (Buttons)
 

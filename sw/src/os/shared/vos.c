@@ -53,7 +53,8 @@ int vos_open_serial (vos_t* vos, const char* device, int baudrate)
                                         sys_serial_baudrate(baudrate),
                                         eSYS_SER_DB_8,
                                         eSYS_SER_P_NONE,
-                                        eSYS_SER_SB_1)) != eSYS_ERR_NONE) {
+                                        eSYS_SER_SB_1,
+                                        eSYS_SER_FC_NONE)) != eSYS_ERR_NONE) {
             break;
         }
 

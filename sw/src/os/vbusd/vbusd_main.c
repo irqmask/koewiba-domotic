@@ -343,7 +343,8 @@ static int vbusd_open_serial (vbusd_clients_t*  clients,
         if ((rc = sys_serial_set_params(fd, sys_serial_baudrate(baudrate),
                                         eSYS_SER_DB_8,
                                         eSYS_SER_P_NONE,
-                                        eSYS_SER_SB_1)) != eERR_NONE) {
+                                        eSYS_SER_SB_1,
+                                        eSYS_SER_FC_NONE)) != eERR_NONE) {
             sys_serial_close(fd);
             delete_client(client);
             rc = eERR_SYSTEM;

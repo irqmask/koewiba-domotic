@@ -86,12 +86,16 @@ static int send_block_start_message (firmwareupdate_t* fwu)
     memset_s(&msg, sizeof(msg), 0);
     msg.receiver = fwu->module_address;
     msg.data[0] = eCMD_BLOCK_START;
-    msg.data[1] = 1; // blocktype firmware
+    msg.data[1] = 2; // blocktype external EEProm (firmware)
     msg.data[2] = (fwu->fw_firstaddress & 0xFF000000) >> 24; // first address (32bit) highest byte
     msg.data[3] = (fwu->fw_firstaddress & 0x00FF0000) >> 16; // first address (32bit)
     msg.data[4] = (fwu->fw_firstaddress & 0x0000FF00) >> 8;  // first address (32bit)
     msg.data[5] = (fwu->fw_firstaddress & 0x000000FF);       // first address (32bit) lowest byte
-    msg.length = 6;
+    msg.data[6] = (fwu->fw_size & 0xFF000000) >> 24; // size of data (32bit) highest byte
+    msg.data[7] = (fwu->fw_size & 0x00FF0000) >> 16; // size of data (32bit)
+    msg.data[8] = (fwu->fw_size & 0x0000FF00) >> 8;  // size of data (32bit)
+    msg.data[9] = (fwu->fw_size & 0x000000FF);       // size of data (32bit) lowest byte
+    msg.length = 10;
 
     //TODO msg_log(msg);
     rc = msg_ser_send(&fwu->msg_serial, &msg);
@@ -137,7 +141,7 @@ static int send_block_data_message (firmwareupdate_t* fwu)
 
         // calculate data size of the message
         if (remaining > chunksize) {
-            block = 32;
+            block = chunksize;
         } else {
             block = remaining;
         }

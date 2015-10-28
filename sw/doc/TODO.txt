@@ -1,6 +1,8 @@
 TODO allgemein
 - TODO ins Wiki überführen
 - Doku Hardware-Guidelines (Gemeinsame Anforderungen an alle Module, bzw Modulgruppe oder eines Prozessortyps z.B. EEPRom Anschlüsse, verwendeter UART, RS485 select, etc)
+- Verzeichn isstruktur
+
 
 TODO OS
 - clock_os in kwb_router (message_bus) einbauen.
@@ -21,3 +23,63 @@ TODO AVR
 - Coding-Guidelines anwenden
 - Konzept mit mehreren UARTs und SPIs implementieren. Erstmal für den Debug-UART
 
+
+
+zu Verzeichnisstruktur)
+wir wählen Variante 1.
+- Verzeichnisstruktur sw Alternative 1:
+  sw/avr                Applikationen für AVR µc
+  sw/avr/bin
+  sw/avr/build
+  sw/avr/buildscripts
+  sw/avr/doc
+  sw/avr/include
+  sw/avr/shared         Gemeinsame Sourcen für AVR µc
+  sw/doc                Systemunabhängige, gemeinsame SW Dokumente
+  sw/include            Systemunabhängige gemeinsam genutzte Header
+  sw/os                 Applikationen und Libraries für Operating Systems (Windows/Linux/Mac)
+  sw/os/bin
+  sw/os/build
+  sw/os/buildscripts
+  sw/os/doc
+  sw/os/include
+  sw/os/shared
+  sw/os/<kwbapps>
+  sw/shared             Systemunabhängige gemeinsam genutzte Sourcen
+ 
+ 
+- Verzeichnisstruktur sw Alternative 2: (Favorit)
+  sw/
+  sw/bin/avr
+  sw/bin/os
+  sw/build/avr
+  sw/build/os
+  sw/buildscripts/avr
+  sw/buildscripts/os
+  sw/doc
+  sw/doc/avr
+  sw/doc/os
+  sw/src/avr            Applikationen und Libraries für AVR µC
+  sw/src/avr/<avrapps>  Applikation X
+  sw/src/os             Applikationen und Libraries für Operating Systems (Windows/Linux/Mac)
+  sw/src/os/<kwbapps>   Applikation X
+  sw/src/include        Systemunabhängige gemeinsam genutzte Header
+  sw/src/include/avr
+  sw/src/include/os
+  sw/src/shared         Gemeinsame Sourcen für AVR µc
+  sw/src/shared/avr
+  sw/src/shared/os
+ 
+Variante 2b
+  sw/src/avr            Applikationen und Libraries für AVR µC
+  sw/src/avr/<avrapps>  Applikation X
+  sw/src/avr/include    gemeinsam genutzte Header für AVR µC
+  sw/src/avr/shared     gemeinsam genutzte Module für AVR µC
+  sw/src/include        Systemunabhängige, gemeinsame Header
+  sw/src/os             Applikationen und Libraries für Operating Systems (Windows/Linux/Mac)
+  sw/src/os/<kwbapps>   Applikation X
+  sw/src/os/include     gemeinsam genutzte Header für Operating Systems (Windows/Linux/Mac)
+  sw/src/os/shared      gemeinsam genutzte Module für Operating Systems (Windows/Linux/Mac)
+  sw/src/shared         Systemunabhängige, gemeinsame Module
+ 
+ 

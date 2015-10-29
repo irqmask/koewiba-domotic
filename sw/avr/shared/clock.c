@@ -25,7 +25,7 @@
 
 // --- Local variables ---------------------------------------------------------
 
-volatile sClkTimer_t* g_asRunningTimers[CLOCK_NUM_TIMER];
+volatile clock_timer_t* g_running_timers[CLOCK_NUM_TIMER];
 
 // --- Global variables --------------------------------------------------------
 
@@ -36,14 +36,14 @@ volatile sClkTimer_t* g_asRunningTimers[CLOCK_NUM_TIMER];
 /**
  * Register timer in list.
  */
-static BOOL register_timer(sClkTimer_t* psTimer)
+static BOOL register_timer(clock_timer_t* timer_instance)
 {
     uint8_t ii;
 
     for (ii=0; ii<CLOCK_NUM_TIMER; ii++) {
-        if (g_asRunningTimers[ii] == NULL) {
-            g_asRunningTimers[ii] = psTimer;
-            psTimer->active = TRUE;
+        if (g_running_timers[ii] == NULL) {
+        	g_running_timers[ii] = timer_instance;
+        	timer_instance->active = TRUE;
             return TRUE;
         }
     }
@@ -53,14 +53,14 @@ static BOOL register_timer(sClkTimer_t* psTimer)
 /**
  * Remove timer from list.
  */
-static BOOL remove_timer(sClkTimer_t* psTimer)
+static BOOL remove_timer(clock_timer_t* timer_instance)
 {
     uint8_t ii;
 
-    psTimer->active = FALSE;
+    timer_instance->active = FALSE;
     for (ii=0; ii<CLOCK_NUM_TIMER; ii++) {
-        if (g_asRunningTimers[ii] == psTimer) {
-            g_asRunningTimers[ii] = NULL;
+        if (g_running_timers[ii] == timer_instance) {
+        	g_running_timers[ii] = NULL;
             return TRUE;
         }
     }
@@ -76,9 +76,9 @@ ISR(INTERRUPT_TIMER0_COMPA)
     uint8_t ii;
 
     for (ii=0; ii<CLOCK_NUM_TIMER; ii++) {
-        if (g_asRunningTimers[ii] == NULL) continue;
-        if (--g_asRunningTimers[ii]->uTicks == 0) {
-            g_asRunningTimers[ii] = NULL;
+        if (g_running_timers[ii] == NULL) continue;
+        if (--g_running_timers[ii]->ticks == 0) {
+        	g_running_timers[ii] = NULL;
         }
     }
 }
@@ -96,7 +96,7 @@ void clk_initialize(void)
 
     // clear running timers list
     for (ii=0; ii<CLOCK_NUM_TIMER; ii++) {
-        g_asRunningTimers[ii] = NULL;
+    	g_running_timers[ii] = NULL;
     }
 
     // initialize timer interrupt every 1/100th second (fOc = 50Hz)
@@ -120,11 +120,11 @@ void clk_initialize(void)
  * @param[in] start
  * boolean for starting/stopping the timer (TRUE = start)
  */
-void clk_control(BOOL bStart)
+void clk_control(BOOL start)
 {
     static uint8_t tccr1b = 0;
 
-    if (bStart) {
+    if (start) {
         if (0==tccr1b) return;
         REG_TIMER0_TCCRB = tccr1b;
     } else {
@@ -144,15 +144,15 @@ void clk_control(BOOL bStart)
  *
  * @returns TRUE, if timer has been (re)started, otherwise FALSE.
  */
-BOOL clk_timer_start(sClkTimer_t* psTimer, uint16_t uTicks)
+BOOL clk_timer_start(clock_timer_t* timer_instance, uint16_t ticks)
 {
     // if timer is still running ...
-    if (psTimer->uTicks != 0) {
-        psTimer->uTicks = uTicks; // ... restart timer
+    if (timer_instance->ticks != 0) {
+    	timer_instance->ticks = ticks; // ... restart timer
         return TRUE;
     }
-    psTimer->uTicks = uTicks;
-    return register_timer(psTimer);
+    timer_instance->ticks = ticks;
+    return register_timer(timer_instance);
 }
 
 /**
@@ -163,12 +163,12 @@ BOOL clk_timer_start(sClkTimer_t* psTimer, uint16_t uTicks)
  *
  * @returns TRUE, if timer has been successfully removed from runningtimer-list, otherwise FALSE.
  */
-BOOL clk_timer_stop(sClkTimer_t* psTimer)
+BOOL clk_timer_stop(clock_timer_t* timer_instance)
 {
     // if timer could not be removed successfully
-    if( !remove_timer(psTimer) ) return FALSE;
+    if( !remove_timer(timer_instance) ) return FALSE;
     // otherwise reset value
-    psTimer->uTicks = 0;
+    timer_instance->ticks = 0;
     return TRUE;
 }
 
@@ -180,9 +180,9 @@ BOOL clk_timer_stop(sClkTimer_t* psTimer)
  *
  * @returns TRUE, if time is over, otherwise false.
  */
-BOOL clk_timer_is_elapsed(sClkTimer_t* psTimer)
+BOOL clk_timer_is_elapsed(clock_timer_t* timer_instance)
 {
-    if (psTimer->uTicks == 0) {
+    if (timer_instance->ticks == 0) {
         return TRUE;
     } else {
         return FALSE;
@@ -198,9 +198,9 @@ BOOL clk_timer_is_elapsed(sClkTimer_t* psTimer)
  *
  * @returns TRUE, if timer is running, otherwise false.
  */
-BOOL clk_timer_is_running(sClkTimer_t* psTimer)
+BOOL clk_timer_is_running(clock_timer_t* timer_instance)
 {
-    return (psTimer->active);
+    return (timer_instance->active);
 };
 
 /** @} */

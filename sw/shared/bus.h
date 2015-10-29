@@ -192,8 +192,8 @@ typedef struct bus {
     queue_t             tx_queue;                       //!< transmit queue for outgoing messages.
     uint8_t             tx_queue_data[100];             //!< transmit queue data storage.
     uint8_t             auEmptyMsg[BUS_EMPTY_MSG_LEN];  //!< pre-compiled empty message.
-    sClkTimer_t         sReceiveTimeout;                //!< receive timeout
-    sClkTimer_t         sAckTimeout;                    //!< ack timeout
+    clock_timer_t       sReceiveTimeout;                //!< receive timeout
+    clock_timer_t       sAckTimeout;                    //!< ack timeout
 } sBus_t;
 
 // --- Local variables ---------------------------------------------------------

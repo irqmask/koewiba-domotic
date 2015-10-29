@@ -17,6 +17,8 @@
 #endif
 #include "prjtypes.h"
 
+#include "crc16.h"
+
 // --- Definitions -------------------------------------------------------------
 
 // --- Type definitions --------------------------------------------------------
@@ -24,9 +26,9 @@
 // --- Local variables ---------------------------------------------------------
 
 #ifdef PRJCONF_UC_AVR
-static const uint16_t g_auCRCTable[] PROGMEM = {
+static const uint16_t g_CRC_table[] PROGMEM = {
 #else
-static const uint16_t g_auCRCTable[] = {
+static const uint16_t g_CRC_table[] = {
 #endif
     0x0000, 0x1189, 0x2312, 0x329b, 0x4624, 0x57ad, 0x6536, 0x74bf,
     0x8c48, 0x9dc1, 0xaf5a, 0xbed3, 0xca6c, 0xdbe5, 0xe97e, 0xf8f7,
@@ -75,18 +77,42 @@ static const uint16_t g_auCRCTable[] = {
 /**
  * Calculate CRC16 checksum.
  */
-uint16_t crc_calc16(uint8_t* puData, uint8_t uLen)
+uint16_t crc_16_start (void)
+{
+    return CRC_START_VALUE;
+}
+
+uint16_t crc_16_next_byte (uint16_t old_crc, uint8_t new_byte)
+{
+    uint16_t crc;
+    uint8_t temp;
+
+    crc = old_crc;
+	temp = new_byte ^ (crc & 0xFF);
+	crc >>= 8;
+	#ifdef PRJCONF_UC_AVR
+	        crc ^= pgm_read_word(&g_CRC_table[temp]);
+	#else
+	        crc ^= g_CRC_table[temp];
+	#endif
+	return crc;
+}
+
+/**
+ * Calculate CRC16 checksum.
+ */
+uint16_t crc_calc16(uint8_t* data, uint8_t len)
 {
     uint16_t crc = 0;
     uint8_t temp;
 
-    while (uLen--) {
-        temp = *puData++ ^ (crc & 0xFF);
+    while (len--) {
+        temp = *data++ ^ (crc & 0xFF);
         crc >>= 8;
 #ifdef PRJCONF_UC_AVR
-        crc ^= pgm_read_word(&g_auCRCTable[temp]);
+        crc ^= pgm_read_word(&g_CRC_table[temp]);
 #else
-        crc ^= g_auCRCTable[temp];
+        crc ^= g_CRC_table[temp];
 #endif
     }
     return crc;

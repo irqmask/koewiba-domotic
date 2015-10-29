@@ -13,18 +13,17 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 
-#include "pcbconfig.h"
-
+#include "appconfig.h"
+#include "block_message.h"
 #include "bus.h"
 #include "clock.h"
 #include "cmddef_common.h"
+#include "eeprom_spi.h"
 #include "led_debug.h"
 #include "moddef_common.h"
+#include "pcbconfig.h"
+#include "queue.h"
 #include "register.h"
-#include "sleepmode.h"
-
-//TODO remove after debug
-#include "led_debug.h"
 
 // --- Definitions -------------------------------------------------------------
 
@@ -32,10 +31,8 @@
 
 // --- Local variables ---------------------------------------------------------
 
-static sBus_t       g_bus;
-static sClkTimer_t  g_LED_timer;
-static uint8_t      g_buttons = 0,
-                    g_oldbuttons = 0;
+static sBus_t      g_bus;
+static clock_timer_t g_LED_timer;
 
 // --- Global variables --------------------------------------------------------
 
@@ -43,118 +40,114 @@ static uint8_t      g_buttons = 0,
 
 // --- Local functions ---------------------------------------------------------
 
-ISR(INTERRUPT_PINCHANGE2)
+
+static void io_initialize(void)
+{
+    DDRA  |= ((0<<DDA7)  | (1<<DDA6)  | (1<<DDA5)  | (1<<DDA4)  | (1<<DDA3)  | (1<<DDA2)  | (1<<DDA1)  | (1<<DDA0) );
+    DDRB  |= (                                                    (1<<DDB3)  | (1<<DDB2)  | (1<<DDB1)  | (1<<DDB0) );
+    DDRC  |= (                          (0<<DDC5)  | (0<<DDC4)  | (0<<DDC3)  | (1<<DDC2)  | (1<<DDC1)  | (1<<DDC0) );
+
+    PORTA |= ((0<<PA7) | (0<<PA6) | (1<<PA5) | (1<<PA4) | (1<<PA3) | (0<<PA2) | (0<<PA1) | (0<<PA0));
+    PORTB |= (                                                        (1<<PORTB3) | (0<<PORTB2) | (0<<PORTB1) | (0<<PORTB0));
+    PORTC |= (                            (0<<PORTC5) | (0<<PORTC4) | (0<<PORTC3) | (0<<PORTC2) | (0<<PORTC1) | (0<<PORTC0));
+}
+
+void activate_wakeup_interrupt(void)
 {
 
 }
 
-/**
- * Initialize LEDs and keys.
- */
-static void init_LED_and_keys(void)
+void deactivate_wakeup_interrupt(void)
 {
-    DDRD |= (LED_ERROR | LED_STATUS);
-    DDRD &= ~(BTN_TEST | BTN_EXP);
 
-    PORTD &= ~(LED_ERROR | LED_STATUS); // switch LEDs off.
-    PORTD |= (BTN_TEST | BTN_EXP);      // set pull-up for buttons
-
-#if defined (__AVR_ATmega8__)    || \
-    defined (__AVR_ATmega88__)   || \
-    defined (__AVR_ATmega88A__)  || \
-    defined (__AVR_ATmega88P__)
-    // Pin-Change-Interrupt
-    PCICR  = ((0<<PCIE2)   | (0<<PCIE1)   | (0<<PCIE0)); //disable IR_PinChange2
-    PCMSK2 = ((1<<PCINT23) | (0<<PCINT22) | (1<<PCINT21) | (0<<PCINT20) | (0<<PCINT19) | (0<<PCINT18) | (0<<PCINT17) | (0<<PCINT16));
-    PCMSK1 = (               (0<<PCINT14) | (0<<PCINT13) | (0<<PCINT12) | (0<<PCINT11) | (0<<PCINT10) | (0<<PCINT9 ) | (0<<PCINT8 ));
-    PCMSK0 = ((0<<PCINT7 ) | (0<<PCINT6 ) | (0<<PCINT5 ) | (0<<PCINT4 ) | (0<<PCINT3 ) | (0<<PCINT2 ) | (0<<PCINT1 ) | (0<<PCINT0 ));
-#endif
 }
+
 
 // select a receiver address. selector is used to select between different
 // receivers per module.
-static uint16_t get_receiver (uint8_t selector)
+/* TODO remove. only for test purposes. static uint16_t get_receiver (uint8_t selector)
 {
     if (selector == 1) {
         if (g_bus.sCfg.uOwnNodeAddress == 10) return 11;
         if (g_bus.sCfg.uOwnNodeAddress == 11) return 12;
         if (g_bus.sCfg.uOwnNodeAddress == 12) return 10;
 
-        if (g_bus.sCfg.uOwnNodeAddress == 3) return 5;
-        if (g_bus.sCfg.uOwnNodeAddress == 5) return 20;
-        if (g_bus.sCfg.uOwnNodeAddress == 20) return 3;
+        if (g_bus.sCfg.uOwnNodeAddress == 3) return 20;
+        if (g_bus.sCfg.uOwnNodeAddress == 5) return 21;
+        if (g_bus.sCfg.uOwnNodeAddress == 20) return 22;
 
         if (g_bus.sCfg.uOwnNodeAddress == 21) return 22;
         if (g_bus.sCfg.uOwnNodeAddress == 22) return 21;
     } else if (selector == 2) {
         if (g_bus.sCfg.uOwnNodeAddress == 10) return 0x0E; //14
-        if (g_bus.sCfg.uOwnNodeAddress == 11) return 0x02;
+        if (g_bus.sCfg.uOwnNodeAddress == 11) return 5;
         if (g_bus.sCfg.uOwnNodeAddress == 12) return 20;
 
-        if (g_bus.sCfg.uOwnNodeAddress == 3) return 0x0E;
-        if (g_bus.sCfg.uOwnNodeAddress == 5) return 11;
+        if (g_bus.sCfg.uOwnNodeAddress == 3) return 5;
+        if (g_bus.sCfg.uOwnNodeAddress == 5) return 3;
         if (g_bus.sCfg.uOwnNodeAddress == 20) return 12;
 
         if (g_bus.sCfg.uOwnNodeAddress == 21) return 22;
         if (g_bus.sCfg.uOwnNodeAddress == 22) return 21;
     }
     return 0;
-}
+}*/
 
 static void interpret_message (uint16_t sender, uint8_t msglen, uint8_t* msg)
 {
+    //eRegType_t rtype;
+    //uint8_t    val;
+    //uint8_t    i, regno = msg[1];
+    //uint8_t    newmsg[6];
 
     switch (msg[0]) {
+
     case eCMD_STATE_BITFIELDS:
         if (msglen < 2) break;
-        if (msg[2] != 0) {
-            PORTD |= LED_STATUS;
-        } else {
-            PORTD &= ~LED_STATUS;
-        }
+        if (msg[2]) LED_ERROR_ON;
+        else        LED_ERROR_OFF;
         break;
+
+    case eCMD_REQUEST_REG:
+
+        //if (TRUE != app_register_get(msg[1], &rtype, &val)) bus_send_nak_message(&g_bus, sender); break;
+        //newmsg[0] = eCMD_STATE_8BIT + rtype-1;
+        //newmsg[1] = regno;
+        //for (i=0; i<rtype; ++i) newmsg[2+i] = val[i];
+        //bus_send_message(&g_bus, sender, rtype, newmsg);
+    	break;
+    case eCMD_SET_REG_8BIT:
+    	break;
+    case eCMD_SET_REG_16BIT:
+    	break;
+    case eCMD_SET_REG_32BIT:
+    	break;
+
+    case eCMD_BLOCK_START:
+        block_message_start(&g_bus, sender, msglen, msg);
+        break;
+
+    case eCMD_BLOCK_DATA:
+        block_message_data (&g_bus, sender, msglen, msg);
+        break;
+
+    case eCMD_BLOCK_END:
+        block_message_end  (&g_bus, sender, msglen, msg);
+        //no break
+    case eCMD_BLOCK_RESET:
+        block_data_reset();
+        break;
+
     case eCMD_SLEEP:
-        sleep_pinchange2_enable();
+        activate_wakeup_interrupt();
         bus_sleep(&g_bus);
-        sleep_pinchange2_disable();
+        deactivate_wakeup_interrupt();
         break;
     default:
         break;
     }
 }
 
-static void check_buttons (void)
-{
-    const uint8_t registers[8] = {0, 1, 2, 3, 4, 5, 6, 7};
-    uint8_t temp, msglen, msg[8];
-    static uint8_t regidx = 0, light = 0;
-
-    // check button
-    g_buttons = PIND & (BTN_TEST | BTN_EXP);
-    temp = g_buttons ^ g_oldbuttons;
-    g_oldbuttons = g_buttons;
-    if ((g_buttons & BTN_TEST) && (temp & BTN_TEST)) {
-        regidx++;
-        if (regidx > 7) regidx = 0;
-
-        msg[0] = eCMD_REQUEST_REG;
-        msg[1] = registers[regidx];
-        msglen = 2;
-        bus_send_message(&g_bus, get_receiver(1), msglen, msg);
-    }
-    else if ((g_buttons & BTN_EXP) && (temp & BTN_EXP)) {
-        if (light)  light = 0;
-        else        light = 1;
-
-        msg[0] = eCMD_STATE_BITFIELDS;
-        msg[1] = 1;
-        msg[2] = light;
-        msg[3] = 0b00000001;
-        msglen = 4;
-        bus_send_message(&g_bus, get_receiver(1), msglen, msg);
-        bus_send_message(&g_bus, get_receiver(2), msglen, msg);
-    }
-}
 
 // --- Module global functions -------------------------------------------------
 
@@ -168,17 +161,17 @@ int main(void)
 
     clk_initialize();
 
+    //register_set_u8(MOD_eReg_ModuleID, 24);
     register_get(MOD_eReg_ModuleID, 0, &module_id);
     bus_configure(&g_bus, module_id);
     bus_initialize(&g_bus, 0);// initialize bus on UART 0
 
-    init_LED_and_keys();
-
-    g_buttons = PIND & (BTN_TEST | BTN_EXP);
-    g_oldbuttons = g_buttons;
+    io_initialize();
+    eep_initialize();
     sei();
 
-    clk_timer_start(&g_LED_timer, 1000);
+    clk_timer_start(&g_LED_timer, CLOCK_MS_2_TICKS(1000));
+    LED_ERROR_OFF;
 
     while (1) {
         // check for message and read it
@@ -187,7 +180,14 @@ int main(void)
                 interpret_message(sender, msglen, msg);
             }
         }
-        check_buttons();
+        if (block_timer_elapsed()) {
+            uint8_t resetmsg = eCMD_BLOCK_RESET;
+            interpret_message(0, 1, &resetmsg);
+        }
+        if (clk_timer_is_elapsed(&g_LED_timer)) {
+            // TODO remove after debug
+            clk_timer_start(&g_LED_timer, CLOCK_MS_2_TICKS(1000));
+        }
     }
     return 0;
 }

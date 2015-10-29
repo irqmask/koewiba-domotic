@@ -1,6 +1,6 @@
-MCU = atmega88
+MCU = atmega324p
 FORMAT = ihex
-TARGET = testprotocol_atmega88
+TARGET = testprotocol_atmega324p
 
 ROOTDIR = $(subst \,/,$(shell pwd))/../..
 include ../../buildscripts/lib/lib_outputdirs.mk
@@ -11,8 +11,10 @@ include ../../buildscripts/lib/lib_outputdirs.mk
 SRC = ../shared/bus_transport.c \
       ../shared/crc16.c \
       ../shared/queue.c \
+      shared/block_message.c \
       shared/bus_phy.c \
       shared/clock.c \
+      shared/eeprom_spi.c \
       shared/led_debug.c \
       shared/register.c \
       tests/testprotocol/appregister.c \

@@ -18,6 +18,8 @@
 
 // --- Definitions -------------------------------------------------------------
 
+#define CRC_START_VALUE 0
+
 // --- Type definitions --------------------------------------------------------
 
 // --- Local variables ---------------------------------------------------------
@@ -32,7 +34,11 @@
 
 // --- Global functions --------------------------------------------------------
 
-uint16_t crc_calc16(uint8_t* puData, uint8_t uLen);
+uint16_t crc_16_start (void);
+
+uint16_t crc_16_next_byte (uint16_t old_crc, uint8_t new_byte);
+
+uint16_t crc_calc16 (uint8_t* data, uint8_t len);
 
 #endif /* _CRC16_H_ */
 /** @} */

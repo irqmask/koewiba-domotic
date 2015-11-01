@@ -1,4 +1,4 @@
-update=So 18 Okt 2015 17:00:32 CEST
+update=So 01 Nov 2015 08:21:31 CET
 version=1
 last_client=kicad
 [pcbnew]
@@ -27,15 +27,15 @@ NetIExt=net
 version=1
 LibDir=../../../electronic/00library/kicad/01symbols
 [eeschema/libraries]
-LibName1=/home/mue/projekte/electronic/00library/kicad/01symbols/connectors
-LibName2=/home/mue/projekte/electronic/00library/kicad/01symbols/diodes
-LibName3=/home/mue/projekte/electronic/00library/kicad/01symbols/ics_controller_atmel
-LibName4=/home/mue/projekte/electronic/00library/kicad/01symbols/ics_misc
-LibName5=/home/mue/projekte/electronic/00library/kicad/01symbols/ics_peripheral
-LibName6=/home/mue/projekte/electronic/00library/kicad/01symbols/ics_regulator
-LibName7=/home/mue/projekte/electronic/00library/kicad/01symbols/logo
-LibName8=/home/mue/projekte/electronic/00library/kicad/01symbols/power
-LibName9=/home/mue/projekte/electronic/00library/kicad/01symbols/standard
-LibName10=logo
+LibName1=connectors
+LibName2=diodes
+LibName3=logo
+LibName4=ics_controller_atmel
+LibName5=ics_misc
+LibName6=ics_peripheral
+LibName7=ics_signal
+LibName8=power
+LibName9=standard
+LibName10=transistors
 [general]
 version=1

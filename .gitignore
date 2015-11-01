@@ -5,7 +5,7 @@
 *.elf
 
 # Libraries
-*.lib
+#*.lib lib files are needed for PCB design with Kicad
 *.a
 
 # Shared objects (inc. Windows DLLs)
@@ -37,12 +37,14 @@
 .project
 .cproject
 .directory
+.metadata
 **/.settings
 
 # Intermediate and backup files
 *.bak
 *.kdev4
 *_version.h
+*_old.*
 
 # Other
 *.ps

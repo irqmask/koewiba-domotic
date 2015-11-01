@@ -1,4 +1,4 @@
-update=Do 15 Okt 2015 20:07:07 CEST
+update=So 01 Nov 2015 08:21:56 CET
 version=1
 last_client=kicad
 [pcbnew]
@@ -23,6 +23,8 @@ ModuleOutlineThickness=0.150000000000
 [cvpcb]
 version=1
 NetIExt=net
+[general]
+version=1
 [eeschema]
 version=1
 LibDir=../../../electronic/00library/kicad/01symbols
@@ -40,5 +42,3 @@ LibName10=modules
 LibName11=power
 LibName12=standard
 LibName13=transistors
-[general]
-version=1

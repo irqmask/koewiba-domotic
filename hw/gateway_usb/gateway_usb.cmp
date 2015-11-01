@@ -1,0 +1,31 @@
+Cmp-Mod V01 Created by CvPcb (2014-03-19 BZR 4756)-product date = Di 07 Jul 2015 21:26:03 CEST
+
+BeginCmp
+TimeStamp = /559C29B2;
+Reference = U1;
+ValeurCmp = ADuM1201;
+IdModule  = ;
+EndCmp
+
+BeginCmp
+TimeStamp = /559C29C6;
+Reference = U2;
+ValeurCmp = ADuM1201;
+IdModule  = ;
+EndCmp
+
+BeginCmp
+TimeStamp = /559C29DA;
+Reference = U3;
+ValeurCmp = ADuM1201;
+IdModule  = ;
+EndCmp
+
+BeginCmp
+TimeStamp = /559C29EE;
+Reference = U4;
+ValeurCmp = ADuM1201;
+IdModule  = ;
+EndCmp
+
+EndListe

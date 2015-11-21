@@ -254,6 +254,7 @@ Format: 0x22, CRC16 (16bit Wert)
 
 0x23 - Block Info
 Sendet Informationen über den soeben übertragenen Block an den Block Absender.
+Format: 0x23, CRC16_from_host (16bit Wert), CRC16_in_eeprom (16bit Wert)
 
 0x24 - Request Version
 Fordert Firmwareversionsstring an.

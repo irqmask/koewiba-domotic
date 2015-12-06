@@ -19,7 +19,8 @@ typedef struct block_data {
     uint32_t startaddress;
     uint32_t blocksize;
     uint16_t sender;
-    uint16_t crc;
+    uint16_t crc_host;
+    uint16_t crc_local;
     uint32_t received;
     uint8_t  additional_info1;
     uint8_t  additional_info2;

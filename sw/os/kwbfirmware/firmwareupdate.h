@@ -19,8 +19,19 @@
 
 // --- Type definitions --------------------------------------------------------
 
+typedef enum fwu_states {
+    eFWU_IDLE,
+    eFWU_START,
+    eFWU_DATA,
+    eFWU_WAIT_INFO,
+    eFWU_END,
+    eFWU_CRC_INFO,
+    eFWU_LAST
+} fwu_states_t;
+
 //! Firmware update process data structure.
 typedef struct firmwareupdate {
+    fwu_states_t    curr_state;         //!< Current state of firmware-update statemachine.
     msg_serial_t    msg_serial;         //!< Handle of the serial connection.
     char            filename[256];      //!< Path and filename to the IHEX file.
     uint16_t        module_address;     //!< target module address.
@@ -35,6 +46,14 @@ typedef struct firmwareupdate {
     
     uint32_t        curr_offset;        //!< Current offset in fw_memory during 
                                         //!< transmission.
+    uint32_t        node_curr_offset;   //!< Current offset in fw_memory during 
+                                        //!< transmission.
+    uint16_t        node_crc_expected;  //!< Checksum expected by node.
+    uint16_t        node_crc_calculated;//!< Checksum calculated by node.
+    uint8_t         block_info_received;//!< Flag if block_info message has been
+                                        //!< received. Reset by block_data and 
+                                        //!< block_end message. Set by block_info
+                                        //!< message.
 } firmwareupdate_t;
     
 // --- Local variables ---------------------------------------------------------

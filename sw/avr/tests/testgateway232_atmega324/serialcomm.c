@@ -26,6 +26,9 @@
 #include "ucontroller.h"
 #include "queue.h"
 
+// TODO remove after debug
+#include "led_debug.h"
+
 // --- Definitions -------------------------------------------------------------
 
 #define SERIAL_BAUDRATE 57600

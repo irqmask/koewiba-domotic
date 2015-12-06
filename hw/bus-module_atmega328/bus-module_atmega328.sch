@@ -1,23 +1,13 @@
 EESchema Schematic File Version 2
-LIBS:bus-module_atmega328-rescue
 LIBS:connectors
-LIBS:display
-LIBS:encoder
-LIBS:ics_40xx
+LIBS:diodes
 LIBS:ics_controller_atmel
 LIBS:ics_misc
-LIBS:ics_opamp
-LIBS:ics_opto
 LIBS:ics_peripheral
 LIBS:ics_regulator
 LIBS:logo
 LIBS:power
-LIBS:relays
-LIBS:sensors
 LIBS:standard
-LIBS:transformer
-LIBS:transistors
-LIBS:diodes
 LIBS:bus-module_atmega328-cache
 EELAYER 25 0
 EELAYER END
@@ -225,12 +215,12 @@ $EndComp
 $Comp
 L +24V #PWR03
 U 1 1 559D77F1
-P 9950 2400
-F 0 "#PWR03" H 9950 2600 50  0001 C CNN
-F 1 "+24V" H 9950 2510 50  0000 C CNN
-F 2 "" H 9950 2400 60  0000 C CNN
-F 3 "" H 9950 2400 60  0000 C CNN
-	1    9950 2400
+P 9350 2400
+F 0 "#PWR03" H 9350 2600 50  0001 C CNN
+F 1 "+24V" H 9350 2510 50  0000 C CNN
+F 2 "" H 9350 2400 60  0000 C CNN
+F 3 "" H 9350 2400 60  0000 C CNN
+	1    9350 2400
 	1    0    0    -1  
 $EndComp
 $Comp
@@ -351,7 +341,7 @@ Entry Wire Line
 Entry Wire Line
 	6750 3100 6850 3000
 Wire Bus Line
-	6750 5800 6750 2750
+	6750 2750 6750 5800
 Wire Wire Line
 	8350 2900 10050 2900
 Text Label 4300 3850 0    40   ~ 0
@@ -419,7 +409,7 @@ Wire Wire Line
 Wire Wire Line
 	4300 5700 4700 5700
 Wire Bus Line
-	5400 5600 5400 5800
+	5400 5800 5400 5600
 Text Label 4300 6700 0    40   ~ 0
 /CSEEP
 Text Label 4300 6800 0    40   ~ 0
@@ -471,9 +461,9 @@ Wire Wire Line
 Wire Wire Line
 	5900 6800 5750 6800
 Wire Wire Line
-	5900 6200 5900 6150
+	5900 6150 5900 6200
 Wire Wire Line
-	5900 6150 4550 6150
+	4550 6150 5900 6150
 Wire Wire Line
 	4550 6150 4550 6200
 Wire Wire Line
@@ -687,8 +677,6 @@ F 3 "" H 9550 4200 60  0000 C CNN
 	1    9550 4200
 	1    0    0    -1  
 $EndComp
-Wire Wire Line
-	9950 2400 9950 2500
 Wire Wire Line
 	10050 3100 9950 3100
 Wire Wire Line
@@ -1015,7 +1003,7 @@ Wire Wire Line
 Wire Wire Line
 	5450 2100 5450 2350
 Wire Wire Line
-	6650 2750 6150 2750
+	6150 2750 6650 2750
 Wire Wire Line
 	6250 2150 6250 2750
 Connection ~ 6250 2750
@@ -1079,7 +1067,7 @@ Entry Wire Line
 Entry Wire Line
 	1500 4500 1600 4400
 Wire Bus Line
-	1500 5800 1500 2800
+	1500 2800 1500 5800
 Wire Wire Line
 	1600 3900 1950 3900
 Wire Wire Line
@@ -1150,26 +1138,24 @@ F 3 "" H 2150 2750 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 Wire Bus Line
-	5400 5800 1500 5800
+	1500 5800 5400 5800
 $Comp
 L SEMTECH_SR05 D2
 U 1 1 55EC2FF2
 P 9050 3700
 F 0 "D2" H 9125 3450 50  0000 C CNN
 F 1 "SEMTECH SR05" H 9050 4050 50  0000 C CNN
-F 2 "Housings_SOT:SOT143R_Diode_Reverse" H 9050 3700 60  0001 C CNN
+F 2 "Diode_SMD:SOT143" H 9050 3700 60  0001 C CNN
 F 3 "" H 9050 3700 60  0000 C CNN
 	1    9050 3700
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
-	9950 2500 10050 2500
-Wire Wire Line
 	8350 3000 8100 3000
 Wire Wire Line
 	9550 4200 9550 4100
 Wire Wire Line
-	6750 1450 4950 1450
+	4950 1450 6750 1450
 Wire Wire Line
 	4950 1450 4950 1700
 Wire Wire Line
@@ -1277,4 +1263,21 @@ Text Label 9200 2700 0    40   ~ 0
 A
 Text Label 9200 2900 0    40   ~ 0
 B
+$Comp
+L FUSE F1
+U 1 1 56648405
+P 9750 2500
+F 0 "F1" H 9750 2600 50  0000 C CNN
+F 1 "FUSE" H 9750 2400 50  0000 C CNN
+F 2 "Resistor:R_1812" H 9750 2500 60  0001 C CNN
+F 3 "" H 9750 2500 60  0000 C CNN
+	1    9750 2500
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	9350 2400 9350 2500
+Wire Wire Line
+	9350 2500 9550 2500
+Wire Wire Line
+	9950 2500 10050 2500
 $EndSCHEMATC

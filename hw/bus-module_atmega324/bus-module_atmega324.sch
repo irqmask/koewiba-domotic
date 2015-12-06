@@ -1,23 +1,13 @@
 EESchema Schematic File Version 2
-LIBS:bus-module_atmega324-rescue
-LIBS:analog_devices
 LIBS:connectors
-LIBS:display
-LIBS:encoder
-LIBS:ftdi
 LIBS:ics_controller_atmel
 LIBS:ics_misc
-LIBS:ics_opamp
-LIBS:ics_opto
 LIBS:ics_peripheral
 LIBS:ics_regulator
 LIBS:logo
 LIBS:power
-LIBS:relays
-LIBS:sensors
 LIBS:standard
-LIBS:transformer
-LIBS:transistors
+LIBS:diodes
 LIBS:bus-module_atmega324-cache
 EELAYER 25 0
 EELAYER END
@@ -280,12 +270,12 @@ $EndComp
 $Comp
 L +24V #PWR04
 U 1 1 559D77F1
-P 9700 2400
-F 0 "#PWR04" H 9700 2600 50  0001 C CNN
-F 1 "+24V" H 9700 2510 50  0000 C CNN
-F 2 "" H 9700 2400 60  0000 C CNN
-F 3 "" H 9700 2400 60  0000 C CNN
-	1    9700 2400
+P 9250 2400
+F 0 "#PWR04" H 9250 2600 50  0001 C CNN
+F 1 "+24V" H 9250 2510 50  0000 C CNN
+F 2 "" H 9250 2400 60  0000 C CNN
+F 3 "" H 9250 2400 60  0000 C CNN
+	1    9250 2400
 	1    0    0    -1  
 $EndComp
 $Comp
@@ -645,7 +635,7 @@ Wire Wire Line
 Wire Wire Line
 	4300 5700 4500 5700
 Wire Bus Line
-	5200 5600 5200 5800
+	5200 5800 5200 5600
 Text Label 4300 6650 0    40   ~ 0
 /CSEEP
 Text Label 4300 6750 0    40   ~ 0
@@ -697,9 +687,9 @@ Wire Wire Line
 Wire Wire Line
 	5900 6750 5750 6750
 Wire Wire Line
-	5900 6150 5900 6100
+	5900 6100 5900 6150
 Wire Wire Line
-	5900 6100 4550 6100
+	4550 6100 5900 6100
 Wire Wire Line
 	4550 6100 4550 6150
 Wire Wire Line
@@ -951,7 +941,7 @@ F 3 "" H 9450 3700 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
-	9700 2400 9700 2500
+	9250 2400 9250 2500
 Wire Wire Line
 	9800 3100 9700 3100
 Wire Wire Line
@@ -1521,13 +1511,11 @@ U 1 1 55EC3163
 P 8900 3300
 F 0 "D2" H 8975 3050 50  0000 C CNN
 F 1 "SEMTECH_SR05" H 8900 3650 50  0000 C CNN
-F 2 "Housings_SOT:SOT143R_Diode_Reverse" H 8900 3300 60  0001 C CNN
+F 2 "Diode_SMD:SOT143" H 8900 3300 60  0001 C CNN
 F 3 "" H 8900 3300 60  0000 C CNN
 	1    8900 3300
 	1    0    0    -1  
 $EndComp
-Wire Wire Line
-	9700 2500 9800 2500
 Wire Wire Line
 	9450 3650 9450 3700
 Wire Wire Line
@@ -1558,4 +1546,19 @@ F 3 "" H 2150 4250 60  0000 C CNN
 	1    2150 4150
 	1    0    0    -1  
 $EndComp
+$Comp
+L FUSE F1
+U 1 1 566474AD
+P 9500 2500
+F 0 "F1" H 9500 2600 50  0000 C CNN
+F 1 "FUSE" H 9500 2400 50  0000 C CNN
+F 2 "Resistor:R_1812" H 9500 2500 60  0001 C CNN
+F 3 "" H 9500 2500 60  0000 C CNN
+	1    9500 2500
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	9250 2500 9300 2500
+Wire Wire Line
+	9700 2500 9800 2500
 $EndSCHEMATC

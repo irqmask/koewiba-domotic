@@ -10,42 +10,42 @@
 \red255\green255\blue255;}
 {\stylesheet
 {\s6\tx1584\sbasedon33\snext32 Chapter Heading;}
-{\s43\sl287\slmult1\sa140\f1\fs24\lang1031\sbasedon32\snext43 Text Body;}
-{\s41\fi-431\li720 Star List;}
-{\s21\keepn\sb240\sa120\f0\fs28\lang1031\sbasedon32\snext43 Heading;}
-{\s30\fi-431\li720\sbasedon36 Lower Case List;}
-{\s2\li1440\ri1440\sa120\sbasedon32 Block Text;}
-{\s46\fi-431\li720 Triangle List;}
-{\s22\keepn\sb240\sa120\f0\fs36\b\lang1031\sbasedon21\snext43 Heading 1;}
-{\s23\keepn\sb200\sa120\f0\fs32\b\lang1031\sbasedon21\snext43 Heading 2;}
-{\s4\fi-431\li720 Bullet List;}
+{\s43\sl286\slmult1\sa139\f1\fs24\lang1031\sbasedon32 Text Body;}
+{\s41\fi-430\li720 Star List;}
+{\s21\sb240\sa119\f0\fs28\lang1031\sbasedon32\snext43 Heading;}
+{\s30\fi-430\li720\sbasedon36 Lower Case List;}
+{\s2\li1440\ri1440\sa119\sbasedon32 Block Text;}
+{\s46\fi-430\li720 Triangle List;}
+{\s22\sb240\sa119\f0\fs36\b\lang1031\sbasedon21\snext43 Heading 1;}
+{\s23\sb200\sa119\f0\fs32\b\lang1031\sbasedon21\snext43 Heading 2;}
+{\s4\fi-430\li720 Bullet List;}
 {\s25\sb440\sa60\f2\fs24\b\sbasedon32\snext32 Heading 4;}
-{\s26\fi-431\li720 Heart List;}
-{\s1\fi-431\li720 Arrowhead List;}
-{\s40\fi-431\li720 Square List;}
-{\s42\keepn\qc\sb60\sa120\f0\fs36\lang1031\sbasedon21\snext43 Subtitle;}
-{\s11\qc\sb240\sa120\f2\fs32\b\sbasedon32\snext32 Contents Header;}
+{\s26\fi-430\li720 Heart List;}
+{\s1\fi-430\li720 Arrowhead List;}
+{\s40\fi-430\li720 Square List;}
+{\s42\qc\sb60\sa119\f0\fs36\lang1031\sbasedon21\snext43 Subtitle;}
+{\s11\qc\sb240\sa119\f2\fs32\b\sbasedon32\snext32 Contents Header;}
 {\s37\f3\sbasedon32 Plain Text;}
 {\s19\fs20\sbasedon32 Footnote Text;}
-{\s24\keepn\sb140\sa120\sbasedon21\snext43 Heading 3;}
-{\s36\fi-431\li720 Numbered List;}
-{\s13\fi-431\li720 Diamond List;}
-{\s20\fi-431\li720 Hand List;}
-{\s47\fi-431\li720\sbasedon36 Upper Case List;}
-{\s38\sa280\f1\fs24\lang1031\sbasedon32\snext38 Quotations;}
-{\s29\sl287\slmult1\sa140\f1\fs24\lang1031\sbasedon43\snext29 List;}
-{\s3\fi-431\li720 Box List;}
-{\s48\fi-431\li720\sbasedon36 Upper Roman List;}
-{\s32\f1\fs24\lang1031\snext32 Normal;}
-{\s5\sb120\sa120\f1\fs24\i\lang1031\sbasedon32\snext5 Caption;}
-{\s45\keepn\qc\sb240\sa120\f0\fs56\b\lang1031\sbasedon21\snext43 Title;}
+{\s24\sb139\sa119\f2\fs24\b\sbasedon21\snext43 Heading 3;}
+{\s36\fi-430\li720 Numbered List;}
+{\s13\fi-430\li720 Diamond List;}
+{\s20\fi-430\li720 Hand List;}
+{\s47\fi-430\li720\sbasedon36 Upper Case List;}
+{\s38\sa279\f1\fs24\lang1031\sbasedon32 Quotations;}
+{\s29\sl286\slmult1\sa139\f1\fs24\lang1031\sbasedon43 List;}
+{\s3\fi-430\li720 Box List;}
+{\s48\fi-430\li720\sbasedon36 Upper Roman List;}
+{\s32\f1\fs24\lang1031 Normal;}
+{\s5\sb119\sa119\f1\fs24\i\lang1031\sbasedon32 Caption;}
+{\s45\qc\sb240\sa119\f0\fs56\b\lang1031\sbasedon21\snext43 Title;}
 {\s28\f1\fs24\lang1031\sbasedon32\snext19 Index;}
 {\s39\tx1584\sbasedon33\snext32 Section Heading;}
-{\s27\fi-431\li720 Implies List;}
-{\s44\fi-431\li720 Tick List;}
+{\s27\fi-430\li720 Implies List;}
+{\s44\fi-430\li720 Tick List;}
 {\s14\fi-288\li288\sbasedon32 Endnote;}
-{\s12\fi-431\li720 Dashed List;}
-{\s31\fi-431\li720\sbasedon32 Lower Roman List;}
+{\s12\fi-430\li720 Dashed List;}
+{\s31\fi-430\li720\sbasedon32 Lower Roman List;}
 {\*\cs18\fs20\super Footnote Reference;}
 {\s16\sbasedon32 Endnote Text;}
 {\*\cs15\fs20\super Endnote Reference;}
@@ -53,24 +53,25 @@
 {\s34\tx431\sbasedon23\snext32 Numbered Heading 2;}
 {\s35\tx431\sbasedon24\snext32 Numbered Heading 3;}
 {\s17\fi-288\li288\fs20\sbasedon32 Footnote;}
-{\s7\fi-431\li720\sbasedon32\snext32 Contents 1;}
-{\s8\fi-431\li1440\sbasedon32\snext32 Contents 2;}
-{\s9\fi-431\li2160\sbasedon32\snext32 Contents 3;}
-{\s10\fi-431\li2880\sbasedon32\snext32 Contents 4;}}
-\kerning0\cf0\ftnbj\fet2\ftnstart1\ftnnar\aftnnar\ftnstart1\aftnstart1\aenddoc\revprop3{\*\rdf}{\info\uc1{\title   }{\author RM}}\deftab720\viewkind1\paperw11905\paperh16837\margl1440\margr1440\widowctrl
+{\s7\fi-430\li720\sbasedon32\snext32 Contents 1;}
+{\s8\fi-430\li1440\sbasedon32\snext32 Contents 2;}
+{\s9\fi-430\li2160\sbasedon32\snext32 Contents 3;}
+{\s10\fi-430\li2880\sbasedon32\snext32 Contents 4;}}
+\kerning0\cf0\ftnbj\fet2\ftnstart1\ftnnar\aftnnar\ftnstart1\aftnstart1\aenddoc\revprop3{\*\rdf}{\info\uc1}\deftab720\viewkind1\paperw11905\paperh16837\margl1440\margr1440\widowctrl
 \sectd\sbknone\colsx360\footery152\margtsxn566\margbsxn566\marglsxn566\margrsxn566\pgncont\ltrsect
-\pard\plain\ltrpar\ql\s32\itap0{\s32\f1\fs24\lang1031{\*\listtag0}\par}
-\pard\plain\ltrpar\ql\sb240\sa120\s22\itap0\keepn\tx0{\s22\f0\fs36\b\lang1031{\*\listtag0}\abinodiroverride\ltrch Pinbelegungen}{\s22\f0\fs36\b\lang1031{\*\listtag0}\par}
-\pard\plain\ltrpar\ql\s32\itap0{\s32\f1\fs24\lang1031{\*\listtag0}\par}
-\pard\plain\ltrpar\ql\sb200\sa120\s23\itap0\keepn\tx0{\s23\f0\fs32\b\lang1031{\*\listtag0}\abinodiroverride\ltrch BUS WAGO Stecker}{\s23\f0\fs32\b\lang1031{\*\listtag0}\par}
-\pard\plain\ltrpar\ql\s32\itap0{\s32\f1\fs24\lang1031{\*\listtag0}\abinodiroverride\ltrch (von oben/links gesehen)}{\s32\f1\fs24\lang1031{\*\listtag0}\par}
-\pard\plain\ltrpar\ql\s32\itap0{\s32\f1\fs24\lang1031{\*\listtag0}\abinodiroverride\ltrch Pin\tab Bezeichner\tab Farbe Klemme\tab Farbe Stecker}{\s32\f1\fs24\lang1031{\*\listtag0}\par}
-\pard\plain\ltrpar\ql\s32\itap0{\s32\f1\fs24\lang1031{\*\listtag0}\abinodiroverride\ltrch 1\tab +24V\tab \tab orange\tab \tab \tab rot}{\s32\f1\fs24\lang1031{\*\listtag0}\par}
-\pard\plain\ltrpar\ql\s32\itap0{\s32\f1\fs24\lang1031{\*\listtag0}\abinodiroverride\ltrch 2\tab RS485-A\tab gr\'fcn \tab \tab \tab gelb}{\s32\f1\fs24\lang1031{\*\listtag0}\par}
-\pard\plain\ltrpar\ql\s32\itap0{\s32\f1\fs24\lang1031{\*\listtag0}\abinodiroverride\ltrch 3\tab RS485-B\tab grau\tab \tab \tab wei\'df}{\s32\f1\fs24\lang1031{\*\listtag0}\par}
-\pard\plain\ltrpar\ql\s32\itap0{\s32\f1\fs24\lang1031{\*\listtag0}\abinodiroverride\ltrch 4\tab GND\tab \tab blau\tab \tab \tab schwarz}{\s32\f1\fs24\lang1031{\*\listtag0}\par}
-\pard\plain\ltrpar\ql\s32\itap0{\shp{\*\shpinst\shpz0\shpbxmargin\shpbypara\shpwr2\shpwrk0\shpfblwtxt0\shpleft0\shptop0\shpbottom1440\shpright1440\shplid436590218{\sp{\sn shapeType}{\sv 75}}{\sp{\sn pib}{\sv {\pict\jpegblip\picw1036\pich968\picwgoal1440\picscalex6\pichgoal1440\picscaley7
-\bliptag10000{\*\blipuid 00000000000000000000000000002710}
+\pard\plain\ltrpar\ql\s32\sl240\slmult1\itap0{\s32\f1\fs24\lang1031{\*\listtag0}\par}
+\pard\plain\ltrpar\ql\sb240\sa119\s22\sl240\slmult1\itap0\tx0{\s22\f0\fs36\b\lang1031{\*\listtag0}\abinodiroverride\ltrch Pinbelegungen}{\s22\f0\fs36\b\lang1031{\*\listtag0}\par}
+\pard\plain\ltrpar\ql\s32\sl240\slmult1\itap0{\s32\f0\fs36\b\lang1031{\*\listtag0}\par}
+\pard\plain\ltrpar\ql\sb200\sa119\s23\sl240\slmult1\itap0\tx0{\s23\f0\fs32\b\lang1031{\*\listtag0}\abinodiroverride\ltrch BUS WAGO Stecker}{\s23\f0\fs32\b\lang1031{\*\listtag0}\par}
+\pard\plain\ltrpar\ql\s32\sl240\slmult1\itap0{\s32\f1\fs24\lang1031{\*\listtag0}\abinodiroverride\ltrch (von oben/links gesehen)}{\s32\f1\fs24\lang1031{\*\listtag0}\par}
+\pard\plain\ltrpar\ql\s32\sl240\slmult1\itap0{\s32\f1\fs24\lang1031{\*\listtag0}\abinodiroverride\ltrch Pin\tab Bezeichner\tab Farbe Klemme\tab Farbe Stecker}{\s32\f1\fs24\lang1031{\*\listtag0}\par}
+\pard\plain\ltrpar\ql\s32\sl240\slmult1\itap0{\s32\f1\fs24\lang1031{\*\listtag0}\abinodiroverride\ltrch 1\tab +24V\tab \tab orange\tab \tab \tab rot}{\s32\f1\fs24\lang1031{\*\listtag0}\par}
+\pard\plain\ltrpar\ql\s32\sl240\slmult1\itap0{\s32\f1\fs24\lang1031{\*\listtag0}\abinodiroverride\ltrch 2\tab RS485-A\tab gr\'fcn \tab \tab \tab gelb}{\s32\f1\fs24\lang1031{\*\listtag0}\par}
+\pard\plain\ltrpar\ql\s32\sl240\slmult1\itap0{\s32\f1\fs24\lang1031{\*\listtag0}\abinodiroverride\ltrch 3\tab RS485-B\tab grau\tab \tab \tab wei\'df}{\s32\f1\fs24\lang1031{\*\listtag0}\par}
+\pard\plain\ltrpar\ql\s32\sl240\slmult1\itap0{\s32\f1\fs24\lang1031{\*\listtag0}\abinodiroverride\ltrch 4\tab GND\tab \tab blau\tab \tab \tab schwarz}{\s32\f1\fs24\lang1031{\*\listtag0}\par}
+\pard\plain\ltrpar\ql\s32\sl240\slmult1\itap0{\s32\f1\fs24\lang1031{\*\listtag0}\par}
+\pard\plain\ltrpar\ql\s32\sl240\slmult1\itap0{\shp{\*\shpinst\shpz0\shpbxmargin\shpbypara\shpwr2\shpwrk0\shpfblwtxt0\shpleft0\shptop0\shpbottom1440\shpright1440\shplid849851249{\sp{\sn shapeType}{\sv 75}}{\sp{\sn pib}{\sv {\pict\jpegblip\picw1036\pich968\picwgoal1440\picscalex6\pichgoal1440\picscaley7
+\bliptag10001{\*\blipuid 00000000000000000000000000002711}
 ffd8ffe000104a46494600010101006000600000ffe100404578696600004949
 2a0008000000010069870400010000001a00000000000000020002a009000100
 00000c04000003a0090001000000c803000000000000ffdb0043000806060706
@@ -4407,28 +4408,27 @@ a0995edd679ad0b83fbb5381cd5ab5b8ba9ec2e223bb613b40f5c5145022adbb
 6a48791bad5ad64340969121cc8f8e14f7ef4514fa8d11c104d71382d1156008
 031d6896372041244f231e98e00a28a22936172b69ba6ba4b34d21c6582807b5
 417c366a850a8750d9c8a28a99e8c68eae78636d2e3982c6a51723d6b13ed529
-fba481f5a28a13d019ffd90000000000000000000000000000000000}}}{\sp{\sn dxTextLeft}{\sv 27305}}{\sp{\sn dxTextRight}{\sv 27305}}{\sp{\sn dxTextTop}{\sv 27305}}{\sp{\sn dxTextBottom}{\sv 27305}}{\abiframeprops frame-col-ypos:0,181250in; bot-style:none; xpos:0,029167in; wrap-mode:wrapped-both; frame-type:image; ypos:0,181250in; left-style:none; frame-height:1,422222in; top-style:none; position-to:block-above-text; frame-col-xpos:0,029167in; right-style:none; frame-width:1,507639in}}}
-\pard\plain\ltrpar\ql\s32\itap0{\s32\f1\fs24\lang1031{\*\listtag0}\par}
-\pard\plain\ltrpar\ql\s32\itap0{\s32\f1\fs24\lang1031{\*\listtag0}\par}
-\pard\plain\ltrpar\ql\s32\itap0{\s32\f1\fs24\lang1031{\*\listtag0}\par}
-\pard\plain\ltrpar\ql\s32\itap0{\s32\f1\fs24\lang1031{\*\listtag0}\par}
-\pard\plain\ltrpar\ql\s32\itap0{\s32\f1\fs24\lang1031{\*\listtag0}\par}
-\pard\plain\ltrpar\ql\s32\itap0{\s32\f1\fs24\lang1031{\*\listtag0}\par}
-\pard\plain\ltrpar\ql\s32\itap0{\s32\f1\fs24\lang1031{\*\listtag0}\par}
-\pard\plain\ltrpar\ql\s32\itap0{\s32\f1\fs24\lang1031{\*\listtag0}\par}
-\pard\plain\ltrpar\ql\s32\itap0{\s32\f1\fs24\lang1031{\*\listtag0}\par}
-\pard\plain\ltrpar\ql\s32\itap0{\s32\f1\fs24\lang1031{\*\listtag0}\par}
-\pard\plain\ltrpar\ql\s32\itap0{\s32\f1\fs24\lang1031{\*\listtag0}\abinodiroverride\ltrch Prozessor}{\s32\f1\fs24\lang1031{\*\listtag0}\par}
-\pard\plain\ltrpar\ql\s32\itap0{\s32\f1\fs24\lang1031{\*\listtag0}\par}
-\pard\plain\ltrpar\ql\s32\itap0{\s32\f1\fs24\b\lang1031{\*\listtag0}\abinodiroverride\ltrch Funktion\tab \tab ATTiny1643\tab ATMEGA324\tab ATMEGA88/168/328}{\s32\f1\fs24\b\lang1031{\*\listtag0}\par}
-\pard\plain\ltrpar\ql\s32\itap0{\s32\f1\fs24\lang1031{\*\listtag0}\abinodiroverride\ltrch SPI SS\tab EEProm\tab 18 \uc1\u8211\'96 PB3\tab 44 \uc1\u8211\'96 PB4\tab }{\s32\f1\fs24\lang1031{\*\listtag0}\par}
-\pard\plain\ltrpar\ql\s32\itap0{\s32\f1\fs24\lang1031{\*\listtag0}\abinodiroverride\ltrch RS485 WE (UART0)\tab 15 \uc1\u8211\'96 PC2\tab 13 - PD4}{\s32\f1\fs24\lang1031{\*\listtag0}\par}
-\pard\plain\ltrpar\ql\s32\itap0{\s32\f1\fs24\lang1031{\*\listtag0}\abinodiroverride\ltrch RS232  (UART1)\tab \tab \tab 14 - PD5\tab \tab n.a.}{\s32\f1\fs24\lang1031{\*\listtag0}\par}
-\pard\plain\ltrpar\ql\itap0{\f1\fs24\lang1031{\*\listtag0}\abinodiroverride\ltrch \page }{\f1\fs24\lang1031{\*\listtag0}\par}
-\pard\plain\ltrpar\ql\s32\itap0{\s32\f1\fs24\lang1031{\*\listtag0}\par}
-\pard\plain\ltrpar\ql\s32\itap0{\s32\f1\fs24\lang1031{\*\listtag0}\par}
-\pard\plain\ltrpar\ql\s32\itap0{\s32\f1\fs24\lang1031{\*\listtag0}\abinodiroverride\ltrch ATMEGA8\tab \tab \tab \tab \tab \tab ATMEGA88}{\s32\f1\fs24\lang1031{\*\listtag0}\par}
-\pard\plain\ltrpar\ql\s32\itap0{\s32\f1\fs24\lang1031{\*\listtag0}\par}
-\pard\plain\ltrpar\ql\s32\itap0{\s32\f1\fs24\lang1031{\*\listtag0}\par}
-\pard\plain\ltrpar\qc\s32\itap0{\s32\f1\fs24\lang1031{\*\listtag0}\par}
-\pard\plain\ltrpar\ql\itap0{\f1\fs24\lang1031{\*\listtag0}\par}}
+fba481f5a28a13d019ffd90000000000000000000000000000000000}}}{\sp{\sn dxTextLeft}{\sv 27305}}{\sp{\sn dxTextRight}{\sv 27305}}{\sp{\sn dxTextTop}{\sv 27305}}{\sp{\sn dxTextBottom}{\sv 27305}}{\abiframeprops frame-col-ypos:0,181250in; bot-style:none; xpos:0,029167in; frame-width:1,507639in; wrap-mode:wrapped-both; frame-type:image; ypos:0,181250in; frame-height:1,422222in; left-style:none; position-to:block-above-text; frame-col-xpos:0,029167in; right-style:none; top-style:none}}}
+\pard\plain\ltrpar\ql\s32\sl240\slmult1\itap0{\s32\f1\fs24\lang1031{\*\listtag0}\par}
+\pard\plain\ltrpar\ql\s32\sl240\slmult1\itap0{\s32\f1\fs24\lang1031{\*\listtag0}\par}
+\pard\plain\ltrpar\ql\s32\sl240\slmult1\itap0{\s32\f1\fs24\lang1031{\*\listtag0}\par}
+\pard\plain\ltrpar\ql\s32\sl240\slmult1\itap0{\s32\f1\fs24\lang1031{\*\listtag0}\par}
+\pard\plain\ltrpar\ql\s32\sl240\slmult1\itap0{\s32\f1\fs24\lang1031{\*\listtag0}\par}
+\pard\plain\ltrpar\ql\s32\sl240\slmult1\itap0{\s32\f1\fs24\lang1031{\*\listtag0}\par}
+\pard\plain\ltrpar\ql\s32\sl240\slmult1\itap0{\s32\f1\fs24\lang1031{\*\listtag0}\par}
+\pard\plain\ltrpar\ql\s32\sl240\slmult1\itap0{\s32\f1\fs24\lang1031{\*\listtag0}\par}
+\pard\plain\ltrpar\ql\s32\sl240\slmult1\itap0{\s32\f1\fs24\lang1031{\*\listtag0}\par}
+\pard\plain\ltrpar\ql\s32\sl240\slmult1\itap0{\s32\f1\fs24\lang1031{\*\listtag0}\abinodiroverride\ltrch Prozessor}{\s32\f1\fs24\lang1031{\*\listtag0}\par}
+\pard\plain\ltrpar\ql\s32\sl240\slmult1\itap0{\s32\f1\fs24\lang1031{\*\listtag0}\par}
+\pard\plain\ltrpar\ql\s32\sl240\slmult1\itap0{\s32\f1\fs24\b\lang1031{\*\listtag0}\abinodiroverride\ltrch Funktion\tab \tab ATTiny1643\tab ATMEGA324\tab ATMEGA88/168/328}{\s32\f1\fs24\b\lang1031{\*\listtag0}\par}
+\pard\plain\ltrpar\ql\s32\sl240\slmult1\itap0{\s32\f1\fs24\lang1031{\*\listtag0}\abinodiroverride\ltrch SPI SS\tab EEProm\tab 18 \uc1\u8211\'96 PB3\tab 44 \uc1\u8211\'96 PB4\tab \tab 14 - PB2}{\s32\f1\fs24\lang1031{\*\listtag0}\par}
+\pard\plain\ltrpar\ql\s32\sl240\slmult1\itap0{\s32\f1\fs24\lang1031{\*\listtag0}\abinodiroverride\ltrch RS485 WE (UART0)\tab 15 \uc1\u8211\'96 PC2\tab 13 - PD4\tab \tab 32 - PD2}{\s32\f1\fs24\lang1031{\*\listtag0}\par}
+\pard\plain\ltrpar\ql\s32\sl240\slmult1\itap0{\s32\f1\fs24\lang1031{\*\listtag0}\abinodiroverride\ltrch RS232  (UART1)\tab \tab \tab 14 - PD5\tab \tab n.a.}{\s32\f1\fs24\lang1031{\*\listtag0}\par}
+\pard\plain\ltrpar\ql\sl240\slmult1\itap0{\f1\fs24\lang1031{\*\listtag0}\abinodiroverride\ltrch \page }{\f1\fs24\lang1031{\*\listtag0}\par}
+\pard\plain\ltrpar\ql\s32\sl240\slmult1\itap0{\s32\f1\fs24\lang1031{\*\listtag0}\par}
+\pard\plain\ltrpar\ql\s32\sl240\slmult1\itap0{\s32\f1\fs24\lang1031{\*\listtag0}\par}
+\pard\plain\ltrpar\ql\s32\sl240\slmult1\itap0{\s32\f1\fs24\lang1031{\*\listtag0}\abinodiroverride\ltrch ATMEGA8\tab \tab \tab \tab \tab \tab ATMEGA88}{\s32\f1\fs24\lang1031{\*\listtag0}\par}
+\pard\plain\ltrpar\ql\s32\sl240\slmult1\itap0{\s32\f1\fs24\lang1031{\*\listtag0}\par}
+\pard\plain\ltrpar\ql\s32\sl240\slmult1\itap0{\s32\f1\fs24\lang1031{\*\listtag0}\par}
+\pard\plain\ltrpar\qc\s32\sl240\slmult1\itap0{\s32\f1\fs24\lang1031{\*\listtag0}\par}
+\pard\plain\ltrpar\ql\sl240\slmult1\itap0{\f1\fs24\lang1031{\*\listtag0}\par}}

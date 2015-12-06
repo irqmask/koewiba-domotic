@@ -35,7 +35,7 @@ typedef enum {
     eCMD_BLOCK_START            = 0x20,
     eCMD_BLOCK_DATA             = 0x21,
     eCMD_BLOCK_END              = 0x22,
-    eCMD_BLOCK_REJECT           = 0x23,
+    eCMD_BLOCK_INFO             = 0x23,
     eCMD_BLOCK_RESET            = 0x24,
     
     eCMD_FIRST_APP_SPECIFIC     = 0x40, //!< First application specific command.

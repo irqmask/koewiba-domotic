@@ -103,7 +103,8 @@ static void reset_incomming_on_error(msg_serial_t* msg_serial)
         default:   fprintf(stderr, "%c", msg_serial->incomming_buffer[ii]); break;
         }
     }
-    fprintf(stderr, "\n");
+    //fprintf(stderr, "\n");
+    fprintf(stderr, "total length = %d, message length = %d\n", msg_serial->incomming_num_received, msg_serial->incomming_message.length);
     msg_serial->incomming_num_received = 0;
     msg_serial->incomming_state = eSER_RECV_STATE_IDLE;
 }
@@ -128,6 +129,7 @@ static BOOL process_receiving(msg_serial_t* msg_serial, char new_char)
     case eSER_RECV_STATE_RECEIVER:
         digit = 4 - msg_serial->incomming_num_received;
         if (convert_char_to_nibble(new_char, &nibble) != 0) {
+            fprintf(stderr, "Error in state eSER_RECV_STATE_RECEIVER!\n");
             reset_incomming_on_error(msg_serial);
             break;
         } else {
@@ -141,13 +143,14 @@ static BOOL process_receiving(msg_serial_t* msg_serial, char new_char)
     case eSER_RECV_STATE_LENGTH:
         digit = 6 - msg_serial->incomming_num_received;
         if (convert_char_to_nibble(new_char, &nibble) != 0) {
+            fprintf(stderr, "Error in state eSER_RECV_STATE_LENGTH char %x!\n", new_char);
             reset_incomming_on_error(msg_serial);
             break;
         } else {
             msg_serial->incomming_message.length |= (nibble << (4*digit));
         }
         if (msg_serial->incomming_num_received >= 6) {
-            msg_serial->incomming_state = eSER_RECV_STATE_LENGTH;
+            msg_serial->incomming_state = eSER_RECV_STATE_DATA;
         }
         break;
 
@@ -155,15 +158,17 @@ static BOOL process_receiving(msg_serial_t* msg_serial, char new_char)
         digit = msg_serial->incomming_num_received % 2; // digit sequence: 1010...
         index = (msg_serial->incomming_num_received - 7) / 2;
         if (convert_char_to_nibble(new_char, &nibble) != 0) {
+            fprintf(stderr, "Error in state eSER_RECV_STATE_DATA!\n");
             reset_incomming_on_error(msg_serial);
             break;
         } else {
             if (digit == 1) msg_serial->incomming_message.data[index] = 0;
             msg_serial->incomming_message.data[index] |= (nibble << (4*digit));
         }
-        if (index + 1 == msg_serial->incomming_message.length) {
+        if (index + 1 == msg_serial->incomming_message.length && digit == 0) {
             msg_serial->incomming_state = eSER_RECV_STATE_NEWLINE;
         } else if (index + 1 > msg_serial->incomming_message.length){
+            fprintf(stderr, "Error in state eSER_RECV_STATE_DATA!\n");
             reset_incomming_on_error(msg_serial);
         }
         break;
@@ -171,6 +176,7 @@ static BOOL process_receiving(msg_serial_t* msg_serial, char new_char)
     case eSER_RECV_STATE_NEWLINE:
         if (msg_serial->incomming_num_received != (msg_serial->incomming_message.length * 2 + 7) ||
             new_char != '\n') {
+            fprintf(stderr, "Error in state eSER_RECV_STATE_NEWLINE!\n");
             reset_incomming_on_error(msg_serial);
         } else {
             // message received
@@ -181,6 +187,7 @@ static BOOL process_receiving(msg_serial_t* msg_serial, char new_char)
         break;
 
     default:
+        fprintf(stderr, "Wrong receive state: %d\n", msg_serial->incomming_state);
         reset_incomming_on_error(msg_serial);
         break;
     }
@@ -198,7 +205,6 @@ static int32_t msg_read (void* arg)
         do {
             // read one character, break if receive queue empty
             if (1 != sys_serial_recv(msg_serial->fd, &new_char, 1)) break;
-            printf("%c\n", new_char);
             // process character and check for a complete message
             message_complete = process_receiving(msg_serial, new_char);
         } while (!message_complete);

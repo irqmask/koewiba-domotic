@@ -30,10 +30,10 @@
 
 // --- Local variables ---------------------------------------------------------
 
-static sBus_t      g_bus;
-static sClkTimer_t g_app_timer;
-static uint16_t    g_target_temp;
-static uint16_t    g_current_temp;
+static sBus_t           g_bus;
+static clock_timer_t    g_app_timer;
+static uint16_t         g_target_temp;
+static uint16_t         g_current_temp;
 
 // --- Global variables --------------------------------------------------------
 

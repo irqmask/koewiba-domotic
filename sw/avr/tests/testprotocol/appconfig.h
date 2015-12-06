@@ -19,7 +19,7 @@
 
 // --- Definitions -------------------------------------------------------------
 
-#define BUS_APPCONFIG   1
+#define BUS_APPCONFIG      1
 #undef BUS_SCHEDULER                //!< This program has no scheduling capabilities.
 #define BUS_TX_QUEUE_SIZE  100      //!< Size in bytes of the message transmit queue.
 #define BUS_MAXSENDMSGLEN   16      //!< Maximum length of a message to be sent.

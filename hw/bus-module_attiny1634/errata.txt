@@ -1,0 +1,6 @@
+Revision A:
+-----------
+- Revisionskennung auf Kupfer-Layer.
+- Sicherung im 24V-Zweig fehlt.
+- Programmierstecker zu nah an WAGO-Klemmen.
+- Footprint für TVS-Diode (D2) zu groß.

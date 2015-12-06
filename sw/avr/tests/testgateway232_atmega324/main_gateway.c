@@ -24,13 +24,16 @@
 #include "register.h"
 #include "serialcomm.h"
 
+// TODO remove after debug
+#include "led_debug.h"
+
 // --- Definitions -------------------------------------------------------------
 
 // --- Type definitions --------------------------------------------------------
 
 // --- Local variables ---------------------------------------------------------
 
-static sClkTimer_t g_LED_timer;
+static clock_timer_t g_LED_timer;
 
 // --- Global variables --------------------------------------------------------
 
@@ -81,7 +84,7 @@ int main(void)
     clk_initialize();
     scomm_initialize_uart1(&g_serial_phy);
 
-    //register_set_u8(MOD_eReg_ModuleID, 2);
+    register_set_u8(MOD_eReg_ModuleID, 2);
     register_get(MOD_eReg_ModuleID, 0, &module_id);
     bus_configure(&g_bus, module_id);
     bus_initialize(&g_bus, 0);// initialize bus on UART 0
@@ -94,7 +97,7 @@ int main(void)
     while (1) {
         // check for message and read it
         if (bus_get_message(&g_bus)) {
-         //   interpret_and_forward_message(&g_bus, &g_serial_phy);
+            bgw_forward_bus_msg(&g_bus, &g_serial_phy);
 
             if (bus_read_message(&g_bus, &sender, &msglen, msg)) {
               //  interpret_message(sender, msglen, msg);

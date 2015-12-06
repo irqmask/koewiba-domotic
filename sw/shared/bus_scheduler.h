@@ -53,7 +53,7 @@ typedef struct schd {
     uint8_t         auTokenMsg[BUS_TOKEN_MSG_LEN];  //!< pre-compiled token message.
     BOOL            bSchedDiscovery;                //!< bus-discovery mode.
     BOOL            bSchedWaitingForAnswer;         //!< flag, if scheduler is waiting for an answer
-    sClkTimer_t     sNodeAnsTimeout;                //!< node answer timeout
+    clock_timer_t   sNodeAnsTimeout;                //!< node answer timeout
 } sSched_t;
 
 // --- Local variables ---------------------------------------------------------

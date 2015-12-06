@@ -18,6 +18,7 @@
 #include "ucontroller.h"
 #include "bus_intern.h"
 #include "pcbconfig.h"
+#include "prjtypes.h"
 
 // --- Switches ----------------------------------------------------------------
 

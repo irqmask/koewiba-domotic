@@ -1,13 +1,14 @@
 EESchema Schematic File Version 2
 LIBS:connectors
 LIBS:diodes
+LIBS:logo
 LIBS:ics_controller_atmel
 LIBS:ics_misc
 LIBS:ics_peripheral
-LIBS:ics_regulator
-LIBS:logo
+LIBS:ics_signal
 LIBS:power
 LIBS:standard
+LIBS:transistors
 LIBS:bus-module_attiny1634-cache
 EELAYER 25 0
 EELAYER END
@@ -15,8 +16,8 @@ $Descr A4 11693 8268
 encoding utf-8
 Sheet 1 1
 Title "bus-module_attiny1634"
-Date "2015-10-28"
-Rev "1"
+Date "2015-12-06"
+Rev "2"
 Comp "KoeWiBa"
 Comment1 ""
 Comment2 ""
@@ -48,45 +49,45 @@ $EndComp
 $Comp
 L CONN_1 J4
 U 1 1 559D5A6B
-P 9900 2500
-F 0 "J4" H 9900 2575 50  0000 C CNN
-F 1 "CONN_1" H 9900 2425 25  0000 C CNN
-F 2 "Connector_Miscelleaneus:WAGO243" H 9900 2500 60  0001 C CNN
-F 3 "" H 9900 2500 60  0000 C CNN
-	1    9900 2500
+P 10400 2500
+F 0 "J4" H 10400 2575 50  0000 C CNN
+F 1 "CONN_1" H 10400 2425 25  0000 C CNN
+F 2 "Connector_Miscelleaneus:WAGO243" H 10400 2500 60  0001 C CNN
+F 3 "" H 10400 2500 60  0000 C CNN
+	1    10400 2500
 	1    0    0    -1  
 $EndComp
 $Comp
 L CONN_1 J5
 U 1 1 559D5ACC
-P 9900 2700
-F 0 "J5" H 9900 2775 50  0000 C CNN
-F 1 "CONN_1" H 9900 2625 25  0000 C CNN
-F 2 "Connector_Miscelleaneus:WAGO243" H 9900 2700 60  0001 C CNN
-F 3 "" H 9900 2700 60  0000 C CNN
-	1    9900 2700
+P 10400 2700
+F 0 "J5" H 10400 2775 50  0000 C CNN
+F 1 "CONN_1" H 10400 2625 25  0000 C CNN
+F 2 "Connector_Miscelleaneus:WAGO243" H 10400 2700 60  0001 C CNN
+F 3 "" H 10400 2700 60  0000 C CNN
+	1    10400 2700
 	1    0    0    -1  
 $EndComp
 $Comp
 L CONN_1 J6
 U 1 1 559D5B5B
-P 9900 2900
-F 0 "J6" H 9900 2975 50  0000 C CNN
-F 1 "CONN_1" H 9900 2825 25  0000 C CNN
-F 2 "Connector_Miscelleaneus:WAGO243" H 9900 2900 60  0001 C CNN
-F 3 "" H 9900 2900 60  0000 C CNN
-	1    9900 2900
+P 10400 2900
+F 0 "J6" H 10400 2975 50  0000 C CNN
+F 1 "CONN_1" H 10400 2825 25  0000 C CNN
+F 2 "Connector_Miscelleaneus:WAGO243" H 10400 2900 60  0001 C CNN
+F 3 "" H 10400 2900 60  0000 C CNN
+	1    10400 2900
 	1    0    0    -1  
 $EndComp
 $Comp
 L CONN_1 J7
 U 1 1 559D5B94
-P 9900 3100
-F 0 "J7" H 9900 3175 50  0000 C CNN
-F 1 "CONN_1" H 9900 3025 25  0000 C CNN
-F 2 "Connector_Miscelleaneus:WAGO243" H 9900 3100 60  0001 C CNN
-F 3 "" H 9900 3100 60  0000 C CNN
-	1    9900 3100
+P 10400 3100
+F 0 "J7" H 10400 3175 50  0000 C CNN
+F 1 "CONN_1" H 10400 3025 25  0000 C CNN
+F 2 "Connector_Miscelleaneus:WAGO243" H 10400 3100 60  0001 C CNN
+F 3 "" H 10400 3100 60  0000 C CNN
+	1    10400 3100
 	1    0    0    -1  
 $EndComp
 $Comp
@@ -215,12 +216,12 @@ $EndComp
 $Comp
 L +24V #PWR03
 U 1 1 559D77F1
-P 9700 2400
-F 0 "#PWR03" H 9700 2600 50  0001 C CNN
-F 1 "+24V" H 9700 2510 50  0000 C CNN
-F 2 "" H 9700 2400 60  0000 C CNN
-F 3 "" H 9700 2400 60  0000 C CNN
-	1    9700 2400
+P 9450 2400
+F 0 "#PWR03" H 9450 2600 50  0001 C CNN
+F 1 "+24V" H 9450 2510 50  0000 C CNN
+F 2 "" H 9450 2400 60  0000 C CNN
+F 3 "" H 9450 2400 60  0000 C CNN
+	1    9450 2400
 	1    0    0    -1  
 $EndComp
 $Comp
@@ -490,7 +491,7 @@ F 3 "" H 9450 3700 60  0000 C CNN
 	1    9450 3700
 	1    0    0    -1  
 $EndComp
-Text Notes 10100 3100 0    60   ~ 0
+Text Notes 10600 3100 0    60   ~ 0
 +24V\n\nA\n\nB \n\nGND
 Entry Wire Line
 	1550 2800 1650 2700
@@ -742,7 +743,7 @@ Wire Wire Line
 Wire Wire Line
 	6850 2800 7200 2800
 Wire Wire Line
-	8200 2700 9800 2700
+	8200 2700 10300 2700
 Wire Wire Line
 	8350 2900 8350 3000
 Wire Wire Line
@@ -754,7 +755,7 @@ Wire Wire Line
 Wire Bus Line
 	6750 5800 6750 2750
 Wire Wire Line
-	8350 2900 9800 2900
+	8350 2900 10300 2900
 Wire Wire Line
 	4650 3250 4300 3250
 Wire Wire Line
@@ -844,9 +845,7 @@ Wire Wire Line
 Wire Wire Line
 	7200 1450 7200 1600
 Wire Wire Line
-	9700 2400 9700 2500
-Wire Wire Line
-	9800 3100 9700 3100
+	10300 3100 9700 3100
 Wire Wire Line
 	9700 3100 9700 3650
 Wire Wire Line
@@ -939,8 +938,6 @@ Wire Bus Line
 	2750 2700 2750 5800
 Wire Bus Line
 	1550 5800 6750 5800
-Wire Wire Line
-	9450 2500 9800 2500
 Wire Wire Line
 	9450 3550 9450 3700
 Wire Wire Line
@@ -1084,8 +1081,7 @@ F 3 "" H 9450 3300 60  0000 C CNN
 	0    1    1    0   
 $EndComp
 Wire Wire Line
-	9450 2500 9450 3050
-Connection ~ 9700 2500
+	9450 2400 9450 3050
 Wire Wire Line
 	7200 2900 7100 2900
 Wire Wire Line
@@ -1108,7 +1104,7 @@ U 1 1 55F9E475
 P 8900 3300
 F 0 "D2" H 8975 3050 50  0000 C CNN
 F 1 "SEMTECH_SR05" H 8900 3550 50  0000 C CNN
-F 2 "Housings_SOT:SOT143R_Diode_Reverse" H 8900 3300 60  0001 C CNN
+F 2 "Diode_SMD:SOT143" H 8900 3300 60  0001 C CNN
 F 3 "" H 8900 3300 60  0000 C CNN
 	1    8900 3300
 	1    0    0    -1  
@@ -1125,4 +1121,20 @@ Text Label 9000 2700 0    40   ~ 0
 A
 Text Label 9000 2900 0    40   ~ 0
 B
+$Comp
+L FUSE F1
+U 1 1 56645547
+P 9900 2500
+F 0 "F1" H 9900 2600 50  0000 C CNN
+F 1 "FUSE" H 9900 2400 50  0000 C CNN
+F 2 "Resistor:R_1812" H 9900 2500 60  0001 C CNN
+F 3 "" H 9900 2500 60  0000 C CNN
+	1    9900 2500
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	10300 2500 10100 2500
+Wire Wire Line
+	9700 2500 9450 2500
+Connection ~ 9450 2500
 $EndSCHEMATC

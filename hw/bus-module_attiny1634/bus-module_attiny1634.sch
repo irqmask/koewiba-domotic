@@ -16,8 +16,8 @@ $Descr A4 11693 8268
 encoding utf-8
 Sheet 1 1
 Title "bus-module_attiny1634"
-Date "2015-10-28"
-Rev "1"
+Date "2015-12-06"
+Rev "2"
 Comp "KoeWiBa"
 Comment1 ""
 Comment2 ""

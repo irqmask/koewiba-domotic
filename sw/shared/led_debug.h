@@ -13,6 +13,7 @@
 #define LED_DEBUG_H_
 
 // --- Include section ---------------------------------------------------------
+#include "prjconf.h"
 
 #ifdef PRJCONF_UC_AVR
  #include <avr/io.h>
@@ -31,20 +32,20 @@
 #define LED_PCBBONFIG 1
 // Pin assignments of board keys and LEDs
 // Port D pin assignments
- #define LED_STATUS      0b01000000  //!< Yellow status LED
- #define LED_ERROR       0b00010000  //!< Red error LED
- #define BTN_TEST        0b00100000
- #define BTN_EXP         0b10000000
+ #define LED_STATUS      PD6  //!< Yellow status LED
+ #define LED_ERROR       PD4  //!< Red error LED
+ #define BTN_TEST        PD5
+ #define BTN_EXP         PD7
 #endif
 
 #ifdef PRJCONF_UC_AVR
- #define LED_ERROR_ON        LED_ERROR_PORT |=  LED_ERROR
- #define LED_ERROR_OFF       LED_ERROR_PORT &= ~LED_ERROR
- #define LED_ERROR_TOGGLE    LED_ERROR_PORT ^=  LED_ERROR
+ #define LED_ERROR_ON        LED_ERROR_PORT |=  (1<<LED_ERROR)
+ #define LED_ERROR_OFF       LED_ERROR_PORT &= ~(1<<LED_ERROR)
+ #define LED_ERROR_TOGGLE    LED_ERROR_PORT ^=  (1<<LED_ERROR)
 
- #define LED_STATUS_ON       LED_STATUS_PORT |=  LED_STATUS
- #define LED_STATUS_OFF      LED_STATUS_PORT &= ~LED_STATUS
- #define LED_STATUS_TOGGLE   LED_STATUS_PORT ^=  LED_STATUS
+ #define LED_STATUS_ON       LED_STATUS_PORT |=  (1<<LED_STATUS)
+ #define LED_STATUS_OFF      LED_STATUS_PORT &= ~(1<<LED_STATUS)
+ #define LED_STATUS_TOGGLE   LED_STATUS_PORT ^=  (1<<LED_STATUS)
  
 #else
  #define LED_ERROR_ON

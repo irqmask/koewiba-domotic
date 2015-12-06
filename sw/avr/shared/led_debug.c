@@ -30,32 +30,32 @@
  */
 void dbg_toggle_status_LED (void)
 {
-    PORTD ^= LED_STATUS;
+	LED_STATUS_PORT ^= (1<<LED_STATUS);
 }
 
 void dbg_status_LED_on (void)
 {
-    PORTD |= LED_STATUS;
+	LED_STATUS_PORT |= (1<<LED_STATUS);
 }
 
 void dbg_status_LED_off (void)
 {
-    PORTD &= ~LED_STATUS;
+	LED_STATUS_PORT &= ~(1<<LED_STATUS);
 }
 
 void dbg_toggle_error_LED (void)
 {
-    PORTD ^= LED_ERROR;
+	LED_ERROR_PORT ^= (1<<LED_ERROR);
 }
 
 void dbg_error_LED_on (void)
 {
-    PORTD |= LED_ERROR;
+	LED_ERROR_PORT |= (1<<LED_ERROR);
 }
 
 void dbg_error_LED_off (void)
 {
-    PORTD &= ~LED_ERROR;
+	LED_ERROR_PORT &= ~(1<<LED_ERROR);
 }
 
 // --- Module global functions -------------------------------------------------

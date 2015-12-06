@@ -1,10 +1,10 @@
 /**
- * @addtogroup TESTGATEWAY_PCBCONFIG
+ * @addtogroup TESTGATEWAY_ATMEGA324_PCBCONFIG
  * @brief PCB configuration of the "testgateway" application.
  *
  * @{
  * @file    pcbconfig.h
- * @brief   PCB configuration of the "testscheduler" application.
+ * @brief   PCB configuration of the "testgateway" application.
  *
  * @preliminary     for using the pcb in bus-mode the following connections have to be established:
  *                  - connect CS (PB4) with PD0
@@ -24,28 +24,43 @@
 
 // --- Definitions -------------------------------------------------------------
 
-// KoeWiba-Bus
-#define BUS_PCBCONFIG 1
+// bus-module_atmega324 specific pin assignments
+// ----------------------------------------------------------------------------
 
-#define BUS_PORT_ENASND0 PORTD
-#define BUS_DDR_ENASND0  DDRD
-#define BUS_PORT_DISRCV0 PORTD
-#define BUS_DDR_DISRCV0  DDRD
+#define BUS_PCBCONFIG       1
+#define BUS_DDR_ENASND0     DDRD
+#define BUS_PORT_ENASND0    PORTD
+#define BUS_ENASND0         PD4
 
-#define BUS_ENASND0      PD4
-#define BUS_DISRCV0      PD4
+#define SPI_PCBCONFIG       1
+#define SPI_DDR_MOSI        DDRB
+#define SPI_DDR_MISO        DDRB
+#define SPI_DDR_SCK         DDRB
+#define SPI_DDR_SS          DDRB
+#define SPI_PORT_SS         PORTB
+#define SPI_MOSI            PB5
+#define SPI_MISO            PB6
+#define SPI_SCK             PB7
+#define SPI_SS              PB4 // same as EEPROM!
 
-#define LED_PCBCONFIG 1
-// Outputs (LEDs)
-#define LED_ERROR           0b00100000  //!< Red error LED on PA5
-#define LED_ERROR_ON        PORTA |=  LED_ERROR
-#define LED_ERROR_OFF       PORTA &= ~LED_ERROR
-#define LED_ERROR_TOGGLE    PORTA ^=  LED_ERROR
+#define EEPROM_PCB_CONFIG   1
+#define __25LC256__
+#define EEP_CS_PORT         PORTB
+#define EEP_CS_DDR          DDRB
+#define EEP_CS              PB4
 
-#define LED_STATUS          0b00010000  //!< Red error LED on PA5
-#define LED_STATUS_ON       PORTA |=  LED_STATUS
-#define LED_STATUS_OFF      PORTA &= ~LED_STATUS
-#define LED_STATUS_TOGGLE   PORTA ^=  LED_STATUS
+// Application specific pin assignments
+// ----------------------------------------------------------------------------
+
+// Pin assignments of board keys and LEDs
+#define LED_PCBCONFIG       1
+#define LED_STATUS          PC3  //left yellow LED
+#define LED_ERROR           PC4  //right yellow LED
+#define LED_STATUS_DDR      DDRC
+#define LED_ERROR_DDR       DDRC
+#define LED_STATUS_PORT     PORTC
+#define LED_ERROR_PORT      PORTC
+
 
 #define SCOMM_PORTOUT       PORTD
 #define SCOMM_PORTIN        PIND
@@ -59,20 +74,6 @@
 #define SLEEP_WakeupPinsPortC   0
 #define SLEEP_PinChangeIR_Enable()   GIMSK |=  ((1<<PCIE2)|(1<<PCIE1)|(1<<PCIE0));
 #define SLEEP_PinChangeIR_Disable()  GIMSK &= ~((1<<PCIE2)|(1<<PCIE1)|(1<<PCIE0));
-
-// SPI
-#define SPI_SCK_DDR     PORTB
-#define SPI_SCK_PIN     PB7
-
-// EEPROM
-#define EEPROM_PCB_CONFIG   1
-
-#define EEP_CS_PORT  PORTB
-#define EEP_CS_DDR   DDRB
-#define EEP_CS       PB4
-#define REG_SPI_DATA SPDR
-#define REG_SPSR0    SPSR
-
 
 // --- Type definitions --------------------------------------------------------
 

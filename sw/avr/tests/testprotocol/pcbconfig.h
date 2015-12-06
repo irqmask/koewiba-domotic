@@ -20,25 +20,19 @@
 #define BUS_PCBCONFIG 1
 #define BUS_DDR_ENASND0     DDRD
 #define BUS_PORT_ENASND0    PORTD
-#define BUS_ENASND0         PD2
-#define BUS_DDR_DISRCV0     DDRD
-#define BUS_PORT_DISRCV0    PORTD
-#define BUS_DISRCV0         PD3
-#define TXRXEN0_SEPERATE    1
-
-#define SPI_SCK_DDR         PORTC
-#define SPI_SCK_PIN         PC1
+#define BUS_ENASND0         PD4
+#undef  TXRXEN0_SEPERATE
 
 // Pin assignments of board keys and LEDs
-// Port D pin assignments
 #define LED_PCBCONFIG       1
-#define LED_STATUS          0b01000000  //!< Yellow status LED
-#define LED_ERROR           0b00010000  //!< Red error LED
-#define BTN_TEST            0b00100000
-#define BTN_EXP             0b10000000
-
-#define LED_STATUS_PORT     PORTD
-#define LED_ERROR_PORT      PORTD
+#define LED_STATUS          PC3  //left yellow LED
+#define LED_ERROR           PC4  //right yellow LED
+#define BTN_TEST            PC5
+#define BTN_EXP             PC6
+#define LED_STATUS_DDR      DDRC
+#define LED_ERROR_DDR       DDRC
+#define LED_STATUS_PORT     PORTC
+#define LED_ERROR_PORT      PORTC
 
 // --- Type definitions --------------------------------------------------------
 

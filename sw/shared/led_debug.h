@@ -39,12 +39,12 @@
 #endif
 
 #ifdef PRJCONF_UC_AVR
- #define LED_ERROR_ON        LED_ERROR_PORT |=  (1<<LED_ERROR)
- #define LED_ERROR_OFF       LED_ERROR_PORT &= ~(1<<LED_ERROR)
+ #define LED_ERROR_ON        LED_ERROR_PORT &= ~(1<<LED_ERROR)
+ #define LED_ERROR_OFF       LED_ERROR_PORT |=  (1<<LED_ERROR)
  #define LED_ERROR_TOGGLE    LED_ERROR_PORT ^=  (1<<LED_ERROR)
 
- #define LED_STATUS_ON       LED_STATUS_PORT |=  (1<<LED_STATUS)
- #define LED_STATUS_OFF      LED_STATUS_PORT &= ~(1<<LED_STATUS)
+ #define LED_STATUS_ON       LED_STATUS_PORT &= ~(1<<LED_STATUS)
+ #define LED_STATUS_OFF      LED_STATUS_PORT |=  (1<<LED_STATUS)
  #define LED_STATUS_TOGGLE   LED_STATUS_PORT ^=  (1<<LED_STATUS)
  
 #else

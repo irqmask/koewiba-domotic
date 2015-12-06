@@ -30,9 +30,9 @@
 
 // --- Local variables ---------------------------------------------------------
 
-static sBus_t 		g_sBus;
-static sSched_t     g_sSched;
-static sClkTimer_t 	g_sLedTimer;
+static sBus_t           g_sBus;
+static sSched_t         g_sSched;
+static clock_timer_t    g_sLedTimer;
 
 // --- Global variables --------------------------------------------------------
 

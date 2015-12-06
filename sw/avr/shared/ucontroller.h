@@ -64,7 +64,7 @@
  #define ADDR_SIGNATURE_BYTE1   2
  #define ADDR_SIGNATURE_BYTE2   4
 
-#elif defined (__AVR_ATmega88__) || defined (__AVR_ATmega88A__) || defined (__AVR_ATmega88P__)
+#elif defined (__AVR_ATmega88__) || defined (__AVR_ATmega88A__) || defined (__AVR_ATmega88P__) || defined (__AVR_ATmega328__) || defined (__AVR_ATmega328P__)
 // UART
  #define REGISTER_UCSRA0         UCSR0A
  #define REGISTER_UCSRB0         UCSR0B
@@ -312,6 +312,8 @@
     defined (__AVR_ATmega88__)   || \
     defined (__AVR_ATmega88A__)  || \
     defined (__AVR_ATmega88P__)  || \
+    defined (__AVR_ATmega328__)  || \
+    defined (__AVR_ATmega328P__)  || \
     defined (__AVR_ATmega324P__) || \
     defined (__AVR_ATmega324A__) || \
     defined (__AVR_ATtiny1634__)

@@ -36,6 +36,8 @@
       defined (__AVR_ATmega88__)   || \
       defined (__AVR_ATmega88A__)  || \
       defined (__AVR_ATmega88P__)  || \
+      defined (__AVR_ATmega328__)  || \
+      defined (__AVR_ATmega328P__) || \
       defined (__AVR_ATmega324P__) || \
       defined (__AVR_ATmega324A__) || \
       defined (__AVR_ATtiny1634__)

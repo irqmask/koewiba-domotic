@@ -20,7 +20,7 @@
 
 typedef struct clock {
     sys_time_t          starttime;
-    sClkTimer_t*        timer;
+    clock_timer_t*      timer;
 } local_clock_timer_t;
 
 // --- Local variables ---------------------------------------------------------
@@ -36,13 +36,13 @@ static local_clock_timer_t g_running_timers[CLOCK_NUM_TIMER];
 /**
  * Register timer in list.
  */
-static BOOL register_timer (sClkTimer_t* psTimer)
+static BOOL register_timer (clock_timer_t* timer)
 {
     uint8_t ii;
 
     for (ii=0; ii<CLOCK_NUM_TIMER; ii++) {
         if (g_running_timers[ii].timer == NULL) {
-            g_running_timers[ii].timer = psTimer;
+            g_running_timers[ii].timer = timer;
             g_running_timers[ii].starttime = sys_time_get_usecs();
             return TRUE;
         }
@@ -72,8 +72,8 @@ static void clean_up (void)
     for (ii=0; ii<CLOCK_NUM_TIMER; ii++) {
         if (g_running_timers[ii].timer == NULL) continue;
         if (elapsed_ticks(g_running_timers[ii].starttime) >=
-            g_running_timers[ii].timer->uTicks) {
-            g_running_timers[ii].timer->uTicks = 0;
+            g_running_timers[ii].timer->ticks) {
+            g_running_timers[ii].timer->ticks = 0;
             g_running_timers[ii].timer = NULL;
         }
     }
@@ -118,15 +118,15 @@ void clk_control (BOOL start)
  *
  * @returns TRUE, if timer has been (re)started, otherwise FALSE.
  */
-BOOL clk_timer_start (sClkTimer_t* psTimer, uint16_t uTicks)
+BOOL clk_timer_start (clock_timer_t* timer, uint16_t ticks)
 {
     // if timer is still running ...
-    if (psTimer->uTicks != 0) {
-        psTimer->uTicks = uTicks; // ... restart timer
+    if (timer->ticks != 0) {
+        timer->ticks = ticks; // ... restart timer
         return TRUE;
     }
-    psTimer->uTicks = uTicks;
-    return register_timer(psTimer);
+    timer->ticks = ticks;
+    return register_timer(timer);
 }
 
 /**
@@ -137,10 +137,10 @@ BOOL clk_timer_start (sClkTimer_t* psTimer, uint16_t uTicks)
  *
  * @returns TRUE, if time is over, otherwise false.
  */
-BOOL clk_timer_is_elapsed (sClkTimer_t* psTimer)
+BOOL clk_timer_is_elapsed (clock_timer_t* timer)
 {
     clean_up();
-    if (psTimer->uTicks == 0) {
+    if (timer->ticks == 0) {
         return TRUE;
     } else {
         return FALSE;
@@ -161,15 +161,14 @@ uint16_t clk_timers_next_expiration (void)
         if (g_running_timers[ii].timer == NULL) continue;
 
         elapsed = elapsed_ticks(g_running_timers[ii].starttime);
-        if (elapsed > g_running_timers[ii].timer->uTicks) {
+        if (elapsed > g_running_timers[ii].timer->ticks) {
             new_diff = 0;
         } else {
-            new_diff = g_running_timers[ii].timer->uTicks - elapsed;
+            new_diff = g_running_timers[ii].timer->ticks - elapsed;
         }
         if (new_diff < diff) diff = new_diff;
     }
     return diff;
 }
-
 
 /** @} */

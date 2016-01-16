@@ -95,11 +95,6 @@ void deactivate_wakeup_interrupt(void)
 
 static void interpret_message (uint16_t sender, uint8_t msglen, uint8_t* msg)
 {
-    //eRegType_t rtype;
-    //uint8_t    val;
-    //uint8_t    i, regno = msg[1];
-    //uint8_t    newmsg[6];
-
     switch (msg[0]) {
 
     case eCMD_STATE_BITFIELDS:
@@ -126,11 +121,9 @@ static void interpret_message (uint16_t sender, uint8_t msglen, uint8_t* msg)
     case eCMD_BLOCK_START:
         block_message_start(&g_bus, sender, msglen, msg);
         break;
-
     case eCMD_BLOCK_DATA:
         block_message_data (&g_bus, sender, msglen, msg);
         break;
-
     case eCMD_BLOCK_END:
         block_message_end  (&g_bus, sender, msglen, msg);
         //no break
@@ -148,7 +141,6 @@ static void interpret_message (uint16_t sender, uint8_t msglen, uint8_t* msg)
     }
 }
 
-
 // --- Module global functions -------------------------------------------------
 
 // --- Global functions --------------------------------------------------------
@@ -161,12 +153,13 @@ int main(void)
 
     clk_initialize();
 
-    register_set_u8(MOD_eReg_ModuleID, 3);
+    //register_set_u8(MOD_eReg_ModuleID, 3);
     register_get(MOD_eReg_ModuleID, 0, &module_id);
     bus_configure(&g_bus, module_id);
     bus_initialize(&g_bus, 0);// initialize bus on UART 0
 
     io_initialize();
+    spi_master_init_blk();
     eep_initialize();
     sei();
 
@@ -180,14 +173,14 @@ int main(void)
                 interpret_message(sender, msglen, msg);
             }
         }
-        if (block_timer_elapsed()) {
-            uint8_t resetmsg = eCMD_BLOCK_RESET;
-            interpret_message(0, 1, &resetmsg);
-        }
-        if (clk_timer_is_elapsed(&g_LED_timer)) {
-            // TODO remove after debug
-            clk_timer_start(&g_LED_timer, CLOCK_MS_2_TICKS(1000));
-        }
+        //if (block_timer_elapsed()) {
+        //    uint8_t resetmsg = eCMD_BLOCK_RESET;
+        //    interpret_message(0, 1, &resetmsg);
+        //}
+        //if (clk_timer_is_elapsed(&g_LED_timer)) {
+        //    // TODO remove after debug
+        //    clk_timer_start(&g_LED_timer, CLOCK_MS_2_TICKS(1000));
+        //}
     }
     return 0;
 }

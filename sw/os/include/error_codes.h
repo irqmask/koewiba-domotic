@@ -27,15 +27,14 @@
 // --- Type definitions --------------------------------------------------------
 
 typedef enum {
-    eRUNNING = -1, 
+    eRUNNING = -1,
     eERR_NONE = 0,
     eERR_NOT_IMPLEMENTED = ERROR_GENERIC,
     eERR_MALLOC, // out of memory
     eERR_SYSTEM,
     eERR_BAD_PARAMETER,
     eERR_INVALID_FD,
-    
-    
+    eERR_PROCESS_FAILED
 } gen_errors_t;
 
 // --- Local variables ---------------------------------------------------------

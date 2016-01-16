@@ -54,12 +54,12 @@
 
 // Pin assignments of board keys and LEDs
 #define LED_PCBCONFIG       1
-#define LED_STATUS          PC3  //left yellow LED
-#define LED_ERROR           PC4  //right yellow LED
-#define LED_STATUS_DDR      DDRC
-#define LED_ERROR_DDR       DDRC
-#define LED_STATUS_PORT     PORTC
-#define LED_ERROR_PORT      PORTC
+#define LED_STATUS          PB0  // left green LED
+#define LED_ERROR           PB1  // right red LED
+#define LED_STATUS_DDR      DDRB
+#define LED_ERROR_DDR       DDRB
+#define LED_STATUS_PORT     PORTB
+#define LED_ERROR_PORT      PORTB
 
 
 #define SCOMM_PORTOUT       PORTD

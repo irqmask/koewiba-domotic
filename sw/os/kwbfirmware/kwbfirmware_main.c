@@ -231,6 +231,7 @@ int main (int argc, char* argv[])
         ioloop_set_default_timeout(&mainloop, 1);
 
         firmware_update_init(&firmware, &mainloop, options.serial_device, options.serial_baudrate);
+        if (rc != eERR_NONE) break;
         rc = firmware_update_start(&firmware, options.filename, options.node_address);
         if (rc != eERR_NONE) break;
 
@@ -241,12 +242,14 @@ int main (int argc, char* argv[])
             if (rc != eRUNNING) {
                 if (rc == eMSG_ERR_BUSY) {
                     sys_sleep_ms(100);
+                } else if (rc == eERR_NONE) {
+                    printf("FIRMWARE UPDATE SUCCESSFULL!\n");
+                    end_application = true;
                 } else {
-                    // end or error
+                    printf("FIRMWARE UPDATE FAILED!\n");
                     end_application = true;
                 }
             }
-            sys_sleep_ms(500);
         }
         firmware_update_close(&firmware);
     } while (0);

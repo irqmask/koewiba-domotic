@@ -11,7 +11,7 @@
  * Block-Start  |Datatype     |[highbyte ...        Start-Adresse         ...lowbyte ]|
  * Block-Data   |[high...   Offset   ...low]|[                         ... Data ...
  * Block-End    |[high...   CRC16    ...low]|
- * Block-Info   |[high..CRC16 expected..low]|[high..CRC16 calcul ...low]|[high... 
+ * Block-Info   |[high..CRC16 expected..low]|[high..CRC16 calcul ...low]|[high...
  *
  * Datatype: 0 undefined
  *           1 internal EEProm
@@ -52,7 +52,7 @@
  * @param[in]   data    Pointer to data.
  * @param[in]   length  Length in byte of memory to be logged.
  */
-void log_hexdump16 (uint8_t* data, uint16_t length)
+static void log_hexdump16 (uint8_t* data, uint16_t length)
 {
     uint16_t offset = 0;
 
@@ -69,41 +69,69 @@ void log_hexdump16 (uint8_t* data, uint16_t length)
     printf("\n");
 }
 
+static uint16_t calculate_crc16 (firmwareupdate_t* fwu)
+{
+    uint32_t ii;
+    uint16_t crc;
+
+    crc = crc_16_start();
+    for (ii=0; ii<fwu->fw_size; ii++) {
+        crc = crc_16_next_byte(crc, fwu->fw_memory[ii]);
+    }
+    return crc;
+}
+
 /**
  * Handles block_info message.
  * Sets current node crc and current node write offset.
  */
-void parse_block_info_msg (msg_t* message, firmwareupdate_t* fwu)
+static void parse_block_info_msg (msg_t* message, firmwareupdate_t* fwu)
 {
-    uint32_t node_write_offset = 0;
+    uint32_t node_last_address = 0;
     uint16_t node_crc_expected = 0, node_crc_calculated = 0;
-    
+
     if (message->length >= 9 && fwu != NULL) {
         node_crc_expected |= (message->data[1] << 8);
         node_crc_expected |= (message->data[2]);
         node_crc_calculated |= (message->data[3] << 8);
         node_crc_calculated |= (message->data[4]);
-        node_write_offset |= (message->data[5] << 24);
-        node_write_offset |= (message->data[6] << 16);
-        node_write_offset |= (message->data[7] << 8);
-        node_write_offset |= (message->data[8]);
+        node_last_address |= (message->data[5] << 24);
+        node_last_address |= (message->data[6] << 16);
+        node_last_address |= (message->data[7] << 8);
+        node_last_address |= (message->data[8]);
 
-        fwu->node_curr_offset = node_write_offset;
+        fwu->last_node_address = node_last_address;
         fwu->node_crc_expected = node_crc_expected;
         fwu->node_crc_calculated = node_crc_calculated;
         fwu->block_info_received = 1;
     }
 }
 
+static void parse_block_ack_msg (msg_t* message, firmwareupdate_t* fwu)
+{
+    if (message->data[1] == eCMD_BLOCK_DATA) {
+        fwu->last_node_offset = (message->data[2] << 8) | message->data[3];
+    }
+}
+
+static void parse_block_nak_msg (msg_t* message, firmwareupdate_t* fwu)
+{
+    if (message->data[1] == eCMD_BLOCK_START ||
+        message->data[1] == eCMD_BLOCK_DATA ||
+        message->data[1] == eCMD_BLOCK_END) {
+        fwu->curr_state = eFWU_ERROR_ABORT;
+    }
+}
+
 /**
  * Message handler for incomming messages.
  * Specific message handlers will be called from here.
- * 
+ *
  * param[in] message    Message to be parsed.
  * param[in] reference  Pointer to connection from where the message has been received.
  * param[in] arg        Special argument: Pointer to firmware update structure.
  */
-void handle_incomming_messages (msg_t* message, void* reference, void* arg)
+static void handle_incomming_messages (msg_t* message, void* reference, void* arg)
 {
     printf("incomming: ");
     log_hexdump16(message->data, message->length);
@@ -113,6 +141,12 @@ void handle_incomming_messages (msg_t* message, void* reference, void* arg)
 	switch (message->data[0]) {
         case eCMD_BLOCK_INFO:
             parse_block_info_msg(message, arg);
+            break;
+        case eCMD_ACK:
+            parse_block_ack_msg(message, arg);
+            break;
+        case eCMD_NAK:
+            parse_block_nak_msg(message, arg);
             break;
         default:
             break;
@@ -202,7 +236,7 @@ static int send_block_data_message (firmwareupdate_t* fwu)
         msg.length = 3 + block;
 
         // send message and check if all data has been sent
-        //TODO msg_log(msg);
+        fwu->last_offset = fwu->curr_offset;
         rc = msg_ser_send(&fwu->msg_serial, &msg);
         if (rc == eERR_NONE || rc == eRUNNING) {
             fwu->curr_offset += block;
@@ -239,7 +273,7 @@ static int send_block_end_message (firmwareupdate_t* fwu)
     uint16_t crc;
     msg_t    msg;
 
-    crc = crc_calc16(fwu->fw_memory, fwu->fw_size);
+    crc = calculate_crc16(fwu);
 
     memset_s(&msg, sizeof(msg), 0);
     msg.receiver = fwu->module_address;
@@ -287,7 +321,7 @@ int firmware_update_init (firmwareupdate_t* fwu,
         rc = msg_ser_open(&fwu->msg_serial, ioloop, device, baudrate);
         if (rc != eERR_NONE) break;
 
-	msg_ser_set_incomming_handler(&fwu->msg_serial, handle_incomming_messages, fwu);
+        msg_ser_set_incomming_handler(&fwu->msg_serial, handle_incomming_messages, fwu);
     } while (FALSE);
     return rc;
 }
@@ -377,24 +411,25 @@ int firmware_update_start (firmwareupdate_t*    fwu,
 int firmware_update_run (firmwareupdate_t* fwu)
 {
     int rc = eRUNNING;
-    //printf("firmware update run()\n");
 
     switch (fwu->curr_state) {
     case eFWU_IDLE:
-        rc = eERR_NONE;       
+        rc = eERR_NONE;
         break;
     case eFWU_START:
+        // start the block transfer
         send_block_start_message(fwu);
         fwu->curr_state = eFWU_DATA;
         break;
     case eFWU_DATA:
+        // send next chunk of data to the node
         fwu->block_info_received = 0;
         send_block_data_message(fwu);
-        fwu->curr_state = eFWU_WAIT_INFO;
+        fwu->curr_state = eFWU_WAIT_ACK;
         break;
-    case eFWU_WAIT_INFO:
-        // wait until block-info message has been received
-        if (fwu->curr_offset == fwu->node_curr_offset) {
+    case eFWU_WAIT_ACK:
+        // wait until acknowledge message has been received
+        if (fwu->last_offset == fwu->last_node_offset) {
             if (fwu->fw_size > fwu->curr_offset) {
                 fwu->curr_state = eFWU_DATA;
             } else {
@@ -409,14 +444,16 @@ int firmware_update_run (firmwareupdate_t* fwu)
         break;
     case eFWU_CRC_INFO:
         if (fwu->block_info_received) {
-            fwu->curr_state = eFWU_IDLE;
-            rc = eERR_NONE;
             if (fwu->node_crc_expected == fwu->node_crc_calculated) {
-                printf("FIRMWARE UPDATE SUCCESSFULL!\n");
+                fwu->curr_state = eFWU_IDLE;
             } else {
-                printf("FIRMWARE UPDATE FAILED!\n");
+                fwu->curr_state = eFWU_ERROR_ABORT;
             }
         }
+        break;
+    case eFWU_ERROR_ABORT:
+        rc = eERR_PROCESS_FAILED;
+        fwu->curr_state = eFWU_IDLE;
         break;
     default:
         break;

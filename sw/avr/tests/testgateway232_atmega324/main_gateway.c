@@ -49,10 +49,10 @@ static void io_initialize(void)
     DDRA  |= ((0<<DDA7) | (0<<DDA6) | (1<<DDA5) | (1<<DDA4) | (0<<DDA3) | (0<<DDA2) | (0<<DDA1) | (0<<DDA0) );
     PORTA |= ((0<<PA7)   |  (0<<PA6)  |  (0<<PA5)  |  (0<<PA4)  |  (0<<PA3)  |  (0<<PA2)  |  (0<<PA1)  |  (0<<PA0)  );
 
-    DDRB  |= ((1<<DDB7) | (0<<DDB6) | (1<<DDB5) | (0<<DDB4) | (0<<DDB3) | (1<<DDB2) | (0<<DDB1) | (0<<DDB0) );
+    DDRB  |= ((1<<DDB7) | (0<<DDB6) | (0<<DDB5) | (0<<DDB4) | (0<<DDB3) | (0<<DDB2) | (1<<DDB1) | (1<<DDB0) );
     PORTB |= ((0<<PB7)   |  (0<<PB6)  |  (0<<PB5)  |  (0<<PB4)  |  (0<<PB3)  |  (0<<PB2)  |  (0<<PB1)  |  (0<<PB0)  );
 
-    DDRC  |= ((0<<DDC7) | (0<<DDC6) | (0<<DDC5) | (0<<DDC4) | (0<<DDC3) | (0<<DDC2) | (0<<DDC1) | (0<<DDC0) );
+    DDRC  |= ((0<<DDC7) | (0<<DDC6) | (1<<DDC5) | (0<<DDC4) | (0<<DDC3) | (0<<DDC2) | (0<<DDC1) | (0<<DDC0) );
     PORTC |= ((0<<PC7)   |  (0<<PC6)  |  (0<<PC5)  |  (0<<PC4)  |  (0<<PC3)  |  (0<<PC2)  |  (0<<PC1)  |  (0<<PC0)  );
 
     DDRD  |= ((0<<DDD7) | (0<<DDD6) | (1<<DDD5) | (1<<DDD4) | (0<<DDD3) | (0<<DDD2) | (0<<DDD1) | (0<<DDD0) );
@@ -67,6 +67,21 @@ void activate_wakeup_interrupt(void)
 void deactivate_wakeup_interrupt(void)
 {
 
+}
+
+static void interpret_message (uint16_t sender, uint8_t msglen, uint8_t* msg)
+{
+    switch (msg[0]) {
+    case eCMD_SLEEP:
+        activate_wakeup_interrupt();
+        LED_STATUS_OFF;
+        LED_ERROR_OFF;
+        bus_sleep(&g_bus);
+        deactivate_wakeup_interrupt();
+        break;
+    default:
+        break;
+    }
 }
 
 // --- Module global functions -------------------------------------------------
@@ -84,27 +99,32 @@ int main(void)
     clk_initialize();
     scomm_initialize_uart1(&g_serial_phy);
 
-    register_set_u8(MOD_eReg_ModuleID, 2);
+    //register_set_u8(MOD_eReg_ModuleID, 2);
     register_get(MOD_eReg_ModuleID, 0, &module_id);
     bus_configure(&g_bus, module_id);
     bus_initialize(&g_bus, 0);// initialize bus on UART 0
 
     sei();
-
-    clk_timer_start(&g_LED_timer, 100);
+    LED_STATUS_OFF;
     LED_ERROR_OFF;
+    clk_timer_start(&g_LED_timer, CLOCK_MS_2_TICKS(1000));
 
     while (1) {
         // check for message and read it
         if (bus_get_message(&g_bus)) {
             bgw_forward_bus_msg(&g_bus, &g_serial_phy);
-
             if (bus_read_message(&g_bus, &sender, &msglen, msg)) {
-              //  interpret_message(sender, msglen, msg);
+                interpret_message(sender, msglen, msg);
             }
-
         }
         bgw_forward_serial_msg(&g_bus, &g_serial_phy);
+
+        if (clk_timer_is_elapsed(&g_LED_timer)) {
+        	// cyclic reset of error LED
+            LED_ERROR_OFF;
+            LED_STATUS_TOGGLE;
+            clk_timer_start(&g_LED_timer, CLOCK_MS_2_TICKS(1000));
+        }
     }
     return 0;
 }

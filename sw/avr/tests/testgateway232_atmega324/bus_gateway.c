@@ -32,7 +32,8 @@ typedef enum bgw_state {
 
 // --- Local variables ---------------------------------------------------------
 
-static bgw_state_t  g_curr_state;
+static bgw_state_t      g_curr_state;
+static clock_timer_t	g_message_timeout;
 static uint8_t      g_curr_recv_h;
 static uint8_t      g_curr_recv_l;
 static uint8_t      g_curr_len;
@@ -212,7 +213,7 @@ void bgw_forward_serial_msg (sBus_t* bus, scomm_phy_t* rs232_phy)
         break;
 
     case eBGW_WAIT_COMPLETE:
-        // wait until complete message incuding newline is in the queue
+        // wait until complete message including newline is in the queue
         if (q_get_pending(&rs232_phy->recvQ) >= ((g_curr_len<<1) + 1)) {
             g_curr_state = eBGW_RECV;
         }
@@ -229,10 +230,10 @@ void bgw_forward_serial_msg (sBus_t* bus, scomm_phy_t* rs232_phy)
         num_bytes = q_get_pending(&rs232_phy->recvQ);
         while (num_bytes--) {
             if (q_get_byte(&rs232_phy->recvQ) == '\n') {
-                g_curr_state = eBGW_IDLE;
                 break;
             }
         }
+        g_curr_state = eBGW_IDLE;
         break;
     }
     serial_phy_check_q_level(rs232_phy);

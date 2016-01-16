@@ -25,7 +25,6 @@
 #define BUS_MESSAGE_TIMEOUT     50      //!< Timeout in ms between sent token and complete received message.
 #define BUS_ACK_TIMEOUT         30      //!< Timeout in ms between sent message and acknowledge byte.
 
-
 #define TOKENBIT 0x80
 #define ADDRMASK ~(TOKENBIT)
 

@@ -326,7 +326,7 @@ void bus_schedule_check_and_set_sleep (sBus_t* psBus)
     if (eMod_Sleeping == psBus->eModuleState) {
         if (bus_trp_send_sleepcmd(psBus)) {
             clk_control(FALSE); // disable clock-timer, otherwise
-                                 // irq will cause immediate wakeup.
+                                // IRQ will cause immediate wake-up.
 
             // sleep till byte is received.
 #ifdef PRJCONF_UC_AVR

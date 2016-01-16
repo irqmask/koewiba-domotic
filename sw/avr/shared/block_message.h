@@ -21,6 +21,7 @@ typedef struct block_data {
     uint16_t sender;
     uint16_t crc_host;
     uint16_t crc_local;
+    uint16_t last_offset;
     uint32_t received;
     uint8_t  additional_info1;
     uint8_t  additional_info2;

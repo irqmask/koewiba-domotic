@@ -23,9 +23,10 @@ typedef enum fwu_states {
     eFWU_IDLE,
     eFWU_START,
     eFWU_DATA,
-    eFWU_WAIT_INFO,
+    eFWU_WAIT_ACK,
     eFWU_END,
     eFWU_CRC_INFO,
+    eFWU_ERROR_ABORT,
     eFWU_LAST
 } fwu_states_t;
 
@@ -35,27 +36,30 @@ typedef struct firmwareupdate {
     msg_serial_t    msg_serial;         //!< Handle of the serial connection.
     char            filename[256];      //!< Path and filename to the IHEX file.
     uint16_t        module_address;     //!< target module address.
-    
-    uint8_t*        fw_memory;          //!< Pointer to the memory block wich 
+
+    uint8_t*        fw_memory;          //!< Pointer to the memory block wich
                                         //!< contains the target module's firmware.
     uint32_t        fw_firstaddress;    //!< First (lowest) address of the target
                                         //!< module's firmware.
-    uint32_t        fw_startaddress;    //!< Program entry point of the target's 
+    uint32_t        fw_startaddress;    //!< Program entry point of the target's
                                         //!< firmware.
     uint32_t        fw_size;            //!< Size on bytes of the firmware.
-    
-    uint32_t        curr_offset;        //!< Current offset in fw_memory during 
+
+    uint32_t        curr_offset;        //!< Current offset in fw_memory during
                                         //!< transmission.
-    uint32_t        node_curr_offset;   //!< Current offset in fw_memory during 
+    uint32_t        last_offset;        //!< Last offset in fw_memory during
                                         //!< transmission.
+    uint32_t        last_node_offset;   //!< Last offset which has been
+                                        //!< acknowledged by node.
+    uint32_t        last_node_address;  //!< Last used address in node.
     uint16_t        node_crc_expected;  //!< Checksum expected by node.
     uint16_t        node_crc_calculated;//!< Checksum calculated by node.
     uint8_t         block_info_received;//!< Flag if block_info message has been
-                                        //!< received. Reset by block_data and 
+                                        //!< received. Reset by block_data and
                                         //!< block_end message. Set by block_info
                                         //!< message.
 } firmwareupdate_t;
-    
+
 // --- Local variables ---------------------------------------------------------
 
 // --- Global variables --------------------------------------------------------
@@ -68,9 +72,9 @@ typedef struct firmwareupdate {
 
 // --- Global functions --------------------------------------------------------
 
-int firmware_update_init    (firmwareupdate_t*  fwu, 
+int firmware_update_init    (firmwareupdate_t*  fwu,
                              ioloop_t*          ioloop,
-                             const char*        device, 
+                             const char*        device,
                              int                baudrate);
 
 int firmware_update_start   (firmwareupdate_t*  fwu,

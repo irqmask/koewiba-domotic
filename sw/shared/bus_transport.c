@@ -91,7 +91,7 @@ static BOOL receive (sBus_t* psBus)
             // token received?
             if (u & TOKENBIT) {
                 // is it me?
-                if ((u & ADDRMASK) == (psBus->sCfg.uOwnNodeAddress & 0x007f)) {
+                if ((u & ADDRMASK) == (psBus->sCfg.uOwnNodeAddress & 0x007F)) {
                     psBus->eState = eBus_GotToken;
                 } else {
                     psBus->eState = eBus_Idle;
@@ -193,7 +193,7 @@ static BOOL receive (sBus_t* psBus)
                 psBus->msg_receive_state = eBUS_RECV_FOREIGN_MESSAGE;
                 reset_bus(psBus);
                 // wait for ACK of receiver of foreign message
-                clk_timer_start(&psBus->sAckTimeout, CLOCK_MS_2_TICKS(BUS_ACK_TIMEOUT));
+                clk_timer_start(&psBus->ack_timeout, CLOCK_MS_2_TICKS(BUS_ACK_TIMEOUT));
                 psBus->eState = eBus_AckWaitReceiving;
             }
         }
@@ -318,7 +318,7 @@ static void wait_for_ack_passive (sBus_t* psBus)
     uint8_t u;
 
     do {
-        if (clk_timer_is_elapsed(&psBus->sAckTimeout)) {
+        if (clk_timer_is_elapsed(&psBus->ack_timeout)) {
             // timeout. go back to idle
             reset_bus(psBus);
             break;

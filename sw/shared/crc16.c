@@ -103,7 +103,7 @@ uint16_t crc_16_next_byte (uint16_t old_crc, uint8_t new_byte)
  */
 uint16_t crc_calc16(uint8_t* data, uint8_t len)
 {
-    uint16_t crc = 0;
+    uint16_t crc = CRC_START_VALUE;
     uint8_t temp;
 
     while (len--) {

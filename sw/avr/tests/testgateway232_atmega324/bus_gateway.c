@@ -32,8 +32,7 @@ typedef enum bgw_state {
 
 // --- Local variables ---------------------------------------------------------
 
-static bgw_state_t      g_curr_state;
-static clock_timer_t	g_message_timeout;
+static bgw_state_t  g_curr_state;
 static uint8_t      g_curr_recv_h;
 static uint8_t      g_curr_recv_l;
 static uint8_t      g_curr_len;

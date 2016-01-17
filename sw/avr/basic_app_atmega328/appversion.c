@@ -25,21 +25,13 @@
 
 // Note: The linker sorts the variables upside down. app_controller_id begins at 
 //       the lowest address and app_version begins at the highest address.
-const unsigned char app_version[MOD_LEN_APPVER] __attribute__((section(".versioninfo"))) 
-                        = {6,0x07};
+const unsigned char app_versioninfo[MOD_LEN_CONTROLLERID + MOD_LEN_BOARDID + MOD_LEN_BOARDREV + MOD_LEN_APPID + MOD_LEN_APPVER] __attribute__((section(".versioninfo")))
+                        = {SIGNATURE_0,SIGNATURE_1,SIGNATURE_2,0x00,
+                           1,2,         // board ID
+                           1,           // board revision
+                           0,1,         // application ID
+                           0,0};        // application version
 
-const unsigned char app_id[MOD_LEN_APPID] __attribute__((section(".versioninfo"))) 
-                        = {4,0x05};
-
-const unsigned char app_board_rev[MOD_LEN_BOARDREV] __attribute__((section(".versioninfo"))) 
-                        = {3};
-
-const unsigned char app_board_id[MOD_LEN_BOARDID] __attribute__((section(".versioninfo"))) 
-                        = {1,0x02};
-
-const unsigned char app_controller_id[MOD_LEN_CONTROLLERID] __attribute__((section(".versioninfo"))) 
-                        = {SIGNATURE_0,SIGNATURE_1,SIGNATURE_2,0x00};
-                    
 // --- Module global variables -------------------------------------------------
 
 // --- Local functions ---------------------------------------------------------

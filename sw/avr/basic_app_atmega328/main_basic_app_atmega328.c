@@ -40,7 +40,6 @@ static clock_timer_t g_LED_timer;
 
 // --- Local functions ---------------------------------------------------------
 
-
 static void io_initialize(void)
 {
     DDRB  |= (                                                                                    (0<<DDB1)   | (1<<DDB0)  );
@@ -62,41 +61,9 @@ void deactivate_wakeup_interrupt(void)
 
 }
 
-
-// select a receiver address. selector is used to select between different
-// receivers per module.
-/* TODO remove. only for test purposes. static uint16_t get_receiver (uint8_t selector)
-{
-    if (selector == 1) {
-        if (g_bus.sCfg.uOwnNodeAddress == 10) return 11;
-        if (g_bus.sCfg.uOwnNodeAddress == 11) return 12;
-        if (g_bus.sCfg.uOwnNodeAddress == 12) return 10;
-
-        if (g_bus.sCfg.uOwnNodeAddress == 3) return 20;
-        if (g_bus.sCfg.uOwnNodeAddress == 5) return 21;
-        if (g_bus.sCfg.uOwnNodeAddress == 20) return 22;
-
-        if (g_bus.sCfg.uOwnNodeAddress == 21) return 22;
-        if (g_bus.sCfg.uOwnNodeAddress == 22) return 21;
-    } else if (selector == 2) {
-        if (g_bus.sCfg.uOwnNodeAddress == 10) return 0x0E; //14
-        if (g_bus.sCfg.uOwnNodeAddress == 11) return 5;
-        if (g_bus.sCfg.uOwnNodeAddress == 12) return 20;
-
-        if (g_bus.sCfg.uOwnNodeAddress == 3) return 5;
-        if (g_bus.sCfg.uOwnNodeAddress == 5) return 3;
-        if (g_bus.sCfg.uOwnNodeAddress == 20) return 12;
-
-        if (g_bus.sCfg.uOwnNodeAddress == 21) return 22;
-        if (g_bus.sCfg.uOwnNodeAddress == 22) return 21;
-    }
-    return 0;
-}*/
-
 static void interpret_message (uint16_t sender, uint8_t msglen, uint8_t* msg)
 {
     switch (msg[0]) {
-
     case eCMD_STATE_BITFIELDS:
         if (msglen < 2) break;
         if (msg[2]) LED_ERROR_ON;
@@ -104,7 +71,6 @@ static void interpret_message (uint16_t sender, uint8_t msglen, uint8_t* msg)
         break;
 
     case eCMD_REQUEST_REG:
-
         //if (TRUE != app_register_get(msg[1], &rtype, &val)) bus_send_nak_message(&g_bus, sender); break;
         //newmsg[0] = eCMD_STATE_8BIT + rtype-1;
         //newmsg[1] = regno;

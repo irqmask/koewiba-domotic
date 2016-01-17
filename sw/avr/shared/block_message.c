@@ -78,7 +78,6 @@ static BOOL process_eeprom_block_start (uint8_t msglen, uint8_t* msg)
 		g_bd.additional_info1 = 3;
 		return FALSE;
 	}
-  	//eep_check_statusregister(0);
     return TRUE;
 }
 
@@ -94,7 +93,7 @@ static BOOL process_eeprom_block_data (uint8_t msglen, uint8_t* msg)
     }
 
     g_bd.last_offset = (msg[1]<<8) | msg[2];
-    address16 = (uint16_t)(g_bd.startaddress + g_bd.last_offset) & 0x0000FFFF;
+    address16 = (uint16_t)(MOD_eExtEEPAddr_AppStart + g_bd.startaddress + g_bd.last_offset) & 0x0000FFFF;
     len = msglen-3;
     LED_STATUS_TOGGLE;
     if (len != eep_write(address16, len, &msg[3])) {
@@ -122,7 +121,9 @@ static BOOL process_eeprom_block_end (uint8_t msglen, uint8_t* msg)
     g_bd.crc_host = ((msg[1]<<8) | msg[2]);
 
     g_bd.crc_local = crc_16_start();
-	for (address_eeprom=0; address_eeprom<g_bd.blocksize; address_eeprom++) {
+	for (address_eeprom = MOD_eExtEEPAddr_AppStart;
+         address_eeprom<g_bd.blocksize + MOD_eExtEEPAddr_AppStart;
+         address_eeprom++) {
 		if (1 != eep_read(address_eeprom, 1, &byte)) {
 	    	g_bd.additional_info1 = 3;
 	    	g_bd.additional_info2 = 0;
@@ -133,6 +134,15 @@ static BOOL process_eeprom_block_end (uint8_t msglen, uint8_t* msg)
 	if (g_bd.crc_local != g_bd.crc_host) {
     	g_bd.additional_info1 = 4;
     	g_bd.additional_info2 = 0;
+		return FALSE;
+	}
+	// save length and crc in external EEPROM
+	if (MOD_LEN_APPSIZE != eep_write(MOD_eExtEEPAddr_AppSize, MOD_LEN_APPSIZE, (uint8_t*)&g_bd.blocksize)) {
+		g_bd.additional_info1 = 5;
+		return FALSE;
+	}
+	if (MOD_LEN_APPCRC != eep_write(MOD_eExtEEPAddr_AppCrc, MOD_LEN_APPCRC, (uint8_t*)&g_bd.crc_host)) {
+		g_bd.additional_info1 = 6;
 		return FALSE;
 	}
 	return TRUE;
@@ -165,7 +175,7 @@ BOOL block_message_start (sBus_t* bus, uint16_t sender, uint8_t msglen, uint8_t*
     return ret;
 }
 
-BOOL block_message_data(sBus_t* bus, uint16_t sender, uint8_t msglen, uint8_t* msg)
+BOOL block_message_data (sBus_t* bus, uint16_t sender, uint8_t msglen, uint8_t* msg)
 {
 	BOOL ret = TRUE;
 
@@ -195,7 +205,7 @@ BOOL block_message_data(sBus_t* bus, uint16_t sender, uint8_t msglen, uint8_t* m
     return ret;
 }
 
-BOOL block_message_end(sBus_t* bus, uint16_t sender, uint8_t msglen, uint8_t* msg)
+BOOL block_message_end (sBus_t* bus, uint16_t sender, uint8_t msglen, uint8_t* msg)
 {
 	BOOL ret = TRUE;
 
@@ -226,7 +236,7 @@ BOOL block_message_end(sBus_t* bus, uint16_t sender, uint8_t msglen, uint8_t* ms
     return ret;
 }
 
-void block_data_reset(void)
+void block_data_reset (void)
 {
     clk_timer_stop(&g_timer);
     g_bd.blocktype    = eSTORAGE_NONE;
@@ -246,7 +256,7 @@ void block_data_reset(void)
  *
  * @returns TRUE, if timer is active and time is over, otherwise false.
  */
-BOOL block_timer_elapsed(void)
+BOOL block_timer_elapsed (void)
 {
     return (clk_timer_is_running(&g_timer) && clk_timer_is_elapsed(&g_timer));
 }

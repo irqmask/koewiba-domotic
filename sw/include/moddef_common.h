@@ -19,8 +19,8 @@
 
 // --- Definitions -------------------------------------------------------------
 
-#define MOD_LEN_APPSIZE         4
-#define MOD_LEN_APPCRC          4
+#define MOD_LEN_APPSIZE         2
+#define MOD_LEN_APPCRC          2
 
 #define MOD_LEN_CONTROLLERID    4
 #define MOD_LEN_BOARDID         2
@@ -62,7 +62,6 @@ typedef enum {
     MOD_eCfg_BldFlag,                   //!< Storage for bootloader flags for
                                         //!< next reboot will be reset by the
                                         //!< bootloader.
-
     MOD_eCfg_FirstAppSpecific   = 16,
 } MOD_eCfgCommon_t;
 

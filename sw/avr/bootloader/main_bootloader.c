@@ -12,7 +12,6 @@
 #include <avr/eeprom.h>
 #include <avr/io.h>
 #include <avr/interrupt.h>
-#include <util/crc16.h>
 #include <util/delay.h>
 
 // include
@@ -21,6 +20,7 @@
 #include "ucontroller.h"
 
 // shared
+#include "crc16.h"
 #include "eeprom_spi.h"
 #include "spi.h"
 
@@ -120,9 +120,10 @@ BOOL check_crc (uint32_t* length)
     eep_read(MOD_eExtEEPAddr_AppCrc, 2, (uint8_t*)&crcexpected);
 
     // calculate CRC of EEProm content
+    crc = crc_16_start();
     for (ii=0; ii<*length; ii++) {
         eep_read(MOD_eExtEEPAddr_AppStart, 1, &byte);
-        crc = _crc16_update(crc, byte);
+        crc = crc_16_next_byte(crc, byte);
     }
     if (crc != crcexpected) return FALSE;
 
@@ -135,18 +136,18 @@ BOOL check_controller_id (void)
 
     eep_read(BLD_eExtEEPAddr_CtrlID + 0, 1, &eepcontent);
     sigbyte = boot_signature_byte_get(ADDR_SIGNATURE_BYTE0);
-    uart_put_hex(sigbyte);
-    //if (sigbyte != eepcontent) return FALSE;
+    //uart_put_hex(sigbyte);
+    if (sigbyte != eepcontent) return FALSE;
 
     eep_read(BLD_eExtEEPAddr_CtrlID + 1, 1, &eepcontent);
     sigbyte = boot_signature_byte_get(ADDR_SIGNATURE_BYTE1);
-    uart_put_hex(sigbyte);
-    //if (sigbyte != eepcontent) return FALSE;
+    //uart_put_hex(sigbyte);
+    if (sigbyte != eepcontent) return FALSE;
 
     eep_read(BLD_eExtEEPAddr_CtrlID + 2, 1, &eepcontent);
     sigbyte = boot_signature_byte_get(ADDR_SIGNATURE_BYTE2);
-    uart_put_hex(sigbyte);
-    //if (sigbyte != eepcontent) return FALSE;
+    //uart_put_hex(sigbyte);
+    if (sigbyte != eepcontent) return FALSE;
 
     return TRUE;
 }
@@ -283,12 +284,10 @@ int main ( void )
             bld_status &= ~(1<<eBldFlagAppProgram);
             eeprom_write_byte((uint8_t*)MOD_eReg_BldFlag, bld_status);
         } while ( FALSE );
-
     }
 
     // start application
     start();
-
     return 0;
 }
 

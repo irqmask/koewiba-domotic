@@ -18,6 +18,7 @@ SRC = ../shared/bus_transport.c \
       shared/led_debug.c \
       shared/register.c \
       basic_app_atmega328/appregister.c \
+      basic_app_atmega328/appversion.c \
       basic_app_atmega328/main_basic_app_atmega328.c
 
 # Place -I options here
@@ -29,7 +30,7 @@ INCDIRS = -I. \
 
 LOCAL_CFLAGS = -DF_CPU=7372800 -DHAS_PCBCONFIG_H -DHAS_APPCONFIG_H -D__AVR_ATmega328__
 LOCAL_ASFLAGS =
-LOCAL_LDFLAGS =
+LOCAL_LDFLAGS = -T ../include/avr5_kwb.x
 
 include ../buildscripts/lib/lib_build_avr.mk
 include ../buildscripts/lib/lib_program_avr.mk

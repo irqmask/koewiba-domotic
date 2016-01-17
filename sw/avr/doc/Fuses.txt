@@ -156,7 +156,7 @@ avrdude -p atmega88 -P usb -c avrisp2 -B 32 -U eeprom:w:atmega88_address12.hex:i
 
 ATTINY1634 (signature 1E 94 12)
 ====================================================================
-avrdude -p attiny1634 -P usb -c avrisp2 -B 32 -U lfuse:w:0xEC:m
+avrdude -p attiny1634 -P usb -c avrisp2 -B 32 -U lfuse:w:0xAD:m
 avrdude -p attiny1634 -P usb -c avrisp2 -B 32 -U hfuse:w:0xD5:m
-avrdude -p attiny1634 -P usb -c avrisp2 -B 32 -U efuse:w:0x07:m
+avrdude -p attiny1634 -P usb -c avrisp2 -B 32 -U efuse:w:0x1F:m
 

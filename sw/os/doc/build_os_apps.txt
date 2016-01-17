@@ -11,6 +11,7 @@ mkdir 3rd_party
  Verzeichnis kopieren.>
 cd 3rd_party
 
+# http://www.digip.org/jansson/
 tar -xzzf jansson-2.7.tar.gz
 mv jansson-2.7 jansson
 cd jansson
@@ -20,6 +21,7 @@ make
 sudo make install
 cd ..
 
+# http://sourceforge.net/projects/safeclib/
 tar -xzzf libsafec-10052013.tar.gz
 mv libsafec-10052013 libsafec
 cd libsafec
@@ -29,6 +31,8 @@ make
 sudo make install
 cd ..
 
+# update shared libraries
+ldconfig
 
 3. Koewiba Applikationen bauen
 # -------------------------------------------------------------------------------

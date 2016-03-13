@@ -5,7 +5,9 @@
  * @{
  * @file    bus_gateway.c
  * @brief   Gateway to transmit messages from bus to serial line and vice versa.
-
+ * Serial format of a message:
+ * [RECEIVER-ADDR][LENGTH][DATA]       [NEWLINE]
+ * [HH HL LH LL]  [H L]   [0..LENGTH-1][\n]
  * @author  Robert Mueller, Christian Verhalen
  *///---------------------------------------------------------------------------
 

@@ -9,16 +9,24 @@
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
 
-#ifndef _CRC16_H_
-#define _CRC16_H_
+#ifndef _CRC16_KWB_H_
+#define _CRC16_KWB_H_
 
 // --- Include section ---------------------------------------------------------
 
+#include "prjconf.h"
+#ifdef PRJCONF_UC_AVR
+#include <util/crc16.h>
+#endif
 #include "prjtypes.h"
 
 // --- Definitions -------------------------------------------------------------
 
-#define CRC_START_VALUE 0
+#define CRC_START_VALUE 0xFFFF
+
+#ifdef PRJCONF_UC_AVR
+#define crc_16_next_byte _crc16_update
+#endif
 
 // --- Type definitions --------------------------------------------------------
 
@@ -34,11 +42,11 @@
 
 // --- Global functions --------------------------------------------------------
 
-uint16_t crc_16_start (void);
-
+#ifndef PRJCONF_UC_AVR
 uint16_t crc_16_next_byte (uint16_t old_crc, uint8_t new_byte);
+#endif
 
 uint16_t crc_calc16 (uint8_t* data, uint8_t len);
 
-#endif /* _CRC16_H_ */
+#endif /* _CRC16_KWB_H_ */
 /** @} */

@@ -15,9 +15,9 @@
 #include "cmddef_common.h"
 #include "crc16.h"
 #include "eeprom_spi.h"
+#include "moddef_common.h"
 #include "prjtypes.h"
-
-#include "led_debug.h"
+#include "register.h"
 
 static clock_timer_t	g_timer; 	//!< transmission timer to detect timeouts
 static block_data_t   	g_bd; 		//!< status data of current_transmission
@@ -73,6 +73,7 @@ static BOOL process_eeprom_block_start (uint8_t msglen, uint8_t* msg)
     g_bd.startaddress   = ((uint32_t)msg[2]<<24) | ((uint32_t)msg[3]<<16) | ((uint32_t)msg[4]<<8) | (uint32_t)msg[5];
     g_bd.blocksize   	= ((uint32_t)msg[6]<<24) | ((uint32_t)msg[7]<<16) | ((uint32_t)msg[8]<<8) | (uint32_t)msg[9];
 
+    // check if data block fits in external EEProm
 	if (g_bd.startaddress >= EEPROM_SIZE ||
 		(EEPROM_SIZE - g_bd.startaddress) < g_bd.blocksize ) {
 		g_bd.additional_info1 = 3;
@@ -86,21 +87,29 @@ static BOOL process_eeprom_block_data (uint8_t msglen, uint8_t* msg)
     uint16_t address16;
     uint8_t  len     = 0;
 
+    // message has to contain at least command ID, and 2 bytes offset
     if (3 > msglen) {
     	g_bd.additional_info1 = 2;
     	g_bd.additional_info2 = msglen;
     	return FALSE;
     }
 
+    // get current offset from message and
+    // calculate current offset in external EEProm
     g_bd.last_offset = (msg[1]<<8) | msg[2];
     address16 = (uint16_t)(MOD_eExtEEPAddr_AppStart + g_bd.startaddress + g_bd.last_offset) & 0x0000FFFF;
+
+    // length of data if message length without command ID and 2 bytes offset
     len = msglen-3;
-    LED_STATUS_TOGGLE;
+
+    // copy data into external EEProm
     if (len != eep_write(address16, len, &msg[3])) {
         g_bd.additional_info1 = 3;
         g_bd.additional_info2 = len;
         return FALSE;
     }
+
+    // save highest address of written byte
     if (address16 + len - 1 > g_bd.received) {
         g_bd.received = address16 + len - 1;
     }
@@ -109,9 +118,10 @@ static BOOL process_eeprom_block_data (uint8_t msglen, uint8_t* msg)
 
 static BOOL process_eeprom_block_end (uint8_t msglen, uint8_t* msg)
 {
-    uint16_t address_eeprom;
+    uint16_t address_eeprom, size;
     uint8_t  byte;
 
+    // message has to contain at least command ID and CRC calculated by host-computer
     if (3 > msglen) {
     	g_bd.additional_info1 = 2;
     	g_bd.additional_info2 = msglen;
@@ -120,7 +130,8 @@ static BOOL process_eeprom_block_end (uint8_t msglen, uint8_t* msg)
 
     g_bd.crc_host = ((msg[1]<<8) | msg[2]);
 
-    g_bd.crc_local = crc_16_start();
+    // calculate CRC local
+    g_bd.crc_local = CRC_START_VALUE;
 	for (address_eeprom = MOD_eExtEEPAddr_AppStart;
          address_eeprom<g_bd.blocksize + MOD_eExtEEPAddr_AppStart;
          address_eeprom++) {
@@ -137,7 +148,8 @@ static BOOL process_eeprom_block_end (uint8_t msglen, uint8_t* msg)
 		return FALSE;
 	}
 	// save length and crc in external EEPROM
-	if (MOD_LEN_APPSIZE != eep_write(MOD_eExtEEPAddr_AppSize, MOD_LEN_APPSIZE, (uint8_t*)&g_bd.blocksize)) {
+	size = (uint16_t)g_bd.blocksize;
+	if (MOD_LEN_APPSIZE != eep_write(MOD_eExtEEPAddr_AppSize, MOD_LEN_APPSIZE, (uint8_t*)&size)) {
 		g_bd.additional_info1 = 5;
 		return FALSE;
 	}
@@ -145,6 +157,9 @@ static BOOL process_eeprom_block_end (uint8_t msglen, uint8_t* msg)
 		g_bd.additional_info1 = 6;
 		return FALSE;
 	}
+	// set flag that controller is reprogrammed after next reset
+	register_set_u8(MOD_eReg_BldFlag, (1<<eBldFlagAppProgram));
+
 	return TRUE;
 }
 

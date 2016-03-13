@@ -74,7 +74,7 @@ static uint16_t calculate_crc16 (firmwareupdate_t* fwu)
     uint32_t ii;
     uint16_t crc;
 
-    crc = crc_16_start();
+    crc = CRC_START_VALUE;
     for (ii=0; ii<fwu->fw_size; ii++) {
         crc = crc_16_next_byte(crc, fwu->fw_memory[ii]);
     }

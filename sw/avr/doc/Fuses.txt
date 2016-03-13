@@ -87,30 +87,36 @@ Low Fuse:   0b11011111 = 0xDF
                     ^--------- CKSEL1    1
                      ^-------- CKSEL0    1 CKSEL3:0 = 1111External crystal/resonator high frequency; Start-up time: 16K CK + 64ms
 
-High Fuse:  0b11010101 = 0xD5
+High Fuse:  0b11010010 = 0xD2
               ^--------------- RSTDISBL  1 = disabled: reset is enabled
                ^-------------- DWEN      1 = disabled: debug wire
                 ^------------- SPIEN     0 = enabled: SPI programming
                  ^------------ WDTON     1 = disabled: Watchdogtime alwys on
                   ^----------- EESAVE    0 = enabled: EEProm memory preserve through chip erase
+                   ^---------- BOOTSZ1   0
+                    ^--------- BOOTSZ0   1 = BOOTSZ1:0 = 01 = 1024 words for bootloader. appflash 0000-77FF, bootflash 7800-7FFF
+                     ^-------- BOOTRST   0 = Reset vector points to application(1) or bootloader(0)
+
+Ext. Fuse:  0b00000001 = 0x05
+              ^--------------- -         x
+               ^-------------- -         x
+                ^------------- -         x
+                 ^------------ -         x
+                  ^----------- -         x
                    ^---------- BODLEVEL2 1
                     ^--------- BODLEVEL1 0
                      ^-------- BODLEVEL0 1 = 101 Brown-out level 2,7V
 
-Ext. Fuse:  0b00000001 = 0x01
-              ^--------------- -        x
-               ^-------------- -        x
-                ^------------- -        x
-                 ^------------ -        x
-                  ^----------- -        x
-                   ^---------- BOOTSZ1  0
-                    ^--------- BOOTSZ0  0 = BOOTSZ1:0 = 00 = 1024 words for bootloader. appflash 0000-3BFF, bootflash 3C00-3FFF
-                     ^-------- BOOTRST  1 = Reset vector points to application(1) or bootloader(0)
-
 Fuse Bytes programmieren mit AVR-Dude:
+Without bootloader:
 avrdude -p atmega328p -P usb -c avrisp2 -B 32 -U lfuse:w:0xDF:m
-avrdude -p atmega328p -P usb -c avrisp2 -B 32 -U hfuse:w:0xD5:m
-avrdude -p atmega328p -P usb -c avrisp2 -B 32 -U efuse:w:0x01:m
+avrdude -p atmega328p -P usb -c avrisp2 -B 32 -U hfuse:w:0xD3:m
+avrdude -p atmega328p -P usb -c avrisp2 -B 32 -U efuse:w:0x05:m
+With bootloader:
+avrdude -p atmega328p -P usb -c avrisp2 -B 32 -U lfuse:w:0xDF:m
+avrdude -p atmega328p -P usb -c avrisp2 -B 32 -U hfuse:w:0xD2:m
+avrdude -p atmega328p -P usb -c avrisp2 -B 32 -U efuse:w:0x05:m
+
 
 
 ATMEGA324P (signature 1E 95 08)
@@ -132,7 +138,7 @@ High Fuse:  0b11010010 = 0xD2
                  ^------------ WDTON    1 = disabled watchdog timer always on
                   ^----------- EESAVE   0 = enabled EEProm memory preserve through chip erase
                    ^---------- BOOTSZ1  0
-                    ^--------- BOOTSZ0  1 = BOOTSZ1:0 = 01 = 1024 words for bootloader. appflash 0000-3BFF, bootflash 3C00-3FFF
+                    ^--------- BOOTSZ0  1 = BOOTSZ1:0 = 01 = 1024 words for bootloader. appflash 0000-77FF, bootflash 7800-7FFF
                      ^-------- BOOTRST  0 = Reset vector points to bootloader
 
 Ext. Fuse:  0b11111111 = 0xFF

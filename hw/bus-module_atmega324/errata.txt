@@ -1,0 +1,5 @@
+Revision A:
+-------------------
+- BTX and BTXEN inputs are floating. Shall have pull-down resistors ~10k to assure proper level. The missing pull-down resistor leads to bus-message errors.
+- The revision is not printed on a copper layer. At least one but better the top and bottom shall have revision number, which is still readable when all connectors are in place.
+

@@ -23,7 +23,7 @@ LOCAL_CFLAGS = -DF_CPU=7372800 -DHAS_PCBCONFIG_H
 LOCAL_ASFLAGS =
 
 # Modified linker flags for bootloader!
-#  for ATMEGA32 / 324: -Ttext=0x7800
+#  for ATMEGA328 / 324: -Ttext=0x7800
 # Addressrange in words:
 # $0000 - $3BFF
 # $3C00 - $3FFF

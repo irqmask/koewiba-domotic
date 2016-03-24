@@ -14,9 +14,10 @@ SRC = ../shared/bus_transport.c \
       shared/bus_phy.c \
       shared/clock.c \
       shared/led_debug.c \
+      shared/main_avr.c \
       shared/register.c \
-      tests/elektor_bus-node_atmega88/appregister.c \
-      tests/elektor_bus-node_atmega88/main_elektor_bus-node.c
+      tests/elektor_bus-node_atmega88/application.c \
+      tests/elektor_bus-node_atmega88/appregister.c
 
 # Place -I options here
 INCDIRS = -I. \
@@ -26,7 +27,7 @@ INCDIRS = -I. \
           -I../../../shared
 
 
-LOCAL_CFLAGS = -DF_CPU=16000000 -DHAS_PCBCONFIG_H -DHAS_APPCONFIG_H
+LOCAL_CFLAGS = -DF_CPU=16000000 -DHAS_PCBCONFIG_H -DHAS_APPCONFIG_H -DNO_BLOCK_MESSAGE -DNO_EEPROM_SPI
 LOCAL_ASFLAGS =
 LOCAL_LDFLAGS =
 

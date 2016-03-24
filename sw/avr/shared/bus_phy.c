@@ -20,10 +20,6 @@
 #include "pcbconfig.h"
 #include "prjtypes.h"
 
-// --- Switches ----------------------------------------------------------------
-
-#define sw_recvlisten FALSE
-
 // --- Definitions -------------------------------------------------------------
 
 #define UBRRVAL ((uint16_t)(((F_CPU / (16.0 * BUS_BAUDRATE)) - 1.0) + 0.5))
@@ -186,7 +182,7 @@ void bus_phy_initialize(sBusPhy_t* psPhy, uint8_t uUart)
     }
 #endif
 
-    // sender is initial off, receiver is always on.
+    // sender is initial off, receiver is on.
     bus_phy_activate_sender(psPhy, FALSE);
 #ifdef TXRXEN0_SEPERATE
     bus_phy_activate_receiver(psPhy, TRUE);
@@ -202,7 +198,7 @@ void bus_phy_initialize(sBusPhy_t* psPhy, uint8_t uUart)
  */
 void bus_phy_activate_sender(sBusPhy_t* psPhy, BOOL bActivate)
 {
-    if ((!sw_recvlisten) && bActivate) bus_phy_activate_receiver(psPhy, FALSE);
+    bus_phy_activate_receiver(psPhy, !bActivate);
     if (0==psPhy->uUart) {
         if (bActivate)  BUS_PORT_ENASND0 |=  (1<<BUS_ENASND0);
         else            BUS_PORT_ENASND0 &= ~(1<<BUS_ENASND0);
@@ -213,12 +209,10 @@ void bus_phy_activate_sender(sBusPhy_t* psPhy, BOOL bActivate)
         else            BUS_PORT_ENASND1 &= ~(1<<BUS_ENASND1);
     }
 #endif
-
-    if ((!sw_recvlisten) && !bActivate) bus_phy_activate_receiver(psPhy, TRUE);
 }
 
 /**
- * Activate or deactivate bus's receiver hardware.
+ * Activate or de-activate bus's receiver hardware.
  *
  * @param[in] psPhy     Handle of bus physical layer.
  * @param[in] bActivate
@@ -361,7 +355,6 @@ void bus_phy_flush(sBusPhy_t* psPhy)
 
 // --- Global functions --------------------------------------------------------
 
-
 /*
 void bus_debug_send(uint8_t *data, uint8_t len)
 {
@@ -380,5 +373,6 @@ void bus_debug_send(uint8_t *data, uint8_t len)
 	REGISTER_UCSRB |= (1<<REGBIT_TXCIE);
 }
 */
+
 /** @} */
 /** @} */

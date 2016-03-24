@@ -1,6 +1,6 @@
 MCU = atmega328p
 FORMAT = ihex
-TARGET = test_bus-module_atmega328
+TARGET = test_bus-module_atmega328p
 
 ROOTDIR = $(subst \,/,$(shell pwd))/../..
 include ../../buildscripts/lib/lib_outputdirs.mk
@@ -17,8 +17,8 @@ SRC = ../shared/bus_transport.c \
       shared/eeprom_spi.c \
       shared/led_debug.c \
       shared/register.c \
-      tests/test_bus-module_atmega328/appregister.c \
-      tests/test_bus-module_atmega328/main_test_bus-module_atmega328.c
+      tests/test_bus-module_atmega328p/appregister.c \
+      tests/test_bus-module_atmega328p/main_test_bus-module_atmega328.c
 
 # Place -I options here
 INCDIRS = -I. \

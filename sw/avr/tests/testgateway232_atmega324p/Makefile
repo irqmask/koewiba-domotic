@@ -1,6 +1,6 @@
 MCU = atmega324p
 FORMAT = ihex
-TARGET = testgateway232_atmega324
+TARGET = testgateway232_atmega324p
 
 ROOTDIR = $(subst \,/,$(shell pwd))/../..
 include ../../buildscripts/lib/lib_outputdirs.mk
@@ -14,10 +14,10 @@ SRC = ../shared/bus_transport.c \
       shared/bus_phy.c \
       shared/clock.c \
       shared/register.c \
-      tests/testgateway232_atmega324/appregister.c \
-      tests/testgateway232_atmega324/bus_gateway.c \
-      tests/testgateway232_atmega324/main_gateway.c \
-      tests/testgateway232_atmega324/serialcomm.c \
+      tests/testgateway232_atmega324p/appregister.c \
+      tests/testgateway232_atmega324p/bus_gateway.c \
+      tests/testgateway232_atmega324p/main_gateway.c \
+      tests/testgateway232_atmega324p/serialcomm.c \
 
 # Place -I options here
 INCDIRS = -I. \

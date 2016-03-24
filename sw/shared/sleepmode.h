@@ -27,8 +27,14 @@
 // --- Definitions -------------------------------------------------------------
 
 #ifdef PRJCONF_UC_AVR
-#define sleep_pinchange2_enable()   PCICR |=  (1<<PCIE2)
-#define sleep_pinchange2_disable()  PCICR &= ~(1<<PCIE2)
+
+#ifdef __AVR_ATtiny1634__
+ #define sleep_pinchange2_enable()   GIMSK |=  (1<<PCIE2)
+ #define sleep_pinchange2_disable()  GIMSK &= ~(1<<PCIE2)
+#else
+ #define sleep_pinchange2_enable()   PCICR |=  (1<<PCIE2)
+ #define sleep_pinchange2_disable()  PCICR &= ~(1<<PCIE2)
+#endif
 // future use
 //#define sleep_pinchange2_enable()   PINCHGIR_REGISTER |=  PCIE_BITS
 //#define sleep_pinchange2_disable()  PINCHGIR_REGISTER &= ~PCIE_BITS

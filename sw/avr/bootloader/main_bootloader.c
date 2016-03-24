@@ -3,7 +3,7 @@
  *
  * @{
  * @file    main_bootloader.c
- * @brief   Bootloader TODO CV
+ * @brief   Common bootloader code for atmega328, atmega324 and attiny1634.
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
 

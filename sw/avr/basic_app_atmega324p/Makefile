@@ -16,10 +16,11 @@ SRC = ../shared/bus_transport.c \
       shared/clock.c \
       shared/eeprom_spi.c \
       shared/led_debug.c \
+      shared/main_avr.c \
       shared/register.c \
+      basic_app_atmega324p/application.c \
       basic_app_atmega324p/appregister.c \
-      basic_app_atmega324p/appversion.c \
-      basic_app_atmega324p/main_basic_app_atmega324.c
+      basic_app_atmega324p/appversion.c
 
 # Place -I options here
 INCDIRS = -I. \

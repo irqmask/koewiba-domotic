@@ -1,11 +1,11 @@
 /**
- * @addtogroup ROOMTHERMOSTATE
+ * @addtogroup BASIC_ATMEGA328
  * @addtogroup APPREGISTER
- * @brief Registers of the application roomthermostate.
+ * @brief Registers of the application "basic_app_atmega328".
  *
  * @{
  * @file    appregister.h
- * @brief   Registers of the application roomthermostate.
+ * @brief   Registers of the application "basic_app_atmega328".
  *
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------

@@ -1,11 +1,11 @@
 /**
- * @addtogroup ROOMTHERMOSTATE_ATMEGA324
- * @addtogroup ROOMTHERMOSTATE_ATMEGA324_APPVERSION
- * @brief Version information of "roomthermostate" project.
+ * @addtogroup BASIC_ATMEGA328
+ * @addtogroup APPVERSION
+ * @brief Version information of "basic_app_atmega328" project.
  *
  * @{
  * @file    appversion.c
- * @brief   Version information of "roomthermostate" project.
+ * @brief   Version information of "basic_app_atmega328" project.
  *
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------

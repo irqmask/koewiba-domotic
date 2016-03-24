@@ -17,14 +17,20 @@
 
 #include <avr/interrupt.h>
 
-#include "block_message.h"
 #include "bus.h"
 #include "clock.h"
 #include "cmddef_common.h"
-#include "eeprom_spi.h"
 #include "moddef_common.h"
 #include "queue.h"
 #include "register.h"
+#include "sleepmode.h"
+
+#ifndef NO_BLOCK_MESSAGE
+ #include "block_message.h"
+#endif
+#ifndef NO_EEPROM_SPI
+ #include "eeprom_spi.h"
+#endif
 
 // --- Definitions -------------------------------------------------------------
 
@@ -32,20 +38,24 @@
 
 // --- Local variables ---------------------------------------------------------
 
-static sBus_t      g_bus;
-
 // --- Global variables --------------------------------------------------------
+
+sBus_t  g_bus;
 
 // --- Module global variables -------------------------------------------------
 
 // --- Local functions ---------------------------------------------------------
-
 
 extern void app_init (void);
 
 extern void app_on_command (uint16_t sender, uint8_t msglen, uint8_t* msg);
 
 extern void app_background (void);
+
+ISR(INTERRUPT_PINCHANGE2)
+{
+
+}
 
 static inline void interpret_message (uint16_t sender, uint8_t msglen, uint8_t* msg)
 {
@@ -64,6 +74,7 @@ static inline void interpret_message (uint16_t sender, uint8_t msglen, uint8_t* 
     case eCMD_SET_REG_32BIT:
         break;
 
+#ifndef NO_BLOCK_MESSAGE
     case eCMD_BLOCK_START:
         block_message_start(&g_bus, sender, msglen, msg);
         break;
@@ -76,9 +87,12 @@ static inline void interpret_message (uint16_t sender, uint8_t msglen, uint8_t* 
     case eCMD_BLOCK_RESET:
         block_data_reset();
         break;
+#endif
 
     case eCMD_SLEEP:
+        sleep_pinchange2_enable();
         bus_sleep(&g_bus);
+        sleep_pinchange2_disable();
         break;
 
     default:
@@ -103,8 +117,10 @@ int main(void)
     bus_configure(&g_bus, module_id);
     bus_initialize(&g_bus, 0);// initialize bus on UART 0
 
+#ifndef NO_EEPROM_SPI
     spi_master_init_blk();
     eep_initialize();
+#endif
 
     app_init();
 

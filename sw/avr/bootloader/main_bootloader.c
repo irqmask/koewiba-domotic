@@ -12,7 +12,6 @@
 #include <avr/eeprom.h>
 #include <avr/io.h>
 #include <avr/interrupt.h>
-#include <util/delay.h>
 
 // include
 #include "moddef_common.h"
@@ -24,7 +23,47 @@
 #include "eeprom_spi.h"
 #include "spi.h"
 
+#ifdef HAS_PCBCONFIG_H
+ #include "pcbconfig.h"
+#endif
+
+#ifdef DEBUG_LED_OUTPUT
+ #include <util/delay.h>
+#endif
+
 // --- Definitions -------------------------------------------------------------
+
+#ifdef DEBUG_LED_OUTPUT
+ #define DBG_INIT()         DBG_DDR |= DBG_ALL_MASK;  \
+                            DBG_PORT &= ~DBG_ALL_MASK; \
+                            _delay_ms(1000);
+ #define DBG_SET_PIN0()     DBG_PORT |= (1<<DBG_0_PIN); \
+                            _delay_ms(500);
+ #define DBG_SET_PIN1()     DBG_PORT |= (1<<DBG_1_PIN); \
+                            _delay_ms(500);
+ #define DBG_SET_PIN2()     DBG_PORT |= (1<<DBG_2_PIN); \
+                            _delay_ms(500);
+ #define DBG_SET_PIN3()     DBG_PORT |= (1<<DBG_3_PIN); \
+                            _delay_ms(500);
+ #define DBG_SET_PIN4()     DBG_PORT |= (1<<DBG_4_PIN); \
+                            _delay_ms(500);
+ #define DBG_SET_PIN5()     DBG_PORT |= (1<<DBG_5_PIN); \
+                            _delay_ms(500);
+ #define DBG_ALL_ON()       DBG_PORT |= DBG_ALL_MASK; \
+                            _delay_ms(300);
+ #define DBG_ALL_OFF()      DBG_PORT &= ~DBG_ALL_MASK; \
+                            _delay_ms(300);
+#else
+ #define DBG_INIT()
+ #define DBG_SET_PIN0()
+ #define DBG_SET_PIN1()
+ #define DBG_SET_PIN2()
+ #define DBG_SET_PIN3()
+ #define DBG_SET_PIN4()
+ #define DBG_SET_PIN5()
+ #define DBG_ALL_ON()
+ #define DBG_ALL_OFF()
+#endif
 
 // --- Type definitions --------------------------------------------------------
 
@@ -155,10 +194,7 @@ int main ( void )
     register uint8_t temp, tempSREG;
     void (*start) ( void ) = (void*) 0x0000; // function pointer to application code
 
-    //TODO remove after debug
-    DDRC = 0x3F;
-    PORTC = 0;
-    _delay_ms(1000);
+    DBG_INIT();
 
     // disable all interrupts
     cli();
@@ -185,25 +221,19 @@ int main ( void )
 
     if (bld_status & (1<<eBldFlagAppProgram)) {
         bld_status &= ~(1<<eBldFlagAppProgram);
-        //TODO remove after debug
-    	PORTC |= (1<<0);
-        _delay_ms(1000);
+        DBG_SET_PIN0();
         do {
             // check external EEProm
             if (!check_crc(&length)) {
                 bld_status |= (1 << eBldFlagCRCMismatch);
                 break;
             }
-            //TODO remove after debug
-        	PORTC |= (1<<1);
-        	_delay_ms(1000);
+            DBG_SET_PIN1();
 
             // check controller
             if (!check_controller_id()) {
                 bld_status |= (1 << eBldFlagControllerTypeMismatch);
-                //TODO remove after debug
-                PORTC |= (1<<5);
-                _delay_ms(1000);
+                DBG_SET_PIN5();
                 break;
             }
 
@@ -223,14 +253,12 @@ int main ( void )
                 bld_status |= (1 << eBldFlagAppVersionChanged);
             }
 
-            //TODO remove after debug
-            PORTC |= (1<<2);
-            _delay_ms(1000);
+            DBG_SET_PIN2();
+
             // flash new application
             program_flash(0, length);
-            //TODO remove after debug
-            PORTC |= (1<<3);
-            _delay_ms(1000);
+
+            DBG_SET_PIN3();
 
             bld_status |= (1 << eBldFlagNewSWProgrammed);
             // re-enable RWW-section again. We need this if we want to jump back
@@ -239,23 +267,15 @@ int main ( void )
         } while ( FALSE );
         eeprom_write_byte(&g_reg_internal_eep[MOD_eCfg_BldFlag], bld_status);
     }
-    // debug code. TODO remove when bootloader code is finally stable
-    /*PORTC |= (1<<4);
-    _delay_ms(1000);
-    PORTC &= 0xC0;
-    _delay_ms(500);
-    PORTC |= 0x3F;
-    _delay_ms(500);
-    PORTC &= 0xC0;
-    _delay_ms(500);
-    PORTC |= 0x3F;
-    _delay_ms(500);
-    PORTC &= 0xC0;
-    _delay_ms(500);
-    PORTC |= 0x3F;
-    _delay_ms(500);
-    PORTC &= 0xC0;
-    _delay_ms(500);*/
+    DBG_SET_PIN4();
+
+    DBG_ALL_OFF();
+    DBG_ALL_ON();
+    DBG_ALL_OFF();
+    DBG_ALL_ON();
+    DBG_ALL_OFF();
+    DBG_ALL_ON();
+    DBG_ALL_OFF();
 
     // restore interrupt vector table
     cli();

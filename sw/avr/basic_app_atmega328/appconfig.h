@@ -1,10 +1,11 @@
 /**
- * @addtogroup TESTSCHEDULER_APPCONFIG
- * @brief Configuration of modules used in "testscheduler" project.
+ * @addtogroup BASIC_ATMEGA328
+ * @addtogroup APPCONFIG
+ * @brief Configuration of modules used in "basic_atmega328" project.
  *
  * @{
  * @file    appconfig.h
- * @brief   Configuration of modules used in "testscheduler" project.
+ * @brief   Configuration of modules used in "basic_atmega328" project.
  *
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------

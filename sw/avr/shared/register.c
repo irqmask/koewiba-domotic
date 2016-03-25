@@ -46,23 +46,23 @@ uint8_t register_eeprom_array[APP_eCfg_Last] EEMEM;
  * @param[in] uSender
  * Sender of the request message.
  */
-static void answer_register_request (sBus_t*                psBus,
-                                     uint8_t                uRegNo,
-                                     uint16_t               uSender)
+static void answer_register_request (sBus_t*                bus,
+                                     uint8_t                reg_no,
+                                     uint16_t               sender)
 {
     uint32_t    value;
     eRegType_t  regtype = eRegType_Unkown;
 
-    value = register_get(uRegNo, &regtype, &value);
+    value = register_get(reg_no, &regtype, &value);
     switch (regtype) {
     case eRegType_U8:
-        register_send_u8(psBus, uSender, uRegNo, (uint8_t)(value & 0x000000FF));
+        register_send_u8(bus, sender, reg_no, (uint8_t)(value & 0x000000FF));
         break;
     case eRegType_U16:
-        register_send_u16(psBus, uSender, uRegNo, (uint16_t)(value & 0x0000FFFF));
+        register_send_u16(bus, sender, reg_no, (uint16_t)(value & 0x0000FFFF));
         break;
     case eRegType_U32:
-        register_send_u32(psBus, uSender, uRegNo, value);
+        register_send_u32(bus, sender, reg_no, value);
         break;
     default:
         break;
@@ -71,79 +71,80 @@ static void answer_register_request (sBus_t*                psBus,
 
 // --- Module global functions -------------------------------------------------
 
-extern BOOL app_register_get        (uint8_t                uRegNo,
-                                     eRegType_t*            peRegType,
-                                     void*                  pvValue);
-extern void app_register_set        (uint8_t                uRegNo,
-                                     uint32_t               uValue);
+extern BOOL app_register_get        (uint8_t                reg_no,
+                                     eRegType_t*            reg_type,
+                                     void*                  value);
+
+extern void app_register_set        (uint8_t                reg_no,
+                                     uint32_t               value);
 
 // --- Global functions --------------------------------------------------------
 
-BOOL        register_get            (uint8_t                uRegNo,
-                                     eRegType_t*            peRegType,
-                                     void*                  pvValue)
+BOOL        register_get            (uint8_t                reg_no,
+                                     eRegType_t*            reg_type,
+                                     void*                  value)
 {
-    eRegType_t  regtype;
+    eRegType_t  l_regtype;
 
-    if (peRegType == NULL) peRegType = &regtype;
-    if (pvValue == NULL) return FALSE;
+    if (reg_type == NULL) reg_type = &l_regtype;
+    if (value == NULL) return FALSE;
 
-    switch (uRegNo) {
+    switch (reg_no) {
     // registers saved in EEProm
     case MOD_eReg_ModuleID:
-        *peRegType = eRegType_U16;
-        *(uint16_t*)pvValue = eeprom_read_word((uint16_t*)&register_eeprom_array[MOD_eCfg_ModuleID]);
+        *reg_type = eRegType_U16;
+        *(uint16_t*)value = eeprom_read_word((uint16_t*)&register_eeprom_array[MOD_eCfg_ModuleID]);
         break;
 
     case MOD_eReg_BldFlag:
-        *peRegType = eRegType_U8;
-        *(uint8_t*)pvValue = eeprom_read_byte(&register_eeprom_array[MOD_eCfg_BldFlag]);
+        *reg_type = eRegType_U8;
+        *(uint8_t*)value = eeprom_read_byte(&register_eeprom_array[MOD_eCfg_BldFlag]);
         break;
 
     // registers in ROM/RAM
     case MOD_eReg_DeviceSignature0:
-        *peRegType = eRegType_U8;
-        *(uint8_t*)pvValue = boot_signature_byte_get(ADDR_SIGNATURE_BYTE0);
+        *reg_type = eRegType_U8;
+        *(uint8_t*)value = boot_signature_byte_get(ADDR_SIGNATURE_BYTE0);
         break;
 
     case MOD_eReg_DeviceSignature1:
-        *peRegType = eRegType_U8;
-        *(uint8_t*)pvValue = boot_signature_byte_get(ADDR_SIGNATURE_BYTE1);
+        *reg_type = eRegType_U8;
+        *(uint8_t*)value = boot_signature_byte_get(ADDR_SIGNATURE_BYTE1);
         break;
 
     case MOD_eReg_DeviceSignature2:
-        *peRegType = eRegType_U8;
-        *(uint8_t*)pvValue = boot_signature_byte_get(ADDR_SIGNATURE_BYTE2);
+        *reg_type = eRegType_U8;
+        *(uint8_t*)value = boot_signature_byte_get(ADDR_SIGNATURE_BYTE2);
         break;
 
     case MOD_eReg_BoardID:
-        *peRegType = eRegType_U8;
-        *(uint8_t*)pvValue = 0; //TODO CV: implement
+        *reg_type = eRegType_U8;
+        *(uint8_t*)value = 0; //TODO CV: implement
         break;
 
     case MOD_eReg_AppID:
-        *peRegType = eRegType_U8;
-        *(uint8_t*)pvValue = 0; //TODO CV: implement
+        *reg_type = eRegType_U8;
+        *(uint8_t*)value = 0; //TODO CV: implement
         break;
 
     case MOD_eReg_AppVersionMajor:
-        *peRegType = eRegType_U8;
-        *(uint8_t*)pvValue = 0; //TODO CV: implement
+        *reg_type = eRegType_U8;
+        *(uint8_t*)value = 0; //TODO CV: implement
         break;
 
     case MOD_eReg_AppVersionMinor:
-        *peRegType = eRegType_U8;
-        *(uint8_t*)pvValue = 0; //TODO CV: implement
+        *reg_type = eRegType_U8;
+        *(uint8_t*)value = 0; //TODO CV: implement
         break;
 
     case MOD_eReg_AppVersionBugfix:
-        *peRegType = eRegType_U8;
-        *(uint8_t*)pvValue = 0; //TODO CV: implement
+        *reg_type = eRegType_U8;
+        *(uint8_t*)value = 0; //TODO CV: implement
         break;
 
     // application specific registers
     default:
-        return app_register_get(uRegNo, peRegType, pvValue);
+        return app_register_get(reg_no, reg_type, value);
     }
     return TRUE;
 }
@@ -157,20 +158,20 @@ BOOL        register_get            (uint8_t                uRegNo,
  * @note If the value provided is greater than register width, e.g. uValue is
  * 16bit, register is 8bit, only the lower byte of uValue is used.
  */
-void        register_set            (uint8_t                uRegNo,
-                                     uint32_t               uValue)
+void        register_set            (uint8_t                reg_no,
+                                     uint32_t               value)
 {
     uint16_t    tempval16;
     uint8_t     tempval;
 
-    switch (uRegNo) {
+    switch (reg_no) {
     // registers saved in EEProm
     case MOD_eReg_ModuleID:
-        tempval16 = (uint16_t)(uValue & 0x0000FFFF);
+        tempval16 = (uint16_t)(value & 0x0000FFFF);
         eeprom_write_word((uint16_t*)&register_eeprom_array[MOD_eCfg_ModuleID], tempval16);
         break;
     case MOD_eReg_BldFlag:
-        tempval = (uint8_t)(uValue & 0x000000FF);
+        tempval = (uint8_t)(value & 0x000000FF);
         eeprom_write_byte(&register_eeprom_array[MOD_eCfg_BldFlag], tempval);
         break;
 
@@ -178,70 +179,70 @@ void        register_set            (uint8_t                uRegNo,
 
     // application registers
     default:
-        app_register_set(uRegNo, uValue);
+        app_register_set(reg_no, value);
         break;
     }
 }
 
-void        register_set_u8         (uint8_t                uRegNo,
-                                     uint8_t                uValue)
+void        register_set_u8         (uint8_t                reg_no,
+                                     uint8_t                value)
 {
-    register_set(uRegNo, uValue);
+    register_set(reg_no, value);
 }
 
-void        register_set_u16        (uint8_t                uRegNo,
-                                     uint16_t               uValue)
+void        register_set_u16        (uint8_t                reg_no,
+                                     uint16_t               value)
 {
-    register_set(uRegNo, uValue);
+    register_set(reg_no, value);
 }
 
-void        register_set_u32        (uint8_t                uRegNo,
-                                     uint32_t               uValue)
+void        register_set_u32        (uint8_t                reg_no,
+                                     uint32_t               value)
 {
-    register_set (uRegNo, uValue);
+    register_set (reg_no, value);
 }
 
 /**
  * Command interpreter for register commands.
  */
-void        register_do_command     (sBus_t*                psBus,
-                                     uint8_t*               puMsg,
-                                     uint8_t                uMsgLen,
-                                     uint16_t               uSender)
+void        register_do_command     (sBus_t*                bus,
+                                     uint16_t               sender,
+                                     uint8_t                msglen,
+                                     uint8_t*               msg)
 {
     uint32_t temp32;
     uint16_t temp16;
 
     // check command
-    switch (puMsg[0]) {
+    switch (msg[0]) {
     case eCMD_REQUEST_REG:
         // Format: <Command><Registernumber>
-        if (uMsgLen >= 2) {
-            answer_register_request(psBus, puMsg[1], uSender);
+        if (msglen >= 2) {
+            answer_register_request(bus, msg[1], sender);
         }
         break;
     case eCMD_SET_REG_8BIT:
         // Format: <Command><Registernumber><Value>
-        if (uMsgLen >= 3) {
-            register_set_u8   (puMsg[1], puMsg[2]);
+        if (msglen >= 3) {
+            register_set_u8   (msg[1], msg[2]);
         }
         break;
     case eCMD_SET_REG_16BIT:
         // Format: <Command><Registernumber><LowValue><HighValue>
-        if (uMsgLen >= 4) {
-            temp16 = puMsg[2];
-            temp16 |= ((uint16_t)puMsg[3]<<8);
-            register_set_u16(puMsg[1], temp16);
+        if (msglen >= 4) {
+            temp16 = msg[2];
+            temp16 |= ((uint16_t)msg[3]<<8);
+            register_set_u16(msg[1], temp16);
         }
         break;
     case eCMD_SET_REG_32BIT:
         // Format: <Command><Registernumber><LowLowValue><LowValue><HighValue><HighHighValue>
-        if (uMsgLen >= 6) {
-            temp32 = puMsg[2];
-            temp32 |= ((uint32_t)puMsg[3]<<8);
-            temp32 |= ((uint32_t)puMsg[4]<<16);
-            temp32 |= ((uint32_t)puMsg[5]<<24);
-            register_set_u32(puMsg[1], temp32);
+        if (msglen >= 6) {
+            temp32 = msg[2];
+            temp32 |= ((uint32_t)msg[3]<<8);
+            temp32 |= ((uint32_t)msg[4]<<16);
+            temp32 |= ((uint32_t)msg[5]<<24);
+            register_set_u32(msg[1], temp32);
         }
         break;
     default:
@@ -261,17 +262,17 @@ void        register_do_command     (sBus_t*                psBus,
  * @param[in] uValue
  * Value to encode to the message.
  */
-void        register_send_u8        (sBus_t*                psBus,
-                                     uint16_t               uReceiver,
-                                     uint8_t                uRegNo,
-                                     uint8_t                uValue)
+void        register_send_u8        (sBus_t*                bus,
+                                     uint16_t               receiver,
+                                     uint8_t                reg_no,
+                                     uint8_t                value)
 {
     uint8_t msg[3];
 
     msg[0] = eCMD_STATE_8BIT;
-    msg[1] = uRegNo;
-    msg[2] = uValue;
-    bus_send_message(psBus, uReceiver, sizeof(msg), msg);
+    msg[1] = reg_no;
+    msg[2] = value;
+    bus_send_message(bus, receiver, sizeof(msg), msg);
 }
 
 /**
@@ -286,18 +287,18 @@ void        register_send_u8        (sBus_t*                psBus,
  * @param[in] uValue
  * Value to encode to the message.
  */
-void        register_send_u16       (sBus_t*                psBus,
-                                     uint16_t               uReceiver,
-                                     uint8_t                uRegNo,
-                                     uint16_t               uValue)
+void        register_send_u16       (sBus_t*                bus,
+                                     uint16_t               receiver,
+                                     uint8_t                reg_no,
+                                     uint16_t               value)
 {
     uint8_t msg[4];
 
     msg[0] = eCMD_STATE_16BIT;
-    msg[1] = uRegNo;
-    msg[2] = uValue & 0x00FF;
-    msg[3] = uValue >> 8;
-    bus_send_message(psBus, uReceiver, sizeof(msg), msg);
+    msg[1] = reg_no;
+    msg[2] = value & 0x00FF;
+    msg[3] = value >> 8;
+    bus_send_message(bus, receiver, sizeof(msg), msg);
 }
 
 /**
@@ -312,20 +313,20 @@ void        register_send_u16       (sBus_t*                psBus,
  * @param[in] uValue
  * Value to encode to the message.
  */
-void        register_send_u32       (sBus_t*                psBus,
-                                     uint16_t               uReceiver,
-                                     uint8_t                uRegNo,
-                                     uint32_t               uValue)
+void        register_send_u32       (sBus_t*                bus,
+                                     uint16_t               receiver,
+                                     uint8_t                reg_no,
+                                     uint32_t               value)
 {
     uint8_t msg[6];
 
     msg[0] = eCMD_STATE_32BIT;
-    msg[1] = uRegNo;
-    msg[2] = uValue & 0x000000FF;
-    msg[3] = (uValue >> 8) & 0x000000FF;
-    msg[4] = (uValue >> 16) & 0x000000FF;
-    msg[5] = (uValue >> 24) & 0x000000FF;
-    bus_send_message(psBus, uReceiver, sizeof(msg), msg);
+    msg[1] = reg_no;
+    msg[2] = value & 0x000000FF;
+    msg[3] = (value >> 8) & 0x000000FF;
+    msg[4] = (value >> 16) & 0x000000FF;
+    msg[5] = (value >> 24) & 0x000000FF;
+    bus_send_message(bus, receiver, sizeof(msg), msg);
 }
 
 /**

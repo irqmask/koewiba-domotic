@@ -16,6 +16,7 @@
 // --- Include section ---------------------------------------------------------
 
 #include <avr/interrupt.h>
+#include <avr/wdt.h>
 
 #include "bus.h"
 #include "clock.h"
@@ -57,21 +58,31 @@ ISR(INTERRUPT_PINCHANGE2)
 
 }
 
+/**
+ * Disable watchdog before main() starts.
+ */
+#ifdef __AVR_ATtiny1634__
+//TODO implement watchdog initialization for attiny1634
+#else
+void init_wdt (void) __attribute__((naked)) __attribute__((section(".init3")));
+void init_wdt(void)
+{
+    MCUSR = 0;
+    wdt_disable();
+}
+#endif
+
 static inline void interpret_message (uint16_t sender, uint8_t msglen, uint8_t* msg)
 {
     switch (msg[0]) {
     case eCMD_REQUEST_REG:
-        //if (TRUE != app_register_get(msg[1], &rtype, &val)) bus_send_nak_message(&g_bus, sender); break;
-        //newmsg[0] = eCMD_STATE_8BIT + rtype-1;
-        //newmsg[1] = regno;
-        //for (i=0; i<rtype; ++i) newmsg[2+i] = val[i];
-        //bus_send_message(&g_bus, sender, rtype, newmsg);
-        break;
+        // fallthrough
     case eCMD_SET_REG_8BIT:
-        break;
+        // fallthrough
     case eCMD_SET_REG_16BIT:
-        break;
+        // fallthrough
     case eCMD_SET_REG_32BIT:
+        register_do_command(&g_bus, sender, msglen, msg);
         break;
 
 #ifndef NO_BLOCK_MESSAGE
@@ -93,6 +104,16 @@ static inline void interpret_message (uint16_t sender, uint8_t msglen, uint8_t* 
         sleep_pinchange2_enable();
         bus_sleep(&g_bus);
         sleep_pinchange2_disable();
+        break;
+
+    case eCMD_RESET:
+        cli();
+#ifdef __AVR_ATtiny1634__
+        //TODO implement reset for attiny1634
+#else
+        wdt_enable(WDTO_15MS);
+        while (1); // wait until watchdog resets the controller.
+#endif
         break;
 
     default:

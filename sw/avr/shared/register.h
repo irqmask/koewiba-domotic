@@ -56,42 +56,42 @@ extern uint8_t register_eeprom_array[];
 
 // --- Global functions --------------------------------------------------------
 
-BOOL        register_get            (uint8_t                uRegNo,
-                                     eRegType_t*            peRegType,
-                                     void*                  pvValue);
+BOOL        register_get            (uint8_t                reg_no,
+                                     eRegType_t*            reg_type,
+                                     void*                  value);
 
-void        register_set_u8         (uint8_t                uRegNo,
-                                     uint8_t                uValue);
+void        register_set_u8         (uint8_t                reg_no,
+                                     uint8_t                value);
 
-void        register_set_u16        (uint8_t                uRegNo,
-                                     uint16_t               uValue);
+void        register_set_u16        (uint8_t                reg_no,
+                                     uint16_t               value);
 
-void        register_set_u32        (uint8_t                uRegNo,
-                                     uint32_t               uValue);
+void        register_set_u32        (uint8_t                reg_no,
+                                     uint32_t               value);
 
-void        register_do_command     (sBus_t*                psBus,
-                                     uint8_t*               puMsg,
-                                     uint8_t                uMsgLen,
-                                     uint16_t               uSender);
+void        register_do_command     (sBus_t*                bus,
+                                     uint16_t               sender,
+                                     uint8_t                msglen,
+                                     uint8_t*               msg);
 
-void        register_send_u8        (sBus_t*                psBus,
-                                     uint16_t               uReceiver,
-                                     uint8_t                uRegNo,
-                                     uint8_t                uValue);
+void        register_send_u8        (sBus_t*                bus,
+                                     uint16_t               receiver,
+                                     uint8_t                reg_no,
+                                     uint8_t                value);
 
-void        register_send_u16       (sBus_t*                psBus,
-                                     uint16_t               uReceiver,
-                                     uint8_t                uRegNo,
-                                     uint16_t               uValue);
+void        register_send_u16       (sBus_t*                bus,
+                                     uint16_t               receiver,
+                                     uint8_t                reg_no,
+                                     uint16_t               value);
 
-void        register_send_u32       (sBus_t*                psBus,
-                                     uint16_t               uReceiver,
-                                     uint8_t                uRegNo,
-                                     uint32_t               uValue);
+void        register_send_u32       (sBus_t*                bus,
+                                     uint16_t               receiver,
+                                     uint8_t                reg_no,
+                                     uint32_t               value);
 
-BOOL        register_do_mapping     (uint16_t               uRemoteModuleAddr,
-                                     uint8_t                uRemoteRegister,
-                                     uint32_t               uValue);
+BOOL        register_do_mapping     (uint16_t               remote_module_addr,
+                                     uint8_t                remote_register,
+                                     uint32_t               value);
 
 #endif // _REGISTER_H_
 /**

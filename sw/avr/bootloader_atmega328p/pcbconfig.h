@@ -40,16 +40,17 @@
 // Application specific pin assignments
 // ----------------------------------------------------------------------------
 
-#undef DEBUG_LED_OUTPUT
-#define DBG_0_PIN           PC0
-#define DBG_1_PIN           PC1
-#define DBG_2_PIN           PC2
-#define DBG_3_PIN           PC3
-#define DBG_4_PIN           PC4
-#define DBG_5_PIN           PC5
-#define DBG_PORT            PORTC
-#define DBG_DDR             DDRC
-#define DBG_ALL_MASK        (1<<DBG_0_PIN | 1<<DBG_1_PIN | 1<<DBG_2_PIN | 1<<DBG_3_PIN | 1<<DBG_4_PIN | 1<<DBG_5_PIN)
+#ifdef DEBUG_LED_OUTPUT
+ #define DBG_0_PIN          PC0
+ #define DBG_1_PIN          PC1
+ #define DBG_2_PIN          PC2
+ #define DBG_3_PIN          PC3
+ #define DBG_4_PIN          PC4
+ #define DBG_5_PIN          PC5
+ #define DBG_PORT           PORTC
+ #define DBG_DDR            DDRC
+ #define DBG_ALL_MASK       (1<<DBG_0_PIN | 1<<DBG_1_PIN | 1<<DBG_2_PIN | 1<<DBG_3_PIN | 1<<DBG_4_PIN | 1<<DBG_5_PIN)
+#endif
 
 // --- Type definitions --------------------------------------------------------
 

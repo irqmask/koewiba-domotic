@@ -53,7 +53,7 @@ static void reset_bus(sBus_t* psBus)
 static void create_empty_message(sBus_t* psBus)
 {
     psBus->auEmptyMsg[0] = BUS_SYNCBYTE;
-    psBus->auEmptyMsg[1] = psBus->sCfg.uOwnNodeAddress & 0x007F; // local address on bus
+    psBus->auEmptyMsg[1] = psBus->sCfg.uOwnNodeAddress; // local address on bus
     psBus->auEmptyMsg[2] = 0; // length
 }
 
@@ -62,7 +62,7 @@ static void send_ack(sBus_t* psBus)
 {
     uint8_t ack = BUS_ACKBYTE;
 
-    bus_phy_send(&psBus->sPhy, &ack, 1);
+    bus_phy_send(&psBus->sPhy, &ack, 1) ;
 }
 
 // Receive and interpret data.
@@ -91,7 +91,7 @@ static BOOL receive (sBus_t* psBus)
             // token received?
             if (u & TOKENBIT) {
                 // is it me?
-                if ((u & ADDRMASK) == (psBus->sCfg.uOwnNodeAddress & 0x007F)) {
+                if ((u & ADDRMASK) == (psBus->sCfg.uOwnNodeAddress)) {
                     psBus->eState = eBus_GotToken;
                 } else {
                     psBus->eState = eBus_Idle;
@@ -162,7 +162,7 @@ static BOOL receive (sBus_t* psBus)
                     crc = crc_calc16(&psBus->sRecvMsg.auBuf[0], psBus->sRecvMsg.length + 3 - 2);
                     if (crc == psBus->sRecvMsg.uCRC) {
                         // message has been received correctly
-                        if(psBus->sCfg.uOwnAddress == psBus->sRecvMsg.uReceiver) {
+                        if (psBus->sCfg.uOwnAddress == psBus->sRecvMsg.uReceiver) {
                             // Send ACK if it was not a broadcast-message.
                             send_ack(psBus);
                         }

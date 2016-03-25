@@ -4,7 +4,7 @@
  * @{
  * @file    message.c
  * @brief   Common message handling function.
- *  
+ *
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
 
@@ -14,6 +14,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "log.h"
 #include "message.h"
 
 #if defined (PRJCONF_UNIX) || \
@@ -43,12 +44,12 @@ void msg_log (msg_t message)
     bool first_line = true;
     uint8_t remaining_length, ii, bytes_in_line;
     char logline[256], tmp[256];
-    
+
     remaining_length = message.length;
     ii = 0;
     bytes_in_line = 0;
-    
-    while (remaining_length) {    
+
+    while (remaining_length) {
         if (bytes_in_line == 0) {
             if (first_line == true) {
                 first_line = false;
@@ -57,7 +58,7 @@ void msg_log (msg_t message)
                 snprintf(logline, sizeof(logline), "             ");
             }
         }
-        
+
         if (remaining_length > 1 && bytes_in_line < 16) {
             snprintf(tmp, sizeof(tmp), "%02X ", message.data[ii]);
         } else {
@@ -69,8 +70,7 @@ void msg_log (msg_t message)
         ii++;
         if (bytes_in_line == 16 || remaining_length == 0) {
             bytes_in_line = 0;
-            //fwrite(logline, strlen(logline), 1, stdout);
-            fprintf(stdout, "%s\n", logline);
+            log_msg(LOG_VERBOSE1, "%s", logline);
             logline[0] = '\0';
         }
     }

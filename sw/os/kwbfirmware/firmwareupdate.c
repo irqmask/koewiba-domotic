@@ -28,10 +28,14 @@
 #include <safe_lib.h>
 
 #include "cmddef_common.h"
+#include "moddef_common.h"
+
 #include "crc16.h"
 #include "firmwareupdate.h"
+#include "log.h"
 #include "message.h"
 #include "message_serial.h"
+
 #include "systime.h"
 
 // --- Definitions -------------------------------------------------------------
@@ -52,21 +56,34 @@
  * @param[in]   data    Pointer to data.
  * @param[in]   length  Length in byte of memory to be logged.
  */
-static void log_hexdump16 (uint8_t* data, uint16_t length)
+static void log_hexdump16 (log_mask_t logmask, char* keyword, uint8_t* data, uint16_t length)
 {
-    uint16_t offset = 0;
+    char        buffer[LOG_MAX_MESSAGE_LENGTH];
+    char        hexbuffer[4];
+    uint16_t    offset = 0;
 
     assert (data != NULL);
 
+    buffer[0] = '\0';
+
     while (offset < length) {
         if ((offset % 16) == 0) {
-            if (offset != 0) printf("\n");
-            printf("%04X: ", offset);
+            // log old message
+            if (offset != 0) {
+                log_msg(logmask, "%s %04X %s", keyword, offset-16, buffer);
+            }
+            // prepare new message
+            buffer[0]='\0';
         }
-        printf("%02X ", data[offset]);
+
+        snprintf(hexbuffer, sizeof(hexbuffer), "%02X ", data[offset]);
         offset++;
+        strcat_s(buffer, sizeof(buffer), hexbuffer);
     }
-    printf("\n");
+    // check if there is not-logged data
+    if (offset % 16 != 0) {
+        log_msg(logmask, "%s %04X %s", keyword, offset > 16 ? offset-16 : 0, buffer);
+    }
 }
 
 static uint16_t calculate_crc16 (firmwareupdate_t* fwu)
@@ -79,6 +96,14 @@ static uint16_t calculate_crc16 (firmwareupdate_t* fwu)
         crc = crc_16_next_byte(crc, fwu->fw_memory[ii]);
     }
     return crc;
+}
+
+static void parse_set_reg_8bit_msg (msg_t* message, firmwareupdate_t* fwu)
+{
+    if (message->data[1] == MOD_eReg_BldFlag) {
+        fwu->bldflags = message->data[2];
+        fwu->bldflags_received = 1;
+    }
 }
 
 /**
@@ -133,12 +158,14 @@ static void parse_block_nak_msg (msg_t* message, firmwareupdate_t* fwu)
  */
 static void handle_incomming_messages (msg_t* message, void* reference, void* arg)
 {
-    printf("incomming: ");
-    log_hexdump16(message->data, message->length);
+    log_hexdump16(LOG_VERBOSE2, "BUS I ", message->data, message->length);
 
     if (message->length > 0) {
         // incomming command handler
 	switch (message->data[0]) {
+        case eCMD_STATE_8BIT:
+            parse_set_reg_8bit_msg(message, arg);
+            break;
         case eCMD_BLOCK_INFO:
             parse_block_info_msg(message, arg);
             break;
@@ -286,6 +313,85 @@ static int send_block_end_message (firmwareupdate_t* fwu)
     return rc;
 }
 
+/**
+ * Send a reset message to the target node.
+ *
+ * @returns     eERR_NONE if message has been sent successfully, otherwise
+ *              errorcode.
+ */
+static int send_reset_message (firmwareupdate_t* fwu)
+{
+    int      rc = eERR_NONE;
+    msg_t    msg;
+
+    memset_s(&msg, sizeof(msg), 0);
+    msg.receiver = fwu->module_address;
+    msg.data[0] = eCMD_RESET;
+    msg.length = 1;
+
+    rc = msg_ser_send(&fwu->msg_serial, &msg);
+    return rc;
+}
+
+/**
+ * Send a request register message to the target node.
+ *
+ * @returns     eERR_NONE if message has been sent successfully, otherwise
+ *              errorcode.
+ */
+static int send_request_bldflags_message (firmwareupdate_t* fwu)
+{
+    int      rc = eERR_NONE;
+    msg_t    msg;
+
+    memset_s(&msg, sizeof(msg), 0);
+    msg.receiver = fwu->module_address;
+    msg.data[0] = eCMD_REQUEST_REG;
+    msg.data[1] = MOD_eReg_BldFlag;
+    msg.length = 2;
+
+    rc = msg_ser_send(&fwu->msg_serial, &msg);
+    return rc;
+}
+
+static int receive_and_check_bldflags (firmwareupdate_t* fwu)
+{
+    int rc = eRUNNING;
+
+    if (fwu->bldflags_received) {
+        rc = eERR_NONE;
+        log_msg(LOG_STATUS, "BLDFlags: %d", fwu->bldflags);
+        if ((fwu->bldflags & (1<<eBldFlagNewSWProgrammed)) == 0) {
+            log_error("BLDFlags: Controller has NOT been flashed!");
+            rc = eERR_PROCESS_FAILED;
+        } else {
+            log_msg(LOG_STATUS, "BLDFlags: Controller has been flashed.");
+        }
+        if (fwu->bldflags & (1<<eBldFlagCRCMismatch)) {
+            log_error("BLDFlags: Node CRC mismatch for firmware! Firmware not flashed into the controller!");
+            if (rc <= eERR_NONE) rc = eERR_PROCESS_FAILED;
+        }
+        if (fwu->bldflags & (1<<eBldFlagControllerTypeMismatch)) {
+            log_error("BLDFlags: Node controller type mismatch. Firmware not flashed into the controller!");
+            if (rc <= eERR_NONE) rc = eERR_PROCESS_FAILED;
+        }
+        if (fwu->bldflags & (1<<eBldFlagBoardTypeMismatch)) {
+            log_warning("BLDFlags: Node board type mismatch. Firmware flashed. Check if firmware is suitable for the node board!");
+        }
+        if (fwu->bldflags & (1<<eBldFlagAppIDChanged)) {
+            log_msg(LOG_STATUS, "BLDFlags: Node application ID changed");
+        }
+        if (fwu->bldflags & (1<<eBldFlagAppIDChanged)) {
+            log_msg(LOG_STATUS, "BLDFlags: Application version changed");
+        }
+        if (fwu->bldflags & (1<<eBldFlagAppProgram)) {
+            log_error("BLDFlags: Node reset not performed!");
+            if (rc <= eERR_NONE) rc = eERR_PROCESS_FAILED;
+        }
+    }
+    return rc;
+}
+
 // --- Module global functions -------------------------------------------------
 
 // --- Global functions --------------------------------------------------------
@@ -312,7 +418,6 @@ int firmware_update_init (firmwareupdate_t* fwu,
     int rc = 0;
 
     do {
-        printf("firmware update init()\n");
         assert(fwu != NULL);
         memset_s(fwu, sizeof(firmwareupdate_t), 0);
 
@@ -322,6 +427,9 @@ int firmware_update_init (firmwareupdate_t* fwu,
         if (rc != eERR_NONE) break;
 
         msg_ser_set_incomming_handler(&fwu->msg_serial, handle_incomming_messages, fwu);
+        // default: reset target node after update
+        fwu->reset_target_node = 1;
+        fwu->progress_thd = 5;
     } while (FALSE);
     return rc;
 }
@@ -348,8 +456,6 @@ int firmware_update_start (firmwareupdate_t*    fwu,
 
     assert(fwu != NULL);
 
-    printf("firmware update start()\n");
-
     fwu->curr_state = eFWU_IDLE;
     strcpy_s(fwu->filename, sizeof(fwu->filename), filename);
     fwu->module_address = module_address;
@@ -363,22 +469,22 @@ int firmware_update_start (firmwareupdate_t*    fwu,
                             &fwu->fw_firstaddress,
                             &target_last_addr, NULL, NULL);
         if (rc != eERR_NONE) {
-            fprintf(stderr, "Failed to open %s, error %d\n", fwu->filename, rc);
+            log_error("Failed to open %s, error %d", fwu->filename, rc);
             break;
         }
         fwu->fw_size = target_last_addr - fwu->fw_firstaddress + 1;
-        printf("target file: %s, module address %d\n", fwu->filename, fwu->module_address);
-        printf("target start address: 0x%04X\n", fwu->fw_startaddress);
-        printf("target first address: 0x%04X\n", fwu->fw_firstaddress);
-        printf("target last address:  0x%04X\n", target_last_addr);
-        printf("target memory size:   %d\n", fwu->fw_size);
+        log_msg(LOG_STATUS, "target file: %s, module address %d", fwu->filename, fwu->module_address);
+        log_msg(LOG_STATUS, "target start address: 0x%04X", fwu->fw_startaddress);
+        log_msg(LOG_STATUS, "target first address: 0x%04X", fwu->fw_firstaddress);
+        log_msg(LOG_STATUS, "target last address:  0x%04X", target_last_addr);
+        log_msg(LOG_STATUS, "size:                 %d", fwu->fw_size);
 
         // allocate and initialie target memory. Initialize to 0xFF
         // because flash memory is 0xFF when it is erased.
         fwu->fw_memory = malloc(fwu->fw_size);
         memset_s(fwu->fw_memory, fwu->fw_size, 0xFF);
         if (fwu->fw_memory == NULL) {
-            fprintf(stderr, "Out of memory. Failed to allocate %d bytes\n", fwu->fw_size);
+            log_error("Out of memory. Failed to allocate %d bytes", fwu->fw_size);
             rc = eERR_MALLOC;
             break;
         }
@@ -387,7 +493,7 @@ int firmware_update_start (firmwareupdate_t*    fwu,
         rc = ihex_read_file_mem(filename, NULL, NULL, NULL,
                                 fwu->fw_memory, fwu->fw_size);
         if (rc != eERR_NONE) {
-            fprintf(stderr, "Failed to open %s, error %d\n", fwu->filename, rc);
+            log_error("Failed to open %s, error %d", fwu->filename, rc);
             free(&fwu->fw_memory);
             fwu->fw_memory = NULL;
             break;
@@ -435,6 +541,14 @@ int firmware_update_run (firmwareupdate_t* fwu)
             } else {
                 fwu->curr_state = eFWU_END;
             }
+            // update progress
+            uint8_t progress = (uint8_t)(100 * fwu->curr_offset / fwu->fw_size);
+            if ((progress - fwu->last_progress) >= fwu->progress_thd || progress == 100) {
+                fwu->last_progress = progress;
+                if (fwu->progress_func != NULL) {
+                    fwu->progress_func(progress, fwu->progress_arg);
+                }
+            }
         }
         break;
     case eFWU_END:
@@ -445,10 +559,38 @@ int firmware_update_run (firmwareupdate_t* fwu)
     case eFWU_CRC_INFO:
         if (fwu->block_info_received) {
             if (fwu->node_crc_expected == fwu->node_crc_calculated) {
-                fwu->curr_state = eFWU_IDLE;
+                if (fwu->reset_target_node) {
+                    fwu->curr_state = eFWU_RESET_NODE;
+                } else {
+                    fwu->curr_state = eFWU_IDLE;
+                }
             } else {
                 fwu->curr_state = eFWU_ERROR_ABORT;
             }
+        }
+        break;
+    case eFWU_RESET_NODE:
+        send_reset_message(fwu);
+        fwu->curr_state = eFWU_WAIT_AFTER_RESET;
+        fwu->wait_start = sys_time_get_usecs();
+        break;
+    case eFWU_WAIT_AFTER_RESET:
+        // wait 10 seconds
+        if ((sys_time_get_usecs() - fwu->wait_start) >= 10000*1000) {
+            fwu->curr_state = eFWU_BLDFLAGS;
+        }
+        break;
+    case eFWU_BLDFLAGS:
+        send_request_bldflags_message(fwu);
+        fwu->curr_state = eFWU_WAIT_BLDFLAGS;
+        fwu->wait_start = sys_time_get_usecs();
+        break;
+    case eFWU_WAIT_BLDFLAGS:
+        if ((sys_time_get_usecs() - fwu->wait_start) >= 10000*1000) {
+            fwu->curr_state = eFWU_ERROR_ABORT;
+        }
+        if ((rc = receive_and_check_bldflags(fwu)) >= 0) {
+            fwu->curr_state = eFWU_IDLE;
         }
         break;
     case eFWU_ERROR_ABORT:
@@ -471,7 +613,6 @@ int firmware_update_run (firmwareupdate_t* fwu)
 void firmware_update_close (firmwareupdate_t* fwu)
 {
     assert(fwu != NULL);
-    printf("firmware update close()\n");
     if (fwu->fw_memory != NULL) {
         free(fwu->fw_memory);
         fwu->fw_memory = NULL;
@@ -480,6 +621,39 @@ void firmware_update_close (firmwareupdate_t* fwu)
     fwu->curr_offset = 0;
 
     msg_ser_close(&fwu->msg_serial);
+}
+
+/**
+ * Register a function which is used to upgrade the progress of the firmware
+ * upload.
+ *
+ * @param[in,out]   fwu             Pointer to firmware update process data.
+ * @param[in]       func            Progress update function.
+ * @param[in]       arg             Additional information for the func()
+ */
+void firmware_register_progress_func (firmwareupdate_t*     fwu,
+                                      fwu_progress_func_t   func,
+                                      void*                 arg)
+{
+    assert(fwu != NULL);
+    fwu->progress_func = func;
+    fwu->progress_arg = arg;
+}
+
+/**
+ * Set threshold for the progress update.
+ *
+ * The progress update function is called, if the progress increased
+ * at least thd since the last call of the progress update function.
+ *
+ * @param[in,out]   fwu             Pointer to firmware update process data.
+ * @param[in]       thd             Threshold.
+ */
+void firmware_set_progress_thd (firmwareupdate_t*     fwu,
+                                uint8_t               thd)
+{
+    assert(fwu != NULL);
+    fwu->progress_thd = thd;
 }
 
 /** @} */

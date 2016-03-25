@@ -16,6 +16,7 @@
 // --- Include section ---------------------------------------------------------
 
 #include "prjtypes.h"
+#include "register.h"
 
 // --- Definitions -------------------------------------------------------------
 
@@ -43,6 +44,7 @@
 void app_init (void) 
 {
     //TODO insert application specific initializations here!
+    //register_set_u16(MOD_eReg_ModuleID, 4);
 }
 
 /**

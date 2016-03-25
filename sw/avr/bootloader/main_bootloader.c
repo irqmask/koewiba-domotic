@@ -12,6 +12,7 @@
 #include <avr/eeprom.h>
 #include <avr/io.h>
 #include <avr/interrupt.h>
+#include <avr/wdt.h>
 
 // include
 #include "moddef_common.h"
@@ -85,6 +86,16 @@ uint8_t g_reg_internal_eep[MOD_eCfg_FirstAppSpecific] EEMEM;
 // --- Module global variables -------------------------------------------------
 
 // --- Local functions ---------------------------------------------------------
+
+/**
+ * Disable watchdog before main starts.
+ */
+void init_wdt (void) __attribute__((naked)) __attribute__((section(".init3")));
+void init_wdt(void)
+{
+    MCUSR = 0;
+    wdt_disable();
+}
 
 BOOL check_crc (uint16_t* length)
 {

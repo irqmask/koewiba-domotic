@@ -14,6 +14,7 @@
 // --- Include section ---------------------------------------------------------
 
 #include "message_serial.h"
+#include "systime.h"
 
 // --- Definitions -------------------------------------------------------------
 
@@ -26,9 +27,15 @@ typedef enum fwu_states {
     eFWU_WAIT_ACK,
     eFWU_END,
     eFWU_CRC_INFO,
+    eFWU_RESET_NODE,
+    eFWU_WAIT_AFTER_RESET,
+    eFWU_BLDFLAGS,
+    eFWU_WAIT_BLDFLAGS,
     eFWU_ERROR_ABORT,
     eFWU_LAST
 } fwu_states_t;
+
+typedef void (*fwu_progress_func_t)(uint8_t progress, void* arg);
 
 //! Firmware update process data structure.
 typedef struct firmwareupdate {
@@ -58,6 +65,18 @@ typedef struct firmwareupdate {
                                         //!< received. Reset by block_data and
                                         //!< block_end message. Set by block_info
                                         //!< message.
+    uint8_t         reset_target_node;  //!< Flag, if the target not shall be
+                                        //!< reset automatically after firmware
+                                        //!< upload.
+    sys_time_t      wait_start;         //!< timestamp of start of waiting for a response.
+    uint8_t         bldflags;           //!< Bootloader flags, which inform about
+                                        //!< the upload success.
+    uint8_t         bldflags_received;  //!< Flag, if the requested bootloader
+                                        //!< flags have been received yet.
+    uint8_t         last_progress;      //!< last progress;
+    uint8_t         progress_thd;       //!< threshold of progress update.
+    fwu_progress_func_t progress_func;  //!< progress update function.
+    void*           progress_arg;       //!< optional arguments for progress_func;
 } firmwareupdate_t;
 
 // --- Local variables ---------------------------------------------------------
@@ -84,6 +103,13 @@ int firmware_update_start   (firmwareupdate_t*  fwu,
 int firmware_update_run     (firmwareupdate_t*  fwu);
 
 void firmware_update_close  (firmwareupdate_t*  fwu);
+
+void firmware_register_progress_func (firmwareupdate_t*     fwu,
+                                      fwu_progress_func_t   func,
+                                      void*                 arg);
+
+void firmware_set_progress_thd (firmwareupdate_t*     fwu,
+                                uint8_t               thd);
 
 #endif // _FIRMWAREUPDATE_H_
 /** @} */

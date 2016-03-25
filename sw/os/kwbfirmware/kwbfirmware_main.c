@@ -22,6 +22,7 @@
 
 #include "error_codes.h"
 #include "ioloop.h"
+#include "log.h"
 #include "firmwareupdate.h"
 #include "message_serial.h"
 #include "systime.h"
@@ -103,7 +104,7 @@ static bool parse_commandline_options (int argc, char* argv[], options_t* option
     int                     c;
 
     while (1) {
-        c = getopt(argc, argv, "d:b:a:p:n:f:");
+        c = getopt(argc, argv, "d:b:a:p:n:f:v");
         if (c == -1) break;
 
         switch (c) {
@@ -130,6 +131,9 @@ static bool parse_commandline_options (int argc, char* argv[], options_t* option
             break;
         case 'f':
             strcpy_s(options->filename, sizeof(options->filename), optarg);
+            break;
+        case 'v':
+            log_add_mask(LOG_VERBOSE1 | LOG_VERBOSE2);
             break;
         default:
             rc = false;
@@ -188,6 +192,12 @@ static void print_usage (void)
     printf(" -b <baudrate>       Baudrate of serial connection. Default: 57600\n");
     printf(" -n <node address>   Node address of module to update.\n");
     printf(" -f <filename>       Filename of firmware to update.\n");
+    printf(" -v                  Verbose logging.\n");
+}
+
+static void print_progress (uint8_t progress, void* arg)
+{
+    log_msg(LOG_STATUS, "Update progress %d", progress);
 }
 
 // --- Module global functions -------------------------------------------------
@@ -210,8 +220,6 @@ int main (int argc, char* argv[])
     firmwareupdate_t    firmware;
 
     do {
-        printf("\nkwbfirmware... %d\n",'M');
-
         // set default options for kwbrouter
         set_options(&options,
                     "/dev/ttyUSB0",                 // no serial device, use vbusd as default
@@ -231,11 +239,12 @@ int main (int argc, char* argv[])
         ioloop_set_default_timeout(&mainloop, 1);
 
         firmware_update_init(&firmware, &mainloop, options.serial_device, options.serial_baudrate);
+        firmware_register_progress_func(&firmware, print_progress, NULL);
+
         if (rc != eERR_NONE) break;
         rc = firmware_update_start(&firmware, options.filename, options.node_address);
         if (rc != eERR_NONE) break;
 
-        printf("entering mainloop...\n");
         while (!end_application) {
             ioloop_run_once(&mainloop);
             rc = firmware_update_run(&firmware);
@@ -243,10 +252,10 @@ int main (int argc, char* argv[])
                 if (rc == eMSG_ERR_BUSY) {
                     sys_sleep_ms(100);
                 } else if (rc == eERR_NONE) {
-                    printf("FIRMWARE UPDATE SUCCESSFULL!\n");
+                    log_msg(LOG_STATUS, "FIRMWARE UPDATE SUCCESSFULL!");
                     end_application = true;
                 } else {
-                    printf("FIRMWARE UPDATE FAILED!\n");
+                    log_msg(LOG_STATUS, "FIRMWARE UPDATE FAILED!");
                     end_application = true;
                 }
             }

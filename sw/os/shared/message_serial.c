@@ -24,10 +24,11 @@
 
 #include <assert.h>
 #include <malloc.h>
-#include <stdio.h>
+//#include <stdio.h>
 #include <string.h>
 
 #include "ioloop.h"
+#include "log.h"
 #include "message_serial.h"
 #include "sysserial.h"
 
@@ -95,7 +96,7 @@ static void reset_incomming_on_error(msg_serial_t* msg_serial)
 {
     uint8_t ii;
 
-    fprintf(stderr, "incomming message corrupt: ");
+    log_error("SERIAL Incomming message corrupt: ");
     for (ii=0; ii<msg_serial->incomming_num_received; ii++) {
         switch (msg_serial->incomming_buffer[ii]) {
         case '\n': fprintf(stderr, "<NL>"); break;
@@ -103,7 +104,6 @@ static void reset_incomming_on_error(msg_serial_t* msg_serial)
         default:   fprintf(stderr, "%c", msg_serial->incomming_buffer[ii]); break;
         }
     }
-    //fprintf(stderr, "\n");
     fprintf(stderr, "total length = %d, message length = %d\n", msg_serial->incomming_num_received, msg_serial->incomming_message.length);
     msg_serial->incomming_num_received = 0;
     msg_serial->incomming_state = eSER_RECV_STATE_IDLE;
@@ -129,7 +129,7 @@ static BOOL process_receiving(msg_serial_t* msg_serial, char new_char)
     case eSER_RECV_STATE_RECEIVER:
         digit = 4 - msg_serial->incomming_num_received;
         if (convert_char_to_nibble(new_char, &nibble) != 0) {
-            fprintf(stderr, "Error in state eSER_RECV_STATE_RECEIVER!\n");
+            log_error("Error in state eSER_RECV_STATE_RECEIVER!");
             reset_incomming_on_error(msg_serial);
             break;
         } else {
@@ -143,7 +143,7 @@ static BOOL process_receiving(msg_serial_t* msg_serial, char new_char)
     case eSER_RECV_STATE_LENGTH:
         digit = 6 - msg_serial->incomming_num_received;
         if (convert_char_to_nibble(new_char, &nibble) != 0) {
-            fprintf(stderr, "Error in state eSER_RECV_STATE_LENGTH char %x!\n", new_char);
+            log_error("Error in state eSER_RECV_STATE_LENGTH char %x!", new_char);
             reset_incomming_on_error(msg_serial);
             break;
         } else {
@@ -158,7 +158,7 @@ static BOOL process_receiving(msg_serial_t* msg_serial, char new_char)
         digit = msg_serial->incomming_num_received % 2; // digit sequence: 1010...
         index = (msg_serial->incomming_num_received - 7) / 2;
         if (convert_char_to_nibble(new_char, &nibble) != 0) {
-            fprintf(stderr, "Error in state eSER_RECV_STATE_DATA!\n");
+            log_error("Error in state eSER_RECV_STATE_DATA!");
             reset_incomming_on_error(msg_serial);
             break;
         } else {
@@ -168,7 +168,7 @@ static BOOL process_receiving(msg_serial_t* msg_serial, char new_char)
         if (index + 1 == msg_serial->incomming_message.length && digit == 0) {
             msg_serial->incomming_state = eSER_RECV_STATE_NEWLINE;
         } else if (index + 1 > msg_serial->incomming_message.length){
-            fprintf(stderr, "Error in state eSER_RECV_STATE_DATA!\n");
+            log_error("Error in state eSER_RECV_STATE_DATA!");
             reset_incomming_on_error(msg_serial);
         }
         break;
@@ -176,7 +176,7 @@ static BOOL process_receiving(msg_serial_t* msg_serial, char new_char)
     case eSER_RECV_STATE_NEWLINE:
         if (msg_serial->incomming_num_received != (msg_serial->incomming_message.length * 2 + 7) ||
             new_char != '\n') {
-            fprintf(stderr, "Error in state eSER_RECV_STATE_NEWLINE!\n");
+            log_error("Error in state eSER_RECV_STATE_NEWLINE!");
             reset_incomming_on_error(msg_serial);
         } else {
             // message received
@@ -187,7 +187,7 @@ static BOOL process_receiving(msg_serial_t* msg_serial, char new_char)
         break;
 
     default:
-        fprintf(stderr, "Wrong receive state: %d\n", msg_serial->incomming_state);
+        log_error("Wrong receive state: %d", msg_serial->incomming_state);
         reset_incomming_on_error(msg_serial);
         break;
     }
@@ -287,7 +287,7 @@ int msg_ser_open (msg_serial_t*   msg_serial,
 
         msg_serial->fd = sys_serial_open(device);
         if (msg_serial->fd == INVALID_FD) {
-            perror("msg_serial: error opening serial connection");
+            log_sys_error("msg_serial: error opening serial connection");
             rc = eERR_SYSTEM;
             break;
         }
@@ -299,7 +299,7 @@ int msg_ser_open (msg_serial_t*   msg_serial,
                                    eSYS_SER_SB_1,
                                    eSYS_SER_FC_HW);
         if (rc != eERR_NONE) {
-            perror("msg_serial: error setting baudrate and serial parameters");
+            log_sys_error("msg_serial: error setting baudrate and serial parameters");
             break;
         }
         sys_serial_flush(msg_serial->fd);
@@ -344,18 +344,18 @@ int msg_ser_send (msg_serial_t* msg_serial, msg_t* message)
 
         msg_serial->ser_data_length = format_serial_message(msg_serial->ser_data, sizeof(msg_serial->ser_data), message);
         if (msg_serial->ser_data_length == 0) {
-            fprintf(stderr, "msg_serial: error encoding serial message!");
+            log_error("msg_serial: error encoding serial message!");
             rc = eMSG_ERR_SIZE;
         } else {
-            fprintf(stderr, "SERIAL: %s", msg_serial->ser_data);
+            log_msg(LOG_VERBOSE2, "SERIAL %s", msg_serial->ser_data);
             msg_serial->ser_data_written = sys_serial_send(msg_serial->fd,
                                                            (void*)msg_serial->ser_data,
                                                            msg_serial->ser_data_length);
             if (msg_serial->ser_data_written < 0) {
-                perror("msg_serial: serial send failed!");
+                log_sys_error("msg_serial: serial send failed!");
                 rc = eERR_SYSTEM;
             } else if (msg_serial->ser_data_written < msg_serial->ser_data_length) {
-                fprintf(stderr, "msg_serial: not all bytes written\n");
+                log_warning("SERIAL Not all bytes written");
                 rc = eRUNNING;
             }
         }
@@ -379,7 +379,7 @@ int msg_ser_continue_sending (msg_serial_t* msg_serial)
                                   &msg_serial->ser_data[msg_serial->ser_data_written],
                                   to_send);
         if (written < 0) {
-            perror("msg_serial: serial send failed!");
+            log_sys_error("msg_serial: serial send failed!");
             rc = eERR_SYSTEM;
         } else {
             msg_serial->ser_data_written += written;

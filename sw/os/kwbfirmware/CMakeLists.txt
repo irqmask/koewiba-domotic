@@ -32,6 +32,7 @@ set (kwbfirmware_SRCS
     ihex.c
     kwbfirmware_main.c
     ../shared/ioloop.c
+    ../shared/log.c
     ../shared/message.c
     ../shared/message_serial.c
     ../../shared/crc16.c

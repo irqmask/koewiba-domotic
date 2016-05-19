@@ -16,12 +16,14 @@
 
 // --- Include section ---------------------------------------------------------
 
-#include "error_codes.h"
 #include "prjconf.h"
 
 #if defined (PRJCONF_WINDOWS)
 #include <windows.h>
 #endif
+
+#include "error_codes.h"
+#include "prjtypes.h"
 
 // --- Definitions -------------------------------------------------------------
 

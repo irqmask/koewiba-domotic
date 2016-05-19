@@ -18,7 +18,7 @@
 #include "prjconf.h"
 
 #include <getopt.h>
-#include <stdbool.h>
+#include <stdBOOL.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
@@ -47,9 +47,9 @@ typedef struct options {
     uint16_t    router_port;
     char        vbusd_address[256];
     uint16_t    vbusd_port;
-    bool        serial_device_set;
-    bool        router_address_set;
-    bool        vbusd_address_set;
+    BOOL        serial_device_set;
+    BOOL        router_address_set;
+    BOOL        vbusd_address_set;
     uint16_t    own_node_address;
 } options_t;
 
@@ -101,9 +101,9 @@ static void set_options (options_t*     options,
     options->own_node_address = own_node_address;
 }
 
-static bool parse_commandline_options (int argc, char* argv[], options_t* options)
+static BOOL parse_commandline_options (int argc, char* argv[], options_t* options)
 {
-    bool                    rc = true;
+    BOOL                    rc = TRUE;
     int                     c;
 
     while (1) {
@@ -114,7 +114,7 @@ static bool parse_commandline_options (int argc, char* argv[], options_t* option
         case 'd':
             printf("device %s\n", optarg);
             strcpy_s(options->serial_device, sizeof(options->serial_device), optarg);
-            options->serial_device_set = true;
+            options->serial_device_set = TRUE;
             break;
         case 'b':
             printf("baudrate %s\n", optarg);
@@ -123,7 +123,7 @@ static bool parse_commandline_options (int argc, char* argv[], options_t* option
         case 'a':
             printf("router address %s\n", optarg);
             strcpy_s(options->router_address, sizeof(options->router_address), optarg);
-            options->router_address_set = true;
+            options->router_address_set = TRUE;
             break;
         case 'p':
             printf("router port %s\n", optarg);
@@ -132,7 +132,7 @@ static bool parse_commandline_options (int argc, char* argv[], options_t* option
         case 'v':
             printf("vbusd address %s\n", optarg);
             strcpy_s(options->vbusd_address, sizeof(options->vbusd_address), optarg);
-            options->vbusd_address_set = true;
+            options->vbusd_address_set = TRUE;
             break;
         case 'w':
             printf("vbusd port %s\n", optarg);
@@ -141,18 +141,18 @@ static bool parse_commandline_options (int argc, char* argv[], options_t* option
         case 'n':
             options->own_node_address = atoi(optarg);
         default:
-            rc = false;
+            rc = FALSE;
             break;
         }
     }
     return rc;
 }
 
-static bool validate_options(options_t* options)
+static BOOL validate_options(options_t* options)
 {
-    bool    rc = false,
-            serial_device_set = false,
-            vbusd_address_set = false;
+    BOOL    rc = FALSE,
+            serial_device_set = FALSE,
+            vbusd_address_set = FALSE;
 
     do {
         // minimum address is "/a": unix socket with name "a" in the root directory
@@ -181,8 +181,8 @@ static bool validate_options(options_t* options)
             break;
         }
         // activate standard vbusd connection if serial path is not given
-        if (!options->serial_device_set) options->vbusd_address_set = true;
-        rc = true;
+        if (!options->serial_device_set) options->vbusd_address_set = TRUE;
+        rc = TRUE;
     } while (0);
     return rc;
 }
@@ -208,7 +208,7 @@ static void print_usage (void)
 int main (int argc, char* argv[])
 {
     int             rc = eERR_NONE;
-    bool            end_application = false;
+    BOOL            end_application = FALSE;
     options_t       options;
     ioloop_t        mainloop;
     msg_socket_t    msg_socket;
@@ -218,7 +218,7 @@ int main (int argc, char* argv[])
     router_t        router;
     char*           address;
     uint16_t        port;
-    bool            serial;
+    BOOL            serial;
 
     do {
         printf("\nkwbrouter...\n");
@@ -233,8 +233,8 @@ int main (int argc, char* argv[])
                     0,                  // port 0: use unix sockets
                     2);                 // own node address
         // parse and validate commandline options
-        if (parse_commandline_options(argc, argv, &options) == false ||
-            validate_options(&options) == false) {
+        if (parse_commandline_options(argc, argv, &options) == FALSE ||
+            validate_options(&options) == FALSE) {
             print_usage();
             rc = eERR_BAD_PARAMETER;
             break;
@@ -257,11 +257,11 @@ int main (int argc, char* argv[])
         if (options.serial_device_set) {
             address = options.serial_device;
             port = options.serial_baudrate;
-            serial = true;
+            serial = TRUE;
         } else {
             address = options.vbusd_address;
             port = options.vbusd_port;
-            serial = false;
+            serial = FALSE;
         }
         rc = msg_b_open(&msg_bus, &mainloop, options.own_node_address, serial,
                         address, port);

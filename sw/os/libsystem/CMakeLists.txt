@@ -22,6 +22,15 @@ endif (WIN32)
 # list of source files
 # ---------------------------------------------------------
 set (libsystem_SRCS
+    getopt.h
+    system.h
+	sysconsole.h
+	sysserial.h
+	syssocket.h
+	systhread.h
+	systime.h
+
+	getopt.c
     sysconsole.c
     sysserial.c
     syssocket.c

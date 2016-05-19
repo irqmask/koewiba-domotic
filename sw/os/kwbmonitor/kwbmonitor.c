@@ -1,15 +1,15 @@
-#include <stdbool.h>
-#include <stdint.h>
 #include <stdio.h>
 #include <string.h>
 
 #include "crc16.h"
 #include "kwbmonitor.h"
+#include "prjtypes.h"
 #include "system.h"
+#include "sysconsole.h"
 #include "systime.h"
 
-bool                g_display_empty_msg = true;
-bool                g_display_token_msg = true;
+BOOL g_display_empty_msg = TRUE;
+BOOL g_display_token_msg = TRUE;
 
 static void current_time_difference (bus_history_t* history, int32_t* diff_ms, int32_t* remaining_us)
 {
@@ -152,17 +152,17 @@ void monitor_parse_message (uint8_t new_byte, bus_history_t* history)
 void monitor_toggle_display_empty_message (void)
 {
     if (g_display_empty_msg) {
-        g_display_empty_msg = false;
+        g_display_empty_msg = FALSE;
     } else {
-        g_display_empty_msg = true;
+        g_display_empty_msg = TRUE;
     }
 }
 
 void monitor_toggle_display_token_message (void)
 {
     if (g_display_token_msg) {
-        g_display_token_msg = false;
+        g_display_token_msg = FALSE;
     } else {
-        g_display_token_msg = true;
+        g_display_token_msg = TRUE;
     }
 }

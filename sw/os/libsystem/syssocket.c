@@ -10,7 +10,7 @@
 
 // --- Include section ---------------------------------------------------------
 
-#include "system.h"
+#include "prjconf.h"
 
 #if defined (PRJCONF_UNIX) || \
     defined (PRJCONF_POSIX) || \
@@ -26,6 +26,8 @@
   #include <windows.h>
   #include <winsock.h>
 #endif
+
+#include "syssocket.h"
 
 // --- Definitions -------------------------------------------------------------
 
@@ -45,6 +47,9 @@
 
 sys_fd_t sys_socket_open_server_unix (const char* socketname)
 {
+#if defined (PRJCONF_UNIX) || \
+    defined (PRJCONF_POSIX) || \
+    defined (PRJCONF_LINUX)
     int                 rc;
     sys_fd_t            fd;
     struct sockaddr_un  sockinfo;
@@ -79,10 +84,17 @@ sys_fd_t sys_socket_open_server_unix (const char* socketname)
     }
 
     return fd;
+#elif defined (PRJCONF_WINDOWS)
+    //TODO implement windows version
+    return INVALID_FD;
+#endif
 }
 
 sys_fd_t sys_socket_open_client_unix (const char* socketname)
 {
+#if defined (PRJCONF_UNIX) || \
+    defined (PRJCONF_POSIX) || \
+    defined (PRJCONF_LINUX)
     int                 rc;
     sys_fd_t            fd;
     struct sockaddr_un  sockinfo;
@@ -106,6 +118,10 @@ sys_fd_t sys_socket_open_client_unix (const char* socketname)
     }
 
     return fd;
+#elif defined (PRJCONF_WINDOWS)
+    //TODO implement windows version
+    return INVALID_FD;
+#endif
 }
 
 sys_fd_t sys_socket_open_server_tcp (const char* socketaddress, uint16_t port)
@@ -122,52 +138,101 @@ sys_fd_t sys_socket_open_client_tcp (const char* socketaddress, uint16_t port)
 
 void sys_socket_close (sys_fd_t fd)
 {
+    #if defined (PRJCONF_UNIX) || \
+    defined (PRJCONF_POSIX) || \
+    defined (PRJCONF_LINUX)
     close(fd);
+#elif defined (PRJCONF_WINDOWS)
+#endif
 }
 
 sys_fd_t sys_socket_accept (sys_fd_t server_fd)
 {
+#if defined (PRJCONF_UNIX) || \
+    defined (PRJCONF_POSIX) || \
+    defined (PRJCONF_LINUX)
     struct sockaddr_un  sockinfo;
     socklen_t           sockinfolen = sizeof(sockinfo);
     sys_fd_t            fd;
 
     fd = accept (server_fd, (struct sockaddr *)&sockinfo, &sockinfolen);
     return fd;
+#elif defined (PRJCONF_WINDOWS)
+    //TODO implement windows version
+    return INVALID_FD;
+#endif
 }
 
-int sys_socket_recv (sys_fd_t fd, void* buffer, size_t buffersize)
+size_t sys_socket_recv (sys_fd_t fd, void* buffer, size_t buffersize)
 {
+#if defined (PRJCONF_UNIX) || \
+    defined (PRJCONF_POSIX) || \
+    defined (PRJCONF_LINUX)
     return recv(fd, buffer, buffersize, 0);
+#elif defined (PRJCONF_WINDOWS)
+    //TODO implement windows version
+    return 0;
+#endif
 }
 
-int sys_socket_send (sys_fd_t fd, void* buffer, size_t buffersize)
+size_t sys_socket_send (sys_fd_t fd, void* buffer, size_t buffersize)
 {
+#if defined (PRJCONF_UNIX) || \
+    defined (PRJCONF_POSIX) || \
+    defined (PRJCONF_LINUX)
     return send(fd, buffer, buffersize, 0);
+#elif defined (PRJCONF_WINDOWS)
+    //TODO implement windows version
+    return 0;
+#endif
 }
 
 void sys_socket_flush (sys_fd_t fd)
 {
+#if defined (PRJCONF_UNIX) || \
+    defined (PRJCONF_POSIX) || \
+    defined (PRJCONF_LINUX)
     tcflush(fd, TCIOFLUSH);
+#elif defined (PRJCONF_WINDOWS)
+    //TODO implement windows version
+#endif
 }
 
 size_t sys_socket_get_pending_sendq (sys_fd_t fd)
 {
+#if defined (PRJCONF_UNIX) || \
+    defined (PRJCONF_POSIX) || \
+    defined (PRJCONF_LINUX)
     size_t pending_bytes = 0;
 
     ioctl(fd, TIOCOUTQ, &pending_bytes);
     return pending_bytes;
+#elif defined (PRJCONF_WINDOWS)
+    //TODO implement windows version
+    return 0;
+#endif
 }
 
 size_t sys_socket_get_pending_recvq (sys_fd_t fd)
 {
+#if defined (PRJCONF_UNIX) || \
+    defined (PRJCONF_POSIX) || \
+    defined (PRJCONF_LINUX)
     size_t pending_bytes = 0;
 
     ioctl(fd, FIONREAD, &pending_bytes);
     return pending_bytes;
+#elif defined (PRJCONF_WINDOWS)
+    //TODO implement windows version
+    return 0;
+#endif
 }
 
-void sys_socket_set_blocking (sys_fd_t fd, bool blocking)
+void sys_socket_set_blocking (sys_fd_t fd, BOOL blocking)
 {
+#if defined (PRJCONF_UNIX) || \
+    defined (PRJCONF_POSIX) || \
+    defined (PRJCONF_LINUX)
     int opts;
 
     do {
@@ -183,10 +248,16 @@ void sys_socket_set_blocking (sys_fd_t fd, bool blocking)
             break;
         }
     } while (0);
+#elif defined (PRJCONF_WINDOWS)
+    //TODO implement windows version
+#endif
 }
 
 void sys_socket_get_name (sys_fd_t fd, char* address, size_t addr_len, uint16_t* port)
 {
+#if defined (PRJCONF_UNIX) || \
+    defined (PRJCONF_POSIX) || \
+    defined (PRJCONF_LINUX)
     union {
         struct sockaddr  common;
         struct sockaddr_un af_unix;
@@ -208,6 +279,9 @@ void sys_socket_get_name (sys_fd_t fd, char* address, size_t addr_len, uint16_t*
             break;
         }
     }
+#elif defined (PRJCONF_WINDOWS)
+    //TODO implement windows version
+#endif
 }
 
 /** @} */

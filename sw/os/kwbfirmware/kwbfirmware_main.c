@@ -12,7 +12,7 @@
 
 #include <assert.h>
 #include <getopt.h>
-#include <stdbool.h>
+#include <stdBOOL.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -39,9 +39,9 @@ typedef struct options {
     int         serial_baudrate;    //!< Baudrate of serial connection to RS232 gateway.
     char        router_address[256];//!< Address of kwbrouter server.
     uint16_t    router_port;        //!< Port number of kwbrouter server.
-    bool        serial_device_set;  //!< Flag: if set, serial device has been
+    BOOL        serial_device_set;  //!< Flag: if set, serial device has been
                                     //!< configured in the command line options.
-    bool        router_address_set; //!< Flag: is set, router address has been
+    BOOL        router_address_set; //!< Flag: is set, router address has been
                                     //!< configured in the command line options.
     char        filename[256];
     uint16_t    node_address;
@@ -94,13 +94,13 @@ static void set_options (options_t*     options,
  * @param[in]   argv    Command line arguments.
  * @param[out]  options Stucture where options are stored in.
  *
- * @returns true, if command line options have been parsed successfully or no
+ * @returns TRUE, if command line options have been parsed successfully or no
  *          options have been read (in this case, default parameters will be
  *          used).
  */
-static bool parse_commandline_options (int argc, char* argv[], options_t* options)
+static BOOL parse_commandline_options (int argc, char* argv[], options_t* options)
 {
-    bool                    rc = true;
+    BOOL                    rc = TRUE;
     int                     c;
 
     while (1) {
@@ -111,7 +111,7 @@ static bool parse_commandline_options (int argc, char* argv[], options_t* option
         case 'd':
             printf("device %s\n", optarg);
             strcpy_s(options->serial_device, sizeof(options->serial_device), optarg);
-            options->serial_device_set = true;
+            options->serial_device_set = TRUE;
             break;
         case 'b':
             printf("baudrate %s\n", optarg);
@@ -120,7 +120,7 @@ static bool parse_commandline_options (int argc, char* argv[], options_t* option
         case 'a':
             printf("router address %s\n", optarg);
             strcpy_s(options->router_address, sizeof(options->router_address), optarg);
-            options->router_address_set = true;
+            options->router_address_set = TRUE;
             break;
         case 'p':
             printf("router port %s\n", optarg);
@@ -136,7 +136,7 @@ static bool parse_commandline_options (int argc, char* argv[], options_t* option
             log_add_mask(LOG_VERBOSE1 | LOG_VERBOSE2);
             break;
         default:
-            rc = false;
+            rc = FALSE;
             break;
         }
     }
@@ -147,13 +147,13 @@ static bool parse_commandline_options (int argc, char* argv[], options_t* option
  * Validate kwbfirmware runtime options.
  *
  * @param[in,out]   options Structure where options are stored in.
- * @returns         true if options are constient and usable, otherwise false.
+ * @returns         TRUE if options are constient and usable, otherwise FALSE.
  */
- static bool validate_options(options_t* options)
+ static BOOL validate_options(options_t* options)
 {
-    bool    rc = false,
-            serial_device_set = false,
-            vbusd_address_set = false;
+    BOOL    rc = FALSE,
+            serial_device_set = FALSE,
+            vbusd_address_set = FALSE;
 
     do {
         // minimum address is "/a": unix socket with name "a" in the root directory
@@ -173,7 +173,7 @@ static bool parse_commandline_options (int argc, char* argv[], options_t* option
             fprintf(stderr, "Only node addresses from 1 to 65534 allowed!\n");
             break;
         }
-        rc = true;
+        rc = TRUE;
     } while (0);
     return rc;
 }
@@ -215,7 +215,7 @@ int main (int argc, char* argv[])
 {
     int                 rc = eERR_NONE;
     options_t           options;
-    bool                end_application = false;
+    BOOL                end_application = FALSE;
     ioloop_t            mainloop;
     firmwareupdate_t    firmware;
 
@@ -228,8 +228,8 @@ int main (int argc, char* argv[])
                     0,                  // port 0: use unix sockets
                     0x0e);                 // own node address
         // parse and validate commandline options
-        if (parse_commandline_options(argc, argv, &options) == false ||
-            validate_options(&options) == false) {
+        if (parse_commandline_options(argc, argv, &options) == FALSE ||
+            validate_options(&options) == FALSE) {
             print_usage();
             rc = eERR_BAD_PARAMETER;
             break;
@@ -253,10 +253,10 @@ int main (int argc, char* argv[])
                     sys_sleep_ms(100);
                 } else if (rc == eERR_NONE) {
                     log_msg(LOG_STATUS, "FIRMWARE UPDATE SUCCESSFULL!");
-                    end_application = true;
+                    end_application = TRUE;
                 } else {
                     log_msg(LOG_STATUS, "FIRMWARE UPDATE FAILED!");
-                    end_application = true;
+                    end_application = TRUE;
                 }
             }
         }

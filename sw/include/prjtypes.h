@@ -13,13 +13,32 @@
 #define _PRJTYPES_H__
 
 // --- Include section ---------------------------------------------------------
+#include "prjconf.h"
 
-#include <stdbool.h>
+#if !defined (PRJCONF_WINDOWS) 
+#include <stdBOOL.h>
 #include <stdint.h>
+#else
+#include <windows.h>
+#endif
+
+// --- Type definitions --------------------------------------------------------
+
+#if defined (PRJCONF_WINDOWS) 
+typedef unsigned char uint8_t;
+typedef signed char int8_t;
+typedef unsigned short uint16_t;
+typedef signed short int16_t;
+typedef unsigned int uint32_t;
+typedef signed int int32_t;
+typedef unsigned long long int uint64_t;
+typedef signed long long int int64_t;
+#endif
 
 // --- Definitions -------------------------------------------------------------
 
 #ifndef TRUE
+typedef uint8_t BOOL;
 #define TRUE 1
 #endif
 
@@ -32,10 +51,6 @@
 #endif
 
 #define CLOCK_TICKS_PER_SECOND 100
-
-// --- Type definitions --------------------------------------------------------
-
-typedef uint8_t BOOL;
 
 // --- Local variables ---------------------------------------------------------
 

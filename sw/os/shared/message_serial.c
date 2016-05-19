@@ -391,14 +391,14 @@ int msg_ser_continue_sending (msg_serial_t* msg_serial)
     return rc;
 }
 
-bool msg_ser_is_tx_empty (msg_serial_t* msg_serial)
+BOOL msg_ser_is_tx_empty (msg_serial_t* msg_serial)
 {
     int pending_tx = sys_serial_get_pending_sendq(msg_serial->fd);
 
     if (pending_tx > 100) {
-        return false;
+        return FALSE;
     } else {
-        return true;
+        return TRUE;
     }
 }
 

@@ -25,26 +25,25 @@ link_directories (
 )
 
 file (WRITE ${CMAKE_CURRENT_BINARY_DIR}/kwbmonitor_version.h
-     "const char* PGM_VERSION(\"${VERSION}\");\n")
+    "const char* PGM_VERSION(\"${VERSION}\");\n")
 
 set (kwbmonitor_SRCS
-     kwbmonitor_main.c
-     kwbmonitor.c
-     ../shared/ioloop.c
-     ../shared/vos.c
-     ../../shared/crc16.c
+    kwbmonitor.h
+
+    kwbmonitor_main.c
+    kwbmonitor.c
+    ../shared/vos.c
+    ../../shared/crc16.c
 )
 
 # executable
 # ---------------------------------------------------------
 if (WIN32)
-    add_executable ( kwbmonitor WIN32
-        ${kwbmonitor_SRCS} )
+    add_executable ( kwbmonitor ${kwbmonitor_SRCS} )
     install ( TARGETS kwbmonitor
               RUNTIME DESTINATION . )
 else (WIN32)
-    add_executable ( kwbmonitor
-        ${kwbmonitor_SRCS} )
+    add_executable ( kwbmonitor ${kwbmonitor_SRCS} )
     install ( TARGETS kwbmonitor
               RUNTIME DESTINATION bin )
 endif (WIN32)

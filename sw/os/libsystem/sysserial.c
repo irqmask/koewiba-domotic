@@ -10,7 +10,7 @@
 
 // --- Include section ---------------------------------------------------------
 
-#include "system.h"
+#include "prjconf.h"
 
 #include <assert.h>
 #include <stdio.h>
@@ -37,12 +37,16 @@
 
 // --- Local variables ---------------------------------------------------------
 
+#if defined (PRJCONF_UNIX) || \
+    defined (PRJCONF_POSIX) || \
+    defined (PRJCONF_LINUX)
 static const int c_baudrate[eSYS_SER_BR_LAST] = {
     B50, B75, B110, B134, B150, B200, B300, B600, B1200, B1800, B2400, B4800, B9600,
     -1, B19200, -1, B38400, -1, B57600, B115200, -1, B230400, -1, B460800, B500000,
     B576000, B921600, B1000000, B1152000, B1500000, B2000000, B2500000, B3000000,
     B3500000, B4000000
 };
+#endif
 
 static const int c_baudConsts2baudrate[eSYS_SER_BR_LAST] = {
     50, 75, 110, 134, 150, 200, 300, 600, 1200, 1800, 2400, 4800, 9600, 14400,
@@ -51,13 +55,20 @@ static const int c_baudConsts2baudrate[eSYS_SER_BR_LAST] = {
     3500000, 4000000,
 };
 
+#if defined (PRJCONF_UNIX) || \
+    defined (PRJCONF_POSIX) || \
+    defined (PRJCONF_LINUX)
 static const int c_databits[eSYS_SER_DB_LAST] = {
     CS5,            // eSYS_SER_DB_5
     CS6,            // eSYS_SER_DB_6
     CS7,            // eSYS_SER_DB_7
     CS8             // eSYS_SER_DB_8
 };
+#endif
 
+#if defined (PRJCONF_UNIX) || \
+    defined (PRJCONF_POSIX) || \
+    defined (PRJCONF_LINUX)
 static const int c_parity[eSYS_SER_P_LAST] = {
     0,              // eSYS_SER_P_NONE
     PARENB | PARODD,// eSYS_SER_P_ODD
@@ -65,12 +76,17 @@ static const int c_parity[eSYS_SER_P_LAST] = {
     -1,             // eSYS_SER_P_MARK
     -1              // eSYS_SER_P_SPACE
 };
+#endif
 
+#if defined (PRJCONF_UNIX) || \
+    defined (PRJCONF_POSIX) || \
+    defined (PRJCONF_LINUX)
 static const int c_stopbits[eSYS_SER_SB_LAST] = {
     0,              // eSYS_SER_SB_1
     -1,             // eSYS_SER_SB_1p5
     CSTOPB          // eSYS_SER_SB_2
 };
+#endif
 
 // --- Global variables --------------------------------------------------------
 
@@ -84,6 +100,9 @@ static const int c_stopbits[eSYS_SER_SB_LAST] = {
 
 sys_fd_t sys_serial_open (const char* device)
 {
+    #if defined (PRJCONF_UNIX) || \
+    defined (PRJCONF_POSIX) || \
+    defined (PRJCONF_LINUX)
     sys_fd_t fd;
     struct termios settings;
 
@@ -116,11 +135,21 @@ sys_fd_t sys_serial_open (const char* device)
     } while (0);
 
     return fd;
+#elif defined (PRJCONF_WINDOWS)
+    //TODO implement windows version
+    return INVALID_FD;
+#endif
 }
 
 void sys_serial_close (sys_fd_t fd)
 {
+#if defined (PRJCONF_UNIX) || \
+    defined (PRJCONF_POSIX) || \
+    defined (PRJCONF_LINUX)
     close(fd);
+#elif defined (PRJCONF_WINDOWS)
+    //TODO implement windows version
+#endif
 }
 
 int sys_serial_set_params (sys_fd_t            fd,
@@ -131,6 +160,9 @@ int sys_serial_set_params (sys_fd_t            fd,
                            sys_ser_flowctrl_t  flowcontrol)
 {
     int             rc = eSYS_ERR_NONE;
+#if defined (PRJCONF_UNIX) || \
+    defined (PRJCONF_POSIX) || \
+    defined (PRJCONF_LINUX)
     int             sys_baudrate;
     int             sys_databits;
     int             sys_parity;
@@ -182,30 +214,58 @@ int sys_serial_set_params (sys_fd_t            fd,
             rc = eSYS_ERR_SER_CONFIGURE;
         }
     } while (0);
-
+#elif defined (PRJCONF_WINDOWS)
+    //TODO implement windows version
+#endif
     return rc;
 }
 
 size_t sys_serial_send (sys_fd_t fd, void* buf, size_t bufsize)
 {
+#if defined (PRJCONF_UNIX) || \
+    defined (PRJCONF_POSIX) || \
+    defined (PRJCONF_LINUX)
     return write(fd, buf, bufsize);
+#elif defined (PRJCONF_WINDOWS)
+    //TODO implement windows version
+    return 0;
+#endif
 }
 
 size_t sys_serial_recv (sys_fd_t fd, void* buf, size_t bufsize)
 {
+#if defined (PRJCONF_UNIX) || \
+    defined (PRJCONF_POSIX) || \
+    defined (PRJCONF_LINUX)
     return read(fd, buf, bufsize);
+#elif defined (PRJCONF_WINDOWS)
+    //TODO implement windows version
+    return 0;
+#endif
 }
 
 void sys_serial_flush (sys_fd_t fd)
 {
+#if defined (PRJCONF_UNIX) || \
+    defined (PRJCONF_POSIX) || \
+    defined (PRJCONF_LINUX)
     tcflush(fd, TCIOFLUSH);
+#elif defined (PRJCONF_WINDOWS)
+    //TODO implement windows version
+#endif
 }
 
 size_t sys_serial_get_pending_sendq (sys_fd_t fd)
 {
     size_t pending_bytes = 0;
 
+#if defined (PRJCONF_UNIX) || \
+    defined (PRJCONF_POSIX) || \
+    defined (PRJCONF_LINUX)
     ioctl(fd, TIOCOUTQ, &pending_bytes);
+#elif defined (PRJCONF_WINDOWS)
+    //TODO implement windows version
+#endif
     return pending_bytes;
 }
 
@@ -213,17 +273,29 @@ size_t sys_serial_get_pending_recvq (sys_fd_t fd)
 {
     size_t pending_bytes = 0;
 
+#if defined (PRJCONF_UNIX) || \
+    defined (PRJCONF_POSIX) || \
+    defined (PRJCONF_LINUX)
     ioctl(fd, FIONREAD, &pending_bytes);
+#elif defined (PRJCONF_WINDOWS)
+    //TODO implement windows version
+#endif
     return pending_bytes;
 }
 
-void sys_serial_set_blocking (sys_fd_t fd, bool blocking)
+void sys_serial_set_blocking (sys_fd_t fd, BOOL blocking)
 {
+#if defined (PRJCONF_UNIX) || \
+    defined (PRJCONF_POSIX) || \
+    defined (PRJCONF_LINUX)
     if (blocking) {
         fcntl(fd, F_SETFL, 0);
     } else {
         fcntl(fd, F_SETFL, FNDELAY);
     }
+#elif defined (PRJCONF_WINDOWS)
+    //TODO implement windows version
+#endif
 }
 
 sys_ser_baudrate_t sys_serial_baudrate (int baudrate)

@@ -450,7 +450,7 @@ void bus_configure (sBus_t* psBus, uint16_t uNodeAddress)
     psBus->sCfg.uOwnAddress = uNodeAddress;
     psBus->sCfg.uOwnNodeAddress = uNodeAddress & 0x007F;
     psBus->sCfg.uOwnExtAddress = (uNodeAddress >> 8) & 0x000F;
-    psBus->sCfg.router_mode = false;
+    psBus->sCfg.router_mode = FALSE;
     create_empty_message(psBus);
 }
 
@@ -473,7 +473,7 @@ void bus_initialize (sBus_t* psBus, uint8_t uUart)
                  sizeof(psBus->tx_queue_data));
 }
 
-void bus_set_router_mode (sBus_t* bus, bool router_mode)
+void bus_set_router_mode (sBus_t* bus, BOOL router_mode)
 {
     bus->sCfg.router_mode = router_mode;
 }

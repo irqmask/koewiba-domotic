@@ -11,7 +11,7 @@
 // --- Include section ---------------------------------------------------------
 
 #include <assert.h>
-#include <stdbool.h>
+#include <stdBOOL.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -74,7 +74,7 @@ static void handle_message(msg_t* message, void* reference, void* arg)
 int main (int argc, char* argv[])
 {
     int             rc = eERR_NONE;
-    bool            end_application = false;
+    BOOL            end_application = FALSE;
     ioloop_t        mainloop;
     msg_socket_t    msg_socket;
     int fd, totalb=0;

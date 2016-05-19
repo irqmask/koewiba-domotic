@@ -198,7 +198,7 @@ int msg_s_open_server (msg_socket_t*   msg_socket,
                 rc = eERR_SYSTEM;
                 break;
             }
-            sys_socket_set_blocking(fd, false);
+            sys_socket_set_blocking(fd, FALSE);
         } else {
             rc = eERR_NOT_IMPLEMENTED;
             // TODO: insert tcp server code
@@ -238,7 +238,7 @@ int msg_s_open_client (msg_socket_t*   msg_socket,
                 rc = eERR_SYSTEM;
                 break;
             }
-            sys_socket_set_blocking(fd, false);
+            sys_socket_set_blocking(fd, FALSE);
         } else {
             rc = eERR_NOT_IMPLEMENTED;
             // TODO: insert tcp client code

@@ -41,7 +41,7 @@
 
 void msg_log (msg_t message)
 {
-    bool first_line = true;
+    BOOL first_line = TRUE;
     uint8_t remaining_length, ii, bytes_in_line;
     char logline[256], tmp[256];
 
@@ -51,8 +51,8 @@ void msg_log (msg_t message)
 
     while (remaining_length) {
         if (bytes_in_line == 0) {
-            if (first_line == true) {
-                first_line = false;
+            if (first_line == TRUE) {
+                first_line = FALSE;
                 snprintf(logline, sizeof(logline), "%04X %04X %2d ", message.sender, message.receiver, message.length);
             } else {
                 snprintf(logline, sizeof(logline), "             ");

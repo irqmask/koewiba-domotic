@@ -88,7 +88,7 @@ void msg_b_init (msg_bus_t* msg_bus, uint8_t uart_index)
 int msg_b_open (msg_bus_t*     msg_bus,
                 ioloop_t*      ioloop,
                 uint16_t       own_address,
-                bool           open_serial,
+                BOOL           open_serial,
                 const char*    device_or_address,
                 int            baudrate_or_port)
 {
@@ -111,7 +111,7 @@ int msg_b_open (msg_bus_t*     msg_bus,
         }
 
         ioloop_register_fd(ioloop, msg_bus->vos.fd, eIOLOOP_EV_READ, msg_receive, (void*)msg_bus);
-        ioloop_register_timer(ioloop, 10, true, eIOLOOP_EV_TIMER, msg_receive, (void*)msg_bus);
+        ioloop_register_timer(ioloop, 10, TRUE, eIOLOOP_EV_TIMER, msg_receive, (void*)msg_bus);
 
         clk_initialize();
         bus_configure(&msg_bus->bus, own_address);

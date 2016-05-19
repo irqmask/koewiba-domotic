@@ -27,7 +27,7 @@
 
 // --- Definitions -------------------------------------------------------------
 
-#ifdef _SYS_WINDOWS_
+#if defined (PRJCONF_WINDOWS)
 #  define sys_thread_func(name) DWORD WINAPI name( LPVOID p)
 
 #  define sys_thread_start(func)    do{                 \

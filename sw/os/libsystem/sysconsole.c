@@ -7,6 +7,9 @@
     defined (PRJCONF_POSIX) || \
     defined (PRJCONF_LINUX)
   #include <termios.h>
+#elif defined (PRJCONF_WINDOWS) && (_MSC_VER) && _MSC_VER < 1900
+  #include <stdarg.h>
+  #include <string.h>
 #endif
 
 #include "sysconsole.h"
@@ -59,3 +62,29 @@ char getche(void)
 
 #endif
 
+#if defined (PRJCONF_WINDOWS) && (_MSC_VER) && _MSC_VER < 1900
+/*int vsnprintf(char *outBuf, size_t size, const char *format, va_list ap)
+{
+    int count = -1;
+
+    if (size != 0)
+        count = _vsnprintf_s(outBuf, size, _TRUNCATE, format, ap);
+    if (count == -1)
+        count = _vscprintf(format, ap);
+
+    return count;
+}*/
+
+int snprintf(char *outBuf, size_t size, const char *format, ...)
+{
+    int count;
+    va_list ap;
+
+    va_start(ap, format);
+    count = _vsnprintf_s(outBuf, size, size-1, format, ap);
+    va_end(ap);
+
+    return count;
+}
+
+#endif // defined(_MSC_VER) && _MSC_VER < 1900

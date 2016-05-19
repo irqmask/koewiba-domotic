@@ -20,6 +20,7 @@
   #include <sys/time.h>
   #include <sys/types.h>
 #elif defined (PRJCONF_WINDOWS)
+  #include <windows.h>
 #endif
 
 #include "ioloop.h"
@@ -42,7 +43,7 @@ typedef struct ioloop_timer {
     int32_t                 id;
     uint16_t                interval_ticks;
     uint16_t                expiration_time;
-    bool                    run_cyclic;
+    BOOL                    run_cyclic;
     ioloop_event_type_t     eventtype;
     ioloop_event_func_t     callback;
     void*                   arg;
@@ -118,7 +119,7 @@ static void ioloop_update_fd_sets (ioloop_t* ioloop)
         }
         conn = conn->next;
     }
-    ioloop->update_required = false;
+    ioloop->update_required = FALSE;
 }
 
 static void ioloop_insert_conn (ioloop_t* ioloop, ioloop_connection_t* conn)
@@ -265,7 +266,7 @@ void ioloop_init (ioloop_t* ioloop)
 
     memset(ioloop, 0, sizeof(ioloop_t));
     ioloop->default_timeout_ticks = 100; // 100 * 1/100second
-    ioloop->update_required = true;
+    ioloop->update_required = TRUE;
 }
 
 void ioloop_register_fd (ioloop_t*              ioloop,
@@ -288,7 +289,7 @@ void ioloop_register_fd (ioloop_t*              ioloop,
         conn->arg       = arg;
 
         ioloop_insert_conn(ioloop, conn);
-        ioloop->update_required = true;
+        ioloop->update_required = TRUE;
         if (fd > ioloop->highest_fd) ioloop->highest_fd = fd;
     } while (0);
 }
@@ -310,7 +311,7 @@ void ioloop_unregister_fd (ioloop_t* ioloop,
         }
         conn = conn->next;
     }
-    ioloop->update_required = true;
+    ioloop->update_required = TRUE;
 }
 
 void ioloop_set_default_timeout (ioloop_t* ioloop,
@@ -323,7 +324,7 @@ void ioloop_set_default_timeout (ioloop_t* ioloop,
 
 int32_t ioloop_register_timer (ioloop_t*            ioloop,
                                uint16_t             interval_ticks,
-                               bool                 run_cyclic,
+                               BOOL                 run_cyclic,
                                ioloop_event_type_t  eventtype,
                                ioloop_event_func_t  callback,
                                void*                arg)

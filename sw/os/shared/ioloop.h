@@ -50,7 +50,7 @@ typedef struct ioloop_timer ioloop_timer_t;
 typedef struct ioloop {
     ioloop_connection_t*    first_conn;
     ioloop_timer_t*         first_timer;
-    bool                    update_required;
+    BOOL                    update_required;
     sys_fd_t                highest_fd;
     fd_set                  read_fd_set;
     fd_set                  write_fd_set;
@@ -86,7 +86,7 @@ void ioloop_set_default_timeout (ioloop_t* ioloop,
 
 int32_t ioloop_register_timer (ioloop_t*            ioloop,
                                uint16_t             interval_ticks,
-                               bool                 run_cyclic,
+                               BOOL                 run_cyclic,
                                ioloop_event_type_t  eventtype,
                                ioloop_event_func_t  callback,
                                void*                arg);

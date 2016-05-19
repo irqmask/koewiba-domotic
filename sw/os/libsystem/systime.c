@@ -66,8 +66,8 @@ sys_time_t sys_time_get_usecs (void)
     QueryPerformanceCounter(&usecs);
 
     if (QueryPerformanceFrequency(&freq) && freq.QuadPart > 0) {
-        temp = usecs.QuadPart * 1000000;
-        temp /= freq.QuadPart;
+        temp = (double)usecs.QuadPart * 1000000;
+        temp /= (double)freq.QuadPart;
         usecs.QuadPart = (sys_time_t)temp;
     }
 

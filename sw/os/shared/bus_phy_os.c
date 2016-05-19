@@ -165,7 +165,7 @@ BOOL bus_phy_data_received(sBusPhy_t* phy)
  * @param[in] phy       Handle to bus's phsical layer
  * @param[out] byte     Received byte. *puByte remains unchange if no byte has been received.
  *
- * @returns TRUE if a byte has been received, otherwise false.
+ * @returns TRUE if a byte has been received, otherwise FALSE.
  */
 BOOL bus_phy_read_byte(sBusPhy_t* phy, uint8_t *byte)
 {

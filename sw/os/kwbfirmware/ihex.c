@@ -405,7 +405,7 @@ void write_byte_to_mem(uint32_t address, uint8_t byte, void* arg)
  * @param[in]   arg             User defined argument which is passed to the 
  *                              write_byte_func.
  * 
- * @returns     0 if the IHEX file has been successfully read in, otherwise false.
+ * @returns     0 if the IHEX file has been successfully read in, otherwise FALSE.
  */
 int32_t ihex_read_file (const char*             filename,
                         uint32_t*               pstart_address,
@@ -473,7 +473,7 @@ int32_t ihex_read_file (const char*             filename,
  *                              IHEX file contnt exceeds the target memoy size, 
  *                              the read process is stopped.
  * 
- * @returns     0 if the IHEX file has been successfully read in, otherwise false.
+ * @returns     0 if the IHEX file has been successfully read in, otherwise FALSE.
  */
 int32_t ihex_read_file_mem (const char*             filename,
                             uint32_t*               pstart_address,

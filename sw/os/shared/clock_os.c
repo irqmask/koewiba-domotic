@@ -100,7 +100,7 @@ void clk_initialize (void)
  * Start/Stop Clock-Timer
  *
  * @param[in] start
- * boolean for starting/stopping the timer (TRUE = start)
+ * BOOLean for starting/stopping the timer (TRUE = start)
  */
 void clk_control (BOOL start)
 {
@@ -135,7 +135,7 @@ BOOL clk_timer_start (clock_timer_t* timer, uint16_t ticks)
  * @param[in] psTimer
  * Pointer to timer structure.
  *
- * @returns TRUE, if time is over, otherwise false.
+ * @returns TRUE, if time is over, otherwise FALSE.
  */
 BOOL clk_timer_is_elapsed (clock_timer_t* timer)
 {

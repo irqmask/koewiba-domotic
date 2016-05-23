@@ -36,7 +36,7 @@ static local_clock_timer_t g_running_timers[CLOCK_NUM_TIMER];
 /**
  * Register timer in list.
  */
-static BOOL register_timer (clock_timer_t* timer)
+static bool register_timer (clock_timer_t* timer)
 {
     uint8_t ii;
 
@@ -44,10 +44,10 @@ static BOOL register_timer (clock_timer_t* timer)
         if (g_running_timers[ii].timer == NULL) {
             g_running_timers[ii].timer = timer;
             g_running_timers[ii].starttime = sys_time_get_usecs();
-            return TRUE;
+            return true;
         }
     }
-    return FALSE;
+    return false;
 }
 
 static uint16_t elapsed_ticks (sys_time_t starttime)
@@ -100,9 +100,9 @@ void clk_initialize (void)
  * Start/Stop Clock-Timer
  *
  * @param[in] start
- * BOOLean for starting/stopping the timer (TRUE = start)
+ * BOOLean for starting/stopping the timer (true = start)
  */
-void clk_control (BOOL start)
+void clk_control (bool start)
 {
     // nothing to do in linux
 }
@@ -116,14 +116,14 @@ void clk_control (BOOL start)
  * Time in ticks. Convert from millisconds to ticks with
  * CLOCK_MS_2_TICKS macro.
  *
- * @returns TRUE, if timer has been (re)started, otherwise FALSE.
+ * @returns true, if timer has been (re)started, otherwise false.
  */
-BOOL clk_timer_start (clock_timer_t* timer, uint16_t ticks)
+bool clk_timer_start (clock_timer_t* timer, uint16_t ticks)
 {
     // if timer is still running ...
     if (timer->ticks != 0) {
         timer->ticks = ticks; // ... restart timer
-        return TRUE;
+        return true;
     }
     timer->ticks = ticks;
     return register_timer(timer);
@@ -135,15 +135,15 @@ BOOL clk_timer_start (clock_timer_t* timer, uint16_t ticks)
  * @param[in] psTimer
  * Pointer to timer structure.
  *
- * @returns TRUE, if time is over, otherwise FALSE.
+ * @returns true, if time is over, otherwise false.
  */
-BOOL clk_timer_is_elapsed (clock_timer_t* timer)
+bool clk_timer_is_elapsed (clock_timer_t* timer)
 {
     clean_up();
     if (timer->ticks == 0) {
-        return TRUE;
+        return true;
     } else {
-        return FALSE;
+        return false;
     }
 }
 

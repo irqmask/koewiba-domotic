@@ -48,15 +48,15 @@ typedef struct clktimer {
 
 void clk_initialize        (void);
 
-void clk_control           (BOOL start);
+void clk_control           (bool start);
 
-BOOL clk_timer_start       (clock_timer_t* timer_instance, uint16_t ticks);
+bool clk_timer_start       (clock_timer_t* timer_instance, uint16_t ticks);
 
-BOOL clk_timer_stop        (clock_timer_t* timer_instance);
+bool clk_timer_stop        (clock_timer_t* timer_instance);
 
-BOOL clk_timer_is_elapsed  (clock_timer_t* timer_instance);
+bool clk_timer_is_elapsed  (clock_timer_t* timer_instance);
 
-BOOL clk_timer_is_running  (clock_timer_t* timer_instance);
+bool clk_timer_is_running  (clock_timer_t* timer_instance);
 
 uint16_t clk_timers_next_expiration (void);
 

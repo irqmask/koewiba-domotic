@@ -61,9 +61,9 @@ int route_add (router_t*    router,
 
 void route_delete (router_t*    router);
 
-int route_message (router_t*    router,
-                   msg_t*       message,
-                   void*        reference);
+void route_message (router_t*    router,
+                    msg_t*       message,
+                    void*        reference);
 
 #endif /* _ROUTER_H_ */
 /** @} */

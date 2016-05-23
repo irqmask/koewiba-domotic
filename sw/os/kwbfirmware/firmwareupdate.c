@@ -23,19 +23,29 @@
 
 // --- Include section ---------------------------------------------------------
 
+#include "prjconf.h"
+
 #include <assert.h>
 #include <malloc.h>
-#include <safe_lib.h>
+#include <string.h>
+
+#if defined (PRJCONF_UNIX) || \
+    defined (PRJCONF_POSIX) || \
+    defined (PRJCONF_LINUX)
+  #include <safe_lib.h>
+#endif
 
 #include "cmddef_common.h"
 #include "moddef_common.h"
 
 #include "crc16.h"
 #include "firmwareupdate.h"
+#include "ihex.h"
 #include "log.h"
 #include "message.h"
 #include "message_serial.h"
-
+#include "prjtypes.h"
+#include "sysconsole.h"
 #include "systime.h"
 
 // --- Definitions -------------------------------------------------------------
@@ -195,7 +205,7 @@ static int send_block_start_message (firmwareupdate_t* fwu)
     int         rc = eRUNNING;
     msg_t       msg;
 
-    memset_s(&msg, sizeof(msg), 0);
+    memset(&msg, 0, sizeof(msg));
     msg.receiver = fwu->module_address;
     msg.data[0] = eCMD_BLOCK_START;
     msg.data[1] = 2; // blocktype external EEProm (firmware)
@@ -243,7 +253,7 @@ static int send_block_data_message (firmwareupdate_t* fwu)
         }
 
         // prepare message
-        memset_s(&msg, sizeof(msg), 0);
+        memset(&msg, 0, sizeof(msg));
         msg.receiver = fwu->module_address;
         msg.data[0] = eCMD_BLOCK_DATA;
         msg.data[1] = (fwu->curr_offset & 0xFF00) >> 8;
@@ -279,7 +289,7 @@ static int send_block_data_message (firmwareupdate_t* fwu)
         } else {
             rc = eRUNNING;
         }
-    } while (FALSE);
+    } while (false);
     return rc;
 }
 
@@ -302,7 +312,7 @@ static int send_block_end_message (firmwareupdate_t* fwu)
 
     crc = calculate_crc16(fwu);
 
-    memset_s(&msg, sizeof(msg), 0);
+    memset(&msg, 0, sizeof(msg));
     msg.receiver = fwu->module_address;
     msg.data[0] = eCMD_BLOCK_END;
     msg.data[1] = (crc & 0xFF00) >> 8;
@@ -324,7 +334,7 @@ static int send_reset_message (firmwareupdate_t* fwu)
     int      rc = eERR_NONE;
     msg_t    msg;
 
-    memset_s(&msg, sizeof(msg), 0);
+    memset(&msg, 0, sizeof(msg));
     msg.receiver = fwu->module_address;
     msg.data[0] = eCMD_RESET;
     msg.length = 1;
@@ -344,7 +354,7 @@ static int send_request_bldflags_message (firmwareupdate_t* fwu)
     int      rc = eERR_NONE;
     msg_t    msg;
 
-    memset_s(&msg, sizeof(msg), 0);
+    memset(&msg, 0, sizeof(msg));
     msg.receiver = fwu->module_address;
     msg.data[0] = eCMD_REQUEST_REG;
     msg.data[1] = MOD_eReg_BldFlag;
@@ -419,7 +429,7 @@ int firmware_update_init (firmwareupdate_t* fwu,
 
     do {
         assert(fwu != NULL);
-        memset_s(fwu, sizeof(firmwareupdate_t), 0);
+        memset(fwu, 0, sizeof(firmwareupdate_t));
 
         msg_ser_init(&fwu->msg_serial);
 
@@ -430,7 +440,7 @@ int firmware_update_init (firmwareupdate_t* fwu,
         // default: reset target node after update
         fwu->reset_target_node = 1;
         fwu->progress_thd = 5;
-    } while (FALSE);
+    } while (false);
     return rc;
 }
 
@@ -481,8 +491,8 @@ int firmware_update_start (firmwareupdate_t*    fwu,
 
         // allocate and initialie target memory. Initialize to 0xFF
         // because flash memory is 0xFF when it is erased.
-        fwu->fw_memory = malloc(fwu->fw_size);
-        memset_s(fwu->fw_memory, fwu->fw_size, 0xFF);
+        fwu->fw_memory = (uint8_t*)malloc(fwu->fw_size);
+        memset(fwu->fw_memory, 0xFF, fwu->fw_size);
         if (fwu->fw_memory == NULL) {
             log_error("Out of memory. Failed to allocate %d bytes", fwu->fw_size);
             rc = eERR_MALLOC;
@@ -499,7 +509,7 @@ int firmware_update_start (firmwareupdate_t*    fwu,
             break;
         }
         fwu->curr_state = eFWU_START;
-    } while (FALSE);
+    } while (false);
     return rc;
 }
 
@@ -516,7 +526,8 @@ int firmware_update_start (firmwareupdate_t*    fwu,
  */
 int firmware_update_run (firmwareupdate_t* fwu)
 {
-    int rc = eRUNNING;
+    int     rc = eRUNNING;
+    uint8_t progress = 0;
 
     switch (fwu->curr_state) {
     case eFWU_IDLE:
@@ -542,7 +553,7 @@ int firmware_update_run (firmwareupdate_t* fwu)
                 fwu->curr_state = eFWU_END;
             }
             // update progress
-            uint8_t progress = (uint8_t)(100 * fwu->curr_offset / fwu->fw_size);
+            progress = (uint8_t)(100 * fwu->curr_offset / fwu->fw_size);
             if ((progress - fwu->last_progress) >= fwu->progress_thd || progress == 100) {
                 fwu->last_progress = progress;
                 if (fwu->progress_func != NULL) {

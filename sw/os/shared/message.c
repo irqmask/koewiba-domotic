@@ -10,18 +10,22 @@
 
 // --- Include section ---------------------------------------------------------
 
+#include "prjconf.h"
+
 #include <assert.h>
 #include <stdio.h>
 #include <string.h>
-
-#include "log.h"
-#include "message.h"
 
 #if defined (PRJCONF_UNIX) || \
     defined (PRJCONF_POSIX) || \
     defined (PRJCONF_LINUX)
   #include <safe_lib.h>
 #endif
+
+#include "log.h"
+#include "message.h"
+#include "prjtypes.h"
+#include "sysconsole.h"
 
 // --- Definitions -------------------------------------------------------------
 
@@ -41,7 +45,7 @@
 
 void msg_log (msg_t message)
 {
-    BOOL first_line = TRUE;
+    bool first_line = true;
     uint8_t remaining_length, ii, bytes_in_line;
     char logline[256], tmp[256];
 
@@ -51,8 +55,8 @@ void msg_log (msg_t message)
 
     while (remaining_length) {
         if (bytes_in_line == 0) {
-            if (first_line == TRUE) {
-                first_line = FALSE;
+            if (first_line == true) {
+                first_line = false;
                 snprintf(logline, sizeof(logline), "%04X %04X %2d ", message.sender, message.receiver, message.length);
             } else {
                 snprintf(logline, sizeof(logline), "             ");

@@ -56,7 +56,7 @@ size_t sys_socket_get_pending_sendq (sys_fd_t fd);
 
 size_t sys_socket_get_pending_recvq (sys_fd_t fd);
 
-void sys_socket_set_blocking (sys_fd_t fd, BOOL blocking);
+void sys_socket_set_blocking (sys_fd_t fd, bool blocking);
 
 void sys_socket_get_name (sys_fd_t fd, char* address, size_t addr_len, uint16_t* port);
 

@@ -228,7 +228,7 @@ size_t sys_socket_get_pending_recvq (sys_fd_t fd)
 #endif
 }
 
-void sys_socket_set_blocking (sys_fd_t fd, BOOL blocking)
+void sys_socket_set_blocking (sys_fd_t fd, bool blocking)
 {
 #if defined (PRJCONF_UNIX) || \
     defined (PRJCONF_POSIX) || \

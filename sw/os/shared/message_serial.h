@@ -83,6 +83,8 @@ void msg_ser_set_incomming_handler (msg_serial_t* msg_serial,
 int msg_ser_send    (msg_serial_t*  msg_serial,
                      msg_t*         message);
 
+int msg_ser_continue_sending (msg_serial_t* msg_serial);
+
 bool msg_ser_is_tx_empty (msg_serial_t* msg_serial);
 
 #endif /* _MESSAGE_SOCKET_H_ */

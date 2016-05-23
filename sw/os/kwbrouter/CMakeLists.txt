@@ -34,6 +34,7 @@ set (kwbrouter_SRCS
     ../shared/bus_phy_os.c
     ../shared/clock_os.c
     ../shared/ioloop.c
+	../shared/log.c
     ../shared/message_bus.c
     ../shared/message_socket.c
     ../shared/vos.c
@@ -45,7 +46,7 @@ set (kwbrouter_SRCS
 # executable
 # ---------------------------------------------------------
 if (WIN32)
-    add_executable ( kwbrouter WIN32
+    add_executable ( kwbrouter 
         ${kwbrouter_SRCS} )
     install ( TARGETS kwbrouter
               RUNTIME DESTINATION . )
@@ -58,7 +59,8 @@ endif (WIN32)
 
 # Link libraries
 # ---------------------------------------------------------
-target_link_libraries (kwbrouter libsystem jansson)
+target_link_libraries (kwbrouter libsystem)
+#TODO needed target_link_libraries (kwbrouter jansson)
 if (WIN32)
 
 else (WIN32)

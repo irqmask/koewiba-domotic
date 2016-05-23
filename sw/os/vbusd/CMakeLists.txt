@@ -35,7 +35,7 @@ set (vbusd_SRCS
 # executable
 # ---------------------------------------------------------
 if (WIN32)
-    add_executable ( vbusd WIN32
+    add_executable ( vbusd 
         ${vbusd_SRCS} )
     install ( TARGETS vbusd
               RUNTIME DESTINATION . )

@@ -283,7 +283,7 @@ size_t sys_serial_get_pending_recvq (sys_fd_t fd)
     return pending_bytes;
 }
 
-void sys_serial_set_blocking (sys_fd_t fd, BOOL blocking)
+void sys_serial_set_blocking (sys_fd_t fd, bool blocking)
 {
 #if defined (PRJCONF_UNIX) || \
     defined (PRJCONF_POSIX) || \

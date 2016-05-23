@@ -30,13 +30,14 @@ file (WRITE ${CMAKE_CURRENT_BINARY_DIR}/kwbtest_version.h
 set (kwbtest_SRCS
     kwbtest_main.c
     ../shared/ioloop.c
+	../shared/log.c
     ../shared/message_socket.c
 )
 
 # executable
 # ---------------------------------------------------------
 if (WIN32)
-    add_executable ( kwbtest WIN32
+    add_executable ( kwbtest
         ${kwbtest_SRCS} )
     install ( TARGETS kwbtest
               RUNTIME DESTINATION . )

@@ -72,7 +72,7 @@ void    bus_scheduler_initialize            (sBus_t* psBus,
                                              sSched_t* psSched,
                                              uint8_t uUart);
 
-BOOL    bus_schedule_and_get_message        (sBus_t*        psBus,
+bool    bus_schedule_and_get_message        (sBus_t*        psBus,
                                              sSched_t*      psSched);
 
 void    bus_schedule_check_and_set_sleep    (sBus_t* psBus);

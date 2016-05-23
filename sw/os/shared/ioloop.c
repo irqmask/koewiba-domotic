@@ -43,7 +43,7 @@ typedef struct ioloop_timer {
     int32_t                 id;
     uint16_t                interval_ticks;
     uint16_t                expiration_time;
-    BOOL                    run_cyclic;
+    bool                    run_cyclic;
     ioloop_event_type_t     eventtype;
     ioloop_event_func_t     callback;
     void*                   arg;
@@ -106,11 +106,14 @@ static int32_t ioloop_get_id (ioloop_t* ioloop)
 static void ioloop_update_fd_sets (ioloop_t* ioloop)
 {
     ioloop_connection_t* conn;
+    
+    conn = ioloop->first_conn;
 
+#if defined (PRJCONF_UNIX) || \
+    defined (PRJCONF_POSIX) || \
+    defined (PRJCONF_LINUX)
     FD_ZERO(&ioloop->read_fd_set);
     FD_ZERO(&ioloop->write_fd_set);
-
-    conn = ioloop->first_conn;
     while (conn != NULL) {
         if (conn->eventtype == eIOLOOP_EV_READ) {
             FD_SET(conn->fd, &ioloop->read_fd_set);
@@ -119,7 +122,17 @@ static void ioloop_update_fd_sets (ioloop_t* ioloop)
         }
         conn = conn->next;
     }
-    ioloop->update_required = FALSE;
+#elif defined (PRJCONF_WINDOWS)
+    memset(ioloop->list_of_fds, 0, sizeof(ioloop->list_of_fds));
+    while (conn != NULL && ioloop->num_list_entries < MAXIMUM_WAIT_OBJECTS) {
+        if (conn->eventtype == eIOLOOP_EV_READ || conn->eventtype == eIOLOOP_EV_WRITE) {
+            ioloop->list_of_fds[ioloop->num_list_entries] = conn->fd;
+            ioloop->list_of_conns[ioloop->num_list_entries] = conn;
+            ioloop->num_list_entries++;
+        }
+    }
+#endif
+    ioloop->update_required = false;
 }
 
 static void ioloop_insert_conn (ioloop_t* ioloop, ioloop_connection_t* conn)
@@ -266,7 +279,7 @@ void ioloop_init (ioloop_t* ioloop)
 
     memset(ioloop, 0, sizeof(ioloop_t));
     ioloop->default_timeout_ticks = 100; // 100 * 1/100second
-    ioloop->update_required = TRUE;
+    ioloop->update_required = true;
 }
 
 void ioloop_register_fd (ioloop_t*              ioloop,
@@ -289,8 +302,12 @@ void ioloop_register_fd (ioloop_t*              ioloop,
         conn->arg       = arg;
 
         ioloop_insert_conn(ioloop, conn);
-        ioloop->update_required = TRUE;
+        ioloop->update_required = true;
+#if defined (PRJCONF_UNIX) || \
+    defined (PRJCONF_POSIX) || \
+    defined (PRJCONF_LINUX)
         if (fd > ioloop->highest_fd) ioloop->highest_fd = fd;
+#endif
     } while (0);
 }
 
@@ -311,7 +328,7 @@ void ioloop_unregister_fd (ioloop_t* ioloop,
         }
         conn = conn->next;
     }
-    ioloop->update_required = TRUE;
+    ioloop->update_required = true;
 }
 
 void ioloop_set_default_timeout (ioloop_t* ioloop,
@@ -324,7 +341,7 @@ void ioloop_set_default_timeout (ioloop_t* ioloop,
 
 int32_t ioloop_register_timer (ioloop_t*            ioloop,
                                uint16_t             interval_ticks,
-                               BOOL                 run_cyclic,
+                               bool                 run_cyclic,
                                ioloop_event_type_t  eventtype,
                                ioloop_event_func_t  callback,
                                void*                arg)
@@ -380,8 +397,12 @@ void ioloop_unregister_timer (ioloop_t* ioloop,
     }
 }
 
-int ioloop_run_once (ioloop_t* ioloop)
+void ioloop_run_once (ioloop_t* ioloop)
 {
+#if defined (PRJCONF_UNIX) || \
+    defined (PRJCONF_POSIX) || \
+    defined (PRJCONF_LINUX)
+
     int                     rc;
     ioloop_connection_t*    conn;
     sys_time_t              timeout_us;
@@ -443,8 +464,33 @@ int ioloop_run_once (ioloop_t* ioloop)
 
     // check for elapsed timers again
     ioloop_check_timer(ioloop);
+#elif defined (PRJCONF_WINDOWS)
+    uint32_t                rc, timeout_ms;
+    ioloop_connection_t*    conn;
 
-    return rc;
+    assert(ioloop != NULL);
+
+    // update list of file descriptors for select
+    if (ioloop->update_required) {
+        ioloop_update_fd_sets(ioloop);
+    }
+
+    // check for elapsed timers
+    ioloop_check_timer(ioloop);
+
+    timeout_ms = (1000 * ioloop_get_next_timeout(ioloop)) / CLOCK_TICKS_PER_SECOND;
+
+    rc = WaitForMultipleObjects(ioloop->num_list_entries, ioloop->list_of_fds, FALSE, timeout_ms);
+    if (rc >= WAIT_OBJECT_0 && rc < WAIT_OBJECT_0 + ioloop->num_list_entries) {
+        conn = ioloop->list_of_conns[rc - WAIT_OBJECT_0];
+        if (conn->callback != NULL) {
+            conn->callback(conn->arg);
+        }
+    }
+
+    // check for elapsed timers again
+    ioloop_check_timer(ioloop);
+#endif
 }
 
 /** @} */

@@ -23,8 +23,6 @@
 #include "prjconf.h"
 
 #include <getopt.h>
-#include <stdBOOL.h>
-#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -39,6 +37,8 @@
 #include "message_bus.h"
 #include "bus_scheduler.h"
 #include "ioloop.h"
+#include "log.h"
+#include "prjtypes.h"
 #include "vos.h"
 #include "system.h"
 
@@ -51,8 +51,8 @@ typedef struct options {
     int         serial_baudrate;
     char        vbusd_address[256];
     uint16_t    vbusd_port;
-    BOOL        serial_device_set;
-    BOOL        vbusd_address_set;
+    bool        serial_device_set;
+    bool        vbusd_address_set;
     uint16_t    own_node_address;
 } options_t;
 
@@ -97,11 +97,11 @@ static void set_options (options_t*     options,
     options->own_node_address = own_node_address;
 }
 
-static BOOL parse_commandline_options (int          argc,
+static bool parse_commandline_options (int          argc,
                                        char*        argv[],
                                        options_t*   options)
 {
-    BOOL                    rc = TRUE;
+    bool                    rc = true;
     int                     c;
 
     while (1) {
@@ -112,7 +112,7 @@ static BOOL parse_commandline_options (int          argc,
             case 'd':
                 printf("device %s\n", optarg);
                 strcpy_s(options->serial_device, sizeof(options->serial_device), optarg);
-                options->serial_device_set = TRUE;
+                options->serial_device_set = true;
                 break;
             case 'b':
                 printf("baudrate %s\n", optarg);
@@ -121,7 +121,7 @@ static BOOL parse_commandline_options (int          argc,
             case 'v':
                 printf("vbusd address %s\n", optarg);
                 strcpy_s(options->vbusd_address, sizeof(options->vbusd_address), optarg);
-                options->vbusd_address_set = TRUE;
+                options->vbusd_address_set = true;
                 break;
             case 'w':
                 printf("vbusd port %s\n", optarg);
@@ -131,39 +131,39 @@ static BOOL parse_commandline_options (int          argc,
                 options->own_node_address = atoi(optarg);
                 break;
             default:
-                rc = FALSE;
+                rc = false;
                 break;
         }
     }
     return rc;
 }
 
-static BOOL validate_options (options_t* options)
+static bool validate_options (options_t* options)
 {
-    BOOL    rc = FALSE,
-    serial_device_set = FALSE,
-    vbusd_address_set = FALSE;
+    bool    rc = false,
+    serial_device_set = false,
+    vbusd_address_set = false;
 
     do {
         // minimum address is "/a": unix socket with name "a" in the root directory
         if (options->serial_device_set &&
             strnlen_s(options->serial_device, sizeof(options->serial_device)) < 2) {
-            fprintf(stderr, "Invalid serial device path!\n");
+            log_error("Invalid serial device path!\n");
             break;
         }
         if (options->vbusd_address_set &&
             strnlen_s(options->vbusd_address, sizeof(options->vbusd_address)) < 2) {
-            fprintf(stderr, "Invalid vbusd address!\n");
+            log_error("Invalid vbusd address!\n");
             break;
         }
         if (options->own_node_address == 0 ||
             options->own_node_address == 0xFF ||
             options->own_node_address == 0xFFFF) {
-            fprintf(stderr, "Invalid own node address %d. It has to be 1..254, 256..65534\n",
+            log_error("Invalid own node address %d. It has to be 1..254, 256..65534\n",
                     options->own_node_address);
             break;
         }
-        rc = TRUE;
+        rc = true;
     } while (0);
     return rc;
 }
@@ -195,10 +195,9 @@ int32_t do_scheduling (void* arg)
 
 int main(int argc, char* argv[])
 {
-    char        cc;
     int         rc = eERR_NONE;
     options_t   options;
-    BOOL        end_application = FALSE;
+    bool        end_application = false;
     ioloop_t    mainloop;
     msg_bus_t   busscheduler;
 
@@ -225,7 +224,7 @@ int main(int argc, char* argv[])
 
         // schedule on incomming bytes and after timer expiration
         ioloop_register_fd(&mainloop, busscheduler.vos.fd, eIOLOOP_EV_READ, do_scheduling, &busscheduler);
-        ioloop_register_timer(&mainloop, 10, TRUE, eIOLOOP_EV_TIMER, do_scheduling, &busscheduler);
+        ioloop_register_timer(&mainloop, 10, true, eIOLOOP_EV_TIMER, do_scheduling, &busscheduler);
 
         while (!end_application) {
             ioloop_run_once(&mainloop);

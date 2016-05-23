@@ -58,7 +58,7 @@ int vos_open_serial (vos_t* vos, const char* device, int baudrate)
             break;
         }
 
-        sys_serial_set_blocking(vos->fd, FALSE);
+        sys_serial_set_blocking(vos->fd, false);
     } while (0);
 
     return rc;
@@ -83,7 +83,7 @@ int vos_open_vbusd (vos_t* vos, const char* address, uint16_t port)
             break;
         }
 
-        sys_socket_set_blocking(vos->fd, FALSE);
+        sys_socket_set_blocking(vos->fd, false);
     } while (0);
 
     return rc;

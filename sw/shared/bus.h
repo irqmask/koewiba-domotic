@@ -120,11 +120,11 @@ typedef enum bus_recv_state {
 } msg_recv_state_t;
 
 typedef enum busflags {
-    e_uartrxflag    = 0b00000001,
-    e_uarttxflag    = 0b00000010,
-    e_uartrxerrflag = 0b00000100,
-    e_uarttxerrflag = 0b00001000,
-    e_timeout       = 0b00010000
+    e_uartrxflag    = (1<<0), // 0b00000001
+    e_uarttxflag    = (1<<1), // 0b00000010
+    e_uartrxerrflag = (1<<2), // 0b00000100
+    e_uarttxerrflag = (1<<3), // 0b00001000
+    e_timeout       = (1<<4), // 0b00010000
 } eBusFlags_t;
 
 //! Possible errors of the bus-sender.
@@ -218,30 +218,30 @@ void    bus_set_router_mode                 (sBus_t*        bus,
 
 void 	bus_flush_bus                       (sBus_t*        psBus);
 
-BOOL 	bus_get_message                     (sBus_t*        psBus);
+bool 	bus_get_message                     (sBus_t*        psBus);
 
-BOOL 	bus_read_message                    (sBus_t*        psBus,
+bool 	bus_read_message                    (sBus_t*        psBus,
                                              uint16_t*      puSender,
                                              uint8_t*       puLen,
                                              uint8_t*       puMsg);
 
-BOOL    bus_read_message_verbose            (sBus_t*        psBus,
+bool    bus_read_message_verbose            (sBus_t*        psBus,
                                              uint16_t*      puSender,
                                              uint16_t*      puReceiver,
                                              uint8_t*       puLen,
                                              uint8_t*       puMsg,
                                              uint16_t*      puCRC);
 
-BOOL 	bus_send_message                    (sBus_t*        psBus,
+bool 	bus_send_message                    (sBus_t*        psBus,
                                              uint16_t       uReceiver,
                                              uint8_t        uLen,
                                              uint8_t*       puMsg);
 
-BOOL 	bus_is_idle                         (sBus_t*        psBus);
+bool 	bus_is_idle                         (sBus_t*        psBus);
 
 void    bus_sleep                           (sBus_t*      	psBus);
 
-BOOL    bus_send_wakeupbyte                 (sBus_t*        psBus);
+bool    bus_send_wakeupbyte                 (sBus_t*        psBus);
 
 #endif /* _BUS_H_ */
 /** @} */

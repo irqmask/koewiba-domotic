@@ -32,6 +32,7 @@ set (kwbscheduler_SRCS
      ../shared/bus_phy_os.c
      ../shared/clock_os.c
      ../shared/ioloop.c
+	 ../shared/log.c
      ../shared/message_bus.c
      ../shared/vos.c
      ../../shared/bus_schedul.c

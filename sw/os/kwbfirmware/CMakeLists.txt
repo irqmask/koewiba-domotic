@@ -41,7 +41,7 @@ set (kwbfirmware_SRCS
 # executable
 # ---------------------------------------------------------
 if (WIN32)
-    add_executable ( kwbfirmware WIN32
+    add_executable ( kwbfirmware
         ${kwbfirmware_SRCS} )
     install ( TARGETS kwbfirmware
               RUNTIME DESTINATION . )

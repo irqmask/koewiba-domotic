@@ -66,11 +66,11 @@ static void send_ack(sBus_t* psBus)
 }
 
 // Receive and interpret data.
-static BOOL receive (sBus_t* psBus)
+static bool receive (sBus_t* psBus)
 {
     uint16_t crc;
     uint8_t u;
-    BOOL    bytereceived;
+    bool    bytereceived;
 
     do {
         if (!(bytereceived = bus_phy_data_received(&psBus->sPhy)) ||
@@ -197,7 +197,7 @@ static BOOL receive (sBus_t* psBus)
                 psBus->eState = eBus_AckWaitReceiving;
             }
         }
-    } while ( FALSE );
+    } while ( false );
 
     return bytereceived;
 }
@@ -262,7 +262,7 @@ static void initiate_sending (sBus_t* psBus)
 static void check_message_sent (sBus_t* psBus)
 {
     // data completely sent?
-    if (bus_phy_sending(&psBus->sPhy) == TRUE) return;
+    if (bus_phy_sending(&psBus->sPhy) == true) return;
     // some retries left, then move to waiting for ack.
     if (0 < psBus->sSendMsg.uRetries) {
         psBus->sSendMsg.uRetries--;
@@ -278,7 +278,7 @@ static void check_message_sent (sBus_t* psBus)
 static void wait_for_ack_after_sending (sBus_t* psBus)
 {
     uint8_t u = 0;
-    BOOL    ack_received = FALSE;
+    bool    ack_received = false;
 
     do {
         if (!bus_phy_data_received(&psBus->sPhy) ||
@@ -289,7 +289,7 @@ static void wait_for_ack_after_sending (sBus_t* psBus)
         switch (u) {
         case BUS_ACKBYTE:
             psBus->sSendMsg.uRetries = 0;
-            ack_received = TRUE;
+            ack_received = true;
             reset_bus(psBus); // go back to idle
             // TODO CV / TODO RM: notify application, that ACK byte has been received.
             break;
@@ -309,7 +309,7 @@ static void wait_for_ack_after_sending (sBus_t* psBus)
                 // been received.
             }
         }
-    } while(FALSE);
+    } while(false);
 }
 
 // wait until an ACK byte has been sent by the receiver of the foreign message
@@ -336,7 +336,7 @@ static void wait_for_ack_passive (sBus_t* psBus)
             // ACK not received, something else received.
             // Also reset the bus and back to idle
         }
-    } while(FALSE);
+    } while(false);
 }
 
 // --- Module global functions -------------------------------------------------
@@ -356,9 +356,9 @@ void bus_trp_reset (sBus_t* psBus)
  *
  * @param[in]   psBus       Handle of the bus.
  *
- * @returns TRUE, if there is a pending received message, otherwise FALSE.
+ * @returns true, if there is a pending received message, otherwise false.
  */
-BOOL bus_trp_send_and_receive (sBus_t* psBus)
+bool bus_trp_send_and_receive (sBus_t* psBus)
 {
     uint8_t bb = 0;
 
@@ -398,7 +398,7 @@ BOOL bus_trp_send_and_receive (sBus_t* psBus)
     default:
         // repeat receiving while queue is not empty
         while (psBus->msg_receive_state != eBUS_RECV_MESSAGE && bb<2) {
-            if (receive(psBus) == FALSE) break;
+            if (receive(psBus) == false) break;
             bb++;
         }
         break;
@@ -412,9 +412,9 @@ BOOL bus_trp_send_and_receive (sBus_t* psBus)
  *
  * @param[in]   psBus       Handle of the bus.
  *
- * @returns TRUE, if the sleep command has been sent, otherwise FALSE.
+ * @returns true, if the sleep command has been sent, otherwise false.
  */
-BOOL bus_trp_send_sleepcmd (sBus_t* psBus)
+bool bus_trp_send_sleepcmd (sBus_t* psBus)
 {
     uint16_t crc;
     uint8_t msg[8];
@@ -431,9 +431,9 @@ BOOL bus_trp_send_sleepcmd (sBus_t* psBus)
 
     if( bus_phy_send(&psBus->sPhy, msg, sizeof msg) ) {
         while( bus_phy_sending(&psBus->sPhy) ) {}; // Wait till message is sent completely.
-        return TRUE;
+        return true;
     }
-    return FALSE;
+    return false;
 }
 
 // --- Global functions --------------------------------------------------------
@@ -450,7 +450,7 @@ void bus_configure (sBus_t* psBus, uint16_t uNodeAddress)
     psBus->sCfg.uOwnAddress = uNodeAddress;
     psBus->sCfg.uOwnNodeAddress = uNodeAddress & 0x007F;
     psBus->sCfg.uOwnExtAddress = (uNodeAddress >> 8) & 0x000F;
-    psBus->sCfg.router_mode = FALSE;
+    psBus->sCfg.router_mode = false;
     create_empty_message(psBus);
 }
 
@@ -473,7 +473,7 @@ void bus_initialize (sBus_t* psBus, uint8_t uUart)
                  sizeof(psBus->tx_queue_data));
 }
 
-void bus_set_router_mode (sBus_t* bus, BOOL router_mode)
+void bus_set_router_mode (sBus_t* bus, bool router_mode)
 {
     bus->sCfg.router_mode = router_mode;
 }
@@ -494,9 +494,9 @@ void bus_flush_bus (sBus_t* psBus)
  *
  * @param[in]   psBus       Handle of the bus.
  *
- * @returns TRUE, if there is a pending message.
+ * @returns true, if there is a pending message.
  */
-BOOL bus_get_message (sBus_t* psBus)
+bool bus_get_message (sBus_t* psBus)
 {
     return bus_trp_send_and_receive(psBus);
 }
@@ -509,9 +509,9 @@ BOOL bus_get_message (sBus_t* psBus)
  * @param[out] 	puLen       (Netto) Length of the message.
  * @param[out]  puMsg       Received message.
  *
- * @returns TRUE, if a message has been received and.
+ * @returns true, if a message has been received and.
  */
-BOOL bus_read_message (sBus_t*  psBus,
+bool bus_read_message (sBus_t*  psBus,
                        uint16_t* puSender,
                        uint8_t* puLen,
                        uint8_t* puMsg)
@@ -536,10 +536,10 @@ BOOL bus_read_message (sBus_t*  psBus,
         psBus->eState = eBus_Idle;
 
         *puLen      = len;
-        return TRUE;
-    } while ( FALSE );
+        return true;
+    } while ( false );
 
-    return FALSE;
+    return false;
 }
 
 /**
@@ -552,9 +552,9 @@ BOOL bus_read_message (sBus_t*  psBus,
  * @param[out]  puMsg       Received message.
  * @param[out]  puCRC       CRC of the message.
  *
- * @returns TRUE, if a message has been received and.
+ * @returns true, if a message has been received and.
  */
-BOOL bus_read_message_verbose (sBus_t*   psBus,
+bool bus_read_message_verbose (sBus_t*   psBus,
                                uint16_t* puSender,
                                uint16_t* puReceiver,
                                uint8_t*  puLen,
@@ -582,10 +582,10 @@ BOOL bus_read_message_verbose (sBus_t*   psBus,
 
         *puLen      = len;
         *puCRC      = psBus->sRecvMsg.uCRC;
-        return TRUE;
-    } while ( FALSE );
+        return true;
+    } while ( false );
 
-    return FALSE;
+    return false;
 }
 
 /**
@@ -596,10 +596,10 @@ BOOL bus_read_message_verbose (sBus_t*   psBus,
  * @param[in]   uLen        (Netto) Length of the message.
  * @param[in]   puMsg       Message to send.
  *
- * @returns TRUE, if the message has successfully been queued.
+ * @returns true, if the message has successfully been queued.
  * @note Use bus_is_idle() to check if message is successfully transmitted.
  */
-BOOL bus_send_message (sBus_t*    psBus,
+bool bus_send_message (sBus_t*    psBus,
                        uint16_t   uReceiver,
                        uint8_t    uLen,
                        uint8_t*   puMsg)
@@ -645,10 +645,10 @@ BOOL bus_send_message (sBus_t*    psBus,
             q_put_byte(&psBus->tx_queue, *puMsg++);
         }
 
-        return TRUE;
-    } while ( FALSE );
+        return true;
+    } while ( false );
 
-    return FALSE;
+    return false;
 }
 
 /**
@@ -656,10 +656,10 @@ BOOL bus_send_message (sBus_t*    psBus,
  *
  * @param[in]   psBus       Handle of the bus.
  *
- * @returns TRUE, if the message has successfully been queued.
+ * @returns true, if the message has successfully been queued.
  * @note Use bus_is_idle() to check if message is successfully transmitted.
  */
-BOOL bus_send_ack_message (sBus_t* psBus, uint16_t uReceiver)
+bool bus_send_ack_message (sBus_t* psBus, uint16_t uReceiver)
 {
     uint16_t crc;
 
@@ -680,9 +680,9 @@ BOOL bus_send_ack_message (sBus_t* psBus, uint16_t uReceiver)
         crc = crc_calc16(&psBus->sSendMsg.auBuf[0], psBus->sSendMsg.uOverallLength);
         psBus->sSendMsg.auBuf[psBus->sSendMsg.uOverallLength++] = crc >> 8;
         psBus->sSendMsg.auBuf[psBus->sSendMsg.uOverallLength++] = crc & 0xFF;
-        return TRUE;
-    } while ( FALSE );
-    return FALSE;
+        return true;
+    } while ( false );
+    return false;
 }
 
 /**
@@ -693,7 +693,7 @@ BOOL bus_send_ack_message (sBus_t* psBus, uint16_t uReceiver)
  * @param[in]   recH/L     Receiver address (High/Low-Byte) of the message.
  * @param[in]   *msg       message pointer.
  *
- * @returns TRUE, if the message has successfully been queued.
+ * @returns true, if the message has successfully been queued.
  * @note Use bus_is_idle() to check if message is successfully transmitted.
  */
 
@@ -702,9 +702,9 @@ BOOL bus_send_ack_message (sBus_t* psBus, uint16_t uReceiver)
  * Check if bus is in IDLE state.
  *
  * @param[in]   psBus       Handle of the bus.
- * @returns TRUE, if bus is IDLE.
+ * @returns true, if bus is IDLE.
  */
-BOOL bus_is_idle (sBus_t*       psBus)
+bool bus_is_idle (sBus_t*       psBus)
 {
     return (psBus->eState == eBus_Idle);
 }
@@ -718,7 +718,7 @@ void bus_sleep (sBus_t*       psBus)
 {
 	psBus->eModuleState = eMod_Sleeping;
     // disable clock-timer, otherwise IRQ will cause immediate wakeup.
-	clk_control(FALSE);
+	clk_control(false);
 
 	// sleep till byte is received.
 	sleep_set_mode(SLEEP_MODE_IDLE);
@@ -729,7 +729,7 @@ void bus_sleep (sBus_t*       psBus)
 	sleep_delay_ms(1);      // wait for sys-clock becoming stable
 
 	bus_flush_bus(psBus);   // Clean bus-buffer
-	clk_control(TRUE);      // enable clock-timer
+	clk_control(true);      // enable clock-timer
 
 	// wait for first pending byte, then set module to running state
 	psBus->eState = eBus_InitWait;
@@ -738,16 +738,16 @@ void bus_sleep (sBus_t*       psBus)
 /**
  * Send the bus wake-up byte.
  * @param[in]   psBus      Handle of the bus.
- * @returns TRUE, if the wake-up byte has been sent otherwise FALSE.
+ * @returns true, if the wake-up byte has been sent otherwise false.
  */
-BOOL bus_send_wakeupbyte(sBus_t* psBus)
+bool bus_send_wakeupbyte(sBus_t* psBus)
 {
     uint8_t msg = BUS_WAKEUPBYTE;
     if (bus_phy_send(&psBus->sPhy, &msg, 1)) {
         while( bus_phy_sending(&psBus->sPhy) ) {}; // Wait till message is sent completely.
-        return TRUE;
+        return true;
     }
-    return FALSE;
+    return false;
 }
 
 /** @} */

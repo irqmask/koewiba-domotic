@@ -55,6 +55,8 @@ void log_add_mask (log_mask_t logmask);
 
 void log_msg (log_mask_t logmask, char* logmessage, ...);
 
+void log_warning(char* logmessage, ...);
+
 void log_error (char* logmessage, ...);
 
 void log_sys_error (char* logmessage, ...);

@@ -10,11 +10,21 @@
 
 // --- Include section ---------------------------------------------------------
 
+#include "prjconf.h"
+
 #include <stdarg.h>
-#include <safe_lib.h>
+#include <stdio.h>
 #include <string.h>
 
+#if defined (PRJCONF_UNIX) || \
+    defined (PRJCONF_POSIX) || \
+    defined (PRJCONF_LINUX)
+  #include <safe_lib.h>
+  #include <unistd.h>
+#endif
+
 #include "log.h"
+#include "sysconsole.h"
 #include "systime.h"
 
 // --- Definitions -------------------------------------------------------------

@@ -22,21 +22,24 @@
 
 // --- Include section ---------------------------------------------------------
 
+#include "prjconf.h"
+
 #include <assert.h>
 #include <malloc.h>
 //#include <stdio.h>
 #include <string.h>
-
-#include "ioloop.h"
-#include "log.h"
-#include "message_serial.h"
-#include "sysserial.h"
 
 #if defined (PRJCONF_UNIX) || \
     defined (PRJCONF_POSIX) || \
     defined (PRJCONF_LINUX)
   #include <safe_lib.h>
 #endif
+
+#include "ioloop.h"
+#include "log.h"
+#include "message_serial.h"
+#include "sysconsole.h"
+#include "sysserial.h"
 
 // --- Definitions -------------------------------------------------------------
 
@@ -95,21 +98,31 @@ static int convert_char_to_nibble (char single_char, uint8_t* nibble)
 static void reset_incomming_on_error(msg_serial_t* msg_serial)
 {
     uint8_t ii;
+    char strbuf1[1024], strbuf2[1024], single_char[2];
 
-    log_error("SERIAL Incomming message corrupt: ");
+    // log faulty message
+    snprintf(strbuf1, sizeof(strbuf1)-1, "SERIAL Incomming message corrupt: \"");
+    single_char[1] = '\0';
     for (ii=0; ii<msg_serial->incomming_num_received; ii++) {
         switch (msg_serial->incomming_buffer[ii]) {
-        case '\n': fprintf(stderr, "<NL>"); break;
-        case '\r': fprintf(stderr, "<CR>"); break;
-        default:   fprintf(stderr, "%c", msg_serial->incomming_buffer[ii]); break;
+        case '\n': strcat_s(strbuf1, sizeof(strbuf1), "<NL>"); break;
+        case '\r': strcat_s(strbuf1, sizeof(strbuf1), "<CR>"); break;
+        default:   
+            single_char[0] =  msg_serial->incomming_buffer[ii];
+            strcat_s(strbuf1, sizeof(strbuf1), single_char);
+            break;
         }
     }
-    fprintf(stderr, "total length = %d, message length = %d\n", msg_serial->incomming_num_received, msg_serial->incomming_message.length);
+    snprintf(strbuf2, sizeof(strbuf2)-1, "\" total length = %d, message length = %d\n", msg_serial->incomming_num_received, msg_serial->incomming_message.length);
+    strcat_s(strbuf1, sizeof(strbuf1), strbuf2);
+    log_error(strbuf1);
+
+    // reset incomming state
     msg_serial->incomming_num_received = 0;
     msg_serial->incomming_state = eSER_RECV_STATE_IDLE;
 }
 
-static BOOL process_receiving(msg_serial_t* msg_serial, char new_char)
+static bool process_receiving(msg_serial_t* msg_serial, char new_char)
 {
     uint8_t digit, nibble, index;
 
@@ -182,7 +195,7 @@ static BOOL process_receiving(msg_serial_t* msg_serial, char new_char)
             // message received
             msg_serial->incomming_num_received = 0;
             msg_serial->incomming_state = eSER_RECV_STATE_IDLE;
-            return TRUE;
+            return true;
         }
         break;
 
@@ -191,14 +204,14 @@ static BOOL process_receiving(msg_serial_t* msg_serial, char new_char)
         reset_incomming_on_error(msg_serial);
         break;
     }
-    return FALSE;
+    return false;
 }
 
 static int32_t msg_read (void* arg)
 {
     msg_serial_t*   msg_serial = (msg_serial_t*)arg;
     char            new_char;
-    BOOL            message_complete = FALSE;
+    bool            message_complete = false;
 
     do {
         // reveive message
@@ -270,7 +283,6 @@ int msg_ser_open (msg_serial_t*   msg_serial,
                   int             baudrate)
 {
     int             rc = eERR_NONE;
-    sys_fd_t        fd;
 
     do {
         assert(msg_serial != NULL);
@@ -328,6 +340,7 @@ void msg_ser_set_incomming_handler (msg_serial_t* msg_serial, msg_incom_func_t f
 int msg_ser_send (msg_serial_t* msg_serial, msg_t* message)
 {
     int     rc = eERR_NONE;
+    int     tx_queue_size;
 
     do {
         assert(msg_serial != NULL);
@@ -359,9 +372,8 @@ int msg_ser_send (msg_serial_t* msg_serial, msg_t* message)
                 rc = eRUNNING;
             }
         }
-    } while (FALSE);
-    int tx_queue_size = sys_serial_get_pending_sendq(msg_serial->fd);
-    //printf("msg_serial: tx queue %d\n", tx_queue_size);
+    } while (false);
+    tx_queue_size = sys_serial_get_pending_sendq(msg_serial->fd);
 
     return rc;
 }
@@ -391,14 +403,14 @@ int msg_ser_continue_sending (msg_serial_t* msg_serial)
     return rc;
 }
 
-BOOL msg_ser_is_tx_empty (msg_serial_t* msg_serial)
+bool msg_ser_is_tx_empty (msg_serial_t* msg_serial)
 {
     int pending_tx = sys_serial_get_pending_sendq(msg_serial->fd);
 
     if (pending_tx > 100) {
-        return FALSE;
+        return false;
     } else {
-        return TRUE;
+        return true;
     }
 }
 

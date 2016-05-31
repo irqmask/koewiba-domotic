@@ -74,7 +74,7 @@ void draw_hex16_value (uint16_t value)
 void draw_temp (uint16_t temperature)
 {
     uint8_t byte;
-    BOOL firstdigit = FALSE;
+    bool firstdigit = false;
 
     if (temperature >= 27315) {
         temperature -= 27315;
@@ -88,7 +88,7 @@ void draw_temp (uint16_t temperature)
         if (byte > 0 || firstdigit) {
             temperature -= byte * 1000;
             gdisp_put_char(byte + 0x30);
-            firstdigit = TRUE;
+            firstdigit = true;
         } else {
             gdisp_put_char(' ');
         }
@@ -97,7 +97,7 @@ void draw_temp (uint16_t temperature)
         if (byte > 0 || firstdigit) {
             temperature -= byte * 100;
             gdisp_put_char(byte + 0x30);
-            firstdigit = TRUE;
+            firstdigit = true;
         } else {
             gdisp_put_char(' ');
         }

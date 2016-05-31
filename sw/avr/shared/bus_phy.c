@@ -84,9 +84,9 @@ ISR(INTERRUPT_USART_UDRE0)
  */
 ISR(INTERRUPT_UART_TRANS0)
 {
-    bus_phy_activate_sender(g_UART0Phy, FALSE);
+    bus_phy_activate_sender(g_UART0Phy, false);
 #ifdef TXRXEN0_SEPERATE
-    bus_phy_activate_receiver(g_UART0Phy, TRUE);
+    bus_phy_activate_receiver(g_UART0Phy, true);
 #endif
     g_UART0Phy->uFlags &= ~e_uarttxflag;
 
@@ -136,8 +136,8 @@ ISR(INTERRUPT_USART_UDRE1)
  */
 ISR(INTERRUPT_UART_TRANS1)
 {
-    bus_phy_activate_sender(g_UART1Phy, FALSE);
-    bus_phy_activate_receiver(g_UART1Phy, TRUE);
+    bus_phy_activate_sender(g_UART1Phy, false);
+    bus_phy_activate_receiver(g_UART1Phy, true);
     g_UART1Phy->uFlags &= ~e_uarttxflag;
 }
 #endif
@@ -183,9 +183,9 @@ void bus_phy_initialize(sBusPhy_t* psPhy, uint8_t uUart)
 #endif
 
     // sender is initial off, receiver is on.
-    bus_phy_activate_sender(psPhy, FALSE);
+    bus_phy_activate_sender(psPhy, false);
 #ifdef TXRXEN0_SEPERATE
-    bus_phy_activate_receiver(psPhy, TRUE);
+    bus_phy_activate_receiver(psPhy, true);
 #endif
 }
 
@@ -194,9 +194,9 @@ void bus_phy_initialize(sBusPhy_t* psPhy, uint8_t uUart)
  *
  * @param[in] psPhy     Handle of bus physical layer.
  * @param[in] bActivate
- * @returns TRUE: activate sender, FALSE: deactivate sender.
+ * @returns true: activate sender, false: deactivate sender.
  */
-void bus_phy_activate_sender(sBusPhy_t* psPhy, BOOL bActivate)
+void bus_phy_activate_sender(sBusPhy_t* psPhy, bool bActivate)
 {
     bus_phy_activate_receiver(psPhy, !bActivate);
     if (0==psPhy->uUart) {
@@ -216,9 +216,9 @@ void bus_phy_activate_sender(sBusPhy_t* psPhy, BOOL bActivate)
  *
  * @param[in] psPhy     Handle of bus physical layer.
  * @param[in] bActivate
- * @returns TRUE: activate receiver, FALSE: deactivate receiver.
+ * @returns true: activate receiver, false: deactivate receiver.
  */
-void bus_phy_activate_receiver(sBusPhy_t* psPhy, BOOL bActivate)
+void bus_phy_activate_receiver(sBusPhy_t* psPhy, bool bActivate)
 {
 #ifdef TXRXEN0_SEPERATE
     if (0 == psPhy->uUart) {
@@ -242,22 +242,22 @@ void bus_phy_activate_receiver(sBusPhy_t* psPhy, BOOL bActivate)
  * @param[in] puMsg     Pointer to message to be sent.
  * @param[in] uLen      Length in bytes of mesage to be sent.
  *
- * @returns TRUE: sending successfully initiated, otherwise FALSE.
+ * @returns true: sending successfully initiated, otherwise false.
  */
-BOOL bus_phy_send(sBusPhy_t* psPhy, const uint8_t* puMsg, uint8_t uLen)
+bool bus_phy_send(sBusPhy_t* psPhy, const uint8_t* puMsg, uint8_t uLen)
 {
     if (psPhy->uCurrentBytesToSend != 0) {
-        return FALSE;
+        return false;
     }
     psPhy->uCurrentBytesToSend = uLen;
     psPhy->uFlags |= e_uarttxflag;
     psPhy->puSendPtr = puMsg;
     if (psPhy->uUart == 0) {
-        bus_phy_activate_sender(psPhy, TRUE);
+        bus_phy_activate_sender(psPhy, true);
         REGISTER_UDR0 = *psPhy->puSendPtr;   // send first byte
         REGISTER_UCSRB0 |=  (1<<REGBIT_UDRIE); // enable data register empty interrupt
     }
-    return TRUE;
+    return true;
 }
 
 /**
@@ -265,9 +265,9 @@ BOOL bus_phy_send(sBusPhy_t* psPhy, const uint8_t* puMsg, uint8_t uLen)
  *
  * @param[in] psPhy     Handle of bus physical layer.
  *
- * @returns TRUE:       sending in progress.
+ * @returns true:       sending in progress.
  */
-BOOL bus_phy_sending(sBusPhy_t* psPhy)
+bool bus_phy_sending(sBusPhy_t* psPhy)
 {
     return ((psPhy->uFlags & e_uarttxflag) || (0 < psPhy->uCurrentBytesToSend));
 }
@@ -277,9 +277,9 @@ BOOL bus_phy_sending(sBusPhy_t* psPhy)
  *
  * @param[in] psPhy     Handle of bus physical layer.
  *
- * @returns TRUE: at least one byte is waiting in receive buffer.
+ * @returns true: at least one byte is waiting in receive buffer.
  */
-BOOL bus_phy_data_received(sBusPhy_t* psPhy)
+bool bus_phy_data_received(sBusPhy_t* psPhy)
 {
     return (0 != (psPhy->uFlags & e_uartrxflag));
 }
@@ -315,15 +315,15 @@ uint8_t bus_phy_read(sBusPhy_t* psPhy, uint8_t *puInBuf)
  * @param[in] psPhy     Handle to bus's phsical layer
  * @param[out] puByte   Received byte. *puByte remains unchange if no byte has been received.
  *
- * @returns TRUE if a byte has been received, otherwise false.
+ * @returns true if a byte has been received, otherwise false.
  */
-BOOL bus_phy_read_byte(sBusPhy_t* psPhy, uint8_t *puByte)
+bool bus_phy_read_byte(sBusPhy_t* psPhy, uint8_t *puByte)
 {
     sBusRec_t  *buffer = &psPhy->sRecvBuf;
 
     if (buffer->uWritePos == buffer->uReadPos) {
 		psPhy->uFlags &= ~(e_uartrxflag);
-		return FALSE;
+		return false;
     }
 	*puByte = buffer->auBuf[buffer->uReadPos];
 	buffer->uReadPos = (buffer->uReadPos+1) % sizeof(buffer->auBuf);
@@ -331,7 +331,7 @@ BOOL bus_phy_read_byte(sBusPhy_t* psPhy, uint8_t *puByte)
 	if (buffer->uWritePos == buffer->uReadPos) {
 		psPhy->uFlags &= ~(e_uartrxflag);
 	}
-	return TRUE;
+	return true;
 }
 
 /**

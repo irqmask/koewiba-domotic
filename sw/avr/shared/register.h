@@ -56,7 +56,7 @@ extern uint8_t register_eeprom_array[];
 
 // --- Global functions --------------------------------------------------------
 
-BOOL        register_get            (uint8_t                reg_no,
+bool        register_get            (uint8_t                reg_no,
                                      eRegType_t*            reg_type,
                                      void*                  value);
 
@@ -89,7 +89,7 @@ void        register_send_u32       (sBus_t*                bus,
                                      uint8_t                reg_no,
                                      uint32_t               value);
 
-BOOL        register_do_mapping     (uint16_t               remote_module_addr,
+bool        register_do_mapping     (uint16_t               remote_module_addr,
                                      uint8_t                remote_register,
                                      uint32_t               value);
 

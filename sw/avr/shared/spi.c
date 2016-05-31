@@ -41,7 +41,7 @@ static uint8_t              uCurrUserArg            = 0;
 static uint8_t*             puCurrReceiveBuf        = NULL;
 static SPI_StartSendFunc_t  fpBeforeTransmission    = NULL;
 static SPI_EndSendFunc_t    fpAfterTransmission     = NULL;
-static BOOL                 bIsBusy                 = FALSE;
+static bool                 bIsBusy                 = false;
 
 #endif
 
@@ -56,7 +56,7 @@ static BOOL                 bIsBusy                 = FALSE;
 // Puts a byte on the queue but only the virtual write index is increased, the
 // real one has to be set, if a message is complete enqueued and ready to be
 // sent.
-static BOOL bEnqueue(uint8_t* puWriteIdx, uint8_t uVal)
+static bool bEnqueue(uint8_t* puWriteIdx, uint8_t uVal)
 {
     uint8_t tempidx;
 
@@ -67,22 +67,22 @@ static BOOL bEnqueue(uint8_t* puWriteIdx, uint8_t uVal)
     if (tempidx != uReadIdx) {
         auQueue[*puWriteIdx] = uVal;
         *puWriteIdx = tempidx;
-        return TRUE;
+        return true;
     }
-    return FALSE;
+    return false;
 }
 
 // Takes a byte from the queue
-static BOOL bDequeue(uint8_t* puVal)
+static bool bDequeue(uint8_t* puVal)
 {
     if (IS_DATA_IN_QUEUE) {
         *puVal = auQueue[uReadIdx++];
         if (uReadIdx >= SIZE_QUEUE) {
             uReadIdx = 0;
         }
-        return TRUE;
+        return true;
     }
-    return FALSE;
+    return false;
 }
 
 // Returns the left space in queue
@@ -158,7 +158,7 @@ ISR(INTERRUPT_SPI)
         if (IS_DATA_IN_QUEUE) {
             vStartTransmission();
         } else {
-            bIsBusy = FALSE;
+            bIsBusy = false;
         }
     }
 }
@@ -200,7 +200,7 @@ void            SPI_vMasterInit     (void)
     puCurrReceiveBuf        = NULL;
     fpBeforeTransmission    = NULL;
     fpAfterTransmission     = NULL;
-    bIsBusy                 = FALSE;
+    bIsBusy                 = false;
 }
 
 /**
@@ -223,9 +223,9 @@ uint8_t         SPI_uQueueSpace     (void)
 /**
  * Check if a SPI transmission is ongoing.
  *
- * @returns TRUE, if SPI is busy, otherwise FALSE.
+ * @returns true, if SPI is busy, otherwise false.
  */
-BOOL            SPI_bIsBusy         (void)
+bool            SPI_bIsBusy         (void)
 {
     return bIsBusy;
 }

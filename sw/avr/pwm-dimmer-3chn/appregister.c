@@ -38,7 +38,7 @@
 
 // --- Module global functions -------------------------------------------------
 
-BOOL        app_register_get        (uint8_t                uRegNo,
+bool        app_register_get        (uint8_t                uRegNo,
                                      eRegType_t*            peRegType,
                                      void*                  pvValue)
 {

@@ -28,9 +28,9 @@ typedef struct block_data {
 } block_data_t;
 
 
-BOOL block_message_start(sBus_t* bus, uint16_t sender, uint8_t msglen, uint8_t* msg);
-BOOL block_message_data (sBus_t* bus, uint16_t sender, uint8_t msglen, uint8_t* msg);
-BOOL block_message_end  (sBus_t* bus, uint16_t sender, uint8_t msglen, uint8_t* msg);
+bool block_message_start(sBus_t* bus, uint16_t sender, uint8_t msglen, uint8_t* msg);
+bool block_message_data (sBus_t* bus, uint16_t sender, uint8_t msglen, uint8_t* msg);
+bool block_message_end  (sBus_t* bus, uint16_t sender, uint8_t msglen, uint8_t* msg);
 void block_data_reset   (void);
-BOOL block_timer_elapsed(void);
+bool block_timer_elapsed(void);
 #endif /* _BLOCK_MESSAGE_H_ */

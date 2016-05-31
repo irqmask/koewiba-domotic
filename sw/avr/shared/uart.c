@@ -145,9 +145,9 @@ void uart_init (uint32_t baudrate)
 /**
  * Check if a UART transmission is ongoing.
  *
- * @returns TRUE, if UART is busy, otherwise FALSE.
+ * @returns true, if UART is busy, otherwise false.
  */
-BOOL uart_is_busy (void)
+bool uart_is_busy (void)
 {
     return REGISTER_UCSRB0 & (1<<REGBIT_UDRIE);
 }
@@ -164,11 +164,11 @@ BOOL uart_is_busy (void)
 void uart_transmit (uint8_t*               data,
                     uint8_t                length)
 {
-    BOOL enqueued;
+    bool enqueued;
     while (length--) {
         do {
             enqueued = QUE_uPut(g_uart.auSendQueue, *data);
-        } while (enqueued == FALSE);
+        } while (enqueued == false);
 
         REGISTER_UCSRB0 |= (1<<REGBIT_UDRIE);
         data++;
@@ -184,13 +184,13 @@ void uart_transmit (uint8_t*               data,
  */
 void uart_put_char (char single_char)
 {
-    BOOL enqueued;
+    bool enqueued;
     do {
         enqueued = QUE_uPut(g_uart.auSendQueue, single_char);
         queuedump[dumpindex][0] = g_uart.auSendQueue[1]; // writeindex
         queuedump[dumpindex++][1] = g_uart.auSendQueue[2]; // readindex
         if (dumpindex >= 32) dumpindex = 0;
-    } while (enqueued == FALSE);
+    } while (enqueued == false);
     REGISTER_UCSRB0 |= (1<<REGBIT_UDRIE);
     if (!uart_is_busy()) {
         start_transmission();

@@ -142,7 +142,7 @@ uint8_t         ZAGW_uReceive  (void)
 
         g_uTemperatureBits = (temp_value1 << 8) | temp_value2;
         g_uTemperatureStatus |= (1<<ZAGW_eNewValue);
-    } while (FALSE);
+    } while (false);
 
     // disable sensor
     ZAGW_PORT_EN &= ~(1<<ZAGW_EN);

@@ -56,7 +56,7 @@ typedef struct serialphy {
 // --- Global functions --------------------------------------------------------
 
 void scomm_initialize_uart1         (scomm_phy_t *phy);
-BOOL serial_phy_initiate_sending    (scomm_phy_t *phy);
+bool serial_phy_initiate_sending    (scomm_phy_t *phy);
 void serial_phy_check_q_level       (scomm_phy_t *phy);
 
 #endif // _SERIALCOMM_H_

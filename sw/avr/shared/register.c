@@ -71,7 +71,7 @@ static void answer_register_request (sBus_t*                bus,
 
 // --- Module global functions -------------------------------------------------
 
-extern BOOL app_register_get        (uint8_t                reg_no,
+extern bool app_register_get        (uint8_t                reg_no,
                                      eRegType_t*            reg_type,
                                      void*                  value);
 
@@ -80,14 +80,14 @@ extern void app_register_set        (uint8_t                reg_no,
 
 // --- Global functions --------------------------------------------------------
 
-BOOL        register_get            (uint8_t                reg_no,
+bool        register_get            (uint8_t                reg_no,
                                      eRegType_t*            reg_type,
                                      void*                  value)
 {
     eRegType_t  l_regtype;
 
     if (reg_type == NULL) reg_type = &l_regtype;
-    if (value == NULL) return FALSE;
+    if (value == NULL) return false;
 
     switch (reg_no) {
     // registers saved in EEProm
@@ -146,7 +146,7 @@ BOOL        register_get            (uint8_t                reg_no,
     default:
         return app_register_get(reg_no, reg_type, value);
     }
-    return TRUE;
+    return true;
 }
 
 /**
@@ -336,16 +336,16 @@ void        register_send_u32       (sBus_t*                bus,
  * @param[in] uRemoteRegister   Module register of incoming state message.
  * @param[in] uValue            Value to set.
  *
- * @returns TRUE, if a register mapping for the received address and value
+ * @returns true, if a register mapping for the received address and value
  *          was found.
  */
-BOOL        register_do_mapping     (uint16_t               uRemoteModuleAddr,
+bool        register_do_mapping     (uint16_t               uRemoteModuleAddr,
                                      uint8_t                uRemoteRegister,
                                      uint32_t               uValue)
 {
     uint16_t    addr;
     uint8_t     ii, reg, target_reg;
-    BOOL        retval = FALSE;
+    bool        retval = false;
 
     for (ii=0; ii<REG_MAX_MAPPINGS; ii++) {
         if (!register_get(APP_eReg_RemoteAddr00 + ii, 0, &addr)) continue;
@@ -354,7 +354,7 @@ BOOL        register_do_mapping     (uint16_t               uRemoteModuleAddr,
             if (reg == uRemoteRegister) {
                 if (!register_get(APP_eReg_TargetReg00 + ii, 0, &target_reg)) continue;
                 register_set(target_reg, uValue);
-                retval = TRUE;
+                retval = true;
             }
         }
     }

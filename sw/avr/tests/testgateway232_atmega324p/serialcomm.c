@@ -148,18 +148,18 @@ void scomm_initialize_uart1 (scomm_phy_t* phy)
  *
  * @returns TRUE: sending successfully initiated, otherwise FALSE.
  */
-BOOL serial_phy_initiate_sending (scomm_phy_t* phy)
+bool serial_phy_initiate_sending (scomm_phy_t* phy)
 {
     queue_t *q = &phy->sendQ;
 
-    if (0 == q_get_pending(q)) return FALSE;
+    if (0 == q_get_pending(q)) return false;
     // Wait for empty transmit buffer
     while ( !( REGISTER_UCSRA1 & (1<<REGBIT_UDRE)) ) {};
 
     REGISTER_UDR1    = q_get_byte(q);     // send first byte
     REGISTER_UCSRB1 |= (1<<REGBIT_UDRIE); // enable data register empty interrupt
 
-    return TRUE;
+    return true;
 }
 
 /** */

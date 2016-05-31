@@ -37,7 +37,7 @@
 
 // --- Module global functions -------------------------------------------------
 
-BOOL        app_register_get        (uint8_t                uRegNo,
+bool        app_register_get        (uint8_t                uRegNo,
                                      eRegType_t*            peRegType,
                                      void*                  pvValue)
 {
@@ -45,7 +45,7 @@ BOOL        app_register_get        (uint8_t                uRegNo,
     uint8_t index;
 
     if (peRegType == NULL) peRegType = &regtype;
-    if (pvValue == NULL) return FALSE;
+    if (pvValue == NULL) return false;
     *peRegType = eRegType_U8;
 
     // registers saved in EEProm
@@ -94,10 +94,10 @@ BOOL        app_register_get        (uint8_t                uRegNo,
 
     // registers in ROM/RAM
     default:
-        return FALSE;
+        return false;
         break;
     }
-    return TRUE;
+    return true;
 }
 
 void        app_register_set        (uint8_t                uRegNo,

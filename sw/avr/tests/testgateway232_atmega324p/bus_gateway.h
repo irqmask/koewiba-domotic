@@ -34,6 +34,6 @@
 
 void bgw_forward_serial_msg (sBus_t* bus, scomm_phy_t* phy);
 
-BOOL bgw_forward_bus_msg (sBus_t *bus, scomm_phy_t *serial);
+bool bgw_forward_bus_msg (sBus_t *bus, scomm_phy_t *serial);
 
 #endif /* BUS_GATEWAY_H_ */

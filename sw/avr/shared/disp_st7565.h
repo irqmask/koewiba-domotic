@@ -87,7 +87,7 @@
 
 // --- Global functions --------------------------------------------------------
 
-void            st7565_display_on   (BOOL                   on);
+void            st7565_display_on   (bool                   on);
 
 void            st7565_start_line   (uint8_t                start_line);
 
@@ -97,21 +97,21 @@ void            st7565_column_addr  (uint8_t                column_address);
 
 void            st7565_write_data   (uint8_t                data);
 
-void            st7565_adc_select   (BOOL                   reverse);
+void            st7565_adc_select   (bool                   reverse);
 
-void            st7565_disp_reverse (BOOL                   reverse);
+void            st7565_disp_reverse (bool                   reverse);
 
-void            st7565_disp_all_pixel(BOOL                  all_pixel_on);
+void            st7565_disp_all_pixel(bool                  all_pixel_on);
 
 void            st7565_lcd_bias     (uint8_t                bias);
 
 void            st7565_reset        (void);
 
-void            st7565_com_select   (BOOL                   reverse);
+void            st7565_com_select   (bool                   reverse);
 
-void            st7565_power_ctrl   (BOOL                   booster,
-                                     BOOL                   voltage_regulator,
-                                     BOOL                   voltage_follower);
+void            st7565_power_ctrl   (bool                   booster,
+                                     bool                   voltage_regulator,
+                                     bool                   voltage_follower);
 
 void            st7565_voltage_resistor_ratio
                                     (uint8_t                ratio);
@@ -120,7 +120,7 @@ void            st7565_el_volume_reg_set
                                     (uint8_t                level);
 
 void            st7565_static_indicator_reg_set
-                                    (BOOL                   on,
+                                    (bool                   on,
                                      uint8_t                state);
 
 void            st7565_booster_ratio_reg_set

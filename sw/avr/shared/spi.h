@@ -211,7 +211,7 @@ uint8_t         spi_transmit        (uint8_t*               send_buf,
 
 uint8_t         spi_queue_space     (void);
 
-BOOL            spi_is_busy         (void);
+bool            spi_is_busy         (void);
 
 #endif // SPI_WITH_IRQ
 

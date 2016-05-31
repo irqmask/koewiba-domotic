@@ -166,7 +166,12 @@ int route_add (router_t*    router,
 
 void route_delete (router_t*    router)
 {
+    assert(router != NULL);
 
+    ///@todo define deltetion criteria
+    do {
+
+    } while (0);
 }
 
 void route_message (router_t*    router,

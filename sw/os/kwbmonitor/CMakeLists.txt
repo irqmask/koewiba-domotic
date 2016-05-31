@@ -27,23 +27,56 @@ link_directories (
 file (WRITE ${CMAKE_CURRENT_BINARY_DIR}/kwbmonitor_version.h
     "const char* PGM_VERSION(\"${VERSION}\");\n")
 
+# header and source files
+# ---------------------------------------------------------
+set (include_SRCS
+    ../../include/cmddef_common.h
+    ../../include/moddef_common.h
+    ../../include/prjconf.h
+    ../../include/prjtypes.h
+)
+
+set (shared_SRCS
+    ../../shared/bus.h
+
+    ../../shared/crc16.c
+)
+
+set (os_include_SRCS
+    ../include/error_codes.h
+)
+
+set (os_shared_SRCS
+    ../shared/log.h
+    ../shared/message.h
+    ../shared/vos.h
+
+    ../shared/vos.c
+)
+
 set (kwbmonitor_SRCS
     kwbmonitor.h
 
     kwbmonitor_main.c
     kwbmonitor.c
-    ../shared/vos.c
-    ../../shared/crc16.c
 )
+
+# source groups
+# ---------------------------------------------------------
+source_group(\\ FILES ${kwbmonitor_SRCS})
+source_group(include FILES ${include_SRCS})
+source_group(shared FILES ${shared_SRCS})
+source_group(os\\include FILES ${os_include_SRCS})
+source_group(os\\shared FILES ${os_shared_SRCS})
 
 # executable
 # ---------------------------------------------------------
 if (WIN32)
-    add_executable ( kwbmonitor ${kwbmonitor_SRCS} )
+    add_executable ( kwbmonitor ${include_SRCS} ${shared_SRCS} ${os_include_SRCS} ${os_shared_SRCS} ${kwbmonitor_SRCS} )
     install ( TARGETS kwbmonitor
               RUNTIME DESTINATION . )
 else (WIN32)
-    add_executable ( kwbmonitor ${kwbmonitor_SRCS} )
+    add_executable ( kwbmonitor ${include_SRCS} ${shared_SRCS} ${os_include_SRCS} ${os_shared_SRCS} ${kwbmonitor_SRCS} )
     install ( TARGETS kwbmonitor
               RUNTIME DESTINATION bin )
 endif (WIN32)

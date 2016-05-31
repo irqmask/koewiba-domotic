@@ -17,7 +17,6 @@
 #include "prjconf.h"
 
 #include <assert.h>
-#include <getopt.h>
 #include <malloc.h>
 #include <stdio.h>
 #include <string.h>
@@ -29,11 +28,17 @@
   #include <unistd.h>
 #endif
 
-#include "ioloop.h"
+// include
 #include "prjtypes.h"
+
+// os/libsystem
+#include "sysgetopt.h"
 #include "sysserial.h"
 #include "syssocket.h"
 #include "system.h"
+
+// os/shared
+#include "ioloop.h"
 
 // --- Definitions -------------------------------------------------------------
 

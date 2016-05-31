@@ -27,16 +27,16 @@ set (include_SRCS
 )
 
 set (libsystem_SRCS
-    getopt.h
     system.h
     sysconsole.h
+    sysgetopt.h
     sysserial.h
     syssocket.h
     systhread.h
     systime.h
 
-    getopt.c
     sysconsole.c
+    sysgetopt.c
     sysserial.c
     syssocket.c
     systime.c

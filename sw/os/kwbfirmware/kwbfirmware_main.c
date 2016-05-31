@@ -13,7 +13,6 @@
 #include "prjconf.h"
 
 #include <assert.h>
-#include <getopt.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -24,13 +23,22 @@
   #include <safe_lib.h>
 #endif
 
+// include
+#include "prjtypes.h"
+
+// os/include
 #include "error_codes.h"
+
+// os/shared
 #include "ioloop.h"
 #include "log.h"
-#include "firmwareupdate.h"
 #include "message_serial.h"
-#include "prjtypes.h"
+
+// os/libsystem
+#include "sysgetopt.h"
 #include "systime.h"
+
+#include "firmwareupdate.h"
 
 // --- Definitions -------------------------------------------------------------
 

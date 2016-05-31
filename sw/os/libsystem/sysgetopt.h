@@ -1,5 +1,5 @@
-#ifndef _GETOPT_H_
-#define _GETOPT_H_
+#ifndef _SYSGETOPT_H_
+#define _SYSGETOPT_H_
 
 #include "prjconf.h"
 

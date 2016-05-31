@@ -28,12 +28,16 @@
   #include <unistd.h>
 #endif
 
-#include "getopt.h"
-#include "kwbmonitor.h"
+// include
 #include "prjtypes.h"
+
+// libsystem
 #include "sysconsole.h"
 #include "system.h"
+#include "sysgetopt.h"
 #include "systhread.h"
+
+#include "kwbmonitor.h"
 #include "vos.h"
 
 // --- Definitions -------------------------------------------------------------

@@ -17,7 +17,6 @@
 
 #include "prjconf.h"
 
-#include <getopt.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -28,11 +27,20 @@
   #include <unistd.h>
 #endif
 
+// include
+#include "prjtypes.h"
+
+// shared
 #include "bus.h"
+
+// os/libsystem
+#include "sysgetopt.h"
+
+// os/shared
 #include "ioloop.h"
 #include "message_bus.h"
 #include "message_socket.h"
-#include "prjtypes.h"
+
 #include "router.h"
 
 // --- Definitions -------------------------------------------------------------

@@ -22,7 +22,6 @@
 
 #include "prjconf.h"
 
-#include <getopt.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -34,13 +33,19 @@
   #include <unistd.h>
 #endif
 
+// include
+#include "prjtypes.h"
+
+// os/libsystem
+#include "system.h"
+#include "sysgetopt.h"
+
+// os/shared
 #include "message_bus.h"
 #include "bus_scheduler.h"
 #include "ioloop.h"
 #include "log.h"
-#include "prjtypes.h"
 #include "vos.h"
-#include "system.h"
 
 // --- Definitions -------------------------------------------------------------
 

@@ -22,12 +22,20 @@
 #include <safe_lib.h>
 #endif
 
-#include "error_codes.h"
-#include "ioloop.h"
-#include "message_socket.h"
+// include
 #include "prjtypes.h"
+
+// os/include
+#include "error_codes.h"
+
+// os/libsystem
+#include "sysgetopt.h"
 #include "sysserial.h"
 #include "systime.h"
+
+// os/shared
+#include "ioloop.h"
+#include "message_socket.h"
 
 // --- Definitions -------------------------------------------------------------
 

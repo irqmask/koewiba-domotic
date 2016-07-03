@@ -16,7 +16,7 @@
 #include "prjconf.h"
 
 #if !defined (PRJCONF_WINDOWS) 
-#include <stdBOOL.h>
+#include <stdbool.h>
 #include <stdint.h>
 #else
 #include <windows.h>
@@ -37,13 +37,16 @@ typedef signed long long int int64_t;
 
 // --- Definitions -------------------------------------------------------------
 
-#ifndef TRUE
-typedef uint8_t BOOL;
-#define TRUE 1
+#ifndef bool
+typedef unsigned char bool;
 #endif
 
-#ifndef FALSE
-#define FALSE 0
+#ifndef false
+#define false 0
+#endif
+
+#ifndef true
+#define true (!false)
 #endif
 
 #ifndef NULL

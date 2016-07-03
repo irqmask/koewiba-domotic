@@ -121,7 +121,7 @@ typedef enum {
 
 void            uart_init           (uint32_t               baudrate);
 
-BOOL            uart_is_busy        (void);
+bool            uart_is_busy        (void);
 
 void            uart_transmit       (uint8_t*               data,
                                      uint8_t                length);

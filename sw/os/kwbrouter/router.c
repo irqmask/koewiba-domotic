@@ -24,6 +24,7 @@
   #include <safe_lib.h>
 #endif
 
+#include "log.h"
 #include "message.h"
 #include "message_bus.h"
 #include "message_socket.h"
@@ -100,11 +101,11 @@ static void route_inspect (router_t* router)
 
     rt = router->first_route;
 
-    printf(" #  first  last  port address\n");
+    log_msg(LOG_STATUS, " #  first  last  port address\n");
     while (rt != NULL) {
-        printf("%3d %5d %5d %5d %s\n",
-               count, rt->first_module_id, rt->last_module_id, rt->target_port,
-               rt->target_address);
+        log_msg(LOG_STATUS, "%3d %5d %5d %5d %s\n",
+                            count, rt->first_module_id, rt->last_module_id, rt->target_port,
+                            rt->target_address);
         count++;
         rt = rt->next_entry;
     }
@@ -165,12 +166,17 @@ int route_add (router_t*    router,
 
 void route_delete (router_t*    router)
 {
+    assert(router != NULL);
 
+    ///@todo define deltetion criteria
+    do {
+
+    } while (0);
 }
 
-int route_message (router_t*    router,
-                   msg_t*       message,
-                   void*        reference)
+void route_message (router_t*    router,
+                    msg_t*       message,
+                    void*        reference)
 {
     route_entry_t* route;
 

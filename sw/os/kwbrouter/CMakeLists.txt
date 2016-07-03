@@ -28,37 +28,73 @@ link_directories (
 file (WRITE ${CMAKE_CURRENT_BINARY_DIR}/kwbrouter_version.h
      "const char* PGM_VERSION(\"${VERSION}\");\n")
 
-set (kwbrouter_SRCS
-    kwbrouter_main.c
-    router.c
-    ../shared/bus_phy_os.c
-    ../shared/clock_os.c
-    ../shared/ioloop.c
-    ../shared/message_bus.c
-    ../shared/message_socket.c
-    ../shared/vos.c
+# header and source files
+# ---------------------------------------------------------
+set (include_SRCS
+    ../../include/cmddef_common.h
+    ../../include/moddef_common.h
+    ../../include/prjconf.h
+    ../../include/prjtypes.h
+)
+
+set (shared_SRCS
+    ../../shared/bus.h
+    ../../shared/clock.h
     ../../shared/bus_transport.c
     ../../shared/crc16.c
     ../../shared/queue.c
 )
 
+set (os_include_SRCS
+    ../include/error_codes.h
+)
+
+set (os_shared_SRCS
+    ../shared/log.h
+    ../shared/message.h
+
+    ../shared/bus_phy_os.c
+    ../shared/clock_os.c
+    ../shared/ioloop.c
+    ../shared/log.c
+    ../shared/message_bus.c
+    ../shared/message_socket.c
+    ../shared/vos.c
+)
+    
+set (kwbrouter_SRCS
+    router.h
+
+    kwbrouter_main.c
+    router.c
+)
+
+# source groups
+# ---------------------------------------------------------
+source_group(\\ FILES ${kwbrouter_SRCS})
+source_group(include FILES ${include_SRCS})
+source_group(shared FILES ${shared_SRCS})
+source_group(os\\include FILES ${os_include_SRCS})
+source_group(os\\shared FILES ${os_shared_SRCS})
+
 # executable
 # ---------------------------------------------------------
 if (WIN32)
-    add_executable ( kwbrouter WIN32
-        ${kwbrouter_SRCS} )
+    add_executable ( kwbrouter 
+        ${include_SRCS} ${shared_SRCS} ${os_include_SRCS} ${os_shared_SRCS} ${kwbrouter_SRCS} )
     install ( TARGETS kwbrouter
               RUNTIME DESTINATION . )
 else (WIN32)
     add_executable ( kwbrouter
-        ${kwbrouter_SRCS} )
+        ${include_SRCS} ${shared_SRCS} ${os_include_SRCS} ${os_shared_SRCS} ${kwbrouter_SRCS} )
     install ( TARGETS kwbrouter
               RUNTIME DESTINATION bin )
 endif (WIN32)
 
 # Link libraries
 # ---------------------------------------------------------
-target_link_libraries (kwbrouter libsystem jansson)
+target_link_libraries (kwbrouter libsystem)
+#TODO needed target_link_libraries (kwbrouter jansson)
 if (WIN32)
 
 else (WIN32)

@@ -74,32 +74,32 @@ typedef enum eCommMsgByteIndex {
 // transport layer
 void    bus_trp_reset               (sBus_t* psBus);
 
-BOOL    bus_trp_send_and_receive    (sBus_t* psBus);
+bool    bus_trp_send_and_receive    (sBus_t* psBus);
 
-BOOL    bus_trp_send_sleepcmd       (sBus_t* psBus);
+bool    bus_trp_send_sleepcmd       (sBus_t* psBus);
 
 // physical layer
 void    bus_phy_initialize          (sBusPhy_t*     psPhy,
                                      uint8_t        uUart);
 
 void    bus_phy_activate_sender     (sBusPhy_t*     psPhy,
-                                     BOOL           bActivate);
+                                     bool           bActivate);
 
 void    bus_phy_activate_receiver   (sBusPhy_t*     psPhy,
-                                     BOOL           bActivate);
+                                     bool           bActivate);
 
-BOOL    bus_phy_send                (sBusPhy_t*     psPhy,
+bool    bus_phy_send                (sBusPhy_t*     psPhy,
                                      const uint8_t* puMsg,
                                      uint8_t        uLen);
 
-BOOL    bus_phy_sending             (sBusPhy_t*     psPhy);
+bool    bus_phy_sending             (sBusPhy_t*     psPhy);
 
-BOOL    bus_phy_data_received       (sBusPhy_t*     psPhy);
+bool    bus_phy_data_received       (sBusPhy_t*     psPhy);
 
 uint8_t bus_phy_read                (sBusPhy_t*     psPhy,
                                      uint8_t*       puInBuf);
 
-BOOL    bus_phy_read_byte           (sBusPhy_t*     psPhy,
+bool    bus_phy_read_byte           (sBusPhy_t*     psPhy,
                                      uint8_t*       puByte);
 
 void 	bus_phy_flush				(sBusPhy_t* psPhy);

@@ -59,15 +59,15 @@ uint8_t q_get_pending (queue_t *q)
  * @param[in]  q        Queue-handle.
  * @param[in]  byte     Byte to enqueue.
  *
- * @returns    TRUE if byte was enqueued successful, otherwise FALSE
+ * @returns    true if byte was enqueued successful, otherwise false
  *             (e.g. if queue is full).
  */
-BOOL q_put_byte (queue_t *q, uint8_t byte)
+bool q_put_byte (queue_t *q, uint8_t byte)
 {
-    if ( !q_get_free(q) ) return FALSE;
+    if ( !q_get_free(q) ) return false;
     q->data[q->writepos++] = byte;
     q->writepos %= q->size;
-    return TRUE;
+    return true;
 }
 
 /**

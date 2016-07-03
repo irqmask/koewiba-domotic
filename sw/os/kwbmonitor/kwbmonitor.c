@@ -8,8 +8,8 @@
 #include "sysconsole.h"
 #include "systime.h"
 
-BOOL g_display_empty_msg = TRUE;
-BOOL g_display_token_msg = TRUE;
+bool g_display_empty_msg = true;
+bool g_display_token_msg = true;
 
 static void current_time_difference (bus_history_t* history, int32_t* diff_ms, int32_t* remaining_us)
 {
@@ -152,17 +152,17 @@ void monitor_parse_message (uint8_t new_byte, bus_history_t* history)
 void monitor_toggle_display_empty_message (void)
 {
     if (g_display_empty_msg) {
-        g_display_empty_msg = FALSE;
+        g_display_empty_msg = false;
     } else {
-        g_display_empty_msg = TRUE;
+        g_display_empty_msg = true;
     }
 }
 
 void monitor_toggle_display_token_message (void)
 {
     if (g_display_token_msg) {
-        g_display_token_msg = FALSE;
+        g_display_token_msg = false;
     } else {
-        g_display_token_msg = TRUE;
+        g_display_token_msg = true;
     }
 }

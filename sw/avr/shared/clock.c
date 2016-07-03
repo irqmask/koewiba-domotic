@@ -36,35 +36,35 @@ volatile clock_timer_t* g_running_timers[CLOCK_NUM_TIMER];
 /**
  * Register timer in list.
  */
-static BOOL register_timer(clock_timer_t* timer_instance)
+static bool register_timer(clock_timer_t* timer_instance)
 {
     uint8_t ii;
 
     for (ii=0; ii<CLOCK_NUM_TIMER; ii++) {
         if (g_running_timers[ii] == NULL) {
         	g_running_timers[ii] = timer_instance;
-        	timer_instance->active = TRUE;
-            return TRUE;
+        	timer_instance->active = true;
+            return true;
         }
     }
-    return FALSE;
+    return false;
 }
 
 /**
  * Remove timer from list.
  */
-static BOOL remove_timer(clock_timer_t* timer_instance)
+static bool remove_timer(clock_timer_t* timer_instance)
 {
     uint8_t ii;
 
-    timer_instance->active = FALSE;
+    timer_instance->active = false;
     for (ii=0; ii<CLOCK_NUM_TIMER; ii++) {
         if (g_running_timers[ii] == timer_instance) {
         	g_running_timers[ii] = NULL;
-            return TRUE;
+            return true;
         }
     }
-    return FALSE;
+    return false;
 }
 
 
@@ -118,9 +118,9 @@ void clk_initialize(void)
  * Start/Stop Clock-Timer
  *
  * @param[in] start
- * boolean for starting/stopping the timer (TRUE = start)
+ * boolean for starting/stopping the timer (true = start)
  */
-void clk_control(BOOL start)
+void clk_control(bool start)
 {
     static uint8_t tccr1b = 0;
 
@@ -142,14 +142,14 @@ void clk_control(BOOL start)
  * Time in ticks. Convert from milliseconds to ticks with
  * CLOCK_MS_2_TICKS macro.
  *
- * @returns TRUE, if timer has been (re)started, otherwise FALSE.
+ * @returns true, if timer has been (re)started, otherwise false.
  */
-BOOL clk_timer_start(clock_timer_t* timer_instance, uint16_t ticks)
+bool clk_timer_start(clock_timer_t* timer_instance, uint16_t ticks)
 {
     // if timer is still running ...
     if (timer_instance->ticks != 0) {
     	timer_instance->ticks = ticks; // ... restart timer
-        return TRUE;
+        return true;
     }
     timer_instance->ticks = ticks;
     return register_timer(timer_instance);
@@ -161,15 +161,15 @@ BOOL clk_timer_start(clock_timer_t* timer_instance, uint16_t ticks)
  * @param[in] psTimer
  * Pointer to timer structure.
  *
- * @returns TRUE, if timer has been successfully removed from runningtimer-list, otherwise FALSE.
+ * @returns true, if timer has been successfully removed from runningtimer-list, otherwise false.
  */
-BOOL clk_timer_stop(clock_timer_t* timer_instance)
+bool clk_timer_stop(clock_timer_t* timer_instance)
 {
     // if timer could not be removed successfully
-    if( !remove_timer(timer_instance) ) return FALSE;
+    if( !remove_timer(timer_instance) ) return false;
     // otherwise reset value
     timer_instance->ticks = 0;
-    return TRUE;
+    return true;
 }
 
 /**
@@ -178,14 +178,14 @@ BOOL clk_timer_stop(clock_timer_t* timer_instance)
  * @param[in] psTimer
  * Pointer to timer structure.
  *
- * @returns TRUE, if time is over, otherwise false.
+ * @returns true, if time is over, otherwise false.
  */
-BOOL clk_timer_is_elapsed(clock_timer_t* timer_instance)
+bool clk_timer_is_elapsed(clock_timer_t* timer_instance)
 {
     if (timer_instance->ticks == 0) {
-        return TRUE;
+        return true;
     } else {
-        return FALSE;
+        return false;
     }
 }
 
@@ -196,9 +196,9 @@ BOOL clk_timer_is_elapsed(clock_timer_t* timer_instance)
  * @param[in] psTimer
  * Pointer to timer structure.
  *
- * @returns TRUE, if timer is running, otherwise false.
+ * @returns true, if timer is running, otherwise false.
  */
-BOOL clk_timer_is_running(clock_timer_t* timer_instance)
+bool clk_timer_is_running(clock_timer_t* timer_instance)
 {
     return (timer_instance->active);
 };

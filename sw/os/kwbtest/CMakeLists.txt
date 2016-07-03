@@ -27,22 +27,51 @@ link_directories (
 file (WRITE ${CMAKE_CURRENT_BINARY_DIR}/kwbtest_version.h
      "const char* PGM_VERSION(\"${VERSION}\");\n")
 
-set (kwbtest_SRCS
-    kwbtest_main.c
+# header and source files
+# ---------------------------------------------------------
+set (include_SRCS
+    ../../include/cmddef_common.h
+    ../../include/moddef_common.h
+    ../../include/prjconf.h
+    ../../include/prjtypes.h
+)
+
+set (shared_SRCS
+)
+
+set (os_include_SRCS
+    ../include/error_codes.h
+)
+
+set (os_shared_SRCS
+    ../shared/log.h
+    ../shared/message.h
+
     ../shared/ioloop.c
+    ../shared/log.c
     ../shared/message_socket.c
 )
+
+set (kwbtest_SRCS
+    kwbtest_main.c
+)
+
+# source groups
+# ---------------------------------------------------------
+source_group(\\ FILES ${kwbscheduler_SRCS})
+source_group(include FILES ${include_SRCS})
+source_group(shared FILES ${shared_SRCS})
+source_group(os\\include FILES ${os_include_SRCS})
+source_group(os\\shared FILES ${os_shared_SRCS})
 
 # executable
 # ---------------------------------------------------------
 if (WIN32)
-    add_executable ( kwbtest WIN32
-        ${kwbtest_SRCS} )
+    add_executable ( kwbtest ${include_SRCS} ${shared_SRCS} ${os_include_SRCS} ${os_shared_SRCS} ${kwbtest_SRCS} )
     install ( TARGETS kwbtest
               RUNTIME DESTINATION . )
 else (WIN32)
-    add_executable ( kwbtest
-        ${kwbtest_SRCS} )
+    add_executable ( kwbtest ${include_SRCS} ${shared_SRCS} ${os_include_SRCS} ${os_shared_SRCS} ${kwbtest_SRCS} )
     install ( TARGETS kwbtest
               RUNTIME DESTINATION bin )
 endif (WIN32)

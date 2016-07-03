@@ -10,19 +10,32 @@
 
 // --- Include section ---------------------------------------------------------
 
+#include "prjconf.h"
+
 #include <assert.h>
-#include <stdBOOL.h>
-#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 
+#if defined (PRJCONF_UNIX) || \
+    defined (PRJCONF_POSIX) || \
+    defined (PRJCONF_LINUX)
 #include <safe_lib.h>
+#endif
 
+// include
+#include "prjtypes.h"
+
+// os/include
 #include "error_codes.h"
-#include "ioloop.h"
-#include "message_socket.h"
+
+// os/libsystem
+#include "sysgetopt.h"
 #include "sysserial.h"
 #include "systime.h"
+
+// os/shared
+#include "ioloop.h"
+#include "message_socket.h"
 
 // --- Definitions -------------------------------------------------------------
 
@@ -74,10 +87,10 @@ static void handle_message(msg_t* message, void* reference, void* arg)
 int main (int argc, char* argv[])
 {
     int             rc = eERR_NONE;
-    BOOL            end_application = FALSE;
+    bool            end_application = false;
     ioloop_t        mainloop;
-    msg_socket_t    msg_socket;
-    int fd, totalb=0;
+    sys_fd_t        fd;
+    int             totalb=0;
     const char sendbuf[] = "HalloWelt\0";
 
     do {

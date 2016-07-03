@@ -27,7 +27,7 @@ uint8_t q_get_free    (queue_t *q);
 uint8_t q_get_pending (queue_t *q);
 uint8_t q_read_byte   (queue_t *q, uint16_t pos);
 uint8_t q_get_byte    (queue_t *q);
-BOOL    q_put_byte    (queue_t *q, uint8_t byte);
+bool    q_put_byte    (queue_t *q, uint8_t byte);
 void    q_flush_bytes (queue_t *q, uint16_t quantity);
 void    q_flush_all   (queue_t *q);
 

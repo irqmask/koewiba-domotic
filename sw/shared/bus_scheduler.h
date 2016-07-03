@@ -51,8 +51,8 @@ typedef struct schd {
     uint8_t         uErrorCount;                    //!< current error-count
     uint8_t         uSleepLoopCnt;                  //!< count till going to sleep.
     uint8_t         auTokenMsg[BUS_TOKEN_MSG_LEN];  //!< pre-compiled token message.
-    BOOL            bSchedDiscovery;                //!< bus-discovery mode.
-    BOOL            bSchedWaitingForAnswer;         //!< flag, if scheduler is waiting for an answer
+    bool            bSchedDiscovery;                //!< bus-discovery mode.
+    bool            bSchedWaitingForAnswer;         //!< flag, if scheduler is waiting for an answer
     clock_timer_t   sNodeAnsTimeout;                //!< node answer timeout
 } sSched_t;
 
@@ -72,7 +72,7 @@ void    bus_scheduler_initialize            (sBus_t* psBus,
                                              sSched_t* psSched,
                                              uint8_t uUart);
 
-BOOL    bus_schedule_and_get_message        (sBus_t*        psBus,
+bool    bus_schedule_and_get_message        (sBus_t*        psBus,
                                              sSched_t*      psSched);
 
 void    bus_schedule_check_and_set_sleep    (sBus_t* psBus);

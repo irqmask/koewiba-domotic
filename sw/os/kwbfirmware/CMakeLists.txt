@@ -27,27 +27,57 @@ link_directories (
 file (WRITE ${CMAKE_CURRENT_BINARY_DIR}/kwbfirmware_version.h
      "const char* PGM_VERSION(\"${VERSION}\");\n")
 
-set (kwbfirmware_SRCS
-    firmwareupdate.c
-    ihex.c
-    kwbfirmware_main.c
+# header and source files
+# ---------------------------------------------------------
+set (include_SRCS
+    ../../include/cmddef_common.h
+    ../../include/moddef_common.h
+    ../../include/prjconf.h
+    ../../include/prjtypes.h
+)
+
+set (shared_SRCS
+    ../../shared/bus.h
+
+    ../../shared/crc16.c
+)
+
+set (os_include_SRCS
+    ../include/error_codes.h
+)
+
+set (os_shared_SRCS
+    ../shared/log.h
+    ../shared/message.h
+
     ../shared/ioloop.c
     ../shared/log.c
     ../shared/message.c
     ../shared/message_serial.c
-    ../../shared/crc16.c
 )
+
+set (kwbfirmware_SRCS
+    firmwareupdate.c
+    ihex.c
+    kwbfirmware_main.c
+)
+
+# source groups
+# ---------------------------------------------------------
+source_group(\\ FILES ${kwbfirmware_SRCS})
+source_group(include FILES ${include_SRCS})
+source_group(shared FILES ${shared_SRCS})
+source_group(os\\include FILES ${os_include_SRCS})
+source_group(os\\shared FILES ${os_shared_SRCS})
 
 # executable
 # ---------------------------------------------------------
 if (WIN32)
-    add_executable ( kwbfirmware WIN32
-        ${kwbfirmware_SRCS} )
+    add_executable ( kwbfirmware ${include_SRCS} ${shared_SRCS} ${os_include_SRCS} ${os_shared_SRCS} ${kwbfirmware_SRCS} )
     install ( TARGETS kwbfirmware
               RUNTIME DESTINATION . )
 else (WIN32)
-    add_executable ( kwbfirmware
-        ${kwbfirmware_SRCS} )
+    add_executable ( kwbfirmware ${include_SRCS} ${shared_SRCS} ${os_include_SRCS} ${os_shared_SRCS} ${kwbfirmware_SRCS} )
     install ( TARGETS kwbfirmware
               RUNTIME DESTINATION bin )
 endif (WIN32)

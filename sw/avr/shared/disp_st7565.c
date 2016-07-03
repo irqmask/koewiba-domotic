@@ -38,7 +38,7 @@
 
 // --- Global functions --------------------------------------------------------
 
-void st7565_display_on (BOOL on)
+void st7565_display_on (bool on)
 {
     DISP_PORT_A0 &= ~(1<<DISP_A0);
     DISP_PORT_SS &= ~(1<<DISP_SS);
@@ -89,7 +89,7 @@ void st7565_write_data (uint8_t data)
     DISP_PORT_SS |= (1<<DISP_SS);
 }
 
-void st7565_adc_select (BOOL reverse)
+void st7565_adc_select (bool reverse)
 {
     DISP_PORT_A0 &= ~(1<<DISP_A0);
     DISP_PORT_SS &= ~(1<<DISP_SS);
@@ -101,7 +101,7 @@ void st7565_adc_select (BOOL reverse)
     DISP_PORT_SS |= (1<<DISP_SS);
 }
 
-void st7565_disp_reverse (BOOL reverse)
+void st7565_disp_reverse (bool reverse)
 {
     DISP_PORT_A0 &= ~(1<<DISP_A0);
     DISP_PORT_SS &= ~(1<<DISP_SS);
@@ -113,7 +113,7 @@ void st7565_disp_reverse (BOOL reverse)
     DISP_PORT_SS |= (1<<DISP_SS);
 }
 
-void st7565_disp_all_pixel (BOOL all_pixel_on)
+void st7565_disp_all_pixel (bool all_pixel_on)
 {
     DISP_PORT_A0 &= ~(1<<DISP_A0);
     DISP_PORT_SS &= ~(1<<DISP_SS);
@@ -143,7 +143,7 @@ void st7565_reset (void)
     DISP_PORT_SS |= (1<<DISP_SS);
 }
     
-void st7565_com_select (BOOL reverse)
+void st7565_com_select (bool reverse)
 {
     DISP_PORT_A0 &= ~(1<<DISP_A0);
     DISP_PORT_SS &= ~(1<<DISP_SS);
@@ -155,9 +155,9 @@ void st7565_com_select (BOOL reverse)
     DISP_PORT_SS |= (1<<DISP_SS);
 }
 
-void st7565_power_ctrl (BOOL booster,
-                        BOOL voltage_regulator,
-                        BOOL voltage_follower)
+void st7565_power_ctrl (bool booster,
+                        bool voltage_regulator,
+                        bool voltage_follower)
 {
    uint8_t val;
    
@@ -195,7 +195,7 @@ void st7565_el_volume_reg_set (uint8_t level)
     DISP_PORT_SS |= (1<<DISP_SS);
 }
 
-void st7565_static_indicator_reg_set (BOOL      on,
+void st7565_static_indicator_reg_set (bool      on,
                                       uint8_t   state)
 {
     DISP_PORT_A0 &= ~(1<<DISP_A0);
@@ -252,16 +252,16 @@ void st7565_initialize (void)
     _delay_us(1000);
     
     st7565_lcd_bias(0);                 // bias 1/9   
-    st7565_adc_select(TRUE);            // reverse orientation
-    st7565_com_select(FALSE);           // 6 o'clock mode
+    st7565_adc_select(true);            // reverse orientation
+    st7565_com_select(false);           // 6 o'clock mode
     
     st7565_voltage_resistor_ratio(3);   // set voltage regulator resistor ratio
     st7565_el_volume_reg_set(0x1F);     // set volume mode register
 
-    st7565_power_ctrl(TRUE, TRUE, TRUE);// power control mode: all features on
+    st7565_power_ctrl(true, true, true);// power control mode: all features on
 
-    st7565_disp_reverse(FALSE);         // display mode positive
-    st7565_static_indicator_reg_set(TRUE, 0); // switch indicator off, no blinking
-    st7565_display_on(TRUE);            // switch display on  
+    st7565_disp_reverse(false);         // display mode positive
+    st7565_static_indicator_reg_set(true, 0); // switch indicator off, no blinking
+    st7565_display_on(true);            // switch display on  
 }
 /** @} */

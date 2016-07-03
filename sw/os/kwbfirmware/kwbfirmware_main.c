@@ -10,22 +10,35 @@
 
 // --- Include section ---------------------------------------------------------
 
+#include "prjconf.h"
+
 #include <assert.h>
-#include <getopt.h>
-#include <stdBOOL.h>
-#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include <safe_lib.h>
+#if defined (PRJCONF_UNIX) || \
+    defined (PRJCONF_POSIX) || \
+    defined (PRJCONF_LINUX)
+  #include <safe_lib.h>
+#endif
 
+// include
+#include "prjtypes.h"
+
+// os/include
 #include "error_codes.h"
+
+// os/shared
 #include "ioloop.h"
 #include "log.h"
-#include "firmwareupdate.h"
 #include "message_serial.h"
+
+// os/libsystem
+#include "sysgetopt.h"
 #include "systime.h"
+
+#include "firmwareupdate.h"
 
 // --- Definitions -------------------------------------------------------------
 
@@ -39,9 +52,9 @@ typedef struct options {
     int         serial_baudrate;    //!< Baudrate of serial connection to RS232 gateway.
     char        router_address[256];//!< Address of kwbrouter server.
     uint16_t    router_port;        //!< Port number of kwbrouter server.
-    BOOL        serial_device_set;  //!< Flag: if set, serial device has been
+    bool        serial_device_set;  //!< Flag: if set, serial device has been
                                     //!< configured in the command line options.
-    BOOL        router_address_set; //!< Flag: is set, router address has been
+    bool        router_address_set; //!< Flag: is set, router address has been
                                     //!< configured in the command line options.
     char        filename[256];
     uint16_t    node_address;
@@ -94,13 +107,13 @@ static void set_options (options_t*     options,
  * @param[in]   argv    Command line arguments.
  * @param[out]  options Stucture where options are stored in.
  *
- * @returns TRUE, if command line options have been parsed successfully or no
+ * @returns true, if command line options have been parsed successfully or no
  *          options have been read (in this case, default parameters will be
  *          used).
  */
-static BOOL parse_commandline_options (int argc, char* argv[], options_t* options)
+static bool parse_commandline_options (int argc, char* argv[], options_t* options)
 {
-    BOOL                    rc = TRUE;
+    bool                    rc = true;
     int                     c;
 
     while (1) {
@@ -111,7 +124,7 @@ static BOOL parse_commandline_options (int argc, char* argv[], options_t* option
         case 'd':
             printf("device %s\n", optarg);
             strcpy_s(options->serial_device, sizeof(options->serial_device), optarg);
-            options->serial_device_set = TRUE;
+            options->serial_device_set = true;
             break;
         case 'b':
             printf("baudrate %s\n", optarg);
@@ -120,7 +133,7 @@ static BOOL parse_commandline_options (int argc, char* argv[], options_t* option
         case 'a':
             printf("router address %s\n", optarg);
             strcpy_s(options->router_address, sizeof(options->router_address), optarg);
-            options->router_address_set = TRUE;
+            options->router_address_set = true;
             break;
         case 'p':
             printf("router port %s\n", optarg);
@@ -136,7 +149,7 @@ static BOOL parse_commandline_options (int argc, char* argv[], options_t* option
             log_add_mask(LOG_VERBOSE1 | LOG_VERBOSE2);
             break;
         default:
-            rc = FALSE;
+            rc = false;
             break;
         }
     }
@@ -147,33 +160,33 @@ static BOOL parse_commandline_options (int argc, char* argv[], options_t* option
  * Validate kwbfirmware runtime options.
  *
  * @param[in,out]   options Structure where options are stored in.
- * @returns         TRUE if options are constient and usable, otherwise FALSE.
+ * @returns         true if options are constient and usable, otherwise false.
  */
- static BOOL validate_options(options_t* options)
+ static bool validate_options(options_t* options)
 {
-    BOOL    rc = FALSE,
-            serial_device_set = FALSE,
-            vbusd_address_set = FALSE;
+    bool    rc = false,
+            serial_device_set = false,
+            vbusd_address_set = false;
 
     do {
         // minimum address is "/a": unix socket with name "a" in the root directory
         if (strnlen_s(options->router_address, sizeof(options->router_address)) < 2) {
-            fprintf(stderr, "Missing router address!\n");
+            log_error("Missing router address!\n");
             break;
         }
         if (!options->serial_device_set || strnlen_s(options->serial_device, sizeof(options->serial_device)) < 2) {
-            fprintf(stderr, "Invalid or missing serial connection device!\n");
+            log_error("Invalid or missing serial connection device!\n");
             break;
         }
         if (strnlen_s(options->filename, sizeof(options->filename)) < 2) {
-            fprintf(stderr, "Filename of firmware needed!\n");
+            log_error("Filename of firmware needed!\n");
             break;
         }
         if (options->node_address == 0 || options->node_address == 65535) {
-            fprintf(stderr, "Only node addresses from 1 to 65534 allowed!\n");
+            log_error("Only node addresses from 1 to 65534 allowed!\n");
             break;
         }
-        rc = TRUE;
+        rc = true;
     } while (0);
     return rc;
 }
@@ -215,7 +228,7 @@ int main (int argc, char* argv[])
 {
     int                 rc = eERR_NONE;
     options_t           options;
-    BOOL                end_application = FALSE;
+    bool                end_application = false;
     ioloop_t            mainloop;
     firmwareupdate_t    firmware;
 
@@ -228,8 +241,8 @@ int main (int argc, char* argv[])
                     0,                  // port 0: use unix sockets
                     0x0e);                 // own node address
         // parse and validate commandline options
-        if (parse_commandline_options(argc, argv, &options) == FALSE ||
-            validate_options(&options) == FALSE) {
+        if (parse_commandline_options(argc, argv, &options) == false ||
+            validate_options(&options) == false) {
             print_usage();
             rc = eERR_BAD_PARAMETER;
             break;
@@ -253,10 +266,10 @@ int main (int argc, char* argv[])
                     sys_sleep_ms(100);
                 } else if (rc == eERR_NONE) {
                     log_msg(LOG_STATUS, "FIRMWARE UPDATE SUCCESSFULL!");
-                    end_application = TRUE;
+                    end_application = true;
                 } else {
                     log_msg(LOG_STATUS, "FIRMWARE UPDATE FAILED!");
-                    end_application = TRUE;
+                    end_application = true;
                 }
             }
         }

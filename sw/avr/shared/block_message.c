@@ -62,11 +62,11 @@ static void send_block_info_message (sBus_t* bus, uint16_t receiver, uint16_t cr
 	bus_send_message(bus, receiver, 9, msg);
 }
 
-static BOOL process_eeprom_block_start (uint8_t msglen, uint8_t* msg)
+static bool process_eeprom_block_start (uint8_t msglen, uint8_t* msg)
 {
     if (10 > msglen) {
     	g_bd.additional_info1 = 2;
-    	return FALSE;
+    	return false;
     }
 
     g_bd.blocktype	    = msg[1];
@@ -77,12 +77,12 @@ static BOOL process_eeprom_block_start (uint8_t msglen, uint8_t* msg)
 	if (g_bd.startaddress >= EEPROM_SIZE ||
 		(EEPROM_SIZE - g_bd.startaddress) < g_bd.blocksize ) {
 		g_bd.additional_info1 = 3;
-		return FALSE;
+		return false;
 	}
-    return TRUE;
+    return true;
 }
 
-static BOOL process_eeprom_block_data (uint8_t msglen, uint8_t* msg)
+static bool process_eeprom_block_data (uint8_t msglen, uint8_t* msg)
 {
     uint16_t address16;
     uint8_t  len     = 0;
@@ -91,7 +91,7 @@ static BOOL process_eeprom_block_data (uint8_t msglen, uint8_t* msg)
     if (3 > msglen) {
     	g_bd.additional_info1 = 2;
     	g_bd.additional_info2 = msglen;
-    	return FALSE;
+    	return false;
     }
 
     // get current offset from message and
@@ -106,17 +106,17 @@ static BOOL process_eeprom_block_data (uint8_t msglen, uint8_t* msg)
     if (len != eep_write(address16, len, &msg[3])) {
         g_bd.additional_info1 = 3;
         g_bd.additional_info2 = len;
-        return FALSE;
+        return false;
     }
 
     // save highest address of written byte
     if (address16 + len - 1 > g_bd.received) {
         g_bd.received = address16 + len - 1;
     }
-    return TRUE;
+    return true;
 }
 
-static BOOL process_eeprom_block_end (uint8_t msglen, uint8_t* msg)
+static bool process_eeprom_block_end (uint8_t msglen, uint8_t* msg)
 {
     uint16_t address_eeprom, size;
     uint8_t  byte;
@@ -125,7 +125,7 @@ static BOOL process_eeprom_block_end (uint8_t msglen, uint8_t* msg)
     if (3 > msglen) {
     	g_bd.additional_info1 = 2;
     	g_bd.additional_info2 = msglen;
-    	return FALSE;
+    	return false;
     }
 
     g_bd.crc_host = ((msg[1]<<8) | msg[2]);
@@ -138,35 +138,35 @@ static BOOL process_eeprom_block_end (uint8_t msglen, uint8_t* msg)
 		if (1 != eep_read(address_eeprom, 1, &byte)) {
 	    	g_bd.additional_info1 = 3;
 	    	g_bd.additional_info2 = 0;
-	    	return FALSE;
+	    	return false;
 		}
 		g_bd.crc_local = crc_16_next_byte(g_bd.crc_local, byte);
 	}
 	if (g_bd.crc_local != g_bd.crc_host) {
     	g_bd.additional_info1 = 4;
     	g_bd.additional_info2 = 0;
-		return FALSE;
+		return false;
 	}
 	// save length and crc in external EEPROM
 	size = (uint16_t)g_bd.blocksize;
 	if (MOD_LEN_APPSIZE != eep_write(MOD_eExtEEPAddr_AppSize, MOD_LEN_APPSIZE, (uint8_t*)&size)) {
 		g_bd.additional_info1 = 5;
-		return FALSE;
+		return false;
 	}
 	if (MOD_LEN_APPCRC != eep_write(MOD_eExtEEPAddr_AppCrc, MOD_LEN_APPCRC, (uint8_t*)&g_bd.crc_host)) {
 		g_bd.additional_info1 = 6;
-		return FALSE;
+		return false;
 	}
 	// set flag that controller is reprogrammed after next reset
 	register_set_u8(MOD_eReg_BldFlag, (1<<eBldFlagAppProgram));
 
-	return TRUE;
+	return true;
 }
 
 
-BOOL block_message_start (sBus_t* bus, uint16_t sender, uint8_t msglen, uint8_t* msg)
+bool block_message_start (sBus_t* bus, uint16_t sender, uint8_t msglen, uint8_t* msg)
 {
-	BOOL ret = TRUE;
+	bool ret = true;
 
 	do {
 		g_bd.blocktype = msg[1];
@@ -181,8 +181,8 @@ BOOL block_message_start (sBus_t* bus, uint16_t sender, uint8_t msglen, uint8_t*
 		default:
 			break;
 		}
-	} while (FALSE);
-	if (ret == TRUE) {
+	} while (false);
+	if (ret == true) {
 		clk_timer_start(&g_timer, CLOCK_MS_2_TICKS(10000));
 	} else {
 		send_nak_message(bus, sender, eCMD_BLOCK_START);
@@ -190,15 +190,15 @@ BOOL block_message_start (sBus_t* bus, uint16_t sender, uint8_t msglen, uint8_t*
     return ret;
 }
 
-BOOL block_message_data (sBus_t* bus, uint16_t sender, uint8_t msglen, uint8_t* msg)
+bool block_message_data (sBus_t* bus, uint16_t sender, uint8_t msglen, uint8_t* msg)
 {
-	BOOL ret = TRUE;
+	bool ret = true;
 
 	do {
 		if (sender != g_bd.sender) {
 			g_bd.additional_info1 = 1;
 			g_bd.additional_info2 = 0;
-			ret = FALSE;
+			ret = false;
 			break;
 		}
 		switch (g_bd.blocktype) {
@@ -210,8 +210,8 @@ BOOL block_message_data (sBus_t* bus, uint16_t sender, uint8_t msglen, uint8_t* 
 		default:
 			break;
 		}
-	} while (FALSE);
-    if (ret == TRUE) {
+	} while (false);
+    if (ret == true) {
     	clk_timer_start(&g_timer, CLOCK_MS_2_TICKS(10000));
     	send_ack_message(bus, sender, eCMD_BLOCK_DATA);
     } else {
@@ -220,15 +220,15 @@ BOOL block_message_data (sBus_t* bus, uint16_t sender, uint8_t msglen, uint8_t* 
     return ret;
 }
 
-BOOL block_message_end (sBus_t* bus, uint16_t sender, uint8_t msglen, uint8_t* msg)
+bool block_message_end (sBus_t* bus, uint16_t sender, uint8_t msglen, uint8_t* msg)
 {
-	BOOL ret = TRUE;
+	bool ret = true;
 
 	do {
 		if (sender != g_bd.sender) {
 			g_bd.additional_info1 = 1;
 			g_bd.additional_info2 = 0;
-			ret = FALSE;
+			ret = false;
 			break;
 		}
 		switch (g_bd.blocktype) {
@@ -240,8 +240,8 @@ BOOL block_message_end (sBus_t* bus, uint16_t sender, uint8_t msglen, uint8_t* m
 		default:
 			break;
 		}
-	} while (FALSE);
-    if (ret != TRUE) {
+	} while (false);
+    if (ret != true) {
     	send_nak_message (bus, sender, eCMD_BLOCK_END);
     }
 	send_block_info_message(bus, sender,
@@ -269,9 +269,9 @@ void block_data_reset (void)
  * @param[in] psTimer
  * Pointer to timer structure.
  *
- * @returns TRUE, if timer is active and time is over, otherwise false.
+ * @returns true, if timer is active and time is over, otherwise false.
  */
-BOOL block_timer_elapsed (void)
+bool block_timer_elapsed (void)
 {
     return (clk_timer_is_running(&g_timer) && clk_timer_is_elapsed(&g_timer));
 }

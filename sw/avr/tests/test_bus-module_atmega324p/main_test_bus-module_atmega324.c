@@ -47,11 +47,11 @@ static clock_timer_t    g_LED_timer;
 
 // --- Local functions ---------------------------------------------------------
 
-static BOOL test_eeprom (void)
+static bool test_eeprom (void)
 {
     uint16_t 	ii, wanted_crc16 = 0, read_crc16 = 0;
     uint8_t		databyte;
-    BOOL 		test_is_ok = TRUE;
+    bool        test_is_ok = true;
 
     // fill EEProm
     wanted_crc16 = CRC_START_VALUE;
@@ -71,7 +71,7 @@ static BOOL test_eeprom (void)
     }
 
     if (read_crc16 != wanted_crc16) {
-    	test_is_ok = FALSE;
+    	test_is_ok = false;
     }
 
     return test_is_ok;
@@ -125,7 +125,7 @@ int main(void)
 
     // run EEProm test
     // ------------------------------------------------------
-    if (test_eeprom() == FALSE) {
+    if (test_eeprom() == false) {
     	LED_ERROR_ON;
         msg[1] = 0x00; // 1 = test succeeded, 0 = test failed
     } else {

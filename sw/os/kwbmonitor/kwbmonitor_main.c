@@ -28,12 +28,16 @@
   #include <unistd.h>
 #endif
 
-#include "getopt.h"
-#include "kwbmonitor.h"
+// include
 #include "prjtypes.h"
+
+// libsystem
 #include "sysconsole.h"
 #include "system.h"
+#include "sysgetopt.h"
 #include "systhread.h"
+
+#include "kwbmonitor.h"
 #include "vos.h"
 
 // --- Definitions -------------------------------------------------------------
@@ -45,8 +49,8 @@ typedef struct options {
     int         serial_baudrate;
     char        vbusd_address[256];
     uint16_t    vbusd_port;
-    BOOL        serial_device_set;
-    BOOL        vbusd_address_set;
+    bool        serial_device_set;
+    bool        vbusd_address_set;
 } options_t;
 
 // --- Local variables ---------------------------------------------------------
@@ -129,11 +133,11 @@ static void set_options (options_t*     options,
     options->vbusd_port = vbusd_port;
 }
 
-static BOOL parse_commandline_options (int          argc,
+static bool parse_commandline_options (int          argc,
                                        char*        argv[],
                                        options_t*   options)
 {
-    BOOL                    rc = TRUE;
+    bool                    rc = true;
     int                     c;
 
     while (1) {
@@ -144,7 +148,7 @@ static BOOL parse_commandline_options (int          argc,
             case 'd':
                 printf("device %s\n", optarg);
                 strcpy_s(options->serial_device, sizeof(options->serial_device), optarg);
-                options->serial_device_set = TRUE;
+                options->serial_device_set = true;
                 break;
             case 'b':
                 printf("baudrate %s\n", optarg);
@@ -153,25 +157,25 @@ static BOOL parse_commandline_options (int          argc,
             case 'v':
                 printf("vbusd address %s\n", optarg);
                 strcpy_s(options->vbusd_address, sizeof(options->vbusd_address), optarg);
-                options->vbusd_address_set = TRUE;
+                options->vbusd_address_set = true;
                 break;
             case 'w':
                 printf("vbusd port %s\n", optarg);
                 options->vbusd_port = atoi(optarg);
                 break;
             default:
-                rc = FALSE;
+                rc = false;
                 break;
         }
     }
     return rc;
 }
 
-static BOOL validate_options (options_t* options)
+static bool validate_options (options_t* options)
 {
-    BOOL    rc = FALSE,
-    serial_device_set = FALSE,
-    vbusd_address_set = FALSE;
+    bool    rc = false,
+    serial_device_set = false,
+    vbusd_address_set = false;
 
     do {
         // minimum address is "/a": unix socket with name "a" in the root directory
@@ -185,7 +189,7 @@ static BOOL validate_options (options_t* options)
                 fprintf(stderr, "Invalid vbusd address!\n");
             break;
                 }
-                rc = TRUE;
+                rc = true;
     } while (0);
     return rc;
 }

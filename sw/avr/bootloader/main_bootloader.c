@@ -97,7 +97,7 @@ void init_wdt(void)
     wdt_disable();
 }
 
-BOOL check_crc (uint16_t* length)
+bool check_crc (uint16_t* length)
 {
     uint32_t ii;
     uint16_t crc = 0, crcexpected = 0;
@@ -107,7 +107,7 @@ BOOL check_crc (uint16_t* length)
 
     // get length of the application
     eep_read(MOD_eExtEEPAddr_AppSize, MOD_LEN_APPSIZE, (uint8_t*)length);
-    if (*length > EEPROM_SIZE) return FALSE;
+    if (*length > EEPROM_SIZE) return false;
 
     // read expected CRC value
     eep_read(MOD_eExtEEPAddr_AppCrc, MOD_LEN_APPCRC, (uint8_t*)&crcexpected);
@@ -119,43 +119,43 @@ BOOL check_crc (uint16_t* length)
         crc = crc_16_next_byte(crc, byte);
     }
 
-    if (crc != crcexpected) return FALSE;
+    if (crc != crcexpected) return false;
 
-    return TRUE;
+    return true;
 }
 
-BOOL check_controller_id (void)
+bool check_controller_id (void)
 {
     uint8_t sigbyte, eepcontent = 0;
 
     eep_read(BLD_eExtEEPAddr_CtrlID + 0, 1, &eepcontent);
     sigbyte = boot_signature_byte_get(ADDR_SIGNATURE_BYTE0);
-    if (sigbyte != eepcontent) return FALSE;
+    if (sigbyte != eepcontent) return false;
 
     eep_read(BLD_eExtEEPAddr_CtrlID + 1, 1, &eepcontent);
     sigbyte = boot_signature_byte_get(ADDR_SIGNATURE_BYTE1);
-    if (sigbyte != eepcontent) return FALSE;
+    if (sigbyte != eepcontent) return false;
 
     eep_read(BLD_eExtEEPAddr_CtrlID + 2, 1, &eepcontent);
     sigbyte = boot_signature_byte_get(ADDR_SIGNATURE_BYTE2);
-    if (sigbyte != eepcontent) return FALSE;
+    if (sigbyte != eepcontent) return false;
 
-    return TRUE;
+    return true;
 }
 
-BOOL check_board_type (void)
+bool check_board_type (void)
 {
-    return TRUE;
+    return true;
 }
 
-BOOL has_app_id_changed (void)
+bool has_app_id_changed (void)
 {
-    return TRUE;
+    return true;
 }
 
-BOOL has_app_version_changed (void)
+bool has_app_version_changed (void)
 {
-    return TRUE;
+    return true;
 }
 
 void program_flash (uint16_t address, uint16_t length)
@@ -275,7 +275,7 @@ int main ( void )
             // re-enable RWW-section again. We need this if we want to jump back
             // to the application after bootloading.
             boot_rww_enable ();
-        } while ( FALSE );
+        } while ( false );
         eeprom_write_byte(&g_reg_internal_eep[MOD_eCfg_BldFlag], bld_status);
     }
     DBG_SET_PIN4();

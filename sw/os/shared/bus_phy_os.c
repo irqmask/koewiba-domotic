@@ -67,20 +67,20 @@ void bus_phy_initialize(sBusPhy_t* phy, uint8_t uart)
         if (uart >= BUSPHY_MAX_DEVICES) break;
 
         // sender is initial off, receiver is always on.
-        bus_phy_activate_sender(phy, FALSE);
+        bus_phy_activate_sender(phy, false);
 #ifndef BUS_TXRX_COMBINED
-        bus_phy_activate_receiver(phy, TRUE);
+        bus_phy_activate_receiver(phy, true);
 #endif
-    } while ( FALSE );
+    } while ( false );
 }
 
 /**
  * Activate or deactivate bus's sender hardware (driver).
  *
  * @param[in] phy       Handle of bus physical layer.
- * @param[in] activate  TRUE: activate sender, FALSE: deactivate sender.
+ * @param[in] activate  true: activate sender, false: deactivate sender.
  */
-void bus_phy_activate_sender(sBusPhy_t* phy, BOOL activate)
+void bus_phy_activate_sender(sBusPhy_t* phy, bool activate)
 {
     // insert code for sender activation here, if needed.
 }
@@ -89,10 +89,10 @@ void bus_phy_activate_sender(sBusPhy_t* phy, BOOL activate)
  * Activate or deactivate bus's receiver hardware.
  *
  * @param[in] phy       Handle of bus physical layer.
- * @param[in] activate TRUE: activate receiver, FALSE: deactivate receiver.
+ * @param[in] activate true: activate receiver, false: deactivate receiver.
  */
 #ifndef BUS_TXRX_COMBINED
-void bus_phy_activate_receiver(sBusPhy_t* phy, BOOL activate)
+void bus_phy_activate_receiver(sBusPhy_t* phy, bool activate)
 {
     // insert code for receiver activation here, if needed.
 }
@@ -106,31 +106,31 @@ void bus_phy_activate_receiver(sBusPhy_t* phy, BOOL activate)
  * @param[in] msg       Pointer to message to be sent.
  * @param[in] len       Length in bytes of mesage to be sent.
  *
- * @returns TRUE: sending successfully initiated, otherwise FALSE.
+ * @returns true: sending successfully initiated, otherwise false.
  */
-BOOL bus_phy_send(sBusPhy_t* phy, const uint8_t* msg, uint8_t len)
+bool bus_phy_send(sBusPhy_t* phy, const uint8_t* msg, uint8_t len)
 {
-    BOOL rc = TRUE;
+    bool rc = true;
 
     //if (psPhy->uCurrentBytesToSend != 0) {
-    //    return FALSE;
+    //    return false;
     //}
     //psPhy->uCurrentBytesToSend = uLen;
     phy->uFlags |= e_uarttxflag;
     //psPhy->puSendPtr = puMsg;
 
-    bus_phy_activate_sender(phy, TRUE);
+    bus_phy_activate_sender(phy, true);
     if (vos_send(msg_b_get_uart(phy->uUart), (void*)msg, len) == len) {
         phy->uFlags &= ~e_uarttxflag;
     } else {
         perror("bus_phy_send");
-        rc = FALSE;
+        rc = false;
     }
     debug_log_hex_len(msg, len);
 
-    bus_phy_activate_sender(phy, FALSE);
+    bus_phy_activate_sender(phy, false);
 #ifndef BUS_TXRX_COMBINED
-    bus_phy_activate_receiver(phy, TRUE);
+    bus_phy_activate_receiver(phy, true);
 #endif
     return rc;
 }
@@ -140,9 +140,9 @@ BOOL bus_phy_send(sBusPhy_t* phy, const uint8_t* msg, uint8_t len)
  *
  * @param[in] phy       Handle of bus physical layer.
  *
- * @returns TRUE:       sending in progress.
+ * @returns true:       sending in progress.
  */
-BOOL bus_phy_sending(sBusPhy_t* phy)
+bool bus_phy_sending(sBusPhy_t* phy)
 {
     return (vos_get_pending_send_bytes(msg_b_get_uart(phy->uUart)) != 0);
 }
@@ -152,9 +152,9 @@ BOOL bus_phy_sending(sBusPhy_t* phy)
  *
  * @param[in] phy       Handle of bus physical layer.
  *
- * @returns TRUE: at least one byte is waiting in receive buffer.
+ * @returns true: at least one byte is waiting in receive buffer.
  */
-BOOL bus_phy_data_received(sBusPhy_t* phy)
+bool bus_phy_data_received(sBusPhy_t* phy)
 {
     return (vos_get_pending(msg_b_get_uart(phy->uUart)) > 0);
 }
@@ -165,15 +165,15 @@ BOOL bus_phy_data_received(sBusPhy_t* phy)
  * @param[in] phy       Handle to bus's phsical layer
  * @param[out] byte     Received byte. *puByte remains unchange if no byte has been received.
  *
- * @returns TRUE if a byte has been received, otherwise FALSE.
+ * @returns true if a byte has been received, otherwise false.
  */
-BOOL bus_phy_read_byte(sBusPhy_t* phy, uint8_t *byte)
+bool bus_phy_read_byte(sBusPhy_t* phy, uint8_t *byte)
 {
-    BOOL rc = TRUE;
+    bool rc = true;
 
     if (vos_recv(msg_b_get_uart(phy->uUart), byte, 1) != 1) {
         perror("bus_phy_read_byte");
-        rc = FALSE;
+        rc = false;
     }
     return rc;
 }

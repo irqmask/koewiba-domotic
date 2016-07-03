@@ -21,22 +21,32 @@ endif (WIN32)
 
 # list of source files
 # ---------------------------------------------------------
-set (libsystem_SRCS
-    getopt.h
-    system.h
-	sysconsole.h
-	sysserial.h
-	syssocket.h
-	systhread.h
-	systime.h
+set (include_SRCS
+    ../../include/prjconf.h
+    ../../include/prjtypes.h
+)
 
-	getopt.c
+set (libsystem_SRCS
+    system.h
+    sysconsole.h
+    sysgetopt.h
+    sysserial.h
+    syssocket.h
+    systhread.h
+    systime.h
+
     sysconsole.c
+    sysgetopt.c
     sysserial.c
     syssocket.c
     systime.c
 )
 
+# source groups
+# ---------------------------------------------------------
+source_group(\\ FILES ${libsystem_SRCS})
+source_group(include FILES ${include_SRCS})
+
 # library
 # ---------------------------------------------------------
-add_library (libsystem ${libsystem_SRCS})
+add_library (libsystem ${include_SRCS} ${libsystem_SRCS})

@@ -65,7 +65,7 @@ static uint8_t      g_curr_len;
     serial_phy_initiate_sending(phy);
 }*/
 
-static BOOL convert_nibbles_to_byte (uint8_t nibble_h, uint8_t nibble_l, uint8_t* byte)
+static bool convert_nibbles_to_byte (uint8_t nibble_h, uint8_t nibble_l, uint8_t* byte)
 {
     if (nibble_h >= '0' && nibble_h <= '9') {
         nibble_h -= '0';
@@ -75,7 +75,7 @@ static BOOL convert_nibbles_to_byte (uint8_t nibble_h, uint8_t nibble_l, uint8_t
         nibble_h -= ('A' - 10);
     } else {
         *byte = 0;
-        return FALSE;
+        return false;
     }
     *byte = nibble_h << 4;
 
@@ -87,10 +87,10 @@ static BOOL convert_nibbles_to_byte (uint8_t nibble_h, uint8_t nibble_l, uint8_t
         nibble_l -= ('A' - 10);
     } else {
         *byte = 0;
-        return FALSE;
+        return false;
     }
     *byte |= nibble_l;
-    return TRUE;
+    return true;
 }
 
 static void convert_and_enqueue_byte (queue_t *q, uint8_t byte)
@@ -249,7 +249,7 @@ void bgw_forward_serial_msg (sBus_t* bus, scomm_phy_t* rs232_phy)
  * @returns TURE, if message was correctly read from bus and sent to serial
  * line transmit buffer.
  */
-BOOL bgw_forward_bus_msg (sBus_t *bus, scomm_phy_t *serial)
+bool bgw_forward_bus_msg (sBus_t *bus, scomm_phy_t *serial)
 {
     uint8_t  len = 0;
     uint8_t  length = 0;
@@ -258,7 +258,7 @@ BOOL bgw_forward_bus_msg (sBus_t *bus, scomm_phy_t *serial)
     do {
         // is there a new message pending?
         if (bus->msg_receive_state != eBUS_RECV_MESSAGE) {
-            return FALSE;
+            return false;
         }
         sender   = bus->sRecvMsg.uSender;
         length   = bus->sRecvMsg.length - 4;
@@ -285,6 +285,6 @@ BOOL bgw_forward_bus_msg (sBus_t *bus, scomm_phy_t *serial)
             bus_sleep(bus);
             //sleep_pinchange2_disable();
         }
-    } while ( FALSE );
-    return TRUE;
+    } while ( false );
+    return true;
 }

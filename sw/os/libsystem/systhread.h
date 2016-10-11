@@ -31,7 +31,7 @@
 #  define sys_thread_func(name) DWORD WINAPI name( LPVOID p)
 
 #  define sys_thread_start(func)    do{                 \
-                                        CreateThread(NULL, 0, (func), NULL, 0, NULL);\
+                                        CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)(func), NULL, 0, NULL);\
                                     }while(0);
 #else
 #  define sys_thread_func(name) void *name(void *p)

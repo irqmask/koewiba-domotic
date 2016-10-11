@@ -152,12 +152,12 @@ static bool validate_options (options_t* options)
     do {
         // minimum address is "/a": unix socket with name "a" in the root directory
         if (options->serial_device_set &&
-            strnlen_s(options->serial_device, sizeof(options->serial_device)) < 2) {
+            strnlen(options->serial_device, sizeof(options->serial_device)) < 2) {
             log_error("Invalid serial device path!\n");
             break;
         }
         if (options->vbusd_address_set &&
-            strnlen_s(options->vbusd_address, sizeof(options->vbusd_address)) < 2) {
+            strnlen(options->vbusd_address, sizeof(options->vbusd_address)) < 2) {
             log_error("Invalid vbusd address!\n");
             break;
         }
@@ -176,7 +176,7 @@ static bool validate_options (options_t* options)
 void init_scheduling (msg_bus_t* busscheduler, uint16_t own_node_address)
 {
     msg_b_init(busscheduler, 0);
-    
+
     clk_initialize();
     bus_configure(&busscheduler->bus, own_node_address);
     bus_scheduler_initialize(&busscheduler->bus, &busscheduler->scheduler, 0);

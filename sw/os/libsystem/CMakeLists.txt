@@ -8,7 +8,7 @@ include_directories (
     ${CMAKE_CURRENT_BINARY_DIR}
 )
 
-# system dependant include directories
+# system dependent include directories
 # ---------------------------------------------------------
 if (WIN32)
 
@@ -50,3 +50,5 @@ source_group(include FILES ${include_SRCS})
 # library
 # ---------------------------------------------------------
 add_library (libsystem ${include_SRCS} ${libsystem_SRCS})
+
+set_property(TARGET libsystem PROPERTY CXX_STANDARD 11)

@@ -10,7 +10,7 @@ include_directories (
     ${CMAKE_CURRENT_BINARY_DIR}
 )
 
-# system dependant include directories
+# system dependent include directories
 # ---------------------------------------------------------
 if (WIN32)
 

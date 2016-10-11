@@ -10,7 +10,7 @@ include_directories (
     ${CMAKE_CURRENT_BINARY_DIR}
 )
 
-# system dependant include directories
+# system dependent include directories
 # ---------------------------------------------------------
 if (WIN32)
 
@@ -81,6 +81,8 @@ else (WIN32)
     install ( TARGETS kwbfirmware
               RUNTIME DESTINATION bin )
 endif (WIN32)
+
+set_property(TARGET kwbfirmware PROPERTY CXX_STANDARD 11)
 
 # Link libraries
 # ---------------------------------------------------------

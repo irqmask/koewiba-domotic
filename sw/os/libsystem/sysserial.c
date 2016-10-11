@@ -46,6 +46,12 @@ static const int c_baudrate[eSYS_SER_BR_LAST] = {
     B576000, B921600, B1000000, B1152000, B1500000, B2000000, B2500000, B3000000,
     B3500000, B4000000
 };
+#elif defined (PRJCONF_WINDOWS)
+static const int c_baudrate[eSYS_SER_BR_LAST] = {
+    -1, -1, CBR_110, -1, -1, -1, CBR_300, CBR_600, CBR_1200, -1, CBR_2400, CBR_4800, CBR_9600,
+    CBR_14400, CBR_19200, -1, CBR_38400, -1, CBR_57600, CBR_115200, CBR_128000, -1, CBR_256000, -1, -1,
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1
+};
 #endif
 
 static const int c_baudConsts2baudrate[eSYS_SER_BR_LAST] = {
@@ -64,6 +70,13 @@ static const int c_databits[eSYS_SER_DB_LAST] = {
     CS7,            // eSYS_SER_DB_7
     CS8             // eSYS_SER_DB_8
 };
+#elif defined (PRJCONF_WINDOWS)
+static const int c_databits[eSYS_SER_DB_LAST] = {
+    5,            // eSYS_SER_DB_5
+    6,            // eSYS_SER_DB_6
+    7,            // eSYS_SER_DB_7
+    8             // eSYS_SER_DB_8
+};
 #endif
 
 #if defined (PRJCONF_UNIX) || \
@@ -76,6 +89,8 @@ static const int c_parity[eSYS_SER_P_LAST] = {
     -1,             // eSYS_SER_P_MARK
     -1              // eSYS_SER_P_SPACE
 };
+#elif defined (PRJCONF_WINDOWS)
+//TODO
 #endif
 
 #if defined (PRJCONF_UNIX) || \
@@ -86,6 +101,8 @@ static const int c_stopbits[eSYS_SER_SB_LAST] = {
     -1,             // eSYS_SER_SB_1p5
     CSTOPB          // eSYS_SER_SB_2
 };
+#elif defined (PRJCONF_WINDOWS)
+//TODO
 #endif
 
 // --- Global variables --------------------------------------------------------
@@ -100,10 +117,11 @@ static const int c_stopbits[eSYS_SER_SB_LAST] = {
 
 sys_fd_t sys_serial_open (const char* device)
 {
-    #if defined (PRJCONF_UNIX) || \
+    sys_fd_t fd;
+#if defined (PRJCONF_UNIX) || \
     defined (PRJCONF_POSIX) || \
     defined (PRJCONF_LINUX)
-    sys_fd_t fd;
+
     struct termios settings;
 
     assert(device != NULL);
@@ -124,7 +142,7 @@ sys_fd_t sys_serial_open (const char* device)
             break;
         }
 
-        settings.c_cc[VMIN]  = 1;     // block untill n bytes are received
+        settings.c_cc[VMIN]  = 1;     // block until n bytes are received
         settings.c_cc[VTIME] = 0;     // no timeout
         if (tcsetattr(fd, TCSANOW, &settings) < 0) {
             perror("Unable to set device settings");
@@ -133,12 +151,17 @@ sys_fd_t sys_serial_open (const char* device)
             break;
         }
     } while (0);
-
-    return fd;
 #elif defined (PRJCONF_WINDOWS)
-    //TODO implement windows version
-    return INVALID_FD;
+    do {
+        // exclusive access, default security atributes, non-overlapped IO
+        fd = CreateFile(device, GENERIC_READ | GENERIC_WRITE,
+                        0, NULL, OPEN_EXISTING, 0, NULL);
+        if (fd == INVALID_FD) break;
+
+        //TODO implement windows version
+    } while (0);
 #endif
+    return fd;
 }
 
 void sys_serial_close (sys_fd_t fd)
@@ -149,6 +172,7 @@ void sys_serial_close (sys_fd_t fd)
     close(fd);
 #elif defined (PRJCONF_WINDOWS)
     //TODO implement windows version
+    CloseHandle(fd);
 #endif
 }
 
@@ -215,7 +239,28 @@ int sys_serial_set_params (sys_fd_t            fd,
         }
     } while (0);
 #elif defined (PRJCONF_WINDOWS)
+    DCB dcb;
     //TODO implement windows version
+    do {
+        //  Initialize the DCB structure.
+        SecureZeroMemory(&dcb, sizeof(DCB));
+        dcb.DCBlength = sizeof(DCB);
+
+        //  Build on the current configuration by first retrieving all current
+        //  settings.
+        if (!GetCommState(fd, &dcb)) {
+            rc = eSYS_ERR_SER_CONFIGURE;
+            break;
+        }
+        //TODO dcb.BaudRate = ...
+        dcb.BaudRate = c_baudrate[baudrate];
+        dcb.ByteSize = c_databits[databits];
+
+        if (!SetCommState(fd, &dcb)) {
+            rc = eSYS_ERR_SER_CONFIGURE;
+            break;
+        }
+    } while (0);
 #endif
     return rc;
 }
@@ -228,6 +273,10 @@ size_t sys_serial_send (sys_fd_t fd, void* buf, size_t bufsize)
     return write(fd, buf, bufsize);
 #elif defined (PRJCONF_WINDOWS)
     //TODO implement windows version
+    DWORD written = 0;
+    WriteFile(fd, buf, bufsize, &written, FALSE);
+    return (size_t)written;
+#else
     return 0;
 #endif
 }

@@ -157,7 +157,7 @@ static void interpret_message (sBus_t* bus, uint8_t* msg, uint8_t msg_len, uint1
         }
     } else if (msg[0] <= eCMD_SET_REG_32BIT) {
         // register messages
-        register_do_command(bus, msg, msg_len, sender);
+        register_do_command(bus, sender, msg_len, msg);
     } else {
         // system messages
         switch (msg[0]) {

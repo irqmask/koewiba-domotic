@@ -17,10 +17,10 @@
 
 // --- Definitions -------------------------------------------------------------
 
-#ifdef _WIN32 // note the underscore: without it, it's not msdn official!
+#if defined (_WIN32) || defined (WIN32) // note the underscore: without it, it's not msdn official!
     // Windows (x64 and x86)
     #define PRJCONF_WINDOWS
-#elif __unix__ // all unices
+#elif __unix__ // all unixes
     // Unix
     #define PRJCONF_UNIX
 #elif __posix__

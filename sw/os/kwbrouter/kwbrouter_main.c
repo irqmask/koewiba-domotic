@@ -20,13 +20,6 @@
 #include <stdio.h>
 #include <string.h>
 
-#if defined (PRJCONF_UNIX) || \
-    defined (PRJCONF_POSIX) || \
-    defined (PRJCONF_LINUX)
-  #include <safe_lib.h>
-  #include <unistd.h>
-#endif
-
 // include
 #include "prjtypes.h"
 
@@ -34,6 +27,7 @@
 #include "bus.h"
 
 // os/libsystem
+
 #include "sysgetopt.h"
 
 // os/shared

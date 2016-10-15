@@ -96,7 +96,7 @@ set_property(TARGET kwbrouter PROPERTY CXX_STANDARD 11)
 # Link libraries
 # ---------------------------------------------------------
 target_link_libraries (kwbrouter libsystem)
-#TODO needed target_link_libraries (kwbrouter jansson)
+
 if (WIN32)
 
 else (WIN32)

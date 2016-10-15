@@ -38,7 +38,7 @@ void sys_err_get_as_string (char* buffer, size_t buffersize)
 #else
 void sys_err_get_as_string (char* buffer, size_t buffersize)
 {
-    snprintf(buffer, buffersize-1, "sys_err_get_as_string() not implemented!";
+    snprintf(buffer, buffersize-1, "sys_err_get_as_string() not implemented!");
     buffer[buffersize - 1] = '\0';
 }
 #endif

@@ -80,7 +80,6 @@ typedef enum sys_ser_parity {
     eSYS_SER_P_ODD,
     eSYS_SER_P_EVEN,
     eSYS_SER_P_MARK,
-    eSYS_SER_P_SPACE,
     eSYS_SER_P_LAST
 } sys_ser_parity_t;
 

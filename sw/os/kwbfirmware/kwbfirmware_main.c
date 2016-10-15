@@ -207,6 +207,12 @@ static void print_usage (void)
     printf(" -f <filename>       Filename of firmware to update.\n");
     printf(" -v                  Verbose logging.\n");
     printf("Size of pointer: %d\n", sizeof(void*));
+
+    #ifdef PRJCONF_WINDOWS
+    printf("\n" \
+           "NOTE: serial ports enumerated greater or equal to COM10\n" \
+           "      should be stated as follows: \\\\.\\COM10\n");
+    #endif // PRJCONF_WINDOWS
 }
 
 static void print_progress (uint8_t progress, void* arg)

@@ -33,6 +33,7 @@
 
 // libsystem
 #include "sysconsole.h"
+#include "syserror.h"
 #include "system.h"
 #include "sysgetopt.h"
 #include "systhread.h"
@@ -57,27 +58,6 @@ typedef struct options {
 
 static bus_history_t    g_bus_history;
 static vos_t            g_vos;
-
-/*
-void vListPorts(void)
-{
-    char buff[200];
-    char* iterator = buff;
-    int n;
-
-    PSL_ErrorCodes_e ec = PSerLib_getAvailablePorts(buff, sizeof(buff), &n);
-    if( ec != PSL_ERROR_none ) {
-        printf("error: %s\n", PSerLib_getErrorMessage(ec));
-        if(n>0) {
-            printf("Allthough i found %i devices:\n", n);
-        }
-    } else {
-        printf("found %i devices:\n", n);
-    }
-    for( ; *iterator; iterator+=strlen(iterator)+1 ) {
-        printf("%s\n",iterator);
-    }
-}*/
 
 // --- Global variables --------------------------------------------------------
 
@@ -113,6 +93,12 @@ static void print_usage (void)
     printf(" -b <baudrate>       Baudrate of serial bus connection. Default: 38400\n");
     printf(" -v <vbusd address>  Address of vbusd. Default: /tmp/vbusd.usk\n");
     printf(" -w <vbusd port>     Port number of vbusd. Default: 0\n");
+
+    #ifdef PRJCONF_WINDOWS
+    printf("\n" \
+           "NOTE: serial ports enumerated greater or equal to COM10\n" \
+           "      should be stated as follows: \\\\.\\COM10\n");
+    #endif // PRJCONF_WINDOWS
 }
 
 static void set_options (options_t*     options,
@@ -203,6 +189,7 @@ int main(int argc, char* argv[])
     char cc;
     int rc = eERR_NONE;
     options_t options;
+    BOOL running = TRUE;
 
     printf("kwbmonitor...\n");
     setbuf(stdout, NULL);       // disable buffering of stdout
@@ -224,9 +211,13 @@ int main(int argc, char* argv[])
         if (rc != eERR_NONE) break;
 
         sys_thread_start(&reader_thread);
-        while(42) {
+        while(running) {
             cc = sys_con_getch();
             switch (cc) {
+            case 27: //ESC
+                running = FALSE;
+                break;
+
             case 'e':
             case 'E':
                 monitor_toggle_display_empty_message();

@@ -72,10 +72,10 @@ static const int c_databits[eSYS_SER_DB_LAST] = {
 };
 #elif defined (PRJCONF_WINDOWS)
 static const int c_databits[eSYS_SER_DB_LAST] = {
-    5,            // eSYS_SER_DB_5
-    6,            // eSYS_SER_DB_6
-    7,            // eSYS_SER_DB_7
-    8             // eSYS_SER_DB_8
+    5,              // eSYS_SER_DB_5
+    6,              // eSYS_SER_DB_6
+    7,              // eSYS_SER_DB_7
+    8               // eSYS_SER_DB_8
 };
 #endif
 
@@ -87,10 +87,14 @@ static const int c_parity[eSYS_SER_P_LAST] = {
     PARENB | PARODD,// eSYS_SER_P_ODD
     PARENB,         // eSYS_SER_P_EVEN
     -1,             // eSYS_SER_P_MARK
-    -1              // eSYS_SER_P_SPACE
 };
 #elif defined (PRJCONF_WINDOWS)
-//TODO
+static const int c_parity[eSYS_SER_P_LAST] = {
+    NOPARITY,       // eSYS_SER_P_NONE
+    ODDPARITY,      // eSYS_SER_P_ODD
+    EVENPARITY,     // eSYS_SER_P_EVEN
+    MARKPARITY      // eSYS_SER_P_MARK
+};
 #endif
 
 #if defined (PRJCONF_UNIX) || \
@@ -102,7 +106,11 @@ static const int c_stopbits[eSYS_SER_SB_LAST] = {
     CSTOPB          // eSYS_SER_SB_2
 };
 #elif defined (PRJCONF_WINDOWS)
-//TODO
+static const int c_stopbits[eSYS_SER_SB_LAST] = {
+    ONESTOPBIT,     // eSYS_SER_SB_1
+    ONE5STOPBITS,   // eSYS_SER_SB_1p5
+    TWOSTOPBITS     // eSYS_SER_SB_2
+};
 #endif
 
 // --- Global variables --------------------------------------------------------
@@ -152,14 +160,14 @@ sys_fd_t sys_serial_open (const char* device)
         }
     } while (0);
 #elif defined (PRJCONF_WINDOWS)
-    do {
-        // exclusive access, default security atributes, non-overlapped IO
-        fd = CreateFile(device, GENERIC_READ | GENERIC_WRITE,
-                        0, NULL, OPEN_EXISTING, 0, NULL);
-        if (fd == INVALID_FD) break;
-
-        //TODO implement windows version
-    } while (0);
+        // exclusive access, default security attributes, non-overlapped IO
+        fd = CreateFile(device,
+                        GENERIC_READ | GENERIC_WRITE,
+                        0,
+                        0,
+                        OPEN_EXISTING,
+                        FILE_ATTRIBUTE_NORMAL,
+                        0);
 #endif
     return fd;
 }
@@ -171,7 +179,6 @@ void sys_serial_close (sys_fd_t fd)
     defined (PRJCONF_LINUX)
     close(fd);
 #elif defined (PRJCONF_WINDOWS)
-    //TODO implement windows version
     CloseHandle(fd);
 #endif
 }
@@ -240,21 +247,52 @@ int sys_serial_set_params (sys_fd_t            fd,
     } while (0);
 #elif defined (PRJCONF_WINDOWS)
     DCB dcb;
-    //TODO implement windows version
+
     do {
-        //  Initialize the DCB structure.
+        if (baudrate >= eSYS_SER_BR_LAST ||
+            databits >= eSYS_SER_DB_LAST ||
+            parity >= eSYS_SER_P_LAST ||
+            stopbits >= eSYS_SER_SB_LAST ||
+            flowcontrol >= eSYS_SER_FC_LAST) {
+            eERR_BAD_PARAMETER;
+            break;
+        }
+        // Initialize the DCB structure.
         SecureZeroMemory(&dcb, sizeof(DCB));
         dcb.DCBlength = sizeof(DCB);
 
-        //  Build on the current configuration by first retrieving all current
-        //  settings.
+        // Build on the current configuration by first retrieving all current
+        // settings.
         if (!GetCommState(fd, &dcb)) {
             rc = eSYS_ERR_SER_CONFIGURE;
             break;
         }
-        //TODO dcb.BaudRate = ...
+
         dcb.BaudRate = c_baudrate[baudrate];
         dcb.ByteSize = c_databits[databits];
+        dcb.Parity = c_parity[parity];
+        dcb.StopBits = c_stopbits[stopbits];
+
+        // flow-control is currently only available for transmitting data.
+        dcb.fOutxDsrFlow = FALSE;
+        dcb.fInX = FALSE;
+
+        switch (flowcontrol) {
+        case eSYS_SER_FC_HW:
+            dcb.fOutxCtsFlow = TRUE;
+            dcb.fOutX = FALSE;
+            break;
+        case eSYS_SER_FC_XONXOFF:
+            dcb.fOutxCtsFlow = FALSE;
+            dcb.fOutX = TRUE;
+            break;
+        case eSYS_SER_FC_NONE:
+            dcb.fOutxCtsFlow = FALSE;
+            dcb.fOutX = FALSE;
+            break;
+        default:
+            break;
+        }
 
         if (!SetCommState(fd, &dcb)) {
             rc = eSYS_ERR_SER_CONFIGURE;
@@ -288,7 +326,10 @@ size_t sys_serial_recv (sys_fd_t fd, void* buf, size_t bufsize)
     defined (PRJCONF_LINUX)
     return read(fd, buf, bufsize);
 #elif defined (PRJCONF_WINDOWS)
-    //TODO implement windows version
+    DWORD bytesread = 0;
+    ReadFile(fd, buf, bufsize, &bytesread, NULL);
+    return bytesread;
+#else
     return 0;
 #endif
 }
@@ -300,7 +341,7 @@ void sys_serial_flush (sys_fd_t fd)
     defined (PRJCONF_LINUX)
     tcflush(fd, TCIOFLUSH);
 #elif defined (PRJCONF_WINDOWS)
-    //TODO implement windows version
+    PurgeComm(fd, PURGE_RXCLEAR | PURGE_TXCLEAR);
 #endif
 }
 
@@ -313,7 +354,10 @@ size_t sys_serial_get_pending_sendq (sys_fd_t fd)
     defined (PRJCONF_LINUX)
     ioctl(fd, TIOCOUTQ, &pending_bytes);
 #elif defined (PRJCONF_WINDOWS)
-    //TODO implement windows version
+    COMSTAT stat = {0};
+    // TODO replace ClearCommError to avoid clearing error here.
+    ClearCommError(fd, NULL, &stat);
+    pending_bytes = stat.cbOutQue;
 #endif
     return pending_bytes;
 }
@@ -327,7 +371,10 @@ size_t sys_serial_get_pending_recvq (sys_fd_t fd)
     defined (PRJCONF_LINUX)
     ioctl(fd, FIONREAD, &pending_bytes);
 #elif defined (PRJCONF_WINDOWS)
-    //TODO implement windows version
+    COMSTAT stat = {0};
+    // TODO replace ClearCommError to avoid clearing error here.
+    ClearCommError(fd, NULL, &stat);
+    pending_bytes = stat.cbInQue;
 #endif
     return pending_bytes;
 }
@@ -343,7 +390,7 @@ void sys_serial_set_blocking (sys_fd_t fd, bool blocking)
         fcntl(fd, F_SETFL, FNDELAY);
     }
 #elif defined (PRJCONF_WINDOWS)
-    //TODO implement windows version
+    // using non-overlapping I/O under Windows per default
 #endif
 }
 

@@ -189,7 +189,7 @@ int main(int argc, char* argv[])
     char cc;
     int rc = eERR_NONE;
     options_t options;
-    BOOL running = TRUE;
+    bool running = true;
 
     printf("kwbmonitor...\n");
     setbuf(stdout, NULL);       // disable buffering of stdout
@@ -215,7 +215,7 @@ int main(int argc, char* argv[])
             cc = sys_con_getch();
             switch (cc) {
             case 27: //ESC
-                running = FALSE;
+                running = false;
                 break;
 
             case 'e':

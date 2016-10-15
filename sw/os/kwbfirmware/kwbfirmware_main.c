@@ -206,7 +206,6 @@ static void print_usage (void)
     printf(" -n <node address>   Node address of module to update.\n");
     printf(" -f <filename>       Filename of firmware to update.\n");
     printf(" -v                  Verbose logging.\n");
-    printf("Size of pointer: %d\n", sizeof(void*));
 
     #ifdef PRJCONF_WINDOWS
     printf("\n" \

@@ -29,6 +29,7 @@ set (include_SRCS
 set (libsystem_SRCS
     system.h
     sysconsole.h
+    syserror.h
     sysgetopt.h
     sysserial.h
     syssocket.h
@@ -36,6 +37,7 @@ set (libsystem_SRCS
     systime.h
 
     sysconsole.c
+    syserror.c
     sysgetopt.c
     sysserial.c
     syssocket.c

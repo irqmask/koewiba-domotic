@@ -30,7 +30,7 @@
 
 int g_thread_value = 0;
 
-int test_libsystem_threads_1 (void);
+void test_libsystem_threads_1 (void);
 
 CU_TestInfo test_libsystem_threads[] = {
     { "threads1", test_libsystem_threads_1 },
@@ -61,13 +61,12 @@ int test1_thread (void* ref)
     return 0;
 }
 
-int test_libsystem_threads_1 (void)
+void test_libsystem_threads_1 (void)
 {
     g_thread_value = 0;
     sys_thread_start(test1_thread);
     sys_sleep_ms(10);
     CU_ASSERT(g_thread_value == 42);
-    return CUE_SUCCESS;
 }
 
 /** @} */

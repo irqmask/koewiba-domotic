@@ -27,7 +27,7 @@
 
 // --- Global variables --------------------------------------------------------
 
-int test_libsystem_time_1 (void);
+void test_libsystem_time_1 (void);
 
 CU_TestInfo test_libsystem_time[] = {
     { "time1", test_libsystem_time_1 },
@@ -52,7 +52,7 @@ int libsystem_time_cleanup (void)
     return CUE_SUCCESS;
 }
 
-int test_libsystem_time_1 (void)
+void test_libsystem_time_1 (void)
 {
     sys_time_t start, end, diff;
 
@@ -65,7 +65,6 @@ int test_libsystem_time_1 (void)
 
     CU_ASSERT(diff > 99 * 1000);
     CU_ASSERT(diff < 110 * 1000);
-    return CUE_SUCCESS;
 }
 
 /** @} */

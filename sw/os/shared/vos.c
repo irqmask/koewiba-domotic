@@ -40,7 +40,6 @@ int vos_open_serial (vos_t* vos, const char* device, int baudrate)
     assert(vos != NULL);
 
     do {
-        vos->fd = INVALID_FD;
         vos->interface_type = eVOS_IF_TYPE_SERIAL;
 
         vos->fd = sys_serial_open(device);

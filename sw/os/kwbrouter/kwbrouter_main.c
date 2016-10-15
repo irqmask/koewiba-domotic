@@ -71,7 +71,7 @@ typedef struct options {
 static void handle_new_connection (char* address, uint16_t port, void* reference, void* arg)
 {
     router_t*        router = (router_t*)arg;
-    printf("add route %s:%d ep 0x%x\n", address, port, (unsigned long long int)reference);
+    printf("add route %s:%d ep 0x%x\n", address, port, (unsigned)reference);
     route_add(router, 1, 65525, address, port, eROUTE_TYPE_SOCKET, reference);
 }
 

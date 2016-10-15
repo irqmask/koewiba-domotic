@@ -106,7 +106,7 @@ static int32_t ioloop_get_id (ioloop_t* ioloop)
 static void ioloop_update_fd_sets (ioloop_t* ioloop)
 {
     ioloop_connection_t* conn;
-    
+
     conn = ioloop->first_conn;
 
 #if defined (PRJCONF_UNIX) || \
@@ -143,7 +143,7 @@ static void ioloop_insert_conn (ioloop_t* ioloop, ioloop_connection_t* conn)
 }
 
 /**
- * Timer is removed from list, not deleted.
+ * Remove connection from active connection's list. Connection is not deleted.
  */
 static void ioloop_remove_conn (ioloop_t* ioloop, ioloop_connection_t* conn)
 {
@@ -164,6 +164,9 @@ static void ioloop_remove_conn (ioloop_t* ioloop, ioloop_connection_t* conn)
     }
 }
 
+/**
+ * Remove timer into active timer's list.
+ */
 static void ioloop_insert_timer (ioloop_t* ioloop, ioloop_timer_t* timer)
 {
     ioloop_timer_t *curr_timer, *prev_timer;
@@ -232,7 +235,7 @@ static uint16_t ioloop_get_next_timeout (ioloop_t* ioloop)
     if (ioloop->first_timer == NULL) {
         return ioloop->default_timeout_ticks;
     }
-    
+
     // get difference time to now from first registered timer
     now = ioloop_get_current_ticks();
     if (now > ioloop->first_timer->expiration_time) return 1;
@@ -335,7 +338,7 @@ void ioloop_set_default_timeout (ioloop_t* ioloop,
                                  uint16_t  timeout_ticks)
 {
     assert(ioloop != NULL);
-    
+
     ioloop->default_timeout_ticks = timeout_ticks;
 }
 

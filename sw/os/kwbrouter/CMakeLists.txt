@@ -7,7 +7,6 @@ include_directories (
     ../include
     ../libsystem
     ../shared
-    ../3rd_party/jansson/src
     ${CMAKE_CURRENT_BINARY_DIR}
 )
 

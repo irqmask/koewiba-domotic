@@ -23,7 +23,7 @@ LIBS:standard
 LIBS:transformer
 LIBS:transistors
 LIBS:motor_switch_3pole-cache
-EELAYER 25 0
+EELAYER 26 0
 EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
@@ -1091,6 +1091,8 @@ $Comp
 L FUSE F1
 U 1 1 56648405
 P 9750 2500
+AR Path="/56648405" Ref="F1"  Part="1" 
+AR Path="/578A251D/56648405" Ref="F1"  Part="1" 
 F 0 "F1" H 9750 2600 50  0000 C CNN
 F 1 "FUSE" H 9750 2400 50  0000 C CNN
 F 2 "Resistor:R_1812" H 9750 2500 60  0001 C CNN

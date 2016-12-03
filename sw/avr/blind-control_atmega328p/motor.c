@@ -39,25 +39,25 @@
 void motor_initialize       (void)
 {
     DDRC |= ((1<<MOTOR_UPDOWN_PIN) | (1<<MOTOR_OFFON_PIN));
-    PORTC |= ((1<<MOTOR_UPDOWN_PIN) | (1<<MOTOR_OFFON_PIN));
+    PORTC &= ~((1<<MOTOR_UPDOWN_PIN) | (1<<MOTOR_OFFON_PIN));
 }
 
 void motor_up               (void)
 {
     PORTC |= (1<<MOTOR_UPDOWN_PIN);
-    PORTC &= ~(1<<MOTOR_OFFON_PIN);
+    PORTC |= (1<<MOTOR_OFFON_PIN);
 }
 
 void motor_down             (void)
 {
     PORTC &= ~(1<<MOTOR_UPDOWN_PIN);
-    PORTC &= ~(1<<MOTOR_OFFON_PIN);
+    PORTC |= (1<<MOTOR_OFFON_PIN);
 }
 
 void motor_stop             (void)
 {
-    PORTC |= (1<<MOTOR_OFFON_PIN);
-    PORTC |= (1<<MOTOR_UPDOWN_PIN);
+    PORTC &= ~(1<<MOTOR_OFFON_PIN);
+    PORTC &= ~(1<<MOTOR_UPDOWN_PIN);
 }
 
 /** @} */

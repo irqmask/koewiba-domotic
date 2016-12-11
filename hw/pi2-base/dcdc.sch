@@ -106,7 +106,7 @@ L L L1
 U 1 1 526EBE7B
 P 6600 3850
 F 0 "L1" H 6500 3750 50  0000 L CNN
-F 1 "220uH" H 6500 3935 50  0000 L CNN
+F 1 "100uH" H 6500 3935 50  0000 L CNN
 F 2 "Inductor:L_PISR" H 6600 3850 60  0001 C CNN
 F 3 "" H 6600 3850 60  0001 C CNN
 	1    6600 3850
@@ -198,4 +198,6 @@ Text HLabel 7500 3650 2    50   Output ~ 0
 +5V_OUT
 Wire Wire Line
 	7500 3350 5250 3350
+Text Notes 5250 3200 0    60   ~ 0
+Inductor selected for 24V input voltage and 2A output current
 $EndSCHEMATC

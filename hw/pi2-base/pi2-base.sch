@@ -16,7 +16,7 @@ $Descr A4 11693 8268
 encoding utf-8
 Sheet 1 5
 Title "pi2-base"
-Date "2016-12-06"
+Date "2016-12-11"
 Rev "1"
 Comp "KoeWiBa"
 Comment1 "Base board for Raspberry Pi B2"

@@ -10,7 +10,7 @@ include_directories (
     ${CMAKE_CURRENT_BINARY_DIR}
 )
 
-# system dependant include directories
+# system dependent include directories
 # ---------------------------------------------------------
 if (WIN32)
 
@@ -75,6 +75,8 @@ else (WIN32)
     install ( TARGETS kwbtest
               RUNTIME DESTINATION bin )
 endif (WIN32)
+
+set_property(TARGET kwbtest PROPERTY CXX_STANDARD 11)
 
 # Link libraries
 # ---------------------------------------------------------

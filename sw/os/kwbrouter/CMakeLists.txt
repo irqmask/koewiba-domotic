@@ -11,7 +11,7 @@ include_directories (
     ${CMAKE_CURRENT_BINARY_DIR}
 )
 
-# system dependant include directories
+# system dependent include directories
 # ---------------------------------------------------------
 if (WIN32)
 
@@ -61,7 +61,7 @@ set (os_shared_SRCS
     ../shared/message_socket.c
     ../shared/vos.c
 )
-    
+
 set (kwbrouter_SRCS
     router.h
 
@@ -80,7 +80,7 @@ source_group(os\\shared FILES ${os_shared_SRCS})
 # executable
 # ---------------------------------------------------------
 if (WIN32)
-    add_executable ( kwbrouter 
+    add_executable ( kwbrouter
         ${include_SRCS} ${shared_SRCS} ${os_include_SRCS} ${os_shared_SRCS} ${kwbrouter_SRCS} )
     install ( TARGETS kwbrouter
               RUNTIME DESTINATION . )
@@ -90,6 +90,8 @@ else (WIN32)
     install ( TARGETS kwbrouter
               RUNTIME DESTINATION bin )
 endif (WIN32)
+
+set_property(TARGET kwbrouter PROPERTY CXX_STANDARD 11)
 
 # Link libraries
 # ---------------------------------------------------------

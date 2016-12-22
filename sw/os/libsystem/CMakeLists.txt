@@ -8,7 +8,7 @@ include_directories (
     ${CMAKE_CURRENT_BINARY_DIR}
 )
 
-# system dependant include directories
+# system dependent include directories
 # ---------------------------------------------------------
 if (WIN32)
 
@@ -29,6 +29,7 @@ set (include_SRCS
 set (libsystem_SRCS
     system.h
     sysconsole.h
+    syserror.h
     sysgetopt.h
     sysserial.h
     syssocket.h
@@ -36,6 +37,7 @@ set (libsystem_SRCS
     systime.h
 
     sysconsole.c
+    syserror.c
     sysgetopt.c
     sysserial.c
     syssocket.c
@@ -50,3 +52,5 @@ source_group(include FILES ${include_SRCS})
 # library
 # ---------------------------------------------------------
 add_library (libsystem ${include_SRCS} ${libsystem_SRCS})
+
+set_property(TARGET libsystem PROPERTY CXX_STANDARD 11)

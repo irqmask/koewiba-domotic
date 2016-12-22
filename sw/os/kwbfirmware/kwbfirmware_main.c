@@ -170,15 +170,15 @@ static bool parse_commandline_options (int argc, char* argv[], options_t* option
 
     do {
         // minimum address is "/a": unix socket with name "a" in the root directory
-        if (strnlen_s(options->router_address, sizeof(options->router_address)) < 2) {
+        if (strnlen(options->router_address, sizeof(options->router_address)) < 2) {
             log_error("Missing router address!\n");
             break;
         }
-        if (!options->serial_device_set || strnlen_s(options->serial_device, sizeof(options->serial_device)) < 2) {
+        if (!options->serial_device_set || strnlen(options->serial_device, sizeof(options->serial_device)) < 2) {
             log_error("Invalid or missing serial connection device!\n");
             break;
         }
-        if (strnlen_s(options->filename, sizeof(options->filename)) < 2) {
+        if (strnlen(options->filename, sizeof(options->filename)) < 2) {
             log_error("Filename of firmware needed!\n");
             break;
         }
@@ -206,6 +206,12 @@ static void print_usage (void)
     printf(" -n <node address>   Node address of module to update.\n");
     printf(" -f <filename>       Filename of firmware to update.\n");
     printf(" -v                  Verbose logging.\n");
+
+    #ifdef PRJCONF_WINDOWS
+    printf("\n" \
+           "NOTE: serial ports enumerated greater or equal to COM10\n" \
+           "      should be stated as follows: \\\\.\\COM10\n");
+    #endif // PRJCONF_WINDOWS
 }
 
 static void print_progress (uint8_t progress, void* arg)

@@ -71,7 +71,7 @@ typedef struct options {
 static void handle_new_connection (char* address, uint16_t port, void* reference, void* arg)
 {
     router_t*        router = (router_t*)arg;
-    printf("add route %s:%d ep 0x%x\n", address, port, (unsigned long long int)reference);
+    printf("add route %s:%d ep %p\n", address, port, (void*)reference);
     route_add(router, 1, 65525, address, port, eROUTE_TYPE_SOCKET, reference);
 }
 
@@ -163,17 +163,17 @@ static bool validate_options(options_t* options)
 
     do {
         // minimum address is "/a": unix socket with name "a" in the root directory
-        if (strnlen_s(options->router_address, sizeof(options->router_address)) < 2) {
+        if (strnlen(options->router_address, sizeof(options->router_address)) < 2) {
             fprintf(stderr, "Missing router address!\n");
             break;
         }
         if (options->serial_device_set &&
-            strnlen_s(options->serial_device, sizeof(options->serial_device)) < 2) {
+            strnlen(options->serial_device, sizeof(options->serial_device)) < 2) {
             fprintf(stderr, "Invalid serial device path!\n");
             break;
         }
         if (options->vbusd_address_set &&
-            strnlen_s(options->vbusd_address, sizeof(options->vbusd_address)) < 2) {
+            strnlen(options->vbusd_address, sizeof(options->vbusd_address)) < 2) {
             fprintf(stderr, "Invalid vbusd address!\n");
             break;
         }

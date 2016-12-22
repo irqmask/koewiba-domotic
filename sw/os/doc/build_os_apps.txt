@@ -5,7 +5,7 @@ sudo apt-get install git git-gui cmake build-essential
 
 # 2. 3rd Party libraries installieren
 # -----------------------------------------------------------------------------
-cd <koewiba_root>/sw/src/os
+cd <koewiba_root>/sw/os/
 mkdir 3rd_party
 <jansson-2.7.tar.gz und libsafec-10052013.tar.gz in das 3rd_party
  Verzeichnis kopieren.>

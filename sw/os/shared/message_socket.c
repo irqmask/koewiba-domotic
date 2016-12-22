@@ -124,7 +124,7 @@ static void msg_ready_to_write (void* arg)
 {
     static int count = 0;
     msg_endpoint_t* ep = (msg_endpoint_t*)arg;
-    printf("fd %d is ready to write %d\n", ep->fd, count++);
+    printf("fd %d is ready to write %d\n", (int)ep->fd, count++);
 }
 
 static int32_t msg_accept_endpoint (void* arg)

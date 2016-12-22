@@ -5,12 +5,18 @@
 
 #include <stdio.h>
 
-#if defined (PRJCONF_WINDOWS) && (_MSC_VER) && _MSC_VER < 1900
+#if defined (PRJCONF_WINDOWS)
   #include <conio.h>
   #include <stdarg.h>
 #endif
 
-#define sys_con_getch() getch()
+#if defined (PRJCONF_UNIX) || \
+    defined (PRJCONF_POSIX) || \
+    defined (PRJCONF_LINUX)
+  #define sys_con_getch() getch()
+#elif defined (PRJCONF_WINDOWS) 
+  #define sys_con_getch() _getch()
+#endif
 
 #if defined (PRJCONF_UNIX) || \
     defined (PRJCONF_POSIX) || \

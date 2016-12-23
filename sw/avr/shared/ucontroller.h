@@ -174,7 +174,7 @@
  #define ADDR_SIGNATURE_BYTE2   4
  #define SIGRD 5 // workaround for missing define in avr-headers
 
-#elif defined (__AVR_ATmega324P__) || defined (__AVR_ATmega324A__)
+#elif defined (__AVR_ATmega324P__) || defined (__AVR_ATmega324A__) || defined (__AVR_ATmega324PA__)
  // definition of processor depending global settings
  // TODO CV: this part can be ported maybe to a makefile include
  #define STARTADDR_APPVECTORS   0x0000
@@ -375,6 +375,7 @@
     defined (__AVR_ATmega328P__)  || \
     defined (__AVR_ATmega324P__) || \
     defined (__AVR_ATmega324A__) || \
+    defined (__AVR_ATmega324PA__) || \
     defined (__AVR_ATtiny1634__)
  #define REG_TIMER0_TCCRA       TCCR0A
  #define REG_TIMER0_TCCRB       TCCR0B

@@ -53,9 +53,19 @@ extern void app_on_command (uint16_t sender, uint8_t msglen, uint8_t* msg);
 
 extern void app_background (void);
 
+ISR(INTERRUPT_PINCHANGE0)
+{
+    // nothing to do here, but ISR is needed for sleep-mode
+}
+
+ISR(INTERRUPT_PINCHANGE1)
+{
+    // nothing to do here, but ISR is needed for sleep-mode
+}
+
 ISR(INTERRUPT_PINCHANGE2)
 {
-
+    // nothing to do here, but ISR is needed for sleep-mode
 }
 
 /**
@@ -101,9 +111,9 @@ static inline void interpret_message (uint16_t sender, uint8_t msglen, uint8_t* 
 #endif
 
     case eCMD_SLEEP:
-        sleep_pinchange2_enable();
+        sleep_pinchange_enable();
         bus_sleep(&g_bus);
-        sleep_pinchange2_disable();
+        sleep_pinchange_disable();
         break;
 
     case eCMD_RESET:

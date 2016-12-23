@@ -339,7 +339,7 @@ void        register_send_u32       (sBus_t*                bus,
  * @returns TRUE, if a register mapping for the received address and value
  *          was found.
  */
-BOOL        register_do_mapping     (uint16_t               uRemoteModuleAddr,
+/*BOOL        register_do_mapping     (uint16_t               uRemoteModuleAddr,
                                      uint8_t                uRemoteRegister,
                                      uint32_t               uValue)
 {
@@ -359,6 +359,6 @@ BOOL        register_do_mapping     (uint16_t               uRemoteModuleAddr,
         }
     }
     return retval;
-}
+}*/
 
 /** @} */

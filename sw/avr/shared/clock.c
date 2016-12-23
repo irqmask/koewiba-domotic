@@ -104,7 +104,7 @@ void clk_initialize(void)
     // fIrq = 2 * fOC  = ------------ = --------------- = 100Hz
     //                    N * (OC+1)     1024 * (71+1)
     //
-    REG_TIMER0_OCRA = 141; // 71
+    REG_TIMER0_OCRA = 71;
     // No output waveform generation, CTC mode,
     // select prescaler 1024 CS2..0 = 0b101
     REG_TIMER0_TCCRA = (1<<REGBIT_TIMER0_WGM1);

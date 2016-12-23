@@ -54,7 +54,7 @@
 void app_init (void) 
 {
     //TODO insert application specific initializations here!
-    register_set_u16(MOD_eReg_ModuleID, 64);
+    //register_set_u16(MOD_eReg_ModuleID, 10);
 	motor_initialize();
 	input_initialize();
 }

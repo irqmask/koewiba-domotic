@@ -81,15 +81,15 @@ void app_on_command (uint16_t sender, uint8_t msglen, uint8_t* msg)
 void app_background (void)
 {
     //TODO insert application specific background routines here!
-	if (input_up()) {
+    input_background();
+
+    if (input_up()) {
 		motor_up();
 	}
-	else if (input_down()) {
+	if (input_down()) {
 		motor_down();
 	}
-	else {
-		motor_stop();
-	}
+	motor_background();
 }
 
 /** @} */

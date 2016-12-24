@@ -51,7 +51,7 @@ extern void app_init (void);
 
 extern void app_on_command (uint16_t sender, uint8_t msglen, uint8_t* msg);
 
-extern void app_background (void);
+extern void app_background (sBus_t* bus);
 
 ISR(INTERRUPT_PINCHANGE0)
 {
@@ -164,7 +164,7 @@ int main(void)
                 interpret_message(sender, msglen, msg);
             }
         }
-        app_background();
+        app_background(&g_bus);
     }
     return 0;
 }

@@ -29,6 +29,7 @@
 *.eep
 
 # Directories
+**/bin
 **/build
 **/CMakeFiles
 **/3rd_party/**

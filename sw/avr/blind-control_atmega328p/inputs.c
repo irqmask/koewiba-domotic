@@ -83,9 +83,9 @@ void input_initialize       (void)
 {
     uint8_t n;
 
-    DDRC &= ~((1<<INPUT_UP_PIN) | (1<<INPUT_DOWN_PIN) | (INPUT_WINDOW_PIN));
+    DDRC &= ~((1<<INPUT_UP_PIN) | (1<<INPUT_DOWN_PIN) | (1<<INPUT_WINDOW_PIN));
     // activate internal pull-up resistors
-    PORTC |= ((1<<INPUT_UP_PIN) | (1<<INPUT_DOWN_PIN) | (INPUT_WINDOW_PIN));
+    PORTC |= ((1<<INPUT_UP_PIN) | (1<<INPUT_DOWN_PIN) | (1<<INPUT_WINDOW_PIN));
 
     // activate pin-change-interrupts for the inputs
     PCMSK1 |= ((1<<PCINT12) | (1<<PCINT11) | (1<<PCINT10));

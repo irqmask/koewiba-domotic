@@ -70,11 +70,11 @@ void app_init (void)
 {
     //TODO insert application specific initializations here!
     //register_set_u16(MOD_eReg_ModuleID, 10);
-	motor_initialize();
-	blind_initialize();
-	input_initialize();
-	g_window_state = false;
-	g_last_window_state = !g_window_state;
+    input_initialize();
+    motor_initialize();
+    blind_initialize();
+    g_window_state = false;
+    g_last_window_state = !g_window_state;
 }
 
 /**
@@ -101,21 +101,21 @@ void app_background (sBus_t* bus)
     input_background();
 
     if (input_up()) {
-		motor_up();
-	}
-	if (input_down()) {
-		motor_down();
-	}
+        motor_up();
+    }
+    if (input_down()) {
+        motor_down();
+    }
 
-	// check window position
-	g_window_state = input_window_closed();
-	if (g_last_window_state != g_window_state) {
-	    g_last_window_state = g_window_state;
-	    send_window_state(bus);
-	}
+    // check window position
+    g_window_state = input_window_closed();
+    if (g_last_window_state != g_window_state) {
+        g_last_window_state = g_window_state;
+        send_window_state(bus);
+    }
 
-	blind_background();
-	motor_background();
+    blind_background();
+    motor_background();
 }
 
 /** @} */

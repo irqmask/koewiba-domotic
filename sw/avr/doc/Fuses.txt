@@ -91,7 +91,7 @@ High Fuse:  0b11010010 = 0xD2
               ^--------------- RSTDISBL  1 = disabled: reset is enabled
                ^-------------- DWEN      1 = disabled: debug wire
                 ^------------- SPIEN     0 = enabled: SPI programming
-                 ^------------ WDTON     1 = disabled: Watchdogtime alwys on
+                 ^------------ WDTON     1 = disabled: Watchdogtimer always on
                   ^----------- EESAVE    0 = enabled: EEProm memory preserve through chip erase
                    ^---------- BOOTSZ1   0
                     ^--------- BOOTSZ0   1 = BOOTSZ1:0 = 01 = 1024 words for bootloader. appflash 0000-77FF, bootflash 7800-7FFF

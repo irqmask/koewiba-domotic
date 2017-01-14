@@ -26,6 +26,7 @@
 
 #include "blindctrl.h"
 #include "bus.h"
+#include "cmddef_common.h"
 #include "inputs.h"
 #include "motor.h"
 #include "register.h"
@@ -47,15 +48,18 @@ static bool g_last_window_state = true;
 
 void send_window_state (sBus_t* bus)
 {
-    uint8_t msg[3];
+    uint8_t msg[4];
 
-    msg[0] = 1;      // number of bitfiels bytes
-    msg[1] = (g_window_state==true) ? (1<<0) : 0;
-    msg[2] = (1<<0); // changed bits (here only bit 0)
-    bus_send_message(bus, BUS_BRDCSTADR, 3, msg);
+    msg[0] = eCMD_STATE_BITFIELDS;
+    msg[1] = 1;      // number of bitfiels bytes
+    msg[2] = (g_window_state==true) ? (1<<0) : 0;
+    msg[3] = (1<<0); // changed bits (here only bit 0)
+    bus_send_message(bus, BUS_BRDCSTADR, 4, msg);
 }
 
 // --- Module global functions -------------------------------------------------
+
+extern void        app_register_load       (void);
 
 // --- Global functions --------------------------------------------------------
 
@@ -68,11 +72,12 @@ void send_window_state (sBus_t* bus)
  */
 void app_init (void) 
 {
-    //TODO insert application specific initializations here!
-    //register_set_u16(MOD_eReg_ModuleID, 10);
     input_initialize();
     motor_initialize();
     blind_initialize();
+    // load application parameters
+    app_register_load();
+    // initialize window statemachine
     g_window_state = false;
     g_last_window_state = !g_window_state;
 }
@@ -101,10 +106,10 @@ void app_background (sBus_t* bus)
     input_background();
 
     if (input_up()) {
-        motor_up();
+        blind_move_to_position(100);
     }
     if (input_down()) {
-        motor_down();
+        blind_move_to_position(0);
     }
 
     // check window position
@@ -114,8 +119,8 @@ void app_background (sBus_t* bus)
         send_window_state(bus);
     }
 
-    blind_background();
     motor_background();
+    blind_background(bus);
 }
 
 /** @} */

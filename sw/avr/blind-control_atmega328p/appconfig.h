@@ -32,10 +32,10 @@
 typedef enum appregisters {
     // registers saved in EEProm
     APP_eReg_PositionCurrent = MOD_eReg_FirstAppSpecific, //!< Current position of blind
-    APP_eReg_PositionSetPoint,  //!< Wanted position of blind.
-    APP_eReg_ReactionDelay,     //!< Delay time until movement starts after applying power.
-    APP_eReg_DurationOpen,      //!< Duration to fully open the blind.
-    APP_eReg_DurationClose,     //!< Duration to fully close the blind.
+    APP_eReg_PositionSetPoint,  //!< Wanted position of blind. 0 = completely closed. 100 = completely open
+    APP_eReg_ReactionDelay,     //!< Delay time in timer ticks (1/100sec) until movement starts after applying power.
+    APP_eReg_DurationOpen,      //!< Duration in timer ticks (1/100sec) to fully open the blind.
+    APP_eReg_DurationClose,     //!< Duration in timer ticks (1/100sec) to fully close the blind.
 
     // insert application specific registers here
     APP_eReg_Last
@@ -43,12 +43,13 @@ typedef enum appregisters {
 
 //! Application specific layout of non volatile parameters (internal EEProm)
 typedef enum appconfig {
-    APP_eCfg_PositionCurrent = MOD_eCfg_FirstAppSpecific,
-    APP_eCfg_PositionCurrentLow = APP_eCfg_PositionCurrent,
-    APP_eCfg_PositionCurrentHigh,
-    APP_eCfg_PositionSetPoint,
-    APP_eCfg_PositionSetPointLow = APP_eCfg_PositionSetPoint,
-    APP_eCfg_PositionSetPointHigh,
+    APP_eCfg_ReactionDelay = MOD_eCfg_FirstAppSpecific,
+    APP_eCfg_DurationOpen,
+    APP_eCfg_DurationOpenLow = APP_eCfg_DurationOpen,
+    APP_eCfg_DurationOpenHigh,
+    APP_eCfg_DurationClose,
+    APP_eCfg_DurationCloseLow = APP_eCfg_DurationClose,
+    APP_eCfg_DurationCloseHigh,
 
     // insert application specific configuration here
     APP_eCfg_Last

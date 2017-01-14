@@ -18,6 +18,7 @@
 // --- Include section ---------------------------------------------------------
 
 #include "prjtypes.h"
+#include "bus.h"
 
 // --- Definitions -------------------------------------------------------------
 
@@ -41,7 +42,23 @@ void blind_move_to_position (uint8_t position);
 
 void blind_stop             (void);
 
-void blind_background       (void);
+void blind_background       (sBus_t* bus);
+
+uint8_t blind_get_current_position  (void);
+
+uint8_t blind_get_position_setpoint (void);
+
+uint8_t blind_get_reaction_delay    (void);
+
+void blind_set_reaction_delay       (uint8_t reaction_delay);
+
+uint16_t blind_get_duration_open    (void);
+
+void blind_set_duration_open        (uint16_t duration);
+
+uint16_t blind_get_duration_close   (void);
+
+void blind_set_duration_close       (uint16_t duration);
 
 #endif /* _BLINDCTRL_H_ */
 /** @} */

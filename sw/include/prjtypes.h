@@ -31,6 +31,7 @@
 #define NULL ((void*)0)
 #endif
 
+//! Clock ticks per second.
 #define CLOCK_TICKS_PER_SECOND 100
 
 // --- Type definitions --------------------------------------------------------

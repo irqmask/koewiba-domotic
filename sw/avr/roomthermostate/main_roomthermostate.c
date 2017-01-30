@@ -165,9 +165,9 @@ static void interpret_message (sBus_t* bus, uint8_t* msg, uint8_t msg_len, uint1
             g_bus.eModuleState = eMod_Running;
             break;
         case eCMD_SLEEP:
-            sleep_pinchange2_enable();
+            sleep_pinchange_enable();
             bus_sleep(bus);
-            sleep_pinchange2_disable();
+            sleep_pinchange_disable();
             break;
         default:
             break;

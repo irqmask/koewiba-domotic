@@ -21,10 +21,14 @@
 
 // --- Definitions -------------------------------------------------------------
 
+//! Maximum number of parallel running timers
+#define CLOCK_NUM_TIMER         5
+
 // --- Type definitions --------------------------------------------------------
 
 // --- Local variables ---------------------------------------------------------
 
+//! List of current running timers.
 volatile clock_timer_t* g_running_timers[CLOCK_NUM_TIMER];
 
 // --- Global variables --------------------------------------------------------
@@ -104,7 +108,7 @@ void clk_initialize(void)
     // fIrq = 2 * fOC  = ------------ = --------------- = 100Hz
     //                    N * (OC+1)     1024 * (71+1)
     //
-    REG_TIMER0_OCRA = 141; // 71
+    REG_TIMER0_OCRA = 71;
     // No output waveform generation, CTC mode,
     // select prescaler 1024 CS2..0 = 0b101
     REG_TIMER0_TCCRA = (1<<REGBIT_TIMER0_WGM1);
@@ -136,21 +140,26 @@ void clk_control(bool start)
 /**
  * (Re)Start a count-down timer.
  *
- * @param[in] psTimer
+ * @param[in] timer_instance
  * Pointer to timer structure.
- * @param[in] uTime
+ * @param[in] ticks
  * Time in ticks. Convert from milliseconds to ticks with
  * CLOCK_MS_2_TICKS macro.
  *
- * @returns true, if timer has been (re)started, otherwise false.
+ * @note If timer increases every 100th second, the maximum timer time is
+ *       65535/100 = 655,35sec = 10:55,350.
+ *
+ * @returns true, if timer has been (re)started, otherwise FALSE.
  */
 bool clk_timer_start(clock_timer_t* timer_instance, uint16_t ticks)
 {
     // if timer is still running ...
     if (timer_instance->ticks != 0) {
-    	timer_instance->ticks = ticks; // ... restart timer
+    	timer_instance->tick_start_value = ticks;
+        timer_instance->ticks = ticks; // ... restart timer
         return true;
     }
+    timer_instance->tick_start_value = ticks;
     timer_instance->ticks = ticks;
     return register_timer(timer_instance);
 }
@@ -158,10 +167,10 @@ bool clk_timer_start(clock_timer_t* timer_instance, uint16_t ticks)
 /**
  * Stop a count-down timer.
  *
- * @param[in] psTimer
+ * @param[in] timer_instance
  * Pointer to timer structure.
  *
- * @returns true, if timer has been successfully removed from runningtimer-list, otherwise false.
+ * @returns true, if timer has been successfully removed from running timer-list, otherwise false.
  */
 bool clk_timer_stop(clock_timer_t* timer_instance)
 {
@@ -175,7 +184,7 @@ bool clk_timer_stop(clock_timer_t* timer_instance)
 /**
  * Check if timer elapsed.
  *
- * @param[in] psTimer
+ * @param[in] timer_instance
  * Pointer to timer structure.
  *
  * @returns true, if time is over, otherwise false.
@@ -193,7 +202,7 @@ bool clk_timer_is_elapsed(clock_timer_t* timer_instance)
 /**
  * Check if timer is running.
  *
- * @param[in] psTimer
+ * @param[in] timer_instance
  * Pointer to timer structure.
  *
  * @returns true, if timer is running, otherwise false.
@@ -201,6 +210,32 @@ bool clk_timer_is_elapsed(clock_timer_t* timer_instance)
 bool clk_timer_is_running(clock_timer_t* timer_instance)
 {
     return (timer_instance->active);
-};
+}
+
+/**
+ * Check if timer is running.
+ *
+ * @param[in] timer_instance
+ * Pointer to timer structure.
+ *
+ * @returns Returns Initial value with which the timer was started.
+ */
+uint16_t clk_timer_get_initial_start_ticks(clock_timer_t* timer_instance)
+{
+    return timer_instance->tick_start_value;
+}
+
+/**
+ * Check if timer is running.
+ *
+ * @param[in] timer_instance
+ * Pointer to timer structure.
+ *
+ * @returns Returns the elapsed timer ticks since timer start.
+ */
+uint16_t clk_timer_get_elapsed_ticks(clock_timer_t* timer_instance)
+{
+    return (timer_instance->tick_start_value - timer_instance->ticks);
+}
 
 /** @} */

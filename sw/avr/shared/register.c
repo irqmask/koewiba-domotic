@@ -228,20 +228,20 @@ void        register_do_command     (sBus_t*                bus,
         }
         break;
     case eCMD_SET_REG_16BIT:
-        // Format: <Command><Registernumber><LowValue><HighValue>
+        // Format: <Command><Registernumber><HighValue><LowValue>
         if (msglen >= 4) {
-            temp16 = msg[2];
-            temp16 |= ((uint16_t)msg[3]<<8);
+            temp16 = (uint16_t)msg[2] << 8;
+            temp16 |= msg[3];
             register_set_u16(msg[1], temp16);
         }
         break;
     case eCMD_SET_REG_32BIT:
-        // Format: <Command><Registernumber><LowLowValue><LowValue><HighValue><HighHighValue>
+        // Format: <Command><Registernumber><HighHighValue><HighValue><LowValue><LowLowValue>
         if (msglen >= 6) {
-            temp32 = msg[2];
-            temp32 |= ((uint32_t)msg[3]<<8);
-            temp32 |= ((uint32_t)msg[4]<<16);
-            temp32 |= ((uint32_t)msg[5]<<24);
+            temp32 = ((uint32_t)msg[2]<<24);
+            temp32 |= ((uint32_t)msg[3]<<16);
+            temp32 |= ((uint32_t)msg[4]<<8);
+            temp32 |= msg[5];
             register_set_u32(msg[1], temp32);
         }
         break;
@@ -296,8 +296,8 @@ void        register_send_u16       (sBus_t*                bus,
 
     msg[0] = eCMD_STATE_16BIT;
     msg[1] = reg_no;
-    msg[2] = value & 0x00FF;
-    msg[3] = value >> 8;
+    msg[2] = value >> 8;
+    msg[3] = value & 0x00FF;
     bus_send_message(bus, receiver, sizeof(msg), msg);
 }
 
@@ -322,10 +322,10 @@ void        register_send_u32       (sBus_t*                bus,
 
     msg[0] = eCMD_STATE_32BIT;
     msg[1] = reg_no;
-    msg[2] = value & 0x000000FF;
-    msg[3] = (value >> 8) & 0x000000FF;
-    msg[4] = (value >> 16) & 0x000000FF;
-    msg[5] = (value >> 24) & 0x000000FF;
+    msg[2] = (value >> 24) & 0x000000FF;
+    msg[3] = (value >> 16) & 0x000000FF;
+    msg[4] = (value >> 8) & 0x000000FF;
+    msg[5] = value & 0x000000FF;
     bus_send_message(bus, receiver, sizeof(msg), msg);
 }
 
@@ -339,7 +339,7 @@ void        register_send_u32       (sBus_t*                bus,
  * @returns true, if a register mapping for the received address and value
  *          was found.
  */
-bool        register_do_mapping     (uint16_t               uRemoteModuleAddr,
+/*bool        register_do_mapping     (uint16_t               uRemoteModuleAddr,
                                      uint8_t                uRemoteRegister,
                                      uint32_t               uValue)
 {
@@ -359,6 +359,6 @@ bool        register_do_mapping     (uint16_t               uRemoteModuleAddr,
         }
     }
     return retval;
-}
+}*/
 
 /** @} */

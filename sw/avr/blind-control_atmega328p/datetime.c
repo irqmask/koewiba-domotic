@@ -1,42 +1,21 @@
 /**
- * @addtogroup PRJTYPES
- * @brief Define project specific types definitions.
+ * @addtogroup DATETIME
+ * @brief This module contains functions to manage date and time.
  *
  * @{
- * @file    prjtypes.h
- * @brief   Define project specific types definitions..
- *
+ * @file    datetime.c
+ * @brief   This module contains functions to manage date and time.
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
 
-#ifndef _PRJTYPES_H__
-#define _PRJTYPES_H__
-
 // --- Include section ---------------------------------------------------------
 
-#include <stdbool.h>
-#include <stdint.h>
+#include "prjtypes.h"
+#include "datetime.h"
 
 // --- Definitions -------------------------------------------------------------
 
-#ifndef TRUE
-#define TRUE 1
-#endif
-
-#ifndef FALSE
-#define FALSE 0
-#endif
-
-#ifndef NULL
-#define NULL ((void*)0)
-#endif
-
-//! Clock ticks per second.
-#define CLOCK_TICKS_PER_SECOND 100
-
 // --- Type definitions --------------------------------------------------------
-
-typedef uint8_t BOOL;
 
 // --- Local variables ---------------------------------------------------------
 
@@ -50,5 +29,11 @@ typedef uint8_t BOOL;
 
 // --- Global functions --------------------------------------------------------
 
-#endif /* _PRJTYPES_H__ */
+/**
+ * Initialize clock module. Reset data and start hardware timer.
+ */
+void dat_initialize(void)
+{
+}
+
 /** @} */

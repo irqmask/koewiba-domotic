@@ -1,44 +1,24 @@
 /**
- * @addtogroup TASTER8_PCBCONFIG
- * @brief PCB configuration of the taster8 application.
+ * @addtogroup MOTOR
+ * @brief Public interface of motor control.
+ *
+ * This module contains functions to control the motor relays.
  *
  * @{
- * @file    pcbconfig.h
- * @brief   PCB configuration of the taster8 application.
+ * @file    motor.h
+ * @brief   This module contains functions to control the motor relays.
  *
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
-#ifndef _PCBCONFIG_H_
-#define _PCBCONFIG_H_
+
+#ifndef _MOTOR_H_
+#define _MOTOR_H_
 
 // --- Include section ---------------------------------------------------------
 
 #include "prjtypes.h"
 
 // --- Definitions -------------------------------------------------------------
-
-#define BUS_PCBCONFIG 1
-#define BUS_DDR_ENASND0     DDRD
-#define BUS_PORT_ENASND0    PORTD
-#define BUS_ENASND0         PD2
-#define BUS_DDR_DISRCV0     DDRD
-#define BUS_PORT_DISRCV0    PORTD
-#define BUS_DISRCV0         PD3
-#define TXRXEN0_SEPERATE    1
-
-#define SPI_SCK_DDR         PORTC
-#define SPI_SCK_PIN         PC1
-
-// Pin assignments of board keys and LEDs
-// Port D pin assignments
-#define LED_PCBCONFIG       1
-#define LED_STATUS          PD6  //!< Yellow status LED
-#define LED_ERROR           PD4  //!< Red error LED
-#define BTN_TEST            PD5
-#define BTN_EXP             PD7
-
-#define LED_STATUS_PORT     PORTD
-#define LED_ERROR_PORT      PORTD
 
 // --- Type definitions --------------------------------------------------------
 
@@ -54,5 +34,17 @@
 
 // --- Global functions --------------------------------------------------------
 
-#endif // _PCBCONFIG_H_
+void motor_initialize       (void);
+
+void motor_up               (void);
+
+void motor_down             (void);
+
+void motor_stop             (void);
+
+bool motor_is_running       (void);
+
+void motor_background       (void);
+
+#endif /* _MOTOR_H_ */
 /** @} */

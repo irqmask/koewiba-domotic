@@ -81,6 +81,8 @@
  #define INTERRUPT_USART_RXC0    USART_RX_vect
  #define INTERRUPT_USART_UDRE0   USART_UDRE_vect
  #define INTERRUPT_UART_TRANS0   USART_TX_vect
+ #define INTERRUPT_PINCHANGE0    PCINT0_vect
+ #define INTERRUPT_PINCHANGE1    PCINT1_vect
  #define INTERRUPT_PINCHANGE2    PCINT2_vect
  #define INTERRUPT_SPI           SPI_STC_vect
 
@@ -140,6 +142,8 @@
  #define INTERRUPT_USART_RXC0    USART_RX_vect
  #define INTERRUPT_USART_UDRE0   USART_UDRE_vect
  #define INTERRUPT_UART_TRANS0   USART_TX_vect
+ #define INTERRUPT_PINCHANGE0    PCINT0_vect
+ #define INTERRUPT_PINCHANGE1    PCINT1_vect
  #define INTERRUPT_PINCHANGE2    PCINT2_vect
  #define INTERRUPT_SPI           SPI_STC_vect
 
@@ -216,9 +220,10 @@
  #define INTERRUPT_USART_UDRE1  USART1_UDRE_vect
  #define INTERRUPT_UART_TRANS1  USART1_TX_vect
 
- // Sleepmodes
+ // Sleep-Modes
+ #define INTERRUPT_PINCHANGE0   PCINT0_vect
+ #define INTERRUPT_PINCHANGE1   PCINT1_vect
  #define INTERRUPT_PINCHANGE2   PCINT2_vect
-
  // SPI0
  #define INTERRUPT_SPI          SPI_STC_vect
 
@@ -340,6 +345,8 @@
  #define INTERRUPT_UART_TRANS0  USART0_TX_vect
  #define INTERRUPT_UART_TRANS1  USART1_TX_vect
  // Sleepmodes
+ #define INTERRUPT_PINCHANGE0   PCINT0_vect
+ #define INTERRUPT_PINCHANGE1   PCINT1_vect
  #define INTERRUPT_PINCHANGE2   PCINT2_vect
 
  // Timer 0,1 and 2

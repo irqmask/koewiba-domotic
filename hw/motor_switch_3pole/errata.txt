@@ -1,4 +1,4 @@
-motor-control-3pole
+motor-switch-3pole
 
 Revision 1
 - Relay Pins totally mixed up in footprint!

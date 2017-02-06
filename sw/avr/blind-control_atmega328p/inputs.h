@@ -1,42 +1,26 @@
 /**
- * @addtogroup PRJTYPES
- * @brief Define project specific types definitions.
+ * @addtogroup INPUTS
+ * @brief Public interface to detect the state of inputs.
+ *
+ * This module contains functions to detect the state of inputs.
  *
  * @{
- * @file    prjtypes.h
- * @brief   Define project specific types definitions..
+ * @file    inputs.h
+ * @brief   This module contains functions to detect the state of inputs.
  *
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
 
-#ifndef _PRJTYPES_H__
-#define _PRJTYPES_H__
+#ifndef _INPUTS_H_
+#define _INPUTS_H_
 
 // --- Include section ---------------------------------------------------------
 
 #include <stdbool.h>
-#include <stdint.h>
 
 // --- Definitions -------------------------------------------------------------
 
-#ifndef TRUE
-#define TRUE 1
-#endif
-
-#ifndef FALSE
-#define FALSE 0
-#endif
-
-#ifndef NULL
-#define NULL ((void*)0)
-#endif
-
-//! Clock ticks per second.
-#define CLOCK_TICKS_PER_SECOND 100
-
 // --- Type definitions --------------------------------------------------------
-
-typedef uint8_t BOOL;
 
 // --- Local variables ---------------------------------------------------------
 
@@ -50,5 +34,15 @@ typedef uint8_t BOOL;
 
 // --- Global functions --------------------------------------------------------
 
-#endif /* _PRJTYPES_H__ */
+void input_initialize       (void);
+
+bool input_up               (void);
+
+bool input_down             (void);
+
+bool input_window_closed    (void);
+
+void input_background       (void);
+
+#endif /* _INPUTS_H_ */
 /** @} */

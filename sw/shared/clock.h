@@ -23,8 +23,8 @@
 
 #define CLOCK_NUM_TIMER         4
 
-//! Convert from milliseconds into ticks
-#define CLOCK_MS_2_TICKS(ms)    (uint16_t)((uint32_t)ms*CLOCK_TICKS_PER_SECOND/1000)
+//! Convert from milliseconds into ticks.
+#define CLOCK_MS_2_TICKS(ms)    (uint16_t)((uint32_t)((uint32_t)ms*CLOCK_TICKS_PER_SECOND/1000))
 
 // --- Type definitions --------------------------------------------------------
 

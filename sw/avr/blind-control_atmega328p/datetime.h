@@ -1,15 +1,18 @@
 /**
- * @addtogroup TASTER8_PCBCONFIG
- * @brief PCB configuration of the taster8 application.
+ * @addtogroup DATETIME
+ * @brief Public interface of date and time module.
+ *
+ * This module contains functions to manage date and time.
  *
  * @{
- * @file    pcbconfig.h
- * @brief   PCB configuration of the taster8 application.
+ * @file    datetime.h
+ * @brief   This module contains functions to manage date and time.
  *
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
-#ifndef _PCBCONFIG_H_
-#define _PCBCONFIG_H_
+
+#ifndef _DATETIME_H_
+#define _DATETIME_H_
 
 // --- Include section ---------------------------------------------------------
 
@@ -17,30 +20,29 @@
 
 // --- Definitions -------------------------------------------------------------
 
-#define BUS_PCBCONFIG 1
-#define BUS_DDR_ENASND0     DDRD
-#define BUS_PORT_ENASND0    PORTD
-#define BUS_ENASND0         PD2
-#define BUS_DDR_DISRCV0     DDRD
-#define BUS_PORT_DISRCV0    PORTD
-#define BUS_DISRCV0         PD3
-#define TXRXEN0_SEPERATE    1
-
-#define SPI_SCK_DDR         PORTC
-#define SPI_SCK_PIN         PC1
-
-// Pin assignments of board keys and LEDs
-// Port D pin assignments
-#define LED_PCBCONFIG       1
-#define LED_STATUS          PD6  //!< Yellow status LED
-#define LED_ERROR           PD4  //!< Red error LED
-#define BTN_TEST            PD5
-#define BTN_EXP             PD7
-
-#define LED_STATUS_PORT     PORTD
-#define LED_ERROR_PORT      PORTD
-
 // --- Type definitions --------------------------------------------------------
+
+typedef enum weekday {
+	eMONDAY,
+	eTUESDAY,
+	eWEDNESDAY,
+	eTHURSDAY,
+	eFRIDAY,
+	eSATURDAY,
+	eSUNDAY
+} weekday_t;
+
+//! Time-out timer runtime-data.
+typedef struct datetime {
+    uint16_t 		year;
+    uint8_t			month;
+    uint8_t			day;
+    weekday_t		day_of_week;
+
+    uint8_t			hour;
+    uint8_t         minute;
+    uint8_t         second;
+} datetime_t;
 
 // --- Local variables ---------------------------------------------------------
 
@@ -54,5 +56,7 @@
 
 // --- Global functions --------------------------------------------------------
 
-#endif // _PCBCONFIG_H_
+void dat_initialize        (void);
+
+#endif /* _DATETIME_H_ */
 /** @} */

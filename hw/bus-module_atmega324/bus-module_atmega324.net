@@ -1,14 +1,14 @@
 (export (version D)
   (design
-    (source /home/mue/projekte/koewiba-domotic/hw/bus-module_atmega324/bus-module_atmega324.sch)
-    (date "So 06 Dez 2015 17:55:57 CET")
-    (tool "Eeschema (2015-09-05 BZR 6159)-product")
+    (source /media/Werkstatt/Projekte/koewiba-domotic/hw/bus-module_atmega324/bus-module_atmega324.sch)
+    (date "Fr 10 Feb 2017 22:11:58 CET")
+    (tool "Eeschema no-vcs-found-7600~57~ubuntu14.04.1")
     (sheet (number 1) (name /) (tstamps /)
       (title_block
         (title bus-module_atmega324)
         (company KoeWiBa)
         (rev 1)
-        (date 2015-10-19)
+        (date 2017-02-10)
         (source bus-module_atmega324.sch)
         (comment (number 1) (value ""))
         (comment (number 2) (value ""))
@@ -135,19 +135,19 @@
       (sheetpath (names /) (tstamps /))
       (tstamp 559D6E2A))
     (comp (ref R4)
-      (value 1k)
+      (value 100)
       (footprint Housings_SOIC:SM0805)
       (libsource (lib standard) (part R))
       (sheetpath (names /) (tstamps /))
       (tstamp 559D7BAA))
     (comp (ref R3)
-      (value 1k)
+      (value 100)
       (footprint Housings_SOIC:SM0805)
       (libsource (lib standard) (part R))
       (sheetpath (names /) (tstamps /))
       (tstamp 559D7C90))
     (comp (ref R2)
-      (value 1k)
+      (value 100)
       (footprint Housings_SOIC:SM0805)
       (libsource (lib standard) (part R))
       (sheetpath (names /) (tstamps /))
@@ -237,6 +237,39 @@
       (sheetpath (names /) (tstamps /))
       (tstamp 566474AD)))
   (libparts
+    (libpart (lib ics_peripheral) (part 25LCXXX)
+      (description "Serial EEProm")
+      (footprints
+        (fp DIP8)
+        (fp SO8N))
+      (fields
+        (field (name Reference) U)
+        (field (name Value) 25LCXXX)
+        (field (name Footprint) SO8N)
+        (field (name Datasheet) "SPI EEPROM"))
+      (pins
+        (pin (num 1) (name CS) (type input))
+        (pin (num 2) (name SO) (type output))
+        (pin (num 3) (name WP) (type input))
+        (pin (num 4) (name GND) (type power_in))
+        (pin (num 5) (name SI) (type input))
+        (pin (num 6) (name SCK) (type input))
+        (pin (num 7) (name HOLD) (type BiDi))
+        (pin (num 8) (name VCC) (type power_in))))
+    (libpart (lib ics_regulator) (part AM1S-2405)
+      (aliases
+        (alias AM1S-2403))
+      (footprints
+        (fp AM1S-XXXX_SIL4))
+      (fields
+        (field (name Reference) U)
+        (field (name Value) AM1S-2405)
+        (field (name Footprint) AM1S-XXXX_SIL4))
+      (pins
+        (pin (num 1) (name VIN-) (type passive))
+        (pin (num 2) (name VIN+) (type power_in))
+        (pin (num 3) (name VOUT-) (type passive))
+        (pin (num 4) (name VOUT+) (type power_out))))
     (libpart (lib ics_controller_atmel) (part ATMEGA164-TQFP44)
       (aliases
         (alias ATMEGA324-TQFP44))
@@ -292,25 +325,6 @@
         (pin (num 42) (name PB2/AIN0/INT2) (type BiDi))
         (pin (num 43) (name PB3/AIN1/OC0A) (type BiDi))
         (pin (num 44) (name PB4/SS/OC0B) (type BiDi))))
-    (libpart (lib logo) (part OPEN_HARDWARE_1)
-      (fields
-        (field (name Reference) LOGO)
-        (field (name Value) OPEN_HARDWARE_1)))
-    (libpart (lib standard) (part HOLE)
-      (description "A Hole")
-      (fields
-        (field (name Reference) H)
-        (field (name Value) HOLE))
-      (pins
-        (pin (num 1) (name ~) (type unspc))))
-    (libpart (lib standard) (part R)
-      (description Potentiometer)
-      (fields
-        (field (name Reference) R)
-        (field (name Value) R))
-      (pins
-        (pin (num 1) (name 1) (type passive))
-        (pin (num 2) (name 2) (type passive))))
     (libpart (lib standard) (part C)
       (description Capacitor)
       (fields
@@ -319,15 +333,26 @@
       (pins
         (pin (num 1) (name 1) (type input))
         (pin (num 2) (name 2) (type input))))
-    (libpart (lib standard) (part CP)
+    (libpart (lib connectors) (part CONN-ISP-6)
+      (description "Atmel AVR 6 Pin ISP connector")
       (fields
-        (field (name Reference) C)
-        (field (name Value) CP)
-        (field (name Voltage) 35V)
-        (field (name Tolrance) +-10%))
+        (field (name Reference) J)
+        (field (name Value) CONN-ISP-6)
+        (field (name Footprint) AVR-ISP-6))
       (pins
-        (pin (num 1) (name 1) (type input))
-        (pin (num 2) (name 2) (type input))))
+        (pin (num 1) (name ~) (type passive))
+        (pin (num 2) (name ~) (type passive))
+        (pin (num 3) (name ~) (type passive))
+        (pin (num 4) (name ~) (type passive))
+        (pin (num 5) (name ~) (type passive))
+        (pin (num 6) (name ~) (type passive))))
+    (libpart (lib connectors) (part CONN_1)
+      (description "generic connector 1x1")
+      (fields
+        (field (name Reference) J)
+        (field (name Value) CONN_1))
+      (pins
+        (pin (num 1) (name ~) (type passive))))
     (libpart (lib bus-module_atmega324-cache) (part CONN_10X2-RESCUE-bus-module_atmega324)
       (fields
         (field (name Reference) J)
@@ -353,32 +378,22 @@
         (pin (num 18) (name 18) (type input))
         (pin (num 19) (name 19) (type input))
         (pin (num 20) (name 20) (type input))))
-    (libpart (lib connectors) (part CONN_1)
-      (description "generic connector 1x1")
+    (libpart (lib standard) (part CP)
       (fields
-        (field (name Reference) J)
-        (field (name Value) CONN_1))
+        (field (name Reference) C)
+        (field (name Value) CP)
+        (field (name Voltage) 35V)
+        (field (name Tolrance) +-10%))
       (pins
-        (pin (num 1) (name ~) (type passive))))
-    (libpart (lib ics_peripheral) (part 25LCXXX)
-      (description "Serial EEProm")
-      (footprints
-        (fp DIP8)
-        (fp SO8N))
+        (pin (num 1) (name 1) (type input))
+        (pin (num 2) (name 2) (type input))))
+    (libpart (lib standard) (part CRYSTAL)
       (fields
         (field (name Reference) U)
-        (field (name Value) 25LCXXX)
-        (field (name Footprint) SO8N)
-        (field (name Datasheet) "SPI EEPROM"))
+        (field (name Value) CRYSTAL))
       (pins
-        (pin (num 1) (name CS) (type input))
-        (pin (num 2) (name SO) (type output))
-        (pin (num 3) (name WP) (type input))
-        (pin (num 4) (name GND) (type power_in))
-        (pin (num 5) (name SI) (type input))
-        (pin (num 6) (name SCK) (type input))
-        (pin (num 7) (name HOLD) (type BiDi))
-        (pin (num 8) (name VCC) (type power_in))))
+        (pin (num 1) (name ~) (type output))
+        (pin (num 2) (name ~) (type output))))
     (libpart (lib standard) (part D)
       (description Diode)
       (footprints
@@ -389,6 +404,22 @@
       (pins
         (pin (num 1) (name A) (type input))
         (pin (num 2) (name C) (type input))))
+    (libpart (lib standard) (part FUSE)
+      (aliases
+        (alias Sicherung))
+      (fields
+        (field (name Reference) F)
+        (field (name Value) FUSE))
+      (pins
+        (pin (num 1) (name 1) (type passive))
+        (pin (num 2) (name 2) (type passive))))
+    (libpart (lib standard) (part HOLE)
+      (description "A Hole")
+      (fields
+        (field (name Reference) H)
+        (field (name Value) HOLE))
+      (pins
+        (pin (num 1) (name ~) (type unspc))))
     (libpart (lib standard) (part L)
       (fields
         (field (name Reference) L)
@@ -396,40 +427,6 @@
       (pins
         (pin (num 1) (name 1) (type BiDi))
         (pin (num 2) (name 2) (type BiDi))))
-    (libpart (lib connectors) (part CONN-ISP-6)
-      (description "Atmel AVR 6 Pin ISP connector")
-      (fields
-        (field (name Reference) J)
-        (field (name Value) CONN-ISP-6)
-        (field (name Footprint) AVR-ISP-6))
-      (pins
-        (pin (num 1) (name ~) (type passive))
-        (pin (num 2) (name ~) (type passive))
-        (pin (num 3) (name ~) (type passive))
-        (pin (num 4) (name ~) (type passive))
-        (pin (num 5) (name ~) (type passive))
-        (pin (num 6) (name ~) (type passive))))
-    (libpart (lib standard) (part CRYSTAL)
-      (fields
-        (field (name Reference) U)
-        (field (name Value) CRYSTAL))
-      (pins
-        (pin (num 1) (name ~) (type output))
-        (pin (num 2) (name ~) (type output))))
-    (libpart (lib ics_regulator) (part AM1S-2405)
-      (aliases
-        (alias AM1S-2403))
-      (footprints
-        (fp AM1S-XXXX_SIL4))
-      (fields
-        (field (name Reference) U)
-        (field (name Value) AM1S-2405)
-        (field (name Footprint) AM1S-XXXX_SIL4))
-      (pins
-        (pin (num 1) (name VIN-) (type passive))
-        (pin (num 2) (name VIN+) (type power_in))
-        (pin (num 3) (name VOUT-) (type passive))
-        (pin (num 4) (name VOUT+) (type power_out))))
     (libpart (lib ics_misc) (part MAX487)
       (aliases
         (alias MAX485))
@@ -448,15 +445,18 @@
         (pin (num 6) (name A) (type BiDi))
         (pin (num 7) (name B) (type BiDi))
         (pin (num 8) (name VCC) (type power_in))))
-    (libpart (lib standard) (part FUSE)
-      (aliases
-        (alias Sicherung))
+    (libpart (lib logo) (part OPEN_HARDWARE_1)
       (fields
-        (field (name Reference) F)
-        (field (name Value) FUSE))
+        (field (name Reference) LOGO)
+        (field (name Value) OPEN_HARDWARE_1)))
+    (libpart (lib standard) (part R)
+      (description Potentiometer)
+      (fields
+        (field (name Reference) R)
+        (field (name Value) R))
       (pins
-        (pin (num 1) (name 1) (type input))
-        (pin (num 2) (name 2) (type input))))
+        (pin (num 1) (name 1) (type passive))
+        (pin (num 2) (name 2) (type passive))))
     (libpart (lib diodes) (part TVS-Array)
       (aliases
         (alias SEMTECH_SR05))
@@ -472,24 +472,24 @@
         (pin (num 3) (name 3) (type input))
         (pin (num 4) (name 4) (type input)))))
   (libraries
-    (library (logical bus-module_atmega324-cache)
-      (uri /home/mue/projekte/koewiba-domotic/hw/bus-module_atmega324/bus-module_atmega324-cache.lib))
-    (library (logical diodes)
-      (uri /home/mue/projekte/electronic/00library/kicad/01symbols/diodes.lib))
-    (library (logical ics_misc)
-      (uri /home/mue/projekte/electronic/00library/kicad/01symbols/ics_misc.lib))
-    (library (logical logo)
-      (uri /home/mue/projekte/electronic/00library/kicad/01symbols/logo.lib))
-    (library (logical ics_regulator)
-      (uri /home/mue/projekte/electronic/00library/kicad/01symbols/ics_regulator.lib))
-    (library (logical ics_peripheral)
-      (uri /home/mue/projekte/electronic/00library/kicad/01symbols/ics_peripheral.lib))
-    (library (logical standard)
-      (uri /home/mue/projekte/electronic/00library/kicad/01symbols/standard.lib))
-    (library (logical connectors)
-      (uri /home/mue/projekte/electronic/00library/kicad/01symbols/connectors.lib))
     (library (logical ics_controller_atmel)
-      (uri /home/mue/projekte/electronic/00library/kicad/01symbols/ics_controller_atmel.lib)))
+      (uri /media/Werkstatt/Projekte/electronic/00library/kicad/01symbols/ics_controller_atmel.lib))
+    (library (logical connectors)
+      (uri /media/Werkstatt/Projekte/electronic/00library/kicad/01symbols/connectors.lib))
+    (library (logical ics_peripheral)
+      (uri /media/Werkstatt/Projekte/electronic/00library/kicad/01symbols/ics_peripheral.lib))
+    (library (logical ics_misc)
+      (uri /media/Werkstatt/Projekte/electronic/00library/kicad/01symbols/ics_misc.lib))
+    (library (logical ics_regulator)
+      (uri /media/Werkstatt/Projekte/electronic/00library/kicad/01symbols/ics_regulator.lib))
+    (library (logical logo)
+      (uri /media/Werkstatt/Projekte/electronic/00library/kicad/01symbols/logo.lib))
+    (library (logical standard)
+      (uri /media/Werkstatt/Projekte/electronic/00library/kicad/01symbols/standard.lib))
+    (library (logical diodes)
+      (uri /media/Werkstatt/Projekte/electronic/00library/kicad/01symbols/diodes.lib))
+    (library (logical bus-module_atmega324-cache)
+      (uri /media/Werkstatt/Projekte/koewiba-domotic/hw/bus-module_atmega324/bus-module_atmega324-cache.lib)))
   (nets
     (net (code 1) (name /PB0)
       (node (ref U1) (pin 40))

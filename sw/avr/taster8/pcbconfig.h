@@ -32,10 +32,10 @@
 // Pin assignments of board keys and LEDs
 // Port D pin assignments
 #define LED_PCBCONFIG       1
-#define LED_STATUS          PD6         //!< Yellow status LED
-#define LED_ERROR           PD4         //!< Red error LED
-#define BTN_TEST            0b00100000
-#define BTN_EXP             0b10000000
+#define LED_STATUS          PD6  //!< Yellow status LED
+#define LED_ERROR           PD4  //!< Red error LED
+#define BTN_TEST            PD5
+#define BTN_EXP             PD7
 
 #define LED_STATUS_PORT     PORTD
 #define LED_ERROR_PORT      PORTD

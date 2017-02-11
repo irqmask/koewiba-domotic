@@ -42,5 +42,7 @@ bool input_down             (void);
 
 bool input_window_closed    (void);
 
+void input_background       (void);
+
 #endif /* _INPUTS_H_ */
 /** @} */

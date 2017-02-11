@@ -54,11 +54,11 @@ void IO_vInitialize(void)
  */
 void init_led_and_keys(void)
 {
-    DDRD |= (LED_ERROR | LED_STATUS);
-    DDRD &= ~(BTN_TEST | BTN_EXP);
+    DDRD |= (1<<LED_ERROR | 1<<LED_STATUS);
+    DDRD &= ~(1<<BTN_TEST | 1<<BTN_EXP);
 
-    PORTD &= ~(LED_ERROR | LED_STATUS); // switch LEDs off.
-    PORTD |= (BTN_TEST | BTN_EXP);      // set pull-up for buttons
+    PORTD &= ~(1<<LED_ERROR | 1<<LED_STATUS); // switch LEDs off.
+    PORTD |= (1<<BTN_TEST | 1<<BTN_EXP);      // set pull-up for buttons
 
 #if defined (__AVR_ATmega8__)    || \
     defined (__AVR_ATmega88__)   || \
@@ -86,19 +86,19 @@ static void interpret_message(sBus_t* bus, uint8_t* msg, uint8_t msg_len, uint16
             break;
         case eCMD_STATE_8BIT:
             value = msg[2];
-            register_do_mapping(sender, msg[1], value);
+            //TODO register_do_mapping(sender, msg[1], value);
             break;
         case eCMD_STATE_16BIT:
             value = msg[2];
             value |= ((uint16_t)msg[3] << 8);
-            register_do_mapping(sender, msg[1], value);
+            //TODO register_do_mapping(sender, msg[1], value);
             break;
         case eCMD_STATE_32BIT:
             value = msg[2];
             value |= ((uint32_t)msg[3]<<8);
             value |= ((uint32_t)msg[4]<<16);
             value |= ((uint32_t)msg[5]<<24);
-            register_do_mapping(sender, msg[1], value);
+            //TODO register_do_mapping(sender, msg[1], value);
             break;
         }
 
@@ -110,9 +110,9 @@ static void interpret_message(sBus_t* bus, uint8_t* msg, uint8_t msg_len, uint16
         // system messages
         switch (msg[0]) {
         case eCMD_SLEEP:
-            sleep_pinchange2_enable();
+            sleep_pinchange_enable();
             bus_sleep(bus);
-            sleep_pinchange2_disable();
+            sleep_pinchange_disable();
             break;
         case eCMD_ACK:
             bus->eModuleState = eMod_Running;

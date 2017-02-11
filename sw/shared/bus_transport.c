@@ -436,6 +436,16 @@ bool bus_trp_send_sleepcmd (sBus_t* psBus)
     return false;
 }
 
+/**
+ * Send acknowledge byte.
+ *
+ * @param[in]   bus         Handle of the bus.
+ */
+void bus_trp_send_ackbyte (sBus_t* bus)
+{
+    send_ack(bus);
+}
+
 // --- Global functions --------------------------------------------------------
 
 /**

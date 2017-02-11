@@ -52,8 +52,9 @@ typedef struct schd {
     uint8_t         uSleepLoopCnt;                  //!< count till going to sleep.
     uint8_t         auTokenMsg[BUS_TOKEN_MSG_LEN];  //!< pre-compiled token message.
     bool            bSchedDiscovery;                //!< bus-discovery mode.
-    bool            bSchedWaitingForAnswer;         //!< flag, if scheduler is waiting for an answer
-    clock_timer_t   sNodeAnsTimeout;                //!< node answer timeout
+    bool            bSchedWaitingForAnswer;         //!< flag, if scheduler is waiting for an answer.
+    bool            broadcast_acknowledged;         //!< flag, if a received broadcast message already has been acknowledged.
+    clock_timer_t   sNodeAnsTimeout;                //!< node answer timeout.
 } sSched_t;
 
 // --- Local variables ---------------------------------------------------------

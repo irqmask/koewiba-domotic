@@ -13,8 +13,8 @@
  * ASCII format of a message sent over a serial line:
  * Bytes are transmitted in the following way 01EA3F7C
  * A message ends with a cariage return character.
- * [16-bit address receiver][length][message][CR]
- * [highbyte]      [lowbyte]
+ * [16-bit address sender][16-bit address receiver][length][message][CR]
+ * [highbyte][lowbyte]    [highbyte][lowbyte]
  *
  *
  * @author  Christian Verhalen
@@ -26,7 +26,6 @@
 
 #include <assert.h>
 #include <malloc.h>
-//#include <stdio.h>
 #include <string.h>
 
 #if defined (PRJCONF_UNIX) || \
@@ -45,9 +44,9 @@
 
 // --- Type definitions --------------------------------------------------------
 
-
 typedef enum receive_state {
     eSER_RECV_STATE_IDLE,
+    eSER_RECV_STATE_SENDER,
     eSER_RECV_STATE_RECEIVER,
     eSER_RECV_STATE_LENGTH,
     eSER_RECV_STATE_DATA,
@@ -128,7 +127,7 @@ static bool process_receiving(msg_serial_t* msg_serial, char new_char)
 
     // first byte of new message received
     if (msg_serial->incomming_state == eSER_RECV_STATE_IDLE) {
-        msg_serial->incomming_state = eSER_RECV_STATE_RECEIVER;
+        msg_serial->incomming_state = eSER_RECV_STATE_SENDER;
         msg_serial->incomming_message.sender = 0;
         msg_serial->incomming_message.receiver = 0;
         msg_serial->incomming_message.length = 0;
@@ -139,22 +138,36 @@ static bool process_receiving(msg_serial_t* msg_serial, char new_char)
 
     // decode received
     switch (msg_serial->incomming_state) {
-    case eSER_RECV_STATE_RECEIVER:
+    case eSER_RECV_STATE_SENDER:
         digit = 4 - msg_serial->incomming_num_received;
         if (convert_char_to_nibble(new_char, &nibble) != 0) {
-            log_error("Error in state eSER_RECV_STATE_RECEIVER!");
+            log_error("Error in state eSER_RECV_STATE_SENDER!");
             reset_incomming_on_error(msg_serial);
             break;
         } else {
             msg_serial->incomming_message.sender |= (nibble << (4*digit));
         }
         if (msg_serial->incomming_num_received >= 4) {
+            msg_serial->incomming_state = eSER_RECV_STATE_RECEIVER;
+        }        
+        break;
+
+    case eSER_RECV_STATE_RECEIVER:
+        digit = 8 - msg_serial->incomming_num_received;
+        if (convert_char_to_nibble(new_char, &nibble) != 0) {
+            log_error("Error in state eSER_RECV_STATE_RECEIVER!");
+            reset_incomming_on_error(msg_serial);
+            break;
+        } else {
+            msg_serial->incomming_message.receiver |= (nibble << (4*digit));
+        }
+        if (msg_serial->incomming_num_received >= 8) {
             msg_serial->incomming_state = eSER_RECV_STATE_LENGTH;
         }
         break;
 
     case eSER_RECV_STATE_LENGTH:
-        digit = 6 - msg_serial->incomming_num_received;
+        digit = 10 - msg_serial->incomming_num_received;
         if (convert_char_to_nibble(new_char, &nibble) != 0) {
             log_error("Error in state eSER_RECV_STATE_LENGTH char %x!", new_char);
             reset_incomming_on_error(msg_serial);
@@ -162,14 +175,14 @@ static bool process_receiving(msg_serial_t* msg_serial, char new_char)
         } else {
             msg_serial->incomming_message.length |= (nibble << (4*digit));
         }
-        if (msg_serial->incomming_num_received >= 6) {
+        if (msg_serial->incomming_num_received >= 10) {
             msg_serial->incomming_state = eSER_RECV_STATE_DATA;
         }
         break;
 
     case eSER_RECV_STATE_DATA:
         digit = msg_serial->incomming_num_received % 2; // digit sequence: 1010...
-        index = (msg_serial->incomming_num_received - 7) / 2;
+        index = (msg_serial->incomming_num_received - 11) / 2;
         if (convert_char_to_nibble(new_char, &nibble) != 0) {
             log_error("Error in state eSER_RECV_STATE_DATA!");
             reset_incomming_on_error(msg_serial);
@@ -187,7 +200,7 @@ static bool process_receiving(msg_serial_t* msg_serial, char new_char)
         break;
 
     case eSER_RECV_STATE_NEWLINE:
-        if (msg_serial->incomming_num_received != (msg_serial->incomming_message.length * 2 + 7) ||
+        if (msg_serial->incomming_num_received != (msg_serial->incomming_message.length * 2 + 11) ||
             new_char != '\n') {
             log_error("Error in state eSER_RECV_STATE_NEWLINE!");
             reset_incomming_on_error(msg_serial);
@@ -239,6 +252,9 @@ static size_t format_serial_message (char* serial_buffer, uint8_t max_buffersize
     if (message->length > MAX_MSG_SIZE)  return 0;
     if (max_buffersize < (message->length*2 + 7)) return 0;
     memset(serial_buffer, 0, max_buffersize);
+    // sender
+    convert_byte_to_ascii(serial_buffer, &offset, (message->sender & 0xFF00) >> 8);
+    convert_byte_to_ascii(serial_buffer, &offset, message->sender & 0x00FF);
     // receiver
     convert_byte_to_ascii(serial_buffer, &offset, (message->receiver & 0xFF00) >> 8);
     convert_byte_to_ascii(serial_buffer, &offset, message->receiver & 0x00FF);

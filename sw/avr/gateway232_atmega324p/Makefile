@@ -11,8 +11,10 @@ include ../buildscripts/lib/lib_outputdirs.mk
 SRC = ../shared/bus_transport.c \
       ../shared/crc16.c \
       ../shared/queue.c \
+      shared/block_message.c \
       shared/bus_phy.c \
       shared/clock.c \
+      shared/eeprom_spi.c \
       shared/register.c \
       gateway232_atmega324p/appregister.c \
       gateway232_atmega324p/bus_gateway.c \

@@ -37,35 +37,35 @@
 
 // --- Module global functions -------------------------------------------------
 
-bool        app_register_get        (uint8_t                uRegNo,
-                                     eRegType_t*            peRegType,
-                                     void*                  pvValue)
+bool        app_register_get        (uint8_t                reg_no,
+                                     eRegType_t*            preg_type,
+                                     void*                  pvalue)
 {
     eRegType_t  regtype;
     uint8_t index;
 
-    if (peRegType == NULL) peRegType = &regtype;
-    if (pvValue == NULL) return false;
-    *peRegType = eRegType_U8;
+    if (preg_type == NULL) preg_type = &regtype;
+    if (pvalue == NULL) return false;
+    *preg_type = eRegType_U8;
 
     // registers saved in EEProm
-    if (uRegNo >= APP_eReg_RemoteAddr00 && uRegNo <= APP_eReg_RemoteAddr31) {
-        index = (uRegNo - APP_eReg_RemoteAddr00) * 2;
+    if (reg_no >= APP_eReg_RemoteAddr00 && reg_no <= APP_eReg_RemoteAddr31) {
+        index = (reg_no - APP_eReg_RemoteAddr00) * 2;
         index += APP_eCfg_RemoteAddr00;
-        *(uint16_t*)pvValue = eeprom_read_word((uint16_t*)&register_eeprom_array[index]);
-        *peRegType = eRegType_U16;
+        *(uint16_t*)pvalue = eeprom_read_word((uint16_t*)&register_eeprom_array[index]);
+        *preg_type = eRegType_U16;
     }
-    else if (uRegNo >= APP_eReg_RemoteReg00 && uRegNo <= APP_eReg_RemoteReg31) {
-        index = uRegNo - APP_eReg_RemoteReg00;
+    else if (reg_no >= APP_eReg_RemoteReg00 && reg_no <= APP_eReg_RemoteReg31) {
+        index = reg_no - APP_eReg_RemoteReg00;
         index += APP_eCfg_RemoteReg00;
-        *(uint8_t*)pvValue = eeprom_read_byte(&register_eeprom_array[index]);
+        *(uint8_t*)pvalue = eeprom_read_byte(&register_eeprom_array[index]);
     }
-    else if (uRegNo >= APP_eReg_TargetReg00 && uRegNo <= APP_eReg_TargetReg31) {
-        index = uRegNo - APP_eReg_TargetReg00;
+    else if (reg_no >= APP_eReg_TargetReg00 && reg_no <= APP_eReg_TargetReg31) {
+        index = reg_no - APP_eReg_TargetReg00;
         index += APP_eCfg_TargetReg00;
-        *(uint8_t*)pvValue = eeprom_read_byte(&register_eeprom_array[index]);
+        *(uint8_t*)pvalue = eeprom_read_byte(&register_eeprom_array[index]);
     }
-    else switch (uRegNo) {
+    else switch (reg_no) {
     // registers saved in EEProm
     // TODO add handler for with application specific registers here!
 
@@ -77,32 +77,32 @@ bool        app_register_get        (uint8_t                uRegNo,
     return true;
 }
 
-void        app_register_set        (uint8_t                uRegNo,
-                                     uint32_t               uValue)
+void        app_register_set        (uint8_t                reg_no,
+                                     uint32_t               value)
 {
     uint16_t    tempval16;
     uint8_t     tempval, index;
 
-    tempval16 = (uint16_t)(uValue & 0x0000FFFF);
-    tempval = (uint8_t)(uValue & 0x000000FF);
+    tempval16 = (uint16_t)(value & 0x0000FFFF);
+    tempval = (uint8_t)(value & 0x000000FF);
 
     // registers saved in EEProm
-    if (uRegNo >= APP_eReg_RemoteAddr00 && uRegNo <= APP_eReg_RemoteAddr31) {
-        index = (uRegNo - APP_eReg_RemoteAddr00) * 2;
+    if (reg_no >= APP_eReg_RemoteAddr00 && reg_no <= APP_eReg_RemoteAddr31) {
+        index = (reg_no - APP_eReg_RemoteAddr00) * 2;
         index += APP_eCfg_RemoteAddr00;
         eeprom_write_word((uint16_t*)&register_eeprom_array[index], tempval16);
     }
-    else if (uRegNo >= APP_eReg_RemoteReg00 && uRegNo <= APP_eReg_RemoteReg31) {
-        index = uRegNo - APP_eReg_RemoteReg00;
+    else if (reg_no >= APP_eReg_RemoteReg00 && reg_no <= APP_eReg_RemoteReg31) {
+        index = reg_no - APP_eReg_RemoteReg00;
         index += APP_eCfg_RemoteReg00;
         eeprom_write_byte(&register_eeprom_array[index], tempval);
     }
-    else if (uRegNo >= APP_eReg_TargetReg00 && uRegNo <= APP_eReg_TargetReg31) {
-        index = uRegNo - APP_eReg_TargetReg00;
+    else if (reg_no >= APP_eReg_TargetReg00 && reg_no <= APP_eReg_TargetReg31) {
+        index = reg_no - APP_eReg_TargetReg00;
         index += APP_eCfg_TargetReg00;
         eeprom_write_byte(&register_eeprom_array[index], tempval);
     }
-    else switch (uRegNo) {
+    else switch (reg_no) {
     // registers saved in EEProm
     // TODO add handler for with application specific registers here!
 

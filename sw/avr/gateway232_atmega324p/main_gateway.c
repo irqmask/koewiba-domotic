@@ -12,6 +12,7 @@
 
 #include <avr/io.h>
 #include <avr/interrupt.h>
+#include <avr/wdt.h>
 
 #include "appconfig.h"
 #include "bus.h"
@@ -22,6 +23,14 @@
 #include "pcbconfig.h"
 #include "register.h"
 #include "serialcomm.h"
+#include "sleepmode.h"
+
+#ifndef NO_BLOCK_MESSAGE
+ #include "block_message.h"
+#endif
+#ifndef NO_EEPROM_SPI
+ #include "eeprom_spi.h"
+#endif
 
 // TODO remove after debug
 #include "led_debug.h"
@@ -42,6 +51,21 @@ scomm_phy_t     g_serial_phy;
 // --- Module global variables -------------------------------------------------
 
 // --- Local functions ---------------------------------------------------------
+
+ISR(INTERRUPT_PINCHANGE0)
+{
+    // nothing to do here, but ISR is needed for sleep-mode
+}
+
+ISR(INTERRUPT_PINCHANGE1)
+{
+    // nothing to do here, but ISR is needed for sleep-mode
+}
+
+ISR(INTERRUPT_PINCHANGE2)
+{
+    // nothing to do here, but ISR is needed for sleep-mode
+}
 
 static void io_initialize(void)
 {
@@ -68,9 +92,34 @@ void deactivate_wakeup_interrupt(void)
 
 }
 
-static void interpret_message (uint16_t sender, uint8_t msglen, uint8_t* msg)
+static inline void interpret_message (uint16_t sender, uint8_t msglen, uint8_t* msg)
 {
     switch (msg[0]) {
+    case eCMD_REQUEST_REG:
+        // fallthrough
+    case eCMD_SET_REG_8BIT:
+        // fallthrough
+    case eCMD_SET_REG_16BIT:
+        // fallthrough
+    case eCMD_SET_REG_32BIT:
+        register_do_command(&g_bus, sender, msglen, msg);
+        break;
+
+#ifndef NO_BLOCK_MESSAGE
+    case eCMD_BLOCK_START:
+        block_message_start(&g_bus, sender, msglen, msg);
+        break;
+    case eCMD_BLOCK_DATA:
+        block_message_data (&g_bus, sender, msglen, msg);
+        break;
+    case eCMD_BLOCK_END:
+        block_message_end  (&g_bus, sender, msglen, msg);
+        //no break
+    case eCMD_BLOCK_RESET:
+        block_data_reset();
+        break;
+#endif
+
     case eCMD_SLEEP:
         activate_wakeup_interrupt();
         LED_STATUS_OFF;
@@ -78,6 +127,17 @@ static void interpret_message (uint16_t sender, uint8_t msglen, uint8_t* msg)
         bus_sleep(&g_bus);
         deactivate_wakeup_interrupt();
         break;
+
+    case eCMD_RESET:
+        cli();
+#ifdef __AVR_ATtiny1634__
+        //TODO implement reset for attiny1634
+#else
+        wdt_enable(WDTO_15MS);
+        while (1); // wait until watchdog resets the controller.
+#endif
+        break;
+
     default:
         break;
     }
@@ -98,7 +158,7 @@ int main(void)
     clk_initialize();
     scomm_initialize_uart1(&g_serial_phy);
 
-    //register_set_u16(MOD_eReg_ModuleID, 9);
+    //register_set_u16(MOD_eReg_ModuleID, 0x0303);
     register_get(MOD_eReg_ModuleID, 0, &module_id);
     bus_configure(&g_bus, module_id);
     bus_initialize(&g_bus, 0);// initialize bus on UART 0

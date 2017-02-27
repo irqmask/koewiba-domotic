@@ -143,7 +143,7 @@ static bgw_state_t bgw_send_message_to_bus (sBus_t* bus, scomm_phy_t* rs232_phy)
     q_put_byte(&bus->tx_queue, g_curr_recv_l);
     // EA - Extended address 4bit sender in higher nibble, 4bit receiver
     // in lower nibble.
-    q_put_byte(&bus->tx_queue, (g_curr_recv_h & 0x0F) | ((bus->sCfg.uOwnNodeAddress & 0x0F00) >> 4));
+    q_put_byte(&bus->tx_queue, (g_curr_recv_h & 0x0F) | (bus->sCfg.uOwnExtAddress << 4));
 
     // copy data
     while (g_curr_len--) {

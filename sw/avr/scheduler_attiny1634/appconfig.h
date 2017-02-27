@@ -15,6 +15,7 @@
 // --- Include section ---------------------------------------------------------
 
 #include "prjtypes.h"
+#include "moddef_common.h"
 
 // --- Definitions -------------------------------------------------------------
 
@@ -25,6 +26,22 @@
 #define BUS_MAXRECVMSGLEN   64 + 2  //!< Maximum length of a message to be received.
 
 // --- Type definitions --------------------------------------------------------
+
+//! Application specific layout of registers
+typedef enum appregisters {
+    // registers saved in EEProm
+    APP_eReg_TODO00 = MOD_eReg_FirstAppSpecific, //!< Register mapping: remote address 0 (16bit)
+
+    // insert application specific registers here
+    APP_eReg_Last
+} eRegisters_t;
+
+//! Application specific layout of non volatile parameters (internal EEProm)
+typedef enum appconfig {
+    APP_eCfg_TODO00 = MOD_eCfg_FirstAppSpecific,
+    // insert application specific configuration here
+    APP_eCfg_Last
+} eConfiguration_t;
 
 // --- Local variables ---------------------------------------------------------
 

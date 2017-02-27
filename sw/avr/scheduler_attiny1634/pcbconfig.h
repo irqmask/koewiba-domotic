@@ -34,6 +34,23 @@
 #define BUS_DISRCV0      PA6
 #define BUS_DISRCV1      PA2
 
+#define SPI_PCBCONFIG       1
+#define SPI_DDR_MOSI        DDRB
+#define SPI_DDR_MISO        DDRB
+#define SPI_DDR_SCK         DDRC
+#define SPI_DDR_SS          DDRC
+#define SPI_PORT_SS         PORTC
+#define SPI_MOSI            PB2
+#define SPI_MISO            PB1
+#define SPI_SCK             PC1
+#define SPI_SS              PC0 // same as EEPROM!
+
+#define EEPROM_PCB_CONFIG   1
+#define __25LC256__
+#define EEP_CS_PORT         PORTC
+#define EEP_CS_DDR          DDRC
+#define EEP_CS              PC0
+
 // Application specific pin assignments
 // ----------------------------------------------------------------------------
 

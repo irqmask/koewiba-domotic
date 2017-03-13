@@ -31,10 +31,11 @@ typedef enum {
 
 //! Saves the state of the blind control statemachine.
 static blind_state_t g_blind_state = idle;
-//! Current position in percent 0% = fully closed 100% = fully open.
-static uint8_t g_current_position = 0;
-//! Desired position in percent 0% = fully closed 100% = fully open.
-static uint8_t g_position_setpoint = 0;
+//! Current position in percent 0% = open 100% = fully closed.
+static uint8_t g_current_position = 50; // initialize to 50% so initial open or
+                                        // close is possible.
+//! Desired position in percent 0% = open 100% = fully closed.
+static uint8_t g_position_setpoint = 50;
 //! Delay time in timer ticks (1/100sec) until movement starts after applying
 //! power.
 static uint8_t g_reaction_delay = 0;
@@ -52,7 +53,7 @@ static clock_timer_t g_blindtimer;
 
 /**
  * Calculate the movement time to move the blinds down, depending on the
- * position setpoint and the current position.
+ * position set-point and the current position.
  *
  * @returns Movement duration in timer ticks.
  */
@@ -61,10 +62,10 @@ static uint16_t calc_motor_time_down (void)
     uint32_t down_duration;
     uint8_t  diff;
 
-    if (g_position_setpoint == 0) {
+    if (g_position_setpoint == 100) {
         down_duration = g_duration_close;
     } else {
-        diff = g_current_position - g_position_setpoint;
+        diff = g_position_setpoint - g_current_position;
         down_duration = g_duration_close;
         down_duration *= diff;
         down_duration /= 100;
@@ -78,7 +79,7 @@ static uint16_t calc_motor_time_down (void)
 
 /**
  * Calculate the movement time to move the blinds up, depending on the
- * position setpoint and the current position.
+ * position set-point and the current position.
  *
  * @returns Movement duration in timer ticks.
  */
@@ -87,10 +88,10 @@ static uint16_t calc_motor_time_up (void)
     uint32_t up_duration;
     uint8_t  diff;
 
-    if (g_position_setpoint == 100) {
+    if (g_position_setpoint == 0) {
         up_duration = g_duration_open;
     } else {
-        diff = g_position_setpoint - g_current_position;
+        diff = g_current_position - g_position_setpoint;
         up_duration = g_duration_open;
         up_duration *= diff;
         up_duration /= 100;
@@ -132,15 +133,18 @@ static void send_position_setpoint (sBus_t* bus)
 void blind_initialize       (void)
 {
     g_blind_state = idle;
-    g_current_position = 0;
-    g_position_setpoint = 0;
+    // current bling position is unknown. assume 50% so that driving in both
+    // directions is still possible. 0% or 100% will apply each full up or down
+    // time.
+    g_current_position = 50;
+    g_position_setpoint = 50;
 }
 
 /**
  * Move the blind to the position.
  *
  * @param[in] position
- * Position to move to. 0 = completely closed. 100 = completely open.
+ * Position to move to. 0 = completely open. 100 = completely closed.
  */
 void blind_move_to_position (uint8_t new_position)
 {
@@ -148,12 +152,12 @@ void blind_move_to_position (uint8_t new_position)
     if (g_blind_state == idle && new_position != g_current_position) {
         g_position_setpoint = new_position;
 
-        if (new_position < g_current_position) {
+        if (new_position > g_current_position) {
             // move down
             clk_timer_start(&g_blindtimer, calc_motor_time_down());
             motor_down();
             g_blind_state = moving_down;
-        } else if (new_position > g_current_position) {
+        } else if (new_position < g_current_position) {
             // move up
             clk_timer_start(&g_blindtimer, calc_motor_time_up());
             motor_up();
@@ -189,14 +193,18 @@ void blind_stop             (void)
 
         // calculate new current position
         if (g_position_setpoint > g_current_position) {
-            total_ticks = g_duration_open;
-            temp = 100 * elapsed_ticks / total_ticks;
-            if (temp + g_current_position > 100) g_current_position = 100;
+            total_ticks = g_duration_close;
+            temp = 100;
+            temp *= elapsed_ticks;
+            temp /= total_ticks;
+            if (temp + (int32_t)g_current_position > 100) g_current_position = 100;
             else g_current_position += temp;
         } else {
-            total_ticks = g_duration_close;
-            temp = 100 * elapsed_ticks / total_ticks;
-            if (temp > g_current_position) g_current_position = 0;
+            total_ticks = g_duration_open;
+            temp = 100;
+            temp *= elapsed_ticks;
+            temp /= total_ticks;
+            if (temp > (int32_t)g_current_position) g_current_position = 0;
             else g_current_position -= temp;
         }
 
@@ -214,7 +222,7 @@ void blind_background       (sBus_t* bus)
         break;
 
     case moving_up:
-        // fallthrough to moving_down
+        // fall-through to moving_down
     case moving_down:
         if (clk_timer_is_elapsed(&g_blindtimer)) {
             motor_stop();

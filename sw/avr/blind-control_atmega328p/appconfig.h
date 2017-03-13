@@ -34,7 +34,7 @@
 typedef enum appregisters {
     // registers saved in EEProm
     APP_eReg_PositionCurrent = MOD_eReg_FirstAppSpecific, //!< Current position of blind
-    APP_eReg_PositionSetPoint,  //!< Wanted position of blind. 0 = completely closed. 100 = completely open
+    APP_eReg_PositionSetPoint,  //!< Wanted position of blind. 100 = completely closed. 0 = completely open
     APP_eReg_ReactionDelay,     //!< Delay time in timer ticks (1/100sec) until movement starts after applying power.
     APP_eReg_DurationOpen,      //!< Duration in timer ticks (1/100sec) to fully open the blind.
     APP_eReg_DurationClose,     //!< Duration in timer ticks (1/100sec) to fully close the blind.

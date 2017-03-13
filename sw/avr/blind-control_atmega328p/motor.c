@@ -12,8 +12,10 @@
 
 #include <avr/io.h>
 
+#include "appconfig.h"
 #include "clock.h"
 #include "motor.h"
+#include "sleepmode.h"
 
 // --- Definitions -------------------------------------------------------------
 
@@ -68,6 +70,7 @@ void motor_up               (void)
         g_motor_state = start_moving_up;
         PORTC |= (1<<MOTOR_UPDOWN_PIN);
         clk_timer_start(&g_motor_timer, CLOCK_MS_2_TICKS(MOTOR_SWITCH_DELAY));
+        sleep_prevent(APP_eSLEEPMASK_MOTOR, 1);
     } else {
         motor_stop();
     }
@@ -79,6 +82,7 @@ void motor_down             (void)
         g_motor_state = start_moving_down;
         PORTC &= ~(1<<MOTOR_UPDOWN_PIN);
         clk_timer_start(&g_motor_timer, CLOCK_MS_2_TICKS(MOTOR_SWITCH_DELAY));
+        sleep_prevent(APP_eSLEEPMASK_MOTOR, 1);
     } else {
         motor_stop();
     }
@@ -90,6 +94,7 @@ void motor_stop             (void)
         g_motor_state = stopping;
         PORTC &= ~(1<<MOTOR_OFFON_PIN);
         clk_timer_start(&g_motor_timer, CLOCK_MS_2_TICKS(MOTOR_SWITCH_DELAY));
+        sleep_prevent(APP_eSLEEPMASK_MOTOR, 0);
     }
 }
 

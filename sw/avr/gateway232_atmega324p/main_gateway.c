@@ -1,5 +1,5 @@
 /**
- * @addtogroup TEST_GATEWAY
+ * @addtogroup BUS_GATEWAY
  *
  * @{
  * @file    main_gateway.c

@@ -1,5 +1,6 @@
 /**
- * @addtogroup TESTGATEWAY_ATMEGA324_PCBCONFIG
+ * @addtogroup BUS_GATEWAY
+ * @addtogroup PCBCONFIG
  * @brief PCB configuration of the "testgateway" application.
  *
  * @{

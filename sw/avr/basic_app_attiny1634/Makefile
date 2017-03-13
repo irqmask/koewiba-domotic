@@ -18,6 +18,7 @@ SRC = ../shared/bus_transport.c \
       shared/led_debug.c \
       shared/main_avr.c \
       shared/register.c \
+      shared/sleepmode.c \
       basic_app_attiny1634/application.c \
       basic_app_attiny1634/appregister.c \
       basic_app_attiny1634/appversion.c

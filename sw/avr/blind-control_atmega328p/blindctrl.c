@@ -65,7 +65,9 @@ static uint16_t calc_motor_time_down (void)
         down_duration = g_duration_close;
     } else {
         diff = g_current_position - g_position_setpoint;
-        down_duration = (g_duration_close * diff) / 100;
+        down_duration = g_duration_close;
+        down_duration *= diff;
+        down_duration /= 100;
     }
 
     down_duration += g_reaction_delay;
@@ -89,7 +91,9 @@ static uint16_t calc_motor_time_up (void)
         up_duration = g_duration_open;
     } else {
         diff = g_position_setpoint - g_current_position;
-        up_duration = (g_duration_open * diff) / 100;
+        up_duration = g_duration_open;
+        up_duration *= diff;
+        up_duration /= 100;
     }
 
     up_duration += g_reaction_delay;

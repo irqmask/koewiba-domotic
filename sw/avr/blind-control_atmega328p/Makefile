@@ -18,6 +18,7 @@ SRC = ../shared/bus_transport.c \
       shared/led_debug.c \
       shared/main_avr.c \
       shared/register.c \
+      shared/sleepmode.c \
       blind-control_atmega328p/application.c \
       blind-control_atmega328p/appregister.c \
       blind-control_atmega328p/appversion.c \

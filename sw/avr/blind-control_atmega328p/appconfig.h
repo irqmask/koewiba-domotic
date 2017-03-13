@@ -26,6 +26,8 @@
 #define BUS_MAXSENDMSGLEN   16      //!< Maximum length of a message to be sent.
 #define BUS_MAXRECVMSGLEN   64 + 2  //!< Maximum length of a message to be received.
 
+#define APP_eSLEEPMASK_MOTOR    (1<<0)  //!< Mask used for sleep_prevent() function.
+                                        //!< Prevent the controller to fall asleep if motor is moving.
 // --- Type definitions --------------------------------------------------------
 
 //! Application specific layout of registers
@@ -58,6 +60,8 @@ typedef enum appconfig {
 // --- Local variables ---------------------------------------------------------
 
 // --- Global variables --------------------------------------------------------
+
+extern const unsigned char app_versioninfo[];
 
 // --- Module global variables -------------------------------------------------
 

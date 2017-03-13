@@ -16,7 +16,9 @@ SRC = ../shared/bus_transport.c \
       shared/clock.c \
       shared/eeprom_spi.c \
       shared/register.c \
+      shared/sleepmode.c \
       gateway232_atmega324p/appregister.c \
+      gateway232_atmega324p/appversion.c \
       gateway232_atmega324p/bus_gateway.c \
       gateway232_atmega324p/main_gateway.c \
       gateway232_atmega324p/serialcomm.c \

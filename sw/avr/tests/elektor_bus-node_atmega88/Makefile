@@ -16,8 +16,10 @@ SRC = ../shared/bus_transport.c \
       shared/led_debug.c \
       shared/main_avr.c \
       shared/register.c \
+      shared/sleepmode.c \
       tests/elektor_bus-node_atmega88/application.c \
-      tests/elektor_bus-node_atmega88/appregister.c
+      tests/elektor_bus-node_atmega88/appregister.c \
+      tests/elektor_bus-node_atmega88/appversion.c
 
 # Place -I options here
 INCDIRS = -I. \

@@ -117,29 +117,43 @@ bool        register_get            (uint8_t                reg_no,
         *(uint8_t*)value = boot_signature_byte_get(ADDR_SIGNATURE_BYTE2);
         break;
 
-    case MOD_eReg_BoardID:
+    case MOD_eReg_DeviceSignature3:
         *reg_type = eRegType_U8;
-        *(uint8_t*)value = 0; //TODO CV: implement
+        *(uint8_t*)value = 0;// not used yet // boot_signature_byte_get(ADDR_SIGNATURE_BYTE2);
+        break;
+
+    case MOD_eReg_BoardID:
+        *reg_type = eRegType_U16;
+        *(uint16_t*)value = app_versioninfo[MOD_eVerBoardIdHigh];
+        *(uint16_t*)value <<= 8;
+        *(uint16_t*)value |= app_versioninfo[MOD_eVerBoardIdLow];
+        break;
+
+    case MOD_eReg_BoardRev:
+        *reg_type = eRegType_U8;
+        *(uint8_t*)value = app_versioninfo[MOD_eVerBoardRev];
         break;
 
     case MOD_eReg_AppID:
-        *reg_type = eRegType_U8;
-        *(uint8_t*)value = 0; //TODO CV: implement
+        *reg_type = eRegType_U16;
+        *(uint16_t*)value = app_versioninfo[MOD_eVerAppIdHigh];
+        *(uint16_t*)value <<= 8;
+        *(uint16_t*)value = app_versioninfo[MOD_eVerAppIdLow];
         break;
 
     case MOD_eReg_AppVersionMajor:
         *reg_type = eRegType_U8;
-        *(uint8_t*)value = 0; //TODO CV: implement
+        *(uint8_t*)value = app_versioninfo[MOD_eVerAppMajor];
         break;
 
     case MOD_eReg_AppVersionMinor:
         *reg_type = eRegType_U8;
-        *(uint8_t*)value = 0; //TODO CV: implement
+        *(uint8_t*)value = app_versioninfo[MOD_eVerAppMinor];
         break;
 
     case MOD_eReg_AppVersionBugfix:
         *reg_type = eRegType_U8;
-        *(uint8_t*)value = 0; //TODO CV: implement
+        *(uint8_t*)value = app_versioninfo[MOD_eVerAppBugfix];
         break;
 
     // application specific registers

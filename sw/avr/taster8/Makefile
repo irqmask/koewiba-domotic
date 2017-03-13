@@ -15,8 +15,10 @@ SRC = ../shared/bus_transport.c \
       shared/clock.c \
       shared/led_debug.c \
       shared/register.c \
+      shared/sleepmode.c \
       taster8/appregister.c \
       taster8/application.c \
+      taster8/appversion.c \
       taster8/ledskeys.c \
       taster8/main_taster8.c
 

@@ -1,11 +1,11 @@
 /**
- * @addtogroup BASIC_APP_ATMEGA324
- * @addtogroup APPVERSION
- * @brief Version information of "basic_app_atmega324" project.
+ * @addtogroup 8KEYS_ATMEGA328
+ * @addtogroup 8KEYS_ATMEGA328_APPVERSION
+ * @brief Version information of "8keys_atmega328" project.
  *
  * @{
  * @file    appversion.c
- * @brief   Version information of "basic_app_atmega324" project.
+ * @brief   Version information of "8keys_atmega328" project.
  *
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
@@ -29,11 +29,11 @@
 //! @see BOARD_IDs, APP_IDs, APP_VERSIONING
 const unsigned char app_versioninfo[MOD_LEN_CONTROLLERID + MOD_LEN_BOARDID + MOD_LEN_BOARDREV + MOD_LEN_APPID + MOD_LEN_APPVER] __attribute__((section(".versioninfo")))
                         = {SIGNATURE_0,SIGNATURE_1,SIGNATURE_2,0x00,
-                           0x00,0x01,   // board ID            (high byte, low byte)
+                           0xFF,0xFE,   // (not defined yet)board ID            (high byte, low byte)
                            1,           // board revision
-                           0x00,0x03,   // application ID      (high byte, low byte)
+                           0xFF,0xFE,   // (not defined yet)application ID      (high byte, low byte)
                            0,1,0};      // application version (major, minor, bugfix)
-
+                    
 // --- Module global variables -------------------------------------------------
 
 // --- Local functions ---------------------------------------------------------

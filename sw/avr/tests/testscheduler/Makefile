@@ -16,6 +16,7 @@ SRC = ../shared/bus_scheduler.c \
       shared/bus_phy.c \
       shared/clock.c \
       shared/led_debug.c \
+      shared/sleepmode.c \
       tests/testscheduler/main_testscheduler.c
 
 # Place -I options here

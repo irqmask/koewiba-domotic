@@ -39,7 +39,6 @@
 //#define sleep_pinchange2_enable()   PINCHGIR_REGISTER |=  PCIE_BITS
 //#define sleep_pinchange2_disable()  PINCHGIR_REGISTER &= ~PCIE_BITS
 #define sleep_set_mode(m)           set_sleep_mode(m)
-#define sleep_activate()            sleep_mode()
 #define sleep_delay_ms(t)           _delay_ms(t)
 #else
 #define sleep_pinchange_enable()
@@ -47,10 +46,13 @@
 #define sleep_set_mode(m)
 #define sleep_activate()
 #define sleep_delay_ms(t)
+#define sleep_prevent(a,b)
 #endif
+
 // --- Type definitions --------------------------------------------------------
 
 // --- Local variables ---------------------------------------------------------
+
 
 // --- Global variables --------------------------------------------------------
 
@@ -61,6 +63,14 @@
 // --- Module global functions -------------------------------------------------
 
 // --- Global functions --------------------------------------------------------
+
+#ifdef PRJCONF_UC_AVR
+
+void sleep_activate(void);
+
+void sleep_prevent(uint8_t prevent_mask, uint8_t on);
+
+#endif
 
 #endif /* _SLEEPMODE_H_ */
 /** @} */

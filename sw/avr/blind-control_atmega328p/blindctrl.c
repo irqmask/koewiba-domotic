@@ -40,9 +40,9 @@ static uint8_t g_position_setpoint = 50;
 //! power.
 static uint8_t g_reaction_delay = 0;
 //! Duration in timer ticks (1/100sec) to fully open the blind.
-static uint16_t g_duration_open = CLOCK_MS_2_TICKS(10000);
+static uint16_t g_duration_open = CLOCK_MS_2_TICKS(1000);
 //! Duration in timer ticks (1/100sec) to fully close the blind.
-static uint16_t g_duration_close = CLOCK_MS_2_TICKS(10000);
+static uint16_t g_duration_close = CLOCK_MS_2_TICKS(1000);
 static clock_timer_t g_blindtimer;
 
 // --- Global variables --------------------------------------------------------

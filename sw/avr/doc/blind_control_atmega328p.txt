@@ -7,3 +7,9 @@ Number | Type | Code name                 | Description
  0x12  |  U16 | APP_eReg_ReactionDelay    | Delay time in timer ticks (1/100sec) until movement starts after applying power.
  0x13  |  U16 | APP_eReg_DurationOpen     | Duration in timer ticks (1/100sec) to fully open the blind.
  0x14  |  U16 | APP_eReg_DurationClose    | Duration in timer ticks (1/100sec) to fully close the blind.
+
+Gägige Zahlen
+
+  50 = 0x32
+ 100 = 0x64
+1000 = 0x03E8

@@ -13,6 +13,7 @@
 
 #include <avr/boot.h>
 #include <avr/eeprom.h>
+#include <avr/pgmspace.h>
 
 #include "prjtypes.h"
 #include "cmddef_common.h"
@@ -53,19 +54,20 @@ static void answer_register_request (sBus_t*                bus,
     uint32_t    value;
     eRegType_t  regtype = eRegType_Unkown;
 
-    value = register_get(reg_no, &regtype, &value);
-    switch (regtype) {
-    case eRegType_U8:
-        register_send_u8(bus, sender, reg_no, (uint8_t)(value & 0x000000FF));
-        break;
-    case eRegType_U16:
-        register_send_u16(bus, sender, reg_no, (uint16_t)(value & 0x0000FFFF));
-        break;
-    case eRegType_U32:
-        register_send_u32(bus, sender, reg_no, value);
-        break;
-    default:
-        break;
+    if (register_get(reg_no, &regtype, &value)) {
+        switch (regtype) {
+        case eRegType_U8:
+            register_send_u8(bus, sender, reg_no, (uint8_t)(value & 0x000000FF));
+            break;
+        case eRegType_U16:
+            register_send_u16(bus, sender, reg_no, (uint16_t)(value & 0x0000FFFF));
+            break;
+        case eRegType_U32:
+            register_send_u32(bus, sender, reg_no, value);
+            break;
+        default:
+            break;
+        }
     }
 }
 
@@ -124,36 +126,46 @@ bool        register_get            (uint8_t                reg_no,
 
     case MOD_eReg_BoardID:
         *reg_type = eRegType_U16;
-        *(uint16_t*)value = app_versioninfo[MOD_eVerBoardIdHigh];
+        *(uint16_t*)value = pgm_read_byte(&app_versioninfo[MOD_eVerBoardIdHigh]);
         *(uint16_t*)value <<= 8;
-        *(uint16_t*)value |= app_versioninfo[MOD_eVerBoardIdLow];
+        *(uint16_t*)value |= pgm_read_byte(&app_versioninfo[MOD_eVerBoardIdLow]);
+        //*(uint16_t*)value = app_versioninfo[MOD_eVerBoardIdHigh];
+        //*(uint16_t*)value <<= 8;
+        //*(uint16_t*)value |= app_versioninfo[MOD_eVerBoardIdLow];
         break;
 
     case MOD_eReg_BoardRev:
         *reg_type = eRegType_U8;
-        *(uint8_t*)value = app_versioninfo[MOD_eVerBoardRev];
+        *(uint8_t*)value = pgm_read_byte(&app_versioninfo[MOD_eVerBoardRev]);
+        //*(uint8_t*)value = app_versioninfo[MOD_eVerBoardRev];
         break;
 
     case MOD_eReg_AppID:
         *reg_type = eRegType_U16;
-        *(uint16_t*)value = app_versioninfo[MOD_eVerAppIdHigh];
+        *(uint16_t*)value = pgm_read_byte(&app_versioninfo[MOD_eVerAppIdHigh]);
         *(uint16_t*)value <<= 8;
-        *(uint16_t*)value = app_versioninfo[MOD_eVerAppIdLow];
+        *(uint16_t*)value |= pgm_read_byte(&app_versioninfo[MOD_eVerAppIdLow]);
+        //*(uint16_t*)value = app_versioninfo[MOD_eVerAppIdHigh];
+        //*(uint16_t*)value <<= 8;
+        //*(uint16_t*)value |= app_versioninfo[MOD_eVerAppIdLow];
         break;
 
     case MOD_eReg_AppVersionMajor:
         *reg_type = eRegType_U8;
-        *(uint8_t*)value = app_versioninfo[MOD_eVerAppMajor];
+        *(uint8_t*)value = pgm_read_byte(&app_versioninfo[MOD_eVerAppMajor]);
+        //*(uint8_t*)value = app_versioninfo[MOD_eVerAppMajor];
         break;
 
     case MOD_eReg_AppVersionMinor:
         *reg_type = eRegType_U8;
-        *(uint8_t*)value = app_versioninfo[MOD_eVerAppMinor];
+        *(uint8_t*)value = pgm_read_byte(&app_versioninfo[MOD_eVerAppMinor]);
+        //*(uint8_t*)value = app_versioninfo[MOD_eVerAppMinor];
         break;
 
     case MOD_eReg_AppVersionBugfix:
         *reg_type = eRegType_U8;
-        *(uint8_t*)value = app_versioninfo[MOD_eVerAppBugfix];
+        *(uint8_t*)value = pgm_read_byte(&app_versioninfo[MOD_eVerAppBugfix]);
+        //*(uint8_t*)value = app_versioninfo[MOD_eVerAppBugfix];
         break;
 
     // application specific registers

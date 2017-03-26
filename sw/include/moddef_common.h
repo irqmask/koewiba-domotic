@@ -31,7 +31,7 @@
 //! Application's version items in #app_versioninfo
 //! @see BOARD_IDs, APP_IDs, APP_VERSIONING
 typedef enum {
-    MOD_eVerCtrlSignature0,     //!< 1st byte of controller's device signature.
+    MOD_eVerCtrlSignature0 = 0, //!< 1st byte of controller's device signature.
     MOD_eVerCtrlSignature1,     //!< 2nd byte of controller's device signature.
     MOD_eVerCtrlSignature2,     //!< 3rd byte of controller's device signature.
     MOD_eVerCtrlSignature3,     //!< 4th byte of controller's device signature.

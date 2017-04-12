@@ -1,5 +1,5 @@
 /**
- * @addtogroup BUSGATEWAY
+ * @addtogroup BUS_GATEWAY
  * @brief Serial line driver for receiving and sending of messages.
  *
  * IMPORTANT: Dependent on the controller used for serialcomm the receive-queue

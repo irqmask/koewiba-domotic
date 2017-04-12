@@ -78,6 +78,8 @@ bool    bus_trp_send_and_receive    (sBus_t* psBus);
 
 bool    bus_trp_send_sleepcmd       (sBus_t* psBus);
 
+void    bus_trp_send_ackbyte        (sBus_t* bus);
+
 // physical layer
 void    bus_phy_initialize          (sBusPhy_t*     psPhy,
                                      uint8_t        uUart);

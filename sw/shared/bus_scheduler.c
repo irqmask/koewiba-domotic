@@ -274,6 +274,17 @@ bool bus_schedule_and_get_message (sBus_t* psBus, sSched_t* psSched )
 
     msg_received = bus_trp_send_and_receive(psBus);
 
+    // scheduler send ACK bytes for broadcast messages
+    if (msg_received == true &&
+        psBus->sRecvMsg.uReceiver == BUS_BRDCSTADR) {
+        if (psSched->broadcast_acknowledged == false) {
+            psSched->broadcast_acknowledged = true;
+            bus_trp_send_ackbyte(psBus);
+        }
+    } else {
+        psSched->broadcast_acknowledged = false;
+    }
+
     if (psSched->bSchedWaitingForAnswer) {
         bool receive_end = false;
 

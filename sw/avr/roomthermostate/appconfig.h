@@ -325,6 +325,8 @@ typedef enum appconfig {
 
 // --- Global variables --------------------------------------------------------
 
+extern const unsigned char app_versioninfo[];
+
 // --- Module global variables -------------------------------------------------
 
 // --- Local functions ---------------------------------------------------------

@@ -23,14 +23,16 @@
 
 // --- Global variables --------------------------------------------------------
 
-// Note: The linker sorts the variables upside down. app_controller_id begins at 
-//       the lowest address and app_version begins at the highest address.
+//! Application's version information
+//! @note The linker sorts the variables upside down. app_controller_id begins at
+//!       the lowest address and app_version begins at the highest address.
+//! @see BOARD_IDs, APP_IDs, APP_VERSIONING
 const unsigned char app_versioninfo[MOD_LEN_CONTROLLERID + MOD_LEN_BOARDID + MOD_LEN_BOARDREV + MOD_LEN_APPID + MOD_LEN_APPVER] __attribute__((section(".versioninfo")))
                         = {SIGNATURE_0,SIGNATURE_1,SIGNATURE_2,0x00,
-                           1,3,         // board ID
+                           0x00,0x03,   // board ID
                            1,           // board revision
-                           0,1,         // application ID
-                           0,0};        // application version
+                           0x00,0x05,   // application ID
+                           0,1,0};      // application version
 
 // --- Module global variables -------------------------------------------------
 

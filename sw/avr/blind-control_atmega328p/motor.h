@@ -42,5 +42,9 @@ void motor_down             (void);
 
 void motor_stop             (void);
 
+bool motor_is_running       (void);
+
+void motor_background       (void);
+
 #endif /* _MOTOR_H_ */
 /** @} */

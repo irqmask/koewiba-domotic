@@ -17,7 +17,9 @@ SRC = ../shared/bus_transport.c \
       shared/eeprom_spi.c \
       shared/led_debug.c \
       shared/register.c \
+      shared/sleepmode.c \
       tests/test_bus-module_attiny1634/appregister.c \
+      tests/test_bus-module_attiny1634/appversion.c \
       tests/test_bus-module_attiny1634/main_test_bus-module_attiny1634.c
 
 # Place -I options here

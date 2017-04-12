@@ -1,6 +1,6 @@
-MCU = atmega88
+MCU = atmega324p
 FORMAT = ihex
-TARGET = taster8_atmega88
+TARGET = gateway232_atmega324p
 
 ROOTDIR = $(subst \,/,$(shell pwd))/..
 include ../buildscripts/lib/lib_outputdirs.mk
@@ -11,16 +11,17 @@ include ../buildscripts/lib/lib_outputdirs.mk
 SRC = ../shared/bus_transport.c \
       ../shared/crc16.c \
       ../shared/queue.c \
+      shared/block_message.c \
       shared/bus_phy.c \
       shared/clock.c \
-      shared/led_debug.c \
+      shared/eeprom_spi.c \
       shared/register.c \
       shared/sleepmode.c \
-      taster8/appregister.c \
-      taster8/application.c \
-      taster8/appversion.c \
-      taster8/ledskeys.c \
-      taster8/main_taster8.c
+      gateway232_atmega324p/appregister.c \
+      gateway232_atmega324p/appversion.c \
+      gateway232_atmega324p/bus_gateway.c \
+      gateway232_atmega324p/main_gateway.c \
+      gateway232_atmega324p/serialcomm.c \
 
 # Place -I options here
 INCDIRS = -I. \
@@ -29,7 +30,8 @@ INCDIRS = -I. \
           -I../../include \
           -I../../shared
 
-LOCAL_CFLAGS = -DF_CPU=16000000 -DHAS_PCBCONFIG_H -DHAS_APPCONFIG_H
+
+LOCAL_CFLAGS = -DF_CPU=7372800 -DHAS_PCBCONFIG_H -DHAS_APPCONFIG_H
 LOCAL_ASFLAGS =
 LOCAL_LDFLAGS =
 

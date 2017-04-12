@@ -1,11 +1,11 @@
 /**
- * @addtogroup BASIC_APP_ATMEGA324
+ * @addtogroup BUS_GATEWAY
  * @addtogroup APPVERSION
- * @brief Version information of "basic_app_atmega324" project.
+ * @brief Version information of "gateway232_atmega324" project.
  *
  * @{
  * @file    appversion.c
- * @brief   Version information of "basic_app_atmega324" project.
+ * @brief   Version information of "gateway232_atmega324" project.
  *
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
@@ -31,7 +31,7 @@ const unsigned char app_versioninfo[MOD_LEN_CONTROLLERID + MOD_LEN_BOARDID + MOD
                         = {SIGNATURE_0,SIGNATURE_1,SIGNATURE_2,0x00,
                            0x00,0x01,   // board ID            (high byte, low byte)
                            1,           // board revision
-                           0x00,0x03,   // application ID      (high byte, low byte)
+                           0x00,0x02,   // application ID      (high byte, low byte)
                            0,1,0};      // application version (major, minor, bugfix)
 
 // --- Module global variables -------------------------------------------------

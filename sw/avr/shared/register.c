@@ -13,6 +13,7 @@
 
 #include <avr/boot.h>
 #include <avr/eeprom.h>
+#include <avr/pgmspace.h>
 
 #include "prjtypes.h"
 #include "cmddef_common.h"
@@ -53,19 +54,20 @@ static void answer_register_request (sBus_t*                bus,
     uint32_t    value;
     eRegType_t  regtype = eRegType_Unkown;
 
-    value = register_get(reg_no, &regtype, &value);
-    switch (regtype) {
-    case eRegType_U8:
-        register_send_u8(bus, sender, reg_no, (uint8_t)(value & 0x000000FF));
-        break;
-    case eRegType_U16:
-        register_send_u16(bus, sender, reg_no, (uint16_t)(value & 0x0000FFFF));
-        break;
-    case eRegType_U32:
-        register_send_u32(bus, sender, reg_no, value);
-        break;
-    default:
-        break;
+    if (register_get(reg_no, &regtype, &value)) {
+        switch (regtype) {
+        case eRegType_U8:
+            register_send_u8(bus, sender, reg_no, (uint8_t)(value & 0x000000FF));
+            break;
+        case eRegType_U16:
+            register_send_u16(bus, sender, reg_no, (uint16_t)(value & 0x0000FFFF));
+            break;
+        case eRegType_U32:
+            register_send_u32(bus, sender, reg_no, value);
+            break;
+        default:
+            break;
+        }
     }
 }
 
@@ -117,29 +119,53 @@ bool        register_get            (uint8_t                reg_no,
         *(uint8_t*)value = boot_signature_byte_get(ADDR_SIGNATURE_BYTE2);
         break;
 
-    case MOD_eReg_BoardID:
+    case MOD_eReg_DeviceSignature3:
         *reg_type = eRegType_U8;
-        *(uint8_t*)value = 0; //TODO CV: implement
+        *(uint8_t*)value = 0;// not used yet // boot_signature_byte_get(ADDR_SIGNATURE_BYTE2);
+        break;
+
+    case MOD_eReg_BoardID:
+        *reg_type = eRegType_U16;
+        *(uint16_t*)value = pgm_read_byte(&app_versioninfo[MOD_eVerBoardIdHigh]);
+        *(uint16_t*)value <<= 8;
+        *(uint16_t*)value |= pgm_read_byte(&app_versioninfo[MOD_eVerBoardIdLow]);
+        //*(uint16_t*)value = app_versioninfo[MOD_eVerBoardIdHigh];
+        //*(uint16_t*)value <<= 8;
+        //*(uint16_t*)value |= app_versioninfo[MOD_eVerBoardIdLow];
+        break;
+
+    case MOD_eReg_BoardRev:
+        *reg_type = eRegType_U8;
+        *(uint8_t*)value = pgm_read_byte(&app_versioninfo[MOD_eVerBoardRev]);
+        //*(uint8_t*)value = app_versioninfo[MOD_eVerBoardRev];
         break;
 
     case MOD_eReg_AppID:
-        *reg_type = eRegType_U8;
-        *(uint8_t*)value = 0; //TODO CV: implement
+        *reg_type = eRegType_U16;
+        *(uint16_t*)value = pgm_read_byte(&app_versioninfo[MOD_eVerAppIdHigh]);
+        *(uint16_t*)value <<= 8;
+        *(uint16_t*)value |= pgm_read_byte(&app_versioninfo[MOD_eVerAppIdLow]);
+        //*(uint16_t*)value = app_versioninfo[MOD_eVerAppIdHigh];
+        //*(uint16_t*)value <<= 8;
+        //*(uint16_t*)value |= app_versioninfo[MOD_eVerAppIdLow];
         break;
 
     case MOD_eReg_AppVersionMajor:
         *reg_type = eRegType_U8;
-        *(uint8_t*)value = 0; //TODO CV: implement
+        *(uint8_t*)value = pgm_read_byte(&app_versioninfo[MOD_eVerAppMajor]);
+        //*(uint8_t*)value = app_versioninfo[MOD_eVerAppMajor];
         break;
 
     case MOD_eReg_AppVersionMinor:
         *reg_type = eRegType_U8;
-        *(uint8_t*)value = 0; //TODO CV: implement
+        *(uint8_t*)value = pgm_read_byte(&app_versioninfo[MOD_eVerAppMinor]);
+        //*(uint8_t*)value = app_versioninfo[MOD_eVerAppMinor];
         break;
 
     case MOD_eReg_AppVersionBugfix:
         *reg_type = eRegType_U8;
-        *(uint8_t*)value = 0; //TODO CV: implement
+        *(uint8_t*)value = pgm_read_byte(&app_versioninfo[MOD_eVerAppBugfix]);
+        //*(uint8_t*)value = app_versioninfo[MOD_eVerAppBugfix];
         break;
 
     // application specific registers
@@ -228,20 +254,20 @@ void        register_do_command     (sBus_t*                bus,
         }
         break;
     case eCMD_SET_REG_16BIT:
-        // Format: <Command><Registernumber><LowValue><HighValue>
+        // Format: <Command><Registernumber><HighValue><LowValue>
         if (msglen >= 4) {
-            temp16 = msg[2];
-            temp16 |= ((uint16_t)msg[3]<<8);
+            temp16 = (uint16_t)msg[2] << 8;
+            temp16 |= msg[3];
             register_set_u16(msg[1], temp16);
         }
         break;
     case eCMD_SET_REG_32BIT:
-        // Format: <Command><Registernumber><LowLowValue><LowValue><HighValue><HighHighValue>
+        // Format: <Command><Registernumber><HighHighValue><HighValue><LowValue><LowLowValue>
         if (msglen >= 6) {
-            temp32 = msg[2];
-            temp32 |= ((uint32_t)msg[3]<<8);
-            temp32 |= ((uint32_t)msg[4]<<16);
-            temp32 |= ((uint32_t)msg[5]<<24);
+            temp32 = ((uint32_t)msg[2]<<24);
+            temp32 |= ((uint32_t)msg[3]<<16);
+            temp32 |= ((uint32_t)msg[4]<<8);
+            temp32 |= msg[5];
             register_set_u32(msg[1], temp32);
         }
         break;
@@ -296,8 +322,8 @@ void        register_send_u16       (sBus_t*                bus,
 
     msg[0] = eCMD_STATE_16BIT;
     msg[1] = reg_no;
-    msg[2] = value & 0x00FF;
-    msg[3] = value >> 8;
+    msg[2] = value >> 8;
+    msg[3] = value & 0x00FF;
     bus_send_message(bus, receiver, sizeof(msg), msg);
 }
 
@@ -322,10 +348,10 @@ void        register_send_u32       (sBus_t*                bus,
 
     msg[0] = eCMD_STATE_32BIT;
     msg[1] = reg_no;
-    msg[2] = value & 0x000000FF;
-    msg[3] = (value >> 8) & 0x000000FF;
-    msg[4] = (value >> 16) & 0x000000FF;
-    msg[5] = (value >> 24) & 0x000000FF;
+    msg[2] = (value >> 24) & 0x000000FF;
+    msg[3] = (value >> 16) & 0x000000FF;
+    msg[4] = (value >> 8) & 0x000000FF;
+    msg[5] = value & 0x000000FF;
     bus_send_message(bus, receiver, sizeof(msg), msg);
 }
 
@@ -339,7 +365,7 @@ void        register_send_u32       (sBus_t*                bus,
  * @returns true, if a register mapping for the received address and value
  *          was found.
  */
-bool        register_do_mapping     (uint16_t               uRemoteModuleAddr,
+/*bool        register_do_mapping     (uint16_t               uRemoteModuleAddr,
                                      uint8_t                uRemoteRegister,
                                      uint32_t               uValue)
 {
@@ -359,6 +385,6 @@ bool        register_do_mapping     (uint16_t               uRemoteModuleAddr,
         }
     }
     return retval;
-}
+}*/
 
 /** @} */

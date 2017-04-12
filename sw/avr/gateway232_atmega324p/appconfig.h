@@ -1,5 +1,6 @@
 /**
- * @addtogroup TESTSCHEDULER_APPCONFIG
+ * @addtogroup BUS_GATEWAY
+ * @addtogroup APPCONFIG
  * @brief Configuration of modules used in "testscheduler" project.
  *
  * @{
@@ -298,6 +299,8 @@ typedef enum appconfig {
 // --- Local variables ---------------------------------------------------------
 
 // --- Global variables --------------------------------------------------------
+
+extern const unsigned char app_versioninfo[];
 
 // --- Module global variables -------------------------------------------------
 

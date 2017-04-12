@@ -1,5 +1,5 @@
 /**
- * @addtogroup TESTPROTOCOL
+ * @addtogroup GATEWAY232
  * @addtogroup APPREGISTER
  * @brief Registers of the application testprotocol.
  *

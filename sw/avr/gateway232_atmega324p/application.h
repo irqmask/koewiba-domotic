@@ -1,5 +1,5 @@
 /**
- * @addtogroup TASTER8
+ * @addtogroup BUS_GATEWAY
  * @addtogroup APPLICATION
  * @brief Interface of the business logic of the application taster8.
  *

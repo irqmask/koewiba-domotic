@@ -17,27 +17,27 @@
  *
  */
 
-#ifndef ROUTER_H
-#define ROUTER_H
-
-#include <list>
-#include <stddef.h>
+#ifndef RCONNSERIAL_H
+#define RCONNSERIAL_H
 
 #include "routeconnection.h"
+#include "message_serial.h"
 
-class Router
+class RConnSerial : public RouteConnection
 {
 private:
-    std::list<RouteConnection*> connections;
+    msg_serial_t serial;
 
 public:
-    Router();
-    ~Router();
+    RConnSerial();
+    RConnSerial(ioloop_t* ioloop);
+    ~RConnSerial();
 
-    void AddConnection(RouteConnection* connection);
-    void RemoveConnection(RouteConnection* connection);
+    int Open(const char* device, int baudrate);
+    void Close();
 
-    void DistributeMessage(msg_t* message, RouteConnection* sender);
+    int Send(msg_t* message);
+    void OnIncommingMessage(msg_t* message);
 };
 
-#endif // ROUTER_H
+#endif // RCONNSERIAL_H

@@ -49,6 +49,7 @@ set (os_shared_SRCS
 
     ../shared/ioloop.c
     ../shared/log.c
+    ../shared/message.c
     ../shared/message_socket.c
 )
 

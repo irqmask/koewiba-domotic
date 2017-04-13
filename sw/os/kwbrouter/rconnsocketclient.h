@@ -17,27 +17,33 @@
  *
  */
 
-#ifndef ROUTER_H
-#define ROUTER_H
+#ifndef RCONNSOCKETCLIENT_H
+#define RCONNSOCKETCLIENT_H
 
-#include <list>
-#include <stddef.h>
+#include "message_socket.h"
 
 #include "routeconnection.h"
 
-class Router
+class RConnSocketClient : public RouteConnection
 {
 private:
-    std::list<RouteConnection*> connections;
+    ioloop_t*       ioloop;
+    msg_endpoint_t* ep;
+    msg_socket_t*   socket;
+    msg_socket_t    local_socket;
+
 
 public:
-    Router();
-    ~Router();
+    RConnSocketClient();
+    RConnSocketClient(msg_socket_t* server, msg_endpoint_t* ep, const char* address, uint16_t port);
+    ~RConnSocketClient();
 
-    void AddConnection(RouteConnection* connection);
-    void RemoveConnection(RouteConnection* connection);
+    int Open(const char* address, int port);
+    void Close();
 
-    void DistributeMessage(msg_t* message, RouteConnection* sender);
+    int Send(msg_t* message);
+    void OnMessageReceived(msg_t* message);
+    void OnConnectionClosed();
 };
 
-#endif // ROUTER_H
+#endif // RCONNSOCKETCLIENT_H

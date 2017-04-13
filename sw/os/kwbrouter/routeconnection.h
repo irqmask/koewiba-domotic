@@ -17,27 +17,34 @@
  *
  */
 
-#ifndef ROUTER_H
-#define ROUTER_H
+#ifndef ROUTECONNECTION_H
+#define ROUTECONNECTION_H
 
-#include <list>
-#include <stddef.h>
+#include "ioloop.h"
+#include "message.h"
 
-#include "routeconnection.h"
-
-class Router
+class RouteConnection
 {
-private:
-    std::list<RouteConnection*> connections;
+protected:
+    msg_incom_func_t    extOnIncommingMsg;
+    void*               extOnIncommingMsgArg;
+    msg_conn_func_t     extOnConnectionClosed;
+    void*               extOnConnectionClosedArg;
+    ioloop_t*           ioloop;
 
 public:
-    Router();
-    ~Router();
+    RouteConnection();
+    ~RouteConnection();
 
-    void AddConnection(RouteConnection* connection);
-    void RemoveConnection(RouteConnection* connection);
+    void SetIncommingHandler(msg_incom_func_t func, void* arg);
+    void ClearIncommingHandler();
+    void OnIncommingMessage(msg_t* message);
 
-    void DistributeMessage(msg_t* message, RouteConnection* sender);
+    void SetConnectionHandler(msg_conn_func_t func, void* arg);
+    void ClearConnectionHandler();
+    virtual void OnConnectionClosed();
+
+    virtual int Send(msg_t* message);
 };
 
-#endif // ROUTER_H
+#endif // ROUTECONNECTION_H

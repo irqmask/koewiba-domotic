@@ -1,3 +1,21 @@
+/*
+ * kwbkouter - A router for koewiba-domotic messages.
+ * Copyright (C) 2017  christian <irqmask@gmx.de>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
 /**
  * @addtogroup KWBROUTER
  *
@@ -18,24 +36,29 @@
 #include "prjconf.h"
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
+
+extern "C" {
+#include "safe_lib.h"
+}
 
 // include
 #include "prjtypes.h"
 
-// shared
-#include "bus.h"
-
 // os/libsystem
-
 #include "sysgetopt.h"
 
 // os/shared
 #include "ioloop.h"
-#include "message_bus.h"
-#include "message_socket.h"
+#include "log.h"
 
 #include "router.h"
+#include "rconnserial.h"
+#include "rconnsocketclient.h"
+#include "socketserver.h"
+
+using namespace std;
 
 // --- Definitions -------------------------------------------------------------
 
@@ -46,12 +69,9 @@ typedef struct options {
     int         serial_baudrate;
     char        router_address[256];
     uint16_t    router_port;
-    char        vbusd_address[256];
-    uint16_t    vbusd_port;
     bool        serial_device_set;
     bool        router_address_set;
-    bool        vbusd_address_set;
-    uint16_t    own_node_address;
+
 } options_t;
 
 // --- Local variables ---------------------------------------------------------
@@ -62,28 +82,11 @@ typedef struct options {
 
 // --- Local functions ---------------------------------------------------------
 
-static void handle_new_connection (char* address, uint16_t port, void* reference, void* arg)
-{
-    router_t*        router = (router_t*)arg;
-    printf("add route %s:%d ep %p\n", address, port, (void*)reference);
-    route_add(router, 1, 65525, address, port, eROUTE_TYPE_SOCKET, reference);
-}
-
-static void handle_incomming_msg (msg_t* message, void* reference, void* arg)
-{
-    router_t*        router = (router_t*)arg;
-    printf("message received.\n");
-    route_message(router, message, reference);
-}
-
 static void set_options (options_t*     options,
                          const char*    serial_device,
                          int            serial_baudrate,
                          const char*    router_address,
-                         uint16_t       router_port,
-                         const char*    vbusd_address,
-                         uint16_t       vbusd_port,
-                         uint16_t       own_node_address)
+                         uint16_t       router_port)
 {
     memset(options, 0, sizeof(options_t));
 
@@ -95,11 +98,6 @@ static void set_options (options_t*     options,
         strcpy_s(options->router_address, sizeof(options->router_address), router_address);
     }
     options->router_port = router_port;
-    if (vbusd_address != NULL) {
-        strcpy_s(options->vbusd_address, sizeof(options->vbusd_address), vbusd_address);
-    }
-    options->vbusd_port = vbusd_port;
-    options->own_node_address = own_node_address;
 }
 
 static bool parse_commandline_options (int argc, char* argv[], options_t* options)
@@ -130,17 +128,7 @@ static bool parse_commandline_options (int argc, char* argv[], options_t* option
             printf("router port %s\n", optarg);
             options->router_port = atoi(optarg);
             break;
-        case 'v':
-            printf("vbusd address %s\n", optarg);
-            strcpy_s(options->vbusd_address, sizeof(options->vbusd_address), optarg);
-            options->vbusd_address_set = true;
-            break;
-        case 'w':
-            printf("vbusd port %s\n", optarg);
-            options->vbusd_port = atoi(optarg);
-            break;
-        case 'n':
-            options->own_node_address = atoi(optarg);
+
         default:
             rc = false;
             break;
@@ -166,23 +154,7 @@ static bool validate_options(options_t* options)
             fprintf(stderr, "Invalid serial device path!\n");
             break;
         }
-        if (options->vbusd_address_set &&
-            strnlen(options->vbusd_address, sizeof(options->vbusd_address)) < 2) {
-            fprintf(stderr, "Invalid vbusd address!\n");
-            break;
-        }
 
-        if (options->serial_device_set && options->vbusd_address_set) {
-            fprintf(stderr, "vbusd address and serial device at the same time not allowed!\n");
-            break;
-        }
-
-        if (options->own_node_address == 0 || options->own_node_address == 65535) {
-            fprintf(stderr, "Only node addresses from 1 to 65534 allowed!\n");
-            break;
-        }
-        // activate standard vbusd connection if serial path is not given
-        if (!options->serial_device_set) options->vbusd_address_set = true;
         rc = true;
     } while (0);
     return rc;
@@ -196,10 +168,7 @@ static void print_usage (void)
     printf(" -a <address>        Address of kwbrouter server. Default: /tmp/kwbr.usk\n");
     printf(" -p <port>           Port number of kwbrouter server. Default: 0\n");
     printf(" -d <device>         Device of serial bus connection.\n");
-    printf(" -b <baudrate>       Baudrate of serial bus connection. Default: 38400\n");
-    printf(" -v <vbusd address>  Address of vbusd. Default: /tmp/vbusd.usk\n");
-    printf(" -w <vbusd port>     Port number of vbusd. Default: 0\n");
-    printf(" -n <node address>   Own node address with which the kwbrouter appears on the bus.\n");
+    printf(" -b <baudrate>       Baudrate of serial bus connection. Default: 57600\n");
 }
 
 // --- Module global functions -------------------------------------------------
@@ -212,26 +181,17 @@ int main (int argc, char* argv[])
     bool            end_application = false;
     options_t       options;
     ioloop_t        mainloop;
-    msg_socket_t    msg_socket;
-    msg_bus_t       msg_bus;
-    msg_endpoint_t* ep;
-    router_t        router;
-    char*           address;
-    uint16_t        port;
-    bool            serial;
 
     do {
         printf("\nkwbrouter...\n");
 
         // set default options for kwbrouter
         set_options(&options,
-                    "",                 // no serial device, use vbusd as default
-                    38400,              // baudrate, if not given
-                    "/tmp/kwbr.usk",    // default address of vbusd socket
-                    0,                  // port 0: use unix sockets
-                    "/tmp/vbusd.usk",   // default address of vbusd socket
-                    0,                  // port 0: use unix sockets
-                    2);                 // own node address
+                    "",                 // no serial device
+                    57600,              // baudrate, if not given
+                    "/tmp/kwbr.usk",    // default address of kwbrouter socket
+                    0);                 // port 0: use unix sockets
+
         // parse and validate commandline options
         if (parse_commandline_options(argc, argv, &options) == false ||
             validate_options(&options) == false) {
@@ -239,7 +199,24 @@ int main (int argc, char* argv[])
             rc = eERR_BAD_PARAMETER;
             break;
         }
+
+        // all logs on
+        log_set_mask(0xFFFFFFFF);
+
         ioloop_init(&mainloop);
+
+        Router* router = new Router();
+
+        RConnSerial* serconn = new RConnSerial(&mainloop);
+        serconn->Open("/dev/ttyUSB0", 57600);
+        router->AddConnection(serconn);
+
+        // open new server and let-every connection auto-connect to router
+        SocketServer* server = new SocketServer(&mainloop, router);
+        server->Open(options.router_address, options.router_port);
+
+       // RConnSocketServer server = new
+ /*
         route_init(&router);
 
         // initialize network routing
@@ -268,11 +245,20 @@ int main (int argc, char* argv[])
         if (rc != eERR_NONE) break;
         msg_b_set_incomming_handler(&msg_bus, handle_incomming_msg, &router);
         route_add(&router, 1, 65535, address, port, eROUTE_TYPE_SERIAL, &msg_bus);
-
+*/
         printf("entering mainloop...\n");
         while (!end_application) {
             ioloop_run_once(&mainloop);
         }
+
+        server->Close();
+        delete server;
+
+        router->RemoveConnection(serconn);
+        serconn->Close();
+        delete serconn;
+
+        delete router;
     } while (0);
     return rc;
 }

@@ -78,7 +78,7 @@ void log_add_mask (log_mask_t logmask)
  * Log a message if there are matches between the message logmask and the
  * global active logmask.
  */
-void log_msg (log_mask_t logmask, char* logmessage, ...)
+void log_msg (log_mask_t logmask, const char* logmessage, ...)
 {
     va_list args;
 
@@ -95,7 +95,7 @@ void log_msg (log_mask_t logmask, char* logmessage, ...)
     }
 }
 
-void log_warning(char* logmessage, ...)
+void log_warning(const char* logmessage, ...)
 {
     va_list args;
 
@@ -108,7 +108,7 @@ void log_warning(char* logmessage, ...)
     }
 }
 
-void log_error (char* logmessage, ...)
+void log_error (const char* logmessage, ...)
 {
     va_list args;
 
@@ -121,7 +121,7 @@ void log_error (char* logmessage, ...)
     }
 }
 
-void log_sys_error (char* logmessage, ...)
+void log_sys_error (const char* logmessage, ...)
 {
     va_list args;
 

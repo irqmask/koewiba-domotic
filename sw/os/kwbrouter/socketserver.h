@@ -1,5 +1,5 @@
 /*
- * kwbkouter - A router for koewiba-domotic messages.
+ * <one line to give the program's name and a brief idea of what it does.>
  * Copyright (C) 2017  christian <irqmask@gmx.de>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,27 +17,35 @@
  *
  */
 
-#ifndef ROUTER_H
-#define ROUTER_H
+#ifndef SOCKETSERVER_H
+#define SOCKETSERVER_H
 
 #include <list>
-#include <stddef.h>
 
-#include "routeconnection.h"
+#include "message_socket.h"
 
-class Router
+#include "rconnsocketclient.h"
+#include "router.h"
+
+class SocketServer
 {
 private:
-    std::list<RouteConnection*> connections;
+    std::list<RConnSocketClient*> clients;
+    ioloop_t*                   ioloop;
+    Router*                     router;
+    msg_socket_t                server;
 
 public:
-    Router();
-    ~Router();
+    SocketServer();
+    SocketServer(ioloop_t* iol);
+    SocketServer(ioloop_t* iol, Router* r);
+    ~SocketServer();
 
-    void AddConnection(RouteConnection* connection);
-    void RemoveConnection(RouteConnection* connection);
+    int Open(const char* address, uint16_t port);
+    void Close();
 
-    void DistributeMessage(msg_t* message, RouteConnection* sender);
+    void OnNewConnection(msg_endpoint_t* endpoint);
+    void OnCloseConnection(RConnSocketClient* client);
 };
 
-#endif // ROUTER_H
+#endif // SOCKETSERVER_H

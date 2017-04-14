@@ -71,6 +71,7 @@ typedef struct options {
 
 struct mosquitto*   g_mosq = NULL;
 msg_socket_t        g_kwb_socket;
+msg_endpoint_t*     g_kwb_socket_ep;
 bool                g_end_application = false;
 
 // --- Module global variables -------------------------------------------------
@@ -87,11 +88,8 @@ extern int msg2mqtt(msg_t* message,
 
 extern int mqtt2msg_subscribe(struct mosquitto* mosq);
 
-extern int mqtt_split_topic(char* topic,
-                            uint16_t* sender,
-                            uint16_t* receiver,
-                            char** msgtype,
-                            char** remaining_topic);
+extern int mqtt2msg(char* topic, char* msgtext, msg_t* message);
+
 
 static void set_options (options_t*     options,
                          const char*    router_address,
@@ -167,8 +165,14 @@ static void log_mqtt_version(void)
 
 void on_mqtt_message(void *userdata, const struct mosquitto_message *message)
 {
-    if (message->payloadlen){
+    msg_t kwbmsg;
+
+    if (message->payloadlen) {
         log_msg(LOG_STATUS, "MQTT %s %s\n", message->topic, message->payload);
+        memset(&kwbmsg, 0, sizeof(kwbmsg));
+        if (mqtt2msg(message->topic, message->payload, &kwbmsg) == eERR_NONE) {
+            msg_s_send(g_kwb_socket_ep, &kwbmsg);
+        }
     } else {
         log_msg(LOG_STATUS, "MQTT %s (null)\n", message->topic);
     }
@@ -179,7 +183,7 @@ void on_mqtt_connect(void *userdata, int result)
     if (!result) {
         log_msg(LOG_STATUS, "MQTT connected. Result %d", result);
         /* Subscribe to broker information topics on successful connect. */
-        mosquitto_subscribe(g_mosq, NULL, "$SYS/#", 2);
+        mqtt2msg_subscribe(g_mosq);
     } else {
         log_msg(LOG_ERROR, "MQTT connection failed! Result %d", result);
     }
@@ -248,8 +252,8 @@ int kwb_socket_setup(ioloop_t* ioloop, options_t* options)
         if ((retval = msg_s_open_client(&g_kwb_socket, ioloop, "/tmp/kwbr.usk", 0)) != eERR_NONE) {
             break;
         }
-        msg_ep = msg_s_get_endpoint(&g_kwb_socket, 0, 0);
-        msg_s_set_closeconnection_handler(msg_ep, on_kwb_close_connection, NULL);
+        g_kwb_socket_ep = msg_s_get_endpoint(&g_kwb_socket, 0, 0);
+        msg_s_set_closeconnection_handler(g_kwb_socket_ep, on_kwb_close_connection, NULL);
     } while (0);
 
     return retval;
@@ -264,21 +268,9 @@ int main (int argc, char* argv[])
     int             mid, rc = eERR_NONE;
     options_t       options;
     ioloop_t        mainloop;
-    uint16_t sender = 0, receiver = 0;
-    char topic[256], *msgtype = NULL, *remaining_topic = NULL;
 
     do {
         printf("\nkwbmqttgateway...\n");
-        strncpy(topic, "kwb/0000/0022/state8bit/aa", sizeof(topic)-1);
-        mqtt_split_topic(topic, &sender, &receiver, &msgtype, &remaining_topic);
-        strncpy(topic, "kwb/0440/0022/state8bit/4", sizeof(topic)-1);
-        mqtt_split_topic(topic, &sender, &receiver, &msgtype, &remaining_topic);
-        strncpy(topic, "kwb/0000/b/state8bit/a", sizeof(topic)-1);
-        mqtt_split_topic(topic, &sender, &receiver, &msgtype, &remaining_topic);
-        strncpy(topic, "kwb/a/0022/state8bit", sizeof(topic)-1);
-        mqtt_split_topic(topic, &sender, &receiver, &msgtype, &remaining_topic);
-        strncpy(topic, "kwb/z/0022/state8bit/aa", sizeof(topic)-1);
-        mqtt_split_topic(topic, &sender, &receiver, &msgtype, &remaining_topic);
 
         // set default options for nkwbmqttgateway
         set_options(&options,
@@ -303,9 +295,6 @@ int main (int argc, char* argv[])
         if (rc != eERR_NONE) break;
 
         rc = kwb_socket_setup(&mainloop, &options);
-        if (rc != eERR_NONE) break;
-
-        rc = mqtt2msg_subscribe(g_mosq);
         if (rc != eERR_NONE) break;
 
         printf("entering mainloop...\n");

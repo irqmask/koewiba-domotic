@@ -65,6 +65,7 @@ typedef struct _mqtt_message_types {
 int mqtt2msg_state_8bit(char* topic, char* msgtext, msg_t* message);
 int mqtt2msg_state_16bit(char* topic, char* msgtext, msg_t* message);
 int mqtt2msg_state_32bit(char* topic, char* msgtext, msg_t* message);
+int mqtt2msg_request_reg(char* topic, char* msgtext, msg_t* message);
 int mqtt2msg_setreg_8bit(char* topic, char* msgtext, msg_t* message);
 int mqtt2msg_setreg_16bit(char* topic, char* msgtext, msg_t* message);
 int mqtt2msg_setreg_32bit(char* topic, char* msgtext, msg_t* message);
@@ -73,6 +74,7 @@ mqtt_msg_types_t g_mqtt_msg_types[] = {
     "state8bit", "kwb/+/+/state8bit/#", mqtt2msg_state_8bit,
     "state16bit", "kwb/+/+/state16bit/#", mqtt2msg_state_16bit,
     "state32bit", "kwb/+/+/state32bit/#", mqtt2msg_state_32bit,
+    "requestreg", "kwb/+/+/requestreg", mqtt2msg_request_reg,
     "setreg8bit", "kwb/+/+/setreg8bit/#", mqtt2msg_setreg_8bit,
     "setreg16bit", "kwb/+/+/setreg16bit/#", mqtt2msg_setreg_16bit,
     "setreg32bit", "kwb/+/+/setreg32bit/#", mqtt2msg_setreg_32bit,
@@ -139,7 +141,7 @@ int mqtt2msg_state_8bit(char* topic, char* msgtext, msg_t* message)
         }
         message->data[1] = value;
 
-        value = strtoul(topic, NULL, 16);
+        value = strtoul(msgtext, NULL, 16);
         if (value > UCHAR_MAX || errno != 0) {
             retval = eERR_UNKNOWN_MESSAGE;
             break;
@@ -152,30 +154,157 @@ int mqtt2msg_state_8bit(char* topic, char* msgtext, msg_t* message)
 int mqtt2msg_state_16bit(char* topic, char* msgtext, msg_t* message)
 {
     int retval = eERR_NONE;
+    uint32_t value;
+
+    do {
+        message->length = 4;
+        message->data[0] = eCMD_STATE_16BIT;
+
+        value = strtoul(topic, NULL, 16);
+        if (value > UCHAR_MAX || errno != 0) {
+            retval = eERR_UNKNOWN_MESSAGE;
+            break;
+        }
+        message->data[1] = value;
+
+        value = strtoul(msgtext, NULL, 16);
+        if (value > USHRT_MAX || errno != 0) {
+            retval = eERR_UNKNOWN_MESSAGE;
+            break;
+        }
+        message->data[2] = (value >> 8) & 0x000000FF;
+        message->data[3] = value & 0x000000FF;
+    } while (0);
     return retval;
 }
 
 int mqtt2msg_state_32bit(char* topic, char* msgtext, msg_t* message)
 {
     int retval = eERR_NONE;
+    uint32_t value;
+
+    do {
+        message->length = 6;
+        message->data[0] = eCMD_STATE_16BIT;
+
+        value = strtoul(topic, NULL, 16);
+        if (value > UCHAR_MAX || errno != 0) {
+            retval = eERR_UNKNOWN_MESSAGE;
+            break;
+        }
+        message->data[1] = value;
+
+        value = strtoul(msgtext, NULL, 16);
+        if (value > UINT_MAX || errno != 0) {
+            retval = eERR_UNKNOWN_MESSAGE;
+            break;
+        }
+        message->data[2] = (value >> 24) & 0x000000FF;
+        message->data[3] = (value >> 16) & 0x000000FF;
+        message->data[4] = (value >> 8) & 0x000000FF;
+        message->data[5] = value & 0x000000FF;
+    } while (0);
+    return retval;
+}
+
+int mqtt2msg_request_reg(char* topic, char* msgtext, msg_t* message)
+{
+    int retval = eERR_NONE;
+    uint32_t value;
+
+    do {
+        message->length = 2;
+        message->data[0] = eCMD_REQUEST_REG;
+
+        value = strtoul(msgtext, NULL, 16);
+        if (value > UCHAR_MAX || errno != 0) {
+            retval = eERR_UNKNOWN_MESSAGE;
+            break;
+        }
+        message->data[1] = value;
+    } while (0);
     return retval;
 }
 
 int mqtt2msg_setreg_8bit(char* topic, char* msgtext, msg_t* message)
 {
     int retval = eERR_NONE;
+    uint32_t value;
+
+    do {
+        message->length = 3;
+        message->data[0] = eCMD_SET_REG_8BIT;
+
+        value = strtoul(topic, NULL, 16);
+        if (value > UCHAR_MAX || errno != 0) {
+            retval = eERR_UNKNOWN_MESSAGE;
+            break;
+        }
+        message->data[1] = value;
+
+        value = strtoul(msgtext, NULL, 16);
+        if (value > UCHAR_MAX || errno != 0) {
+            retval = eERR_UNKNOWN_MESSAGE;
+            break;
+        }
+        message->data[2] = value;
+    } while (0);
     return retval;
 }
 
 int mqtt2msg_setreg_16bit(char* topic, char* msgtext, msg_t* message)
 {
     int retval = eERR_NONE;
+    uint32_t value;
+
+    do {
+        message->length = 4;
+        message->data[0] = eCMD_SET_REG_16BIT;
+
+        value = strtoul(topic, NULL, 16);
+        if (value > UCHAR_MAX || errno != 0) {
+            retval = eERR_UNKNOWN_MESSAGE;
+            break;
+        }
+        message->data[1] = value;
+
+        value = strtoul(msgtext, NULL, 16);
+        if (value > USHRT_MAX || errno != 0) {
+            retval = eERR_UNKNOWN_MESSAGE;
+            break;
+        }
+        message->data[2] = (value >> 8) & 0x000000FF;
+        message->data[3] = value & 0x000000FF;
+    } while (0);
     return retval;
 }
 
 int mqtt2msg_setreg_32bit(char* topic, char* msgtext, msg_t* message)
 {
     int retval = eERR_NONE;
+    uint32_t value;
+
+    do {
+        message->length = 6;
+        message->data[0] = eCMD_SET_REG_32BIT;
+
+        value = strtoul(topic, NULL, 16);
+        if (value > UCHAR_MAX || errno != 0) {
+            retval = eERR_UNKNOWN_MESSAGE;
+            break;
+        }
+        message->data[1] = value;
+
+        value = strtoul(msgtext, NULL, 16);
+        if (value > UINT_MAX || errno != 0) {
+            retval = eERR_UNKNOWN_MESSAGE;
+            break;
+        }
+        message->data[2] = (value >> 24) & 0x000000FF;
+        message->data[3] = (value >> 16) & 0x000000FF;
+        message->data[4] = (value >> 8) & 0x000000FF;
+        message->data[5] = value & 0x000000FF;
+    } while (0);
     return retval;
 }
 
@@ -195,6 +324,7 @@ int mqtt2msg_subscribe(struct mosquitto* mosq)
                       msg_types->topic, mrc);
             break;
         }
+        log_msg(LOG_STATUS, "mosquitto_subscribe() sucessfully subscribed %s", msg_types->topic);
         msg_types++;
     }
     if (mrc != MOSQ_ERR_SUCCESS) {
@@ -221,10 +351,10 @@ int mqtt2msg(char* topic, char* msgtext, msg_t* message)
             if (strcasecmp(msgtype, msg_types->msgtype) == 0) {
                 message->sender = sender;
                 message->receiver = receiver;
-                msg_types->func(remaining_topic, msgtext, message);
-                retval = eERR_NONE;
+                retval = msg_types->func(remaining_topic, msgtext, message);
                 break;
             }
+            msg_types++;
         }
     } while (0);
     return retval;

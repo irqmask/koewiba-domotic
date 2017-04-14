@@ -100,7 +100,6 @@ void ioloop_set_default_timeout (ioloop_t* ioloop,
 int32_t ioloop_register_timer (ioloop_t*            ioloop,
                                uint16_t             interval_ticks,
                                bool                 run_cyclic,
-                               ioloop_event_type_t  eventtype,
                                ioloop_event_func_t  callback,
                                void*                arg);
 

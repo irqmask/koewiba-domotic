@@ -34,7 +34,10 @@ typedef enum {
     eERR_SYSTEM,
     eERR_BAD_PARAMETER,
     eERR_INVALID_FD,
-    eERR_PROCESS_FAILED
+    eERR_PROCESS_FAILED,
+    eERR_3RD_PARTY_FUNC_FAILED,
+    eERR_UNSUPPORTED_MESSAGE,
+    eERR_UNKNOWN_MESSAGE
 } gen_errors_t;
 
 // --- Local variables ---------------------------------------------------------

@@ -73,7 +73,7 @@ int main (int argc, char* argv[])
     int             rc = eERR_NONE;
     ioloop_t        mainloop;
     msg_socket_t    msg_socket;
-
+    msg_endpoint_t* msg_ep;
 
     do {
         printf("\nkwbtest...\n");
@@ -82,10 +82,11 @@ int main (int argc, char* argv[])
 
         msg_s_init(&msg_socket);
         msg_s_set_incomming_handler(&msg_socket, handle_message, NULL);
-        msg_s_set_closeconnection_handler(&msg_socket, on_close_connection);
         if ((rc = msg_s_open_client(&msg_socket, &mainloop, "/tmp/kwbr.usk", 0)) != eERR_NONE) {
             break;
         }
+        msg_ep = msg_s_get_endpoint(&msg_socket, 0, 0);
+        msg_s_set_closeconnection_handler(msg_ep, on_close_connection, NULL);
         printf("entering mainloop...\n");
         while (!g_end_application) {
             ioloop_run_once(&mainloop);

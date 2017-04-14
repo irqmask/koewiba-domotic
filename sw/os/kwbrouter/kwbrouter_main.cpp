@@ -171,6 +171,14 @@ static void print_usage (void)
     printf(" -b <baudrate>       Baudrate of serial bus connection. Default: 57600\n");
 }
 
+static void create_unix_socket_file(options_t* options)
+{
+    FILE* file_handle;
+
+    file_handle = fopen(options->router_address, "w+");
+    if (file_handle != NULL) fclose(file_handle);
+}
+
 // --- Module global functions -------------------------------------------------
 
 // --- Global functions --------------------------------------------------------
@@ -212,6 +220,7 @@ int main (int argc, char* argv[])
         router->AddConnection(serconn);
 
         // open new server and let-every connection auto-connect to router
+        create_unix_socket_file(&options);
         SocketServer* server = new SocketServer(&mainloop, router);
         server->Open(options.router_address, options.router_port);
 

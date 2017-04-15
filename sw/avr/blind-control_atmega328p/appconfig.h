@@ -38,7 +38,7 @@ typedef enum appregisters {
     APP_eReg_ReactionDelay,     //!< Delay time in timer ticks (1/100sec) until movement starts after applying power.
     APP_eReg_DurationOpen,      //!< Duration in timer ticks (1/100sec) to fully open the blind.
     APP_eReg_DurationClose,     //!< Duration in timer ticks (1/100sec) to fully close the blind.
-
+    APP_eReg_WindowState,       //!< State of the window
     // insert application specific registers here
     APP_eReg_Last
 } eRegisters_t;

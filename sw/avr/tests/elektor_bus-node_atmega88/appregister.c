@@ -78,26 +78,19 @@ void        app_register_set        (uint8_t                uRegNo,
                                      uint32_t               uValue)
 {
     uint16_t    tempval16;
-    uint8_t     tempval, index;
+    uint8_t     tempval;
 
     tempval16 = (uint16_t)(uValue & 0x0000FFFF);
     tempval = (uint8_t)(uValue & 0x000000FF);
 
-    // registers saved in EEProm
-    if (uRegNo >= APP_eReg_RemoteAddr00 && uRegNo <= APP_eReg_RemoteAddr31) {
-        index = (uRegNo - APP_eReg_RemoteAddr00) * 2;
-        index += APP_eCfg_RemoteAddr00;
-        eeprom_write_word((uint16_t*)&register_eeprom_array[index], tempval16);
-    }
-    else if (uRegNo >= APP_eReg_RemoteReg00 && uRegNo <= APP_eReg_RemoteReg31) {
-        index = uRegNo - APP_eReg_RemoteReg00;
-        index += APP_eCfg_RemoteReg00;
-        eeprom_write_byte(&register_eeprom_array[index], tempval);
-    }
-    else if (uRegNo >= APP_eReg_TargetReg00 && uRegNo <= APP_eReg_TargetReg31) {
-        index = uRegNo - APP_eReg_TargetReg00;
-        index += APP_eCfg_TargetReg00;
-        eeprom_write_byte(&register_eeprom_array[index], tempval);
+    switch(uRegNo) {
+    case MOD_eReg_FirstAppSpecific:
+        if (tempval != 0) {
+            PORTD |= (1<<LED_STATUS);
+        } else {
+            PORTD &= ~(1<<LED_STATUS);
+        }
+        break;
     }
     // registers in ROM/RAM
 }

@@ -226,6 +226,7 @@ int msg2mqtt(msg_t* message, char* topic, size_t max_topic_len, char* msgtext, s
         msg_log(*message);
         break;
     }
+    return retval;
 }
 
 /** @} */

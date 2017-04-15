@@ -17,6 +17,8 @@
  *
  */
 
+#include <string.h>
+
 #include "log.h"
 
 #include "rconnsocketclient.h"
@@ -42,6 +44,8 @@ RConnSocketClient::RConnSocketClient() : ep(NULL),
 {
     msg_s_init(&this->local_socket);
     this->socket = &this->local_socket;
+    memset(this->name, 0, sizeof(name));
+    snprintf(name, sizeof(name-1), "USOCK");
 }
 
 RConnSocketClient::RConnSocketClient(msg_socket_t* server, msg_endpoint_t* ep, const char* address, uint16_t port)
@@ -49,6 +53,8 @@ RConnSocketClient::RConnSocketClient(msg_socket_t* server, msg_endpoint_t* ep, c
     this->socket = server;
     this->ep = ep;
     this->ioloop = server->ioloop;
+    memset(this->name, 0, sizeof(name));
+    snprintf(name, sizeof(name-1), "USOCK");
     msg_s_set_incomming_handler(this->socket, incommingMessageHdl, this);
     msg_s_set_closeconnection_handler(ep, closeConnectionHdl, this);
     log_msg(LOG_STATUS, "New socket connection %s:%d", address, port);
@@ -83,6 +89,8 @@ void RConnSocketClient::Close()
 
 int RConnSocketClient::Send(msg_t* message)
 {
+    log_msg(LOG_VERBOSE1, "%6s <-- message sent", this->GetName());
+    msg_log(*message);
     return msg_s_send(ep, message);
 }
 

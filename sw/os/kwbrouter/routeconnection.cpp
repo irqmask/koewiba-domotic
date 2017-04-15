@@ -17,6 +17,7 @@
  *
  */
 
+#include <string.h>
 #include "log.h"
 
 #include "routeconnection.h"
@@ -26,10 +27,17 @@ RouteConnection::RouteConnection() : extOnIncommingMsg((msg_incom_func_t)NULL),
                                      extOnIncommingMsgArg(NULL),
                                      ioloop((ioloop_t*)NULL)
 {
+    memset(this->name, 0, sizeof(name));
+    snprintf(name, sizeof(name-1), "RC");
 }
 
 RouteConnection::~RouteConnection()
 {
+}
+
+const char* RouteConnection::GetName()
+{
+    return this->name;
 }
 
 void RouteConnection::SetIncommingHandler(msg_incom_func_t func, void* arg)
@@ -46,12 +54,14 @@ void RouteConnection::ClearIncommingHandler()
 
 int RouteConnection::Send(msg_t* message)
 {
+    log_msg(LOG_VERBOSE1, "%6s <-- message sent", this->GetName());
+    msg_log(*message);
     return 0;
 }
 
 void RouteConnection::OnIncommingMessage(msg_t* message)
 {
-    log_msg(LOG_STATUS, "Client received message");
+    log_msg(LOG_VERBOSE1, "%6s --> message received", this->GetName());
     msg_log(*message);
     if (this->extOnIncommingMsg != NULL) {
         this->extOnIncommingMsg(message, this, this->extOnIncommingMsgArg);

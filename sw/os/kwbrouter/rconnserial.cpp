@@ -17,6 +17,10 @@
  *
  */
 
+#include <string.h>
+
+#include "log.h"
+
 #include "rconnserial.h"
 
 // --- Local functions ---------------------------------------------------------
@@ -29,14 +33,18 @@ static void incommingMessageHdl(msg_t* message, void* reference, void* arg)
 
 // --- Class member functions --------------------------------------------------
 
-RConnSerial::RConnSerial() : RouteConnection()
+RConnSerial::RConnSerial()
 {
     msg_ser_init(&this->serial);
+    memset(this->name, 0, sizeof(name));
+    snprintf(this->name, sizeof(name-1), "SERIAL");
 }
 
 RConnSerial::RConnSerial(ioloop_t* ioloop)
 {
-    RConnSerial();
+    msg_ser_init(&this->serial);
+    memset(this->name, 0, sizeof(name));
+    snprintf(this->name, sizeof(name-1), "SERIAL");
     this->ioloop = ioloop;
 }
 
@@ -61,11 +69,15 @@ void RConnSerial::Close()
 
 int RConnSerial::Send(msg_t* message)
 {
+    log_msg(LOG_VERBOSE1, "%6s <-- message sent", this->GetName());
+    msg_log(*message);
     return msg_ser_send(&this->serial, message);
 }
 
 void RConnSerial::OnIncommingMessage(msg_t* message)
 {
+    log_msg(LOG_VERBOSE1, "%6s --> message received", this->GetName());
+    msg_log(*message);
     if (this->extOnIncommingMsg != NULL) {
         this->extOnIncommingMsg(message, this, this->extOnIncommingMsgArg);
     }

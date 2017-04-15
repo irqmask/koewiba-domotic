@@ -26,8 +26,6 @@
 
 void onIncommingMessage(msg_t* message, void* reference, void* arg)
 {
-    log_msg(LOG_STATUS, "Router received message");
-    msg_log(*message);
     Router* router = (Router*)arg;
     RouteConnection* sender = (RouteConnection*)reference;
     router->DistributeMessage(message, sender);

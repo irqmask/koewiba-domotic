@@ -31,10 +31,13 @@ protected:
     msg_conn_func_t     extOnConnectionClosed;
     void*               extOnConnectionClosedArg;
     ioloop_t*           ioloop;
+    char                name[32];
 
 public:
     RouteConnection();
     ~RouteConnection();
+
+    virtual const char* GetName();
 
     void SetIncommingHandler(msg_incom_func_t func, void* arg);
     void ClearIncommingHandler();

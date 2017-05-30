@@ -18,8 +18,12 @@
 
 #include "prjconf.h"
 
-#if defined (PRJCONF_WINDOWS)
-#include <windows.h>
+#if defined (PRJCONF_UNIX) || \
+defined (PRJCONF_POSIX) || \
+defined (PRJCONF_LINUX)
+  #include <safe_lib.h>
+#elif defined (PRJCONF_WINDOWS)
+  #include <windows.h>
 #endif
 
 #include "error_codes.h"
@@ -39,7 +43,7 @@
 
 typedef enum {
     eSYS_ERR_NONE = eERR_NONE,
-    
+
     eSYS_ERR_SER_UNSUPPORTED = 200,
     eSYS_ERR_SER_CONFIGURE,
 } sys_errors_t;

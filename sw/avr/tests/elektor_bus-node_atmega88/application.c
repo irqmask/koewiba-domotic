@@ -96,13 +96,11 @@ static void check_buttons (void)
         if (light)  light = 0;
         else        light = 1;
         
-        msg[0] = eCMD_STATE_BITFIELDS;
-        msg[1] = 1;
+        msg[0] = eCMD_SET_REG_8BIT;
+        msg[1] = MOD_eReg_FirstAppSpecific;
         msg[2] = light;
-        msg[3] = 0b00000001;
-        msglen = 4;
+        msglen = 3;
         bus_send_message(&g_bus, get_receiver(1), msglen, msg);
-        bus_send_message(&g_bus, get_receiver(2), msglen, msg);
     }
 }
 
@@ -148,7 +146,8 @@ void app_init (void)
 void app_on_command (uint16_t sender, uint8_t msglen, uint8_t* msg)
 {
     switch (msg[0]) {
-    case eCMD_STATE_BITFIELDS:
+    case eCMD_SET_REG_8BIT:
+        if (msg[1] != MOD_eReg_FirstAppSpecific) break;
         if (msglen < 2) break;
         if (msg[2] != 0) {
             PORTD |= (1<<LED_STATUS);

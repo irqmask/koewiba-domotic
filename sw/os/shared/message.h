@@ -18,6 +18,10 @@
 
 #include "bus.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // --- Definitions -------------------------------------------------------------
 
 #if (BUS_MAXSENDMSGLEN > BUS_MAXRECVMSGLEN)
@@ -42,6 +46,7 @@ typedef struct msg {
 } msg_t;
 
 typedef void (*msg_incom_func_t)(msg_t* message, void* reference, void* arg);
+typedef void (*msg_conn_func_t)(const char* address, uint16_t port, void* reference, void* arg);
 
 // --- Local variables ---------------------------------------------------------
 
@@ -56,6 +61,10 @@ typedef void (*msg_incom_func_t)(msg_t* message, void* reference, void* arg);
 // --- Global functions --------------------------------------------------------
 
 void msg_log (msg_t message);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _MESSAGE_H_ */
 /** @} */

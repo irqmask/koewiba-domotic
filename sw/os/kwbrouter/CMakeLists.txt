@@ -36,14 +36,6 @@ set (include_SRCS
     ../../include/prjtypes.h
 )
 
-set (shared_SRCS
-    ../../shared/bus.h
-    ../../shared/clock.h
-    ../../shared/bus_transport.c
-    ../../shared/crc16.c
-    ../../shared/queue.c
-)
-
 set (os_include_SRCS
     ../include/error_codes.h
 )
@@ -52,20 +44,25 @@ set (os_shared_SRCS
     ../shared/log.h
     ../shared/message.h
 
-    ../shared/bus_phy_os.c
-    ../shared/clock_os.c
     ../shared/ioloop.c
     ../shared/log.c
-    ../shared/message_bus.c
+    ../shared/message.c
+    ../shared/message_serial.c
     ../shared/message_socket.c
-    ../shared/vos.c
 )
 
 set (kwbrouter_SRCS
-    router.h
+    routeconnection.h
+    rconnserial.h
+    rconnsocketclient.h
 
-    kwbrouter_main.c
-    router.c
+    router.cpp
+    routeconnection.cpp
+    rconnserial.cpp
+    rconnsocketclient.cpp
+    socketserver.cpp
+
+    kwbrouter_main.cpp
 )
 
 # source groups
@@ -95,7 +92,7 @@ set_property(TARGET kwbrouter PROPERTY CXX_STANDARD 11)
 # Link libraries
 # ---------------------------------------------------------
 target_link_libraries (kwbrouter libsystem)
-#TODO needed target_link_libraries (kwbrouter jansson)
+
 if (WIN32)
 
 else (WIN32)

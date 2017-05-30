@@ -18,6 +18,7 @@ SRC = ../shared/bus_transport.c \
       shared/led_debug.c \
       shared/main_avr.c \
       shared/register.c \
+      shared/sleepmode.c \
       basic_app_atmega324p/application.c \
       basic_app_atmega324p/appregister.c \
       basic_app_atmega324p/appversion.c

@@ -4,4 +4,5 @@ Revision 1:
 - Footprint for TVS-Diode (D2) is too big.
 - Fuse in 24V branch is missing.
 - ISP too close to WAGO clamps.
+- 24V is missing on J1 and/or J2
 

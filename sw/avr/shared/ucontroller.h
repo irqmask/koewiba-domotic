@@ -81,6 +81,8 @@
  #define INTERRUPT_USART_RXC0    USART_RX_vect
  #define INTERRUPT_USART_UDRE0   USART_UDRE_vect
  #define INTERRUPT_UART_TRANS0   USART_TX_vect
+ #define INTERRUPT_PINCHANGE0    PCINT0_vect
+ #define INTERRUPT_PINCHANGE1    PCINT1_vect
  #define INTERRUPT_PINCHANGE2    PCINT2_vect
  #define INTERRUPT_SPI           SPI_STC_vect
 
@@ -140,6 +142,8 @@
  #define INTERRUPT_USART_RXC0    USART_RX_vect
  #define INTERRUPT_USART_UDRE0   USART_UDRE_vect
  #define INTERRUPT_UART_TRANS0   USART_TX_vect
+ #define INTERRUPT_PINCHANGE0    PCINT0_vect
+ #define INTERRUPT_PINCHANGE1    PCINT1_vect
  #define INTERRUPT_PINCHANGE2    PCINT2_vect
  #define INTERRUPT_SPI           SPI_STC_vect
 
@@ -174,7 +178,7 @@
  #define ADDR_SIGNATURE_BYTE2   4
  #define SIGRD 5 // workaround for missing define in avr-headers
 
-#elif defined (__AVR_ATmega324P__) || defined (__AVR_ATmega324A__)
+#elif defined (__AVR_ATmega324P__) || defined (__AVR_ATmega324A__) || defined (__AVR_ATmega324PA__)
  // definition of processor depending global settings
  // TODO CV: this part can be ported maybe to a makefile include
  #define STARTADDR_APPVECTORS   0x0000
@@ -216,9 +220,10 @@
  #define INTERRUPT_USART_UDRE1  USART1_UDRE_vect
  #define INTERRUPT_UART_TRANS1  USART1_TX_vect
 
- // Sleepmodes
+ // Sleep-Modes
+ #define INTERRUPT_PINCHANGE0   PCINT0_vect
+ #define INTERRUPT_PINCHANGE1   PCINT1_vect
  #define INTERRUPT_PINCHANGE2   PCINT2_vect
-
  // SPI0
  #define INTERRUPT_SPI          SPI_STC_vect
 
@@ -340,6 +345,8 @@
  #define INTERRUPT_UART_TRANS0  USART0_TX_vect
  #define INTERRUPT_UART_TRANS1  USART1_TX_vect
  // Sleepmodes
+ #define INTERRUPT_PINCHANGE0   PCINT0_vect
+ #define INTERRUPT_PINCHANGE1   PCINT1_vect
  #define INTERRUPT_PINCHANGE2   PCINT2_vect
 
  // Timer 0,1 and 2
@@ -375,6 +382,7 @@
     defined (__AVR_ATmega328P__)  || \
     defined (__AVR_ATmega324P__) || \
     defined (__AVR_ATmega324A__) || \
+    defined (__AVR_ATmega324PA__) || \
     defined (__AVR_ATtiny1634__)
  #define REG_TIMER0_TCCRA       TCCR0A
  #define REG_TIMER0_TCCRB       TCCR0B

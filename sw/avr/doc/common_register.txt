@@ -1,0 +1,23 @@
+Registers:
+Number      | Type | Code name                 | Description
+ (hex)(dec) |      |                           | 
+------------+------+---------------------------+--------------------------------------------------------------------------------------
+ 0x00    0  |  U8  | MOD_eReg_Undefined        | unused
+ 0x01    1  |  U16 | MOD_eReg_ModuleID         | Module ID
+ 0x02    2  |  U8  | MOD_eReg_BldFlag          | Flags for bootloader
+ 0xE6  230  |  U8  | MOD_eReg_DeviceSignature0 | 1st byte of device signature
+ 0xE7  231  |  U8  | MOD_eReg_DeviceSignature1 | 2nd byte of device signature
+ 0xE8  232  |  U8  | MOD_eReg_DeviceSignature2 | 3rd byte of device signature
+ 0xE9  233  |  U8  | MOD_eReg_DeviceSignature3 | 4th byte of device signature
+ 0xEA  234  |  U8  | MOD_eReg_BoardID          | Needed Board ID for the application
+ 0xEB  235  |  U8  | MOD_eReg_BoardRev         | Needed Board revision (at least)
+ 0xEC  236  |  U8  | MOD_eReg_AppID            | Application ID
+ 0xED  237  |  U8  | MOD_eReg_AppVersionMajor  | Application version major
+ 0xEE  238  |  U8  | MOD_eReg_AppVersionMinor  | Application version minor
+ 0xEF  239  |  U8  | MOD_eReg_AppVersionBugfix | Application version bug-fix
+
+Gängige Zahlen
+
+  50 = 0x32
+ 100 = 0x64
+1000 = 0x03E8

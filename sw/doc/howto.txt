@@ -1,0 +1,12 @@
+How to make serial device show up on raspberry pi2?
+1) Enter raspberry configuration
+   sudo raspi-config
+   Disable boot console over serial (Menu interfaces)
+2) reboot
+3) Edit /boot/config.txt: sudo nano /boot/config.txt
+   Make sure there is a line stating: enable_uart=1
+   If it says enable_uart=0 change it to enable_uart=1 !
+4) Add pi user to dialout group
+   sudo usermod -a -G dialout pi
+5) reboot
+

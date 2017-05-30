@@ -419,12 +419,12 @@ bool bus_trp_send_sleepcmd (sBus_t* psBus)
     uint16_t crc;
     uint8_t msg[8];
 
-    msg[0] = BUS_SYNCBYTE;                  // SY - Syncronization byte: '�' = 0b10011010
-    msg[1] = psBus->sCfg.uOwnNodeAddress;   // AS - Address sender on bus 7bit
-    msg[2] = sizeof(msg) - 3;               // LE - Length of message from AR to CRCL
-    msg[3] = 0x00;                          // AR - Address receiver 7bit (Broadcast)
-    msg[4] = 0x00;                          // EA - Extended address 4bit sender in higher nibble, 4bit receiver in lower nibble.
-    msg[5] = eCMD_SLEEP;                    // MD - Sleep-Command
+    msg[0] = BUS_SYNCBYTE;                      // SY - Syncronization byte: '�' = 0b10011010
+    msg[1] = psBus->sCfg.uOwnNodeAddress;       // AS - Address sender on bus 7bit
+    msg[2] = sizeof(msg) - 3;                   // LE - Length of message from AR to CRCL
+    msg[3] = 0x00;                              // AR - Address receiver 7bit (Bus-Broadcast)
+    msg[4] = psBus->sCfg.uOwnExtAddress << 4;   // EA - Extended address 4bit sender in higher nibble, 4bit receiver in lower nibble.
+    msg[5] = eCMD_SLEEP;                        // MD - Sleep-Command
     crc = crc_calc16(&msg[0], 6);
     msg[6] = crc >> 8;
     msg[7] = crc & 0xFF;
@@ -434,6 +434,16 @@ bool bus_trp_send_sleepcmd (sBus_t* psBus)
         return true;
     }
     return false;
+}
+
+/**
+ * Send acknowledge byte.
+ *
+ * @param[in]   bus         Handle of the bus.
+ */
+void bus_trp_send_ackbyte (sBus_t* bus)
+{
+    send_ack(bus);
 }
 
 // --- Global functions --------------------------------------------------------
@@ -638,7 +648,7 @@ bool bus_send_message (sBus_t*    psBus,
         // EA - Extended address 4bit sender in higher nibble, 4bit receiver
         // in lower nibble.
         q_put_byte(&psBus->tx_queue, ((uReceiver & 0x0F00) >> 8) |
-                          ((psBus->sCfg.uOwnNodeAddress & 0x0F00) >> 4));
+                          (psBus->sCfg.uOwnExtAddress << 4));
 
         // copy data
         while (uLen--) {

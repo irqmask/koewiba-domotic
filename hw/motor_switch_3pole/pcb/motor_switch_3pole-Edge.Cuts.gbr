@@ -1,0 +1,19 @@
+G04 #@! TF.GenerationSoftware,KiCad,Pcbnew,no-vcs-found*
+G04 #@! TF.CreationDate,2016-12-03T15:59:49+01:00*
+G04 #@! TF.ProjectId,motor_switch_3pole,6D6F746F725F7377697463685F33706F,2*
+G04 #@! TF.FileFunction,Profile,NP*
+%FSLAX46Y46*%
+G04 Gerber Fmt 4.6, Leading zero omitted, Abs format (unit mm)*
+G04 Created by KiCad (PCBNEW no-vcs-found) date Sat Dec  3 15:59:49 2016*
+%MOMM*%
+%LPD*%
+G01*
+G04 APERTURE LIST*
+%ADD10C,0.100000*%
+G04 APERTURE END LIST*
+D10*
+X125000000Y-100000000D02*
+G75*
+G03X125000000Y-100000000I-25000000J0D01*
+G01*
+M02*

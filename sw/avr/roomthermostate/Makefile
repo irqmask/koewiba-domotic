@@ -20,6 +20,7 @@ SRC = ../shared/bus_transport.c \
       shared/gdisplay_symbols_x16.c \
       shared/gdisplay_symbols_x24.c \
       shared/register.c \
+      shared/sleepmode.c \
       shared/zagwire.c \
       roomthermostate/appregister.c \
       roomthermostate/appversion.c \

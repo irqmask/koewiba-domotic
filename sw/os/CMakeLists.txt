@@ -8,6 +8,7 @@ add_subdirectory (libsystem)
 
 add_subdirectory (kwbfirmware)
 add_subdirectory (kwbmonitor)
+add_subdirectory (kwbmqttgateway)
 add_subdirectory (kwbrouter)
 add_subdirectory (kwbtest)
 if (WIN32)

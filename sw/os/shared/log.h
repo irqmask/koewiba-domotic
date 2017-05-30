@@ -18,6 +18,10 @@
 
 #include "prjtypes.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // --- Definitions -------------------------------------------------------------
 
 #define LOG_ERROR       0x00000001
@@ -53,13 +57,17 @@ log_mask_t log_get_mask (void);
 
 void log_add_mask (log_mask_t logmask);
 
-void log_msg (log_mask_t logmask, char* logmessage, ...);
+void log_msg (log_mask_t logmask, const char* logmessage, ...);
 
-void log_warning(char* logmessage, ...);
+void log_warning(const char* logmessage, ...);
 
-void log_error (char* logmessage, ...);
+void log_error (const char* logmessage, ...);
 
-void log_sys_error (char* logmessage, ...);
+void log_sys_error (const char* logmessage, ...);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _LOG_H_ */
 /** @} */

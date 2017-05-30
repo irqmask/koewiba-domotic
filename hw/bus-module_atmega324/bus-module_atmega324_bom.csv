@@ -1,18 +1,21 @@
-Bezeichner,Gehäuse,Stückzahl,Bezeichnung,Anbieter und Ref
-"C1,C2",SM0805,2,18pF,
-"C3,C4,C5,C6,C7,C10,C11",SM0805,7,100nF,
-C8,SM0805,1,"4,7nF",
-C9,cp_smd_6.3,1,100µF,
-D1,SOD323,1,1N4148WS (SOD323),
-D2,SOT143R_Diode_Reverse,1,SEMTECH_SR05,
-"J1,J2",HEADER_10x2,2,CONN_10X2,
-J3,HEADER_3x2,1,CONN-ISP-6,
-"J8,J7,J6,J5",WAGO243,4,CONN_1,
-L1,SM0805,1,10µH,
-"R1,R5,R6",SM0805,3,10k,
-"R2,R3,R4",SM0805,3,1k,
-U1,TQFP-44_10x10mm_Pitch0.8mm,1,ATMEGA324-TQFP44,
-U2,HC49-SMD,1,"7,3728MHz",
-U3,SO8E,1,25LCXXX,
-"U4,U5",SO8E,2,MAX3485,
-U6,AM1S-XXXX_SIL4,1,AM1S-2403,
+"Id";"Designator";"Package";"Quantity";"Designation";"Supplier and ref";
+1;"LOGO1";"Symbol_OSHW-Logo_SilkScreen";1;"Open Hardware";;;
+2;"U4,U5";"SO8E";2;"MAX3485";;;
+3;"J1,J2";"HEADER_10x2";2;"CONN_10X2";;;
+4;"U3";"SO8E";1;"25LCXXX";;;
+5;"R1,R5,R6";"SM0805";3;"10k";;;
+6;"U6";"AM1S-XXXX_SIL4";1;"AM1S-2403";;;
+7;"J8,J7,J6,J5";"WAGO243";4;"CONN_1";;;
+8;"U2";"HC49-SMD";1;"7,3728MHz";;;
+9;"C1,C2";"SM0805";2;"18pF";;;
+10;"C3,C4,C5,C6,C7,C10,C11";"SM0805";7;"100nF";;;
+11;"C8";"SM0805";1;"4,7nF";;;
+12;"C9";"cp_smd_6.3";1;"100µF";;;
+13;"L1";"SM0805";1;"10µH";;;
+14;"R2,R3,R4";"SM0805";3;"100";;;
+15;"J3";"HEADER_3x2";1;"CONN-ISP-6";;;
+16;"D1";"SOD323";1;"1N4148WS (SOD323)";;;
+17;"H1";"HOLE_2.5mm";1;"HOLE";;;
+18;"U1";"TQFP-44_10x10mm_Pitch0.8mm";1;"ATMEGA324-TQFP44";;;
+19;"D2";"SOT143";1;"SEMTECH_SR05";;;
+20;"F1";"R_1812";1;"FUSE";;;

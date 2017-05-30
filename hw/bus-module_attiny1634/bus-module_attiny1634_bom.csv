@@ -1,20 +1,24 @@
-Bezeichner,Gehäuse,Stückzahl,Bezeichnung,Anbieter und Ref
-C1,SM0805,1,"4,7nF",
-"C2,C3",SM0805,2,18pF,
-"C4,C5,C7",SM0805,3,100nF,
-C6,cp_smd_6.3,1,100µF,
-D1,SOD323,1,1N4148WS (SOD323),
-D2,SOT143R_Diode_Reverse,1,SEMTECH_SR05,
-"J2,J1",HEADER_5x2,2,CONN_5X2,
-J3,HEADER_3x2,1,CONN-ISP-6,
-"J6,J5,J4,J7",WAGO243,4,CONN_1,
-"R1,R5,R6",SM0805,3,10k,
-"R2,R3,R4",SM0805,3,1k,
-R7,R400,1,Varistor,
-"REF**,REF**",Perforation_4mm,2,Perforation_4mm,
-"REF**,REF**",Perforation_5mm,2,Perforation_5mm,
-U1,HC49-SMD,1,"7,3728MHz",
-U2,SO8E,1,25LCXXX,
-U3,SO20L,1,ATtiny1634-SOIC,
-U4,SO8E,1,MAX3485,
-U5,AM1S-XXXX_SIL4,1,AM1S-2403,
+"Id";"Designator";"Package";"Quantity";"Designation";"Supplier and ref";
+1;"HOLE_2.5mm,HOLE_2.5mm";"HOLE_2.5mm";2;"VAL**";;;
+2;"LOGO1";"Symbol_OSHW-Logo_SilkScreen";1;"OSHW";;;
+3;"J6,J5,J4,J7";"WAGO243";4;"CONN_1";;;
+4;"J3";"HEADER_3x2";1;"CONN-ISP-6";;;
+5;"H1";"HOLE_2.5mm";1;"HOLE";;;
+6;"C1";"SM0805";1;"4,7nF";;;
+7;"C2,C3";"SM0805";2;"18pF";;;
+8;"J2,J1";"HEADER_5x2";2;"CONN_5X2";;;
+9;"R1,R5,R6";"SM0805";3;"10k";;;
+10;"R2,R3,R4";"SM0805";3;"100";;;
+11;"R7";"R400";1;"Varistor";;;
+12;"U4";"SO8E";1;"MAX3485";;;
+13;"C4,C5,C7";"SM0805";3;"100nF";;;
+14;"U5";"AM1S-XXXX_SIL4";1;"AM1S-2403";;;
+15;"C6";"cp_smd_6.3";1;"100µF";;;
+16;"U1";"HC49-SMD";1;"7,3728MHz";;;
+17;"U2";"SO8E";1;"25LCXXX";;;
+18;"U3";"SO20L";1;"ATtiny1634-SOIC";;;
+19;"D1";"SOD323";1;"1N4148WS (SOD323)";;;
+20;"REF**,REF**";"Perforation_5mm";2;"Perforation_5mm";;;
+21;"REF**,REF**";"Perforation_4mm";2;"Perforation_4mm";;;
+22;"F1";"R_1812";1;"FUSE";;;
+23;"D2";"SOT143";1;"SEMTECH_SR05";;;

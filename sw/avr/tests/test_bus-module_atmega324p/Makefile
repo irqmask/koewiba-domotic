@@ -17,7 +17,9 @@ SRC = ../shared/bus_transport.c \
       shared/eeprom_spi.c \
       shared/led_debug.c \
       shared/register.c \
+      shared/sleepmode.c \
       tests/test_bus-module_atmega324p/appregister.c \
+      tests/test_bus-module_atmega324p/appversion.c \
       tests/test_bus-module_atmega324p/main_test_bus-module_atmega324.c
 
 # Place -I options here

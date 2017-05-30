@@ -16,10 +16,13 @@
 #include <util/delay.h>
 
 #include "pcbconfig.h"
+#include "block_message.h"
 #include "bus.h"
 #include "bus_scheduler.h"
 #include "clock.h"
+#include "cmddef_common.h"
 #include "led_debug.h"
+#include "register.h"
 
 // --- Definitions -------------------------------------------------------------
 
@@ -30,9 +33,9 @@
 
 // --- Local variables ---------------------------------------------------------
 
-static sBus_t           g_sBus;
-static sSched_t         g_sSched;
-static clock_timer_t    g_sLedTimer;
+static sBus_t           g_bus;
+static sSched_t         g_sched;
+static clock_timer_t    g_led_timer;
 
 // --- Global variables --------------------------------------------------------
 
@@ -63,36 +66,110 @@ void io_initialize (void)
 #endif
 }
 
+static inline void interpret_message (uint16_t sender, uint8_t msglen, uint8_t* msg)
+{
+    switch (msg[0]) {
+    case eCMD_REQUEST_REG:
+        // fallthrough
+    case eCMD_SET_REG_8BIT:
+        // fallthrough
+    case eCMD_SET_REG_16BIT:
+        // fallthrough
+    case eCMD_SET_REG_32BIT:
+        register_do_command(&g_bus, sender, msglen, msg);
+        break;
+
+#ifndef NO_BLOCK_MESSAGE
+    case eCMD_BLOCK_START:
+        block_message_start(&g_bus, sender, msglen, msg);
+        break;
+    case eCMD_BLOCK_DATA:
+        block_message_data (&g_bus, sender, msglen, msg);
+        break;
+    case eCMD_BLOCK_END:
+        block_message_end  (&g_bus, sender, msglen, msg);
+        //no break
+    case eCMD_BLOCK_RESET:
+        block_data_reset();
+        break;
+#endif
+
+//    case eCMD_SLEEP:
+//        sleep_pinchange_enable();
+//        bus_sleep(&g_bus);
+//        sleep_pinchange_disable();
+//        break;
+
+    case eCMD_RESET:
+        cli();
+#ifdef __AVR_ATtiny1634__
+        //TODO implement reset for attiny1634
+#else
+        wdt_enable(WDTO_15MS);
+        while (1); // wait until watchdog resets the controller.
+#endif
+        break;
+
+    default:
+        break;
+    }
+}
+
 // --- Module global functions -------------------------------------------------
+
+/**
+ * Scheduler specific register_get function.
+ *
+ * @param[in] reg_no
+ */
+bool        app_register_get        (uint8_t                reg_no,
+                                     eRegType_t*            reg_type,
+                                     void*                  value)
+{
+    // currently nothing to do
+    return false;
+}
+
+/**
+ * Scheduler specific register_set function.
+ */
+void        app_register_set        (uint8_t                reg_no,
+                                     uint32_t               value)
+{
+    // currently nothing to do
+}
 
 // --- Global functions --------------------------------------------------------
 
 int main(void)
 {
+    uint16_t    module_id = 0;
     uint8_t     msglen = 0;
     uint16_t    sender = 0;
     uint8_t     msg[BUS_MAXRECVMSGLEN];
 
     io_initialize();
     clk_initialize();
-    bus_configure(&g_sBus, 1); // configure a bus node with address 1
-    bus_scheduler_initialize(&g_sBus, &g_sSched, 0);// initialize bus on UART 0
+    //register_set_u16(MOD_eReg_ModuleID, 0x001);
+    register_get(MOD_eReg_ModuleID, 0, &module_id);
+    bus_configure(&g_bus, module_id); // configure a bus node with address 1
+    bus_scheduler_initialize(&g_bus, &g_sched, 0);// initialize bus on UART 0
 
     sei();
 
-    clk_timer_start(&g_sLedTimer, CLOCK_MS_2_TICKS(1000));
+    clk_timer_start(&g_led_timer, CLOCK_MS_2_TICKS(1000));
 
     while (1) {
-    	if (bus_schedule_and_get_message(&g_sBus, &g_sSched)) {
-    		if (bus_read_message(&g_sBus, &sender, &msglen, msg)) {
-                // TODO do something
+    	if (bus_schedule_and_get_message(&g_bus, &g_sched)) {
+    		if (bus_read_message(&g_bus, &sender, &msglen, msg)) {
+    		    interpret_message(sender, msglen, msg);
     		}
     	}
-    	else bus_schedule_check_and_set_sleep(&g_sBus);
+    	else bus_schedule_check_and_set_sleep(&g_bus);
 
-        if (clk_timer_is_elapsed(&g_sLedTimer)) {
+        if (clk_timer_is_elapsed(&g_led_timer)) {
         	// TODO remove after debug
-            clk_timer_start(&g_sLedTimer, CLOCK_MS_2_TICKS(1000));
+            clk_timer_start(&g_led_timer, CLOCK_MS_2_TICKS(1000));
             LED_ERROR_TOGGLE;
         }
     }

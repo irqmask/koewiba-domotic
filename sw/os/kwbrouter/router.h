@@ -1,69 +1,43 @@
-/**
- * @addtogroup ROUTER
- * @brief Route KWB messages between IPC sockets, TCP/IP sockets and the bus
- *        itself.
+/*
+ * kwbkouter - A router for koewiba-domotic messages.
+ * Copyright (C) 2017  christian <irqmask@gmx.de>
  *
- * TODO: Detailed description of module.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- * @{
- * @file    router.h
- * @brief   Route KWB messages between IPC sockets, TCP/IP sockets and the bus
- *          itself.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * @author  Christian Verhalen
- *///---------------------------------------------------------------------------
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
 
-#ifndef _ROUTER_H_
-#define _ROUTER_H_
+#ifndef ROUTER_H
+#define ROUTER_H
 
-// --- Include section ---------------------------------------------------------
+#include <list>
+#include <stddef.h>
 
-#include "message.h"
+#include "routeconnection.h"
 
-// --- Definitions -------------------------------------------------------------
+class Router
+{
+private:
+    std::list<RouteConnection*> connections;
 
-// --- Type definitions --------------------------------------------------------
+public:
+    Router();
+    ~Router();
 
-typedef enum route_type {
-    eROUTE_TYPE_UNKNOWN,
-    eROUTE_TYPE_SERIAL,
-    eROUTE_TYPE_SOCKET,
-    eROUTE_TYPE_LAST
-} route_type_t;
+    void AddConnection(RouteConnection* connection);
+    void RemoveConnection(RouteConnection* connection);
 
-typedef struct route_entry route_entry_t;
+    void DistributeMessage(msg_t* message, RouteConnection* sender);
+};
 
-typedef struct router {
-    route_entry_t* first_route;
-} router_t;
-
-// --- Local variables ---------------------------------------------------------
-
-// --- Global variables --------------------------------------------------------
-
-// --- Module global variables -------------------------------------------------
-
-// --- Local functions ---------------------------------------------------------
-
-// --- Module global functions -------------------------------------------------
-
-// --- Global functions --------------------------------------------------------
-
-void route_init (router_t* router);
-
-int route_add (router_t*    router,
-               uint16_t     first_module_id,
-               uint16_t     last_module_id,
-               const char*  target_address,
-               uint16_t     target_port,
-               route_type_t type,
-               void*        reference);
-
-void route_delete (router_t*    router);
-
-void route_message (router_t*    router,
-                    msg_t*       message,
-                    void*        reference);
-
-#endif /* _ROUTER_H_ */
-/** @} */
+#endif // ROUTER_H

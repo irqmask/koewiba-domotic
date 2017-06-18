@@ -59,7 +59,7 @@ static int on_read_handler(void* arg)
 {
     struct mosquitto* mosq = (struct mosquitto*)arg;
 
-    mosquitto_loop_read(mosq);
+    mosquitto_loop_read(mosq, 10);
     return 0;
 }
 
@@ -67,7 +67,7 @@ static int on_write_handler(void* arg)
 {
     struct mosquitto* mosq = (struct mosquitto*)arg;
 
-    mosquitto_loop_write(mosq);
+    mosquitto_loop_write(mosq, 10);
     return 0;
 }
 

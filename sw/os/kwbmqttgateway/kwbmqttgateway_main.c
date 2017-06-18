@@ -163,7 +163,7 @@ static void log_mqtt_version(void)
     log_msg(LOG_STATUS, "Mosquitto client library version %d.%d.%d", major, minor, bugfix);
 }
 
-void on_mqtt_message(void *userdata, const struct mosquitto_message *message)
+void on_mqtt_message(struct mosquitto* mosq, void *userdata, const struct mosquitto_message *message)
 {
     msg_t kwbmsg;
 
@@ -178,7 +178,7 @@ void on_mqtt_message(void *userdata, const struct mosquitto_message *message)
     }
 }
 
-void on_mqtt_connect(void *userdata, int result)
+void on_mqtt_connect(struct mosquitto* mosq, void *userdata, int result)
 {
     if (!result) {
         log_msg(LOG_STATUS, "MQTT connected. Result %d", result);
@@ -189,7 +189,7 @@ void on_mqtt_connect(void *userdata, int result)
     }
 }
 
-void my_subscribe_callback(void *userdata, uint16_t mid, int qos_count, const uint8_t *granted_qos)
+void my_subscribe_callback(struct mosquitto* mosq, void *userdata, int mid, int qos_count, const int *granted_qos)
 {
     int i;
 
@@ -203,7 +203,7 @@ int mosquitto_setup(ioloop_t* ioloop)
 {
     uint16_t mid = 0;
 
-    g_mosq = mosquitto_new("kwbmqttgateway", NULL);
+    g_mosq = mosquitto_new("kwbmqttgateway", true, NULL);
     if (!g_mosq) {
         fprintf(stderr, "Error: Out of memory.\n");
         return eERR_MALLOC;
@@ -213,7 +213,7 @@ int mosquitto_setup(ioloop_t* ioloop)
     mosquitto_message_callback_set(g_mosq, on_mqtt_message);
     mosquitto_subscribe_callback_set(g_mosq, my_subscribe_callback);
 
-    if (mosquitto_connect(g_mosq, "localhost", 1883, 60, 1)){
+    if (mosquitto_connect(g_mosq, "localhost", 1883, 60)){
         fprintf(stderr, "Unable to connect.\n");
         return eERR_SYSTEM;
     }
@@ -224,7 +224,7 @@ int mosquitto_setup(ioloop_t* ioloop)
 void on_kwb_incomming_message(msg_t* message, void* reference, void* arg)
 {
     char topic[256], msgtext[256];
-    uint16_t mid = 0;
+    int mid = 0;
     int mrc;
 
     if (msg2mqtt(message, topic, sizeof(topic), msgtext, sizeof(msgtext)) != eERR_NONE) {

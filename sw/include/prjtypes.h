@@ -37,8 +37,10 @@ typedef signed long long int int64_t;
 
 // --- Definitions -------------------------------------------------------------
 
+#ifndef __cplusplus
 #ifndef bool
 typedef unsigned char bool;
+#endif
 #endif
 
 #ifndef false

@@ -21,6 +21,7 @@
     defined (PRJCONF_POSIX) || \
     defined (PRJCONF_LINUX)
   #include <safe_lib.h>
+  #include <unistd.h>
 #endif
 
 // include

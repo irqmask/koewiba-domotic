@@ -31,8 +31,6 @@
 
 // --- Include section ---------------------------------------------------------
 
-#include "mosquitto.h"
-
 // include
 #include "prjtypes.h"
 
@@ -40,8 +38,9 @@
 #include "clock.h"
 
 // os/shared
-#include "ioloop.h"
 #include "log.h"
+
+#include "kwbmqttgateway.h"
 
 // --- Definitions -------------------------------------------------------------
 
@@ -57,25 +56,26 @@
 
 static int on_read_handler(void* arg)
 {
-    struct mosquitto* mosq = (struct mosquitto*)arg;
+    app_handles_t* h = (app_handles_t*)arg;
 
-    mosquitto_loop_read(mosq, 10);
+    mosquitto_loop_read(h->mosq, 1);
     return 0;
 }
 
 static int on_write_handler(void* arg)
 {
-    struct mosquitto* mosq = (struct mosquitto*)arg;
+    app_handles_t* h = (app_handles_t*)arg;
 
-    mosquitto_loop_write(mosq, 10);
+    mosquitto_loop_write(h->mosq, 1);
+    mosquitto_ioloop_suspend_write(h);
     return 0;
 }
 
 static int on_misc_handler(void* arg)
 {
-    struct mosquitto* mosq = (struct mosquitto*)arg;
+    app_handles_t* h = (app_handles_t*)arg;
 
-    mosquitto_loop_misc(mosq);
+    mosquitto_loop_misc(h->mosq);
     return 0;
 }
 
@@ -83,21 +83,38 @@ static int on_misc_handler(void* arg)
 
 // --- Global functions --------------------------------------------------------
 
-int mosquitto_connect_to_ioloop(struct  mosquitto* mosq, ioloop_t* ioloop)
+int mosquitto_connect_to_ioloop(app_handles_t* h)
 {
     int fd, retval = eERR_NONE;
 
     do {
-        fd = mosquitto_socket(mosq);
+        fd = mosquitto_socket(h->mosq);
         if (fd == INVALID_FD) {
             retval = eERR_INVALID_FD;
             break;
         }
-        ioloop_register_fd(ioloop, fd, eIOLOOP_EV_READ, on_read_handler, mosq);
-        ioloop_register_fd(ioloop, fd, eIOLOOP_EV_WRITE, on_write_handler, mosq);
-        ioloop_register_timer(ioloop, CLOCK_MS_2_TICKS(100), 1, on_misc_handler, mosq);
+        ioloop_register_fd(h->ioloop, fd, eIOLOOP_EV_READ, on_read_handler, h);
+        ioloop_register_fd(h->ioloop, fd, eIOLOOP_EV_WRITE, on_write_handler, h);
+        ioloop_register_timer(h->ioloop, CLOCK_MS_2_TICKS(100), 1, on_misc_handler, h);
     } while (0);
     return retval;
+}
+
+/** 
+ * Check if a MQTTmessage has to be written. If not suspend write callbacks.
+ */
+void mosquitto_ioloop_suspend_write(app_handles_t* h)
+{
+    int fd;
+
+    fd = mosquitto_socket(h->mosq);
+    if (fd == INVALID_FD) return;
+
+    if (mosquitto_want_write(h->mosq)) {
+        ioloop_register_fd(h->ioloop, fd, eIOLOOP_EV_WRITE, on_write_handler, h->mosq);
+    } else {
+        ioloop_unregister_fd(h->ioloop, fd, eIOLOOP_EV_WRITE);
+    }
 }
 
 /** @} */

@@ -265,7 +265,7 @@ void msg_s_close_connection (msg_socket_t* msg_socket, msg_endpoint_t* ep)
     assert(ep != NULL);
 
     if (ep->fd != INVALID_FD) {
-        ioloop_unregister_fd(msg_socket->ioloop, ep->fd);
+        ioloop_unregister_fd(msg_socket->ioloop, ep->fd, eIOLOOP_EV_UNKNOWN);
         sys_socket_close (ep->fd);
         ep->fd = INVALID_FD;
         if (ep->close_connection_handler != NULL) {

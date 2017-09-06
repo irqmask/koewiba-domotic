@@ -91,8 +91,9 @@ void ioloop_register_fd (ioloop_t* ioloop,
                          ioloop_event_func_t callback,
                          void* arg);
 
-void ioloop_unregister_fd (ioloop_t* ioloop,
-                           sys_fd_t fd);
+void ioloop_unregister_fd (ioloop_t* ioloop,                         
+                           sys_fd_t fd,
+                           ioloop_event_type_t eventtype);
 
 void ioloop_set_default_timeout (ioloop_t* ioloop,
                                  uint16_t  timeout_ticks);

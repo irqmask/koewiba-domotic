@@ -315,7 +315,8 @@ void ioloop_register_fd (ioloop_t*              ioloop,
 }
 
 void ioloop_unregister_fd (ioloop_t* ioloop,
-                           sys_fd_t fd)
+                           sys_fd_t fd,
+                           ioloop_event_type_t eventtype)
 {
     ioloop_connection_t* conn;
 
@@ -324,7 +325,8 @@ void ioloop_unregister_fd (ioloop_t* ioloop,
     conn = ioloop->first_conn;
 
     while (conn != NULL) {
-        if (conn->fd == fd) {
+        if (conn->fd == fd && 
+            (eventtype == eIOLOOP_EV_UNKNOWN || conn->eventtype == eventtype)) {
             ioloop_remove_conn(ioloop, conn);
             free(conn);
             break;

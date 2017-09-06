@@ -53,6 +53,8 @@
 #include "message.h"
 #include "message_socket.h"
 
+#include "kwbmqttgateway.h"
+
 // --- Definitions -------------------------------------------------------------
 
 // --- Type definitions --------------------------------------------------------
@@ -69,7 +71,7 @@ typedef struct options {
 
 // --- Local variables ---------------------------------------------------------
 
-struct mosquitto*   g_mosq = NULL;
+app_handles_t       g_handles;
 msg_socket_t        g_kwb_socket;
 msg_endpoint_t*     g_kwb_socket_ep;
 bool                g_end_application = false;
@@ -79,17 +81,6 @@ bool                g_end_application = false;
 // --- Global variables --------------------------------------------------------
 
 // --- Local functions ---------------------------------------------------------
-
-extern int mosquitto_connect_to_ioloop(struct  mosquitto* mosq, ioloop_t* ioloop);
-
-extern int msg2mqtt(msg_t* message,
-                    char* topic, size_t max_topic_len,
-                    char* msgtext, size_t max_msgtext_len);
-
-extern int mqtt2msg_subscribe(struct mosquitto* mosq);
-
-extern int mqtt2msg(char* topic, char* msgtext, msg_t* message);
-
 
 static void set_options (options_t*     options,
                          const char*    router_address,
@@ -183,7 +174,7 @@ void on_mqtt_connect(struct mosquitto* mosq, void *userdata, int result)
     if (!result) {
         log_msg(LOG_STATUS, "MQTT connected. Result %d", result);
         /* Subscribe to broker information topics on successful connect. */
-        mqtt2msg_subscribe(g_mosq);
+        mqtt2msg_subscribe(mosq);
     } else {
         log_msg(LOG_ERROR, "MQTT connection failed! Result %d", result);
     }
@@ -199,26 +190,26 @@ void my_subscribe_callback(struct mosquitto* mosq, void *userdata, int mid, int 
     }
 }
 
-int mosquitto_setup(ioloop_t* ioloop)
+int mosquitto_setup()
 {
     uint16_t mid = 0;
 
-    g_mosq = mosquitto_new("kwbmqttgateway", true, NULL);
-    if (!g_mosq) {
+    g_handles.mosq = mosquitto_new("kwbmqttgateway", true, NULL);
+    if (!g_handles.mosq) {
         fprintf(stderr, "Error: Out of memory.\n");
         return eERR_MALLOC;
     }
 
-    mosquitto_connect_callback_set(g_mosq, on_mqtt_connect);
-    mosquitto_message_callback_set(g_mosq, on_mqtt_message);
-    mosquitto_subscribe_callback_set(g_mosq, my_subscribe_callback);
+    mosquitto_connect_callback_set(g_handles.mosq, on_mqtt_connect);
+    mosquitto_message_callback_set(g_handles.mosq, on_mqtt_message);
+    mosquitto_subscribe_callback_set(g_handles.mosq, my_subscribe_callback);
 
-    if (mosquitto_connect(g_mosq, "localhost", 1883, 60)){
+    if (mosquitto_connect(g_handles.mosq, "localhost", 1883, 60)){
         fprintf(stderr, "Unable to connect.\n");
         return eERR_SYSTEM;
     }
 
-    return mosquitto_connect_to_ioloop(g_mosq, ioloop);
+    return mosquitto_connect_to_ioloop(&g_handles);
 }
 
 void on_kwb_incomming_message(msg_t* message, void* reference, void* arg)
@@ -230,10 +221,13 @@ void on_kwb_incomming_message(msg_t* message, void* reference, void* arg)
     if (msg2mqtt(message, topic, sizeof(topic), msgtext, sizeof(msgtext)) != eERR_NONE) {
         return;
     }
-    mrc = mosquitto_publish(g_mosq, &mid, topic, strnlen(msgtext, sizeof(msgtext)), msgtext, 1, true);
+    mrc = mosquitto_publish(g_handles.mosq, &mid, topic, strnlen(msgtext, sizeof(msgtext)), msgtext, 1, true);
     if (mrc != MOSQ_ERR_SUCCESS) {
         log_error("mosquitto_publish() failed with errorcode %d", mrc);
+        return;
     }
+    // send message when fd is ready to accept data
+    mosquitto_ioloop_suspend_write(&g_handles);
 }
 
 void on_kwb_close_connection(const char* address, uint16_t port, void* reference, void* arg)
@@ -272,6 +266,7 @@ int main (int argc, char* argv[])
     do {
         printf("\nkwbmqttgateway...\n");
 
+        g_handles.ioloop = &mainloop;
         // set default options for nkwbmqttgateway
         set_options(&options,
                     "/tmp/kwbr.usk",    // default address of nkwbmqttgateway socket
@@ -288,20 +283,20 @@ int main (int argc, char* argv[])
         log_set_mask(0xFFFFFFFF);
         log_mqtt_version();
 
-        ioloop_init(&mainloop);
+        ioloop_init(g_handles.ioloop);
 
         mosquitto_lib_init();
-        rc = mosquitto_setup(&mainloop);
+        rc = mosquitto_setup();
         if (rc != eERR_NONE) break;
 
-        rc = kwb_socket_setup(&mainloop, &options);
+        rc = kwb_socket_setup(g_handles.ioloop, &options);
         if (rc != eERR_NONE) break;
 
         printf("entering mainloop...\n");
         while (!g_end_application) {
-            ioloop_run_once(&mainloop);
+            ioloop_run_once(g_handles.ioloop);
         }
-        mosquitto_destroy(g_mosq);
+        mosquitto_destroy(g_handles.mosq);
         mosquitto_lib_cleanup();
     } while (0);
     return rc;

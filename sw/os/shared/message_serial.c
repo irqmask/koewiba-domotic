@@ -343,7 +343,7 @@ void msg_ser_close (msg_serial_t* msg_serial)
     assert(msg_serial != NULL);
 
     if (msg_serial->fd != INVALID_FD) {
-        ioloop_unregister_fd(msg_serial->ioloop, msg_serial->fd);
+        ioloop_unregister_fd(msg_serial->ioloop, msg_serial->fd, eIOLOOP_EV_UNKNOWN);
         sys_serial_close (msg_serial->fd);
         msg_serial->fd = INVALID_FD;
     }

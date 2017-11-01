@@ -44,6 +44,7 @@ extern "C" {
 }
 
 // include
+#include "kwb_defines.h"
 #include "prjtypes.h"
 
 // os/libsystem
@@ -111,21 +112,21 @@ static bool parse_commandline_options (int argc, char* argv[], options_t* option
 
         switch (c) {
         case 'd':
-            printf("device %s\n", optarg);
+            log_msg(KWB_LOG_INFO, "device %s", optarg);
             strcpy_s(options->serial_device, sizeof(options->serial_device), optarg);
             options->serial_device_set = true;
             break;
         case 'b':
-            printf("baudrate %s\n", optarg);
+            log_msg(KWB_LOG_INFO, "baudrate %s", optarg);
             options->serial_baudrate = atoi(optarg);
             break;
         case 'a':
-            printf("router address %s\n", optarg);
+            log_msg(KWB_LOG_INFO, "router address %s", optarg);
             strcpy_s(options->router_address, sizeof(options->router_address), optarg);
             options->router_address_set = true;
             break;
         case 'p':
-            printf("router port %s\n", optarg);
+            log_msg(KWB_LOG_INFO, "router port %s", optarg);
             options->router_port = atoi(optarg);
             break;
 
@@ -146,12 +147,12 @@ static bool validate_options(options_t* options)
     do {
         // minimum address is "/a": unix socket with name "a" in the root directory
         if (strnlen(options->router_address, sizeof(options->router_address)) < 2) {
-            fprintf(stderr, "Missing router address!\n");
+            log_error("Missing router address!");
             break;
         }
         if (options->serial_device_set &&
             strnlen(options->serial_device, sizeof(options->serial_device)) < 2) {
-            fprintf(stderr, "Invalid serial device path!\n");
+            log_error("Invalid serial device path!");
             break;
         }
 
@@ -162,13 +163,13 @@ static bool validate_options(options_t* options)
 
 static void print_usage (void)
 {
-    printf("\nUsage:\n");
-    printf("kwbrouter [-a <address>] [-p <port>] [-d <device>] [-b <baudrate>] [-v <vbusd address>] [-w <vbusd port>] [-n <node address>]\n\n");
-    printf("Arguments:\n");
-    printf(" -a <address>        Address of kwbrouter server. Default: /tmp/kwbr.usk\n");
-    printf(" -p <port>           Port number of kwbrouter server. Default: 0\n");
-    printf(" -d <device>         Device of serial bus connection.\n");
-    printf(" -b <baudrate>       Baudrate of serial bus connection. Default: 57600\n");
+    fprintf(stderr, "\nUsage:\n");
+    fprintf(stderr, "kwbrouter [-a <address>] [-p <port>] [-d <device>] [-b <baudrate>] [-v <vbusd address>] [-w <vbusd port>] [-n <node address>]\n\n");
+    fprintf(stderr, "Arguments:\n");
+    fprintf(stderr, " -a <address>        Address of kwbrouter server. Default: /tmp/kwbr.usk\n");
+    fprintf(stderr, " -p <port>           Port number of kwbrouter server. Default: 0\n");
+    fprintf(stderr, " -d <device>         Device of serial bus connection.\n");
+    fprintf(stderr, " -b <baudrate>       Baudrate of serial bus connection. Default: 57600\n");
 }
 
 static void create_unix_socket_file(options_t* options)
@@ -191,7 +192,9 @@ int main (int argc, char* argv[])
     ioloop_t        mainloop;
 
     do {
-        printf("\nkwbrouter...\n");
+        // all logs on
+        log_set_mask(0xFFFFFFFF);
+        log_msg(KWB_LOG_INFO, "kwbrouter...");
 
         // set default options for kwbrouter
         set_options(&options,
@@ -207,9 +210,6 @@ int main (int argc, char* argv[])
             rc = eERR_BAD_PARAMETER;
             break;
         }
-
-        // all logs on
-        log_set_mask(0xFFFFFFFF);
 
         ioloop_init(&mainloop);
 
@@ -255,7 +255,7 @@ int main (int argc, char* argv[])
         msg_b_set_incomming_handler(&msg_bus, handle_incomming_msg, &router);
         route_add(&router, 1, 65535, address, port, eROUTE_TYPE_SERIAL, &msg_bus);
 */
-        printf("entering mainloop...\n");
+        log_msg(KWB_LOG_STATUS, "entering mainloop...\n");
         while (!end_application) {
             ioloop_run_once(&mainloop);
         }

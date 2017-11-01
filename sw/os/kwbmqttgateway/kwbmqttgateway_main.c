@@ -42,6 +42,7 @@
 #include "mosquitto.h"
 
 // include
+#include "kwb_defines.h"
 #include "prjtypes.h"
 
 // os/libsystem
@@ -105,12 +106,12 @@ static bool parse_commandline_options (int argc, char* argv[], options_t* option
 
         switch (c) {
         case 'a':
-            printf("router address %s\n", optarg);
+            log_msg(KWB_LOG_INFO, "router address %s", optarg);
             strcpy_s(options->router_address, sizeof(options->router_address), optarg);
             options->router_address_set = true;
             break;
         case 'p':
-            printf("router port %s\n", optarg);
+            log_msg(KWB_LOG_INFO, "router port %s", optarg);
             options->router_port = atoi(optarg);
             break;
 
@@ -129,7 +130,7 @@ static bool validate_options(options_t* options)
     do {
         // minimum address is "/a": unix socket with name "a" in the root directory
         if (strnlen(options->router_address, sizeof(options->router_address)) < 2) {
-            fprintf(stderr, "Missing router address!\n");
+            log_error("Missing router address!");
             break;
         }
         rc = true;
@@ -139,11 +140,11 @@ static bool validate_options(options_t* options)
 
 static void print_usage (void)
 {
-    printf("\nUsage:\n");
-    printf("kwbmqttgateway [-a <address>] [-p <port>]\n\n");
-    printf("Arguments:\n");
-    printf(" -a <address>        Address of kwbrouter server. Default: /tmp/kwbr.usk\n");
-    printf(" -p <port>           Port number of kwbrouter server. Default: 0\n");
+    fprintf(stderr, "\nUsage:\n");
+    fprintf(stderr, "kwbmqttgateway [-a <address>] [-p <port>]\n\n");
+    fprintf(stderr, "Arguments:\n");
+    fprintf(stderr, " -a <address>        Address of kwbrouter server. Default: /tmp/kwbr.usk\n");
+    fprintf(stderr, " -p <port>           Port number of kwbrouter server. Default: 0\n");
 }
 
 static void log_mqtt_version(void)
@@ -151,7 +152,7 @@ static void log_mqtt_version(void)
     int major = 0, minor = 0, bugfix = 0;
 
     mosquitto_lib_version(&major, &minor, &bugfix);
-    log_msg(LOG_STATUS, "Mosquitto client library version %d.%d.%d", major, minor, bugfix);
+    log_msg(LOG_STATUS, "MQTT Mosquitto client library version %d.%d.%d", major, minor, bugfix);
 }
 
 void on_mqtt_message(struct mosquitto* mosq, void *userdata, const struct mosquitto_message *message)
@@ -159,10 +160,11 @@ void on_mqtt_message(struct mosquitto* mosq, void *userdata, const struct mosqui
     msg_t kwbmsg;
 
     if (message->payloadlen) {
-        log_msg(LOG_STATUS, "MQTT %s %s\n", message->topic, message->payload);
+        log_msg(KWB_LOG_INTERCOMM, "MQTTRECV %s %s\n", message->topic, message->payload);
         memset(&kwbmsg, 0, sizeof(kwbmsg));
         if (mqtt2msg(message->topic, message->payload, &kwbmsg) == eERR_NONE) {
             msg_s_send(g_kwb_socket_ep, &kwbmsg);
+            msg_log("SOCKETSEND", kwbmsg);
         }
     } else {
         log_msg(LOG_STATUS, "MQTT %s (null)\n", message->topic);
@@ -172,11 +174,11 @@ void on_mqtt_message(struct mosquitto* mosq, void *userdata, const struct mosqui
 void on_mqtt_connect(struct mosquitto* mosq, void *userdata, int result)
 {
     if (!result) {
-        log_msg(LOG_STATUS, "MQTT connected. Result %d", result);
+        log_msg(KWB_LOG_STATUS, "MQTT connected. Result %d", result);
         /* Subscribe to broker information topics on successful connect. */
         mqtt2msg_subscribe(mosq);
     } else {
-        log_msg(LOG_ERROR, "MQTT connection failed! Result %d", result);
+        log_error("MQTT connection failed! Result %d", result);
     }
 }
 
@@ -184,7 +186,7 @@ void my_subscribe_callback(struct mosquitto* mosq, void *userdata, int mid, int 
 {
     int i;
 
-    log_msg(LOG_STATUS, "MQTT subscribed (mid: %d): %d", mid, granted_qos[0]);
+    log_msg(KWB_LOG_STATUS, "MQTT subscribed (mid: %d): %d", mid, granted_qos[0]);
     for(i=1; i<qos_count; i++){
         log_msg(LOG_STATUS, ", %d", granted_qos[i]);
     }
@@ -192,11 +194,13 @@ void my_subscribe_callback(struct mosquitto* mosq, void *userdata, int mid, int 
 
 int mosquitto_setup()
 {
+    const char* mqtt_address = "localhost";
+    const uint mqtt_port = 1883;
     uint16_t mid = 0;
 
     g_handles.mosq = mosquitto_new("kwbmqttgateway", true, NULL);
     if (!g_handles.mosq) {
-        fprintf(stderr, "Error: Out of memory.\n");
+        log_error("MQTT Out of memory while opening mosquitto handle.");
         return eERR_MALLOC;
     }
 
@@ -204,11 +208,12 @@ int mosquitto_setup()
     mosquitto_message_callback_set(g_handles.mosq, on_mqtt_message);
     mosquitto_subscribe_callback_set(g_handles.mosq, my_subscribe_callback);
 
-    if (mosquitto_connect(g_handles.mosq, "localhost", 1883, 60)){
-        fprintf(stderr, "Unable to connect.\n");
+    if (mosquitto_connect(g_handles.mosq, mqtt_address, mqtt_port, 60)){
+        log_error("MQTT Unable to connect to mosquitto server %s:%d", mqtt_address, mqtt_port);
         return eERR_SYSTEM;
     }
 
+    log_msg(KWB_LOG_INFO, "MQTT mosquitto_setup() connecting to ioloop");
     return mosquitto_connect_to_ioloop(&g_handles);
 }
 
@@ -218,20 +223,23 @@ void on_kwb_incomming_message(msg_t* message, void* reference, void* arg)
     int mid = 0;
     int mrc;
 
+    msg_log("SOCKETRECV", *message);
     if (msg2mqtt(message, topic, sizeof(topic), msgtext, sizeof(msgtext)) != eERR_NONE) {
         return;
     }
     mrc = mosquitto_publish(g_handles.mosq, &mid, topic, strnlen(msgtext, sizeof(msgtext)), msgtext, 1, true);
     if (mrc != MOSQ_ERR_SUCCESS) {
-        log_error("mosquitto_publish() failed with errorcode %d", mrc);
+        log_error("MQTTSEND mosquitto_publish() failed with errorcode %d, topic=%s message=%s", mrc, topic, msgtext);
         return;
     }
+    log_msg(KWB_LOG_INTERCOMM, "MQTTSEND %s %s", topic, msgtext);
     // send message when fd is ready to accept data
     mosquitto_ioloop_suspend_write(&g_handles);
 }
 
 void on_kwb_close_connection(const char* address, uint16_t port, void* reference, void* arg)
 {
+    log_msg(KWB_LOG_STATUS, "MQTT connection closed. address=%s port=%d", address, port);
     g_end_application = true;
 }
 
@@ -264,7 +272,9 @@ int main (int argc, char* argv[])
     ioloop_t        mainloop;
 
     do {
-        printf("\nkwbmqttgateway...\n");
+        // all logs on
+        log_set_mask(0xFFFFFFFF);
+        log_msg(KWB_LOG_INFO, "kwbmqttgateway...");
 
         g_handles.ioloop = &mainloop;
         // set default options for nkwbmqttgateway
@@ -279,8 +289,6 @@ int main (int argc, char* argv[])
             rc = eERR_BAD_PARAMETER;
             break;
         }
-        // all logs on
-        log_set_mask(0xFFFFFFFF);
         log_mqtt_version();
 
         ioloop_init(g_handles.ioloop);
@@ -292,7 +300,7 @@ int main (int argc, char* argv[])
         rc = kwb_socket_setup(g_handles.ioloop, &options);
         if (rc != eERR_NONE) break;
 
-        printf("entering mainloop...\n");
+        log_msg(KWB_LOG_STATUS, "entering mainloop...");
         while (!g_end_application) {
             ioloop_run_once(g_handles.ioloop);
         }

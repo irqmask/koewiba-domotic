@@ -55,14 +55,14 @@ void RouteConnection::ClearIncommingHandler()
 int RouteConnection::Send(msg_t* message)
 {
     log_msg(LOG_VERBOSE1, "%6s <-- message sent", this->GetName());
-    msg_log(*message);
+    msg_log("???SEND", *message);
     return 0;
 }
 
 void RouteConnection::OnIncommingMessage(msg_t* message)
 {
     log_msg(LOG_VERBOSE1, "%6s --> message received", this->GetName());
-    msg_log(*message);
+    msg_log("???RECV", *message);
     if (this->extOnIncommingMsg != NULL) {
         this->extOnIncommingMsg(message, this, this->extOnIncommingMsgArg);
     }
@@ -82,7 +82,7 @@ void RouteConnection::ClearConnectionHandler()
 
 void RouteConnection::OnConnectionClosed()
 {
-    log_msg(LOG_STATUS, "Client connection closed");
+    log_msg(LOG_STATUS, "%s Client connection closed", this->GetName());
     if (this->extOnConnectionClosed != NULL) {
         this->extOnConnectionClosed("", 0, this, this->extOnConnectionClosedArg);
     }

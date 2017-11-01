@@ -19,6 +19,9 @@
 
 #include <string.h>
 
+// include 
+#include "kwb_defines.h"
+// shared
 #include "log.h"
 
 #include "rconnsocketclient.h"
@@ -45,7 +48,7 @@ RConnSocketClient::RConnSocketClient() : ep(NULL),
     msg_s_init(&this->local_socket);
     this->socket = &this->local_socket;
     memset(this->name, 0, sizeof(name));
-    snprintf(name, sizeof(name-1), "USOCK");
+    snprintf(this->name, sizeof(name-1), "USOCK");
 }
 
 RConnSocketClient::RConnSocketClient(msg_socket_t* server, msg_endpoint_t* ep, const char* address, uint16_t port)
@@ -54,10 +57,10 @@ RConnSocketClient::RConnSocketClient(msg_socket_t* server, msg_endpoint_t* ep, c
     this->ep = ep;
     this->ioloop = server->ioloop;
     memset(this->name, 0, sizeof(name));
-    snprintf(name, sizeof(name-1), "USOCK");
+    snprintf(this->name, sizeof(name-1), "USOCK");
     msg_s_set_incomming_handler(this->socket, incommingMessageHdl, this);
     msg_s_set_closeconnection_handler(ep, closeConnectionHdl, this);
-    log_msg(LOG_STATUS, "New socket connection %s:%d", address, port);
+    log_msg(LOG_STATUS, "%s New client socket connection %s:%d", this->name, address, port);
 }
 
 RConnSocketClient::~RConnSocketClient()
@@ -75,7 +78,11 @@ int RConnSocketClient::Open(const char* address, int port)
     if (retval == eERR_NONE) {
         this->ep = this->socket->first_ep; // clients only have one endpoint
         msg_s_set_closeconnection_handler(this->ep, closeConnectionHdl, this);
+        log_msg(KWB_LOG_STATUS, "%s open connection to %s:%d", this->GetName(), address, port);
+    } else {
+        log_error("%s opening connection to %s:%d failed", this->GetName(), address, port);
     }
+    
     return retval;
 }
 
@@ -85,12 +92,13 @@ void RConnSocketClient::Close()
         msg_s_close_connection(this->socket, this->ep);
         this->ep = NULL;
     }
+    log_msg(KWB_LOG_STATUS, "%s close connection", this->GetName());
 }
 
 int RConnSocketClient::Send(msg_t* message)
 {
     log_msg(LOG_VERBOSE1, "%6s <-- message sent", this->GetName());
-    msg_log(*message);
+    msg_log("SOCKETSEND", *message);
     return msg_s_send(ep, message);
 }
 

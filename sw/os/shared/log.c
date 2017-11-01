@@ -84,13 +84,8 @@ void log_msg (log_mask_t logmask, const char* logmessage, ...)
 
     if ((logmask & active_logs) != 0) {
         va_start(args, logmessage);
-        if (logmask & LOG_ERROR) {
-            vfprintf(stderr, logmessage, args);
-            fprintf(stderr, "\n");
-        } else {
-            vfprintf(stdout, logmessage, args);
-            fprintf(stdout, "\n");
-        }
+        vfprintf(stderr, logmessage, args);
+        fprintf(stderr, "\n");
         va_end(args);
     }
 }
@@ -101,9 +96,9 @@ void log_warning(const char* logmessage, ...)
 
     if ((LOG_WARNING & active_logs) != 0) {
         va_start(args, logmessage);
-        fprintf(stdout, "WARNING   ");
-        vfprintf(stdout, logmessage, args);
-        fprintf(stdout, "\n");
+        fprintf(stderr, "WARNING   ");
+        vfprintf(stderr, logmessage, args);
+        fprintf(stderr, "\n");
         va_end(args);
     }
 }

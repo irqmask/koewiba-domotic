@@ -70,14 +70,14 @@ void RConnSerial::Close()
 int RConnSerial::Send(msg_t* message)
 {
     log_msg(LOG_VERBOSE1, "%6s <-- message sent", this->GetName());
-    msg_log(*message);
+    msg_log("SERIALSEND", *message);
     return msg_ser_send(&this->serial, message);
 }
 
 void RConnSerial::OnIncommingMessage(msg_t* message)
 {
     log_msg(LOG_VERBOSE1, "%6s --> message received", this->GetName());
-    msg_log(*message);
+    msg_log("SERIALRECV", *message);
     if (this->extOnIncommingMsg != NULL) {
         this->extOnIncommingMsg(message, this, this->extOnIncommingMsgArg);
     }

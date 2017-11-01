@@ -27,6 +27,7 @@
 
 // os/include
 #include "error_codes.h"
+#include "kwb_defines.h"
 
 // os/libsystem
 #include "sysgetopt.h"
@@ -55,8 +56,7 @@ bool   g_end_application = false;
 
 static void handle_message(msg_t* message, void* reference, void* arg)
 {
-    log_msg(LOG_STATUS, "Message Received");
-    msg_log(*message);
+    msg_log("RECV", *message);
 }
 
 static void on_close_connection(const char* address, uint16_t port, void* reference, void* arg)
@@ -76,7 +76,7 @@ int main (int argc, char* argv[])
     msg_endpoint_t* msg_ep;
 
     do {
-        printf("\nkwbtest...\n");
+        log_msg(KWB_LOG_INFO, "kwbtest...");
         log_set_mask(0xFFFFFFFF);
         ioloop_init(&mainloop);
 
@@ -87,7 +87,7 @@ int main (int argc, char* argv[])
         }
         msg_ep = msg_s_get_endpoint(&msg_socket, 0, 0);
         msg_s_set_closeconnection_handler(msg_ep, on_close_connection, NULL);
-        printf("entering mainloop...\n");
+        log_msg(KWB_LOG_STATUS, "entering mainloop...");
         while (!g_end_application) {
             ioloop_run_once(&mainloop);
         }

@@ -29,6 +29,7 @@
 
 // os/include
 #include "error_codes.h"
+#include "kwb_defines.h"
 
 // os/shared
 #include "ioloop.h"
@@ -123,21 +124,21 @@ static bool parse_commandline_options (int argc, char* argv[], options_t* option
 
         switch (c) {
         case 'd':
-            printf("device %s\n", optarg);
+            log_msg(KWB_LOG_INFO, "device %s", optarg);
             strcpy_s(options->serial_device, sizeof(options->serial_device), optarg);
             options->serial_device_set = true;
             break;
         case 'b':
-            printf("baudrate %s\n", optarg);
+            log_msg(KWB_LOG_INFO, "baudrate %s", optarg);
             options->serial_baudrate = atoi(optarg);
             break;
         case 'a':
-            printf("router address %s\n", optarg);
+            log_msg(KWB_LOG_INFO, "router address %s", optarg);
             strcpy_s(options->router_address, sizeof(options->router_address), optarg);
             options->router_address_set = true;
             break;
         case 'p':
-            printf("router port %s\n", optarg);
+            log_msg(KWB_LOG_INFO, "router port %s", optarg);
             options->router_port = atoi(optarg);
             break;
         case 'n':
@@ -147,7 +148,7 @@ static bool parse_commandline_options (int argc, char* argv[], options_t* option
             strcpy_s(options->filename, sizeof(options->filename), optarg);
             break;
         case 'v':
-            log_add_mask(LOG_VERBOSE1 | LOG_VERBOSE2);
+            log_add_mask(KWB_LOG_VERBOSE1 | KWB_LOG_VERBOSE2);
             break;
         default:
             rc = false;
@@ -197,27 +198,27 @@ static bool parse_commandline_options (int argc, char* argv[], options_t* option
  */
 static void print_usage (void)
 {
-    printf("\nUsage:\n");
-    printf("kwbfirmware [-a <address>] [-p <port>] [-d <device>] [-b <baudrate>] [-n <node address>] [-f <path and filename to hex-file>]\n\n");
-    printf("Arguments:\n");
-    printf(" -a <address>        Address of kwbrouter server. Default: /tmp/kwbr.usk\n");
-    printf(" -p <port>           Port number of kwbrouter server. Default: 0\n");
-    printf(" -d <device>         Device of serial connection.\n");
-    printf(" -b <baudrate>       Baudrate of serial connection. Default: 57600\n");
-    printf(" -n <node address>   Node address of module to update.\n");
-    printf(" -f <filename>       Filename of firmware to update.\n");
-    printf(" -v                  Verbose logging.\n");
+    fprintf(stderr, "\nUsage:\n");
+    fprintf(stderr, "kwbfirmware [-a <address>] [-p <port>] [-d <device>] [-b <baudrate>] [-n <node address>] [-f <path and filename to hex-file>]\n\n");
+    fprintf(stderr, "Arguments:\n");
+    fprintf(stderr, " -a <address>        Address of kwbrouter server. Default: /tmp/kwbr.usk\n");
+    fprintf(stderr, " -p <port>           Port number of kwbrouter server. Default: 0\n");
+    fprintf(stderr, " -d <device>         Device of serial connection.\n");
+    fprintf(stderr, " -b <baudrate>       Baudrate of serial connection. Default: 57600\n");
+    fprintf(stderr, " -n <node address>   Node address of module to update.\n");
+    fprintf(stderr, " -f <filename>       Filename of firmware to update.\n");
+    fprintf(stderr, " -v                  Verbose logging.\n");
 
     #ifdef PRJCONF_WINDOWS
-    printf("\n" \
-           "NOTE: serial ports enumerated greater or equal to COM10\n" \
-           "      should be stated as follows: \\\\.\\COM10\n");
+    fprintf(stderr, "\n" \
+                    "NOTE: serial ports enumerated greater or equal to COM10\n" \
+                    "      should be stated as follows: \\\\.\\COM10\n");
     #endif // PRJCONF_WINDOWS
 }
 
 static void print_progress (uint8_t progress, void* arg)
 {
-    log_msg(LOG_STATUS, "Update progress %d", progress);
+    log_msg(KWB_LOG_INFO, "Update progress %d", progress);
 }
 
 // --- Module global functions -------------------------------------------------

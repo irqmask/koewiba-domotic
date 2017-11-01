@@ -22,6 +22,7 @@
   #include <safe_lib.h>
 #endif
 
+#include "kwb_defines.h"
 #include "log.h"
 #include "message.h"
 #include "prjtypes.h"
@@ -43,7 +44,7 @@
 
 // --- Global functions --------------------------------------------------------
 
-void msg_log (msg_t message)
+void msg_log (const char* keyword, msg_t message)
 {
     bool first_line = true;
     uint8_t remaining_length, ii, bytes_in_line;
@@ -74,7 +75,7 @@ void msg_log (msg_t message)
         ii++;
         if (bytes_in_line == 16 || remaining_length == 0) {
             bytes_in_line = 0;
-            log_msg(LOG_VERBOSE1, "%s", logline);
+            log_msg(KWB_LOG_INTERCOMM, "%s %s", keyword, logline);
             logline[0] = '\0';
         }
     }

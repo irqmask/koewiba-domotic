@@ -38,6 +38,8 @@
 #include "cmddef_common.h"
 #include "moddef_common.h"
 
+#include "kwb_defines.h"
+
 #include "crc16.h"
 #include "firmwareupdate.h"
 #include "ihex.h"
@@ -483,11 +485,11 @@ int firmware_update_start (firmwareupdate_t*    fwu,
             break;
         }
         fwu->fw_size = target_last_addr - fwu->fw_firstaddress + 1;
-        log_msg(LOG_STATUS, "target file: %s, module address %d", fwu->filename, fwu->module_address);
-        log_msg(LOG_STATUS, "target start address: 0x%04X", fwu->fw_startaddress);
-        log_msg(LOG_STATUS, "target first address: 0x%04X", fwu->fw_firstaddress);
-        log_msg(LOG_STATUS, "target last address:  0x%04X", target_last_addr);
-        log_msg(LOG_STATUS, "size:                 %d", fwu->fw_size);
+        log_msg(KWB_LOG_INFO, "target file: %s, module address %d", fwu->filename, fwu->module_address);
+        log_msg(KWB_LOG_INFO, "target start address: 0x%04X", fwu->fw_startaddress);
+        log_msg(KWB_LOG_INFO, "target first address: 0x%04X", fwu->fw_firstaddress);
+        log_msg(KWB_LOG_INFO, "target last address:  0x%04X", target_last_addr);
+        log_msg(KWB_LOG_INFO, "size:                 %d", fwu->fw_size);
 
         // allocate and initialie target memory. Initialize to 0xFF
         // because flash memory is 0xFF when it is erased.

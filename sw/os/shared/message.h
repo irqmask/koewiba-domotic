@@ -60,7 +60,7 @@ typedef void (*msg_conn_func_t)(const char* address, uint16_t port, void* refere
 
 // --- Global functions --------------------------------------------------------
 
-void msg_log (msg_t message);
+void msg_log (const char* keyword, msg_t message);
 
 #ifdef __cplusplus
 }

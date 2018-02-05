@@ -24,6 +24,15 @@ link_directories (
     ${CMAKE_CURRENT_BINARY_DIR}
 )
 
+# system dependent definitions
+# ---------------------------------------------------------
+if (WIN32)
+    # TODO implement missing secure functions for linux,
+    # change implementation to secure functions and remove
+    # this warning suppression.
+    add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+endif (WIN32)
+
 file (WRITE ${CMAKE_CURRENT_BINARY_DIR}/kwbrouter_version.h
      "const char* PGM_VERSION(\"${VERSION}\");\n")
 
@@ -41,8 +50,11 @@ set (os_include_SRCS
 )
 
 set (os_shared_SRCS
+    ../shared/ioloop.h
     ../shared/log.h
     ../shared/message.h
+    ../shared/message_serial.h
+    ../shared/message_socket.h
 
     ../shared/ioloop.c
     ../shared/log.c
@@ -52,9 +64,11 @@ set (os_shared_SRCS
 )
 
 set (kwbrouter_SRCS
+    router.h
     routeconnection.h
     rconnserial.h
     rconnsocketclient.h
+    socketserver.h
 
     router.cpp
     routeconnection.cpp

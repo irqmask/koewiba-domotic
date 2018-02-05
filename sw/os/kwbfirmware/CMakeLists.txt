@@ -24,6 +24,15 @@ link_directories (
     ${CMAKE_CURRENT_BINARY_DIR}
 )
 
+# system dependent definitions
+# ---------------------------------------------------------
+if (WIN32)
+    # TODO implement missing secure functions for linux,
+    # change implementation to secure functions and remove
+    # this warning suppression.
+    add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+endif (WIN32)
+
 file (WRITE ${CMAKE_CURRENT_BINARY_DIR}/kwbfirmware_version.h
      "const char* PGM_VERSION(\"${VERSION}\");\n")
 
@@ -38,6 +47,7 @@ set (include_SRCS
 
 set (shared_SRCS
     ../../shared/bus.h
+    ../../shared/crc16.h
 
     ../../shared/crc16.c
 )
@@ -47,8 +57,10 @@ set (os_include_SRCS
 )
 
 set (os_shared_SRCS
+    ../shared/ioloop.h
     ../shared/log.h
     ../shared/message.h
+    ../shared/message_serial.h
 
     ../shared/ioloop.c
     ../shared/log.c
@@ -57,6 +69,9 @@ set (os_shared_SRCS
 )
 
 set (kwbfirmware_SRCS
+    firmwareupdate.h
+    ihex.h
+
     firmwareupdate.c
     ihex.c
     kwbfirmware_main.c

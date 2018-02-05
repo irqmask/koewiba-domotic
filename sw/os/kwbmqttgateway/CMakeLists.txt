@@ -7,7 +7,7 @@ include_directories (
     ../include
     ../libsystem
     ../shared
-    ../3rd_party/jansson/src
+    ../3rd_party/mosquitto
     ${CMAKE_CURRENT_BINARY_DIR}
 )
 
@@ -21,9 +21,28 @@ else (WIN32)
     )
 endif (WIN32)
 
+
 link_directories (
     ${CMAKE_CURRENT_BINARY_DIR}
 )
+
+# system dependent link directories
+# ---------------------------------------------------------
+if (WIN32)
+    link_directories (
+        ../3rd_party/mosquitto
+        ../../3rd_party/mosquitto
+    )
+endif (WIN32)
+
+# system dependent definitions
+# ---------------------------------------------------------
+if (WIN32)
+    # TODO implement missing secure functions for linux,
+    # change implementation to secure functions and remove
+    # this warning suppression.
+    add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+endif (WIN32)
 
 file (WRITE ${CMAKE_CURRENT_BINARY_DIR}/kwbmqttgateway_version.h
      "const char* PGM_VERSION(\"${VERSION}\");\n")
@@ -42,8 +61,10 @@ set (os_include_SRCS
 )
 
 set (os_shared_SRCS
+    ../shared/ioloop.h
     ../shared/log.h
     ../shared/message.h
+    ../shared/message_socket.h
 
     ../shared/ioloop.c
     ../shared/log.c
@@ -52,6 +73,8 @@ set (os_shared_SRCS
 )
 
 set (kwbmqttgateway_SRCS
+    kwbmqttgateway.h
+
     kwbmqttgateway_main.c
     msg2mqtt.c
     mosquitto_ioloop_glue.c
@@ -85,13 +108,12 @@ set_property(TARGET kwbmqttgateway PROPERTY CXX_STANDARD 11)
 # Link libraries
 # ---------------------------------------------------------
 target_link_libraries (kwbmqttgateway libsystem)
+target_link_libraries (kwbmqttgateway mosquitto)
 
 if (WIN32)
-
 else (WIN32)
     target_link_libraries (kwbmqttgateway pthread)
     target_link_libraries (kwbmqttgateway safec-1.0)
-    target_link_libraries (kwbmqttgateway mosquitto)
 endif (WIN32)
 
 add_dependencies (kwbmqttgateway libsystem)

@@ -1,5 +1,14 @@
+/**
+ * @addtogroup KWBROUTER
+ *
+ * @{
+ * @file    socketserver.h
+ * @brief   Wrapper class to provide a server for UNIX sockets or TCP sockets 
+ *          using the /ref MESSAGE_SOCKET module.
+ *
+ * @author  Christian Verhalen
+ *///---------------------------------------------------------------------------
 /*
- * <one line to give the program's name and a brief idea of what it does.>
  * Copyright (C) 2017  christian <irqmask@gmx.de>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -14,9 +23,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
-
 #ifndef SOCKETSERVER_H
 #define SOCKETSERVER_H
 
@@ -27,6 +34,12 @@
 #include "rconnsocketclient.h"
 #include "router.h"
 
+/**
+ * Uses /refIOLOOP and /refMESSAGE_SOCKET to open and maintain a socket server
+ * for Unix-Sockets and TCP-Sockets to which clients can connect to.
+ * The socket server is not thread-safe and ment to be used in a single-threaded
+ * mainloop.
+ */
 class SocketServer
 {
 private:
@@ -49,3 +62,4 @@ public:
 };
 
 #endif // SOCKETSERVER_H
+/** @} */

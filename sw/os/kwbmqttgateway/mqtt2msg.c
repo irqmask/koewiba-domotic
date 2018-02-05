@@ -1,5 +1,13 @@
+/**
+ * @addtogroup KWBMQTTGATEWAY
+ *
+ * @{
+ * @file    mqtt2msg.c
+ * @brief   Convert koewiba message to mqtt and vice versa.
+ *
+ * @author  Christian Verhalen
+ *///---------------------------------------------------------------------------
 /*
- * kwbkouter - A router for koewiba-domotic messages.
  * Copyright (C) 2017  christian <irqmask@gmx.de>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -14,17 +22,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
-/**
- * @addtogroup KWBMQTTGATEWAY
- *
- * @{
- * @file    mqtt2msg.c
- * @brief   Convert koewiba message to mqtt and vice versa.
- *
- * @author  Christian Verhalen
- *///---------------------------------------------------------------------------
 
 // --- Include section ---------------------------------------------------------
 
@@ -35,11 +33,18 @@
 #include <string.h>
 
 #include "mosquitto.h"
-#include "safe_lib.h"
+#if defined (PRJCONF_UNIX) || \
+    defined (PRJCONF_POSIX) || \
+    defined (PRJCONF_LINUX)
+#include <safe_lib.h>
+#endif
 
 // include
 #include "cmddef_common.h"
 #include "prjtypes.h"
+
+// libsystem
+#include "sysstring.h"
 
 // os/include
 #include "error_codes.h"
@@ -94,31 +99,39 @@ int mqtt_split_topic(char* topic,
 {
     int retval = eERR_UNKNOWN_MESSAGE;
     char *slash_pos = topic;
-    char *senderstr, *receiverstr, regstr;
+    char *senderstr, *receiverstr;
 
     do {
+        slash_pos = strstr(topic, "/");
+        if (slash_pos == NULL) break;
         //! todo use safe string functions correctly! e.g. strlen(topic) = :-(
-        if (strstr_s(topic, strlen(topic), "/", 1, &slash_pos) != 0) break;
+        //if (strstr_s(topic, strlen(topic), "/", 1, &slash_pos) != 0) break;
         *slash_pos = '\0'; slash_pos++; if (*slash_pos == '\0') break;
         senderstr = slash_pos;
         topic = slash_pos;
-        if (strstr_s(topic, strlen(topic), "/", 1, &slash_pos) != 0) break;
+        //if (strstr_s(topic, strlen(topic), "/", 1, &slash_pos) != 0) break;
+        slash_pos = strstr(topic, "/");
+        if (slash_pos == NULL) break;
         *slash_pos = '\0'; slash_pos++; if (*slash_pos == '\0') break;
         receiverstr = slash_pos;
         topic = slash_pos;
-        if (strstr_s(topic, strlen(topic), "/", 1, &slash_pos) != 0) break;
+        //if (strstr_s(topic, strlen(topic), "/", 1, &slash_pos) != 0) break;
+        slash_pos = strstr(topic, "/");
+        if (slash_pos == NULL) break;
         *slash_pos = '\0'; slash_pos++; if (*slash_pos == '\0') break;
         *msgtype = slash_pos;
         topic = slash_pos;
-        if (strstr_s(topic, strlen(topic), "/", 1, &slash_pos) == 0) {
+        //if (strstr_s(topic, strlen(topic), "/", 1, &slash_pos) == 0) {
+        slash_pos = strstr(topic, "/");
+        if (slash_pos == NULL) {
+            *remaining_topic = NULL;
+        } else {
             *slash_pos = '\0'; slash_pos++;
             *remaining_topic = slash_pos;
-        } else {
-            *remaining_topic = NULL;
         }
 
-        *sender = strtoul(senderstr, NULL, 16);
-        *receiver = strtoul(receiverstr, NULL, 16);
+        *sender = (uint16_t)strtoul(senderstr, NULL, 16);
+        *receiver = (uint16_t)strtoul(receiverstr, NULL, 16);
 
         retval = eERR_NONE;
     } while (0);
@@ -348,7 +361,7 @@ int mqtt2msg(char* topic, char* msgtext, msg_t* message)
         }
 
         while (msg_types->func != NULL) {
-            if (strcasecmp(msgtype, msg_types->msgtype) == 0) {
+            if (sys_strcasecmp(msgtype, msg_types->msgtype) == 0) {
                 message->sender = sender;
                 message->receiver = receiver;
                 retval = msg_types->func(remaining_topic, msgtext, message);

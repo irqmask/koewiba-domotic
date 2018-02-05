@@ -1,5 +1,16 @@
+/**
+ * @addtogroup KWBROUTER
+ *
+ * @{
+ * @file    rconnserial.cpp
+ * @brief   Implementation of a route over a serial connection.
+ *
+ * This implements opening and closing as well as sending and receiving messages 
+ * over a serial connection.
+ *
+ * @author  Christian Verhalen
+ *///---------------------------------------------------------------------------
 /*
- * kwbkouter - A router for koewiba-domotic messages.
  * Copyright (C) 2017  christian <irqmask@gmx.de>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -14,9 +25,9 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 
+#include <stdio.h>
 #include <string.h>
 
 #include "log.h"
@@ -25,6 +36,9 @@
 
 // --- Local functions ---------------------------------------------------------
 
+/**
+ * Callback handler for incomming messages.
+ */
 static void incommingMessageHdl(msg_t* message, void* reference, void* arg)
 {
     RConnSerial* sercon = (RConnSerial*)arg;
@@ -33,6 +47,10 @@ static void incommingMessageHdl(msg_t* message, void* reference, void* arg)
 
 // --- Class member functions --------------------------------------------------
 
+/**
+ * Constructs a serial router connection object without usage of the ioloop
+ * background routine.
+ */
 RConnSerial::RConnSerial()
 {
     msg_ser_init(&this->serial);
@@ -40,6 +58,12 @@ RConnSerial::RConnSerial()
     snprintf(this->name, sizeof(name-1), "SERIAL");
 }
 
+/**
+ * Constructs a serial router connection object with usage of the ioloop
+ * background routine.
+ *
+ * @param[in]   ioloop      Pointer to existing ioloop.
+ */
 RConnSerial::RConnSerial(ioloop_t* ioloop)
 {
     msg_ser_init(&this->serial);
@@ -48,11 +72,23 @@ RConnSerial::RConnSerial(ioloop_t* ioloop)
     this->ioloop = ioloop;
 }
 
+/**
+ * The destructor closes serial connection if still open.
+ */
 RConnSerial::~RConnSerial()
 {
     msg_ser_close(&this->serial);
 }
 
+/**
+ * Constructs a serial router connection object with usage of the ioloop
+ * background routine.
+ *
+ * @param[in]   device      Path and filename of serial device e.g. /dev/ttyS0.
+ * @param[in]   baudrate    Baudrate of serial connection.
+ * 
+ * @returns 0 when successful, otherwise error code.
+ */
 int RConnSerial::Open(const char* device, int baudrate)
 {
     int retval = 0;
@@ -62,11 +98,21 @@ int RConnSerial::Open(const char* device, int baudrate)
     return retval;
 }
 
+/**
+ * Close the serial connection.
+ */
 void RConnSerial::Close()
 {
     msg_ser_close(&this->serial);
 }
 
+/**
+ * Send a message of type msg_t over the serial line.
+ *
+ * @param[in]   message     Message to be sent.
+ *
+ * @returns 0 when successful, otherwise error code.
+ */
 int RConnSerial::Send(msg_t* message)
 {
     log_msg(LOG_VERBOSE1, "%6s <-- message sent", this->GetName());
@@ -74,6 +120,14 @@ int RConnSerial::Send(msg_t* message)
     return msg_ser_send(&this->serial, message);
 }
 
+/**
+ * This callback is called when an incomming message from the serial line is 
+ * received. The message will be forwarded to the extOnIncommingMsg() handler
+ * of class RouteConnection.
+ *
+ * @param[in]   message     Received message. The message is only valid 
+ *                          during the lifetime of this function.
+ */
 void RConnSerial::OnIncommingMessage(msg_t* message)
 {
     log_msg(LOG_VERBOSE1, "%6s --> message received", this->GetName());
@@ -83,3 +137,4 @@ void RConnSerial::OnIncommingMessage(msg_t* message)
     }
 }
 
+/** @} */

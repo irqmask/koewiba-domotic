@@ -1,5 +1,13 @@
+/**
+ * @addtogroup KWBMQTTGATEWAY
+ *
+ * @{
+ * @file    msg2mqtt.c
+ * @brief   Convert koewiba message to mqtt and vice versa.
+ *
+ * @author  Christian Verhalen
+ *///---------------------------------------------------------------------------
 /*
- * kwbkouter - A router for koewiba-domotic messages.
  * Copyright (C) 2017  christian <irqmask@gmx.de>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -14,17 +22,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
-/**
- * @addtogroup KWBMQTTGATEWAY
- *
- * @{
- * @file    msg2mqtt.c
- * @brief   Convert koewiba message to mqtt and vice versa.
- *
- * @author  Christian Verhalen
- *///---------------------------------------------------------------------------
 
 // --- Include section ---------------------------------------------------------
 
@@ -110,6 +108,11 @@ void msg2mqtt_request_reg(msg_t* message, char* topic, size_t max_topic_len, cha
     msgtext[max_msgtext_len-1] = '\0';
 }
 
+/**
+ * Encode MQTT message "set register 8bit"
+ *
+ * @param[in]   message KWB set register 8bit message which is transformed into MWTT message.
+ */
 void msg2mqtt_set_reg_8bit(msg_t* message, char* topic, size_t max_topic_len, char* msgtext, size_t max_msgtext_len)
 {
     snprintf(topic, max_topic_len-1, "kwb/%04X/%04X/setreg8bit/%02X",

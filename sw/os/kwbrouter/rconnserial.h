@@ -1,5 +1,16 @@
+/**
+ * @addtogroup KWBROUTER
+ *
+ * @{
+ * @file    rconnserial.h
+ * @brief   Declaration of a route over a serial connection.
+ *
+ * This implements opening and closing as well as sending and receiving messages
+ * over a serial connection.
+ *
+ * @author  Christian Verhalen
+ *///---------------------------------------------------------------------------
 /*
- * kwbkouter - A router for koewiba-domotic messages.
  * Copyright (C) 2017  christian <irqmask@gmx.de>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -14,19 +25,20 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
-
 #ifndef RCONNSERIAL_H
 #define RCONNSERIAL_H
 
 #include "routeconnection.h"
 #include "message_serial.h"
 
+/**
+ * This class implements a route for KWB messages over a serial line.
+ */
 class RConnSerial : public RouteConnection
 {
 private:
-    msg_serial_t serial;
+    msg_serial_t serial;    //!< Concrete serial connetion.
 
 public:
     RConnSerial();
@@ -41,3 +53,4 @@ public:
 };
 
 #endif // RCONNSERIAL_H
+/** @} */

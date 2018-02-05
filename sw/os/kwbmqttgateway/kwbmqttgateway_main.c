@@ -1,5 +1,16 @@
+/**
+ * @addtogroup KWBMQTTGATEWAY
+ *
+ * @{
+ * @file    kwbmqttgateway_main.c
+ * @brief   Gateway to convert koewiba message to mqtt and vice versa.
+ * kwbmqttgateway routes commands comming from a kwbrouter to an mqtt broker.
+ * Messages from another MQTT client are aubscribed for and transmitted to a
+ * kwbrouter for distribution.
+ *
+ * @author  Christian Verhalen
+ *///---------------------------------------------------------------------------
 /*
- * kwbkouter - A router for koewiba-domotic messages.
  * Copyright (C) 2017  christian <irqmask@gmx.de>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -14,20 +25,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
-/**
- * @addtogroup KWBMQTTGATEWAY
- *
- * @{
- * @file    kwbmqttgateway_main.c
- * @brief   Gateway to convert koewiba message to mqtt and vice versa.
- * kwbmqttgateway routes commands comming from a kwbrouter to an mqtt broker.
- * Messages from another MQTT client are aubscribed for and transmitted to a
- * kwbrouter for distribution.
- *
- * @author  Christian Verhalen
- *///---------------------------------------------------------------------------
 
 // --- Include section ---------------------------------------------------------
 
@@ -38,8 +36,13 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "safe_lib.h"
 #include "mosquitto.h"
+
+#if defined (PRJCONF_UNIX) || \
+    defined (PRJCONF_POSIX) || \
+    defined (PRJCONF_LINUX)
+#include <safe_lib.h>
+#endif
 
 // include
 #include "kwb_defines.h"
@@ -60,22 +63,23 @@
 
 // --- Type definitions --------------------------------------------------------
 
+/**
+ * Storage type selected options for this application.
+ */
 typedef struct options {
-    char        serial_device[256];
-    int         serial_baudrate;
-    char        router_address[256];
-    uint16_t    router_port;
-    bool        serial_device_set;
-    bool        router_address_set;
-
+    char        router_address[256];    //!< address of tcp- or unix socket server.
+    uint16_t    router_port;            //!< port of tcp socket server or 0 for
+                                        //!< unix socket server.
+    bool        router_address_set;     //!< flag if router address is set and valid.
 } options_t;
 
 // --- Local variables ---------------------------------------------------------
 
-app_handles_t       g_handles;
-msg_socket_t        g_kwb_socket;
-msg_endpoint_t*     g_kwb_socket_ep;
-bool                g_end_application = false;
+app_handles_t       g_handles;          //!< stores globally used handles in 
+                                        //!< this application.
+msg_socket_t        g_kwb_socket;       //!< handle to established socket connection.
+msg_endpoint_t*     g_kwb_socket_ep;    //!< handle of endpoint of established socket connection.
+bool                g_end_application = false;  //!< flag, if mainloop shall be exited.
 
 // --- Module global variables -------------------------------------------------
 
@@ -83,6 +87,7 @@ bool                g_end_application = false;
 
 // --- Local functions ---------------------------------------------------------
 
+// funciton to set default options.
 static void set_options (options_t*     options,
                          const char*    router_address,
                          uint16_t       router_port)
@@ -123,6 +128,7 @@ static bool parse_commandline_options (int argc, char* argv[], options_t* option
     return rc;
 }
 
+// check for missing and given arguments which are mutual exclusive and validate the values.
 static bool validate_options(options_t* options)
 {
     bool    rc = false;
@@ -138,6 +144,7 @@ static bool validate_options(options_t* options)
     return rc;
 }
 
+// explain briefly the command-line arguments of the application 
 static void print_usage (void)
 {
     fprintf(stderr, "\nUsage:\n");
@@ -147,6 +154,7 @@ static void print_usage (void)
     fprintf(stderr, " -p <port>           Port number of kwbrouter server. Default: 0\n");
 }
 
+// writes the version of the mosquitto library to log-file.
 static void log_mqtt_version(void)
 {
     int major = 0, minor = 0, bugfix = 0;
@@ -155,6 +163,9 @@ static void log_mqtt_version(void)
     log_msg(LOG_STATUS, "MQTT Mosquitto client library version %d.%d.%d", major, minor, bugfix);
 }
 
+/**
+ * Is called by mqtt library when a mqtt message has been received.
+ */
 void on_mqtt_message(struct mosquitto* mosq, void *userdata, const struct mosquitto_message *message)
 {
     msg_t kwbmsg;
@@ -195,7 +206,7 @@ void my_subscribe_callback(struct mosquitto* mosq, void *userdata, int mid, int 
 int mosquitto_setup()
 {
     const char* mqtt_address = "localhost";
-    const uint mqtt_port = 1883;
+    const int mqtt_port = 1883;
     uint16_t mid = 0;
 
     g_handles.mosq = mosquitto_new("kwbmqttgateway", true, NULL);
@@ -246,7 +257,6 @@ void on_kwb_close_connection(const char* address, uint16_t port, void* reference
 int kwb_socket_setup(ioloop_t* ioloop, options_t* options)
 {
     int retval = eERR_NONE;
-    msg_endpoint_t* msg_ep;
 
     do {
         msg_s_init(&g_kwb_socket);
@@ -267,7 +277,7 @@ int kwb_socket_setup(ioloop_t* ioloop, options_t* options)
 
 int main (int argc, char* argv[])
 {
-    int             mid, rc = eERR_NONE;
+    int             rc = eERR_NONE;
     options_t       options;
     ioloop_t        mainloop;
 

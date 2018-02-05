@@ -1,5 +1,16 @@
+/**
+ * @addtogroup KWBMQTTGATEWAY
+ *
+ * @{
+ * @file    mosquitto_ioloop_glue.c
+ * @brief   Gateway to convert koewiba message to mqtt and vice versa.
+ * kwbmqttgateway routes commands comming from a kwbrouter to an mqtt broker.
+ * Messages from another MQTT client are aubscribed for and transmitted to a
+ * kwbrouter for distribution.
+ *
+ * @author  Christian Verhalen
+ *///---------------------------------------------------------------------------
 /*
- * kwbkouter - A router for koewiba-domotic messages.
  * Copyright (C) 2017  christian <irqmask@gmx.de>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -14,20 +25,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
-/**
- * @addtogroup KWBMQTTGATEWAY
- *
- * @{
- * @file    mosquitto_ioloop_glue.c
- * @brief   Gateway to convert koewiba message to mqtt and vice versa.
- * kwbmqttgateway routes commands comming from a kwbrouter to an mqtt broker.
- * Messages from another MQTT client are aubscribed for and transmitted to a
- * kwbrouter for distribution.
- *
- * @author  Christian Verhalen
- *///---------------------------------------------------------------------------
 
 // --- Include section ---------------------------------------------------------
 
@@ -85,10 +83,11 @@ static int on_misc_handler(void* arg)
 
 int mosquitto_connect_to_ioloop(app_handles_t* h)
 {
-    int fd, retval = eERR_NONE;
+    int retval = eERR_NONE;
+    sys_fd_t fd = INVALID_FD;
 
     do {
-        fd = mosquitto_socket(h->mosq);
+        fd = (sys_fd_t)mosquitto_socket(h->mosq);
         if (fd == INVALID_FD) {
             retval = eERR_INVALID_FD;
             break;
@@ -105,9 +104,9 @@ int mosquitto_connect_to_ioloop(app_handles_t* h)
  */
 void mosquitto_ioloop_suspend_write(app_handles_t* h)
 {
-    int fd;
+    sys_fd_t fd;
 
-    fd = mosquitto_socket(h->mosq);
+    fd = (sys_fd_t)mosquitto_socket(h->mosq);
     if (fd == INVALID_FD) return;
 
     if (mosquitto_want_write(h->mosq)) {

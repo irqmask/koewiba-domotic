@@ -1,3 +1,13 @@
+/**
+ * @addtogroup KWBROUTER
+ *
+ * @{
+ * @file    router.h
+ * @brief   Router takes incomming message from a connection and routes it to 
+ *          all other connections.
+ *
+ * @author  Christian Verhalen
+ *///---------------------------------------------------------------------------
 /*
  * kwbkouter - A router for koewiba-domotic messages.
  * Copyright (C) 2017  christian <irqmask@gmx.de>
@@ -16,7 +26,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-
 #ifndef ROUTER_H
 #define ROUTER_H
 
@@ -25,6 +34,14 @@
 
 #include "routeconnection.h"
 
+/**
+ * The router takes incomming message from a connection and routes it to 
+ * all other connections.
+ * The router is not thread-safe, it has to be used in a single threaded 
+ * loop.
+ * The current design routes an incomming message from one connection to 
+ * all other connections.
+ */
 class Router
 {
 private:
@@ -41,3 +58,4 @@ public:
 };
 
 #endif // ROUTER_H
+/** @} */

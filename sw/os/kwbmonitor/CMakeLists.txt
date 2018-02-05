@@ -27,6 +27,15 @@ link_directories (
 file (WRITE ${CMAKE_CURRENT_BINARY_DIR}/kwbmonitor_version.h
     "const char* PGM_VERSION(\"${VERSION}\");\n")
 
+# system dependent definitions
+# ---------------------------------------------------------
+if (WIN32)
+    # TODO implement missing secure functions for linux,
+    # change implementation to secure functions and remove
+    # this warning suppression.
+    add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+endif (WIN32)
+
 # header and source files
 # ---------------------------------------------------------
 set (include_SRCS

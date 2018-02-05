@@ -1,5 +1,13 @@
+/**
+ * @addtogroup KWBROUTER
+ *
+ * @{
+ * @file    routeconnection.h
+ * @brief   This is the base class for connections of the router.
+ *
+ * @author  Christian Verhalen
+ *///---------------------------------------------------------------------------
 /*
- * kwbkouter - A router for koewiba-domotic messages.
  * Copyright (C) 2017  christian <irqmask@gmx.de>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -14,15 +22,19 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
-
 #ifndef ROUTECONNECTION_H
 #define ROUTECONNECTION_H
 
 #include "ioloop.h"
 #include "message.h"
 
+/**
+ * Base class for connections to or from which messages are routed by the 
+ * router. 
+ * This class itself provides only common used functions for all 
+ * route-connection types. Do not use it by itself!
+ */
 class RouteConnection
 {
 protected:
@@ -51,3 +63,4 @@ public:
 };
 
 #endif // ROUTECONNECTION_H
+/** @} */

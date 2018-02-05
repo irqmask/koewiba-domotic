@@ -1,18 +1,12 @@
 /**
- * @addtogroup VBUSD_OR_SERIAL
- * @brief "vbus or serial": Module to switch between a vbusd connection and a
- *        serial connection.
+ * @addtogroup SYSSTRING
+ * @brief Various sting functions.
  *
- * This module allows an application to switch between a vbusd connection and
- * a serial connection during startup. This is useful if a application shall
- * run in both ways. For example a monitoring application could be connected to
- * vbusd during developement of a bus application and to a serial connection
- * later in the field.
+ * This module offers system independent functions for string handling.
  *
  * @{
- * @file    vos.h
- * @brief   "vbus or serial": Module to switch between a vbusd connection and a
- *          serial connection.
+ * @file    sysstring.h
+ * @brief   Various sting functions.
  *
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
@@ -32,28 +26,26 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef _VOS_H_
-#define _VOS_H_
+#ifndef _SYSSTRING_H_
+#define _SYSSTRING_H_
 
 // --- Include section ---------------------------------------------------------
+
+#include <stdio.h>
+#include <string.h>
 
 #include "system.h"
 
 // --- Definitions -------------------------------------------------------------
 
+//! Compare two strings case-insensitive
+#if defined (PRJCONF_WINDOWS)
+#define sys_strcasecmp  _stricmp
+#else
+#define sys_strcasecmp  strcasecmp    
+#endif
+
 // --- Type definitions --------------------------------------------------------
-
-typedef enum vos_if {
-    eVOS_IF_TYPE_UNKNOWN,
-    eVOS_IF_TYPE_SERIAL,
-    eVOS_IF_TYPE_VBUSD,
-    eVOS_IF_TYPE_LAST
-} vos_if_t;
-
-typedef struct vos {
-    vos_if_t    interface_type;
-    sys_fd_t    fd;
-} vos_t;
 
 // --- Local variables ---------------------------------------------------------
 
@@ -67,23 +59,10 @@ typedef struct vos {
 
 // --- Global functions --------------------------------------------------------
 
-int vos_open_serial (vos_t* vos, const char* device, int baudrate);
+#if defined (PRJCONF_WINDOWS) && (_MSC_VER) && _MSC_VER < 1900
+//int vsnprintf(char *outBuf, size_t size, const char *format, va_list ap);
+int snprintf(char *outBuf, size_t size, const char *format, ...);
+#endif
 
-int vos_open_vbusd (vos_t* vos, const char* address, uint16_t port);
-
-void vos_close (vos_t* vos);
-
-int vos_set_params (vos_t* vos, int baudrate);
-
-size_t vos_send (vos_t* vos, void* buf, size_t bufsize);
-
-size_t vos_recv (vos_t* vos, void* buf, size_t bufsize);
-
-void vos_flush (vos_t* vos);
-
-size_t vos_get_pending (vos_t* vos);
-
-size_t vos_get_pending_send_bytes (vos_t* vos);
-
-#endif /* _VOS_H_ */
+#endif /* _SYSSTRING_H_ */
 /** @} */

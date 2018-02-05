@@ -1,5 +1,13 @@
+/**
+ * @addtogroup KWBMQTTGATEWAY
+ *
+ * @{
+ * @file    kwbmqttgatewayh
+ * @brief   Common datastructures and functions used in kwbmqttgateway.
+ *
+ * @author  Christian Verhalen
+ *///---------------------------------------------------------------------------
 /*
- * kwbkouter - A router for koewiba-domotic messages.
  * Copyright (C) 2017  christian <irqmask@gmx.de>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -14,20 +22,11 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
-/**
- * @addtogroup KWBMQTTGATEWAY
- *
- * @{
- * @file    kwbmqttgatewayh
- * @brief   Common datastructures and functions used in kwbmqttgateway.
- *
- * @author  Christian Verhalen
- *///---------------------------------------------------------------------------
+#ifndef _KWBMQTTGATEWAY_H_
+#define _KWBMQTTGATEWAY_H_
 
 // --- Include section ---------------------------------------------------------
-
 
 #include <stdint.h>
 #include <stdio.h>
@@ -45,9 +44,10 @@
 
 // --- Type definitions --------------------------------------------------------
 
+//! Structure of global variables.
 typedef struct _app_handles_t {
-    ioloop_t*           ioloop;
-    struct mosquitto*   mosq;
+    ioloop_t*           ioloop;     //!< IO background loop /ref IOLOOP ioloop.
+    struct mosquitto*   mosq;       //!< Global mosquitto handle.
 } app_handles_t;
 
 // --- Local variables ---------------------------------------------------------
@@ -76,4 +76,5 @@ extern int mqtt2msg_subscribe(struct mosquitto* mosq);
 
 extern int mqtt2msg(char* topic, char* msgtext, msg_t* message);
 
+#endif // _KWBMQTTGATEWAY_H_
 /** @} */

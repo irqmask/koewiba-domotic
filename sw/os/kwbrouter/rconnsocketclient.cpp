@@ -1,5 +1,16 @@
+/**
+ * @addtogroup KWBROUTER
+ *
+ * @{
+ * @file    rconnsocketclient.cpp
+ * @brief   Implementation of a route over a socket connection.
+ *
+ * This implements opening and closing as well as sending and receiving messages
+ * over a socket connection. It connects to a socket server.
+ *
+ * @author  Christian Verhalen
+ *///---------------------------------------------------------------------------
 /*
- * kwbkouter - A router for koewiba-domotic messages.
  * Copyright (C) 2017  christian <irqmask@gmx.de>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -14,9 +25,9 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 
+#include <stdio.h>
 #include <string.h>
 
 // include 
@@ -28,12 +39,16 @@
 
 // --- Local functions ---------------------------------------------------------
 
+// will be called from /ref MESSAGE_SOCKET when a complete message has been
+// received and is passed to the common OnIncommingMessage() handler for all
+// type of connections.
 static void incommingMessageHdl(msg_t* message, void* reference, void* arg)
 {
     RConnSocketClient* sockcon = (RConnSocketClient*)arg;
     sockcon->OnIncommingMessage(message);
 }
 
+// will be called from /ref MESSAGE_SOCKET when a connection is closed. 
 static void closeConnectionHdl(const char* address, uint16_t port, void* reference, void* arg)
 {
     RConnSocketClient* sockcon = (RConnSocketClient*)arg;
@@ -42,6 +57,9 @@ static void closeConnectionHdl(const char* address, uint16_t port, void* referen
 
 // --- Class member functions --------------------------------------------------
 
+/**
+ * @todo consolidate constructors into one with default values.
+ */
 RConnSocketClient::RConnSocketClient() : ep(NULL),
                                          socket(NULL)
 {
@@ -51,6 +69,13 @@ RConnSocketClient::RConnSocketClient() : ep(NULL),
     snprintf(this->name, sizeof(name-1), "USOCK");
 }
 
+/**
+ * Initializes a socket connection which has been accepted by the socket server.
+ *
+ * @param[in]   server      Pointer to the server.
+ * @param[in]   ep          Endpoint of established socket-connection.
+ * @todo remove address and port from interface. It is only used for logging purposes. Let server do it.
+ */
 RConnSocketClient::RConnSocketClient(msg_socket_t* server, msg_endpoint_t* ep, const char* address, uint16_t port)
 {
     this->socket = server;
@@ -63,11 +88,22 @@ RConnSocketClient::RConnSocketClient(msg_socket_t* server, msg_endpoint_t* ep, c
     log_msg(LOG_STATUS, "%s New client socket connection %s:%d", this->name, address, port);
 }
 
+/**
+ * The destructor closes the socket connection if still open.
+ */
 RConnSocketClient::~RConnSocketClient()
 {
     this->Close();
 }
 
+/** 
+ * Open a socket connection either to a UNIX socket or to a TCP socket.
+ *
+ * @param[in]   address     Path and name to unix-socket ot TCP/IP address.
+ * @param[in]   port        0 for unix-socket or well-known TCP/IP port number.
+ *
+ * @returns 0 if successfull, otherwise error-code.
+ */
 int RConnSocketClient::Open(const char* address, int port)
 {
     int retval;
@@ -86,6 +122,9 @@ int RConnSocketClient::Open(const char* address, int port)
     return retval;
 }
 
+/**
+ * Actively close an established socket connection.
+ */
 void RConnSocketClient::Close()
 {
     if (this->socket != NULL && this->ep != NULL) {
@@ -95,6 +134,13 @@ void RConnSocketClient::Close()
     log_msg(KWB_LOG_STATUS, "%s close connection", this->GetName());
 }
 
+/**
+ * Send a KWB message over established socket connection.
+ *
+ * @param[in]   message     Message to be sent.
+ *
+ * @returns 0 if successfull, otherwise error-code.
+ */
 int RConnSocketClient::Send(msg_t* message)
 {
     log_msg(LOG_VERBOSE1, "%6s <-- message sent", this->GetName());
@@ -102,9 +148,13 @@ int RConnSocketClient::Send(msg_t* message)
     return msg_s_send(ep, message);
 }
 
+/**
+ * Called by external "OnClose" event
+ */
 void RConnSocketClient::OnConnectionClosed()
 {
     this->ep = NULL;
     RouteConnection::OnConnectionClosed();
 }
 
+/** @} */

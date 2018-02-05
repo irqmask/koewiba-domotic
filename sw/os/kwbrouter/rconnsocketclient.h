@@ -1,5 +1,16 @@
+/**
+ * @addtogroup KWBROUTER
+ *
+ * @{
+ * @file    rconnsocketclient.h
+ * @brief   Declaration of a route over a socket connection.
+ *
+ * This implements opening and closing as well as sending and receiving messages
+ * over a socket connection. It connects to a socket server.
+ *
+ * @author  Christian Verhalen
+ *///---------------------------------------------------------------------------
 /*
- * kwbkouter - A router for koewiba-domotic messages.
  * Copyright (C) 2017  christian <irqmask@gmx.de>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -14,9 +25,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
-
 #ifndef RCONNSOCKETCLIENT_H
 #define RCONNSOCKETCLIENT_H
 
@@ -24,14 +33,18 @@
 
 #include "routeconnection.h"
 
+/**
+ * This class implements a route for KWB messages over a socket
+ * connection.
+ */
 class RConnSocketClient : public RouteConnection
 {
 private:
-    ioloop_t*       ioloop;
-    msg_endpoint_t* ep;
-    msg_socket_t*   socket;
-    msg_socket_t    local_socket;
-
+    ioloop_t*       ioloop;         //!< Store reference to ioloop.
+    msg_endpoint_t* ep;             //!< Stores information about established socket connection.
+    msg_socket_t*   socket;         //!< Stores information about public socket server.
+    msg_socket_t    local_socket;   //!< Class local storage about socket server, if not 
+                                    //!< given by constructor.
 
 public:
     RConnSocketClient();
@@ -42,8 +55,8 @@ public:
     void Close();
 
     int Send(msg_t* message);
-    void OnMessageReceived(msg_t* message);
     void OnConnectionClosed();
 };
 
 #endif // RCONNSOCKETCLIENT_H
+/** @} */

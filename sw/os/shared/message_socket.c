@@ -8,6 +8,22 @@
  *
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
+/*
+ * Copyright (C) 2017  christian <irqmask@gmx.de>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 // --- Include section ---------------------------------------------------------
 
@@ -30,12 +46,19 @@
 
 // --- Type definitions --------------------------------------------------------
 
+/**
+ * Endpoint of established socket connection.
+ * An endpoint structure stores all the information about an established 
+ * point-to-point connection. Endpoints are stored in a linked list.
+ */
 typedef struct msg_endpoint {
-    msg_endpoint_t* next;
-    msg_ep_type_t   type;
-    msg_socket_t*   msg_socket;
-    sys_fd_t        fd;
-    msg_conn_func_t close_connection_handler;
+    msg_endpoint_t* next;           //!< Next element in linked list.
+    msg_ep_type_t   type;           //!< Connection-type. See #msg_ep_type_t.
+    msg_socket_t*   msg_socket;     //!< Information about public socket server.
+    sys_fd_t        fd;             //!< Handle to established connection.
+    //! handler for closed connections, called when connection is closed.
+    msg_conn_func_t close_connection_handler;   
+    //! Optional argument, conveyed to the closed connection handler, when called.
     void*           close_connection_arg;
 } msg_endpoint_t;
 

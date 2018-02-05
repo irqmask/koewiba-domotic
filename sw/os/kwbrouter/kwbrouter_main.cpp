@@ -1,5 +1,22 @@
+/**
+ * @addtogroup KWBROUTER
+ *
+ * @{
+ * @file    kwbrouter_main.c
+ * @brief   Router for commands received from bus or different nets.
+ * kwbrouter routs commands comming from a source to one or more destinations.
+ * Source and destination could be kwbrouters on a different IP or serial RS485
+ * connections or local UNIX sockets for IPC.
+ * Other programs eg a webserver or kwbupload a firmware uploader can connect
+ * to kwbrouter to receive or send messages.
+ *
+ * @todo Add possibility to have two servers simultaneously, one for unix 
+ *       sockets, one for tcp sockets.
+ * @todo Add possibility for router beeing a client to another router.
+ *
+ * @author  Christian Verhalen
+ *///---------------------------------------------------------------------------
 /*
- * kwbkouter - A router for koewiba-domotic messages.
  * Copyright (C) 2017  christian <irqmask@gmx.de>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -14,23 +31,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
-/**
- * @addtogroup KWBROUTER
- *
- * @{
- * @file    kwbrouter_main.c
- * @brief   Router for commands received from bus or different nets.
- * kwbrouter routs commands comming from a source to one or more destinations.
- * Source and destination could be kwbrouters on a different IP or serial RS485
- * connections or local UNIX sockets for IPC.
- * Other programs eg a webserver or kwbupload a firmware uploader can connect
- * to kwbrouter to receive or send messages.
- *
- * @author  Christian Verhalen
- *///---------------------------------------------------------------------------
-
 // --- Include section ---------------------------------------------------------
 
 #include "prjconf.h"
@@ -40,7 +41,11 @@
 #include <string.h>
 
 extern "C" {
-#include "safe_lib.h"
+#if defined (PRJCONF_UNIX) || \
+    defined (PRJCONF_POSIX) || \
+    defined (PRJCONF_LINUX)
+#include <safe_lib.h>
+#endif
 }
 
 // include
@@ -65,14 +70,14 @@ using namespace std;
 
 // --- Type definitions --------------------------------------------------------
 
+//! Stores default and interpreted command-line arguments
 typedef struct options {
-    char        serial_device[256];
-    int         serial_baudrate;
-    char        router_address[256];
-    uint16_t    router_port;
-    bool        serial_device_set;
-    bool        router_address_set;
-
+    char        serial_device[256];     //! Name of the serial device connection.
+    int         serial_baudrate;        //! Baudrate for the serial connection.
+    char        router_address[256];    //! Address of the router or unix socket
+    uint16_t    router_port;            //! Listening port of the router
+    bool        serial_device_set;      //! Flag, if a serial device is configured.
+    bool        router_address_set;     //! Flag, if a router is configured.
 } options_t;
 
 // --- Local variables ---------------------------------------------------------
@@ -83,6 +88,9 @@ typedef struct options {
 
 // --- Local functions ---------------------------------------------------------
 
+// used to preset the option structure with valid argument values.
+// @todo consider using reference instead of pointer so the lifetime pf option 
+//       structure is clear to the programmer.
 static void set_options (options_t*     options,
                          const char*    serial_device,
                          int            serial_baudrate,
@@ -101,6 +109,8 @@ static void set_options (options_t*     options,
     options->router_port = router_port;
 }
 
+// @todo consider using reference instead of pointer so the lifetime pf option 
+//       structure is clear to the programmer.
 static bool parse_commandline_options (int argc, char* argv[], options_t* options)
 {
     bool                    rc = true;
@@ -138,6 +148,7 @@ static bool parse_commandline_options (int argc, char* argv[], options_t* option
     return rc;
 }
 
+// check for missing and given arguments which are mutual exclusive and validate the values.
 static bool validate_options(options_t* options)
 {
     bool    rc = false,
@@ -161,6 +172,7 @@ static bool validate_options(options_t* options)
     return rc;
 }
 
+// explain briefly the command-line arguments of the application 
 static void print_usage (void)
 {
     fprintf(stderr, "\nUsage:\n");
@@ -172,6 +184,9 @@ static void print_usage (void)
     fprintf(stderr, " -b <baudrate>       Baudrate of serial bus connection. Default: 57600\n");
 }
 
+// name speeks for itself. A file is needed to open a unix socket otherwise 
+// you'll get "file not found" error.
+//@todo consider moving this into /ref MESSAGE_SOCKET module.
 static void create_unix_socket_file(options_t* options)
 {
     FILE* file_handle;
@@ -184,6 +199,9 @@ static void create_unix_socket_file(options_t* options)
 
 // --- Global functions --------------------------------------------------------
 
+/**
+ * Entry point into kwbrouter application.
+ */
 int main (int argc, char* argv[])
 {
     int             rc = eERR_NONE;

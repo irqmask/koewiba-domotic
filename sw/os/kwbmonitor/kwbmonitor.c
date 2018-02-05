@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2017  christian <irqmask@gmx.de>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 #include <stdio.h>
 #include <string.h>
 
@@ -16,8 +32,8 @@ static void current_time_difference (bus_history_t* history, uint32_t* diff_ms, 
     sys_time_t diff_us;
 
     diff_us = (history->time_curr_byte - history->time_start);
-    *diff_ms = diff_us / 1000;
-    *remaining_us = diff_us - (*diff_ms * 1000);
+    *diff_ms = (uint32_t)(diff_us / 1000);
+    *remaining_us = (uint32_t)(diff_us - (*diff_ms * 1000));
 }
 
 void monitor_init (bus_history_t* history)

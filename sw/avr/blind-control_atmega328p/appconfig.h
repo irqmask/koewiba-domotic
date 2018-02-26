@@ -15,6 +15,7 @@
 
 // --- Include section ---------------------------------------------------------
 
+#include "cmddef_common.h"
 #include "prjtypes.h"
 #include "moddef_common.h"
 
@@ -29,6 +30,11 @@
 #define APP_eSLEEPMASK_MOTOR    (1<<0)  //!< Mask used for sleep_prevent() function.
                                         //!< Prevent the controller to fall asleep if motor is moving.
 // --- Type definitions --------------------------------------------------------
+
+//! Application specific commands
+typedef enum appcommands {
+    APP_eCmd_Stop = eCMD_FIRST_APP_SPECIFIC,    //!< Stop blind movement
+} eCommands_t;
 
 //! Application specific layout of registers
 typedef enum appregisters {

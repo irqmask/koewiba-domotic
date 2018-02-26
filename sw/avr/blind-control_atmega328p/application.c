@@ -89,7 +89,10 @@ void app_init (void)
 void app_on_command (uint16_t sender, uint8_t msglen, uint8_t* msg)
 {
     switch (msg[0]) {
-    //TODO insert application specific command interpreter here!
+    case APP_eCmd_Stop:
+        blind_stop();
+        break;
+
     default:
         break;
     }

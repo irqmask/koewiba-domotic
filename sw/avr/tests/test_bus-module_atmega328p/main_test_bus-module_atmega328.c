@@ -129,6 +129,7 @@ int main(void)
     	LED_ERROR_ON;
         msg[1] = 0x00; // 1 = test succeeded, 0 = test failed
     } else {
+        LED_STATUS_ON;
         msg[1] = 0x01; // 1 = test succeeded, 0 = test failed
     }
     // report EEProm test status

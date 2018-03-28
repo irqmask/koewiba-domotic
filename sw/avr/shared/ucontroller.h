@@ -254,15 +254,15 @@
  #define REGBIT_SPI2X0          SPI2X0
  #else
 // SPI
- #define REG_SPCR0              SPCR
- #define REG_SPDR0              SPDR
- #define REG_SPSR0              SPSR
+ #define REG_SPCR0              SPCR0
+ #define REG_SPDR0              SPDR0
+ #define REG_SPSR0              SPSR0
  // SPCR
- #define REGBIT_SPE0            SPE
- #define REGBIT_MSTR0           MSTR
+ #define REGBIT_SPE0            SPE0
+ #define REGBIT_MSTR0           MSTR0
  // SPSR
- #define REGBIT_SPIF0           SPIF
- #define REGBIT_SPI2X0          SPI2X
+ #define REGBIT_SPIF0           SPIF0
+ #define REGBIT_SPI2X0          SPI2X0
  #endif // AVRSTUDIO6
 
  // Signature byte addresses.

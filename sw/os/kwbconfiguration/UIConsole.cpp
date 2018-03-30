@@ -260,8 +260,8 @@ void UIMain::writeRegister()
     }
     std::cout << "Write register of module ID: 0x" << std::hex <<selected_module_id << std::endl;
     register_id = queryU8("Please select register: ");
-    value = queryU8("Please enter value: ");
-    std::cout << "Module: " << selected_module_id << " Register: 0x" << std::hex << +register_id << " ";
+    value = queryU32("Please enter value: ");
+    std::cout << "Module: 0x" << std::hex << selected_module_id << " Register: 0x" << std::hex << +register_id << " ";
     if (app.writeRegister(register_id, value)) {
         std::cout << "Value: " << std::dec << value << " / 0x" << std::hex << value << " written." << std::endl; 
     } else {   

@@ -139,7 +139,7 @@ static void send_current_position (uint8_t index, sBus_t* bus)
     uint8_t msg[3];
 
     msg[0] = eCMD_STATE_8BIT;
-    msg[1] = APP_eReg_PositionCurrent;
+    msg[1] = APP_eReg_B0_PositionCurrent + APP_NUM_REGS_PER_BLIND * index;
     msg[2] = g_blind_control[index].current_position;
     bus_send_message(bus, BUS_BRDCSTADR, 3, msg);
 }
@@ -154,7 +154,7 @@ static void send_position_setpoint (uint8_t index, sBus_t* bus)
     uint8_t msg[3];
 
     msg[0] = eCMD_STATE_8BIT;
-    msg[1] = APP_eReg_PositionSetPoint;
+    msg[1] = APP_eReg_B0_PositionSetPoint + APP_NUM_REGS_PER_BLIND * index;
     msg[2] = g_blind_control[index].position_setpoint;
     bus_send_message(bus, BUS_BRDCSTADR, 3, msg);
 }

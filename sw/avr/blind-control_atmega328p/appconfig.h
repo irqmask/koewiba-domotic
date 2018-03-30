@@ -42,14 +42,14 @@ typedef enum appcommands {
 //! Application specific layout of registers
 typedef enum appregisters {
     // registers saved in EEProm
-    APP_eReg_PositionCurrent = MOD_eReg_FirstAppSpecific, //!< Current position of blind
-    APP_eReg_PositionSetPoint,  //!< Wanted position of blind. 100 = completely closed. 0 = completely open
-    APP_eReg_PositionDifference,//!< Difference between wanted and current position.
-    APP_eReg_ReactionDelay,     //!< Delay time in timer ticks (1/100sec) until movement starts after applying power.
-    APP_eReg_DurationOpen,      //!< Duration in timer ticks (1/100sec) to fully open the blind.
-    APP_eReg_DurationClose,     //!< Duration in timer ticks (1/100sec) to fully close the blind.
-    APP_eReg_Unused1,           //!< unused
-    APP_eReg_Unused2,           //!< unused
+    APP_eReg_B0_PositionCurrent = MOD_eReg_FirstAppSpecific, //!< Current position of blind
+    APP_eReg_B0_PositionSetPoint,  //!< Wanted position of blind. 100 = completely closed. 0 = completely open
+    APP_eReg_B0_PositionDifference,//!< Difference between wanted and current position.
+    APP_eReg_B0_ReactionDelay,     //!< Delay time in timer ticks (1/100sec) until movement starts after applying power.
+    APP_eReg_B0_DurationOpen,      //!< Duration in timer ticks (1/100sec) to fully open the blind.
+    APP_eReg_B0_DurationClose,     //!< Duration in timer ticks (1/100sec) to fully close the blind.
+    APP_eReg_B0_Unused1,           //!< unused
+    APP_eReg_B0_Unused2,           //!< unused
 
     APP_eReg_TimeUp1_Weekday,
     APP_eReg_TimeUp1_Hour,
@@ -77,6 +77,9 @@ typedef enum appregisters {
     // insert application specific registers here
     APP_eReg_Last
 } eRegisters_t;
+
+//! Number of registers per blind
+#define APP_NUM_REGS_PER_BLIND (APP_eReg_B0_Unused2 - APP_eReg_B0_PositionCurrent + 1)
 
 //! Application specific layout of non volatile parameters (internal EEProm)
 typedef enum appconfig {

@@ -58,22 +58,22 @@ bool        app_register_get        (uint8_t                reg_no,
 
     switch (reg_no) {
     // registers in ROM/RAM
-    case APP_eReg_PositionCurrent:
+    case APP_eReg_B0_PositionCurrent:
         *(uint8_t*)pvalue = blind_get_current_position(0);
         break;
-    case APP_eReg_PositionSetPoint:
+    case APP_eReg_B0_PositionSetPoint:
         *(uint8_t*)pvalue = blind_get_position_setpoint(0);
         break;
 
     // registers saved in EEProm
-    case APP_eReg_ReactionDelay:
+    case APP_eReg_B0_ReactionDelay:
         *(uint8_t*)pvalue = eeprom_read_byte(&register_eeprom_array[APP_eCfg_ReactionDelay]);
         break;
-    case APP_eReg_DurationOpen:
+    case APP_eReg_B0_DurationOpen:
         *(uint16_t*)pvalue = eeprom_read_word((uint16_t*)&register_eeprom_array[APP_eCfg_DurationOpen]);
         *preg_type = eRegType_U16;
         break;
-    case APP_eReg_DurationClose:
+    case APP_eReg_B0_DurationClose:
         *(uint16_t*)pvalue = eeprom_read_word((uint16_t*)&register_eeprom_array[APP_eCfg_DurationClose]);
         *preg_type = eRegType_U16;
         break;
@@ -93,25 +93,25 @@ void        app_register_set        (uint8_t                reg_no,
 
     // registers in ROM/RAM
     switch (reg_no) {
-    case APP_eReg_PositionCurrent:
+    case APP_eReg_B0_PositionCurrent:
         // read only
         break;
-    case APP_eReg_PositionSetPoint:
+    case APP_eReg_B0_PositionSetPoint:
         blind_move_to_position(0, value & 0x000000FF);
         break;
 
     // registers saved in EEProm
-    case APP_eReg_ReactionDelay:
+    case APP_eReg_B0_ReactionDelay:
         value8 = value & 0x000000FF;
         blind_set_reaction_delay(0, value8);
         eeprom_write_byte(&register_eeprom_array[APP_eCfg_ReactionDelay], value8);
         break;
-    case APP_eReg_DurationOpen:
+    case APP_eReg_B0_DurationOpen:
         value16 = value & 0x0000FFFF;
         blind_set_duration_open(0, value16);
         eeprom_write_word((uint16_t*)&register_eeprom_array[APP_eCfg_DurationOpen], value16);
         break;
-    case APP_eReg_DurationClose:
+    case APP_eReg_B0_DurationClose:
         value16 = value & 0x0000FFFF;
         blind_set_duration_close(0, value16);
         eeprom_write_word((uint16_t*)&register_eeprom_array[APP_eCfg_DurationClose], value16);

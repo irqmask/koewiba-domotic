@@ -70,6 +70,7 @@
 
 // --- Global functions --------------------------------------------------------
 
+/*
 void dbg_toggle_status_LED (void);
 
 void dbg_status_LED_on (void);
@@ -81,5 +82,5 @@ void dbg_toggle_error_LED (void);
 void dbg_error_LED_on (void);
 
 void dbg_error_LED_off (void);
-
+*/
 #endif /* LED_DEBUG_H_ */

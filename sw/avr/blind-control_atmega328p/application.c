@@ -27,6 +27,7 @@
 #include "blindctrl.h"
 #include "bus.h"
 #include "cmddef_common.h"
+#include "datetime.h"
 #include "inputs.h"
 #include "motor.h"
 #include "register.h"
@@ -72,8 +73,10 @@ extern void        app_register_load       (void);
 void app_init (void) 
 {
     input_initialize();
-    motor_initialize();
-    blind_initialize();
+    motors_initialize();
+    blinds_initialize();
+    dt_initialize();
+
     // load application parameters
     app_register_load();
     // initialize window statemachine
@@ -88,9 +91,12 @@ void app_init (void)
  */
 void app_on_command (uint16_t sender, uint8_t msglen, uint8_t* msg)
 {
+    uint8_t blind_index = 0;
+
     switch (msg[0]) {
     case APP_eCmd_Stop:
-        blind_stop();
+        blind_index = msg[1];
+        if (blind_index < BLIND_COUNT) blind_stop(blind_index);
         break;
 
     default:
@@ -108,10 +114,10 @@ void app_background (sBus_t* bus)
     input_background();
 
     if (input_up()) {
-        blind_move_to_position(100);
+        blind_move_to_position(0, 100);
     }
     if (input_down()) {
-        blind_move_to_position(0);
+        blind_move_to_position(0, 0);
     }
 
     // check window position
@@ -121,8 +127,8 @@ void app_background (sBus_t* bus)
         send_window_state(bus);
     }
 
-    motor_background();
-    blind_background(bus);
+    motors_background();
+    blinds_background(bus);
 }
 
 /** @} */

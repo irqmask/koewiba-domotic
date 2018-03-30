@@ -21,9 +21,6 @@
 
 // --- Definitions -------------------------------------------------------------
 
-//! Maximum number of parallel running timers
-#define CLOCK_NUM_TIMER         5
-
 // --- Type definitions --------------------------------------------------------
 
 // --- Local variables ---------------------------------------------------------

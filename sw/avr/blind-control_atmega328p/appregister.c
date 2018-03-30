@@ -7,6 +7,9 @@
  * @file    appregister.h
  * @brief   Registers of the application "basic_app_atmega328".
  *
+ * The application specific registers are like this:
+ *
+ *
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
 
@@ -38,9 +41,9 @@
 
 void        app_register_load       (void)
 {
-    blind_set_reaction_delay(eeprom_read_byte(&register_eeprom_array[APP_eCfg_ReactionDelay]));
-    blind_set_duration_open(eeprom_read_word((uint16_t*)&register_eeprom_array[APP_eCfg_DurationOpen]));
-    blind_set_duration_close(eeprom_read_word((uint16_t*)&register_eeprom_array[APP_eCfg_DurationClose]));
+    blind_set_reaction_delay(0, eeprom_read_byte(&register_eeprom_array[APP_eCfg_ReactionDelay]));
+    blind_set_duration_open(0, eeprom_read_word((uint16_t*)&register_eeprom_array[APP_eCfg_DurationOpen]));
+    blind_set_duration_close(0, eeprom_read_word((uint16_t*)&register_eeprom_array[APP_eCfg_DurationClose]));
 }
 
 bool        app_register_get        (uint8_t                reg_no,
@@ -56,10 +59,10 @@ bool        app_register_get        (uint8_t                reg_no,
     switch (reg_no) {
     // registers in ROM/RAM
     case APP_eReg_PositionCurrent:
-        *(uint8_t*)pvalue = blind_get_current_position();
+        *(uint8_t*)pvalue = blind_get_current_position(0);
         break;
     case APP_eReg_PositionSetPoint:
-        *(uint8_t*)pvalue = blind_get_position_setpoint();
+        *(uint8_t*)pvalue = blind_get_position_setpoint(0);
         break;
 
     // registers saved in EEProm
@@ -94,23 +97,23 @@ void        app_register_set        (uint8_t                reg_no,
         // read only
         break;
     case APP_eReg_PositionSetPoint:
-        blind_move_to_position(value & 0x000000FF);
+        blind_move_to_position(0, value & 0x000000FF);
         break;
 
     // registers saved in EEProm
     case APP_eReg_ReactionDelay:
         value8 = value & 0x000000FF;
-        blind_set_reaction_delay(value8);
+        blind_set_reaction_delay(0, value8);
         eeprom_write_byte(&register_eeprom_array[APP_eCfg_ReactionDelay], value8);
         break;
     case APP_eReg_DurationOpen:
         value16 = value & 0x0000FFFF;
-        blind_set_duration_open(value16);
+        blind_set_duration_open(0, value16);
         eeprom_write_word((uint16_t*)&register_eeprom_array[APP_eCfg_DurationOpen], value16);
         break;
     case APP_eReg_DurationClose:
         value16 = value & 0x0000FFFF;
-        blind_set_duration_close(value16);
+        blind_set_duration_close(0, value16);
         eeprom_write_word((uint16_t*)&register_eeprom_array[APP_eCfg_DurationClose], value16);
         break;
     default:

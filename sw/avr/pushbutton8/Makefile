@@ -1,6 +1,6 @@
-MCU = atmega88
+MCU = atmega328p
 FORMAT = ihex
-TARGET = taster8_atmega88
+TARGET = pushbutton8
 
 ROOTDIR = $(subst \,/,$(shell pwd))/..
 include ../buildscripts/lib/lib_outputdirs.mk
@@ -16,11 +16,11 @@ SRC = ../shared/bus_transport.c \
       shared/led_debug.c \
       shared/register.c \
       shared/sleepmode.c \
-      taster8/appregister.c \
-      taster8/application.c \
-      taster8/appversion.c \
-      taster8/ledskeys.c \
-      taster8/main_taster8.c
+      pushbutton8/appregister.c \
+      pushbutton8/application.c \
+      pushbutton8/appversion.c \
+      pushbutton8/ledskeys.c \
+      pushbutton8/main_pushbutton8.c
 
 # Place -I options here
 INCDIRS = -I. \
@@ -29,9 +29,9 @@ INCDIRS = -I. \
           -I../../include \
           -I../../shared
 
-LOCAL_CFLAGS = -DF_CPU=16000000 -DHAS_PCBCONFIG_H -DHAS_APPCONFIG_H
+LOCAL_CFLAGS = -DF_CPU=7372800 -DHAS_PCBCONFIG_H -DHAS_APPCONFIG_H
 LOCAL_ASFLAGS =
-LOCAL_LDFLAGS =
+LOCAL_LDFLAGS = -T ../include/avr5_kwb.x
 
 include ../buildscripts/lib/lib_build_avr.mk
 include ../buildscripts/lib/lib_program_avr.mk

@@ -135,21 +135,20 @@ static bool receive (sBus_t* psBus)
                     break;
                 }
                 psBus->sRecvMsg.uReceiver = u;
-                // hello, is it me you are looking for (or broadcast-message)?
-                if ((psBus->sCfg.router_mode) ||
-                    (BUS_BRDCSTADR == u) ||
-                    (u == psBus->sCfg.uOwnNodeAddress)) {
-                    // nothing more to do here.
-                } else {
-                    // we are not interested in this message
-                    psBus->eState = eBus_ReceivingPassive;
-                }
 
             // 5. byte: EA - Extended address 4bit sender in higher nibble, 4bit receiver in lower nibble.
             } else if (psBus->sRecvMsg.uOverallLength == 4) {
                 psBus->sRecvMsg.uSender |= (((uint16_t)u & 0x00F0) << 4);
                 psBus->sRecvMsg.uReceiver |= (((uint16_t)u & 0x000F) << 8);
-                // TODO check receiver address again
+                // hello, is it me you are looking for (or broadcast-message or router)?
+                if (psBus->sCfg.router_mode ||
+                    psBus->sRecvMsg.uReceiver == BUS_BRDCSTADR ||
+                    psBus->sRecvMsg.uReceiver == psBus->sCfg.uOwnAddress) {
+                    // nothing more to do here.
+                } else {
+                    // we are not interested in this message
+                    psBus->eState = eBus_ReceivingPassive;
+                }
 
             // receive data (5th byte till length + 3(SY+AS+LE) - 2(CRC))
             } else if (psBus->sRecvMsg.uOverallLength > 4) {

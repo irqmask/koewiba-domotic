@@ -26,10 +26,10 @@
 typedef uint8_t     uKeyVal_t;      //!< Type to store key states.
 
 typedef enum {
-    eLed_off,
-    eLed_on,
-    eLed_blink_slow,
-    eLed_blink_fast
+    eLED_off,
+    eLED_on,
+    eLED_blink_slow,
+    eLED_blink_fast
 } eLEDMode_t;
 
 // --- Local variables ---------------------------------------------------------
@@ -46,17 +46,17 @@ typedef enum {
 
 void        leds_keys_init          (void);
 
-void        led_switch              (uint8_t uLED, eLEDMode_t eMode);
+void        leds_keys_background    (void);
 
-uKeyVal_t   key_get_pressed         (uKeyVal_t uKeyMask);
+void        led_switch              (uint8_t led_index, eLEDMode_t mode);
 
-uKeyVal_t   key_get_pressed_repeat  (uKeyVal_t uKeyMask);
+uint8_t     key_get_pressed         (uint8_t mask);
 
-uKeyVal_t   key_get_pressed_short   (uKeyVal_t uKeyMask);
+uint8_t     key_get_pressed_repeat  (uint8_t mask);
 
-uKeyVal_t   key_get_pressed_long    (uKeyVal_t uKeyMask);
+uint8_t     key_get_pressed_short   (uint8_t mask);
 
-void        key_clear               (void);
+uint8_t     key_get_pressed_long    (uint8_t mask);
 
 #endif // _LEDS_KEYS_H_
 /** @} */

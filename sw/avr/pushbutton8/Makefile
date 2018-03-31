@@ -11,16 +11,18 @@ include ../buildscripts/lib/lib_outputdirs.mk
 SRC = ../shared/bus_transport.c \
       ../shared/crc16.c \
       ../shared/queue.c \
+      shared/block_message.c \
       shared/bus_phy.c \
       shared/clock.c \
+      shared/eeprom_spi.c \
       shared/led_debug.c \
+      shared/main_avr.c \
       shared/register.c \
       shared/sleepmode.c \
-      pushbutton8/appregister.c \
       pushbutton8/application.c \
+      pushbutton8/appregister.c \
       pushbutton8/appversion.c \
       pushbutton8/ledskeys.c \
-      pushbutton8/main_pushbutton8.c
 
 # Place -I options here
 INCDIRS = -I. \

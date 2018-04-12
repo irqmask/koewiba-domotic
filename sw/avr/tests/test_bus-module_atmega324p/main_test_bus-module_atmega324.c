@@ -87,7 +87,7 @@ static void interpret_message (uint16_t sender, uint8_t msglen, uint8_t* msg)
         break;
 
     case eCMD_SLEEP:
-        bus_sleep(&g_bus);
+        //bus_sleep(&g_bus);
         break;
 
     default:
@@ -109,7 +109,7 @@ int main(void)
     LED_ERROR_DDR |= (1<<LED_ERROR);
     clk_initialize();
 
-    //register_set_u16(MOD_eReg_ModuleID, 0x202);
+    //register_set_u16(MOD_eReg_ModuleID, 0x6E);
     register_get(MOD_eReg_ModuleID, 0, &module_id);
     bus_configure(&g_bus, module_id);
     bus_initialize(&g_bus, 0);// initialize bus on UART 0

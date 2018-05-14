@@ -67,7 +67,7 @@ static void dt_tick_day(void)
     uint8_t dpm;
 
     g_dtdata.dow++;
-    if (g_dtdata.dow > CLK_SUNDAY) g_dtdata.dow = CLK_MONDAY;
+    if (g_dtdata.dow > DT_SUNDAY) g_dtdata.dow = DT_MONDAY;
 
     dpm = g_days_per_month[g_dtdata.month];
     // leap year?
@@ -124,7 +124,7 @@ void dt_initialize(void)
     g_dtdata.hour = 0;
     g_dtdata.minute = 0;
     g_dtdata.second = 0;
-    g_dtdata.dow = CLK_MONDAY;
+    g_dtdata.dow = DT_MONDAY;
 }
 
 /**
@@ -146,7 +146,7 @@ void dt_set(uint16_t year, uint8_t month, uint8_t day,
 {
     if (month < 1 || month > 12 ||
         day < 1 || day > 31 ||
-        hour > 23 || minute > 59 || second > 59 || dow > CLK_SUNDAY) {
+        hour > 23 || minute > 59 || second > 59 || dow > DT_SUNDAY) {
         return;
     }
     g_dtdata.year = year;
@@ -169,7 +169,7 @@ void dt_set(uint16_t year, uint8_t month, uint8_t day,
  * @param[out]  minute  Minute to set. Possible values are 0..59.
  * @param[out]  second  Second to set. Possible values are 0..59.
  * @param[out]  dow     Day of week. Possible values are
- *                      CLK_MONDAY .. CLK_SUNDAY.
+ *                      DT_MONDAY .. DT_SUNDAY.
  */
 void dt_get(uint16_t *year, uint8_t *month, uint8_t *day,
                uint8_t *hour, uint8_t *minute, uint8_t *second,
@@ -204,6 +204,15 @@ uint16_t dt_get_year()
 }
 
 /**
+ * Sets the current year.
+ * @param[in]   year    Year to set.
+ */
+void dt_set_year(uint16_t year)
+{
+    g_dtdata.year = year;
+}
+
+/**
  * @returns current month.
  */
 uint8_t dt_get_month()
@@ -212,11 +221,33 @@ uint8_t dt_get_month()
 }
 
 /**
+ * Sets the current month.
+ * @param[in]   month     Month to set.
+ */
+void dt_set_month(uint8_t month)
+{
+    if (month > 0 && month <= 12) {
+        g_dtdata.month = month;
+    }
+}
+
+/**
  * @returns current day of week.
  */
-dt_day_of_week_t dt_get_day_of_week()
+dt_day_of_week_t dt_get_day_of_week(void)
 {
     return g_dtdata.dow;
+}
+
+/**
+ * Sets the current day of week.
+ * @param[in]   dow     Day of week.
+ */
+void dt_set_day_of_week(dt_day_of_week_t dow)
+{
+    if (dow >= DT_MONDAY && dow <= DT_SUNDAY) {
+        g_dtdata.dow = dow;
+    }
 }
 
 /**
@@ -228,11 +259,33 @@ uint8_t dt_get_day()
 }
 
 /**
+ * Sets the current day.
+ * @param[in]   day    Day to set.
+ */
+void dt_set_day(uint8_t day)
+{
+    if (day <= 31) {
+        g_dtdata.day = day;
+    }
+}
+
+/**
  * @returns current hour.
  */
 uint8_t dt_get_hour()
 {
     return g_dtdata.hour;
+}
+
+/**
+ * Sets the current hour.
+ * @param[in]   hour    Hour to set.
+ */
+void dt_set_hour(uint8_t hour)
+{
+    if (hour <= 24) {
+        g_dtdata.hour = hour;
+    }
 }
 
 /**
@@ -244,11 +297,33 @@ uint8_t dt_get_minute()
 }
 
 /**
+ * Sets the current minute.
+ * @param[in]   minute  Minute to set.
+ */
+void dt_set_minute(uint8_t minute)
+{
+    if (minute <= 60) {
+        g_dtdata.minute = minute;
+    }
+}
+
+/**
  * @returns current second.
  */
 uint8_t dt_get_second()
 {
     return g_dtdata.second;
+}
+
+/**
+ * Sets the current second.
+ * @param[in]   second  Second to set.
+ */
+void dt_set_second(uint8_t second)
+{
+    if (second <= 60) {
+        g_dtdata.second = second;
+    }
 }
 
 /**

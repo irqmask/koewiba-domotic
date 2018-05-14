@@ -1,10 +1,11 @@
 /**
- * @addtogroup BASIC_APP_ATMEGA328_PCBCONFIG
- * @brief PCB configuration of the "basic_app_atmega328" application.
+ * @addtogroup BLINDCONTROL
+ * @addtogroup PCBCONFIG
+ * @brief PCB configuration of the "blind-control_atmega328p" application.
  *
  * @{
  * @file    pcbconfig.h
- * @brief   PCB configuration of the "basic_app_atmega328" application.
+ * @brief   PCB configuration of the "blind-control_atmega328p" application.
  *
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------

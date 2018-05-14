@@ -1,10 +1,10 @@
 /**
  * @addtogroup DATETIME
- * @brief A clock module for date and time.
+ * @brief A module for date and time.
  *
  * @{
  * @file    datetime.h
- * @brief   A clock module for date and time.
+ * @brief   A module for date and time.
  *
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
@@ -38,13 +38,13 @@
 
 //! Enumeration of days of week.
 typedef enum _dayofweek_t {
-    CLK_MONDAY,
-    CLK_TUEDAY,
-    CLK_WEDNESDAY,
-    CLK_THURSDAY,
-    CLK_FRIDAY,
-    CLK_SATURDAY,
-    CLK_SUNDAY
+    DT_MONDAY,
+    DT_TUEDAY,
+    DT_WEDNESDAY,
+    DT_THURSDAY,
+    DT_FRIDAY,
+    DT_SATURDAY,
+    DT_SUNDAY
 } dt_day_of_week_t;
 
 //! structure to hold local date and time.
@@ -74,17 +74,31 @@ void dt_get(uint16_t *year, uint8_t *month, uint8_t *day,
 
 uint16_t dt_get_year(void);
 
+void dt_set_year(uint16_t year);
+
 uint8_t dt_get_month(void);
+
+void dt_set_month(uint8_t month);
 
 uint8_t dt_get_day(void);
 
+void dt_set_day(uint8_t day);
+
 uint8_t dt_get_hour(void);
+
+void dt_set_hour(uint8_t hour);
 
 uint8_t dt_get_minute(void);
 
+void dt_set_minute(uint8_t minute);
+
 uint8_t dt_get_second(void);
 
+void dt_set_second(uint8_t second);
+
 dt_day_of_week_t dt_get_day_of_week(void);
+
+void dt_set_day_of_week(dt_day_of_week_t dow);
 
 void dt_tick_second(void);
 

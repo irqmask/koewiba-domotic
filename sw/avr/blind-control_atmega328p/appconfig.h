@@ -1,11 +1,11 @@
 /**
- * @addtogroup BASIC_ATMEGA328
+ * @addtogroup BLINDCONTROL
  * @addtogroup APPCONFIG
- * @brief Configuration of modules used in "basic_atmega328" project.
+ * @brief Configuration of modules used in "blind-control_atmega328p" project.
  *
  * @{
  * @file    appconfig.h
- * @brief   Configuration of modules used in "basic_atmega328" project.
+ * @brief   Configuration of modules used in "blind-control_atmega328p" project.
  *
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
@@ -48,25 +48,35 @@ typedef enum appregisters {
     APP_eReg_B0_ReactionDelay,     //!< Delay time in timer ticks (1/100sec) until movement starts after applying power.
     APP_eReg_B0_DurationOpen,      //!< Duration in timer ticks (1/100sec) to fully open the blind.
     APP_eReg_B0_DurationClose,     //!< Duration in timer ticks (1/100sec) to fully close the blind.
-    APP_eReg_B0_Unused1,           //!< unused
+    APP_eReg_B0_Mode,              //!< Mode how the blind/motor is controlled.
+    APP_eReg_B0_Unused3,           //!< unused
     APP_eReg_B0_Unused2,           //!< unused
+    APP_eReg_B0_Unused1,           //!< unused
 
     APP_eReg_TimeUp1_Weekday,
     APP_eReg_TimeUp1_Hour,
     APP_eReg_TimeUp1_Minute,
+    APP_eReg_TimeUp1_Unused2,
+    APP_eReg_TimeUp1_Unused1,
     APP_eReg_TimeDown1_Weekday,
     APP_eReg_TimeDown1_Hour,
     APP_eReg_TimeDown1_Minute,
+    APP_eReg_TimeDown1_Unused2,
+    APP_eReg_TimeDown1_Unused1,
     APP_eReg_TimeUp2_Weekday,
     APP_eReg_TimeUp2_Hour,
     APP_eReg_TimeUp2_Minute,
+    APP_eReg_TimeUp2_Unused2,
+    APP_eReg_TimeUp2_Unused1,
     APP_eReg_TimeDown2_Weekday,
     APP_eReg_TimeDown2_Hour,
     APP_eReg_TimeDown2_Minute,
+    APP_eReg_TimeDown2_Unused2,
+    APP_eReg_TimeDown2_Unused1,
 
-    APP_eReg_WindowState = 42,  //!< State of the window
+    APP_eReg_WindowState = 46,  //!< State of the window
 
-    APP_eReg_Year = 233,        //!< Current year.
+    APP_eReg_Year = 223,        //!< Current year.
     APP_eReg_Month,             //!< Current month.
     APP_eReg_Day,               //!< Current day.
     APP_eReg_DayOfWeek,         //!< Current day of week.
@@ -90,6 +100,7 @@ typedef enum appconfig {
     APP_eCfg_DurationClose,
     APP_eCfg_DurationCloseLow = APP_eCfg_DurationClose,
     APP_eCfg_DurationCloseHigh,
+    APP_eCfg_Mode,
 
     APP_eCfg_TimeUp1_Weekday,
     APP_eCfg_TimeUp1_Hour,

@@ -22,14 +22,18 @@
 #include "blindctrl.h"
 #include "bus.h"
 #include "cmddef_common.h"
+#include "datetime.h"
 #include "motor.h"
 #include "register.h"
+#include "timer.h"
 
 // --- Definitions -------------------------------------------------------------
 
 // --- Type definitions --------------------------------------------------------
 
 // --- Local variables ---------------------------------------------------------
+
+static timer_data_t g_seconds_timer;
 
 // --- Global variables --------------------------------------------------------
 
@@ -54,11 +58,15 @@ void app_init (void)
 {
     motors_initialize();
     blinds_initialize();
+    dt_initialize();
+
     // load application parameters
     app_register_load();
 
     DDRB |= (1<<PB0);
     PORTB &= ~(1<<PB0);// switch off board's 24VDC supply
+
+    timer_start(&g_seconds_timer, TIMER_MS_2_TICKS(1000));
 }
 
 /**
@@ -96,6 +104,11 @@ void app_background (sBus_t* bus)
         PORTB |= (1<<PB0);
     } else {
         PORTB &= ~(1<<PB0);
+    }
+
+    if (timer_is_elapsed(&g_seconds_timer)) {
+        timer_start(&g_seconds_timer, TIMER_MS_2_TICKS(1000));
+        dt_tick_second();
     }
 }
 

@@ -1,11 +1,11 @@
 /**
- * @addtogroup BASIC_ATMEGA328
+ * @addtogroup BLINDCONTROL
  * @addtogroup APPVERSION
- * @brief Version information of "basic_app_atmega328" project.
+ * @brief Version information of "blind-control_atmega328p" project.
  *
  * @{
  * @file    appversion.c
- * @brief   Version information of "basic_app_atmega328" project.
+ * @brief   Version information of "blind-control_atmega328p" project.
  *
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
@@ -32,7 +32,7 @@ const unsigned char app_versioninfo[MOD_LEN_CONTROLLERID + MOD_LEN_BOARDID + MOD
                            0x00,0x05,   // board ID            (high byte, low byte)
                            2,           // board revision
                            0x00,0x06,   // application ID      (high byte, low byte)
-                           0,4,3};      // application version (major, minor, bugfix)
+                           0,4,4};      // application version (major, minor, bugfix)
 
 // --- Module global variables -------------------------------------------------
 

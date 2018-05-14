@@ -19,12 +19,12 @@
 #include <avr/wdt.h>
 
 #include "bus.h"
-#include "clock.h"
 #include "cmddef_common.h"
 #include "moddef_common.h"
 #include "queue.h"
 #include "register.h"
 #include "sleepmode.h"
+#include "timer.h"
 
 #ifndef NO_BLOCK_MESSAGE
  #include "block_message.h"
@@ -142,7 +142,7 @@ int main(void)
     uint8_t msg[BUS_MAXRECVMSGLEN];
     uint16_t sender = 0, module_id = 0x7F;
 
-    clk_initialize();
+    timer_initialize();
 
     register_get(MOD_eReg_ModuleID, 0, &module_id);
     bus_configure(&g_bus, module_id);

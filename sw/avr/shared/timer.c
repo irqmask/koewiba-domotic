@@ -1,13 +1,12 @@
 /**
- * @addtogroup CLOCK
- * @brief System clock.
+ * @addtogroup TIMER
+ * @brief System timer.
  *
- * This module contains a clock for the current time (if configured in
- * appconfig.h) and timer e.g. for timeout handling.
+ * This module contains a timer e.g. for timeout handling.
  *
  * @{
- * @file    clock.c
- * @brief   System clock.
+ * @file    timer.c
+ * @brief   System timer.
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
 
@@ -16,7 +15,7 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include "prjtypes.h"
-#include "clock.h"
+#include "timer.h"
 #include "ucontroller.h"
 
 // --- Definitions -------------------------------------------------------------
@@ -26,7 +25,7 @@
 // --- Local variables ---------------------------------------------------------
 
 //! List of current running timers.
-volatile clock_timer_t* g_running_timers[CLOCK_NUM_TIMER];
+volatile timer_data_t* g_running_timers[TIMER_COUNT];
 
 // --- Global variables --------------------------------------------------------
 
@@ -37,11 +36,11 @@ volatile clock_timer_t* g_running_timers[CLOCK_NUM_TIMER];
 /**
  * Register timer in list.
  */
-static bool register_timer(clock_timer_t* timer_instance)
+static bool register_timer(timer_data_t* timer_instance)
 {
     uint8_t ii;
 
-    for (ii=0; ii<CLOCK_NUM_TIMER; ii++) {
+    for (ii=0; ii<TIMER_COUNT; ii++) {
         if (g_running_timers[ii] == NULL) {
         	g_running_timers[ii] = timer_instance;
         	timer_instance->active = true;
@@ -54,12 +53,12 @@ static bool register_timer(clock_timer_t* timer_instance)
 /**
  * Remove timer from list.
  */
-static bool remove_timer(clock_timer_t* timer_instance)
+static bool remove_timer(timer_data_t* timer_instance)
 {
     uint8_t ii;
 
     timer_instance->active = false;
-    for (ii=0; ii<CLOCK_NUM_TIMER; ii++) {
+    for (ii=0; ii<TIMER_COUNT; ii++) {
         if (g_running_timers[ii] == timer_instance) {
         	g_running_timers[ii] = NULL;
             return true;
@@ -76,7 +75,7 @@ ISR(INTERRUPT_TIMER0_COMPA)
 {
     uint8_t ii;
 
-    for (ii=0; ii<CLOCK_NUM_TIMER; ii++) {
+    for (ii=0; ii<TIMER_COUNT; ii++) {
         if (g_running_timers[ii] == NULL) continue;
         if (--g_running_timers[ii]->ticks == 0) {
         	g_running_timers[ii] = NULL;
@@ -91,12 +90,12 @@ ISR(INTERRUPT_TIMER0_COMPA)
 /**
  * Initialize clock module. Reset data and start hardware timer.
  */
-void clk_initialize(void)
+void timer_initialize(void)
 {
     uint8_t ii;
 
     // clear running timers list
-    for (ii=0; ii<CLOCK_NUM_TIMER; ii++) {
+    for (ii=0; ii<TIMER_COUNT; ii++) {
     	g_running_timers[ii] = NULL;
     }
 
@@ -121,7 +120,7 @@ void clk_initialize(void)
  * @param[in] start
  * boolean for starting/stopping the timer (true = start)
  */
-void clk_control(bool start)
+void timer_control(bool start)
 {
     static uint8_t tccr1b = 0;
 
@@ -148,7 +147,7 @@ void clk_control(bool start)
  *
  * @returns true, if timer has been (re)started, otherwise FALSE.
  */
-bool clk_timer_start(clock_timer_t* timer_instance, uint16_t ticks)
+bool timer_start(timer_data_t* timer_instance, uint16_t ticks)
 {
     // if timer is still running ...
     if (timer_instance->ticks != 0) {
@@ -169,7 +168,7 @@ bool clk_timer_start(clock_timer_t* timer_instance, uint16_t ticks)
  *
  * @returns true, if timer has been successfully removed from running timer-list, otherwise false.
  */
-bool clk_timer_stop(clock_timer_t* timer_instance)
+bool timer_stop(timer_data_t* timer_instance)
 {
     // if timer could not be removed successfully
     if( !remove_timer(timer_instance) ) return false;
@@ -186,7 +185,7 @@ bool clk_timer_stop(clock_timer_t* timer_instance)
  *
  * @returns true, if time is over, otherwise false.
  */
-bool clk_timer_is_elapsed(clock_timer_t* timer_instance)
+bool timer_is_elapsed(timer_data_t* timer_instance)
 {
     if (timer_instance->ticks == 0) {
         return true;
@@ -204,7 +203,7 @@ bool clk_timer_is_elapsed(clock_timer_t* timer_instance)
  *
  * @returns true, if timer is running, otherwise false.
  */
-bool clk_timer_is_running(clock_timer_t* timer_instance)
+bool timer_is_running(timer_data_t* timer_instance)
 {
     return (timer_instance->active);
 }
@@ -217,7 +216,7 @@ bool clk_timer_is_running(clock_timer_t* timer_instance)
  *
  * @returns Returns Initial value with which the timer was started.
  */
-uint16_t clk_timer_get_initial_start_ticks(clock_timer_t* timer_instance)
+uint16_t timer_get_initial_start_ticks(timer_data_t* timer_instance)
 {
     return timer_instance->tick_start_value;
 }
@@ -230,7 +229,7 @@ uint16_t clk_timer_get_initial_start_ticks(clock_timer_t* timer_instance)
  *
  * @returns Returns the elapsed timer ticks since timer start.
  */
-uint16_t clk_timer_get_elapsed_ticks(clock_timer_t* timer_instance)
+uint16_t timer_get_elapsed_ticks(timer_data_t* timer_instance)
 {
     return (timer_instance->tick_start_value - timer_instance->ticks);
 }

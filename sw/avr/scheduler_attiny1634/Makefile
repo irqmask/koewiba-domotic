@@ -15,10 +15,10 @@ SRC = ../shared/bus_scheduler.c \
       ../shared/queue.c \
       shared/block_message.c \
       shared/bus_phy.c \
-      shared/clock.c \
       shared/eeprom_spi.c \
       shared/register.c \
       shared/sleepmode.c \
+      shared/timer.c \
       scheduler_attiny1634/appversion.c \
       scheduler_attiny1634/main_scheduler.c
 

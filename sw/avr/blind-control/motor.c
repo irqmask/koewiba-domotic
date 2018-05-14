@@ -13,9 +13,9 @@
 #include <avr/io.h>
 
 #include "appconfig.h"
-#include "clock.h"
 #include "motor.h"
 #include "sleepmode.h"
+#include "timer.h"
 
 // --- Definitions -------------------------------------------------------------
 
@@ -61,7 +61,7 @@ typedef enum {
 typedef struct {
     motor_state_t motor_state;      //!< current state of the motor.
     motor_state_t last_motor_state; //!< last known state of the motor.
-    clock_timer_t propagation_delay;//!< timer to handle switch delay.
+    timer_data_t       propagation_delay;//!< timer to handle switch delay.
 } motor_control_t;
 
 // --- Local variables ---------------------------------------------------------
@@ -208,7 +208,7 @@ void motor_up               (uint8_t index)
     if (g_motor_control[index].motor_state == idle) {
         g_motor_control[index].motor_state = start_moving_up;
         motor_updown_relay(index, true);
-        clk_timer_start(&g_motor_control[index].propagation_delay, CLOCK_MS_2_TICKS(MOTOR_SWITCH_DELAY));
+        timer_start(&g_motor_control[index].propagation_delay, TIMER_MS_2_TICKS(MOTOR_SWITCH_DELAY));
         sleep_prevent(APP_eSLEEPMASK_MOTOR, 1);
     } else {
         motor_stop(index);
@@ -226,7 +226,7 @@ void motor_down             (uint8_t index)
     if (g_motor_control[index].motor_state == idle) {
         g_motor_control[index].motor_state = start_moving_down;
         motor_updown_relay(index, false);
-        clk_timer_start(&g_motor_control[index].propagation_delay, CLOCK_MS_2_TICKS(MOTOR_SWITCH_DELAY));
+        timer_start(&g_motor_control[index].propagation_delay, TIMER_MS_2_TICKS(MOTOR_SWITCH_DELAY));
         sleep_prevent(APP_eSLEEPMASK_MOTOR, 1);
     } else {
         motor_stop(index);
@@ -244,7 +244,7 @@ void motor_stop             (uint8_t index)
     if (g_motor_control[index].motor_state != idle) {
         g_motor_control[index].motor_state = stopping;
         motor_onoff_relay(index, false);
-        clk_timer_start(&g_motor_control[index].propagation_delay, CLOCK_MS_2_TICKS(MOTOR_SWITCH_DELAY));
+        timer_start(&g_motor_control[index].propagation_delay, TIMER_MS_2_TICKS(MOTOR_SWITCH_DELAY));
         sleep_prevent(APP_eSLEEPMASK_MOTOR, 0);
     }
 }
@@ -350,7 +350,7 @@ void motors_background       (void)
             break;
 
         case start_moving_up:
-            if (clk_timer_is_elapsed(&g_motor_control[index].propagation_delay)) {
+            if (timer_is_elapsed(&g_motor_control[index].propagation_delay)) {
                 g_motor_control[index].motor_state = moving_up;
                 motor_onoff_relay(index, true);
             }
@@ -360,7 +360,7 @@ void motors_background       (void)
             break;
 
         case start_moving_down:
-            if (clk_timer_is_elapsed(&g_motor_control[index].propagation_delay)) {
+            if (timer_is_elapsed(&g_motor_control[index].propagation_delay)) {
                 g_motor_control[index].motor_state = moving_down;
                 motor_onoff_relay(index, true);
             }
@@ -370,7 +370,7 @@ void motors_background       (void)
             break;
 
         case stopping:
-            if (clk_timer_is_elapsed(&g_motor_control[index].propagation_delay)) {
+            if (timer_is_elapsed(&g_motor_control[index].propagation_delay)) {
                 g_motor_control[index].motor_state = idle;
                 motor_updown_relay(index, false);
             }

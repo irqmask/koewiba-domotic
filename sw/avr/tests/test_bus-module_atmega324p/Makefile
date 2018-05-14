@@ -13,11 +13,11 @@ SRC = ../shared/bus_transport.c \
       ../shared/queue.c \
       shared/block_message.c \
       shared/bus_phy.c \
-      shared/clock.c \
       shared/eeprom_spi.c \
       shared/led_debug.c \
       shared/register.c \
       shared/sleepmode.c \
+      shared/timer.c \
       tests/test_bus-module_atmega324p/appregister.c \
       tests/test_bus-module_atmega324p/appversion.c \
       tests/test_bus-module_atmega324p/main_test_bus-module_atmega324.c

@@ -12,11 +12,11 @@ SRC = ../shared/bus_transport.c \
       ../shared/crc16.c \
       ../shared/queue.c \
       shared/bus_phy.c \
-      shared/clock.c \
       shared/led_debug.c \
       shared/main_avr.c \
       shared/register.c \
       shared/sleepmode.c \
+      shared/timer.c \
       tests/elektor_bus-node_atmega88/application.c \
       tests/elektor_bus-node_atmega88/appregister.c \
       tests/elektor_bus-node_atmega88/appversion.c

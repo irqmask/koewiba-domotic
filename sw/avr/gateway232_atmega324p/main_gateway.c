@@ -17,13 +17,13 @@
 #include "appconfig.h"
 #include "bus.h"
 #include "bus_gateway.h"
-#include "clock.h"
 #include "cmddef_common.h"
 #include "moddef_common.h"
 #include "pcbconfig.h"
 #include "register.h"
 #include "serialcomm.h"
 #include "sleepmode.h"
+#include "timer.h"
 
 #ifndef NO_BLOCK_MESSAGE
  #include "block_message.h"
@@ -41,7 +41,7 @@
 
 // --- Local variables ---------------------------------------------------------
 
-static clock_timer_t g_LED_timer;
+static timer_data_t g_LED_timer;
 
 // --- Global variables --------------------------------------------------------
 
@@ -155,7 +155,7 @@ int main(void)
     uint16_t module_id = 0;
 
     io_initialize();
-    clk_initialize();
+    timer_initialize();
     scomm_initialize_uart1(&g_serial_phy);
 
     //register_set_u16(MOD_eReg_ModuleID, 0x0003);
@@ -166,7 +166,7 @@ int main(void)
     sei();
     LED_STATUS_OFF;
     LED_ERROR_OFF;
-    clk_timer_start(&g_LED_timer, CLOCK_MS_2_TICKS(1000));
+    timer_start(&g_LED_timer, TIMER_MS_2_TICKS(1000));
 
     while (1) {
         // check for message and read it
@@ -178,11 +178,11 @@ int main(void)
         }
         bgw_forward_serial_msg(&g_bus, &g_serial_phy);
 
-        if (clk_timer_is_elapsed(&g_LED_timer)) {
+        if (timer_is_elapsed(&g_LED_timer)) {
         	// cyclic reset of error LED
             LED_ERROR_OFF;
             LED_STATUS_TOGGLE;
-            clk_timer_start(&g_LED_timer, CLOCK_MS_2_TICKS(1000));
+            timer_start(&g_LED_timer, TIMER_MS_2_TICKS(1000));
         }
     }
     return 0;

@@ -240,7 +240,7 @@ bool bus_schedule_and_get_message (sBus_t* psBus, sSched_t* psSched )
     case eBus_Idle:
         // send token
         if (sched_send_next_timeslot_token(psBus, psSched)) {
-            clk_timer_start(&psSched->sNodeAnsTimeout, CLOCK_MS_2_TICKS(BUS_MESSAGE_TIMEOUT));
+            timer_start(&psSched->sNodeAnsTimeout, TIMER_MS_2_TICKS(BUS_MESSAGE_TIMEOUT));
             psBus->eState = eBus_SendingToken;
         }
         break;
@@ -260,7 +260,7 @@ bool bus_schedule_and_get_message (sBus_t* psBus, sSched_t* psSched )
                 psBus->eState = eBus_ReceivingWait;
             }
         }
-        else if (clk_timer_is_elapsed(&psSched->sNodeAnsTimeout)) {
+        else if (timer_is_elapsed(&psSched->sNodeAnsTimeout)) {
                 sched_set_node_error(psSched, psSched->auTokenMsg[1] & 0x7F);
                 // return to IDLE state
                 psBus->eState = eBus_Idle;
@@ -298,7 +298,7 @@ bool bus_schedule_and_get_message (sBus_t* psBus, sSched_t* psSched )
             else sched_reset_node_error(psSched, psSched->auTokenMsg[1] & 0x7F);
 
         }
-        else if (clk_timer_is_elapsed(&psSched->sNodeAnsTimeout)) {
+        else if (timer_is_elapsed(&psSched->sNodeAnsTimeout)) {
             receive_end = true;
             // this node has an error, if we are not in discovery-mode, because
             // it did not answer the token
@@ -336,8 +336,8 @@ void bus_schedule_check_and_set_sleep (sBus_t* psBus)
 {
     if (eMod_Sleeping == psBus->eModuleState) {
         if (bus_trp_send_sleepcmd(psBus)) {
-            clk_control(false); // disable clock-timer, otherwise
-                                // IRQ will cause immediate wake-up.
+            timer_control(false); // disable clock-timer, otherwise
+                                  // IRQ will cause immediate wake-up.
 
             // sleep till byte is received.
 #ifdef PRJCONF_UC_AVR
@@ -348,7 +348,7 @@ void bus_schedule_check_and_set_sleep (sBus_t* psBus)
 #endif
             bus_flush_bus(psBus); // Clean bus-buffer
             psBus->eModuleState = eMod_Running;
-            clk_control(true); // enable clock-timer
+            timer_control(true); // enable clock-timer
         }
     }
 }

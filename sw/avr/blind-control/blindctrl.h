@@ -57,6 +57,8 @@ uint16_t blind_get_duration_close   (uint8_t index);
 
 void blind_set_duration_close       (uint8_t index, uint16_t duration);
 
+void blind_set_mode                 (uint8_t index, uint8_t mode);
+
 void blinds_initialize      (void);
 
 void blinds_background      (sBus_t* bus);

@@ -12,9 +12,9 @@
 
 #include "blindctrl.h"
 #include "bus.h"
-#include "clock.h"
 #include "cmddef_common.h"
 #include "motor.h"
+#include "timer.h"
 
 // --- Definitions -------------------------------------------------------------
 
@@ -59,14 +59,17 @@ typedef struct {
     uint16_t        duration_open;
     //! Duration in timer ticks (1/100sec) to fully close the blind.
     uint16_t        duration_close;
-    clock_timer_t   blindtimer;
+    //! Mode of how the blind / motor is controlled.
+    uint8_t         mode;
+    //! Timer to control movement of the blind.
+    timer_data_t         blindtimer;
 } blind_control_t;
 
 // --- Local variables ---------------------------------------------------------
 
 // local data which stores data of all blinds
 static blind_control_t g_blind_control[BLIND_COUNT];
-// indicator if blinds are currently mooving.
+// indicator if blinds are currently moving.
 static uint8_t g_blinds_active = 0;
 
 // --- Global variables --------------------------------------------------------
@@ -195,13 +198,13 @@ void blind_move_to_position (uint8_t index, uint8_t new_position)
 
         if (new_position > g_blind_control[index].current_position) {
             // move down
-            clk_timer_start(&g_blind_control[index].blindtimer, calc_motor_time_down(index));
+            timer_start(&g_blind_control[index].blindtimer, calc_motor_time_down(index));
             motor_down(index);
             g_blind_control[index].blind_state = moving_down;
             g_blinds_active |= (1<<index);
         } else if (new_position < g_blind_control[index].current_position) {
             // move up
-            clk_timer_start(&g_blind_control[index].blindtimer, calc_motor_time_up(index));
+            timer_start(&g_blind_control[index].blindtimer, calc_motor_time_up(index));
             motor_up(index);
             g_blind_control[index].blind_state = moving_up;
             g_blinds_active |= (1<<index);
@@ -229,7 +232,7 @@ void blind_stop             (uint8_t index)
         // blind has been stopped, before finishing movement.
         // calculate new position of the blind, depending on the
         // elapsed movement time.
-        elapsed_ticks = clk_timer_get_elapsed_ticks(&g_blind_control[index].blindtimer);
+        elapsed_ticks = timer_get_elapsed_ticks(&g_blind_control[index].blindtimer);
         // remove reaction delay time, when blinds are not moving
         if (elapsed_ticks > g_blind_control[index].reaction_delay) {
             elapsed_ticks -= g_blind_control[index].reaction_delay;
@@ -362,6 +365,18 @@ void blind_set_duration_close       (uint8_t index, uint16_t duration)
 }
 
 /**
+ * Set the mode, how the blind/motor is controlled.
+ *
+ * @param[in]   index           Index of the blind.
+ * @param[in]   duration        Duration in 1/100 seconds.
+ */
+void blind_set_mode                 (uint8_t index, uint8_t mode)
+{
+    if (index >= BLIND_COUNT) return;
+    g_blind_control[index].mode = mode;
+}
+
+/**
  * Initialize blind control data. Assuming blinds are closed (0) in the beginning.
  */
 void blinds_initialize      (void)
@@ -374,8 +389,8 @@ void blinds_initialize      (void)
         g_blind_control[index].current_position = 50;
         g_blind_control[index].position_setpoint = 50;
         g_blind_control[index].reaction_delay = 0;
-        g_blind_control[index].duration_open = CLOCK_MS_2_TICKS(1000);
-        g_blind_control[index].duration_close = CLOCK_MS_2_TICKS(1000);
+        g_blind_control[index].duration_open = TIMER_MS_2_TICKS(1000);
+        g_blind_control[index].duration_close = TIMER_MS_2_TICKS(1000);
     }
     g_blinds_active = 0;
 }
@@ -402,7 +417,7 @@ void blinds_background      (sBus_t* bus)
         case moving_up:
             // fall-through to moving_down
         case moving_down:
-            if (clk_timer_is_elapsed(&g_blind_control[index].blindtimer)) {
+            if (timer_is_elapsed(&g_blind_control[index].blindtimer)) {
                 motor_stop(index);
                 g_blind_control[index].current_position = g_blind_control[index].position_setpoint;
                 g_blind_control[index].blind_state = stopping;

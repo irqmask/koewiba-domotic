@@ -16,11 +16,11 @@
 #include "cmddef_common.h"
 
 #include "bus.h"
-#include "clock.h"
 #include "gdisplay.h"
 #include "register.h"
 #include "sleepmode.h"
 #include "spi.h"
+#include "timer.h"
 #include "ucontroller.h"
 #include "zagwire.h"
 
@@ -31,7 +31,7 @@
 // --- Local variables ---------------------------------------------------------
 
 static sBus_t           g_bus;
-static clock_timer_t    g_app_timer;
+static timer_data_t          g_app_timer;
 static uint16_t         g_target_temp;
 static uint16_t         g_current_temp;
 
@@ -208,7 +208,7 @@ int main (void)
     DDRC |= ((1<<PC3) | (1<<PC4));
     PORTC &= ~((1<<PC3) | (1<<PC4));
 
-    clk_initialize();
+    timer_initialize();
 
     //register_set_u16(MOD_eReg_ModuleID, 0x000E);
 
@@ -239,15 +239,15 @@ int main (void)
     gdisp_put_text("Addr: ");
     draw_hex16_value(g_bus.sCfg.uOwnNodeAddress);
 
-    clk_timer_start(&g_app_timer, 100);
+    timer_start(&g_app_timer, 100);
     while (1) {
         if (bus_get_message(&g_bus)) {
             if (bus_read_message(&g_bus, &sender, &msglen, msg)) {
                 interpret_message(&g_bus, msg, msglen, sender);
             }
         }
-        if (clk_timer_is_elapsed(&g_app_timer)) {
-            clk_timer_start(&g_app_timer,10);
+        if (timer_is_elapsed(&g_app_timer)) {
+            timer_start(&g_app_timer,10);
             gdisp_choose_font(gdisp_font1_x8);
             gdisp_goto_col_line(0,3);
             gdisp_put_text("Temp: ");

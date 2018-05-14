@@ -12,7 +12,6 @@ SRC = ../shared/bus_transport.c \
       ../shared/crc16.c \
       ../shared/queue.c \
       shared/bus_phy.c \
-      shared/clock.c \
       shared/disp_st7565.c \
       shared/gdisplay.c \
       shared/gdisplay_font_x8.c \
@@ -21,6 +20,7 @@ SRC = ../shared/bus_transport.c \
       shared/gdisplay_symbols_x24.c \
       shared/register.c \
       shared/sleepmode.c \
+      shared/timer.c \
       shared/zagwire.c \
       roomthermostate/appregister.c \
       roomthermostate/appversion.c \

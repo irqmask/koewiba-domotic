@@ -33,7 +33,7 @@
 #include "prjtypes.h"
 
 // shared
-#include "clock.h"
+#include "timer.h"
 
 // os/shared
 #include "log.h"
@@ -94,7 +94,7 @@ int mosquitto_connect_to_ioloop(app_handles_t* h)
         }
         ioloop_register_fd(h->ioloop, fd, eIOLOOP_EV_READ, on_read_handler, h);
         ioloop_register_fd(h->ioloop, fd, eIOLOOP_EV_WRITE, on_write_handler, h);
-        ioloop_register_timer(h->ioloop, CLOCK_MS_2_TICKS(100), 1, on_misc_handler, h);
+        ioloop_register_timer(h->ioloop, TIMER_MS_2_TICKS(100), 1, on_misc_handler, h);
     } while (0);
     return retval;
 }

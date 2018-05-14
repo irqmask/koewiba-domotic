@@ -17,8 +17,8 @@
 // --- Include section ---------------------------------------------------------
 
 #include "bus.h"
-#include "clock.h"
 #include "prjtypes.h"
+#include "timer.h"
 
 #ifdef HAS_APPCONFIG_H
  #include "appconfig.h"
@@ -54,7 +54,7 @@ typedef struct schd {
     bool            bSchedDiscovery;                //!< bus-discovery mode.
     bool            bSchedWaitingForAnswer;         //!< flag, if scheduler is waiting for an answer.
     bool            broadcast_acknowledged;         //!< flag, if a received broadcast message already has been acknowledged.
-    clock_timer_t   sNodeAnsTimeout;                //!< node answer timeout.
+    timer_data_t    sNodeAnsTimeout;                //!< node answer timeout.
 } sSched_t;
 
 // --- Local variables ---------------------------------------------------------

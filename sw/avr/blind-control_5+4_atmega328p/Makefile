@@ -13,12 +13,12 @@ SRC = ../shared/bus_transport.c \
       ../shared/queue.c \
       shared/block_message.c \
       shared/bus_phy.c \
-      shared/clock.c \
       shared/eeprom_spi.c \
       shared/led_debug.c \
       shared/main_avr.c \
       shared/register.c \
       shared/sleepmode.c \
+      shared/timer.c \
       blind-control/blindctrl.c \
       blind-control/motor.c \
       blind-control_5+4_atmega328p/application.c \

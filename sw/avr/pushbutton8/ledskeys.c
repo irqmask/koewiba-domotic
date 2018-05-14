@@ -19,8 +19,9 @@
 #include "appconfig.h"
 #include "pcbconfig.h"
 
-#include "clock.h"
 #include "spi.h"
+#include "timer.h"
+
 #include "ledskeys.h"
 
 // --- Definitions -------------------------------------------------------------
@@ -34,7 +35,7 @@ static uint8_t          g_led_data = 0;
 static uint8_t          g_led_flash_mask = 0x00;
 static uint8_t          g_led_fast_flash_mask = 0x00;
 static uint8_t          g_led_flash_index = 0;
-static clock_timer_t    g_timer;
+static timer_data_t     g_timer;
 
 static uint8_t key_pressed;
 static uint8_t key_repeated;
@@ -177,13 +178,13 @@ void leds_keys_init (void)
     KEY7_WAKEUP_REG |= (1<<KEY7_WAKEUP);
 
     // initialize and start timer
-    clk_timer_start(&g_timer, CLOCK_MS_2_TICKS(150));
+    timer_start(&g_timer, TIMER_MS_2_TICKS(150));
 }
 
 void leds_keys_background (void)
 {
     uint8_t flashed_leds;
-    if (clk_timer_is_elapsed(&g_timer)) {
+    if (timer_is_elapsed(&g_timer)) {
         key_pressed = keys_read();
 
         flashed_leds = 0;
@@ -193,7 +194,7 @@ void leds_keys_background (void)
         g_led_flash_index &= 0x07;
 
         sn74595_send(g_led_data | flashed_leds);
-        clk_timer_start(&g_timer, CLOCK_MS_2_TICKS(150));
+        timer_start(&g_timer, TIMER_MS_2_TICKS(150));
     }
 }
 

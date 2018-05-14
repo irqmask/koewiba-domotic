@@ -14,8 +14,8 @@
 
 #include <avr/io.h>
 
-#include "clock.h"
 #include "inputs.h"
+#include "timer.h"
 
 // --- Definitions -------------------------------------------------------------
 
@@ -31,7 +31,7 @@
 
 // --- Local variables ---------------------------------------------------------
 
-static clock_timer_t    g_input_timer;
+static timer_data_t          g_input_timer;
 static uint8_t          g_debounce_array[NBR_OF_INPUTS];
 static bool             g_last_state[NBR_OF_INPUTS];
 
@@ -95,7 +95,7 @@ void input_initialize       (void)
         g_debounce_array[n] = 0xFF;
         g_last_state[n] = true;
     }
-    clk_timer_start(&g_input_timer, CLOCK_MS_2_TICKS(INPUT_TIMER_INTERVAL));
+    timer_start(&g_input_timer, TIMER_MS_2_TICKS(INPUT_TIMER_INTERVAL));
 }
 
 bool input_up               (void)
@@ -120,8 +120,8 @@ void input_background       (void)
 {
     uint8_t n;
 
-    if (clk_timer_is_elapsed(&g_input_timer)) {
-        clk_timer_start(&g_input_timer, CLOCK_MS_2_TICKS(INPUT_TIMER_INTERVAL));
+    if (timer_is_elapsed(&g_input_timer)) {
+        timer_start(&g_input_timer, TIMER_MS_2_TICKS(INPUT_TIMER_INTERVAL));
         // this part is called every INPUT_TIMER_INTERVAL milliseconds.
         for(n=2; n<2+NBR_OF_INPUTS; n++) {
             g_debounce_array[n-2] <<= 1;

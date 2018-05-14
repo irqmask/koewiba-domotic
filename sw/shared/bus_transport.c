@@ -25,9 +25,9 @@
 
 #include "bus_intern.h"
 #include "cmddef_common.h"
-#include "clock.h"
 #include "crc16.h"
 #include "sleepmode.h"
+#include "timer.h"
 
 // --- Definitions -------------------------------------------------------------
 
@@ -192,7 +192,7 @@ static bool receive (sBus_t* psBus)
                 psBus->msg_receive_state = eBUS_RECV_FOREIGN_MESSAGE;
                 reset_bus(psBus);
                 // wait for ACK of receiver of foreign message
-                clk_timer_start(&psBus->ack_timeout, CLOCK_MS_2_TICKS(BUS_ACK_TIMEOUT));
+                timer_start(&psBus->ack_timeout, TIMER_MS_2_TICKS(BUS_ACK_TIMEOUT));
                 psBus->eState = eBus_AckWaitReceiving;
             }
         }
@@ -317,7 +317,7 @@ static void wait_for_ack_passive (sBus_t* psBus)
     uint8_t u;
 
     do {
-        if (clk_timer_is_elapsed(&psBus->ack_timeout)) {
+        if (timer_is_elapsed(&psBus->ack_timeout)) {
             // timeout. go back to idle
             reset_bus(psBus);
             break;
@@ -727,7 +727,7 @@ void bus_sleep (sBus_t*       psBus)
 {
 	psBus->eModuleState = eMod_Sleeping;
     // disable clock-timer, otherwise IRQ will cause immediate wakeup.
-	clk_control(false);
+	timer_control(false);
 
 	// sleep till byte is received.
 	sleep_set_mode(SLEEP_MODE_IDLE);
@@ -738,7 +738,7 @@ void bus_sleep (sBus_t*       psBus)
 	sleep_delay_ms(1);      // wait for sys-clock becoming stable
 
 	bus_flush_bus(psBus);   // Clean bus-buffer
-	clk_control(true);      // enable clock-timer
+	timer_control(true);      // enable timer
 
 	// wait for first pending byte, then set module to running state
 	psBus->eState = eBus_InitWait;

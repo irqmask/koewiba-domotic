@@ -25,12 +25,12 @@
 #include "moddef_common.h"
 
 #include "bus.h"
-#include "clock.h"
 #include "crc16.h"
 #include "eeprom_spi.h"
 #include "led_debug.h"
 #include "register.h"
 #include "spi.h"
+#include "timer.h"
 
 // --- Definitions -------------------------------------------------------------
 
@@ -39,7 +39,7 @@
 // --- Local variables ---------------------------------------------------------
 
 static sBus_t           g_bus;
-static clock_timer_t    g_LED_timer;
+static timer_data_t     g_LED_timer;
 
 // --- Global variables --------------------------------------------------------
 
@@ -107,7 +107,7 @@ int main(void)
 
     LED_STATUS_DDR |= (1<<LED_STATUS);
     LED_ERROR_DDR |= (1<<LED_ERROR);
-    clk_initialize();
+    timer_initialize();
 
     //register_set_u16(MOD_eReg_ModuleID, 0x202);
     register_get(MOD_eReg_ModuleID, 0, &module_id);
@@ -120,7 +120,7 @@ int main(void)
     sei();
     _delay_ms(1000);
 
-    clk_timer_start(&g_LED_timer, CLOCK_MS_2_TICKS(1000));
+    timer_start(&g_LED_timer, TIMER_MS_2_TICKS(1000));
     LED_ERROR_OFF; LED_STATUS_OFF;
 
     // run EEProm test
@@ -147,8 +147,8 @@ int main(void)
             }
         }
         // toggle status LED once a second
-        if (clk_timer_is_elapsed(&g_LED_timer)) {
-            clk_timer_start(&g_LED_timer, CLOCK_MS_2_TICKS(1000));
+        if (timer_is_elapsed(&g_LED_timer)) {
+            timer_start(&g_LED_timer, TIMER_MS_2_TICKS(1000));
             LED_STATUS_TOGGLE;
         }
     }

@@ -19,10 +19,10 @@
 #include "block_message.h"
 #include "bus.h"
 #include "bus_scheduler.h"
-#include "clock.h"
 #include "cmddef_common.h"
 #include "led_debug.h"
 #include "register.h"
+#include "timer.h"
 
 // --- Definitions -------------------------------------------------------------
 
@@ -35,7 +35,7 @@
 
 static sBus_t           g_bus;
 static sSched_t         g_sched;
-static clock_timer_t    g_led_timer;
+static timer_data_t     g_led_timer;
 
 // --- Global variables --------------------------------------------------------
 
@@ -149,7 +149,7 @@ int main(void)
     uint8_t     msg[BUS_MAXRECVMSGLEN];
 
     io_initialize();
-    clk_initialize();
+    timer_initialize();
     //register_set_u16(MOD_eReg_ModuleID, 0x001);
     register_get(MOD_eReg_ModuleID, 0, &module_id);
     bus_configure(&g_bus, module_id); // configure a bus node with address 1
@@ -157,7 +157,7 @@ int main(void)
 
     sei();
 
-    clk_timer_start(&g_led_timer, CLOCK_MS_2_TICKS(1000));
+    timer_start(&g_led_timer, TIMER_MS_2_TICKS(1000));
 
     while (1) {
     	if (bus_schedule_and_get_message(&g_bus, &g_sched)) {
@@ -167,9 +167,9 @@ int main(void)
     	}
     	else bus_schedule_check_and_set_sleep(&g_bus);
 
-        if (clk_timer_is_elapsed(&g_led_timer)) {
+        if (timer_is_elapsed(&g_led_timer)) {
         	// TODO remove after debug
-            clk_timer_start(&g_led_timer, CLOCK_MS_2_TICKS(1000));
+            timer_start(&g_led_timer, TIMER_MS_2_TICKS(1000));
             LED_ERROR_TOGGLE;
         }
     }

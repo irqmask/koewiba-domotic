@@ -1,5 +1,5 @@
 /**
- * @addtogroup BASIC_APP_ATMEGA328
+ * @addtogroup BLINDCONTROL
  * @addtogroup APPLICATION
  * @brief Application specific code of "blind-control_atmega328p" project.
  *
@@ -31,6 +31,7 @@
 #include "inputs.h"
 #include "motor.h"
 #include "register.h"
+#include "timer.h"
 
 // --- Definitions -------------------------------------------------------------
 
@@ -40,6 +41,7 @@
 
 static bool g_window_state = false;
 static bool g_last_window_state = true;
+static timer_data_t g_seconds_timer;
 
 // --- Global variables --------------------------------------------------------
 
@@ -82,6 +84,8 @@ void app_init (void)
     // initialize window statemachine
     g_window_state = false;
     g_last_window_state = !g_window_state;
+
+    timer_start(&g_seconds_timer, TIMER_MS_2_TICKS(1000));
 }
 
 /**
@@ -129,6 +133,11 @@ void app_background (sBus_t* bus)
 
     motors_background();
     blinds_background(bus);
+
+    if (timer_is_elapsed(&g_seconds_timer)) {
+        timer_start(&g_seconds_timer, TIMER_MS_2_TICKS(1000));
+        dt_tick_second();
+    }
 }
 
 /** @} */

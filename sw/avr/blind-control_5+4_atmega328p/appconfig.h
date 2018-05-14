@@ -48,6 +48,8 @@ typedef enum appregisters {
     APP_eReg_B0_ReactionDelay,     //!< Delay time in timer ticks (1/100sec) until movement starts after applying power.
     APP_eReg_B0_DurationOpen,      //!< Duration in timer ticks (1/100sec) to fully open the blind.
     APP_eReg_B0_DurationClose,     //!< Duration in timer ticks (1/100sec) to fully close the blind.
+    APP_eReg_B0_Mode,              //!< Mode how the blind/motor is controlled.
+    APP_eReg_B0_Unused3,           //!< unused
     APP_eReg_B0_Unused2,           //!< unused
     APP_eReg_B0_Unused1,           //!< unused
     APP_eReg_B0_Last = APP_eReg_B0_Unused1,
@@ -58,6 +60,8 @@ typedef enum appregisters {
     APP_eReg_B1_ReactionDelay,     //!< Delay time in timer ticks (1/100sec) until movement starts after applying power.
     APP_eReg_B1_DurationOpen,      //!< Duration in timer ticks (1/100sec) to fully open the blind.
     APP_eReg_B1_DurationClose,     //!< Duration in timer ticks (1/100sec) to fully close the blind.
+    APP_eReg_B1_Mode,              //!< Mode how the blind/motor is controlled.
+    APP_eReg_B1_Unused3,           //!< unused
     APP_eReg_B1_Unused2,           //!< unused
     APP_eReg_B1_Unused1,           //!< unused
     APP_eReg_B1_Last = APP_eReg_B1_Unused1,
@@ -68,6 +72,8 @@ typedef enum appregisters {
     APP_eReg_B2_ReactionDelay,     //!< Delay time in timer ticks (1/100sec) until movement starts after applying power.
     APP_eReg_B2_DurationOpen,      //!< Duration in timer ticks (1/100sec) to fully open the blind.
     APP_eReg_B2_DurationClose,     //!< Duration in timer ticks (1/100sec) to fully close the blind.
+    APP_eReg_B2_Mode,              //!< Mode how the blind/motor is controlled.
+    APP_eReg_B2_Unused3,           //!< unused
     APP_eReg_B2_Unused2,           //!< unused
     APP_eReg_B2_Unused1,           //!< unused
     APP_eReg_B2_Last = APP_eReg_B2_Unused1,
@@ -78,6 +84,8 @@ typedef enum appregisters {
     APP_eReg_B3_ReactionDelay,     //!< Delay time in timer ticks (1/100sec) until movement starts after applying power.
     APP_eReg_B3_DurationOpen,      //!< Duration in timer ticks (1/100sec) to fully open the blind.
     APP_eReg_B3_DurationClose,     //!< Duration in timer ticks (1/100sec) to fully close the blind.
+    APP_eReg_B3_Mode,              //!< Mode how the blind/motor is controlled.
+    APP_eReg_B3_Unused3,           //!< unused
     APP_eReg_B3_Unused2,           //!< unused
     APP_eReg_B3_Unused1,           //!< unused
     APP_eReg_B3_Last = APP_eReg_B3_Unused1,
@@ -88,10 +96,19 @@ typedef enum appregisters {
     APP_eReg_B4_ReactionDelay,     //!< Delay time in timer ticks (1/100sec) until movement starts after applying power.
     APP_eReg_B4_DurationOpen,      //!< Duration in timer ticks (1/100sec) to fully open the blind.
     APP_eReg_B4_DurationClose,     //!< Duration in timer ticks (1/100sec) to fully close the blind.
+    APP_eReg_B4_Mode,              //!< Mode how the blind/motor is controlled.
+    APP_eReg_B4_Unused3,           //!< unused
     APP_eReg_B4_Unused2,           //!< unused
     APP_eReg_B4_Unused1,           //!< unused
     APP_eReg_B4_Last = APP_eReg_B4_Unused1,
 
+    APP_eReg_Year = 223,        //!< Current year.
+    APP_eReg_Month,             //!< Current month.
+    APP_eReg_Day,               //!< Current day.
+    APP_eReg_DayOfWeek,         //!< Current day of week.
+    APP_eReg_Hour,              //!< Current hour.
+    APP_eReg_Minute,            //!< Current minute.
+    APP_eReg_Second,            //!< Current second.
     // insert application specific registers here
     APP_eReg_Last
 } eRegisters_t;
@@ -108,6 +125,7 @@ typedef enum appconfig {
     APP_eCfg_B0_DurationClose,
     APP_eCfg_B0_DurationCloseLow = APP_eCfg_B0_DurationClose,
     APP_eCfg_B0_DurationCloseHigh,
+    APP_eCfg_B0_Mode,
 
     APP_eCfg_B1_ReactionDelay,
     APP_eCfg_B1_DurationOpen,
@@ -116,6 +134,7 @@ typedef enum appconfig {
     APP_eCfg_B1_DurationClose,
     APP_eCfg_B1_DurationCloseLow = APP_eCfg_B1_DurationClose,
     APP_eCfg_B1_DurationCloseHigh,
+    APP_eCfg_B1_Mode,
 
     APP_eCfg_B2_ReactionDelay,
     APP_eCfg_B2_DurationOpen,
@@ -124,6 +143,7 @@ typedef enum appconfig {
     APP_eCfg_B2_DurationClose,
     APP_eCfg_B2_DurationCloseLow = APP_eCfg_B2_DurationClose,
     APP_eCfg_B2_DurationCloseHigh,
+    APP_eCfg_B2_Mode,
 
     APP_eCfg_B3_ReactionDelay,
     APP_eCfg_B3_DurationOpen,
@@ -132,6 +152,7 @@ typedef enum appconfig {
     APP_eCfg_B3_DurationClose,
     APP_eCfg_B3_DurationCloseLow = APP_eCfg_B3_DurationClose,
     APP_eCfg_B3_DurationCloseHigh,
+    APP_eCfg_B3_Mode,
 
     APP_eCfg_B4_ReactionDelay,
     APP_eCfg_B4_DurationOpen,
@@ -140,6 +161,7 @@ typedef enum appconfig {
     APP_eCfg_B4_DurationClose,
     APP_eCfg_B4_DurationCloseLow = APP_eCfg_B4_DurationClose,
     APP_eCfg_B4_DurationCloseHigh,
+    APP_eCfg_B4_Mode,
 
     // insert application specific configuration here
     APP_eCfg_Last

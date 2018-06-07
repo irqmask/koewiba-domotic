@@ -9,6 +9,22 @@
  *
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
+/*
+ * Copyright (C) 2018  christian <irqmask@web.de>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #ifndef _APPCONFIG_H_
 #define _APPCONFIG_H_
@@ -30,8 +46,18 @@
 #define BLIND_APPCONFIG     1
 #define BLIND_COUNT         1       //!< Number of blind which this software is capable to control.
 
+#define DATETIME_APPCONFIG  1
+#define DATETIME_APP_HAS_ON_MINUTE_FUNCTION 1
+
+#define APP_UPDOWNTIMER_COUNT   4   //!< Number of up/down timer pairs.
+
+#define ALARMCLOCK_APPCONFIG    1
+#define ALARM_COUNT         (APP_UPDOWNTIMER_COUNT*2) //!< Number of programmable alarms.
+
 #define APP_eSLEEPMASK_MOTOR    (1<<0)  //!< Mask used for sleep_prevent() function.
                                         //!< Prevent the controller to fall asleep if motor is moving.
+
+
 // --- Type definitions --------------------------------------------------------
 
 //! Application specific commands
@@ -73,6 +99,26 @@ typedef enum appregisters {
     APP_eReg_TimeDown2_Minute,
     APP_eReg_TimeDown2_Unused2,
     APP_eReg_TimeDown2_Unused1,
+    APP_eReg_TimeUp3_Weekday,
+    APP_eReg_TimeUp3_Hour,
+    APP_eReg_TimeUp3_Minute,
+    APP_eReg_TimeUp3_Unused2,
+    APP_eReg_TimeUp3_Unused1,
+    APP_eReg_TimeDown3_Weekday,
+    APP_eReg_TimeDown3_Hour,
+    APP_eReg_TimeDown3_Minute,
+    APP_eReg_TimeDown3_Unused2,
+    APP_eReg_TimeDown3_Unused1,
+    APP_eReg_TimeUp4_Weekday,
+    APP_eReg_TimeUp4_Hour,
+    APP_eReg_TimeUp4_Minute,
+    APP_eReg_TimeUp4_Unused2,
+    APP_eReg_TimeUp4_Unused1,
+    APP_eReg_TimeDown4_Weekday,
+    APP_eReg_TimeDown4_Hour,
+    APP_eReg_TimeDown4_Minute,
+    APP_eReg_TimeDown4_Unused2,
+    APP_eReg_TimeDown4_Unused1,
 
     APP_eReg_WindowState = 46,  //!< State of the window
 
@@ -102,18 +148,30 @@ typedef enum appconfig {
     APP_eCfg_DurationCloseHigh,
     APP_eCfg_Mode,
 
-    APP_eCfg_TimeUp1_Weekday,
+    APP_eCfg_TimeUp1_Weekdays,
     APP_eCfg_TimeUp1_Hour,
     APP_eCfg_TimeUp1_Minute,
-    APP_eCfg_TimeDown1_Weekday,
+    APP_eCfg_TimeDown1_Weekdays,
     APP_eCfg_TimeDown1_Hour,
     APP_eCfg_TimeDown1_Minute,
-    APP_eCfg_TimeUp2_Weekday,
+    APP_eCfg_TimeUp2_Weekdays,
     APP_eCfg_TimeUp2_Hour,
     APP_eCfg_TimeUp2_Minute,
-    APP_eCfg_TimeDown2_Weekday,
+    APP_eCfg_TimeDown2_Weekdays,
     APP_eCfg_TimeDown2_Hour,
     APP_eCfg_TimeDown2_Minute,
+    APP_eCfg_TimeUp3_Weekdays,
+    APP_eCfg_TimeUp3_Hour,
+    APP_eCfg_TimeUp3_Minute,
+    APP_eCfg_TimeDown3_Weekdays,
+    APP_eCfg_TimeDown3_Hour,
+    APP_eCfg_TimeDown3_Minute,
+    APP_eCfg_TimeUp4_Weekdays,
+    APP_eCfg_TimeUp4_Hour,
+    APP_eCfg_TimeUp4_Minute,
+    APP_eCfg_TimeDown4_Weekdays,
+    APP_eCfg_TimeDown4_Hour,
+    APP_eCfg_TimeDown4_Minute,
 
     // insert application specific configuration here
     APP_eCfg_Last

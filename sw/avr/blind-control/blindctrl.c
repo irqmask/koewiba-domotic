@@ -377,6 +377,20 @@ void blind_set_mode                 (uint8_t index, uint8_t mode)
 }
 
 /**
+ * Check if blind is curently moving.
+ *
+ * @param[in]   index           Index of the blind.
+ * @returns true if blind is moving, otherwise false.
+ */
+bool blind_is_moving                (uint8_t index)
+{
+    if (index < BLIND_COUNT) {
+        return (g_blind_control[index].blind_state != idle);
+    }
+    return false;
+}
+
+/**
  * Initialize blind control data. Assuming blinds are closed (0) in the beginning.
  */
 void blinds_initialize      (void)

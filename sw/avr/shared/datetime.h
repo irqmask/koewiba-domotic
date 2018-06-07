@@ -39,7 +39,7 @@
 //! Enumeration of days of week.
 typedef enum _dayofweek_t {
     DT_MONDAY,
-    DT_TUEDAY,
+    DT_TUESDAY,
     DT_WEDNESDAY,
     DT_THURSDAY,
     DT_FRIDAY,

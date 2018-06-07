@@ -1,10 +1,11 @@
 # KWB Unittests
 cmake_minimum_required (VERSION 2.6)
+
 INCLUDE_DIRECTORIES (
     .
-    ../src/include
-    ../src/shared
-    ../src/upload
+    ../../include
+    ../../avr/include
+    ../../avr/shared
     ${CMAKE_CURRENT_BINARY_DIR}
 )
 
@@ -17,15 +18,12 @@ FILE(WRITE ${CMAKE_CURRENT_BINARY_DIR}/kwb_unittests_version.h
 
 
 SET(kwb_unittests_SRCS
-    ../src/shared/bus_schedul.c
-    ../src/shared/bus_transport.c
-    ../src/shared/pwm.c
-    ../src/upload/ihex.c
-    testbussched.c
-    testihex.c
-    testpwm.c
-    register_tests.c
+    ../../avr/shared/alarmclock.c   
+    ../../avr/shared/datetime.c   
     main.c
+    register_tests.c
+    test_alarmclock.c
+    test_datetime.c
 )
 
 ADD_DEFINITIONS(-DHAS_APPCONFIG_H)

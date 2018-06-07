@@ -29,7 +29,22 @@
 #include "prjtypes.h"
 #include "datetime.h"
 
+#ifdef HAS_APPCONFIG_H
+ #include "appconfig.h"
+#endif
+
 // --- Definitions -------------------------------------------------------------
+
+/**
+ * @subsection DATETIME_APPCONFIG
+ * Configure datetime module. E.g. application specific callbacks.
+ * @{
+ */
+#ifndef DATETIME_APPCONFIG
+ #define DATETIME_APPCONFIG 1
+ #undef  DATETIME_APP_HAS_ON_MINUTE_FUNCTION
+#endif // DATETIME_APPCONFIG
+/** @} */
 
 // --- Type definitions --------------------------------------------------------
 
@@ -64,12 +79,15 @@ static void dt_tick_month(void)
  */
 static void dt_tick_day(void)
 {
-    uint8_t dpm;
+    uint8_t dpm = 0;
 
     g_dtdata.dow++;
     if (g_dtdata.dow > DT_SUNDAY) g_dtdata.dow = DT_MONDAY;
 
-    dpm = g_days_per_month[g_dtdata.month];
+    if (g_dtdata.month > 0 && g_dtdata.month <= 12) {
+        dpm = g_days_per_month[g_dtdata.month - 1];
+    }
+    
     // leap year?
     if (g_dtdata.month == 2 && g_dtdata.year % 4 == 0) dpm++;
 
@@ -94,6 +112,10 @@ static void dt_tick_hour(void)
     }
 }
 
+#ifdef DATETIME_APP_HAS_ON_MINUTE_FUNCTION
+    extern void app_on_minute(void);
+#endif
+
 /**
  * Increase minute by one. 
  */
@@ -106,7 +128,9 @@ static void dt_tick_minute(void)
     }
     // minute and maybe hour and maybe day of week have changed,
     // check if an alarm for this time is scheduled.
-    //alarm_check();
+#ifdef DATETIME_APP_HAS_ON_MINUTE_FUNCTION
+    app_on_minute();
+#endif
 }
 
 // --- Module global functions -------------------------------------------------
@@ -139,23 +163,19 @@ void dt_initialize(void)
  * @param[in]   second  Second to set. Possible values are 0..59.
  * @param[in]   dow     Day of week. Possible values are 
  *                      CLK_MONDAY .. CLK_SUNDAY.
+ * @note Number of days per month and appropriate weekday is not checked here!
  */
 void dt_set(uint16_t year, uint8_t month, uint8_t day,
             uint8_t hour, uint8_t minute, uint8_t second,
             dt_day_of_week_t dow)
 {
-    if (month < 1 || month > 12 ||
-        day < 1 || day > 31 ||
-        hour > 23 || minute > 59 || second > 59 || dow > DT_SUNDAY) {
-        return;
-    }
-    g_dtdata.year = year;
-    g_dtdata.month = month;
-    g_dtdata.day = day;
-    g_dtdata.hour = hour;
-    g_dtdata.minute = minute;
-    g_dtdata.second = second;
-    g_dtdata.dow = dow;
+    dt_set_year(year);
+    dt_set_month(month);
+    dt_set_day(day);
+    dt_set_hour(hour);
+    dt_set_minute(minute);
+    dt_set_second(second);
+    dt_set_day_of_week(dow);
 }
 
 /**
@@ -223,6 +243,8 @@ uint8_t dt_get_month()
 /**
  * Sets the current month.
  * @param[in]   month     Month to set.
+ * 
+ * @note Number of days per month is not checked here!
  */
 void dt_set_month(uint8_t month)
 {
@@ -242,6 +264,9 @@ dt_day_of_week_t dt_get_day_of_week(void)
 /**
  * Sets the current day of week.
  * @param[in]   dow     Day of week.
+ * 
+ * @note Appropriate weekday at year/month/day is not checked here! E.g. you could 
+ * set the 2002-04-30 to DT_FRIDAY, but is was indeed a DT_TUESDAY.
  */
 void dt_set_day_of_week(dt_day_of_week_t dow)
 {
@@ -264,7 +289,7 @@ uint8_t dt_get_day()
  */
 void dt_set_day(uint8_t day)
 {
-    if (day <= 31) {
+    if (day > 0 && day <= 31) {
         g_dtdata.day = day;
     }
 }
@@ -283,7 +308,7 @@ uint8_t dt_get_hour()
  */
 void dt_set_hour(uint8_t hour)
 {
-    if (hour <= 24) {
+    if (hour <= 23) {
         g_dtdata.hour = hour;
     }
 }
@@ -302,7 +327,7 @@ uint8_t dt_get_minute()
  */
 void dt_set_minute(uint8_t minute)
 {
-    if (minute <= 60) {
+    if (minute <= 59) {
         g_dtdata.minute = minute;
     }
 }
@@ -321,7 +346,7 @@ uint8_t dt_get_second()
  */
 void dt_set_second(uint8_t second)
 {
-    if (second <= 60) {
+    if (second <= 59) {
         g_dtdata.second = second;
     }
 }

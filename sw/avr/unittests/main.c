@@ -7,7 +7,7 @@
 #include <CUnit/Basic.h>
 #include <CUnit/Console.h>
 
-extern CU_SuiteInfo TEST_asSuites[];
+extern CU_SuiteInfo test_suites[];
 
 int main (int argc, char* argv[])
 {
@@ -18,7 +18,7 @@ int main (int argc, char* argv[])
             break;
         }
 
-        if ((retval = CU_register_suites(TEST_asSuites)) != CUE_SUCCESS) {
+        if ((retval = CU_register_suites(test_suites)) != CUE_SUCCESS) {
             break;
         }
         CU_basic_set_mode(CU_BRM_VERBOSE);

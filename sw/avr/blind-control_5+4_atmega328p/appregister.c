@@ -7,119 +7,24 @@
  * @file    appregister.h
  * @brief   Registers of the application "blindcontrol_5+4_atmega328p".
  *
- * The application specific registers are like this:
- * APP_eReg_B0_PositionCurrent     | Current position of blind 0. 100 = completely closed. 0 = completely open
- * APP_eReg_B0_PositionSetPoint    | Wanted position of blind. 100 = completely closed. 0 = completely open
- * APP_eReg_B0_PositionDifference  | Difference between wanted and current position.
- * APP_eReg_B0_ReactionDelay       | Delay time in timer ticks (1/100sec) until movement starts after applying power.
- * APP_eReg_B0_DurationOpen        | Duration in timer ticks (1/100sec) to fully open the blind.
- * APP_eReg_B0_DurationClose       | Duration in timer ticks (1/100sec) to fully close the blind.
- * APP_eReg_B0_Reserve2            | unused.
- * APP_eReg_B0_Reserve1            | unused.
- *
- * APP_eReg_B1_PositionCurrent     | Current position of blind 1. 100 = completely closed. 0 = completely open
- * APP_eReg_B1_PositionSetPoint    | Wanted position of blind. 100 = completely closed. 0 = completely open
- * APP_eReg_B1_PositionDifference  | Difference between wanted and current position.
- * APP_eReg_B1_ReactionDelay       | Delay time in timer ticks (1/100sec) until movement starts after applying power.
- * APP_eReg_B1_DurationOpen        | Duration in timer ticks (1/100sec) to fully open the blind.
- * APP_eReg_B1_DurationClose       | Duration in timer ticks (1/100sec) to fully close the blind.
- * APP_eReg_B1_Reserve2            | unused.
- * APP_eReg_B1_Reserve1            | unused.
- *
- * APP_eReg_B2_PositionCurrent     | Current position of blind 2. 100 = completely closed. 0 = completely open
- * APP_eReg_B2_PositionSetPoint    | Wanted position of blind. 100 = completely closed. 0 = completely open
- * APP_eReg_B2_PositionDifference  | Difference between wanted and current position.
- * APP_eReg_B2_ReactionDelay       | Delay time in timer ticks (1/100sec) until movement starts after applying power.
- * APP_eReg_B2_DurationOpen        | Duration in timer ticks (1/100sec) to fully open the blind.
- * APP_eReg_B2_DurationClose       | Duration in timer ticks (1/100sec) to fully close the blind.
- * APP_eReg_B2_Reserve2            | unused.
- * APP_eReg_B2_Reserve1            | unused.
- *
- * APP_eReg_B3_PositionCurrent     | Current position of blind 2. 100 = completely closed. 0 = completely open
- * APP_eReg_B3_PositionSetPoint    | Wanted position of blind. 100 = completely closed. 0 = completely open
- * APP_eReg_B3_PositionDifference  | Difference between wanted and current position.
- * APP_eReg_B3_ReactionDelay       | Delay time in timer ticks (1/100sec) until movement starts after applying power.
- * APP_eReg_B3_DurationOpen        | Duration in timer ticks (1/100sec) to fully open the blind.
- * APP_eReg_B3_DurationClose       | Duration in timer ticks (1/100sec) to fully close the blind.
- * APP_eReg_B3_Reserve2            | unused.
- * APP_eReg_B3_Reserve1            | unused.
- *
- * APP_eReg_B4_PositionCurrent     | Current position of blind 2. 100 = completely closed. 0 = completely open
- * APP_eReg_B4_PositionSetPoint    | Wanted position of blind. 100 = completely closed. 0 = completely open
- * APP_eReg_B4_PositionDifference  | Difference between wanted and current position.
- * APP_eReg_B4_ReactionDelay       | Delay time in timer ticks (1/100sec) until movement starts after applying power.
- * APP_eReg_B4_DurationOpen        | Duration in timer ticks (1/100sec) to fully open the blind.
- * APP_eReg_B4_DurationClose       | Duration in timer ticks (1/100sec) to fully close the blind.
- * APP_eReg_B4_Reserve2            | unused.
- * APP_eReg_B4_Reserve1            | unused.
- *
- * APP_eReg_B0_TimeUp1_Weekday
- * APP_eReg_B0_TimeUp1_Hour
- * APP_eReg_B0_TimeUp1_Minute
- * APP_eReg_B0_TimeDown1_Weekday
- * APP_eReg_B0_TimeDown1_Hour
- * APP_eReg_B0_TimeDown1_Minute
- * APP_eReg_B0_TimeUp2_Weekday
- * APP_eReg_B0_TimeUp2_Hour
- * APP_eReg_B0_TimeUp2_Minute
- * APP_eReg_B0_TimeDown2_Weekday
- * APP_eReg_B0_TimeDown2_Hour
- * APP_eReg_B0_TimeDown2_Minute
- *
- * APP_eReg_B1_TimeUp1_Weekday
- * APP_eReg_B1_TimeUp1_Hour
- * APP_eReg_B1_TimeUp1_Minute
- * APP_eReg_B1_TimeDown1_Weekday
- * APP_eReg_B1_TimeDown1_Hour
- * APP_eReg_B1_TimeDown1_Minute
- * APP_eReg_B1_TimeUp2_Weekday
- * APP_eReg_B1_TimeUp2_Hour
- * APP_eReg_B1_TimeUp2_Minute
- * APP_eReg_B1_TimeDown2_Weekday
- * APP_eReg_B1_TimeDown2_Hour
- * APP_eReg_B1_TimeDown2_Minute
- *
- * APP_eReg_B2_TimeUp1_Weekday
- * APP_eReg_B2_TimeUp1_Hour
- * APP_eReg_B2_TimeUp1_Minute
- * APP_eReg_B2_TimeDown1_Weekday
- * APP_eReg_B2_TimeDown1_Hour
- * APP_eReg_B2_TimeDown1_Minute
- * APP_eReg_B2_TimeUp2_Weekday
- * APP_eReg_B2_TimeUp2_Hour
- * APP_eReg_B2_TimeUp2_Minute
- * APP_eReg_B2_TimeDown2_Weekday
- * APP_eReg_B2_TimeDown2_Hour
- * APP_eReg_B2_TimeDown2_Minute
- *
- * APP_eReg_B3_TimeUp1_Weekday
- * APP_eReg_B3_TimeUp1_Hour
- * APP_eReg_B3_TimeUp1_Minute
- * APP_eReg_B3_TimeDown1_Weekday
- * APP_eReg_B3_TimeDown1_Hour
- * APP_eReg_B3_TimeDown1_Minute
- * APP_eReg_B3_TimeUp2_Weekday
- * APP_eReg_B3_TimeUp2_Hour
- * APP_eReg_B3_TimeUp2_Minute
- * APP_eReg_B3_TimeDown2_Weekday
- * APP_eReg_B3_TimeDown2_Hour
- * APP_eReg_B3_TimeDown2_Minute
- *
- * APP_eReg_B4_TimeUp1_Weekday
- * APP_eReg_B4_TimeUp1_Hour
- * APP_eReg_B4_TimeUp1_Minute
- * APP_eReg_B4_TimeDown1_Weekday
- * APP_eReg_B4_TimeDown1_Hour
- * APP_eReg_B4_TimeDown1_Minute
- * APP_eReg_B4_TimeUp2_Weekday
- * APP_eReg_B4_TimeUp2_Hour
- * APP_eReg_B4_TimeUp2_Minute
- * APP_eReg_B4_TimeDown2_Weekday
- * APP_eReg_B4_TimeDown2_Hour
- * APP_eReg_B4_TimeDown2_Minute
- *
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
+/*
+ * Copyright (C) 2018  christian <irqmask@web.de>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 // --- Include section ---------------------------------------------------------
 

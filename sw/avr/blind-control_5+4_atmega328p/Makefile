@@ -11,6 +11,7 @@ include ../buildscripts/lib/lib_outputdirs.mk
 SRC = ../shared/bus_transport.c \
       ../shared/crc16.c \
       ../shared/queue.c \
+      shared/alarmclock.c \
       shared/block_message.c \
       shared/bus_phy.c \
       shared/datetime.c \

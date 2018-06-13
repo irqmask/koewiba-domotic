@@ -1,4 +1,5 @@
 EESchema Schematic File Version 2
+LIBS:pi2-base-rescue
 LIBS:connectors
 LIBS:diodes
 LIBS:ics_regulator
@@ -10,7 +11,7 @@ LIBS:standard
 LIBS:transistors
 LIBS:ics_peripheral
 LIBS:pi2-base-cache
-EELAYER 26 0
+EELAYER 25 0
 EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
@@ -204,7 +205,7 @@ REL2_NO
 Text HLabel 6175 3900 0    50   UnSpc ~ 0
 REL2_COM
 $Comp
-L OMRON_G5LE-1 REL2
+L OMRON_G5LE-1-RESCUE-pi2-base REL2
 U 1 1 526EA20C
 P 6725 3800
 F 0 "REL2" H 6750 3700 50  0000 C CNN
@@ -315,7 +316,7 @@ F 3 "" H 4225 3800 60  0001 C CNN
 	0    -1   -1   0   
 $EndComp
 $Comp
-L OMRON_G5LE-1 REL1
+L OMRON_G5LE-1-RESCUE-pi2-base REL1
 U 1 1 526EA068
 P 3925 3800
 F 0 "REL1" H 3950 3700 50  0000 C CNN

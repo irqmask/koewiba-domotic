@@ -1,4 +1,4 @@
-update=2018-06-12 3:00:13 PM
+update=2018-06-13 1:06:53 PM
 version=1
 last_client=kicad
 [pcbnew]
@@ -52,3 +52,13 @@ LibName20=relays
 LibName21=resistors
 LibName22=standard
 LibName23=transistors
+[schematic_editor]
+version=1
+PageLayoutDescrFile=
+PlotDirectoryName=
+SubpartIdSeparator=0
+SubpartFirstId=65
+NetFmtName=
+SpiceForceRefPrefix=0
+SpiceUseNetNumbers=0
+LabSize=60

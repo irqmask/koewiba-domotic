@@ -1,4 +1,5 @@
 EESchema Schematic File Version 2
+LIBS:pi2-base-rescue
 LIBS:connectors
 LIBS:diodes
 LIBS:ics_regulator
@@ -10,14 +11,14 @@ LIBS:standard
 LIBS:transistors
 LIBS:ics_peripheral
 LIBS:pi2-base-cache
-EELAYER 26 0
+EELAYER 25 0
 EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
 Sheet 1 5
 Title "pi2-base"
-Date "2017-02-10"
-Rev "1"
+Date "2018-06-12"
+Rev "2"
 Comp "KoeWiBa"
 Comment1 "Base board for Raspberry Pi B2"
 Comment2 ""
@@ -1338,4 +1339,6 @@ F 3 "" H 10750 6200 60  0001 C CNN
 	1    10750 6200
 	1    0    0    -1  
 $EndComp
+Text Notes 600  3100 0    50   ~ 0
+Do NOT use relays for 230V!\nIsolation for 230V not sufficient!
 $EndSCHEMATC

@@ -1,4 +1,5 @@
 EESchema Schematic File Version 2
+LIBS:pi2-base-rescue
 LIBS:connectors
 LIBS:diodes
 LIBS:ics_regulator
@@ -10,7 +11,7 @@ LIBS:standard
 LIBS:transistors
 LIBS:ics_peripheral
 LIBS:pi2-base-cache
-EELAYER 26 0
+EELAYER 25 0
 EELAYER END
 $Descr A4 11693 8268
 encoding utf-8

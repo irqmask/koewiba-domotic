@@ -260,6 +260,14 @@ bool motor_is_running       (uint8_t index)
     return (g_motor_control[index].motor_state != idle);
 }
 
+/**
+ * Set output switching mode for the motor.
+ */
+void motor_set_mode         (uint8_t index, motor_mode_t mode)
+{
+    if (index >= MOTOR_COUNT || mode >= eMOTOR_MODE_LAST) return;
+    g_motor_control[index].motor_mode = mode;
+}
 
 /**
  * Initialize motor module. Configure output pins.

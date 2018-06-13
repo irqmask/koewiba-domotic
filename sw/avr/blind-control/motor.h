@@ -22,6 +22,13 @@
 
 // --- Type definitions --------------------------------------------------------
 
+//! Mode of switching motor into CW / CCW movement.
+ typedef enum motor_mode {
+    eMOTOR_DURATION,    //!< motor output is switch on for the duration of motor turning.
+    eMOTOR_PULSE,       //!< motor output is only pulsed 500ms for turning up/down.
+    eMOTOR_MODE_LAST
+} motor_mode_t;
+
 // --- Local variables ---------------------------------------------------------
 
 // --- Global variables --------------------------------------------------------
@@ -41,6 +48,8 @@ void motor_down             (uint8_t index);
 void motor_stop             (uint8_t index);
 
 bool motor_is_running       (uint8_t index);
+
+void motor_set_mode         (uint8_t index, motor_mode_t mode);
 
 void motors_initialize      (void);
 

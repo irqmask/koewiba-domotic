@@ -27,7 +27,7 @@ NetIExt=net
 version=1
 [eeschema]
 version=1
-LibDir=../../../electronic/00library/kicad/01symbols
+LibDir=$(KIMYLIB)/01symbols
 [eeschema/libraries]
 LibName1=diodes
 LibName2=ics_controller_atmel

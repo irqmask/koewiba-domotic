@@ -1,35 +1,12 @@
-EESchema Schematic File Version 2
-LIBS:diodes
-LIBS:ics_controller_atmel
-LIBS:ics_misc
-LIBS:ics_peripheral
-LIBS:logo
-LIBS:analog_devices
-LIBS:connectors
-LIBS:display
-LIBS:encoder
-LIBS:ftdi
-LIBS:ics_40xx
-LIBS:ics_74xx
-LIBS:ics_opamp
-LIBS:ics_opto
-LIBS:ics_regulator
-LIBS:ics_signal
-LIBS:modules
-LIBS:power
-LIBS:relays
-LIBS:sensors
-LIBS:standard
-LIBS:transformer
-LIBS:transistors
+EESchema Schematic File Version 4
 LIBS:switch_3pole_5x-cache
-EELAYER 25 0
+EELAYER 26 0
 EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
 Sheet 1 4
 Title "switch 3pole 5x"
-Date "2018-06-08"
+Date "2018-09-18"
 Rev "1"
 Comp "koewiba"
 Comment1 ""
@@ -38,29 +15,29 @@ Comment3 ""
 Comment4 ""
 $EndDescr
 $Comp
-L +5V #PWR01
+L power1:+5V #PWR01
 U 1 1 572DAEDB
 P 6450 3350
 F 0 "#PWR01" H 6450 3550 50  0001 C CNN
-F 1 "+5V" H 6450 3460 50  0000 C CNN
+F 1 "+5V" H 6450 3500 50  0000 C CNN
 F 2 "" H 6450 3350 60  0000 C CNN
 F 3 "" H 6450 3350 60  0000 C CNN
 	1    6450 3350
 	-1   0    0    -1  
 $EndComp
 $Comp
-L +24V #PWR02
+L power1:+24V #PWR02
 U 1 1 572DAF09
 P 4750 3350
 F 0 "#PWR02" H 4750 3550 50  0001 C CNN
-F 1 "+24V" H 4750 3460 50  0000 C CNN
+F 1 "+24V" H 4750 3500 50  0000 C CNN
 F 2 "" H 4750 3350 60  0000 C CNN
 F 3 "" H 4750 3350 60  0000 C CNN
 	1    4750 3350
 	-1   0    0    -1  
 $EndComp
 $Comp
-L OPEN_HARDWARE_1 LOGO1
+L switch_3pole_5x-rescue:OPEN_HARDWARE_1 LOGO1
 U 1 1 572E288C
 P 1025 7400
 F 0 "LOGO1" H 1025 7675 60  0000 C CNN
@@ -93,7 +70,7 @@ F5 "button_3" O R 3700 3900 60
 F6 "button_4" O R 3700 4050 60 
 $EndSheet
 $Comp
-L GND #PWR03
+L switch_3pole_5x-rescue:GND #PWR03
 U 1 1 578B8717
 P 6450 4900
 F 0 "#PWR03" H 6450 4700 50  0001 C CNN
@@ -166,8 +143,6 @@ Wire Wire Line
 	6450 4800 6450 4900
 Wire Wire Line
 	7600 3450 7150 3450
-Wire Bus Line
-	7050 3550 7050 5150
 Text Label 3750 3450 0    40   ~ 0
 /button_0
 Text Label 3750 3750 0    40   ~ 0
@@ -243,10 +218,6 @@ Wire Wire Line
 Wire Wire Line
 	4750 4100 5250 4100
 Wire Bus Line
-	6800 5050 6800 3700
-Wire Bus Line
-	4350 3550 4350 5050
-Wire Bus Line
 	4350 5050 6800 5050
 Text Label 5100 5150 0    40   ~ 0
 output
@@ -269,8 +240,6 @@ Entry Wire Line
 Text Label 4800 3800 0    40   ~ 0
 relay_4
 Wire Bus Line
-	4650 3900 4650 5150
-Wire Bus Line
 	4650 5150 7050 5150
 Text Label 7150 3600 0    40   ~ 0
 relay_1
@@ -282,4 +251,12 @@ Wire Wire Line
 	7150 3900 7600 3900
 Wire Wire Line
 	7150 4050 7600 4050
+Wire Bus Line
+	7050 3550 7050 5150
+Wire Bus Line
+	4350 3550 4350 5050
+Wire Bus Line
+	4650 3900 4650 5150
+Wire Bus Line
+	6800 3700 6800 5050
 $EndSCHEMATC

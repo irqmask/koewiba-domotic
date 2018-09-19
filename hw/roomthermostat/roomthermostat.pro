@@ -1,4 +1,4 @@
-update=2018-06-14 1:53:24 PM
+update=Mi 19 Sep 2018 21:39:11 CEST
 version=1
 last_client=kicad
 [pcbnew]
@@ -28,12 +28,4 @@ NetIExt=net
 version=1
 [eeschema]
 version=1
-LibDir=$(KIMYLIB)/01symbols
-[eeschema/libraries]
-LibName1=display
-LibName2=modules
-LibName3=power
-LibName4=sensors
-LibName5=standard
-LibName6=transistors
-LibName7=logo
+LibDir=

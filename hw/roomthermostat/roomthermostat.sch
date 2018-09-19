@@ -1,13 +1,6 @@
-EESchema Schematic File Version 2
-LIBS:display
-LIBS:modules
-LIBS:power
-LIBS:sensors
-LIBS:standard
-LIBS:transistors
-LIBS:logo
+EESchema Schematic File Version 4
 LIBS:roomthermostat-cache
-EELAYER 25 0
+EELAYER 26 0
 EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
@@ -22,7 +15,7 @@ Comment3 ""
 Comment4 ""
 $EndDescr
 $Comp
-L bus-module_atmega328 MOD1
+L modules:bus-module_atmega328 MOD1
 U 1 1 5B2200B5
 P 5100 4000
 F 0 "MOD1" H 4950 3850 50  0000 C CNN
@@ -41,14 +34,14 @@ Wire Wire Line
 Wire Wire Line
 	5300 5050 5300 5150
 Wire Wire Line
-	5300 5150 4900 5150
+	5300 5150 5200 5150
 Connection ~ 5000 5150
 Connection ~ 5200 5150
 Wire Wire Line
 	5100 5150 5100 5250
 Connection ~ 5100 5150
 $Comp
-L GND #PWR01
+L power:GND #PWR01
 U 1 1 5B22013D
 P 5100 5250
 F 0 "#PWR01" H 5100 5050 50  0001 C CNN
@@ -59,7 +52,7 @@ F 3 "" H 5100 5250 60  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L VCC #PWR02
+L power:VCC #PWR02
 U 1 1 5B220159
 P 5100 2800
 F 0 "#PWR02" H 5100 2975 50  0001 C CNN
@@ -72,7 +65,7 @@ $EndComp
 Wire Wire Line
 	4900 3000 4900 2900
 Wire Wire Line
-	4900 2900 5300 2900
+	4900 2900 5000 2900
 Wire Wire Line
 	5300 2900 5300 3000
 Wire Wire Line
@@ -85,7 +78,7 @@ Wire Wire Line
 	5200 3000 5200 2900
 Connection ~ 5200 2900
 $Comp
-L TSIC206_SOIC8 U1
+L sensors:TSIC206_SOIC8 U1
 U 1 1 5B2201B8
 P 8200 3350
 F 0 "U1" H 8200 3800 50  0000 C CNN
@@ -96,7 +89,7 @@ F 3 "" H 8200 3350 60  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L Graphic-OLED-Display_4wireSPI MOD2
+L display:Graphic-OLED-Display_4wireSPI MOD2
 U 1 1 5B220AD1
 P 6900 3750
 F 0 "MOD2" H 6900 4600 50  0000 C CNN
@@ -107,7 +100,7 @@ F 3 "" H 6895 3750 60  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L C C1
+L standard:C C1
 U 1 1 5B220C28
 P 6450 4050
 F 0 "C1" H 6500 4100 50  0000 L CNN
@@ -118,7 +111,7 @@ F 3 "" H 6450 4050 60  0000 C CNN
 	0    1    1    0   
 $EndComp
 $Comp
-L C C2
+L standard:C C2
 U 1 1 5B220CB9
 P 7900 4050
 F 0 "C2" H 7950 4100 50  0000 L CNN
@@ -150,15 +143,15 @@ Text Label 4250 4000 0    40   ~ 0
 Wire Wire Line
 	6700 3850 6450 3850
 Wire Wire Line
-	6600 3750 6600 4350
+	6600 3750 6600 4250
 Wire Wire Line
 	8100 3850 7900 3850
 Wire Wire Line
-	7900 2850 7900 3950
+	7900 2850 7900 3850
 Wire Wire Line
-	8300 3750 8300 4350
+	8300 3750 8300 4250
 $Comp
-L GND #PWR03
+L power:GND #PWR03
 U 1 1 5B221010
 P 6600 4350
 F 0 "#PWR03" H 6600 4150 50  0001 C CNN
@@ -169,7 +162,7 @@ F 3 "" H 6600 4350 60  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND #PWR04
+L power:GND #PWR04
 U 1 1 5B22102E
 P 8300 4350
 F 0 "#PWR04" H 8300 4150 50  0001 C CNN
@@ -180,7 +173,7 @@ F 3 "" H 8300 4350 60  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L VCC #PWR05
+L power:VCC #PWR05
 U 1 1 5B22104C
 P 7900 2850
 F 0 "#PWR05" H 7900 3025 50  0001 C CNN
@@ -191,7 +184,7 @@ F 3 "" H 7900 2850 60  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L VCC #PWR06
+L power:VCC #PWR06
 U 1 1 5B22106A
 P 6450 2850
 F 0 "#PWR06" H 6450 3025 50  0001 C CNN
@@ -212,7 +205,7 @@ DISP_A0
 Text Label 7200 3800 3    40   ~ 0
 /DISP_CS
 Wire Wire Line
-	6450 2850 6450 3950
+	6450 2850 6450 3850
 Connection ~ 6450 3850
 Wire Wire Line
 	6700 3750 6700 3850
@@ -260,8 +253,6 @@ Wire Wire Line
 Wire Bus Line
 	8500 5500 8500 4100
 Wire Bus Line
-	6900 4300 7300 4300
-Wire Bus Line
 	7300 4300 7300 5500
 Entry Wire Line
 	6050 3800 6150 3900
@@ -271,8 +262,6 @@ Entry Wire Line
 	6050 4450 6150 4550
 Entry Wire Line
 	6050 4650 6150 4750
-Wire Bus Line
-	6150 3900 6150 5500
 Wire Bus Line
 	4100 5500 8500 5500
 Entry Wire Line
@@ -285,7 +274,7 @@ NoConn ~ 5650 3600
 NoConn ~ 5650 3400
 NoConn ~ 5650 3700
 $Comp
-L PushButton_SPST_NO S1
+L standard:PushButton_SPST_NO S1
 U 1 1 5B221710
 P 3850 3100
 F 0 "S1" H 4000 3025 50  0000 C BNN
@@ -296,7 +285,7 @@ F 3 "" H 3850 3100 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L PushButton_SPST_NO S2
+L standard:PushButton_SPST_NO S2
 U 1 1 5B22176B
 P 3850 3350
 F 0 "S2" H 4000 3275 50  0000 C BNN
@@ -307,7 +296,7 @@ F 3 "" H 3850 3350 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L PushButton_SPST_NO S3
+L standard:PushButton_SPST_NO S3
 U 1 1 5B22178E
 P 3850 3600
 F 0 "S3" H 4000 3525 50  0000 C BNN
@@ -340,7 +329,7 @@ Wire Wire Line
 Wire Wire Line
 	3850 3100 3750 3100
 Wire Wire Line
-	3750 3100 3750 3700
+	3750 3100 3750 3350
 Wire Wire Line
 	3850 3600 3750 3600
 Connection ~ 3750 3600
@@ -348,7 +337,7 @@ Wire Wire Line
 	3850 3350 3750 3350
 Connection ~ 3750 3350
 $Comp
-L GND #PWR07
+L power:GND #PWR07
 U 1 1 5B221CED
 P 3750 3700
 F 0 "#PWR07" H 3750 3500 50  0001 C CNN
@@ -364,8 +353,6 @@ Wire Wire Line
 	4550 4450 4200 4450
 Entry Wire Line
 	4100 4550 4200 4450
-Wire Bus Line
-	4100 4100 4100 5500
 NoConn ~ 4550 3700
 NoConn ~ 4550 3800
 NoConn ~ 4550 3900
@@ -374,7 +361,7 @@ NoConn ~ 4550 4350
 NoConn ~ 4550 4550
 NoConn ~ 4550 4650
 $Comp
-L OPEN_HARDWARE_1 LOGO1
+L logo:OPEN_HARDWARE_1 LOGO1
 U 1 1 5B225797
 P 3250 5700
 F 0 "LOGO1" H 3250 5975 50  0000 C CNN
@@ -384,4 +371,34 @@ F 3 "" H 3250 5700 60  0001 C CNN
 	1    3250 5700
 	1    0    0    -1  
 $EndComp
+Wire Wire Line
+	5000 5150 4900 5150
+Wire Wire Line
+	5200 5150 5100 5150
+Wire Wire Line
+	5100 5150 5000 5150
+Wire Wire Line
+	5100 2900 5200 2900
+Wire Wire Line
+	5000 2900 5100 2900
+Wire Wire Line
+	5200 2900 5300 2900
+Wire Wire Line
+	6450 3850 6450 3950
+Wire Wire Line
+	6600 4250 6600 4350
+Wire Wire Line
+	7900 3850 7900 3950
+Wire Wire Line
+	8300 4250 8300 4350
+Wire Wire Line
+	3750 3600 3750 3700
+Wire Wire Line
+	3750 3350 3750 3600
+Wire Bus Line
+	4100 4100 4100 5500
+Wire Bus Line
+	6900 4300 7300 4300
+Wire Bus Line
+	6150 3900 6150 5500
 $EndSCHEMATC

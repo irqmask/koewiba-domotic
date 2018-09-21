@@ -1,4 +1,4 @@
-update=2018-06-13 1:06:53 PM
+update=Fr 21 Sep 2018 20:57:33 CEST
 version=1
 last_client=kicad
 [pcbnew]
@@ -25,33 +25,6 @@ version=1
 NetIExt=net
 [general]
 version=1
-[eeschema]
-version=1
-LibDir=$(KIMYLIB)/01symbols
-[eeschema/libraries]
-LibName1=analog_devices
-LibName2=chokes
-LibName3=connectors
-LibName4=diodes
-LibName5=display
-LibName6=encoder
-LibName7=ftdi
-LibName8=ics_40xx
-LibName9=ics_74xx
-LibName10=ics_controller_atmel
-LibName11=ics_controller_microchip
-LibName12=ics_misc
-LibName13=ics_opamp
-LibName14=ics_opto
-LibName15=ics_peripheral
-LibName16=ics_regulator
-LibName17=ics_signal
-LibName18=logo
-LibName19=power
-LibName20=relays
-LibName21=resistors
-LibName22=standard
-LibName23=transistors
 [schematic_editor]
 version=1
 PageLayoutDescrFile=
@@ -62,3 +35,6 @@ NetFmtName=
 SpiceForceRefPrefix=0
 SpiceUseNetNumbers=0
 LabSize=60
+[eeschema]
+version=1
+LibDir=

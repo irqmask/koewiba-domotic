@@ -6,25 +6,14 @@ $Descr A4 11693 8268
 encoding utf-8
 Sheet 1 1
 Title "roomthermostat"
-Date "2018-06-14"
-Rev "1"
+Date "2018-09-22"
+Rev "A"
 Comp "koewiba"
 Comment1 ""
 Comment2 ""
 Comment3 ""
 Comment4 ""
 $EndDescr
-$Comp
-L modules:bus-module_atmega328 MOD1
-U 1 1 5B2200B5
-P 5100 4000
-F 0 "MOD1" H 4950 3850 50  0000 C CNN
-F 1 "bus-module_atmega328" V 5200 4000 40  0000 C CNN
-F 2 "Modules:bus-module_atmega328" H 5100 3850 60  0001 C CNN
-F 3 "" H 5100 3850 60  0000 C CNN
-	1    5100 4000
-	1    0    0    -1  
-$EndComp
 Wire Wire Line
 	4900 5050 4900 5150
 Wire Wire Line
@@ -56,24 +45,16 @@ L power:VCC #PWR02
 U 1 1 5B220159
 P 5100 2800
 F 0 "#PWR02" H 5100 2975 50  0001 C CNN
-F 1 "VCC" H 5100 2900 50  0000 C CNN
+F 1 "VCC" H 5100 2925 50  0000 C CNN
 F 2 "" H 5100 2800 60  0001 C CNN
 F 3 "" H 5100 2800 60  0001 C CNN
 	1    5100 2800
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
-	4900 3000 4900 2900
-Wire Wire Line
-	4900 2900 5000 2900
-Wire Wire Line
 	5300 2900 5300 3000
 Wire Wire Line
 	5100 2800 5100 2900
-Connection ~ 5100 2900
-Wire Wire Line
-	5000 3000 5000 2900
-Connection ~ 5000 2900
 Wire Wire Line
 	5200 3000 5200 2900
 Connection ~ 5200 2900
@@ -177,7 +158,7 @@ L power:VCC #PWR05
 U 1 1 5B22104C
 P 7900 2850
 F 0 "#PWR05" H 7900 3025 50  0001 C CNN
-F 1 "VCC" H 7900 2950 50  0000 C CNN
+F 1 "VCC" H 7900 2975 50  0000 C CNN
 F 2 "" H 7900 2850 60  0001 C CNN
 F 3 "" H 7900 2850 60  0001 C CNN
 	1    7900 2850
@@ -188,7 +169,7 @@ L power:VCC #PWR06
 U 1 1 5B22106A
 P 6450 2850
 F 0 "#PWR06" H 6450 3025 50  0001 C CNN
-F 1 "VCC" H 6450 2950 50  0000 C CNN
+F 1 "VCC" H 6450 2975 50  0000 C CNN
 F 2 "" H 6450 2850 60  0001 C CNN
 F 3 "" H 6450 2850 60  0001 C CNN
 	1    6450 2850
@@ -366,7 +347,7 @@ U 1 1 5B225797
 P 3250 5700
 F 0 "LOGO1" H 3250 5975 50  0000 C CNN
 F 1 "OPEN_HARDWARE_1" H 3250 5475 25  0000 C CNN
-F 2 "" H 3250 5700 60  0001 C CNN
+F 2 "Symbol:Symbol_OSHW-Logo_Copper" H 3250 5700 60  0001 C CNN
 F 3 "" H 3250 5700 60  0001 C CNN
 	1    3250 5700
 	1    0    0    -1  
@@ -379,8 +360,6 @@ Wire Wire Line
 	5100 5150 5000 5150
 Wire Wire Line
 	5100 2900 5200 2900
-Wire Wire Line
-	5000 2900 5100 2900
 Wire Wire Line
 	5200 2900 5300 2900
 Wire Wire Line
@@ -395,6 +374,19 @@ Wire Wire Line
 	3750 3600 3750 3700
 Wire Wire Line
 	3750 3350 3750 3600
+$Comp
+L modules:bus-module_atmega328_revB MOD1
+U 1 1 5BA6C4B8
+P 5100 4000
+F 0 "MOD1" H 5100 4100 40  0000 C CNN
+F 1 "bus-module_atmega328_revB" H 5100 3875 40  0000 C CNN
+F 2 "Modules:bus-module_atmega328" H 5100 3850 60  0001 C CNN
+F 3 "" H 5100 3850 60  0000 C CNN
+	1    5100 4000
+	1    0    0    -1  
+$EndComp
+NoConn ~ 5000 3000
+NoConn ~ 4900 3000
 Wire Bus Line
 	4100 4100 4100 5500
 Wire Bus Line

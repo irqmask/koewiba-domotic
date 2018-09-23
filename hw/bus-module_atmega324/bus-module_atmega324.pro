@@ -1,4 +1,4 @@
-update=So 01 Nov 2015 08:17:42 CET
+update=So 23 Sep 2018 22:18:37 CEST
 version=1
 last_client=kicad
 [pcbnew]
@@ -23,28 +23,18 @@ ModuleOutlineThickness=0.150000000000
 [cvpcb]
 version=1
 NetIExt=net
-[eeschema]
-version=1
-LibDir=/home/christian/Projekte/electronic/00library/kicad/01symbols
-[eeschema/libraries]
-LibName1=analog_devices
-LibName2=connectors
-LibName3=display
-LibName4=encoder
-LibName5=ftdi
-LibName6=ics_controller_atmel
-LibName7=ics_misc
-LibName8=ics_opamp
-LibName9=ics_opto
-LibName10=ics_peripheral
-LibName11=ics_regulator
-LibName12=logo
-LibName13=power
-LibName14=relays
-LibName15=sensors
-LibName16=standard
-LibName17=transformer
-LibName18=transistors
-LibName19=diodes
 [general]
 version=1
+[schematic_editor]
+version=1
+PageLayoutDescrFile=
+PlotDirectoryName=
+SubpartIdSeparator=0
+SubpartFirstId=65
+NetFmtName=
+SpiceForceRefPrefix=0
+SpiceUseNetNumbers=0
+LabSize=60
+[eeschema]
+version=1
+LibDir=

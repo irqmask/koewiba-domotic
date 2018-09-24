@@ -1,4 +1,4 @@
-update=2018-06-12 11:30:32 AM
+update=Mo 24 Sep 2018 19:18:23 CEST
 version=1
 last_client=kicad
 [pcbnew]
@@ -27,16 +27,4 @@ NetIExt=net
 version=1
 [eeschema]
 version=1
-LibDir=$(KIMYLIB)/01symbols
-[eeschema/libraries]
-LibName1=pi2-base-rescue
-LibName2=$(KIMYLIB)/connectors
-LibName3=$(KIMYLIB)/diodes
-LibName4=$(KIMYLIB)/ics_regulator
-LibName5=$(KIMYLIB)/logo
-LibName6=$(KIMYLIB)/modules
-LibName7=$(KIMYLIB)/power
-LibName8=$(KIMYLIB)/relays
-LibName9=$(KIMYLIB)/standard
-LibName10=$(KIMYLIB)/transistors
-LibName11=ics_peripheral
+LibDir=

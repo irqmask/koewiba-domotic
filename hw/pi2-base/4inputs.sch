@@ -1,17 +1,6 @@
-EESchema Schematic File Version 2
-LIBS:pi2-base-rescue
-LIBS:connectors
-LIBS:diodes
-LIBS:ics_regulator
-LIBS:logo
-LIBS:modules
-LIBS:power
-LIBS:relays
-LIBS:standard
-LIBS:transistors
-LIBS:ics_peripheral
+EESchema Schematic File Version 4
 LIBS:pi2-base-cache
-EELAYER 25 0
+EELAYER 26 0
 EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
@@ -26,7 +15,7 @@ Comment3 ""
 Comment4 ""
 $EndDescr
 $Comp
-L R R13
+L standard:R R13
 U 1 1 52AD89E5
 P 4950 2400
 F 0 "R13" H 4950 2300 50  0000 C CNN
@@ -45,7 +34,7 @@ GND
 Text HLabel 4650 2400 0    50   Input ~ 0
 IN1
 $Comp
-L BAT54S D2
+L diodes:BAT54S D2
 U 1 1 583D5AEB
 P 5450 1800
 F 0 "D2" H 5529 1846 50  0000 L CNN
@@ -71,7 +60,7 @@ IN1_PROT
 Wire Wire Line
 	5450 2100 5450 2000
 $Comp
-L R R14
+L standard:R R14
 U 1 1 583D5D3C
 P 4950 3700
 F 0 "R14" H 4950 3600 50  0000 C CNN
@@ -90,7 +79,7 @@ GND
 Text HLabel 4650 3700 0    50   Input ~ 0
 IN2
 $Comp
-L BAT54S D3
+L diodes:BAT54S D3
 U 1 1 583D5D45
 P 5450 3100
 F 0 "D3" H 5529 3146 50  0000 L CNN
@@ -116,7 +105,7 @@ IN2_PROT
 Wire Wire Line
 	5450 3400 5450 3300
 $Comp
-L R R15
+L standard:R R15
 U 1 1 583D5EDE
 P 4950 5050
 F 0 "R15" H 4950 4950 50  0000 C CNN
@@ -135,7 +124,7 @@ GND
 Text HLabel 4650 5050 0    50   Input ~ 0
 IN3
 $Comp
-L BAT54S D4
+L diodes:BAT54S D4
 U 1 1 583D5EE7
 P 5450 4450
 F 0 "D4" H 5529 4496 50  0000 L CNN
@@ -161,7 +150,7 @@ IN3_PROT
 Wire Wire Line
 	5450 4750 5450 4650
 $Comp
-L R R16
+L standard:R R16
 U 1 1 583D5EF7
 P 4950 6400
 F 0 "R16" H 4950 6300 50  0000 C CNN
@@ -180,7 +169,7 @@ GND
 Text HLabel 4650 6400 0    50   Input ~ 0
 IN4
 $Comp
-L BAT54S D5
+L diodes:BAT54S D5
 U 1 1 583D5F00
 P 5450 5800
 F 0 "D5" H 5529 5846 50  0000 L CNN
@@ -206,7 +195,7 @@ IN4_PROT
 Wire Wire Line
 	5450 6100 5450 6000
 $Comp
-L R R18
+L standard:R R18
 U 1 1 584153DB
 P 5150 2850
 F 0 "R18" V 5104 2928 50  0000 L CNN
@@ -217,7 +206,7 @@ F 3 "" H 5150 2850 60  0000 C CNN
 	0    1    1    0   
 $EndComp
 $Comp
-L R R17
+L standard:R R17
 U 1 1 58415503
 P 5150 1550
 F 0 "R17" V 5104 1628 50  0000 L CNN
@@ -244,7 +233,7 @@ Wire Wire Line
 Wire Wire Line
 	5150 1300 5150 1350
 $Comp
-L R R19
+L standard:R R19
 U 1 1 5841585B
 P 5150 4200
 F 0 "R19" V 5104 4278 50  0000 L CNN
@@ -255,7 +244,7 @@ F 3 "" H 5150 4200 60  0000 C CNN
 	0    1    1    0   
 $EndComp
 $Comp
-L R R20
+L standard:R R20
 U 1 1 584158D3
 P 5150 5550
 F 0 "R20" V 5104 5628 50  0000 L CNN

@@ -1,17 +1,6 @@
-EESchema Schematic File Version 2
-LIBS:pi2-base-rescue
-LIBS:connectors
-LIBS:diodes
-LIBS:ics_regulator
-LIBS:logo
-LIBS:modules
-LIBS:power
-LIBS:relays
-LIBS:standard
-LIBS:transistors
-LIBS:ics_peripheral
+EESchema Schematic File Version 4
 LIBS:pi2-base-cache
-EELAYER 25 0
+EELAYER 26 0
 EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
@@ -98,7 +87,7 @@ SDA
 Text Label 6250 3950 2    40   ~ 0
 SCL
 $Comp
-L C C1
+L standard:C C1
 U 1 1 527FA60F
 P 5550 4350
 F 0 "C1" H 5600 4400 50  0000 L CNN
@@ -111,7 +100,7 @@ F 5 "~" H 5350 4130 50  0001 L CNN "Tolerance"
 	0    -1   1    0   
 $EndComp
 $Comp
-L BATT BATT1
+L standard:BATT BATT1
 U 1 1 527FA283
 P 7900 4200
 F 0 "BATT1" H 7800 4050 50  0000 L CNN
@@ -124,7 +113,7 @@ F 5 "~" H 7700 3980 50  0001 L CNN "Tolerance"
 	0    -1   1    0   
 $EndComp
 $Comp
-L C C2
+L standard:C C2
 U 1 1 527FA128
 P 6300 4200
 F 0 "C2" H 6350 4250 50  0000 L CNN
@@ -137,7 +126,7 @@ F 5 "~" H 6100 3980 50  0001 L CNN "Tolerance"
 	0    -1   1    0   
 $EndComp
 $Comp
-L C C4
+L standard:C C4
 U 1 1 527FA124
 P 8250 3900
 F 0 "C4" H 8200 3675 50  0000 L CNN
@@ -150,7 +139,7 @@ F 5 "~" H 8050 3680 50  0001 L CNN "Tolerance"
 	-1   0    0    -1  
 $EndComp
 $Comp
-L C C3
+L standard:C C3
 U 1 1 527FA121
 P 8250 3700
 F 0 "C3" H 8200 3925 50  0000 L CNN
@@ -163,7 +152,7 @@ F 5 "~" H 8050 3480 50  0001 L CNN "Tolerance"
 	-1   0    0    -1  
 $EndComp
 $Comp
-L CRYSTAL U3
+L standard:CRYSTAL U3
 U 1 1 527FA110
 P 7700 3800
 F 0 "U3" H 7850 4050 50  0000 C CNN
@@ -174,7 +163,7 @@ F 3 "" H 7700 3800 60  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L DS1307 U2
+L ics_peripheral:DS1307 U2
 U 1 1 527F9F98
 P 7050 3900
 F 0 "U2" H 7050 3800 50  0000 C CNN
@@ -185,7 +174,7 @@ F 3 "64X8 I2C Real Time Clock" H 7050 3900 50  0001 C CNN
 	-1   0    0    -1  
 $EndComp
 $Comp
-L PCA9517 U1
+L ics_peripheral:PCA9517 U1
 U 1 1 527F9F8E
 P 4900 4000
 F 0 "U1" H 4900 3900 50  0000 C CNN
@@ -216,7 +205,7 @@ Wire Wire Line
 Wire Wire Line
 	4000 4100 3900 4100
 $Comp
-L R R11
+L standard:R R11
 U 1 1 583C425A
 P 5800 3650
 F 0 "R11" V 5754 3728 50  0000 L CNN
@@ -227,7 +216,7 @@ F 3 "" H 5800 3650 60  0000 C CNN
 	0    1    1    0   
 $EndComp
 $Comp
-L R R12
+L standard:R R12
 U 1 1 583C4352
 P 6050 3650
 F 0 "R12" V 6004 3728 50  0000 L CNN

@@ -1,17 +1,6 @@
-EESchema Schematic File Version 2
-LIBS:pi2-base-rescue
-LIBS:connectors
-LIBS:diodes
-LIBS:ics_regulator
-LIBS:logo
-LIBS:modules
-LIBS:power
-LIBS:relays
-LIBS:standard
-LIBS:transistors
-LIBS:ics_peripheral
+EESchema Schematic File Version 4
 LIBS:pi2-base-cache
-EELAYER 25 0
+EELAYER 26 0
 EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
@@ -26,7 +15,7 @@ Comment3 ""
 Comment4 ""
 $EndDescr
 Wire Wire Line
-	5250 3350 5250 3900
+	5250 3350 5250 3650
 Wire Wire Line
 	4600 3650 4550 3650
 Wire Wire Line
@@ -35,9 +24,9 @@ Wire Wire Line
 	5950 4000 5950 4450
 Connection ~ 5950 4450
 Wire Wire Line
-	6850 4450 5250 4450
+	6850 4450 6325 4450
 Wire Wire Line
-	6400 3850 6250 3850
+	6400 3850 6325 3850
 Connection ~ 5850 4450
 Connection ~ 5250 3650
 Wire Wire Line
@@ -45,7 +34,7 @@ Wire Wire Line
 Wire Wire Line
 	4150 3750 4150 3800
 Wire Wire Line
-	5450 3650 5000 3650
+	5450 3650 5250 3650
 Wire Wire Line
 	5850 4450 5850 4525
 Connection ~ 5750 4450
@@ -54,7 +43,7 @@ Wire Wire Line
 Connection ~ 6850 3850
 Connection ~ 6850 3650
 Wire Wire Line
-	6850 3650 6850 3900
+	6850 3650 6850 3850
 Wire Wire Line
 	5250 4450 5250 4200
 Wire Wire Line
@@ -68,7 +57,7 @@ Connection ~ 6325 3850
 Wire Wire Line
 	4100 3650 4150 3650
 $Comp
-L LM2576 U4
+L ics_regulator:LM2576 U4
 U 1 1 52AD6D47
 P 5850 3750
 F 0 "U4" H 5850 4050 50  0000 C CNN
@@ -79,7 +68,7 @@ F 3 "" H 5850 3750 60  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L SCHOTTKY D1
+L standard:SCHOTTKY D1
 U 1 1 526EC28B
 P 6325 4100
 F 0 "D1" H 6325 4200 50  0000 C CNN
@@ -90,7 +79,7 @@ F 3 "" H 6325 4100 60  0001 C CNN
 	0    -1   -1   0   
 $EndComp
 $Comp
-L CP C6
+L standard:CP C6
 U 1 1 526EBEBD
 P 6850 4050
 F 0 "C6" H 6850 3925 50  0000 C CNN
@@ -103,7 +92,7 @@ F 5 "+-10%" H 6850 4305 50  0000 C CNN "Tolrance"
 	0    1    1    0   
 $EndComp
 $Comp
-L L L1
+L standard:L L1
 U 1 1 526EBE7B
 P 6600 3850
 F 0 "L1" H 6500 3750 50  0000 L CNN
@@ -114,7 +103,7 @@ F 3 "" H 6600 3850 60  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND #PWR024
+L power:GND #PWR024
 U 1 1 526EBE53
 P 5850 4525
 F 0 "#PWR024" H 5850 4325 50  0001 C CNN
@@ -125,7 +114,7 @@ F 3 "" H 5850 4525 60  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L CP C5
+L standard:CP C5
 U 1 1 526EBE2E
 P 5250 4050
 F 0 "C5" H 5250 3925 50  0000 C CNN
@@ -138,7 +127,7 @@ F 5 "+-10%" H 5250 4305 50  0000 C CNN "Tolrance"
 	0    1    1    0   
 $EndComp
 $Comp
-L SWITCH SW2
+L standard:SWITCH SW2
 U 1 1 526EA5A3
 P 4100 3750
 F 0 "SW2" H 4275 3925 50  0000 L BNN
@@ -149,7 +138,7 @@ F 3 "" H 4100 3750 60  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND #PWR025
+L power:GND #PWR025
 U 1 1 526EA53B
 P 4150 3800
 F 0 "#PWR025" H 4150 3600 50  0001 C CNN
@@ -160,7 +149,7 @@ F 3 "" H 4150 3800 60  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L FUSE F3
+L standard:FUSE F3
 U 1 1 583C6A9F
 P 7150 3650
 AR Path="/583C6A9F" Ref="F3"  Part="1" 
@@ -173,7 +162,7 @@ F 3 "" H 7150 3650 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L FUSE F2
+L standard:FUSE F2
 U 1 1 583C71B1
 P 4800 3650
 AR Path="/583C71B1" Ref="F2"  Part="1" 
@@ -190,7 +179,7 @@ Text HLabel 4100 3650 0    50   Input ~ 0
 Text HLabel 4100 3750 0    50   Input ~ 0
 GND
 Wire Wire Line
-	6250 3650 6950 3650
+	6250 3650 6850 3650
 Wire Wire Line
 	7350 3650 7500 3650
 Text HLabel 7500 3350 2    50   Output ~ 0
@@ -201,4 +190,22 @@ Wire Wire Line
 	7500 3350 5250 3350
 Text Notes 5250 3200 0    60   ~ 0
 Inductor selected for 24V input voltage and 2A output current
+Wire Wire Line
+	5950 4450 5850 4450
+Wire Wire Line
+	5850 4450 5750 4450
+Wire Wire Line
+	5250 3650 5250 3900
+Wire Wire Line
+	5250 3650 5000 3650
+Wire Wire Line
+	5750 4450 5250 4450
+Wire Wire Line
+	6850 3850 6850 3900
+Wire Wire Line
+	6850 3650 6950 3650
+Wire Wire Line
+	6325 4450 5950 4450
+Wire Wire Line
+	6325 3850 6250 3850
 $EndSCHEMATC

@@ -1,6 +1,7 @@
 Revision A:
 -----------
-- Revisionskennung auf Kupfer-Layer.
-- Sicherung im 24V-Zweig fehlt.
-- Programmierstecker zu nah an WAGO-Klemmen.
-- Footprint für TVS-Diode (D2) zu groß.
+- The revision is not printed on a copper layer. At least one but better the top and bottom shall have revision number, which is still readable when all connectors are in place.
+- Footprint for TVS-Diode (D2) is too big.
+- Fuse in 24V branch is missing.
+- ISP too close to WAGO clamps.
+

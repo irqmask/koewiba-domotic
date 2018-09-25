@@ -1,4 +1,4 @@
-update=So 06 Dez 2015 19:14:36 CET
+update=Mo 24 Sep 2018 20:42:35 CEST
 version=1
 last_client=kicad
 [pcbnew]
@@ -23,19 +23,8 @@ ModuleOutlineThickness=0.150000000000
 [cvpcb]
 version=1
 NetIExt=net
-[eeschema]
-version=1
-LibDir=../../../electronic/00library/kicad/01symbols
-[eeschema/libraries]
-LibName1=connectors
-LibName2=diodes
-LibName3=logo
-LibName4=ics_controller_atmel
-LibName5=ics_misc
-LibName6=ics_peripheral
-LibName7=ics_signal
-LibName8=power
-LibName9=standard
-LibName10=transistors
 [general]
 version=1
+[eeschema]
+version=1
+LibDir=

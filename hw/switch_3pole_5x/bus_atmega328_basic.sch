@@ -7,7 +7,7 @@ encoding utf-8
 Sheet 4 4
 Title "switch 3pole (bus_atmega328_basic)"
 Date "2018-09-18"
-Rev "1"
+Rev "A"
 Comp "KoeWiBa"
 Comment1 ""
 Comment2 ""
@@ -15,7 +15,7 @@ Comment3 ""
 Comment4 ""
 $EndDescr
 $Comp
-L switch_3pole_5x-rescue:25LCXXX U3
+L ics_peripheral:25LCXXX U3
 U 1 1 559D5893
 P 5200 6850
 AR Path="/559D5893" Ref="U3"  Part="1" 
@@ -28,7 +28,7 @@ F 3 "SPI EEPROM" H 5200 6850 40  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L switch_3pole_5x-rescue:MAX487 U6
+L ics_misc:MAX487 U6
 U 1 1 559D596F
 P 7600 2850
 F 0 "U6" H 7350 3250 50  0000 C CNN
@@ -39,7 +39,7 @@ F 3 "" H 7600 2850 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L switch_3pole_5x-rescue:CONN_1 J13
+L connectors:CONN_1 J13
 U 1 1 559D5A6B
 P 10150 2500
 F 0 "J13" H 10150 2575 50  0000 C CNN
@@ -50,7 +50,7 @@ F 3 "" H 10150 2500 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L switch_3pole_5x-rescue:CONN_1 J14
+L connectors:CONN_1 J14
 U 1 1 559D5ACC
 P 10150 2700
 F 0 "J14" H 10150 2775 50  0000 C CNN
@@ -61,7 +61,7 @@ F 3 "" H 10150 2700 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L switch_3pole_5x-rescue:CONN_1 J15
+L connectors:CONN_1 J15
 U 1 1 559D5B5B
 P 10150 2900
 F 0 "J15" H 10150 2975 50  0000 C CNN
@@ -72,7 +72,7 @@ F 3 "" H 10150 2900 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L switch_3pole_5x-rescue:CONN_1 J16
+L connectors:CONN_1 J16
 U 1 1 559D5B94
 P 10150 3100
 F 0 "J16" H 10150 3175 50  0000 C CNN
@@ -83,7 +83,7 @@ F 3 "" H 10150 3100 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L switch_3pole_5x-rescue:AM1S-2403 U7
+L ics_regulator:AM1S-2405 U7
 U 1 1 559D5CD1
 P 8050 1300
 F 0 "U7" H 8050 1300 50  0000 C CNN
@@ -94,7 +94,7 @@ F 3 "" H 7300 1300 25  0001 C CNN
 	-1   0    0    -1  
 $EndComp
 $Comp
-L switch_3pole_5x-rescue:C C9
+L standard:C C9
 U 1 1 559D5E5A
 P 7800 2200
 F 0 "C9" H 7850 2250 50  0000 L CNN
@@ -105,7 +105,7 @@ F 3 "" H 7800 2200 60  0000 C CNN
 	-1   0    0    1   
 $EndComp
 $Comp
-L switch_3pole_5x-rescue:C C3
+L standard:C C3
 U 1 1 559D623B
 P 4950 1800
 F 0 "C3" H 5000 1850 50  0000 L CNN
@@ -116,7 +116,7 @@ F 3 "" H 4950 1800 60  0000 C CNN
 	0    1    1    0   
 $EndComp
 $Comp
-L switch_3pole_5x-rescue:C C6
+L standard:C C6
 U 1 1 559D6400
 P 6450 4650
 F 0 "C6" H 6500 4700 50  0000 L CNN
@@ -127,7 +127,7 @@ F 3 "" H 6450 4650 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L switch_3pole_5x-rescue:C C5
+L standard:C C5
 U 1 1 559D67BD
 P 6450 4300
 F 0 "C5" H 6500 4350 50  0000 L CNN
@@ -138,7 +138,7 @@ F 3 "" H 6450 4300 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L switch_3pole_5x-rescue:C C4
+L standard:C C4
 U 1 1 559D6AC5
 P 5200 6350
 F 0 "C4" H 5250 6400 50  0000 L CNN
@@ -149,7 +149,7 @@ F 3 "" H 5200 6350 60  0000 C CNN
 	0    1    1    0   
 $EndComp
 $Comp
-L switch_3pole_5x-rescue:CONN-ISP-6 J12
+L connectors:CONN-ISP-6 J12
 U 1 1 559D6B4E
 P 7600 5600
 F 0 "J12" H 7450 5850 50  0000 C CNN
@@ -160,7 +160,7 @@ F 3 "" H 7600 5600 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L switch_3pole_5x-rescue:CRYSTAL U5
+L standard:CRYSTAL U5
 U 1 1 559D6E2A
 P 6300 4300
 F 0 "U5" H 6475 4400 50  0000 C CNN
@@ -171,7 +171,7 @@ F 3 "" H 6300 4300 60  0000 C CNN
 	0    1    1    0   
 $EndComp
 $Comp
-L switch_3pole_5x-rescue:GND #PWR029
+L power:GND #PWR029
 U 1 1 559D7329
 P 5350 4950
 F 0 "#PWR029" H 5350 4750 50  0001 C CNN
@@ -182,7 +182,7 @@ F 3 "" H 5350 4950 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L switch_3pole_5x-rescue:GND #PWR030
+L power:GND #PWR030
 U 1 1 559D76CD
 P 4550 7100
 F 0 "#PWR030" H 4550 6900 50  0001 C CNN
@@ -193,7 +193,7 @@ F 3 "" H 4550 7100 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L power1:+24V #PWR031
+L power:+24V #PWR031
 U 1 1 559D77F1
 P 9350 2400
 F 0 "#PWR031" H 9350 2600 50  0001 C CNN
@@ -204,7 +204,7 @@ F 3 "" H 9350 2400 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L switch_3pole_5x-rescue:R R34
+L standard:R R34
 U 1 1 559D7BAA
 P 4900 5700
 F 0 "R34" H 4100 5700 50  0000 C CNN
@@ -215,7 +215,7 @@ F 3 "" H 4900 5700 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L switch_3pole_5x-rescue:R R33
+L standard:R R33
 U 1 1 559D7C90
 P 4900 5600
 F 0 "R33" H 4100 5600 50  0000 C CNN
@@ -226,7 +226,7 @@ F 3 "" H 4900 5600 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L switch_3pole_5x-rescue:R R32
+L standard:R R32
 U 1 1 559D7D33
 P 4900 5500
 F 0 "R32" H 4100 5500 50  0000 C CNN
@@ -262,7 +262,7 @@ Wire Wire Line
 	7700 2200 7600 2200
 Connection ~ 7600 2200
 $Comp
-L switch_3pole_5x-rescue:GND #PWR032
+L power:GND #PWR032
 U 1 1 55A00C4E
 P 7600 3450
 F 0 "#PWR032" H 7600 3250 50  0001 C CNN
@@ -283,7 +283,7 @@ Wire Wire Line
 Wire Wire Line
 	8100 2700 8750 2700
 $Comp
-L switch_3pole_5x-rescue:GND #PWR033
+L power:GND #PWR033
 U 1 1 55A03238
 P 4950 2100
 F 0 "#PWR033" H 4950 1900 50  0001 C CNN
@@ -393,7 +393,7 @@ MOSI
 Text Label 5800 6900 0    40   ~ 0
 SCK
 $Comp
-L switch_3pole_5x-rescue:R R31
+L standard:R R31
 U 1 1 55A05C69
 P 4550 6400
 F 0 "R31" H 4550 6300 50  0000 C CNN
@@ -404,7 +404,7 @@ F 3 "" H 4550 6400 60  0000 C CNN
 	0    1    1    0   
 $EndComp
 $Comp
-L switch_3pole_5x-rescue:R R35
+L standard:R R35
 U 1 1 55A05DA4
 P 5900 6400
 F 0 "R35" H 5900 6300 50  0000 C CNN
@@ -448,7 +448,7 @@ Wire Wire Line
 Wire Wire Line
 	5750 7000 5950 7000
 $Comp
-L switch_3pole_5x-rescue:GND #PWR034
+L power:GND #PWR034
 U 1 1 55A076FA
 P 5200 6500
 F 0 "#PWR034" H 5200 6300 50  0001 C CNN
@@ -474,7 +474,7 @@ Entry Wire Line
 Text Label 6850 5500 0    40   ~ 0
 PB4_MISO
 $Comp
-L switch_3pole_5x-rescue:GND #PWR035
+L power:GND #PWR035
 U 1 1 55A08693
 P 8000 5800
 F 0 "#PWR035" H 8000 5600 50  0001 C CNN
@@ -507,7 +507,7 @@ Wire Wire Line
 Wire Wire Line
 	7300 5700 6850 5700
 $Comp
-L switch_3pole_5x-rescue:GND #PWR036
+L power:GND #PWR036
 U 1 1 55A0C631
 P 8000 2300
 F 0 "#PWR036" H 8000 2100 50  0001 C CNN
@@ -522,7 +522,7 @@ Wire Wire Line
 Wire Wire Line
 	8000 2200 8000 2300
 $Comp
-L switch_3pole_5x-rescue:C C7
+L standard:C C7
 U 1 1 55A0D462
 P 6550 2250
 F 0 "C7" H 6600 2300 50  0000 L CNN
@@ -537,7 +537,7 @@ Wire Wire Line
 Wire Wire Line
 	6550 2350 6550 2450
 $Comp
-L switch_3pole_5x-rescue:R R36
+L standard:R R36
 U 1 1 55A0DE32
 P 6550 1750
 F 0 "R36" H 6550 1650 50  0000 C CNN
@@ -549,7 +549,7 @@ F 3 "" H 6550 1750 60  0000 C CNN
 $EndComp
 Connection ~ 6550 2050
 $Comp
-L switch_3pole_5x-rescue:GND #PWR037
+L power:GND #PWR037
 U 1 1 55A0E9DD
 P 6550 2450
 F 0 "#PWR037" H 6550 2250 50  0001 C CNN
@@ -570,7 +570,7 @@ Wire Wire Line
 Wire Wire Line
 	7200 1400 7200 1500
 $Comp
-L power1:+24V #PWR038
+L power:+24V #PWR038
 U 1 1 55A0FF09
 P 8650 1100
 F 0 "#PWR038" H 8650 1300 50  0001 C CNN
@@ -581,7 +581,7 @@ F 3 "" H 8650 1100 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L switch_3pole_5x-rescue:GND #PWR039
+L power:GND #PWR039
 U 1 1 55A10203
 P 8650 1500
 F 0 "#PWR039" H 8650 1300 50  0001 C CNN
@@ -592,7 +592,7 @@ F 3 "" H 8650 1500 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L switch_3pole_5x-rescue:GND #PWR040
+L power:GND #PWR040
 U 1 1 55A10383
 P 7200 1600
 F 0 "#PWR040" H 7200 1400 50  0001 C CNN
@@ -603,7 +603,7 @@ F 3 "" H 7200 1600 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L switch_3pole_5x-rescue:GND #PWR041
+L power:GND #PWR041
 U 1 1 55A105FF
 P 9550 4200
 F 0 "#PWR041" H 9550 4000 50  0001 C CNN
@@ -696,7 +696,7 @@ PB5_SCK
 Text Label 7900 5600 0    40   ~ 0
 PB3_MOSI
 $Comp
-L switch_3pole_5x-rescue:OPEN_HARDWARE_1 LOGO4
+L logo:OPEN_HARDWARE_1 LOGO4
 U 1 1 55B4D774
 P 1300 7350
 F 0 "LOGO4" H 1300 7625 60  0001 C CNN
@@ -749,7 +749,7 @@ Entry Wire Line
 Entry Wire Line
 	2775 4300 2875 4400
 $Comp
-L switch_3pole_5x-rescue:GND #PWR042
+L power:GND #PWR042
 U 1 1 55D48C16
 P 1800 3700
 F 0 "#PWR042" H 1800 3500 50  0001 C CNN
@@ -830,7 +830,7 @@ PD6
 Text Label 2575 4500 0    40   ~ 0
 PD7
 $Comp
-L switch_3pole_5x-rescue:ATMEGA88-TQFP32 U4
+L ics_controller_atmel:ATMEGA88-TQFP32 U4
 U 1 1 55D48DEF
 P 5350 3550
 F 0 "U4" H 5350 3550 50  0000 C CNN
@@ -856,15 +856,9 @@ Wire Wire Line
 Wire Wire Line
 	6200 3950 6200 4650
 Wire Wire Line
-	6200 4650 6300 4650
-Connection ~ 6300 4650
-Wire Wire Line
-	6250 4300 6300 4300
-Wire Wire Line
 	6250 4300 6250 3850
 Wire Wire Line
 	6250 3850 6150 3850
-Connection ~ 6300 4300
 Wire Wire Line
 	6550 4300 6650 4300
 Wire Wire Line
@@ -962,7 +956,7 @@ Wire Wire Line
 Wire Bus Line
 	1500 5800 4200 5800
 $Comp
-L switch_3pole_5x-rescue:SEMTECH_SR05 D22
+L diodes:SEMTECH_SR05 D22
 U 1 1 55EC2FF2
 P 9050 3700
 F 0 "D22" H 9125 3450 50  0000 C CNN
@@ -981,7 +975,7 @@ Wire Wire Line
 Wire Wire Line
 	4950 1900 4950 2100
 $Comp
-L power1:VCC #PWR043
+L power:VCC #PWR043
 U 1 1 5605057B
 P 7200 1000
 F 0 "#PWR043" H 7200 1175 50  0001 C CNN
@@ -992,7 +986,7 @@ F 3 "" H 7200 1000 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L power1:VCC #PWR044
+L power:VCC #PWR044
 U 1 1 560505CB
 P 5250 1400
 F 0 "#PWR044" H 5250 1575 50  0001 C CNN
@@ -1003,7 +997,7 @@ F 3 "" H 5250 1400 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L power1:VCC #PWR045
+L power:VCC #PWR045
 U 1 1 5605061B
 P 7600 2100
 F 0 "#PWR045" H 7600 2275 50  0001 C CNN
@@ -1014,7 +1008,7 @@ F 3 "" H 7600 2100 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L power1:VCC #PWR046
+L power:VCC #PWR046
 U 1 1 560506A7
 P 5200 6050
 F 0 "#PWR046" H 5200 6225 50  0001 C CNN
@@ -1025,7 +1019,7 @@ F 3 "" H 5200 6050 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L power1:VCC #PWR047
+L power:VCC #PWR047
 U 1 1 56050805
 P 1800 3800
 F 0 "#PWR047" H 1800 3975 50  0001 C CNN
@@ -1036,7 +1030,7 @@ F 3 "" H 1800 3800 60  0000 C CNN
 	0    -1   -1   0   
 $EndComp
 $Comp
-L power1:VCC #PWR048
+L power:VCC #PWR048
 U 1 1 5605145B
 P 8000 5400
 F 0 "#PWR048" H 8000 5575 50  0001 C CNN
@@ -1051,7 +1045,7 @@ A
 Text Label 9200 2900 0    40   ~ 0
 B
 $Comp
-L switch_3pole_5x-rescue:FUSE F2
+L standard:FUSE F2
 U 1 1 56648405
 P 9750 2500
 F 0 "F2" H 9750 2600 50  0000 C CNN
@@ -1118,7 +1112,7 @@ MISO
 Text HLabel 2475 3100 0    40   Output ~ 0
 SCK
 $Comp
-L power1:+24V #PWR049
+L power:+24V #PWR049
 U 1 1 578A4CD7
 P 2775 2575
 F 0 "#PWR049" H 2775 2775 50  0001 C CNN
@@ -1131,7 +1125,7 @@ $EndComp
 Wire Wire Line
 	2775 2575 2475 2575
 $Comp
-L switch_3pole_5x-rescue:C C8
+L standard:C C8
 U 1 1 578E4351
 P 7200 1300
 F 0 "C8" H 7250 1350 50  0000 L CNN
@@ -1171,10 +1165,6 @@ Wire Wire Line
 Wire Wire Line
 	5350 4850 5350 4950
 Wire Wire Line
-	6300 4650 6350 4650
-Wire Wire Line
-	6300 4300 6350 4300
-Wire Wire Line
 	5450 4850 6650 4850
 Wire Wire Line
 	6650 4650 6650 4850
@@ -1196,10 +1186,8 @@ Wire Wire Line
 	7000 2800 7000 2550
 Wire Wire Line
 	7100 2700 7100 2550
-Connection ~ 7100 2700
 Wire Wire Line
 	7100 3000 7100 3150
-Connection ~ 7100 3000
 $Comp
 L connectors:CONN_1 J31
 U 1 1 5BA51235
@@ -1337,6 +1325,10 @@ Wire Wire Line
 	3700 6900 4100 6900
 Wire Wire Line
 	3700 7000 4100 7000
+Wire Wire Line
+	6200 4650 6350 4650
+Wire Wire Line
+	6250 4300 6350 4300
 Wire Bus Line
 	5400 5600 5400 5800
 Wire Bus Line

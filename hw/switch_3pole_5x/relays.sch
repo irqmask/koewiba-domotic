@@ -7,7 +7,7 @@ encoding utf-8
 Sheet 2 4
 Title "switch 3pole 5x (relays)"
 Date "2018-09-18"
-Rev "1"
+Rev "A"
 Comp "koewiba"
 Comment1 ""
 Comment2 ""
@@ -15,7 +15,7 @@ Comment3 ""
 Comment4 ""
 $EndDescr
 $Comp
-L power1:+24V #PWR04
+L power:+24V #PWR04
 U 1 1 572DA356
 P 4700 2450
 F 0 "#PWR04" H 4700 2650 50  0001 C CNN
@@ -26,7 +26,7 @@ F 3 "" H 4700 2450 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L switch_3pole_5x-rescue:D D1
+L standard:D D1
 U 1 1 572DA3A8
 P 5000 1500
 F 0 "D1" H 5000 1600 50  0000 C CNN
@@ -37,7 +37,7 @@ F 3 "" H 5000 1500 60  0000 C CNN
 	0    -1   -1   0   
 $EndComp
 $Comp
-L switch_3pole_5x-rescue:D D2
+L standard:D D2
 U 1 1 572DA4C3
 P 5000 2750
 F 0 "D2" H 5000 2850 50  0000 C CNN
@@ -48,7 +48,7 @@ F 3 "" H 5000 2750 60  0000 C CNN
 	0    -1   -1   0   
 $EndComp
 $Comp
-L switch_3pole_5x-rescue:BSS138 Q2
+L transistors:BSS138 Q2
 U 1 1 572DAB4D
 P 5700 2700
 F 0 "Q2" H 5850 2600 50  0000 L CNN
@@ -59,7 +59,7 @@ F 3 "" H 5700 2700 60  0000 C CNN
 	-1   0    0    -1  
 $EndComp
 $Comp
-L switch_3pole_5x-rescue:BSS138 Q1
+L transistors:BSS138 Q1
 U 1 1 572DAC4A
 P 5700 1450
 F 0 "Q1" H 5850 1350 50  0000 L CNN
@@ -70,7 +70,7 @@ F 3 "" H 5700 1450 60  0000 C CNN
 	-1   0    0    -1  
 $EndComp
 $Comp
-L switch_3pole_5x-rescue:R R7
+L standard:R R7
 U 1 1 572DAC83
 P 6300 1450
 F 0 "R7" H 6300 1350 50  0000 C CNN
@@ -81,7 +81,7 @@ F 3 "" H 6300 1450 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L switch_3pole_5x-rescue:R R1
+L standard:R R1
 U 1 1 572DAD70
 P 6000 1750
 F 0 "R1" H 6000 1650 50  0000 C CNN
@@ -92,7 +92,7 @@ F 3 "" H 6000 1750 60  0000 C CNN
 	0    1    1    0   
 $EndComp
 $Comp
-L switch_3pole_5x-rescue:R R2
+L standard:R R2
 U 1 1 572DADE3
 P 6000 3000
 F 0 "R2" H 6000 2900 50  0000 C CNN
@@ -103,7 +103,7 @@ F 3 "" H 6000 3000 60  0000 C CNN
 	0    1    1    0   
 $EndComp
 $Comp
-L switch_3pole_5x-rescue:R R8
+L standard:R R8
 U 1 1 572DAE46
 P 6300 2700
 F 0 "R8" H 6300 2600 50  0000 C CNN
@@ -114,7 +114,7 @@ F 3 "" H 6300 2700 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L switch_3pole_5x-rescue:GND #PWR05
+L power:GND #PWR05
 U 1 1 572DB59F
 P 5600 3300
 F 0 "#PWR05" H 5600 3100 50  0001 C CNN
@@ -125,7 +125,7 @@ F 3 "" H 5600 3300 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L switch_3pole_5x-rescue:GND #PWR06
+L power:GND #PWR06
 U 1 1 572DB5CD
 P 5600 2050
 F 0 "#PWR06" H 5600 1850 50  0001 C CNN
@@ -140,7 +140,7 @@ relay_0
 Text Label 6900 2700 2    40   ~ 0
 relay_1
 $Comp
-L switch_3pole_5x-rescue:OPEN_HARDWARE_1 LOGO2
+L logo:OPEN_HARDWARE_1 LOGO2
 U 1 1 5B10FE77
 P 975 7350
 F 0 "LOGO2" H 975 7625 60  0000 C CNN
@@ -155,7 +155,7 @@ RELAY_0_NO
 Text Label 3550 1100 0    40   ~ 0
 RELAY_0_NC
 $Comp
-L switch_3pole_5x-rescue:FINDER_34.51.7.024 REL2
+L relays:FINDER_34.51.7.024 REL2
 U 1 1 5842EAE4
 P 4700 2750
 F 0 "REL2" V 4850 2700 50  0000 R CNN
@@ -166,7 +166,7 @@ F 3 "" H 4700 2750 60  0001 C CNN
 	0    -1   -1   0   
 $EndComp
 $Comp
-L switch_3pole_5x-rescue:FINDER_34.51.7.024 REL1
+L relays:FINDER_34.51.7.024 REL1
 U 1 1 5842E555
 P 4700 1500
 F 0 "REL1" V 4850 1450 50  0000 R CNN
@@ -226,7 +226,7 @@ Wire Wire Line
 	4700 1200 4700 1250
 Connection ~ 4700 1250
 $Comp
-L power1:+24V #PWR07
+L power:+24V #PWR07
 U 1 1 584354C0
 P 4700 1200
 F 0 "#PWR07" H 4700 1400 50  0001 C CNN
@@ -249,7 +249,7 @@ Wire Wire Line
 Wire Wire Line
 	5200 1200 5600 1200
 $Comp
-L power1:+24V #PWR08
+L power:+24V #PWR08
 U 1 1 5B0D5EB1
 P 4700 4950
 F 0 "#PWR08" H 4700 5150 50  0001 C CNN
@@ -260,7 +260,7 @@ F 3 "" H 4700 4950 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L switch_3pole_5x-rescue:D D3
+L standard:D D3
 U 1 1 5B0D5EB7
 P 5000 4000
 F 0 "D3" H 5000 4100 50  0000 C CNN
@@ -271,7 +271,7 @@ F 3 "" H 5000 4000 60  0000 C CNN
 	0    -1   -1   0   
 $EndComp
 $Comp
-L switch_3pole_5x-rescue:D D4
+L standard:D D4
 U 1 1 5B0D5EBD
 P 5000 5250
 F 0 "D4" H 5000 5350 50  0000 C CNN
@@ -282,7 +282,7 @@ F 3 "" H 5000 5250 60  0000 C CNN
 	0    -1   -1   0   
 $EndComp
 $Comp
-L switch_3pole_5x-rescue:BSS138 Q4
+L transistors:BSS138 Q4
 U 1 1 5B0D5EC3
 P 5700 5200
 F 0 "Q4" H 5850 5100 50  0000 L CNN
@@ -293,7 +293,7 @@ F 3 "" H 5700 5200 60  0000 C CNN
 	-1   0    0    -1  
 $EndComp
 $Comp
-L switch_3pole_5x-rescue:BSS138 Q3
+L transistors:BSS138 Q3
 U 1 1 5B0D5EC9
 P 5700 3950
 F 0 "Q3" H 5850 3850 50  0000 L CNN
@@ -304,7 +304,7 @@ F 3 "" H 5700 3950 60  0000 C CNN
 	-1   0    0    -1  
 $EndComp
 $Comp
-L switch_3pole_5x-rescue:R R9
+L standard:R R9
 U 1 1 5B0D5ECF
 P 6300 3950
 F 0 "R9" H 6300 3850 50  0000 C CNN
@@ -315,7 +315,7 @@ F 3 "" H 6300 3950 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L switch_3pole_5x-rescue:R R3
+L standard:R R3
 U 1 1 5B0D5ED5
 P 6000 4250
 F 0 "R3" H 6000 4150 50  0000 C CNN
@@ -326,7 +326,7 @@ F 3 "" H 6000 4250 60  0000 C CNN
 	0    1    1    0   
 $EndComp
 $Comp
-L switch_3pole_5x-rescue:R R4
+L standard:R R4
 U 1 1 5B0D5EDB
 P 6000 5500
 F 0 "R4" H 6000 5400 50  0000 C CNN
@@ -337,7 +337,7 @@ F 3 "" H 6000 5500 60  0000 C CNN
 	0    1    1    0   
 $EndComp
 $Comp
-L switch_3pole_5x-rescue:R R10
+L standard:R R10
 U 1 1 5B0D5EE1
 P 6300 5200
 F 0 "R10" H 6300 5100 50  0000 C CNN
@@ -348,7 +348,7 @@ F 3 "" H 6300 5200 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L switch_3pole_5x-rescue:GND #PWR09
+L power:GND #PWR09
 U 1 1 5B0D5EE7
 P 5600 5800
 F 0 "#PWR09" H 5600 5600 50  0001 C CNN
@@ -359,7 +359,7 @@ F 3 "" H 5600 5800 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L switch_3pole_5x-rescue:GND #PWR010
+L power:GND #PWR010
 U 1 1 5B0D5EED
 P 5600 4550
 F 0 "#PWR010" H 5600 4350 50  0001 C CNN
@@ -374,7 +374,7 @@ relay_2
 Text Label 6900 5200 2    40   ~ 0
 relay_3
 $Comp
-L switch_3pole_5x-rescue:FINDER_34.51.7.024 REL4
+L relays:FINDER_34.51.7.024 REL4
 U 1 1 5B0D5EF8
 P 4700 5250
 F 0 "REL4" V 4850 5200 50  0000 R CNN
@@ -385,7 +385,7 @@ F 3 "" H 4700 5250 60  0001 C CNN
 	0    -1   -1   0   
 $EndComp
 $Comp
-L switch_3pole_5x-rescue:FINDER_34.51.7.024 REL3
+L relays:FINDER_34.51.7.024 REL3
 U 1 1 5B0D5EFE
 P 4700 4000
 F 0 "REL3" V 4850 3950 50  0000 R CNN
@@ -441,7 +441,7 @@ Wire Wire Line
 	4700 3700 4700 3750
 Connection ~ 4700 3750
 $Comp
-L power1:+24V #PWR011
+L power:+24V #PWR011
 U 1 1 5B0D5F25
 P 4700 3700
 F 0 "#PWR011" H 4700 3900 50  0001 C CNN
@@ -464,7 +464,7 @@ Wire Wire Line
 Wire Wire Line
 	5200 3700 5600 3700
 $Comp
-L switch_3pole_5x-rescue:D D5
+L standard:D D5
 U 1 1 5B0D679E
 P 5000 6500
 F 0 "D5" H 5000 6600 50  0000 C CNN
@@ -475,7 +475,7 @@ F 3 "" H 5000 6500 60  0000 C CNN
 	0    -1   -1   0   
 $EndComp
 $Comp
-L switch_3pole_5x-rescue:BSS138 Q5
+L transistors:BSS138 Q5
 U 1 1 5B0D67B0
 P 5700 6450
 F 0 "Q5" H 5850 6350 50  0000 L CNN
@@ -486,7 +486,7 @@ F 3 "" H 5700 6450 60  0000 C CNN
 	-1   0    0    -1  
 $EndComp
 $Comp
-L switch_3pole_5x-rescue:R R11
+L standard:R R11
 U 1 1 5B0D67B6
 P 6300 6450
 F 0 "R11" H 6300 6350 50  0000 C CNN
@@ -497,7 +497,7 @@ F 3 "" H 6300 6450 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L switch_3pole_5x-rescue:R R5
+L standard:R R5
 U 1 1 5B0D67BC
 P 6000 6750
 F 0 "R5" H 6000 6650 50  0000 C CNN
@@ -508,7 +508,7 @@ F 3 "" H 6000 6750 60  0000 C CNN
 	0    1    1    0   
 $EndComp
 $Comp
-L switch_3pole_5x-rescue:GND #PWR012
+L power:GND #PWR012
 U 1 1 5B0D67D4
 P 5600 7050
 F 0 "#PWR012" H 5600 6850 50  0001 C CNN
@@ -521,7 +521,7 @@ $EndComp
 Text Label 6900 6450 2    40   ~ 0
 relay_4
 $Comp
-L switch_3pole_5x-rescue:FINDER_34.51.7.024 REL5
+L relays:FINDER_34.51.7.024 REL5
 U 1 1 5B0D67E5
 P 4700 6500
 F 0 "REL5" V 4850 6450 50  0000 R CNN
@@ -554,7 +554,7 @@ Wire Wire Line
 	4700 6200 4700 6250
 Connection ~ 4700 6250
 $Comp
-L power1:+24V #PWR013
+L power:+24V #PWR013
 U 1 1 5B0D680C
 P 4700 6200
 F 0 "#PWR013" H 4700 6400 50  0001 C CNN
@@ -591,7 +591,7 @@ Wire Wire Line
 Wire Wire Line
 	6500 5200 7000 5200
 $Comp
-L switch_3pole_5x-rescue:CONN_3X1 J1
+L connectors:CONN_3X1 J1
 U 1 1 5B1A6C69
 P 3250 1200
 F 0 "J1" H 3325 1425 50  0000 C CNN
@@ -612,7 +612,7 @@ RELAY_1_NO
 Text Label 3550 2350 0    40   ~ 0
 RELAY_1_NC
 $Comp
-L switch_3pole_5x-rescue:CONN_3X1 J2
+L connectors:CONN_3X1 J2
 U 1 1 5B1A7334
 P 3250 2450
 F 0 "J2" H 3325 2675 50  0000 C CNN
@@ -635,7 +635,7 @@ RELAY_2_NO
 Text Label 3550 3600 0    40   ~ 0
 RELAY_2_NC
 $Comp
-L switch_3pole_5x-rescue:CONN_3X1 J3
+L connectors:CONN_3X1 J3
 U 1 1 5B1A79FD
 P 3250 3700
 F 0 "J3" H 3325 3925 50  0000 C CNN
@@ -654,7 +654,7 @@ RELAY_3_NO
 Text Label 3550 4850 0    40   ~ 0
 RELAY_3_NC
 $Comp
-L switch_3pole_5x-rescue:CONN_3X1 J4
+L connectors:CONN_3X1 J4
 U 1 1 5B1A7AE1
 P 3250 4950
 F 0 "J4" H 3325 5175 50  0000 C CNN
@@ -673,7 +673,7 @@ RELAY_4_NO
 Text Label 3550 6100 0    40   ~ 0
 RELAY_4_NC
 $Comp
-L switch_3pole_5x-rescue:CONN_3X1 J5
+L connectors:CONN_3X1 J5
 U 1 1 5B1A7B8A
 P 3250 6200
 F 0 "J5" H 3325 6425 50  0000 C CNN

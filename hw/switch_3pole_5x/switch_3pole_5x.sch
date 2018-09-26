@@ -7,7 +7,7 @@ encoding utf-8
 Sheet 1 4
 Title "switch 3pole 5x"
 Date "2018-09-18"
-Rev "1"
+Rev "A"
 Comp "koewiba"
 Comment1 ""
 Comment2 ""
@@ -15,7 +15,7 @@ Comment3 ""
 Comment4 ""
 $EndDescr
 $Comp
-L power1:+5V #PWR01
+L power:+5V #PWR01
 U 1 1 572DAEDB
 P 6450 3350
 F 0 "#PWR01" H 6450 3550 50  0001 C CNN
@@ -26,7 +26,7 @@ F 3 "" H 6450 3350 60  0000 C CNN
 	-1   0    0    -1  
 $EndComp
 $Comp
-L power1:+24V #PWR02
+L power:+24V #PWR02
 U 1 1 572DAF09
 P 4750 3350
 F 0 "#PWR02" H 4750 3550 50  0001 C CNN
@@ -37,7 +37,7 @@ F 3 "" H 4750 3350 60  0000 C CNN
 	-1   0    0    -1  
 $EndComp
 $Comp
-L switch_3pole_5x-rescue:OPEN_HARDWARE_1 LOGO1
+L logo:OPEN_HARDWARE_1 LOGO1
 U 1 1 572E288C
 P 1025 7400
 F 0 "LOGO1" H 1025 7675 60  0000 C CNN
@@ -70,7 +70,7 @@ F5 "button_3" O R 3700 3900 60
 F6 "button_4" O R 3700 4050 60 
 $EndSheet
 $Comp
-L switch_3pole_5x-rescue:GND #PWR03
+L power:GND #PWR03
 U 1 1 578B8717
 P 6450 4900
 F 0 "#PWR03" H 6450 4700 50  0001 C CNN

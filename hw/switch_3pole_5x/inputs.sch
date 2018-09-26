@@ -7,7 +7,7 @@ encoding utf-8
 Sheet 3 4
 Title "switch 3pole (inputs)"
 Date "2018-09-18"
-Rev "1"
+Rev "A"
 Comp "koewiba"
 Comment1 ""
 Comment2 ""
@@ -19,7 +19,7 @@ Text Label 5050 2400 2    40   ~ 0
 Text Label 5050 3600 2    40   ~ 0
 /button_1
 $Comp
-L power1:+5V #PWR014
+L power:+5V #PWR014
 U 1 1 572DD72B
 P 4250 2900
 F 0 "#PWR014" H 4250 3100 50  0001 C CNN
@@ -30,7 +30,7 @@ F 3 "" H 4250 2900 60  0000 C CNN
 	-1   0    0    -1  
 $EndComp
 $Comp
-L switch_3pole_5x-rescue:GND #PWR015
+L power:GND #PWR015
 U 1 1 572DD731
 P 4250 3400
 F 0 "#PWR015" H 4250 3200 50  0001 C CNN
@@ -41,7 +41,7 @@ F 3 "" H 4250 3400 60  0000 C CNN
 	-1   0    0    -1  
 $EndComp
 $Comp
-L switch_3pole_5x-rescue:GND #PWR016
+L power:GND #PWR016
 U 1 1 572DE6EB
 P 3925 2875
 F 0 "#PWR016" H 3925 2675 50  0001 C CNN
@@ -52,7 +52,7 @@ F 3 "" H 3925 2875 60  0000 C CNN
 	-1   0    0    -1  
 $EndComp
 $Comp
-L switch_3pole_5x-rescue:OPEN_HARDWARE_1 LOGO3
+L logo:OPEN_HARDWARE_1 LOGO3
 U 1 1 5B10FE76
 P 975 7350
 F 0 "LOGO3" H 975 7625 60  0000 C CNN
@@ -63,7 +63,7 @@ F 3 "" H 975 7350 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L switch_3pole_5x-rescue:BAT54S D12
+L diodes:BAT54S D12
 U 1 1 57AB8D78
 P 4250 3150
 F 0 "D12" H 4329 3196 50  0000 L CNN
@@ -80,7 +80,7 @@ Wire Wire Line
 Wire Wire Line
 	3600 2600 3850 2600
 $Comp
-L switch_3pole_5x-rescue:CONN_4X1 J7
+L connectors:CONN_4X1 J7
 U 1 1 5B0E2195
 P 3400 2550
 F 0 "J7" H 3475 2825 50  0000 C CNN
@@ -94,7 +94,7 @@ Wire Wire Line
 	3925 2700 3600 2700
 Connection ~ 3925 2700
 $Comp
-L switch_3pole_5x-rescue:R R22
+L standard:R R22
 U 1 1 572DD721
 P 4250 3600
 F 0 "R22" H 4250 3500 50  0000 C CNN
@@ -105,7 +105,7 @@ F 3 "" H 4250 3600 60  0000 C CNN
 	-1   0    0    -1  
 $EndComp
 $Comp
-L power1:+5V #PWR017
+L power:+5V #PWR017
 U 1 1 5B0E2682
 P 4250 1700
 F 0 "#PWR017" H 4250 1900 50  0001 C CNN
@@ -116,7 +116,7 @@ F 3 "" H 4250 1700 60  0000 C CNN
 	-1   0    0    -1  
 $EndComp
 $Comp
-L switch_3pole_5x-rescue:GND #PWR018
+L power:GND #PWR018
 U 1 1 5B0E2688
 P 4250 2200
 F 0 "#PWR018" H 4250 2000 50  0001 C CNN
@@ -127,7 +127,7 @@ F 3 "" H 4250 2200 60  0000 C CNN
 	-1   0    0    -1  
 $EndComp
 $Comp
-L switch_3pole_5x-rescue:BAT54S D11
+L diodes:BAT54S D11
 U 1 1 5B0E268E
 P 4250 1950
 F 0 "D11" H 4329 1996 50  0000 L CNN
@@ -138,7 +138,7 @@ F 3 "" H 4250 1950 60  0000 C CNN
 	-1   0    0    -1  
 $EndComp
 $Comp
-L switch_3pole_5x-rescue:R R21
+L standard:R R21
 U 1 1 5B0E2694
 P 4250 2400
 F 0 "R21" H 4250 2300 50  0000 C CNN
@@ -185,7 +185,7 @@ Text Label 5050 4800 2    40   ~ 0
 Text Label 5050 6000 2    40   ~ 0
 /button_3
 $Comp
-L power1:+5V #PWR019
+L power:+5V #PWR019
 U 1 1 5B0E2FF8
 P 4250 5300
 F 0 "#PWR019" H 4250 5500 50  0001 C CNN
@@ -196,7 +196,7 @@ F 3 "" H 4250 5300 60  0000 C CNN
 	-1   0    0    -1  
 $EndComp
 $Comp
-L switch_3pole_5x-rescue:GND #PWR020
+L power:GND #PWR020
 U 1 1 5B0E2FFE
 P 4250 5800
 F 0 "#PWR020" H 4250 5600 50  0001 C CNN
@@ -207,7 +207,7 @@ F 3 "" H 4250 5800 60  0000 C CNN
 	-1   0    0    -1  
 $EndComp
 $Comp
-L switch_3pole_5x-rescue:GND #PWR021
+L power:GND #PWR021
 U 1 1 5B0E3004
 P 3925 5275
 F 0 "#PWR021" H 3925 5075 50  0001 C CNN
@@ -218,7 +218,7 @@ F 3 "" H 3925 5275 60  0000 C CNN
 	-1   0    0    -1  
 $EndComp
 $Comp
-L switch_3pole_5x-rescue:BAT54S D14
+L diodes:BAT54S D14
 U 1 1 5B0E300A
 P 4250 5550
 F 0 "D14" H 4329 5596 50  0000 L CNN
@@ -235,7 +235,7 @@ Wire Wire Line
 Wire Wire Line
 	3600 5000 3850 5000
 $Comp
-L switch_3pole_5x-rescue:CONN_4X1 J8
+L connectors:CONN_4X1 J8
 U 1 1 5B0E3013
 P 3400 4950
 F 0 "J8" H 3475 5225 50  0000 C CNN
@@ -249,7 +249,7 @@ Wire Wire Line
 	3925 5100 3600 5100
 Connection ~ 3925 5100
 $Comp
-L switch_3pole_5x-rescue:R R24
+L standard:R R24
 U 1 1 5B0E301B
 P 4250 6000
 F 0 "R24" H 4250 5900 50  0000 C CNN
@@ -260,7 +260,7 @@ F 3 "" H 4250 6000 60  0000 C CNN
 	-1   0    0    -1  
 $EndComp
 $Comp
-L power1:+5V #PWR022
+L power:+5V #PWR022
 U 1 1 5B0E3021
 P 4250 4100
 F 0 "#PWR022" H 4250 4300 50  0001 C CNN
@@ -271,7 +271,7 @@ F 3 "" H 4250 4100 60  0000 C CNN
 	-1   0    0    -1  
 $EndComp
 $Comp
-L switch_3pole_5x-rescue:GND #PWR023
+L power:GND #PWR023
 U 1 1 5B0E3027
 P 4250 4600
 F 0 "#PWR023" H 4250 4400 50  0001 C CNN
@@ -282,7 +282,7 @@ F 3 "" H 4250 4600 60  0000 C CNN
 	-1   0    0    -1  
 $EndComp
 $Comp
-L switch_3pole_5x-rescue:BAT54S D13
+L diodes:BAT54S D13
 U 1 1 5B0E302D
 P 4250 4350
 F 0 "D13" H 4329 4396 50  0000 L CNN
@@ -293,7 +293,7 @@ F 3 "" H 4250 4350 60  0000 C CNN
 	-1   0    0    -1  
 $EndComp
 $Comp
-L switch_3pole_5x-rescue:R R23
+L standard:R R23
 U 1 1 5B0E3033
 P 4250 4800
 F 0 "R23" H 4250 4700 50  0000 C CNN
@@ -338,7 +338,7 @@ button_3
 Text Label 8150 2400 2    40   ~ 0
 /button_4
 $Comp
-L power1:+5V #PWR024
+L power:+5V #PWR024
 U 1 1 5B0E32D9
 P 7350 1700
 F 0 "#PWR024" H 7350 1900 50  0001 C CNN
@@ -349,7 +349,7 @@ F 3 "" H 7350 1700 60  0000 C CNN
 	-1   0    0    -1  
 $EndComp
 $Comp
-L switch_3pole_5x-rescue:GND #PWR025
+L power:GND #PWR025
 U 1 1 5B0E32DF
 P 7350 2200
 F 0 "#PWR025" H 7350 2000 50  0001 C CNN
@@ -360,7 +360,7 @@ F 3 "" H 7350 2200 60  0000 C CNN
 	-1   0    0    -1  
 $EndComp
 $Comp
-L switch_3pole_5x-rescue:BAT54S D15
+L diodes:BAT54S D15
 U 1 1 5B0E32E5
 P 7350 1950
 F 0 "D15" H 7429 1996 50  0000 L CNN
@@ -371,7 +371,7 @@ F 3 "" H 7350 1950 60  0000 C CNN
 	-1   0    0    -1  
 $EndComp
 $Comp
-L switch_3pole_5x-rescue:R R25
+L standard:R R25
 U 1 1 5B0E32EB
 P 7350 2400
 F 0 "R25" H 7350 2300 50  0000 C CNN
@@ -397,7 +397,7 @@ Connection ~ 7650 2400
 Text HLabel 8250 2400 2    60   Output ~ 0
 button_4
 $Comp
-L switch_3pole_5x-rescue:ZD D21
+L standard:ZD D21
 U 1 1 5B0E3DD6
 P 7550 4800
 F 0 "D21" H 7550 4900 50  0000 C CNN
@@ -408,7 +408,7 @@ F 3 "" H 7550 4800 60  0000 C CNN
 	0    -1   -1   0   
 $EndComp
 $Comp
-L power1:+5V #PWR026
+L power:+5V #PWR026
 U 1 1 5B0E3F0E
 P 7550 4500
 F 0 "#PWR026" H 7550 4700 50  0001 C CNN
@@ -419,7 +419,7 @@ F 3 "" H 7550 4500 60  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L switch_3pole_5x-rescue:GND #PWR027
+L power:GND #PWR027
 U 1 1 5B0E3FFA
 P 7550 5100
 F 0 "#PWR027" H 7550 4900 50  0001 C CNN
@@ -436,7 +436,7 @@ Wire Wire Line
 Text Notes 8400 4800 2    40   ~ 0
 Place close to inputs!
 $Comp
-L switch_3pole_5x-rescue:CONN_2X1 J9
+L connectors:CONN_2X1 J9
 U 1 1 5B1A4C2C
 P 6500 2450
 F 0 "J9" H 6575 2625 50  0000 C CNN
@@ -447,7 +447,7 @@ F 3 "" H 6500 2450 60  0000 C CNN
 	-1   0    0    -1  
 $EndComp
 $Comp
-L switch_3pole_5x-rescue:GND #PWR028
+L power:GND #PWR028
 U 1 1 5B0E32BC
 P 6800 2600
 F 0 "#PWR028" H 6800 2400 50  0001 C CNN

@@ -7,7 +7,7 @@ encoding utf-8
 Sheet 5 5
 Title "2 Relays"
 Date "2018-09-24"
-Rev "1"
+Rev "B"
 Comp "KoeWiBa"
 Comment1 "Baseboard for Raspberry PI 2B"
 Comment2 ""

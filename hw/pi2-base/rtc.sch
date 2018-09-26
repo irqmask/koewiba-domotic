@@ -7,7 +7,7 @@ encoding utf-8
 Sheet 2 5
 Title "RTC"
 Date "2016-11-28"
-Rev "1"
+Rev "B"
 Comp "KoeWiBa"
 Comment1 "Baseboard for Raspberry PI 2"
 Comment2 ""
@@ -17,9 +17,9 @@ $EndDescr
 Wire Wire Line
 	4000 3950 4350 3950
 Wire Wire Line
-	5450 3950 6500 3950
+	5450 3950 5800 3950
 Wire Wire Line
-	5450 4050 6500 4050
+	5450 4050 6050 4050
 Connection ~ 5550 3850
 Wire Wire Line
 	5450 3850 5550 3850
@@ -46,33 +46,33 @@ Wire Wire Line
 Wire Wire Line
 	7700 3850 7700 3900
 Wire Wire Line
-	7700 3900 8150 3900
+	7700 3900 8050 3900
 Wire Wire Line
 	7700 3750 7600 3750
 Wire Wire Line
 	8150 3700 7700 3700
 Wire Wire Line
-	7700 3700 7700 3800
+	7700 3700 7700 3750
 Connection ~ 7700 3750
 Wire Wire Line
 	7900 3950 7600 3950
 Wire Wire Line
 	6300 3750 6500 3750
 Wire Wire Line
-	8400 3700 8400 4350
+	8400 3700 8400 3900
 Wire Wire Line
-	8400 4350 6300 4350
+	8400 4350 7900 4350
 Connection ~ 7900 4350
 Wire Wire Line
 	6300 4350 6300 4300
 Wire Wire Line
 	7900 4300 7900 4350
 Wire Wire Line
-	5550 3400 5550 4250
+	5550 3400 5550 3850
 Wire Wire Line
 	4000 4050 4350 4050
 Wire Wire Line
-	6300 3250 6300 4100
+	6300 3250 6300 3400
 Connection ~ 6300 3750
 Text Label 4300 4050 2    40   ~ 0
 RSDA
@@ -191,7 +191,7 @@ Wire Wire Line
 Wire Wire Line
 	4250 4150 4250 4650
 Wire Wire Line
-	5550 4450 5550 4750
+	5550 4450 5550 4650
 Text HLabel 3900 3900 0    50   Input ~ 0
 SCL_3V3
 Text HLabel 3900 4100 0    50   Input ~ 0
@@ -229,7 +229,7 @@ $EndComp
 Wire Wire Line
 	5800 3450 5800 3400
 Wire Wire Line
-	5550 3400 6300 3400
+	5550 3400 5800 3400
 Wire Wire Line
 	6050 3450 6050 3400
 Connection ~ 6050 3400
@@ -248,8 +248,38 @@ Text HLabel 6300 3250 1    50   Input ~ 0
 Wire Wire Line
 	4250 3850 4250 3200
 Wire Wire Line
-	4250 4650 7300 4650
+	4250 4650 5550 4650
 Connection ~ 5550 4650
 Text HLabel 5550 4750 3    50   Input ~ 0
 GND
+Wire Wire Line
+	5550 3850 5550 4250
+Wire Wire Line
+	7300 4350 6300 4350
+Wire Wire Line
+	7700 4350 7300 4350
+Wire Wire Line
+	8400 3900 8400 4350
+Wire Wire Line
+	8050 3900 8150 3900
+Wire Wire Line
+	7700 3750 7700 3800
+Wire Wire Line
+	7900 4350 7700 4350
+Wire Wire Line
+	6300 3750 6300 4100
+Wire Wire Line
+	6050 3400 6300 3400
+Wire Wire Line
+	6300 3400 6300 3750
+Wire Wire Line
+	5800 3950 6500 3950
+Wire Wire Line
+	6050 4050 6500 4050
+Wire Wire Line
+	5800 3400 6050 3400
+Wire Wire Line
+	5550 4650 5550 4750
+Wire Wire Line
+	5550 4650 7300 4650
 $EndSCHEMATC

@@ -12,14 +12,14 @@
   (page A4)
   (title_block
     (title "motor switch 3pole 5x")
-    (date 2018-09-18)
-    (rev 1)
+    (date 2018-09-26)
+    (rev A)
     (company koewiba)
   )
 
   (layers
-    (0 F.Cu signal hide)
-    (31 B.Cu signal hide)
+    (0 F.Cu signal)
+    (31 B.Cu signal)
     (32 B.Adhes user)
     (33 F.Adhes user)
     (34 B.Paste user)
@@ -94,7 +94,7 @@
       (mirror false)
       (drillshape 0)
       (scaleselection 1)
-      (outputdirectory "pcb"))
+      (outputdirectory "gerber"))
   )
 
   (net 0 "")
@@ -5616,10 +5616,10 @@
   (gr_text koewiba (at 191.135 138.43 90) (layer F.Cu)
     (effects (font (size 1 1) (thickness 0.2)) (justify left))
   )
-  (gr_text "motor switch 3pole 5x   Rev 1" (at 168.275 51.435) (layer B.Cu) (tstamp 5B1922BC)
+  (gr_text "motor switch 3pole 5x   Rev A" (at 168.275 51.435) (layer B.Cu) (tstamp 5B1922BC)
     (effects (font (size 1 1) (thickness 0.2)) (justify right mirror))
   )
-  (gr_text "motor switch 3pole 5x   Rev 1" (at 191.77 51.435) (layer F.Cu)
+  (gr_text "motor switch 3pole 5x   Rev A" (at 191.77 51.435) (layer F.Cu)
     (effects (font (size 1 1) (thickness 0.2)) (justify right))
   )
   (gr_text L (at 102.87 128.905) (layer F.SilkS) (tstamp 5B19213C)
@@ -6643,7 +6643,7 @@
     )
     (filled_polygon
       (pts
-        (xy 167.460476 52.665) (xy 191.67 52.665) (xy 191.67 132.025238) (xy 190.065 132.025238) (xy 190.065 138.33)
+        (xy 167.555714 52.665) (xy 191.67 52.665) (xy 191.67 132.025238) (xy 190.065 132.025238) (xy 190.065 138.33)
         (xy 177.485476 138.33) (xy 177.485476 137.36) (xy 174.304524 137.36) (xy 174.304524 138.33) (xy 153.711422 138.33)
         (xy 152.506764 137.125342) (xy 153.25156 136.380546) (xy 153.319973 136.408884) (xy 153.55181 136.455) (xy 153.78819 136.455)
         (xy 154.020027 136.408884) (xy 154.238413 136.318426) (xy 154.434955 136.187101) (xy 154.602101 136.019955) (xy 154.733426 135.823413)
@@ -7598,7 +7598,7 @@
         (xy 144.185042 55.500804) (xy 144.087045 55.264219) (xy 143.944776 55.051298) (xy 143.763702 54.870224) (xy 143.550781 54.727955)
         (xy 143.314196 54.629958) (xy 143.063039 54.58) (xy 142.806961 54.58) (xy 142.555804 54.629958) (xy 142.319219 54.727955)
         (xy 142.106298 54.870224) (xy 141.925224 55.051298) (xy 141.782955 55.264219) (xy 141.684958 55.500804) (xy 141.635 55.751961)
-        (xy 138.53 55.751961) (xy 138.53 52.111422) (xy 139.741422 50.9) (xy 167.460476 50.9)
+        (xy 138.53 55.751961) (xy 138.53 52.111422) (xy 139.741422 50.9) (xy 167.555714 50.9)
       )
     )
   )

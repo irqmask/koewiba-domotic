@@ -7,7 +7,7 @@ encoding utf-8
 Sheet 4 5
 Title "4 Inputs"
 Date "2016-11-29"
-Rev "1"
+Rev "B"
 Comp "KoeWiBa"
 Comment1 "Baseboard for Raspberry PI 2B"
 Comment2 ""
@@ -45,11 +45,11 @@ F 3 "" H 5450 1800 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
-	5150 1800 5350 1800
+	5150 1800 5250 1800
 Wire Wire Line
 	5250 1800 5250 2400
 Wire Wire Line
-	5150 2400 5550 2400
+	5150 2400 5250 2400
 Connection ~ 5250 2400
 Wire Wire Line
 	5450 1300 5450 1600
@@ -90,11 +90,11 @@ F 3 "" H 5450 3100 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
-	5150 3100 5350 3100
+	5150 3100 5250 3100
 Wire Wire Line
 	5250 3100 5250 3700
 Wire Wire Line
-	5150 3700 5550 3700
+	5150 3700 5250 3700
 Connection ~ 5250 3700
 Wire Wire Line
 	5450 2600 5450 2900
@@ -135,11 +135,11 @@ F 3 "" H 5450 4450 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
-	5150 4450 5350 4450
+	5150 4450 5250 4450
 Wire Wire Line
 	5250 4450 5250 5050
 Wire Wire Line
-	5150 5050 5550 5050
+	5150 5050 5250 5050
 Connection ~ 5250 5050
 Wire Wire Line
 	5450 3900 5450 4250
@@ -180,11 +180,11 @@ F 3 "" H 5450 5800 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
-	5150 5800 5350 5800
+	5150 5800 5250 5800
 Wire Wire Line
 	5250 5800 5250 6400
 Wire Wire Line
-	5150 6400 5550 6400
+	5150 6400 5250 6400
 Connection ~ 5250 6400
 Wire Wire Line
 	5450 5250 5450 5600
@@ -217,9 +217,9 @@ F 3 "" H 5150 1550 60  0000 C CNN
 	0    1    1    0   
 $EndComp
 Wire Wire Line
-	5150 2600 5550 2600
+	5150 2600 5450 2600
 Wire Wire Line
-	5150 1300 5550 1300
+	5150 1300 5450 1300
 Connection ~ 5450 1300
 Connection ~ 5450 2600
 Connection ~ 5250 1800
@@ -263,10 +263,10 @@ Connection ~ 5250 4450
 Wire Wire Line
 	5150 4000 5150 3900
 Wire Wire Line
-	5150 3900 5550 3900
+	5150 3900 5450 3900
 Connection ~ 5450 3900
 Wire Wire Line
-	5150 5250 5550 5250
+	5150 5250 5450 5250
 Wire Wire Line
 	5150 5350 5150 5250
 Connection ~ 5450 5250
@@ -274,4 +274,28 @@ Text Notes 4800 1150 0    40   ~ 0
 Inputs are with integrated pull-up to 5V. \nDisable the internal pull-up resistors of a \nconnected mikrocontroller to ensure correct \nfunction of the input protection!
 Text Notes 6100 1550 0    40   ~ 0
 Pulled to ground, a remaining voltage of \n(4700/(4700+56000))*VCC = 0,077 x VCC = 0,38V remains as low voltage.
+Wire Wire Line
+	5250 2400 5550 2400
+Wire Wire Line
+	5250 3700 5550 3700
+Wire Wire Line
+	5250 5050 5550 5050
+Wire Wire Line
+	5250 6400 5550 6400
+Wire Wire Line
+	5450 1300 5550 1300
+Wire Wire Line
+	5450 2600 5550 2600
+Wire Wire Line
+	5250 1800 5350 1800
+Wire Wire Line
+	5250 3100 5350 3100
+Wire Wire Line
+	5250 5800 5350 5800
+Wire Wire Line
+	5250 4450 5350 4450
+Wire Wire Line
+	5450 3900 5550 3900
+Wire Wire Line
+	5450 5250 5550 5250
 $EndSCHEMATC

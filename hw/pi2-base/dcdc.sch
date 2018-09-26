@@ -7,7 +7,7 @@ encoding utf-8
 Sheet 3 5
 Title "DC/DC Converter"
 Date "2016-11-28"
-Rev "1"
+Rev "B"
 Comp "KoeWiBa"
 Comment1 "Baseboard for Raspberry Pi 2"
 Comment2 ""

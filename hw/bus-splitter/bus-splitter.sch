@@ -7,7 +7,7 @@ encoding utf-8
 Sheet 1 1
 Title "bus-splitter"
 Date "2018-09-21"
-Rev "1"
+Rev "A"
 Comp "koewiba"
 Comment1 ""
 Comment2 ""
@@ -15,7 +15,7 @@ Comment3 ""
 Comment4 ""
 $EndDescr
 $Comp
-L bus-splitter-rescue:ATTINY1634-SOIC U4
+L ics_controller_atmel:ATTINY1634-SOIC U4
 U 1 1 5B1FC4AC
 P 6000 3800
 F 0 "U4" H 6000 3800 50  0000 C CNN
@@ -26,7 +26,7 @@ F 3 "" H 6000 3800 25  0001 C CNN
 	-1   0    0    -1  
 $EndComp
 $Comp
-L bus-splitter-rescue:CRYSTAL U3
+L standard:CRYSTAL U3
 U 1 1 5B1FC51B
 P 5650 5050
 F 0 "U3" H 5825 5150 50  0000 C CNN
@@ -37,7 +37,7 @@ F 3 "" H 5650 5050 60  0000 C CNN
 	-1   0    0    1   
 $EndComp
 $Comp
-L bus-splitter-rescue:C C5
+L standard:C C5
 U 1 1 5B1FC574
 P 6200 2650
 F 0 "C5" H 6250 2700 50  0000 L CNN
@@ -48,7 +48,7 @@ F 3 "" H 6200 2650 60  0000 C CNN
 	-1   0    0    1   
 $EndComp
 $Comp
-L bus-splitter-rescue:C C4
+L standard:C C4
 U 1 1 5B1FC5E5
 P 5750 5250
 F 0 "C4" H 5800 5300 50  0000 L CNN
@@ -59,7 +59,7 @@ F 3 "" H 5750 5250 60  0000 C CNN
 	0    1    1    0   
 $EndComp
 $Comp
-L bus-splitter-rescue:C C3
+L standard:C C3
 U 1 1 5B1FC602
 P 5200 5250
 F 0 "C3" H 5250 5300 50  0000 L CNN
@@ -70,7 +70,7 @@ F 3 "" H 5200 5250 60  0000 C CNN
 	0    1    1    0   
 $EndComp
 $Comp
-L bus-splitter-rescue:CONN-ISP-6 J5
+L connectors:CONN-ISP-6 J5
 U 1 1 5B1FC62B
 P 8150 5150
 F 0 "J5" H 8000 5400 50  0000 C CNN
@@ -81,7 +81,7 @@ F 3 "" H 8150 5150 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L bus-splitter-rescue:CONN_1X1 J1
+L connectors:CONN_1X1 J1
 U 1 1 5B1FC7EC
 P 1250 2850
 F 0 "J1" H 1350 2750 50  0000 C CNN
@@ -92,7 +92,7 @@ F 3 "" H 1250 2850 60  0000 C CNN
 	-1   0    0    1   
 $EndComp
 $Comp
-L bus-splitter-rescue:CONN_1X1 J2
+L connectors:CONN_1X1 J2
 U 1 1 5B1FC81B
 P 1250 3150
 F 0 "J2" H 1350 3050 50  0000 C CNN
@@ -103,7 +103,7 @@ F 3 "" H 1250 3150 60  0000 C CNN
 	-1   0    0    1   
 $EndComp
 $Comp
-L bus-splitter-rescue:CONN_1X1 J3
+L connectors:CONN_1X1 J3
 U 1 1 5B1FC852
 P 1250 3450
 F 0 "J3" H 1350 3350 50  0000 C CNN
@@ -114,7 +114,7 @@ F 3 "" H 1250 3450 60  0000 C CNN
 	-1   0    0    1   
 $EndComp
 $Comp
-L bus-splitter-rescue:CONN_1X1 J4
+L connectors:CONN_1X1 J4
 U 1 1 5B1FC8B1
 P 1250 3750
 F 0 "J4" H 1350 3650 50  0000 C CNN
@@ -125,7 +125,7 @@ F 3 "" H 1250 3750 60  0000 C CNN
 	-1   0    0    1   
 $EndComp
 $Comp
-L bus-splitter-rescue:FUSE F1
+L standard:FUSE F1
 U 1 1 5B1FC963
 P 1750 2850
 F 0 "F1" H 1750 2950 50  0000 C CNN
@@ -136,7 +136,7 @@ F 3 "" H 1750 2850 60  0000 C CNN
 	-1   0    0    1   
 $EndComp
 $Comp
-L bus-splitter-rescue:MAX487 U2
+L ics_misc:MAX487 U2
 U 1 1 5B1FCAC1
 P 3550 3300
 F 0 "U2" H 3300 3700 50  0000 C CNN
@@ -147,7 +147,7 @@ F 3 "" H 3550 3300 60  0000 C CNN
 	-1   0    0    -1  
 $EndComp
 $Comp
-L bus-splitter-rescue:MAX487 U5
+L ics_misc:MAX487 U5
 U 1 1 5B1FCB38
 P 8850 3300
 F 0 "U5" H 8600 3700 50  0000 C CNN
@@ -158,7 +158,7 @@ F 3 "" H 8850 3300 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L bus-splitter-rescue:C C2
+L standard:C C2
 U 1 1 5B1FCBA9
 P 3750 2650
 F 0 "C2" H 3800 2700 50  0000 L CNN
@@ -169,7 +169,7 @@ F 3 "" H 3750 2650 60  0000 C CNN
 	-1   0    0    1   
 $EndComp
 $Comp
-L bus-splitter-rescue:R R2
+L standard:R R2
 U 1 1 5B1FD0F2
 P 6900 4750
 F 0 "R2" H 6900 4650 50  0000 C CNN
@@ -180,7 +180,7 @@ F 3 "" H 6900 4750 60  0000 C CNN
 	0    1    1    0   
 $EndComp
 $Comp
-L bus-splitter-rescue:C C6
+L standard:C C6
 U 1 1 5B1FD1F5
 P 6900 5250
 F 0 "C6" H 6950 5300 50  0000 L CNN
@@ -191,7 +191,7 @@ F 3 "" H 6900 5250 60  0000 C CNN
 	0    1    1    0   
 $EndComp
 $Comp
-L bus-splitter-rescue:D D2
+L standard:D D2
 U 1 1 5B1FD25A
 P 6700 4750
 F 0 "D2" H 6710 4830 50  0000 C CNN
@@ -202,7 +202,7 @@ F 3 "" H 6700 4750 60  0000 C CNN
 	0    -1   -1   0   
 $EndComp
 $Comp
-L bus-splitter-rescue:SEMTECH_SR05 D1
+L diodes:SEMTECH_SR05 D1
 U 1 1 5B1FD34A
 P 2600 4050
 F 0 "D1" H 2675 3800 50  0000 C CNN
@@ -213,7 +213,7 @@ F 3 "" H 2600 4050 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L bus-splitter-rescue:SEMTECH_SR05 D3
+L diodes:SEMTECH_SR05 D3
 U 1 1 5B1FD3F5
 P 9800 4050
 F 0 "D3" H 9875 3800 50  0000 C CNN
@@ -224,7 +224,7 @@ F 3 "" H 9800 4050 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L bus-splitter-rescue:Varistor R1
+L standard:Varistor R1
 U 1 1 5B1FD4A0
 P 2050 4100
 F 0 "R1" H 1895 4010 50  0000 L CNN
@@ -235,7 +235,7 @@ F 3 "" H 2050 4100 60  0000 C CNN
 	0    1    1    0   
 $EndComp
 $Comp
-L bus-splitter-rescue:R R4
+L standard:R R4
 U 1 1 5B1FD567
 P 8050 3450
 F 0 "R4" H 8050 3350 50  0000 C CNN
@@ -254,7 +254,7 @@ B
 Text Notes 850  3800 0    60   ~ 0
 GND
 $Comp
-L bus-splitter-rescue:GND #PWR01
+L power:GND #PWR01
 U 1 1 5B1FECB7
 P 2050 4550
 F 0 "#PWR01" H 2050 4350 50  0001 C CNN
@@ -265,7 +265,7 @@ F 3 "" H 2050 4550 60  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L power1:+24V #PWR02
+L power:+24V #PWR02
 U 1 1 5B1FED11
 P 2050 2750
 F 0 "#PWR02" H 2050 2950 50  0001 C CNN
@@ -276,7 +276,7 @@ F 3 "" H 2050 2750 60  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L bus-splitter-rescue:GND #PWR03
+L power:GND #PWR03
 U 1 1 5B1FF42F
 P 3550 3950
 F 0 "#PWR03" H 3550 3750 50  0001 C CNN
@@ -287,7 +287,7 @@ F 3 "" H 3550 3950 60  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L bus-splitter-rescue:GND #PWR04
+L power:GND #PWR04
 U 1 1 5B1FF487
 P 3950 2750
 F 0 "#PWR04" H 3950 2550 50  0001 C CNN
@@ -298,7 +298,7 @@ F 3 "" H 3950 2750 60  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L power1:VCC #PWR05
+L power:VCC #PWR05
 U 1 1 5B1FF4DF
 P 3550 2550
 F 0 "#PWR05" H 3550 2725 50  0001 C CNN
@@ -350,7 +350,7 @@ Wire Wire Line
 Wire Wire Line
 	3550 3850 3550 3950
 $Comp
-L power1:+24V #PWR06
+L power:+24V #PWR06
 U 1 1 5B1FF8D2
 P 2050 4850
 F 0 "#PWR06" H 2050 5050 50  0001 C CNN
@@ -361,7 +361,7 @@ F 3 "" H 2050 4850 60  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L bus-splitter-rescue:GND #PWR07
+L power:GND #PWR07
 U 1 1 5B1FF92A
 P 2050 5450
 F 0 "#PWR07" H 2050 5250 50  0001 C CNN
@@ -372,7 +372,7 @@ F 3 "" H 2050 5450 60  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L bus-splitter-rescue:C C1
+L standard:C C1
 U 1 1 5B1FD7C3
 P 3350 5150
 F 0 "C1" H 3400 5200 50  0000 L CNN
@@ -383,7 +383,7 @@ F 3 "" H 3350 5150 60  0000 C CNN
 	0    1    1    0   
 $EndComp
 $Comp
-L bus-splitter-rescue:AM1S-2405 U1
+L ics_regulator:AM1S-2405 U1
 U 1 1 5B1FC8F2
 P 2650 5150
 F 0 "U1" H 2650 5150 50  0000 C CNN
@@ -419,7 +419,7 @@ Wire Wire Line
 	3350 5250 3350 5350
 Connection ~ 3350 5350
 $Comp
-L bus-splitter-rescue:GND #PWR08
+L power:GND #PWR08
 U 1 1 5B20E396
 P 3350 5450
 F 0 "#PWR08" H 3350 5250 50  0001 C CNN
@@ -433,7 +433,7 @@ Wire Wire Line
 	2050 5250 2050 5450
 Connection ~ 3350 4950
 $Comp
-L power1:VCC #PWR09
+L power:VCC #PWR09
 U 1 1 5B20E5DF
 P 3350 4850
 F 0 "#PWR09" H 3350 5025 50  0001 C CNN
@@ -489,7 +489,7 @@ Entry Wire Line
 Entry Wire Line
 	4800 3850 4900 3750
 $Comp
-L bus-splitter-rescue:R R3
+L standard:R R3
 U 1 1 5B20FAC2
 P 8050 3150
 F 0 "R3" H 8050 3250 50  0000 C CNN
@@ -526,7 +526,7 @@ NoConn ~ 6700 3850
 NoConn ~ 6700 3950
 NoConn ~ 6700 4050
 $Comp
-L power1:VCC #PWR010
+L power:VCC #PWR010
 U 1 1 5B210DC4
 P 6000 2550
 F 0 "#PWR010" H 6000 2725 50  0001 C CNN
@@ -537,7 +537,7 @@ F 3 "" H 6000 2550 60  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L bus-splitter-rescue:GND #PWR011
+L power:GND #PWR011
 U 1 1 5B210E18
 P 6400 2750
 F 0 "#PWR011" H 6400 2550 50  0001 C CNN
@@ -589,7 +589,7 @@ Wire Wire Line
 Wire Wire Line
 	6000 4850 6000 5450
 $Comp
-L bus-splitter-rescue:GND #PWR012
+L power:GND #PWR012
 U 1 1 5B212396
 P 5200 5450
 F 0 "#PWR012" H 5200 5250 50  0001 C CNN
@@ -600,7 +600,7 @@ F 3 "" H 5200 5450 60  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L bus-splitter-rescue:GND #PWR013
+L power:GND #PWR013
 U 1 1 5B2123EA
 P 5750 5450
 F 0 "#PWR013" H 5750 5250 50  0001 C CNN
@@ -611,7 +611,7 @@ F 3 "" H 5750 5450 60  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L bus-splitter-rescue:GND #PWR014
+L power:GND #PWR014
 U 1 1 5B21243E
 P 6000 5450
 F 0 "#PWR014" H 6000 5250 50  0001 C CNN
@@ -622,7 +622,7 @@ F 3 "" H 6000 5450 60  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L power1:VCC #PWR015
+L power:VCC #PWR015
 U 1 1 5B2128CB
 P 8550 4950
 F 0 "#PWR015" H 8550 5125 50  0001 C CNN
@@ -633,7 +633,7 @@ F 3 "" H 8550 4950 60  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L bus-splitter-rescue:GND #PWR016
+L power:GND #PWR016
 U 1 1 5B21291F
 P 8550 5450
 F 0 "#PWR016" H 8550 5250 50  0001 C CNN
@@ -666,7 +666,7 @@ Wire Wire Line
 Wire Wire Line
 	7850 5050 7400 5050
 $Comp
-L bus-splitter-rescue:GND #PWR017
+L power:GND #PWR017
 U 1 1 5B21341E
 P 6900 5450
 F 0 "#PWR017" H 6900 5250 50  0001 C CNN
@@ -695,7 +695,7 @@ Wire Wire Line
 	6800 4450 6800 4350
 Connection ~ 6800 4450
 $Comp
-L power1:VCC #PWR018
+L power:VCC #PWR018
 U 1 1 5B2137A5
 P 6800 4350
 F 0 "#PWR018" H 6800 4525 50  0001 C CNN
@@ -745,7 +745,7 @@ Entry Wire Line
 Entry Wire Line
 	7300 3550 7400 3450
 $Comp
-L bus-splitter-rescue:C C7
+L standard:C C7
 U 1 1 5B215009
 P 9050 2650
 F 0 "C7" H 9100 2700 50  0000 L CNN
@@ -756,7 +756,7 @@ F 3 "" H 9050 2650 60  0000 C CNN
 	-1   0    0    1   
 $EndComp
 $Comp
-L power1:VCC #PWR019
+L power:VCC #PWR019
 U 1 1 5B21500F
 P 8850 2550
 F 0 "#PWR019" H 8850 2725 50  0001 C CNN
@@ -767,7 +767,7 @@ F 3 "" H 8850 2550 60  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L bus-splitter-rescue:GND #PWR020
+L power:GND #PWR020
 U 1 1 5B215015
 P 9250 2750
 F 0 "#PWR020" H 9250 2550 50  0001 C CNN
@@ -787,7 +787,7 @@ Wire Wire Line
 	8950 2650 8850 2650
 Connection ~ 8850 2650
 $Comp
-L bus-splitter-rescue:GND #PWR021
+L power:GND #PWR021
 U 1 1 5B2152E0
 P 8850 3950
 F 0 "#PWR021" H 8850 3750 50  0001 C CNN
@@ -800,7 +800,7 @@ $EndComp
 Wire Wire Line
 	8850 3850 8850 3950
 $Comp
-L bus-splitter-rescue:CONN_1X1 J6
+L connectors:CONN_1X1 J6
 U 1 1 5B215E52
 P 10550 2850
 F 0 "J6" H 10650 2750 50  0000 C CNN
@@ -811,7 +811,7 @@ F 3 "" H 10550 2850 60  0000 C CNN
 	1    0    0    1   
 $EndComp
 $Comp
-L bus-splitter-rescue:CONN_1X1 J7
+L connectors:CONN_1X1 J7
 U 1 1 5B215E58
 P 10550 3150
 F 0 "J7" H 10650 3050 50  0000 C CNN
@@ -822,7 +822,7 @@ F 3 "" H 10550 3150 60  0000 C CNN
 	1    0    0    1   
 $EndComp
 $Comp
-L bus-splitter-rescue:CONN_1X1 J8
+L connectors:CONN_1X1 J8
 U 1 1 5B215E5E
 P 10550 3450
 F 0 "J8" H 10650 3350 50  0000 C CNN
@@ -833,7 +833,7 @@ F 3 "" H 10550 3450 60  0000 C CNN
 	1    0    0    1   
 $EndComp
 $Comp
-L bus-splitter-rescue:CONN_1X1 J9
+L connectors:CONN_1X1 J9
 U 1 1 5B215E64
 P 10550 3750
 F 0 "J9" H 10650 3650 50  0000 C CNN
@@ -909,7 +909,7 @@ A1
 Text Label 10300 3450 0    40   ~ 0
 B1
 $Comp
-L bus-splitter-rescue:GND #PWR022
+L power:GND #PWR022
 U 1 1 5B2108EB
 P 9800 4550
 F 0 "#PWR022" H 9800 4350 50  0001 C CNN
@@ -921,7 +921,7 @@ F 3 "" H 9800 4550 60  0001 C CNN
 $EndComp
 Connection ~ 9800 4450
 $Comp
-L bus-splitter-rescue:OPEN_HARDWARE_1 LOGO1
+L logo:OPEN_HARDWARE_1 LOGO1
 U 1 1 5B225B1C
 P 1200 7250
 F 0 "LOGO1" H 1200 7525 50  0000 C CNN

@@ -7,7 +7,7 @@ encoding utf-8
 Sheet 4 4
 Title "motor switch 3pole (bus_atmega328_basic)"
 Date "2018-09-18"
-Rev "1"
+Rev "A"
 Comp "KoeWiBa"
 Comment1 ""
 Comment2 ""
@@ -1269,20 +1269,6 @@ Wire Wire Line
 Connection ~ 7100 2700
 Wire Wire Line
 	7100 3000 7100 3150
-Wire Bus Line
-	5400 5600 5400 5800
-Wire Bus Line
-	6050 7000 6050 7250
-Wire Bus Line
-	4200 5800 4200 7250
-Wire Bus Line
-	1500 2800 1500 5800
-Wire Bus Line
-	2875 2800 2875 5800
-Wire Bus Line
-	6750 2750 6750 5800
-Wire Bus Line
-	4200 2950 4200 5800
 Connection ~ 7100 3000
 $Comp
 L connectors:CONN_1 J48
@@ -1317,4 +1303,18 @@ F 3 "" H 7100 3250 60  0000 C CNN
 	1    7100 3250
 	0    1    1    0   
 $EndComp
+Wire Bus Line
+	5400 5600 5400 5800
+Wire Bus Line
+	6050 7000 6050 7250
+Wire Bus Line
+	4200 5800 4200 7250
+Wire Bus Line
+	1500 2800 1500 5800
+Wire Bus Line
+	2875 2800 2875 5800
+Wire Bus Line
+	6750 2750 6750 5800
+Wire Bus Line
+	4200 2950 4200 5800
 $EndSCHEMATC

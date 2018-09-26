@@ -7,7 +7,7 @@ encoding utf-8
 Sheet 2 4
 Title "motor switch 3pole 5x (motor relays)"
 Date "2018-09-17"
-Rev "1"
+Rev "A"
 Comp "koewiba"
 Comment1 ""
 Comment2 ""

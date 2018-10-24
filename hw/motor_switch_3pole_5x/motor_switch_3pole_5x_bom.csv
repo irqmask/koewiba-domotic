@@ -20,7 +20,7 @@
 19;"F2";"R_1812";1;"FUSE";;;
 20;"J1";"WAGO2081-1122";1;"CONN_2X1";;;
 21;"J7,J8,J9,J10,J11";"WAGO233-4";5;"WAGO 233-504";;;
-22;"LOGO1,LOGO2,LOGO3";"Symbol_OSHW-Logo_Copper";3;"OPEN_HARDWARE_1";;;
+22;"LOGO1,LOGO2";"Symbol_OSHW-Logo_Copper";2;"OPEN_HARDWARE_1";;;
 23;"LOGO4";"Symbol_OSHW-Logo_SilkScreen";1;"Open Hardware";;;
 24;"C1,C2,C3,C4,C9";"C_0805";5;"100nF";;;
 25;"C5,C6";"C_0805";2;"18pF";;;

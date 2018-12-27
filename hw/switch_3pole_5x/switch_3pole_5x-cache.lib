@@ -1,11 +1,11 @@
 EESchema-LIBRARY Version 2.4
 #encoding utf-8
 #
-# connectors:CONN-ISP-6
+# connectors_CONN-ISP-6
 #
-DEF connectors:CONN-ISP-6 J 0 40 Y Y 1 F N
+DEF connectors_CONN-ISP-6 J 0 40 Y Y 1 F N
 F0 "J" -150 250 50 H V C CNN
-F1 "connectors:CONN-ISP-6" -150 -225 25 H V L CNN
+F1 "connectors_CONN-ISP-6" -150 -225 25 H V L CNN
 F2 "AVR-ISP-6" -150 -250 25 H I L CNN
 F3 "" 0 0 60 H V C CNN
 DRAW
@@ -25,11 +25,11 @@ X ~ 6 300 -100 100 L 40 40 1 1 P
 ENDDRAW
 ENDDEF
 #
-# connectors:CONN_1
+# connectors_CONN_1
 #
-DEF connectors:CONN_1 J 0 40 Y Y 1 F N
+DEF connectors_CONN_1 J 0 40 Y Y 1 F N
 F0 "J" 0 75 50 H V C CNN
-F1 "connectors:CONN_1" 0 -75 25 H V C CNN
+F1 "connectors_CONN_1" 0 -75 25 H V C CNN
 F2 "" 0 0 60 H V C CNN
 F3 "" 0 0 60 H V C CNN
 DRAW
@@ -38,11 +38,11 @@ X ~ 1 -100 0 100 R 25 25 1 1 P
 ENDDRAW
 ENDDEF
 #
-# connectors:CONN_2X1
+# connectors_CONN_2X1
 #
-DEF connectors:CONN_2X1 J 0 40 Y N 1 F N
+DEF connectors_CONN_2X1 J 0 40 Y N 1 F N
 F0 "J" 75 175 50 H V C CNN
-F1 "connectors:CONN_2X1" 175 0 25 V V C CNN
+F1 "connectors_CONN_2X1" 175 0 25 V V C CNN
 F2 "" 0 0 60 H V C CNN
 F3 "" 0 0 60 H V C CNN
 DRAW
@@ -52,11 +52,11 @@ X 2 2 -200 -50 300 R 40 40 1 1 P I
 ENDDRAW
 ENDDEF
 #
-# connectors:CONN_3X1
+# connectors_CONN_3X1
 #
-DEF connectors:CONN_3X1 J 0 40 Y N 1 F N
+DEF connectors_CONN_3X1 J 0 40 Y N 1 F N
 F0 "J" 75 225 50 H V C CNN
-F1 "connectors:CONN_3X1" 175 0 25 V V C CNN
+F1 "connectors_CONN_3X1" 175 0 25 V V C CNN
 F2 "" 0 0 60 H V C CNN
 F3 "" 0 0 60 H V C CNN
 DRAW
@@ -67,11 +67,11 @@ X 3 3 -200 -100 300 R 40 40 1 1 I I
 ENDDRAW
 ENDDEF
 #
-# connectors:CONN_4X1
+# connectors_CONN_4X1
 #
-DEF connectors:CONN_4X1 J 0 40 Y N 1 F N
+DEF connectors_CONN_4X1 J 0 40 Y N 1 F N
 F0 "J" 75 275 50 H V C CNN
-F1 "connectors:CONN_4X1" 175 0 25 V V C CNN
+F1 "connectors_CONN_4X1" 175 0 25 V V C CNN
 F2 "" 0 0 60 H V C CNN
 F3 "" 0 0 60 H V C CNN
 DRAW
@@ -83,11 +83,11 @@ X 4 4 -200 -150 300 R 40 40 1 1 I I
 ENDDRAW
 ENDDEF
 #
-# diodes:BAT54S
+# diodes_BAT54S
 #
-DEF diodes:BAT54S D 0 40 N N 1 F N
+DEF diodes_BAT54S D 0 40 N N 1 F N
 F0 "D" 75 -250 50 H V C CNN
-F1 "diodes:BAT54S" 0 250 50 H V C CNN
+F1 "diodes_BAT54S" 0 250 50 H V C CNN
 F2 "" 0 0 60 H V C CNN
 F3 "" 0 0 60 H V C CNN
 $FPLIST
@@ -105,11 +105,11 @@ X 3 3 -100 0 100 R 40 40 1 1 I
 ENDDRAW
 ENDDEF
 #
-# diodes:SEMTECH_SR05
+# diodes_SEMTECH_SR05
 #
-DEF diodes:SEMTECH_SR05 D 0 40 N N 1 F N
+DEF diodes_SEMTECH_SR05 D 0 40 N N 1 F N
 F0 "D" 75 -250 50 H V C CNN
-F1 "diodes:SEMTECH_SR05" 0 250 50 H V C CNN
+F1 "diodes_SEMTECH_SR05" 0 250 50 H V C CNN
 F2 "" 0 0 60 H V C CNN
 F3 "" 0 0 60 H V C CNN
 ALIAS SEMTECH_SR05
@@ -140,11 +140,11 @@ X 4 4 -250 0 100 R 40 40 1 1 I
 ENDDRAW
 ENDDEF
 #
-# ics_controller_atmel:ATMEGA88-TQFP32
+# ics_controller_atmel_ATMEGA88-TQFP32
 #
-DEF ics_controller_atmel:ATMEGA88-TQFP32 U 0 40 Y Y 1 F N
+DEF ics_controller_atmel_ATMEGA88-TQFP32 U 0 40 Y Y 1 F N
 F0 "U" 0 0 50 H V C CNN
-F1 "ics_controller_atmel:ATMEGA88-TQFP32" 0 -800 50 H V C CNN
+F1 "ics_controller_atmel_ATMEGA88-TQFP32" 0 -800 50 H V C CNN
 F2 "TQFP32" 0 0 25 H I C CNN
 F3 "DOCUMENTATION" 0 0 25 H I C CNN
 $FPLIST
@@ -187,11 +187,11 @@ X PD5/OC0B/T1 9 -800 -600 200 R 40 40 1 1 I
 ENDDRAW
 ENDDEF
 #
-# ics_misc:MAX487
+# ics_misc_MAX487
 #
-DEF ics_misc:MAX487 U 0 40 Y Y 1 F N
+DEF ics_misc_MAX487 U 0 40 Y Y 1 F N
 F0 "U" -250 400 50 H V C CNN
-F1 "ics_misc:MAX487" 200 -400 50 H V C CNN
+F1 "ics_misc_MAX487" 200 -400 50 H V C CNN
 F2 "SSOP28" -150 -400 25 H I C CNN
 F3 "" 0 0 60 H V C CNN
 ALIAS MAX485
@@ -217,11 +217,11 @@ X VCC 8 0 550 200 D 40 25 1 1 W
 ENDDRAW
 ENDDEF
 #
-# ics_peripheral:25LCXXX
+# ics_peripheral_25LCXXX
 #
-DEF ics_peripheral:25LCXXX U 0 40 Y Y 1 F N
+DEF ics_peripheral_25LCXXX U 0 40 Y Y 1 F N
 F0 "U" 0 150 40 H V C CNN
-F1 "ics_peripheral:25LCXXX" 0 -150 40 H V C CNN
+F1 "ics_peripheral_25LCXXX" 0 -150 40 H V C CNN
 F2 "SO8N" 0 0 40 H I C CNN
 F3 "SPI EEPROM" 0 0 40 H I C CNN
 $FPLIST
@@ -241,11 +241,11 @@ X VCC 8 550 150 200 L 40 40 1 1 W
 ENDDRAW
 ENDDEF
 #
-# ics_regulator:AM1S-2405
+# ics_regulator_AM1S-2405
 #
-DEF ics_regulator:AM1S-2405 U 0 40 Y Y 1 F N
+DEF ics_regulator_AM1S-2405 U 0 40 Y Y 1 F N
 F0 "U" 0 0 50 H V C CNN
-F1 "ics_regulator:AM1S-2405" 0 -200 50 H V C CNN
+F1 "ics_regulator_AM1S-2405" 0 -200 50 H V C CNN
 F2 "AM1S-XXXX_SIL4" 0 200 25 H I C CNN
 F3 "" -750 0 25 H I C CNN
 ALIAS AM1S-2403
@@ -261,11 +261,11 @@ X VOUT+ 4 500 100 200 L 40 40 1 1 w
 ENDDRAW
 ENDDEF
 #
-# logo:OPEN_HARDWARE_1
+# logo_OPEN_HARDWARE_1
 #
-DEF logo:OPEN_HARDWARE_1 LOGO 0 40 Y Y 1 F N
+DEF logo_OPEN_HARDWARE_1 LOGO 0 40 Y Y 1 F N
 F0 "LOGO" 0 275 60 H V C CNN
-F1 "logo:OPEN_HARDWARE_1" 0 -225 60 H V C CNN
+F1 "logo_OPEN_HARDWARE_1" 0 -225 60 H V C CNN
 F2 "" 0 0 40 H I C CNN
 F3 "" 0 0 40 H I C CNN
 DRAW
@@ -273,11 +273,11 @@ P 277 0 1 0 132 -171 130 -170 125 -167 118 -162 109 -156 100 -150 93 -146 88 -14
 ENDDRAW
 ENDDEF
 #
-# power:+24V
+# power_+24V
 #
-DEF power:+24V #PWR 0 0 N Y 1 F P
+DEF power_+24V #PWR 0 0 N Y 1 F P
 F0 "#PWR" 0 200 50 H I C CNN
-F1 "power:+24V" 0 110 50 H V C CNN
+F1 "power_+24V" 0 110 50 H V C CNN
 F2 "" 0 0 40 H I C CNN
 F3 "" 0 0 40 H I C CNN
 DRAW
@@ -287,11 +287,11 @@ X +24V 1 0 0 0 U 20 30 0 0 W N
 ENDDRAW
 ENDDEF
 #
-# power:+5V
+# power_+5V
 #
-DEF power:+5V #PWR 0 40 Y Y 1 F P
+DEF power_+5V #PWR 0 40 Y Y 1 F P
 F0 "#PWR" 0 200 50 H I C CNN
-F1 "power:+5V" 0 110 50 H V C CNN
+F1 "power_+5V" 0 110 50 H V C CNN
 F2 "" 0 0 40 H I C CNN
 F3 "" 0 0 40 H I C CNN
 DRAW
@@ -301,11 +301,11 @@ X +5V 1 0 0 0 U 20 20 0 0 W N
 ENDDRAW
 ENDDEF
 #
-# power:GND
+# power_GND
 #
-DEF ~power:GND #PWR 0 10 Y Y 1 F P
+DEF ~power_GND #PWR 0 10 Y Y 1 F P
 F0 "#PWR" 0 -200 50 H I C CNN
-F1 "power:GND" 0 -110 50 H I C CNN
+F1 "power_GND" 0 -110 50 H I C CNN
 F2 "" 0 0 40 H I C CNN
 F3 "" 0 0 40 H I C CNN
 DRAW
@@ -317,11 +317,11 @@ X GND 1 0 0 0 U 40 40 1 1 W N
 ENDDRAW
 ENDDEF
 #
-# power:VCC
+# power_VCC
 #
-DEF power:VCC #PWR 0 0 Y Y 1 F P
+DEF power_VCC #PWR 0 0 Y Y 1 F P
 F0 "#PWR" 0 175 50 H I C CNN
-F1 "power:VCC" 0 100 50 H V C CNN
+F1 "power_VCC" 0 100 50 H V C CNN
 F2 "" 0 0 40 H I C CNN
 F3 "" 0 0 40 H I C CNN
 DRAW
@@ -331,11 +331,11 @@ X VCC 1 0 0 0 U 20 20 0 0 W N
 ENDDRAW
 ENDDEF
 #
-# relays:FINDER_34.51.7.024
+# relays_FINDER_34.51.7.024
 #
-DEF relays:FINDER_34.51.7.024 REL 0 40 Y N 1 F N
+DEF relays_FINDER_34.51.7.024 REL 0 40 Y N 1 F N
 F0 "REL" 25 -100 50 H V C CNN
-F1 "relays:FINDER_34.51.7.024" 50 350 50 H V C CNN
+F1 "relays_FINDER_34.51.7.024" 50 350 50 H V C CNN
 F2 "" 0 0 60 H I C CNN
 F3 "" 0 0 60 H I C CNN
 $FPLIST
@@ -356,11 +356,11 @@ X ~ 5 200 150 100 L 40 40 1 1 P
 ENDDRAW
 ENDDEF
 #
-# standard:C
+# standard_C
 #
-DEF standard:C C 0 40 N N 1 F N
+DEF standard_C C 0 40 N N 1 F N
 F0 "C" 50 50 50 H V L CNN
-F1 "standard:C" 0 -125 50 H V C CNN
+F1 "standard_C" 0 -125 50 H V C CNN
 F2 "" 0 0 60 H V C CNN
 F3 "" 0 0 60 H V C CNN
 DRAW
@@ -379,11 +379,11 @@ X 2 2 100 0 75 L 50 50 1 1 I
 ENDDRAW
 ENDDEF
 #
-# standard:CRYSTAL
+# standard_CRYSTAL
 #
-DEF standard:CRYSTAL U 0 40 Y Y 1 F N
+DEF standard_CRYSTAL U 0 40 Y Y 1 F N
 F0 "U" 175 100 50 H V C CNN
-F1 "standard:CRYSTAL" 175 -100 50 H V C CNN
+F1 "standard_CRYSTAL" 175 -100 50 H V C CNN
 F2 "" 0 0 60 H V C CNN
 F3 "" 0 0 60 H V C CNN
 DRAW
@@ -397,11 +397,11 @@ X ~ 2 350 0 100 L 50 50 1 1 O
 ENDDRAW
 ENDDEF
 #
-# standard:D
+# standard_D
 #
-DEF standard:D D 0 40 N N 1 F N
+DEF standard_D D 0 40 N N 1 F N
 F0 "D" 10 80 50 H V C CNN
-F1 "standard:D" 0 -75 50 H V C CNN
+F1 "standard_D" 0 -75 50 H V C CNN
 F2 "" 0 0 60 H V C CNN
 F3 "" 0 0 60 H V C CNN
 $FPLIST
@@ -417,11 +417,11 @@ X C 2 200 0 100 L 50 50 1 1 I
 ENDDRAW
 ENDDEF
 #
-# standard:FUSE
+# standard_FUSE
 #
-DEF standard:FUSE F 0 40 N N 1 F N
+DEF standard_FUSE F 0 40 N N 1 F N
 F0 "F" 0 100 50 H V C CNN
-F1 "standard:FUSE" 0 -100 50 H V C CNN
+F1 "standard_FUSE" 0 -100 50 H V C CNN
 F2 "" 0 0 60 H V C CNN
 F3 "" 0 0 60 H V C CNN
 ALIAS Sicherung
@@ -433,11 +433,11 @@ X 2 2 200 0 100 L 50 50 1 1 P
 ENDDRAW
 ENDDEF
 #
-# standard:LED
+# standard_LED
 #
-DEF standard:LED D 0 40 N N 1 F N
+DEF standard_LED D 0 40 N N 1 F N
 F0 "D" 0 200 50 H V L CNN
-F1 "standard:LED" 125 50 50 H V L CNN
+F1 "standard_LED" 125 50 50 H V L CNN
 F2 "" 0 0 60 H V C CNN
 F3 "" 0 0 60 H V C CNN
 $FPLIST
@@ -457,11 +457,11 @@ X C 2 400 150 100 L 50 50 1 1 I
 ENDDRAW
 ENDDEF
 #
-# standard:R
+# standard_R
 #
-DEF standard:R R 0 40 N N 1 F N
+DEF standard_R R 0 40 N N 1 F N
 F0 "R" 0 -100 50 H V C CNN
-F1 "standard:R" 0 0 50 H V C CNN
+F1 "standard_R" 0 0 50 H V C CNN
 F2 "" 0 0 60 H V C CNN
 F3 "" 0 0 60 H V C CNN
 DRAW
@@ -471,11 +471,11 @@ X 2 2 200 0 50 L 40 40 1 1 P
 ENDDRAW
 ENDDEF
 #
-# standard:ZD
+# standard_ZD
 #
-DEF standard:ZD D 0 40 N N 1 F N
+DEF standard_ZD D 0 40 N N 1 F N
 F0 "D" 0 100 50 H V C CNN
-F1 "standard:ZD" 0 -75 50 H V C CNN
+F1 "standard_ZD" 0 -75 50 H V C CNN
 F2 "" 0 0 60 H V C CNN
 F3 "" 0 0 60 H V C CNN
 $FPLIST
@@ -491,11 +491,11 @@ X C 2 200 0 100 L 50 50 1 1 I
 ENDDRAW
 ENDDEF
 #
-# transistors:BSS138
+# transistors_BSS138
 #
-DEF transistors:BSS138 Q 0 40 Y N 1 F N
+DEF transistors_BSS138 Q 0 40 Y N 1 F N
 F0 "Q" 150 -100 50 H V L CNN
-F1 "transistors:BSS138" 150 100 50 H V L CNN
+F1 "transistors_BSS138" 150 100 50 H V L CNN
 F2 "SOT23-3" 190 0 25 H I C CNN
 F3 "" 0 0 60 H V C CNN
 ALIAS BSS138

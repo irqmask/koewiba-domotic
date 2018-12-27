@@ -6,8 +6,8 @@ $Descr A4 11693 8268
 encoding utf-8
 Sheet 4 4
 Title "switch 3pole (bus_atmega328_basic)"
-Date "2018-09-18"
-Rev "A"
+Date "2018-12-27"
+Rev "B"
 Comp "KoeWiBa"
 Comment1 ""
 Comment2 ""
@@ -835,7 +835,7 @@ U 1 1 55D48DEF
 P 5350 3550
 F 0 "U4" H 5350 3550 50  0000 C CNN
 F 1 "ATMEGA328-TQFP32" H 5350 2750 50  0000 C CNN
-F 2 "Housings_QFP:TQFP-44_10x10mm_Pitch0.8mm" H 5350 3550 25  0001 C CNN
+F 2 "Housings_QFP:TQFP-32_7x7mm_Pitch0.8mm" H 5350 3550 25  0001 C CNN
 F 3 "DOCUMENTATION" H 5350 3550 25  0001 C CNN
 	1    5350 3550
 	1    0    0    -1  
@@ -1326,9 +1326,9 @@ Wire Wire Line
 Wire Wire Line
 	3700 7000 4100 7000
 Wire Wire Line
-	6200 4650 6350 4650
+	6200 4650 6300 4650
 Wire Wire Line
-	6250 4300 6350 4300
+	6250 4300 6300 4300
 Wire Bus Line
 	5400 5600 5400 5800
 Wire Bus Line
@@ -1343,4 +1343,10 @@ Wire Bus Line
 	6750 2750 6750 5800
 Wire Bus Line
 	4200 2950 4200 5800
+Connection ~ 6300 4300
+Wire Wire Line
+	6300 4300 6350 4300
+Connection ~ 6300 4650
+Wire Wire Line
+	6300 4650 6350 4650
 $EndSCHEMATC

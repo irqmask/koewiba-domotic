@@ -6,8 +6,8 @@ $Descr A4 11693 8268
 encoding utf-8
 Sheet 2 4
 Title "switch 3pole 5x (relays)"
-Date "2018-09-18"
-Rev "A"
+Date "2018-12-27"
+Rev "B"
 Comp "koewiba"
 Comment1 ""
 Comment2 ""

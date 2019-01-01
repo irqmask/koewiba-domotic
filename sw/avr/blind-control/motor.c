@@ -59,9 +59,10 @@ typedef enum {
 
 //! Control state of the motors.
 typedef struct {
-    motor_state_t motor_state;      //!< current state of the motor.
-    motor_state_t last_motor_state; //!< last known state of the motor.
-    timer_data_t       propagation_delay;//!< timer to handle switch delay.
+    motor_mode_t    motor_mode;         //!< control mode of the motor.
+    motor_state_t   motor_state;        //!< current state of the motor.
+    motor_state_t   last_motor_state;   //!< last known state of the motor.
+    timer_data_t    propagation_delay;  //!< timer to handle switch delay.
 } motor_control_t;
 
 // --- Local variables ---------------------------------------------------------

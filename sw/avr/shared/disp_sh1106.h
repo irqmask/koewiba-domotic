@@ -1,9 +1,9 @@
 ﻿/**
  * @addtogroup DISPLAY
- * @addtogroup DISPDRV_ST7565
- * @brief Driver for graphical LCD chip ST7565.
+ * @addtogroup DISPDRV_SH1106
+ * @brief Driver for graphical LCD chip SH1106
  *
- * Contains functions to send the commands via SPI to the ST7565 chip. The chip
+ * Contains functions to send the commands via SPI to the SH1106 chip. The chip
  * in SPI mode is write-only.
  * The blocking functions of the SPI driver are used to send commands to the chip.
  *
@@ -11,8 +11,8 @@
  * Supports appconfig.h for individual settings depending on the application.
  *
  * @{
- * @file    disp_st7565.h
- * @brief   Driver for graphical LCD chip ST7565.
+ * @file    disp_sh1106.h
+ * @brief   Driver for graphical LCD chip SH1106.
  *
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
@@ -32,8 +32,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef _DISP_ST7565_H_
-#define _DISP_ST7565_H_
+#ifndef _DISP_SH1106_H_
+#define _DISP_SH1106_H_
 
 // --- Include section ---------------------------------------------------------
 
@@ -51,42 +51,36 @@
 // --- Definitions -------------------------------------------------------------
 
 /**
- * @subsection DISP_ST7565_PCBCONFIG
+ * @subsection DISP_SH1106_PCBCONFIG
  * Configure LCD Pinout.
  * @{
  */
-#ifndef DISP_ST7565_PCBCONFIG
- #define DISP_ST7565_PCBCONFIG  1
+#ifndef DISP_SH1106_PCBCONFIG
+ #define DISP_SH1106_PCBCONFIG  1
  //! Defines the DDR of a port which contains the slave select signal of the 
  //! display.
  #define DISP_DDR_SS    DDRB
  //! Defines the DDR which contains the A0 signal of the display.
- #define DISP_DDR_A0    DDRD
- //! Defines the DDR which contains the RES signal of the display.
- #define DISP_DDR_RES   DDRD
+ #define DISP_DDR_A0    DDRB
  //! Defines the PORT which contains the slave select signal of the display.
  #define DISP_PORT_SS   PORTB
  //! Defines the PORT which contains the A0 signal of the display.
- #define DISP_PORT_A0   PORTD
- //! Defines the PORT which contains the RES signal of the display. 
- #define DISP_PORT_RES  PORTD
+ #define DISP_PORT_A0   PORTB
  //! Defines the SS pin.
- #define DISP_SS           PB3
+ #define DISP_SS           PB0
  //! Defines the A0 pin.
- #define DISP_A0           PD6
- //! Defines the reset pin
- #define DISP_RES          PD5
-#endif // DISP_ST7565_PCBCONFIG
+ #define DISP_A0           PB1
+#endif // DISP_SH1106_PCBCONFIG
 /** @} */
 
 /**
- * @subsection DISP_ST7565_APPCONFIG
+ * @subsection DISP_SH1106_APPCONFIG
  * Configure size of the SPI driver. E.g. only blocking functions.
  * @{
  */
-#ifndef DISP_ST7565_APPCONFIG
- #define DISP_ST7565_APPCONFIG 1
-#endif // DISP_ST7565_APPCONFIG
+#ifndef DISP_SH1106_APPCONFIG
+ #define DISP_SH1106_APPCONFIG 1
+#endif // DISP_SH1106_APPCONFIG
 /** @} */
 
 // --- Type definitions --------------------------------------------------------
@@ -103,50 +97,27 @@
 
 // --- Global functions --------------------------------------------------------
 
-void            st7565_display_on   (bool                   on);
+void            sh1106_column_addr  (uint8_t                column_address);
 
-void            st7565_start_line   (uint8_t                start_line);
+void            sh1106_page_addr    (uint8_t                page_address);
 
-void            st7565_page_addr    (uint8_t                page_address);
+void            sh1106_start_line   (uint8_t                start_line);
 
-void            st7565_column_addr  (uint8_t                column_address);
+void            sh1106_contrast     (uint8_t                contrast);
 
-void            st7565_write_data   (uint8_t                data);
+void            sh1106_display_on   (BOOL                   on);
 
-void            st7565_adc_select   (bool                   reverse);
+void            sh1106_disp_reverse (BOOL                   reverse);
 
-void            st7565_disp_reverse (bool                   reverse);
+void            sh1106_display_offset(uint8_t               offset);
 
-void            st7565_disp_all_pixel(bool                  all_pixel_on);
+void            sh1106_nop          (void);
 
-void            st7565_lcd_bias     (uint8_t                bias);
+void            sh1106_initialize   (void);
 
-void            st7565_reset        (void);
+void            sh1106_write_data   (uint8_t                data);
 
-void            st7565_com_select   (bool                   reverse);
-
-void            st7565_power_ctrl   (bool                   booster,
-                                     bool                   voltage_regulator,
-                                     bool                   voltage_follower);
-
-void            st7565_voltage_resistor_ratio
-                                    (uint8_t                ratio);
-
-void            st7565_el_volume_reg_set
-                                    (uint8_t                level);
-
-void            st7565_static_indicator_reg_set
-                                    (bool                   on,
-                                     uint8_t                state);
-
-void            st7565_booster_ratio_reg_set
-                                    (uint8_t                level);
-
-void            st7565_nop          (void);
-
-void            st7565_initialize   (void);
-
-#endif // _DISP_ST7565_H_
+#endif // _DISP_SH1106_H_
 /** 
  * @} 
  * @}

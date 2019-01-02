@@ -1,6 +1,6 @@
 MCU = atmega328p
 FORMAT = ihex
-TARGET = test_roomthermostate_atmega328
+TARGET = test_roomthermostat_atmega328
 
 ROOTDIR = $(subst \,/,$(shell pwd))/../..
 include ../../buildscripts/lib/lib_outputdirs.mk
@@ -22,10 +22,10 @@ SRC = ../shared/bus_transport.c \
       shared/led_debug.c \
       shared/register.c \
       shared/zagwire.c \
-      tests/test_roomthermostate_atmega328/appregister.c \
-      tests/test_roomthermostate_atmega328/appversion.c \
-      tests/test_roomthermostate_atmega328/main_test_roomthermostate_atmega328.c \
-      tests/test_roomthermostate_atmega328/test_eeprom.c
+      tests/test_roomthermostat_atmega328/appregister.c \
+      tests/test_roomthermostat_atmega328/appversion.c \
+      tests/test_roomthermostat_atmega328/main_test_roomthermostat_atmega328.c \
+      tests/test_roomthermostat_atmega328/test_eeprom.c
 
 # Place -I options here
 INCDIRS = -I. \

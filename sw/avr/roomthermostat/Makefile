@@ -1,6 +1,6 @@
 MCU = atmega324p
 FORMAT = ihex
-TARGET = roomthermostate_atmega324p
+TARGET = roomthermostat_atmega324p
 
 ROOTDIR = $(subst \,/,$(shell pwd))/..
 include ../buildscripts/lib/lib_outputdirs.mk
@@ -21,9 +21,9 @@ SRC = ../shared/bus_transport.c \
       shared/gdisplay_symbols_x24.c \
       shared/register.c \
       shared/zagwire.c \
-      roomthermostate/appregister.c \
-      roomthermostate/appversion.c \
-      roomthermostate/main_roomthermostate.c
+      roomthermostat/appregister.c \
+      roomthermostat/appversion.c \
+      roomthermostat/main_roomthermostat.c
 
 # Place -I options here
 INCDIRS = -I. \

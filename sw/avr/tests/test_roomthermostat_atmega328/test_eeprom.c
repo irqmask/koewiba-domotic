@@ -52,7 +52,7 @@ static uint16_t             g_curr_byte = 0;
 static uint16_t             g_wanted_crc16 = 0;
 static uint16_t             g_read_crc16 = 0;
 static uint8_t              g_databyte = 0;
-static BOOL                 g_test_is_ok = TRUE;
+static uint8_t              g_test_is_ok = 1;
 
 // --- Global variables --------------------------------------------------------
 
@@ -71,13 +71,13 @@ void test_eeprom_start(void)
     g_databyte = 0;
     g_wanted_crc16 = 0;
     g_read_crc16 = 0;
-    g_test_is_ok = FALSE;
+    g_test_is_ok = 0;
     crc_16_start();
 }
     
-BOOL test_eeprom_run(void)
+uint8_t test_eeprom_run(void)
 {
-    BOOL rc = TRUE;
+    uint8_t rc = 1;
     
     switch (g_state) {
     case eTEST_EEP_WRITE:
@@ -101,9 +101,9 @@ BOOL test_eeprom_run(void)
         if (g_curr_byte >= EEPROM_SIZE) {
             g_state = eTEST_EEP_FINISHED;
             if (g_wanted_crc16 == g_read_crc16) {
-                g_test_is_ok = TRUE;
+                g_test_is_ok = 1;
             }
-            rc = FALSE;
+            rc = 0;
         }
         break;
         
@@ -114,7 +114,7 @@ BOOL test_eeprom_run(void)
     return rc;
 }
 
-BOOL test_eeprom_is_ok(void)
+uint8_t test_eeprom_is_ok(void)
 {
     return g_test_is_ok;
 }

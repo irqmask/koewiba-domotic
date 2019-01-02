@@ -1,14 +1,30 @@
 /**
- * @addtogroup TESTSCHEDULER_APPCONFIG
- * @brief Configuration of modules used in "testscheduler" project.
+ * @addtogroup TEST_ROOMTHERMOSTAT_ATMEGA328
+ * @addtogroup APPCONFIG
+ * @brief Configuration of modules used in "test_roomthermostat_atmega328" project.
  *
  * @{
  * @file    appconfig.h
- * @brief   Configuration of modules used in "testscheduler" project.
+ * @brief   Configuration of modules used in "test_roomthermostat_atmega328" project.
  *
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
-
+/*
+ * Copyright (C) 2019  christian <irqmask@web.de>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 #ifndef _APPCONFIG_H_
 #define _APPCONFIG_H_
 
@@ -316,4 +332,7 @@ typedef enum appconfig {
 // --- Global functions --------------------------------------------------------
 
 #endif /* _APPCONFIG_H_ */
-/** @} */
+/**
+ * @}
+ * @}
+ */

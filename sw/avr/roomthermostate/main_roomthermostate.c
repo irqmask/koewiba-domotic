@@ -198,7 +198,7 @@ int main (void)
     bus_initialize(&g_bus, 0);// initialize bus on UART 0
 
     spi_master_init_blk();
-    ZAGW_vInit();
+    zagw_initialize();
 
     sei();
 
@@ -231,10 +231,10 @@ int main (void)
             gdisp_choose_font(gdisp_font1_x8);
             gdisp_goto_col_line(0,3);
             gdisp_put_text("Temp: ");
-            if (ZAGW_uReceive()) {
-                val = ZAGW_uGetBits();
+            if (zagw_receive()) {
+                val = zagw_get_bits();
                 draw_hex16_value(val);
-                g_current_temp = ZAGW_uGetTemperature();
+                g_current_temp = zagw_get_temperature();
                 draw_temperatures();
             } else {
                 gdisp_put_text("PERR");

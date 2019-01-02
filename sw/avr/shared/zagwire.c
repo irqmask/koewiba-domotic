@@ -1,13 +1,29 @@
 /**
  * @addtogroup ZAGWIRE
- * @brief Zagwire protocoll decoder for TSIC temperature sensors.
+ * @brief Zagwire protocol decoder for TSIC temperature sensors.
  *
  * @{
  * @file    zagwire.c
- * @brief   Zagwire protocoll decoder for TSIC temperature sensors.
+ * @brief   Zagwire protocol decoder for TSIC temperature sensors.
  *
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
+/*
+ * Copyright (C) 2019  christian <irqmask@web.de>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 // --- Include section ---------------------------------------------------------
 
@@ -40,7 +56,10 @@ uint8_t     temperature_status    = 0;
 
 // --- Global functions --------------------------------------------------------
 
-void            zagw_init           (void)
+/**
+ * Initialize zagwire protocol decoder.
+ */
+void            zagw_initialize     (void)
 {
     // set anable port pin as output and disable sensor
 #ifdef ZAGW_PORT_EN
@@ -55,11 +74,17 @@ void            zagw_init           (void)
     temperature_bits = 0;
 }
 
+/**
+ * Start zagwire protocol decoding.
+ */
 void            zagw_start_reception(void)
 {
     temperature_status &= ~(1<<ZAGW_eNewValue);
 }
 
+/**
+ * Receive zagwire data.
+ */
 uint8_t         zagw_receive        (void)
 {
     uint8_t ii, retval, parity, temp_value1, temp_value2;
@@ -156,11 +181,17 @@ uint8_t         zagw_receive        (void)
     return retval;
 }
 
+/**
+ * Return last received raw bitvalue of temperature sensor.
+ */
 uint16_t        zagw_get_bits       (void)
 {
     return temperature_bits;
 }
 
+/**
+ * Return last received temperature value in 1/100K.
+ */
 uint16_t        zagw_get_temperature(void)
 {
     uint32_t temp;

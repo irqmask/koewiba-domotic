@@ -72,7 +72,7 @@ void test_eeprom_start(void)
     g_wanted_crc16 = 0;
     g_read_crc16 = 0;
     g_test_is_ok = 0;
-    crc_16_start();
+    //crc_16_start();
 }
     
 uint8_t test_eeprom_run(void)
@@ -90,7 +90,7 @@ uint8_t test_eeprom_run(void)
             g_state = eTEST_EEP_READ;
             g_databyte = 0;
             g_curr_byte = 0;
-            crc_16_start();
+            //crc_16_start();
         }
         break;
         

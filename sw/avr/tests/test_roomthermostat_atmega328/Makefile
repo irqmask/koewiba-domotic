@@ -21,6 +21,7 @@ SRC = ../shared/bus_transport.c \
       shared/gdisplay_font_x16.c \
       shared/led_debug.c \
       shared/register.c \
+      shared/sleepmode.c \
       shared/zagwire.c \
       tests/test_roomthermostat_atmega328/appregister.c \
       tests/test_roomthermostat_atmega328/appversion.c \

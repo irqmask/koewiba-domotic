@@ -59,6 +59,8 @@
  #define GDISP_RAM_PAGES    4
  #define GDISP_WIDTH        132
  #define GDISP_HEIGHT       32
+ #define  GDISP_TYPE_ST7565 1
+ #undef  GDISP_TYPE_SH1106
 #endif // GDISPLAY_APPCONFIG
 /** @} */
 
@@ -100,6 +102,8 @@ void            gdisp_put_char      (const char             single_char);
 void            gdisp_put_text      (const char*            text);
 
 void            gdisp_put_textp     (const char*            text);
+
+void            gdisp_set_startline (uint8_t                line);
 
 #endif // _GDISPLAY_H_
 /**

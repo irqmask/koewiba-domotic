@@ -25,8 +25,8 @@
 
 // --- Local variables ---------------------------------------------------------
 
-uint16_t    g_uTemperatureBits      = 0;
-uint8_t     g_uTemperatureStatus    = 0;
+uint16_t    temperature_bits      = 0;
+uint8_t     temperature_status    = 0;
 
 // --- Global variables --------------------------------------------------------
 
@@ -40,32 +40,36 @@ uint8_t     g_uTemperatureStatus    = 0;
 
 // --- Global functions --------------------------------------------------------
 
-void            ZAGW_vInit          (void)
+void            zagw_init           (void)
 {
     // set anable port pin as output and disable sensor
+#ifdef ZAGW_PORT_EN
     ZAGW_DDR_EN |= (1<<ZAGW_EN);
     ZAGW_PORT_EN &= ~(1<<ZAGW_EN);
+#endif
     // set data port pin as input and disable pullup resistor
     ZAGW_DDR_DATA &= ~(1<<ZAGW_DATA);
     ZAGW_PORT_DATA &= ~(1<<ZAGW_DATA);
 
-    g_uTemperatureStatus = 0;
-    g_uTemperatureBits = 0;
+    temperature_status = 0;
+    temperature_bits = 0;
 }
 
-void            ZAGW_vStartReception(void)
+void            zagw_start_reception(void)
 {
-    g_uTemperatureStatus &= ~(1<<ZAGW_eNewValue);
+    temperature_status &= ~(1<<ZAGW_eNewValue);
 }
 
-uint8_t         ZAGW_uReceive  (void)
+uint8_t         zagw_receive        (void)
 {
     uint8_t ii, retval, parity, temp_value1, temp_value2;
 
     retval = 1;
 
     // switch sensor on and wait for stabilization
+#ifdef ZAGW_PORT_EN
     ZAGW_PORT_EN |= (1<<ZAGW_EN);
+#endif
     _delay_us(120);
 
     do {
@@ -140,27 +144,29 @@ uint8_t         ZAGW_uReceive  (void)
             break;
         }
 
-        g_uTemperatureBits = (temp_value1 << 8) | temp_value2;
-        g_uTemperatureStatus |= (1<<ZAGW_eNewValue);
+        temperature_bits = (temp_value1 << 8) | temp_value2;
+        temperature_status |= (1<<ZAGW_eNewValue);
     } while (FALSE);
 
     // disable sensor
+#ifdef ZAGW_PORT_EN
     ZAGW_PORT_EN &= ~(1<<ZAGW_EN);
+#endif
 
     return retval;
 }
 
-uint16_t        ZAGW_uGetBits       (void)
+uint16_t        zagw_get_bits       (void)
 {
-    return g_uTemperatureBits;
+    return temperature_bits;
 }
 
-uint16_t        ZAGW_uGetTemperature(void)
+uint16_t        zagw_get_temperature(void)
 {
     uint32_t temp;
     uint16_t digival, temperature;
 
-    digival = g_uTemperatureBits;
+    digival = temperature_bits;
 
     if (digival >= 767) digival += 1;
 

@@ -17,11 +17,33 @@
 
 #include "prjtypes.h"
 #include "ucontroller.h"
-#include "disp_st7565.h"
 
 #include "gdisplay.h"
 
+#ifdef GDISP_TYPE_ST7565
+#include "disp_st7565.h"
+#endif
+#ifdef GDISP_TYPE_SH1106
+#include "disp_sh1106.h"
+#endif
+
+
 // --- Definitions -------------------------------------------------------------
+
+#ifdef GDISP_TYPE_ST7565
+ #define GDISP_INITIALIZE    st7565_initialize
+ #define GDISP_WRITE_DATA    st7565_write_data
+ #define GDISP_PAGE_ADDR     st7565_page_addr
+ #define GDISP_COLUMN_ADDR   st7565_column_addr
+ #define GDISP_START_LINE    st7565_start_line
+#endif
+#ifdef GDISP_TYPE_SH1106
+ #define GDISP_INITIALIZE    sh1106_initialize
+ #define GDISP_WRITE_DATA    sh1106_write_data
+ #define GDISP_PAGE_ADDR     sh1106_page_addr
+ #define GDISP_COLUMN_ADDR   sh1106_column_addr
+ #define GDISP_START_LINE    sh1106_start_line
+#endif
 
 // --- Type definitions --------------------------------------------------------
 
@@ -60,54 +82,55 @@ static void put_char(const char single_char, uint8_t height, uint8_t space)
         colsleft = width;
         // draw first line of the character
         while (colsleft--) {
-            st7565_write_data(pgm_read_byte(&g_current_font[index]));
+
+            GDISP_WRITE_DATA(pgm_read_byte(&g_current_font[index]));
             index += height;
         }
         // space between chars
         for (colsleft=0; colsleft<space; colsleft++) {
-            st7565_write_data(0);
+            GDISP_WRITE_DATA(0);
         }
         // character is at least 2 lines high?
         if (height >= 2) {
             // next 8 lines
-            st7565_page_addr(g_current_page + 1);
-            st7565_column_addr(g_current_column);
+            GDISP_PAGE_ADDR(g_current_page + 1);
+            GDISP_COLUMN_ADDR(g_current_column);
             // reset index and width
             index = indexchar + 1;
             colsleft = width;
             // draw next 8 lines
             while (colsleft--) {
-                st7565_write_data(pgm_read_byte(&g_current_font[index]));
+                GDISP_WRITE_DATA(pgm_read_byte(&g_current_font[index]));
                 index += height;
             }
             // space between chars
             for (colsleft=0; colsleft<space; colsleft++) {
-                st7565_write_data(0);
+                GDISP_WRITE_DATA(0);
             }            
         }
         // character is at least 3 lines high?
         if (height >= 3) {
             // next 8 lines, reset column
-            st7565_page_addr(g_current_page + 2);
-            st7565_column_addr(g_current_column);
+            GDISP_PAGE_ADDR(g_current_page + 2);
+            GDISP_COLUMN_ADDR(g_current_column);
             // reset index and width
             index = indexchar + 2;
             colsleft = width;
             // draw next 8 lines
             while (colsleft--) {
-                st7565_write_data(pgm_read_byte(&g_current_font[index]));
+                GDISP_WRITE_DATA(pgm_read_byte(&g_current_font[index]));
                 index += height;
             }
             // space between chars
             for (colsleft=0; colsleft<space; colsleft++) {
-                st7565_write_data(0);
+                GDISP_WRITE_DATA(0);
             }
         }
         // refresh current column count
         g_current_column += width;
         g_current_column += space;
         // leave current page unchanged
-        st7565_page_addr(g_current_page);
+        GDISP_PAGE_ADDR(g_current_page);
     }
 }
 
@@ -127,24 +150,24 @@ void gdisp_initialize (void)
     DISP_DDR_LED   |= (1<<DISP_LED);
     // backlight off
     DISP_PORT_LED  &= ~(1<<DISP_LED);
-    st7565_initialize();
+    GDISP_INITIALIZE();
     g_current_font    = gdisp_font1_x8;
 
     // clear display ram
     for (page=0; page<GDISP_RAM_PAGES; page++) {
-        st7565_page_addr(page);
-        st7565_column_addr(0);
+        GDISP_PAGE_ADDR(page);
+        GDISP_COLUMN_ADDR(0);
         for (ii=0; ii<GDISP_WIDTH; ii++)
-            st7565_write_data(0);
+            GDISP_WRITE_DATA(0);
     }
     // set cursor to 0,0
-    st7565_page_addr(0);
+    GDISP_PAGE_ADDR(0);
     g_current_page = 0;
-    st7565_column_addr(0);
+    GDISP_COLUMN_ADDR(0);
     g_current_column = 0;
 
     // set start line to the beginning of the display ram
-    st7565_start_line(0);
+    GDISP_START_LINE(0);
 }
 
 /**
@@ -175,9 +198,9 @@ void gdisp_backlight (uint8_t level)
 void gdisp_goto_col_line (uint8_t   col,
                           uint8_t   line)
 {
-    st7565_page_addr(line);
+    GDISP_PAGE_ADDR(line);
     g_current_page = line;
-    st7565_column_addr(col);
+    GDISP_COLUMN_ADDR(col);
     g_current_column = col;
 }
 
@@ -196,19 +219,19 @@ void gdisp_choose_font (const uint8_t* font)
 
 void gdisp_put_spacer (uint8_t height)
 {  
-    st7565_write_data(0); // 1 pixel
+    GDISP_WRITE_DATA(0); // 1 pixel
     if (height > 8) {
-        st7565_page_addr(g_current_page + 1);
-        st7565_column_addr(g_current_column);
-        st7565_write_data(0); // second line
+        GDISP_PAGE_ADDR(g_current_page + 1);
+        GDISP_COLUMN_ADDR(g_current_column);
+        GDISP_WRITE_DATA(0); // second line
     }
     if (height > 16) {
-        st7565_page_addr(g_current_page + 2);
-        st7565_column_addr(g_current_column);
-        st7565_write_data(0); // third line
+        GDISP_PAGE_ADDR(g_current_page + 2);
+        GDISP_COLUMN_ADDR(g_current_column);
+        GDISP_WRITE_DATA(0); // third line
     }
     g_current_column++;
-    st7565_page_addr(g_current_page);
+    GDISP_PAGE_ADDR(g_current_page);
 }
 
 /**
@@ -262,6 +285,17 @@ void gdisp_put_textp (const char* text)
     while ((c = pgm_read_byte(text++)) != '\0') {
         put_char(c, height, 1);
     }
+}
+
+/**
+ * Set start line of display to display.
+ *
+ * @param[in] line
+ * Line number (first is 0)
+ */
+void gdisp_set_startline(uint8_t line)
+{
+    GDISP_START_LINE(line);
 }
 
 /** @} */

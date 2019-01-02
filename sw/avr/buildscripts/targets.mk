@@ -1,3 +1,3 @@
-TARGETS = bootloader_atmega324p roomthermostate taster8 tests/testscheduler
+TARGETS = bootloader_atmega324p roomthermostat taster8 tests/testscheduler
 
 SUBDIRS = $(addprefix ../,$(TARGETS))

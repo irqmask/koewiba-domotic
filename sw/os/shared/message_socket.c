@@ -8,6 +8,22 @@
  *
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
+/*
+ * Copyright (C) 2017  christian <irqmask@gmx.de>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 // --- Include section ---------------------------------------------------------
 
@@ -30,11 +46,20 @@
 
 // --- Type definitions --------------------------------------------------------
 
+/**
+ * Endpoint of established socket connection.
+ * An endpoint structure stores all the information about an established 
+ * point-to-point connection. Endpoints are stored in a linked list.
+ */
 typedef struct msg_endpoint {
-    msg_endpoint_t* next;
-    msg_ep_type_t   type;
-    msg_socket_t*   msg_socket;
-    sys_fd_t        fd;
+    msg_endpoint_t* next;           //!< Next element in linked list.
+    msg_ep_type_t   type;           //!< Connection-type. See #msg_ep_type_t.
+    msg_socket_t*   msg_socket;     //!< Information about public socket server.
+    sys_fd_t        fd;             //!< Handle to established connection.
+    //! handler for closed connections, called when connection is closed.
+    msg_conn_func_t close_connection_handler;   
+    //! Optional argument, conveyed to the closed connection handler, when called.
+    void*           close_connection_arg;
 } msg_endpoint_t;
 
 // --- Local variables ---------------------------------------------------------
@@ -98,8 +123,8 @@ static int32_t msg_read (void* arg)
     msg_t           message;
 
     do {
-    // reveive message
-    rc = sys_socket_recv(ep->fd, &message, sizeof(message));
+        // reveive message
+        rc = sys_socket_recv(ep->fd, &message, sizeof(message));
         if (rc == 0) {
             // connection closed
             msg_s_close_connection(msg_socket, ep);
@@ -122,9 +147,6 @@ static int32_t msg_read (void* arg)
 
 static void msg_ready_to_write (void* arg)
 {
-    static int count = 0;
-    msg_endpoint_t* ep = (msg_endpoint_t*)arg;
-    printf("fd %d is ready to write %d\n", (int)ep->fd, count++);
 }
 
 static int32_t msg_accept_endpoint (void* arg)
@@ -170,6 +192,7 @@ void msg_s_init (msg_socket_t* msg_socket)
     assert(msg_socket != NULL);
 
     memset(msg_socket, 0, sizeof(msg_socket_t));
+    msg_socket->well_known_fd = INVALID_FD;
 }
 
 int msg_s_open_server (msg_socket_t*   msg_socket,
@@ -231,6 +254,7 @@ int msg_s_open_client (msg_socket_t*   msg_socket,
                   sizeof(msg_socket->address),
                   address,
                   strlen(address));
+        msg_socket->port = port;
 
         if (port == 0) {
             fd = sys_socket_open_client_unix(msg_socket->address);
@@ -260,17 +284,34 @@ void msg_s_close_connection (msg_socket_t* msg_socket, msg_endpoint_t* ep)
     assert(msg_socket != NULL);
     assert(ep != NULL);
 
-    ioloop_unregister_fd(msg_socket->ioloop, ep->fd);
-    sys_socket_close (ep->fd);
+    if (ep->fd != INVALID_FD) {
+        ioloop_unregister_fd(msg_socket->ioloop, ep->fd, eIOLOOP_EV_UNKNOWN);
+        sys_socket_close (ep->fd);
+        ep->fd = INVALID_FD;
+        if (ep->close_connection_handler != NULL) {
+            ep->close_connection_handler(msg_socket->address,
+                                        msg_socket->port,
+                                        ep,
+                                        ep->close_connection_arg);
+        }
+    }
     msg_delete_endpoint(msg_socket, ep);
 }
 
-void msg_s_set_newconnection_handler (msg_socket_t* msg_socket, msg_newconn_func_t func, void* arg)
+void msg_s_set_newconnection_handler (msg_socket_t* msg_socket, msg_conn_func_t func, void* arg)
 {
     assert(msg_socket != NULL);
 
     msg_socket->new_connection_handler = func;
     msg_socket->new_connection_arg = arg;
+}
+
+void msg_s_set_closeconnection_handler (msg_endpoint_t* ep, msg_conn_func_t func, void* arg)
+{
+    assert(ep != NULL);
+
+    ep->close_connection_handler = func;
+    ep->close_connection_arg = arg;
 }
 
 void msg_s_set_incomming_handler (msg_socket_t* msg_socket, msg_incom_func_t func, void* arg)
@@ -306,12 +347,14 @@ msg_endpoint_t* msg_s_get_endpoint (msg_socket_t*   msg_socket,
     return ep;
 }
 
-void msg_s_send (msg_endpoint_t* recv_ep, msg_t* message)
+int msg_s_send (msg_endpoint_t* recv_ep, msg_t* message)
 {
     assert(recv_ep != NULL);
     assert(message != NULL);
 
     sys_socket_send(recv_ep->fd, (void*)message, sizeof(msg_t));
+
+    return eERR_NONE;
 }
 
 /** @} */

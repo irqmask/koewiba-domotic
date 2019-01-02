@@ -50,11 +50,10 @@ void send_window_state (sBus_t* bus)
 {
     uint8_t msg[4];
 
-    msg[0] = eCMD_STATE_BITFIELDS;
-    msg[1] = 1;      // number of bitfiels bytes
+    msg[0] = eCMD_STATE_8BIT;
+    msg[1] = APP_eReg_WindowState;      // number of bitfiels bytes
     msg[2] = (g_window_state==true) ? (1<<0) : 0;
-    msg[3] = (1<<0); // changed bits (here only bit 0)
-    bus_send_message(bus, BUS_BRDCSTADR, 4, msg);
+    bus_send_message(bus, BUS_BRDCSTADR, 3, msg);
 }
 
 // --- Module global functions -------------------------------------------------
@@ -90,7 +89,10 @@ void app_init (void)
 void app_on_command (uint16_t sender, uint8_t msglen, uint8_t* msg)
 {
     switch (msg[0]) {
-    //TODO insert application specific command interpreter here!
+    case APP_eCmd_Stop:
+        blind_stop();
+        break;
+
     default:
         break;
     }

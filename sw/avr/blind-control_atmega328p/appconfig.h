@@ -15,6 +15,7 @@
 
 // --- Include section ---------------------------------------------------------
 
+#include "cmddef_common.h"
 #include "prjtypes.h"
 #include "moddef_common.h"
 
@@ -30,6 +31,11 @@
                                         //!< Prevent the controller to fall asleep if motor is moving.
 // --- Type definitions --------------------------------------------------------
 
+//! Application specific commands
+typedef enum appcommands {
+    APP_eCmd_Stop = eCMD_FIRST_APP_SPECIFIC,    //!< Stop blind movement
+} eCommands_t;
+
 //! Application specific layout of registers
 typedef enum appregisters {
     // registers saved in EEProm
@@ -38,7 +44,7 @@ typedef enum appregisters {
     APP_eReg_ReactionDelay,     //!< Delay time in timer ticks (1/100sec) until movement starts after applying power.
     APP_eReg_DurationOpen,      //!< Duration in timer ticks (1/100sec) to fully open the blind.
     APP_eReg_DurationClose,     //!< Duration in timer ticks (1/100sec) to fully close the blind.
-
+    APP_eReg_WindowState,       //!< State of the window
     // insert application specific registers here
     APP_eReg_Last
 } eRegisters_t;

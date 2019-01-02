@@ -12,7 +12,22 @@
  *
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
-
+/*
+ * Copyright (C) 2017  christian <irqmask@gmx.de>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 #ifndef _MESSAGE_SOCKET_H_
 #define _MESSAGE_SOCKET_H_
 
@@ -20,7 +35,13 @@
 
 #include <stdint.h>
 
+#include "ioloop.h"
 #include "message.h"
+#include "syssocket.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 // --- Definitions -------------------------------------------------------------
 
@@ -33,14 +54,13 @@ typedef enum msg_ep_type {
 
 typedef struct msg_endpoint msg_endpoint_t;
 
-typedef void (*msg_newconn_func_t)(char* address, uint16_t port, void* reference, void* arg);
-
 typedef struct msg_socket {
     sys_fd_t            well_known_fd;
     msg_endpoint_t*     first_ep;
     ioloop_t*           ioloop;
     char                address[256];
-    msg_newconn_func_t  new_connection_handler;
+    uint16_t            port;
+    msg_conn_func_t     new_connection_handler;
     void*               new_connection_arg;
     msg_incom_func_t    incomming_handler;
     void*               incomming_arg;
@@ -74,8 +94,12 @@ void msg_s_close_connection (msg_socket_t* msg_socket,
                              msg_endpoint_t* ep);
 
 void msg_s_set_newconnection_handler (msg_socket_t* msg_socket,
-                                      msg_newconn_func_t func,
+                                      msg_conn_func_t func,
                                       void* arg);
+
+void msg_s_set_closeconnection_handler (msg_endpoint_t* ep,
+                                        msg_conn_func_t func,
+                                        void* arg);
 
 void msg_s_set_incomming_handler (msg_socket_t* msg_socket,
                                   msg_incom_func_t func,
@@ -85,8 +109,12 @@ msg_endpoint_t* msg_s_get_endpoint (msg_socket_t*   msg_socket,
                                     int             index,
                                     uint32_t        flags);
 
-void msg_s_send (msg_endpoint_t*    recv_ep,
-                 msg_t*             message);
+int msg_s_send (msg_endpoint_t*    recv_ep,
+                msg_t*             message);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _MESSAGE_SOCKET_H_ */
 /** @} */

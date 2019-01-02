@@ -1,69 +1,61 @@
 /**
- * @addtogroup ROUTER
- * @brief Route KWB messages between IPC sockets, TCP/IP sockets and the bus
- *        itself.
- *
- * TODO: Detailed description of module.
+ * @addtogroup KWBROUTER
  *
  * @{
  * @file    router.h
- * @brief   Route KWB messages between IPC sockets, TCP/IP sockets and the bus
- *          itself.
+ * @brief   Router takes incomming message from a connection and routes it to 
+ *          all other connections.
  *
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
+/*
+ * kwbkouter - A router for koewiba-domotic messages.
+ * Copyright (C) 2017  christian <irqmask@gmx.de>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+#ifndef ROUTER_H
+#define ROUTER_H
 
-#ifndef _ROUTER_H_
-#define _ROUTER_H_
+#include <list>
+#include <stddef.h>
 
-// --- Include section ---------------------------------------------------------
+#include "routeconnection.h"
 
-#include "message.h"
+/**
+ * The router takes incomming message from a connection and routes it to 
+ * all other connections.
+ * The router is not thread-safe, it has to be used in a single threaded 
+ * loop.
+ * The current design routes an incomming message from one connection to 
+ * all other connections.
+ */
+class Router
+{
+private:
+    std::list<RouteConnection*> connections;
 
-// --- Definitions -------------------------------------------------------------
+public:
+    Router();
+    ~Router();
 
-// --- Type definitions --------------------------------------------------------
+    void AddConnection(RouteConnection* connection);
+    void RemoveConnection(RouteConnection* connection);
 
-typedef enum route_type {
-    eROUTE_TYPE_UNKNOWN,
-    eROUTE_TYPE_SERIAL,
-    eROUTE_TYPE_SOCKET,
-    eROUTE_TYPE_LAST
-} route_type_t;
+    void DistributeMessage(msg_t* message, RouteConnection* sender);
+};
 
-typedef struct route_entry route_entry_t;
-
-typedef struct router {
-    route_entry_t* first_route;
-} router_t;
-
-// --- Local variables ---------------------------------------------------------
-
-// --- Global variables --------------------------------------------------------
-
-// --- Module global variables -------------------------------------------------
-
-// --- Local functions ---------------------------------------------------------
-
-// --- Module global functions -------------------------------------------------
-
-// --- Global functions --------------------------------------------------------
-
-void route_init (router_t* router);
-
-int route_add (router_t*    router,
-               uint16_t     first_module_id,
-               uint16_t     last_module_id,
-               const char*  target_address,
-               uint16_t     target_port,
-               route_type_t type,
-               void*        reference);
-
-void route_delete (router_t*    router);
-
-void route_message (router_t*    router,
-                    msg_t*       message,
-                    void*        reference);
-
-#endif /* _ROUTER_H_ */
+#endif // ROUTER_H
 /** @} */

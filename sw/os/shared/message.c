@@ -7,6 +7,22 @@
  *
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
+/*
+ * Copyright (C) 2017  christian <irqmask@gmx.de>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 // --- Include section ---------------------------------------------------------
 
@@ -22,6 +38,7 @@
   #include <safe_lib.h>
 #endif
 
+#include "kwb_defines.h"
 #include "log.h"
 #include "message.h"
 #include "prjtypes.h"
@@ -43,7 +60,7 @@
 
 // --- Global functions --------------------------------------------------------
 
-void msg_log (msg_t message)
+void msg_log (const char* keyword, msg_t message)
 {
     bool first_line = true;
     uint8_t remaining_length, ii, bytes_in_line;
@@ -74,7 +91,7 @@ void msg_log (msg_t message)
         ii++;
         if (bytes_in_line == 16 || remaining_length == 0) {
             bytes_in_line = 0;
-            log_msg(LOG_VERBOSE1, "%s", logline);
+            log_msg(KWB_LOG_INTERCOMM, "%s %s", keyword, logline);
             logline[0] = '\0';
         }
     }

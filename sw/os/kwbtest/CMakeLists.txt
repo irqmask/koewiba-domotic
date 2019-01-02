@@ -24,6 +24,15 @@ link_directories (
     ${CMAKE_CURRENT_BINARY_DIR}
 )
 
+# system dependent definitions
+# ---------------------------------------------------------
+if (WIN32)
+    # TODO implement missing secure functions for linux,
+    # change implementation to secure functions and remove
+    # this warning suppression.
+    add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+endif (WIN32)
+
 file (WRITE ${CMAKE_CURRENT_BINARY_DIR}/kwbtest_version.h
      "const char* PGM_VERSION(\"${VERSION}\");\n")
 
@@ -49,6 +58,7 @@ set (os_shared_SRCS
 
     ../shared/ioloop.c
     ../shared/log.c
+    ../shared/message.c
     ../shared/message_socket.c
 )
 

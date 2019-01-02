@@ -10,7 +10,22 @@
  *
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
-
+/*
+ * Copyright (C) 2017  christian <irqmask@gmx.de>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 #ifndef _LOG_H_
 #define _LOG_H_
 
@@ -18,16 +33,21 @@
 
 #include "prjtypes.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // --- Definitions -------------------------------------------------------------
 
 #define LOG_ERROR       0x00000001
 #define LOG_WARNING     0x00000002
-#define LOG_STATUS      0x00000004
-#define LOG_USERDEFINED 0x00000008
-#define LOG_VERBOSE1    0x00000010
-#define LOG_VERBOSE2    0x00000020
-#define LOG_VERBOSE3    0x00000040
-#define LOG_VERBOSE4    0x00000080
+#define LOG_INFO        0x00000004
+#define LOG_STATUS      0x00000008
+#define LOG_USERDEFINED 0x00000010
+#define LOG_VERBOSE1    0x00000020
+#define LOG_VERBOSE2    0x00000040
+#define LOG_VERBOSE3    0x00000080
+#define LOG_VERBOSE4    0x00000100
 
 #define LOG_MAX_MESSAGE_LENGTH 256
 
@@ -53,13 +73,17 @@ log_mask_t log_get_mask (void);
 
 void log_add_mask (log_mask_t logmask);
 
-void log_msg (log_mask_t logmask, char* logmessage, ...);
+void log_msg (log_mask_t logmask, const char* logmessage, ...);
 
-void log_warning(char* logmessage, ...);
+void log_warning(const char* logmessage, ...);
 
-void log_error (char* logmessage, ...);
+void log_error (const char* logmessage, ...);
 
-void log_sys_error (char* logmessage, ...);
+void log_sys_error (const char* logmessage, ...);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _LOG_H_ */
 /** @} */

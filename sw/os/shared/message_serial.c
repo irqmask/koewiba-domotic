@@ -19,6 +19,22 @@
  *
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
+/*
+ * Copyright (C) 2017  christian <irqmask@gmx.de>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 // --- Include section ---------------------------------------------------------
 
@@ -106,7 +122,7 @@ static void reset_incomming_on_error(msg_serial_t* msg_serial)
         switch (msg_serial->incomming_buffer[ii]) {
         case '\n': strcat_s(strbuf1, sizeof(strbuf1), "<NL>"); break;
         case '\r': strcat_s(strbuf1, sizeof(strbuf1), "<CR>"); break;
-        default:   
+        default:
             single_char[0] =  msg_serial->incomming_buffer[ii];
             strcat_s(strbuf1, sizeof(strbuf1), single_char);
             break;
@@ -149,7 +165,7 @@ static bool process_receiving(msg_serial_t* msg_serial, char new_char)
         }
         if (msg_serial->incomming_num_received >= 4) {
             msg_serial->incomming_state = eSER_RECV_STATE_RECEIVER;
-        }        
+        }
         break;
 
     case eSER_RECV_STATE_RECEIVER:
@@ -283,6 +299,7 @@ void msg_ser_init (msg_serial_t* msg_serial)
     assert(msg_serial != NULL);
 
     memset(msg_serial, 0, sizeof(msg_serial_t));
+    msg_serial->fd = INVALID_FD;
 }
 
 /**
@@ -341,8 +358,11 @@ void msg_ser_close (msg_serial_t* msg_serial)
 {
     assert(msg_serial != NULL);
 
-    ioloop_unregister_fd(msg_serial->ioloop, msg_serial->fd);
-    sys_serial_close (msg_serial->fd);
+    if (msg_serial->fd != INVALID_FD) {
+        ioloop_unregister_fd(msg_serial->ioloop, msg_serial->fd, eIOLOOP_EV_UNKNOWN);
+        sys_serial_close (msg_serial->fd);
+        msg_serial->fd = INVALID_FD;
+    }
 }
 
 void msg_ser_set_incomming_handler (msg_serial_t* msg_serial, msg_incom_func_t func, void* arg)

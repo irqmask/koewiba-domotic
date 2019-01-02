@@ -8,11 +8,28 @@
  *
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
+/*
+ * Copyright (C) 2017  christian <irqmask@gmx.de>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #ifndef _PRJTYPES_H__
 #define _PRJTYPES_H__
 
 // --- Include section ---------------------------------------------------------
+
 #include "prjconf.h"
 
 #if !defined (PRJCONF_WINDOWS) 
@@ -37,6 +54,7 @@ typedef signed long long int int64_t;
 
 // --- Definitions -------------------------------------------------------------
 
+#ifndef __cplusplus
 #ifndef bool
 typedef unsigned char bool;
 #endif
@@ -47,6 +65,7 @@ typedef unsigned char bool;
 
 #ifndef true
 #define true (!false)
+#endif
 #endif
 
 #ifndef NULL

@@ -7,7 +7,23 @@
  *
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
-
+/*
+ * Copyright (C) 2017  christian <irqmask@gmx.de>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+ 
 // --- Include section ---------------------------------------------------------
 
 #include "prjconf.h"
@@ -27,6 +43,7 @@
 
 // os/include
 #include "error_codes.h"
+#include "kwb_defines.h"
 
 // os/libsystem
 #include "sysgetopt.h"
@@ -35,6 +52,8 @@
 
 // os/shared
 #include "ioloop.h"
+#include "log.h"
+#include "message.h"
 #include "message_socket.h"
 
 // --- Definitions -------------------------------------------------------------
@@ -43,41 +62,22 @@
 
 // --- Local variables ---------------------------------------------------------
 
+bool   g_end_application = false;
+
 // --- Global variables --------------------------------------------------------
 
 // --- Module global variables -------------------------------------------------
 
 // --- Local functions ---------------------------------------------------------
 
-void log_hexdump16 (uint8_t* data, uint16_t length)
-{
-    uint16_t offset = 0;
-
-    assert (data != NULL);
-
-    while (offset < length) {
-        if ((offset % 16) == 0) {
-            if (offset != 0) printf("\n");
-            printf("%04X: ", offset);
-        }
-        printf("%02X ", data[offset]);
-        offset++;
-    }
-    printf("\n");
-}
-
 static void handle_message(msg_t* message, void* reference, void* arg)
 {
-    printf("Message received: sender %d, receiver %d, len %d\n",
-           message->sender, message->receiver, message->length);
-    log_hexdump16(message->data, message->length);
-    if (message->data[0] == 1 && message->data[1] == 1) {
-        if (message->data[2] == 1) {
-            system("./relay_on.sh");
-        } else {
-            system("./relay_off.sh");
-        }
-    }
+    msg_log("RECV", *message);
+}
+
+static void on_close_connection(const char* address, uint16_t port, void* reference, void* arg)
+{
+    g_end_application = true;
 }
 
 // --- Module global functions -------------------------------------------------
@@ -87,48 +87,27 @@ static void handle_message(msg_t* message, void* reference, void* arg)
 int main (int argc, char* argv[])
 {
     int             rc = eERR_NONE;
-    bool            end_application = false;
     ioloop_t        mainloop;
-    sys_fd_t        fd;
-    int             totalb=0;
-    const char sendbuf[] = "HalloWelt\0";
+    msg_socket_t    msg_socket;
+    msg_endpoint_t* msg_ep;
 
     do {
-        printf("\nkwbtest...\n");
+        log_msg(KWB_LOG_INFO, "kwbtest...");
+        log_set_mask(0xFFFFFFFF);
         ioloop_init(&mainloop);
 
-        fd = sys_serial_open("/dev/ttyUSB1");
-        if (fd == INVALID_FD) {
-            perror("msg_serial: error opening serial connection");
-            rc = eERR_SYSTEM;
+        msg_s_init(&msg_socket);
+        msg_s_set_incomming_handler(&msg_socket, handle_message, NULL);
+        if ((rc = msg_s_open_client(&msg_socket, &mainloop, "/tmp/kwbr.usk", 0)) != eERR_NONE) {
             break;
         }
-
-        rc = sys_serial_set_params(fd,
-                                   sys_serial_baudrate(57600),
-                                   eSYS_SER_DB_8,
-                                   eSYS_SER_P_NONE,
-                                   eSYS_SER_SB_1,
-                                   eSYS_SER_FC_HW);
-        while (!end_application) {
-            if (sys_serial_send(fd, (void*)sendbuf, 1) == 1) {
-                totalb++;
-                printf("Total bytes sent: %d\n", totalb);
-            } else {
-                printf("Serial buffer full\n");
-            }
-            sys_sleep_ms(20);
-            //ioloop_run_once(&mainloop);
-        }
-        //msg_s_init(&msg_socket);
-        //msg_s_set_incomming_handler(&msg_socket, handle_message, NULL);
-        //if ((rc = msg_s_open_client(&msg_socket, &mainloop, "/tmp/kwb.usk", 0)) != eERR_NONE) {
-            break;
-        //}
-        printf("entering mainloop...\n");
-        while (!end_application) {
+        msg_ep = msg_s_get_endpoint(&msg_socket, 0, 0);
+        msg_s_set_closeconnection_handler(msg_ep, on_close_connection, NULL);
+        log_msg(KWB_LOG_STATUS, "entering mainloop...");
+        while (!g_end_application) {
             ioloop_run_once(&mainloop);
         }
+        //msg_s_close_connection(&msg_socket);
     } while (0);
     return rc;
 }

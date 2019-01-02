@@ -16,7 +16,7 @@ include_directories (
 # ---------------------------------------------------------
 if (WIN32)
     include_directories (
-        ../3rd_party
+        ../3rd_party/CUnit/include
     )
 else (WIN32)
     include_directories (
@@ -28,12 +28,21 @@ link_directories (
     ${CMAKE_CURRENT_BINARY_DIR}
 )
 
-# system dependant include directories
+# system dependant link directories
 # ---------------------------------------------------------
 if (WIN32)
     link_directories (
-        ../3rd_party/CUnit
+        ../3rd_party/CUnit/lib/Debug
     )
+endif (WIN32)
+
+# system dependent definitions
+# ---------------------------------------------------------
+if (WIN32)
+    # TODO implement missing secure functions for linux,
+    # change implementation to secure functions and remove
+    # this warning suppression.
+    add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 endif (WIN32)
 
 file (WRITE ${CMAKE_CURRENT_BINARY_DIR}/kwbtest_version.h
@@ -97,8 +106,9 @@ set_property(TARGET unittests PROPERTY CXX_STANDARD 11)
 # ---------------------------------------------------------
 target_link_libraries (unittests libsystem)
 if (WIN32)
-    target_link_libraries (unittests cunit)
+    target_link_libraries (unittests libcunit)
 else (WIN32)
+    target_link_libraries (unittests cunit)
     target_link_libraries (unittests pthread)
     target_link_libraries (unittests safec-1.0)
 endif (WIN32)

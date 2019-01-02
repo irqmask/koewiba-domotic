@@ -12,7 +12,23 @@
  *
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
-
+/*
+ * Copyright (C) 2017  christian <irqmask@gmx.de>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+ 
 // --- Include section ---------------------------------------------------------
 
 #include "prjconf.h"
@@ -85,19 +101,19 @@ sys_thread_func (reader_thread)
 
 static void print_usage (void)
 {
-    printf("\nkwbmonitor - KoeWiBa bus monitor on a byte level\n");
-    printf("\nUsage:\n");
-    printf("kwbmonitor [-d <device>] [-b <baudrate>] [-v <vbusd address>] [-w <vbusd port>]\n\n");
-    printf("Arguments:\n");
-    printf(" -d <device>         Device of serial bus connection.\n");
-    printf(" -b <baudrate>       Baudrate of serial bus connection. Default: 38400\n");
-    printf(" -v <vbusd address>  Address of vbusd. Default: /tmp/vbusd.usk\n");
-    printf(" -w <vbusd port>     Port number of vbusd. Default: 0\n");
+    fprintf(stderr, "\nkwbmonitor - KoeWiBa bus monitor on a byte level\n");
+    fprintf(stderr, "\nUsage:\n");
+    fprintf(stderr, "kwbmonitor [-d <device>] [-b <baudrate>] [-v <vbusd address>] [-w <vbusd port>]\n\n");
+    fprintf(stderr, "Arguments:\n");
+    fprintf(stderr, " -d <device>         Device of serial bus connection.\n");
+    fprintf(stderr, " -b <baudrate>       Baudrate of serial bus connection. Default: 38400\n");
+    fprintf(stderr, " -v <vbusd address>  Address of vbusd. Default: /tmp/vbusd.usk\n");
+    fprintf(stderr, " -w <vbusd port>     Port number of vbusd. Default: 0\n");
 
     #ifdef PRJCONF_WINDOWS
-    printf("\n" \
-           "NOTE: serial ports enumerated greater or equal to COM10\n" \
-           "      should be stated as follows: \\\\.\\COM10\n");
+    fprintf(stderr, "\n" \
+                    "NOTE: serial ports enumerated greater or equal to COM10\n" \
+                    "      should be stated as follows: \\\\.\\COM10\n");
     #endif // PRJCONF_WINDOWS
 }
 
@@ -132,21 +148,21 @@ static bool parse_commandline_options (int          argc,
 
         switch (c) {
             case 'd':
-                printf("device %s\n", optarg);
+                fprintf(stderr, "device %s\n", optarg);
                 strcpy_s(options->serial_device, sizeof(options->serial_device), optarg);
                 options->serial_device_set = true;
                 break;
             case 'b':
-                printf("baudrate %s\n", optarg);
+                fprintf(stderr, "baudrate %s\n", optarg);
                 options->serial_baudrate = atoi(optarg);
                 break;
             case 'v':
-                printf("vbusd address %s\n", optarg);
+                fprintf(stderr, "vbusd address %s\n", optarg);
                 strcpy_s(options->vbusd_address, sizeof(options->vbusd_address), optarg);
                 options->vbusd_address_set = true;
                 break;
             case 'w':
-                printf("vbusd port %s\n", optarg);
+                fprintf(stderr, "vbusd port %s\n", optarg);
                 options->vbusd_port = atoi(optarg);
                 break;
             default:
@@ -191,7 +207,7 @@ int main(int argc, char* argv[])
     options_t options;
     bool running = true;
 
-    printf("kwbmonitor...\n");
+    fprintf(stderr, "kwbmonitor...\n");
     setbuf(stdout, NULL);       // disable buffering of stdout
 
     do {

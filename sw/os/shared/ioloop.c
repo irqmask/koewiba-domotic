@@ -7,6 +7,22 @@
  *
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
+/*
+ * Copyright (C) 2017  christian <irqmask@gmx.de>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 // --- Include section ---------------------------------------------------------
 
@@ -315,7 +331,8 @@ void ioloop_register_fd (ioloop_t*              ioloop,
 }
 
 void ioloop_unregister_fd (ioloop_t* ioloop,
-                           sys_fd_t fd)
+                           sys_fd_t fd,
+                           ioloop_event_type_t eventtype)
 {
     ioloop_connection_t* conn;
 
@@ -324,7 +341,8 @@ void ioloop_unregister_fd (ioloop_t* ioloop,
     conn = ioloop->first_conn;
 
     while (conn != NULL) {
-        if (conn->fd == fd) {
+        if (conn->fd == fd && 
+            (eventtype == eIOLOOP_EV_UNKNOWN || conn->eventtype == eventtype)) {
             ioloop_remove_conn(ioloop, conn);
             free(conn);
             break;
@@ -345,7 +363,6 @@ void ioloop_set_default_timeout (ioloop_t* ioloop,
 int32_t ioloop_register_timer (ioloop_t*            ioloop,
                                uint16_t             interval_ticks,
                                bool                 run_cyclic,
-                               ioloop_event_type_t  eventtype,
                                ioloop_event_func_t  callback,
                                void*                arg)
 {

@@ -7,7 +7,6 @@ include_directories (
     ../include
     ../libsystem
     ../shared
-    ../3rd_party/jansson/src
     ${CMAKE_CURRENT_BINARY_DIR}
 )
 
@@ -25,6 +24,15 @@ link_directories (
     ${CMAKE_CURRENT_BINARY_DIR}
 )
 
+# system dependent definitions
+# ---------------------------------------------------------
+if (WIN32)
+    # TODO implement missing secure functions for linux,
+    # change implementation to secure functions and remove
+    # this warning suppression.
+    add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+endif (WIN32)
+
 file (WRITE ${CMAKE_CURRENT_BINARY_DIR}/kwbrouter_version.h
      "const char* PGM_VERSION(\"${VERSION}\");\n")
 
@@ -37,36 +45,38 @@ set (include_SRCS
     ../../include/prjtypes.h
 )
 
-set (shared_SRCS
-    ../../shared/bus.h
-    ../../shared/clock.h
-    ../../shared/bus_transport.c
-    ../../shared/crc16.c
-    ../../shared/queue.c
-)
-
 set (os_include_SRCS
     ../include/error_codes.h
 )
 
 set (os_shared_SRCS
+    ../shared/ioloop.h
     ../shared/log.h
     ../shared/message.h
+    ../shared/message_serial.h
+    ../shared/message_socket.h
 
-    ../shared/bus_phy_os.c
-    ../shared/clock_os.c
     ../shared/ioloop.c
     ../shared/log.c
-    ../shared/message_bus.c
+    ../shared/message.c
+    ../shared/message_serial.c
     ../shared/message_socket.c
-    ../shared/vos.c
 )
 
 set (kwbrouter_SRCS
     router.h
+    routeconnection.h
+    rconnserial.h
+    rconnsocketclient.h
+    socketserver.h
 
-    kwbrouter_main.c
-    router.c
+    router.cpp
+    routeconnection.cpp
+    rconnserial.cpp
+    rconnsocketclient.cpp
+    socketserver.cpp
+
+    kwbrouter_main.cpp
 )
 
 # source groups
@@ -96,7 +106,7 @@ set_property(TARGET kwbrouter PROPERTY CXX_STANDARD 11)
 # Link libraries
 # ---------------------------------------------------------
 target_link_libraries (kwbrouter libsystem)
-#TODO needed target_link_libraries (kwbrouter jansson)
+
 if (WIN32)
 
 else (WIN32)

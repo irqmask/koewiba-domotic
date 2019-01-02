@@ -18,6 +18,14 @@ else (WIN32)
     )
 endif (WIN32)
 
+# system dependent definitions
+# ---------------------------------------------------------
+if (WIN32)
+    # TODO implement missing secure functions for linux,
+    # change implementation to secure functions and remove
+    # this warning suppression.
+    add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+endif (WIN32)
 
 # list of source files
 # ---------------------------------------------------------

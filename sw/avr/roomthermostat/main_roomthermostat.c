@@ -171,7 +171,16 @@ static void interpret_message (sBus_t* bus, uint8_t* msg, uint8_t msg_len, uint1
                 else                     draw_window_closed();
             }
         }
+
     } else if (msg[0] <= eCMD_SET_REG_32BIT) {
+        if (msg[0] == eCMD_SET_REG_16BIT && msg[1] == APP_eReg_CurrentDesiredTemperature) {
+            g_target_temp = msg[2];
+            g_target_temp <<= 8;
+            g_target_temp |= msg[3];
+            draw_temperatures();
+            if (g_target_temp %2) draw_window_opened();
+            else draw_window_closed();
+        }
         // register messages
         register_do_command(bus, sender, msg_len, msg);
     } else {
@@ -191,6 +200,16 @@ static void interpret_message (sBus_t* bus, uint8_t* msg, uint8_t msg_len, uint1
     }
 }
 
+static void send_temperature(uint16_t temperature)
+{
+    uint8_t msg[4];
+    msg[0] = eCMD_STATE_16BIT;
+    msg[1] = APP_eReg_CurrentTemperature;
+    msg[2] = temperature >> 8;
+    msg[3] = temperature & 0x00FF;
+    bus_send_message(&g_bus, 0x0000, 4, msg);
+}
+
 // --- Module global functions -------------------------------------------------
 
 // --- Global functions --------------------------------------------------------
@@ -200,6 +219,7 @@ int main (void)
     uint8_t msglen = 0;
     uint8_t msg[BUS_MAXRECVMSGLEN];
     uint16_t module_id = BUS_UNKNOWNADR, sender = 0, val;
+    uint16_t new_temp;
 
     DDRC |= ((1<<PC3) | (1<<PC4));
     PORTC &= ~((1<<PC3) | (1<<PC4));
@@ -250,7 +270,11 @@ int main (void)
             if (zagw_receive()) {
                 val = zagw_get_bits();
                 draw_hex16_value(val);
-                g_current_temp = zagw_get_temperature();
+                new_temp = zagw_get_temperature();
+                if (new_temp != g_current_temp) {
+                    send_temperature(new_temp);
+                }
+                g_current_temp = new_temp;
                 draw_temperatures();
             } else {
                 gdisp_put_text("PERR");

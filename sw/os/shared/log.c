@@ -7,6 +7,22 @@
  *
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
+/*
+ * Copyright (C) 2017  christian <irqmask@gmx.de>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 // --- Include section ---------------------------------------------------------
 
@@ -78,37 +94,32 @@ void log_add_mask (log_mask_t logmask)
  * Log a message if there are matches between the message logmask and the
  * global active logmask.
  */
-void log_msg (log_mask_t logmask, char* logmessage, ...)
+void log_msg (log_mask_t logmask, const char* logmessage, ...)
 {
     va_list args;
 
     if ((logmask & active_logs) != 0) {
         va_start(args, logmessage);
-        if (logmask & LOG_ERROR) {
-            vfprintf(stderr, logmessage, args);
-            fprintf(stderr, "\n");
-        } else {
-            vfprintf(stdout, logmessage, args);
-            fprintf(stdout, "\n");
-        }
+        vfprintf(stderr, logmessage, args);
+        fprintf(stderr, "\n");
         va_end(args);
     }
 }
 
-void log_warning(char* logmessage, ...)
+void log_warning(const char* logmessage, ...)
 {
     va_list args;
 
     if ((LOG_WARNING & active_logs) != 0) {
         va_start(args, logmessage);
-        fprintf(stdout, "WARNING   ");
-        vfprintf(stdout, logmessage, args);
-        fprintf(stdout, "\n");
+        fprintf(stderr, "WARNING   ");
+        vfprintf(stderr, logmessage, args);
+        fprintf(stderr, "\n");
         va_end(args);
     }
 }
 
-void log_error (char* logmessage, ...)
+void log_error (const char* logmessage, ...)
 {
     va_list args;
 
@@ -121,7 +132,7 @@ void log_error (char* logmessage, ...)
     }
 }
 
-void log_sys_error (char* logmessage, ...)
+void log_sys_error (const char* logmessage, ...)
 {
     va_list args;
 

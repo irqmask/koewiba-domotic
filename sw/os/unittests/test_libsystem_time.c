@@ -61,7 +61,7 @@ void test_libsystem_time_1 (void)
     end = sys_time_get_usecs();
 
     diff = end - start;
-    printf("diff is: %d\n", diff) ;
+    printf("diff is: %lld\n", diff) ;
 
     CU_ASSERT(diff > 99 * 1000);
     CU_ASSERT(diff < 110 * 1000);

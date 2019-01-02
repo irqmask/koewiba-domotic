@@ -87,7 +87,7 @@ static void interpret_message (uint16_t sender, uint8_t msglen, uint8_t* msg)
         break;
 
     case eCMD_SLEEP:
-        bus_sleep(&g_bus);
+        //bus_sleep(&g_bus);
         break;
 
     default:
@@ -109,7 +109,7 @@ int main(void)
     LED_ERROR_DDR |= (1<<LED_ERROR);
     clk_initialize();
 
-    register_set_u16(MOD_eReg_ModuleID, 0x7E);
+    //register_set_u16(MOD_eReg_ModuleID, 0x6D);
     register_get(MOD_eReg_ModuleID, 0, &module_id);
     bus_configure(&g_bus, module_id);
     bus_initialize(&g_bus, 0);// initialize bus on UART 0
@@ -129,6 +129,7 @@ int main(void)
     	LED_ERROR_ON;
         msg[1] = 0x00; // 1 = test succeeded, 0 = test failed
     } else {
+        LED_STATUS_ON;
         msg[1] = 0x01; // 1 = test succeeded, 0 = test failed
     }
     // report EEProm test status

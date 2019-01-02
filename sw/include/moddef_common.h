@@ -89,6 +89,12 @@ typedef enum {
 
 // --- Global variables --------------------------------------------------------
 
+extern const unsigned char app_version[];
+extern const unsigned char app_id[];
+extern const unsigned char app_board_rev[];
+extern const unsigned char app_board_id[];
+extern const unsigned char app_controller_id[];
+
 // --- Module global variables -------------------------------------------------
 
 // --- Local functions ---------------------------------------------------------

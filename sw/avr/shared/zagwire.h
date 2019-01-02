@@ -91,15 +91,15 @@ typedef enum zagw_status {
 
 // --- Global functions --------------------------------------------------------
 
-void            ZAGW_vInit          (void);
+void            zagw_init           (void);
 
-void            ZAGW_vStartReception(void);
+void            zagw_start_reception(void);
 
-uint8_t         ZAGW_uReceive       (void);
+uint8_t         zagw_receive        (void);
 
-uint16_t        ZAGW_uGetBits       (void);
+uint16_t        zagw_get_bits       (void);
 
-uint16_t        ZAGW_uGetTemperature(void);
+uint16_t        zagw_get_temperature(void);
 
 #endif // _ZAGWIRE_H_
 /** @} */

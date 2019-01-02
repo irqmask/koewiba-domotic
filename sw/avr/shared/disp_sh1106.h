@@ -105,9 +105,9 @@ void            sh1106_start_line   (uint8_t                start_line);
 
 void            sh1106_contrast     (uint8_t                contrast);
 
-void            sh1106_display_on   (BOOL                   on);
+void            sh1106_display_on   (uint8_t                on);
 
-void            sh1106_disp_reverse (BOOL                   reverse);
+void            sh1106_disp_reverse (uint8_t                reverse);
 
 void            sh1106_display_offset(uint8_t               offset);
 

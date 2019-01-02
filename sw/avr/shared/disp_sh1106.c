@@ -87,7 +87,7 @@ void sh1106_set_contrast (uint8_t contrast)
     write_command(contrast);
 }
 
-void sh1106_adc_select (BOOL reverse)
+void sh1106_adc_select (uint8_t reverse)
 {
     if (reverse) {
         write_command(0b10100001);
@@ -96,7 +96,7 @@ void sh1106_adc_select (BOOL reverse)
     }
 }
 
-void sh1106_display_on (BOOL on)
+void sh1106_display_on (uint8_t on)
 {
     if (on) {
         write_command(0b10101111);
@@ -105,7 +105,7 @@ void sh1106_display_on (BOOL on)
     }        
 }
 
-void sh1106_disp_reverse (BOOL reverse)
+void sh1106_disp_reverse (uint8_t reverse)
 {
     if (reverse) {
         write_command(0b10100111);
@@ -114,7 +114,7 @@ void sh1106_disp_reverse (BOOL reverse)
     }
 }
 
-void sh1106_com_scan_direction (BOOL dir)
+void sh1106_com_scan_direction (uint8_t dir)
 {
     if (dir) {
         write_command(0b11001000);
@@ -144,8 +144,8 @@ void sh1106_initialize (void)
     DISP_PORT_SS |= (1<<DISP_SS);
 
     _delay_us(10);
-    sh1106_display_on(FALSE);
-    sh1106_disp_reverse(FALSE);
+    sh1106_display_on(0);
+    sh1106_disp_reverse(0);
     write_command(0xD5);        // set display clock div
     write_command(0x80);
     write_command(0xA8);        // set multiplex
@@ -166,7 +166,7 @@ void sh1106_initialize (void)
     write_command(0xDB);        // set VCOM detect
     write_command(0x40);
     write_command(0xA4);        // set display all on resume
-    sh1106_display_on(TRUE);
+    sh1106_display_on(1);
 }
 
 void sh1106_write_data(uint8_t data)

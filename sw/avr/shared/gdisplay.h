@@ -15,6 +15,23 @@
  *
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
+/*
+ * Copyright (C) 2019  christian <irqmask@web.de>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #ifndef _GDISPLAY_H_
 #define _GDISPLAY_H_
 
@@ -59,6 +76,8 @@
  #define GDISP_RAM_PAGES    4
  #define GDISP_WIDTH        132
  #define GDISP_HEIGHT       32
+ #define  GDISP_TYPE_ST7565 1
+ #undef  GDISP_TYPE_SH1106
 #endif // GDISPLAY_APPCONFIG
 /** @} */
 
@@ -100,6 +119,8 @@ void            gdisp_put_char      (const char             single_char);
 void            gdisp_put_text      (const char*            text);
 
 void            gdisp_put_textp     (const char*            text);
+
+void            gdisp_set_startline (uint8_t                line);
 
 #endif // _GDISPLAY_H_
 /**

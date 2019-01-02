@@ -1,6 +1,6 @@
 /**
  * @addtogroup ZAGWIRE
- * @brief Zagwire protocoll decoder for TSIC temperature sensors.
+ * @brief Zagwire protocol decoder for TSIC temperature sensors.
  *
  * Contains functions to send and receive data over the SPI interface. Two
  * versions exist: A blocking version which halts the application until the data
@@ -17,10 +17,26 @@
  *
  * @{
  * @file    zagwire.h
- * @brief   Zagwire protocoll decoder for TSIC temperature sensors..
+ * @brief   Zagwire protocol decoder for TSIC temperature sensors.
  *
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
+/*
+ * Copyright (C) 2019  christian <irqmask@web.de>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 #ifndef _ZAGWIRE_H_
 #define _ZAGWIRE_H_
 
@@ -91,15 +107,15 @@ typedef enum zagw_status {
 
 // --- Global functions --------------------------------------------------------
 
-void            ZAGW_vInit          (void);
+void            zagw_initialize    (void);
 
-void            ZAGW_vStartReception(void);
+void            zagw_start_reception(void);
 
-uint8_t         ZAGW_uReceive       (void);
+uint8_t         zagw_receive        (void);
 
-uint16_t        ZAGW_uGetBits       (void);
+uint16_t        zagw_get_bits       (void);
 
-uint16_t        ZAGW_uGetTemperature(void);
+uint16_t        zagw_get_temperature(void);
 
 #endif // _ZAGWIRE_H_
 /** @} */

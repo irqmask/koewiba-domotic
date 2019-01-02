@@ -1,0 +1,9 @@
+"Id";"Bezeichner";"Gehäuse";"Stückzahl";"Bezeichnung";"Anbieter und Ref";
+1;"MOD1";"bus-module_atmega328";1;"bus-module_atmega328_revB";;;
+2;"S3,S2,S1";"TactileSwitch_SPST_SMD_JTP-1138_BacksideMount";3;"PushButton_SPST_NO";;;
+3;"LOGO1";"Symbol_OSHW-Logo_SilkScreen";1;"OPEN_HARDWARE_1";;;
+4;"H1,H4,H2,H3";"HOLE_3.5x7mm";4;"HOLE";;;
+5;"LOGO1,LOGO1";"Symbol_OSHW-Logo_Copper";2;"Open Hardware";;;
+6;"C1,C2";"C_0805";2;"100nF";;;
+7;"MOD2";"GraphDisplay_1_OLED_27x27,5mm_030072BA";1;"Graphic-OLED-Display_4wireSPI";;;
+8;"U1";"SO8E";1;"TSIC206_SOIC8";;;

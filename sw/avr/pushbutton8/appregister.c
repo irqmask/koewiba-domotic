@@ -64,7 +64,7 @@ bool        app_register_get        (uint8_t                reg_no,
                                      void*                  value)
 {
     eRegType_t  rt;
-    uint8_t index;
+//    uint8_t index;
 
     if (reg_type == NULL) reg_type = &rt;
     *reg_type = eRegType_U8;
@@ -72,7 +72,7 @@ bool        app_register_get        (uint8_t                reg_no,
 
     if (reg_no >= APP_eCfg_K0_Mode &&
         reg_no < (APP_eCfg_K0_Mode + APP_NUM_KEYS * NUM_REGS_PER_KEY)) {
-        index = (reg_no - APP_eCfg_K0_Mode) / NUM_REGS_PER_KEY;
+//        index = (reg_no - APP_eCfg_K0_Mode) / NUM_REGS_PER_KEY;
 
         //switch (reg_no)
     }

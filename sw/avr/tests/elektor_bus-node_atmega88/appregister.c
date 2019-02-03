@@ -20,6 +20,7 @@
 
 #include "appconfig.h"
 #include "application.h"
+#include "pcbconfig.h"
 #include "register.h"
 
 // --- Definitions -------------------------------------------------------------
@@ -77,10 +78,10 @@ bool        app_register_get        (uint8_t                uRegNo,
 void        app_register_set        (uint8_t                uRegNo,
                                      uint32_t               uValue)
 {
-    uint16_t    tempval16;
+//    uint16_t    tempval16;
     uint8_t     tempval;
 
-    tempval16 = (uint16_t)(uValue & 0x0000FFFF);
+//    tempval16 = (uint16_t)(uValue & 0x0000FFFF);
     tempval = (uint8_t)(uValue & 0x000000FF);
 
     switch(uRegNo) {

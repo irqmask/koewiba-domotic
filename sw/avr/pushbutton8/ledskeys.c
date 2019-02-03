@@ -19,6 +19,7 @@
 #include "appconfig.h"
 #include "pcbconfig.h"
 
+#include "sn74595.h"
 #include "spi.h"
 #include "timer.h"
 
@@ -46,28 +47,6 @@ static uint8_t key_state;
 // --- Module global variables -------------------------------------------------
 
 // --- Local functions ---------------------------------------------------------
-
-static void sn74595_latch(void)
-{
-    LED_STB_PORT |= (1<<LED_STB_PIN);
-    LED_STB_PORT &= ~(1<<LED_STB_PIN);
-}
-
-static void sn74595_OE_on(void)
-{
-    LED_OE_PORT &= ~(1<<LED_OE_PIN);
-}
-
-static void sn74595_OE_off(void)
-{
-    LED_OE_PORT |= (1<<LED_OE_PIN);
-}
-
-static void sn74595_send(uint8_t data)
-{
-    spi_transmit_blk(data);
-    sn74595_latch();
-}
 
 static uint8_t ledindex_to_dataindex(uint8_t led_index)
 {
@@ -142,12 +121,7 @@ void leds_keys_init (void)
     // set in/out port data direction and initial values.
 
     // initialize LEDs and switch all off
-    LED_OE_DDR |= (1<<LED_OE_PIN);
-    LED_STB_DDR |= (1<<LED_STB_PIN);
-    sn74595_OE_off();
-    LED_STB_PORT &= ~(1<<LED_STB_PIN);
-    spi_transmit_blk(0);
-    sn74595_latch();
+    sn74595_initialize();
     sn74595_OE_on();
 
     // set inputs for keys and enable pull-ups

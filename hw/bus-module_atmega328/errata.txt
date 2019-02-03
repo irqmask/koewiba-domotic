@@ -1,7 +1,12 @@
-Revision 1:
------------
+Revision A:
+-------------------
 - The revision is not printed on a copper layer. At least one but better the top and bottom shall have revision number, which is still readable when all connectors are in place.
 - Footprint for TVS-Diode (D2) is too big.
 - Fuse in 24V branch is missing.
-- 24V on J1 or J2 missing
+
+Revision B:
+-------------------
+- R2...4 shall be 100Ohms instead of 1k
+- WAGO243 pin-holes are too tight
+- Use 100µF multilayer ceramic capacitor instead of electrolytic capacitor
 

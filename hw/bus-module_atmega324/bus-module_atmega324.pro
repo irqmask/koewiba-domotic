@@ -1,4 +1,4 @@
-update=So 06 Dez 2015 17:52:06 CET
+update=So 23 Sep 2018 22:18:37 CEST
 version=1
 last_client=kicad
 [pcbnew]
@@ -37,14 +37,4 @@ SpiceUseNetNumbers=0
 LabSize=60
 [eeschema]
 version=1
-LibDir=../../../electronic/00library/kicad/01symbols
-[eeschema/libraries]
-LibName1=connectors
-LibName2=ics_controller_atmel
-LibName3=ics_misc
-LibName4=ics_peripheral
-LibName5=ics_regulator
-LibName6=logo
-LibName7=power
-LibName8=standard
-LibName9=diodes
+LibDir=

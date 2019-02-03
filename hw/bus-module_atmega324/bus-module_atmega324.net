@@ -1,8 +1,8 @@
 (export (version D)
   (design
-    (source /media/nas/Werkstatt/Projekte/koewiba-domotic/hw/bus-module_atmega324/bus-module_atmega324.sch)
-    (date "Mo 24 Sep 2018 17:30:22 CEST")
-    (tool "Eeschema 5.0.0-fee4fd1~66~ubuntu16.04.1")
+    (source /home/christian/Projekte/koewiba-domotic/hw/bus-module_atmega324/bus-module_atmega324.sch)
+    (date "So 03 Feb 2019 21:05:49 CET")
+    (tool "Eeschema 5.0.2-bee76a0~70~ubuntu18.04.1")
     (sheet (number 1) (name /) (tstamps /)
       (title_block
         (title bus-module_atmega324)
@@ -288,16 +288,15 @@
         (alias SEMTECH_SR05))
       (description "TVS Diode Array, Semtech, SR")
       (footprints
-        (fp AM1S-XXXX_SIL4))
+        (fp SOT143R_Diode_Reverse))
       (fields
-        (field (name Reference) U)
-        (field (name Value) AM1S-2405)
-        (field (name Footprint) AM1S-XXXX_SIL4))
+        (field (name Reference) D)
+        (field (name Value) TVS-Array))
       (pins
-        (pin (num 1) (name VIN-) (type passive))
-        (pin (num 2) (name VIN+) (type power_in))
-        (pin (num 3) (name VOUT-) (type passive))
-        (pin (num 4) (name VOUT+) (type power_out))))
+        (pin (num 1) (name 1) (type input))
+        (pin (num 2) (name 2) (type input))
+        (pin (num 3) (name 3) (type input))
+        (pin (num 4) (name 4) (type input))))
     (libpart (lib ics_controller_atmel) (part ATMEGA164-TQFP44)
       (aliases
         (alias ATMEGA324-TQFP44))

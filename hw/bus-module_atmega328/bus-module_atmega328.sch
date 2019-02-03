@@ -1219,7 +1219,7 @@ A
 Text Label 9200 2900 0    40   ~ 0
 B
 $Comp
-L bus-module_atmega328-rescue:FUSE F1
+L bus-module_atmega328-rescue:FUSE-bus-module_atmega328-rescue F1
 U 1 1 56648405
 P 8950 1200
 F 0 "F1" H 8950 1300 50  0000 C CNN

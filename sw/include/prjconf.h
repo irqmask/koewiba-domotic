@@ -35,19 +35,19 @@
 
 #if defined (_WIN32) || defined (WIN32) // note the underscore: without it, it's not msdn official!
     // Windows (x64 and x86)
-    #define PRJCONF_WINDOWS
+    #define PRJCONF_WINDOWS 1
 #elif __unix__ // all unixes
     // Unix
-    #define PRJCONF_UNIX
+    #define PRJCONF_UNIX    1
 #elif __posix__
     // POSIX
-    #define PRJCONF_POSIX
+    #define PRJCONF_POSIX   1
 #elif __linux__
     // linux
-    #define PRJCONF_LINUX
+    #define PRJCONF_LINUX   1
 #elif __APPLE__
     // Mac OS, not sure if this is covered by __posix__ and/or __unix__ though...
-    #define PRJCONF_APPLE
+    #define PRJCONF_APPLE   1
 #elif defined (__AVR_ATmega8__)    || \
       defined (__AVR_ATmega88__)   || \
       defined (__AVR_ATmega88A__)  || \
@@ -57,7 +57,7 @@
       defined (__AVR_ATmega324P__) || \
       defined (__AVR_ATmega324A__) || \
       defined (__AVR_ATtiny1634__)
-    #define PRJCONF_UC_AVR
+    #define PRJCONF_UC_AVR  1
 #else
     #define PRJCONF_OTHER
 #endif

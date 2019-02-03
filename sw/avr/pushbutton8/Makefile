@@ -18,6 +18,7 @@ SRC = ../shared/bus_transport.c \
       shared/main_avr.c \
       shared/register.c \
       shared/sleepmode.c \
+      shared/sn74595.c \
       shared/timer.c \
       pushbutton8/application.c \
       pushbutton8/appregister.c \

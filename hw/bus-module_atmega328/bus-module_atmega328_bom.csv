@@ -1,5 +1,5 @@
 "Id";"Designator";"Package";"Quantity";"Designation";"Supplier and ref";
-1;"R2,R4,R3";"SM0805";3;"100";;;
+1;"R2,R4,R3";"SM0805";3;"1k";;;
 2;"J2";"HEADER_7x2";1;"CONN_7X2";;;
 3;"J1";"HEADER_10x2";1;"CONN_10X2";;;
 4;"J3";"HEADER_3x2";1;"CONN-ISP-6";;;

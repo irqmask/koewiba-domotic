@@ -1,4 +1,4 @@
-update=So 06 Dez 2015 18:15:04 CET
+update=Sa 22 Sep 2018 20:43:03 CEST
 version=1
 last_client=kicad
 [pcbnew]
@@ -25,16 +25,16 @@ version=1
 NetIExt=net
 [general]
 version=1
+[schematic_editor]
+version=1
+PageLayoutDescrFile=
+PlotDirectoryName=
+SubpartIdSeparator=0
+SubpartFirstId=65
+NetFmtName=
+SpiceForceRefPrefix=0
+SpiceUseNetNumbers=0
+LabSize=60
 [eeschema]
 version=1
-LibDir=../../../electronic/00library/kicad/01symbols
-[eeschema/libraries]
-LibName1=connectors
-LibName2=diodes
-LibName3=ics_controller_atmel
-LibName4=ics_misc
-LibName5=ics_peripheral
-LibName6=ics_regulator
-LibName7=logo
-LibName8=power
-LibName9=standard
+LibDir=

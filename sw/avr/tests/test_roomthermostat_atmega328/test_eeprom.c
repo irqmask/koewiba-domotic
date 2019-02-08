@@ -103,10 +103,13 @@ uint8_t test_eeprom_run(void)
             if (g_wanted_crc16 == g_read_crc16) {
                 g_test_is_ok = 1;
             }
-            rc = 0;
         }
         break;
         
+    case eTEST_EEP_FINISHED:
+        rc = 0;
+        break;
+
     default:
         break;
     }

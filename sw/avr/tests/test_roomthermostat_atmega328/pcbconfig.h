@@ -72,11 +72,22 @@
 #define LED_STATUS_PORT     PORTD
 #define LED_ERROR_PORT      PORTD
 
+#define DISP_SH1106_PCBCONFIG  1
+#define DISP_DDR_RES        DDRD
+#define DISP_DDR_SS         DDRD
+#define DISP_DDR_A0         DDRD
+#define DISP_PORT_RES       PORTD
+#define DISP_PORT_SS        PORTD
+#define DISP_PORT_A0        PORTD
+#define DISP_RES            PD3
+#define DISP_SS             PD4
+#define DISP_A0             PD5
+
 #define ZAGWIRE_PCBCONFIG   1
-#define ZAGW_DDR_DATA       DDRD
-#define ZAGW_PORT_DATA      PORTD
-#define ZAGW_PIN_DATA       PIND
-#define ZAGW_DATA           PD5
+#define ZAGW_DDR_DATA       DDRB
+#define ZAGW_PORT_DATA      PORTB
+#define ZAGW_PIN_DATA       PINB
+#define ZAGW_DATA           PB0
 
 // --- Type definitions --------------------------------------------------------
 

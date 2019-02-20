@@ -45,10 +45,10 @@
 //! @see BOARD_IDs, APP_IDs, APP_VERSIONING
 const unsigned char app_versioninfo[MOD_LEN_CONTROLLERID + MOD_LEN_BOARDID + MOD_LEN_BOARDREV + MOD_LEN_APPID + MOD_LEN_APPVER] __attribute__((section(".versioninfo")))
                         = {SIGNATURE_0,SIGNATURE_1,SIGNATURE_2,0x00,
-                           0x00,0x02,   // board ID            (high byte, low byte)
-                           1,           // board revision
-                           0x00,0x04,   // application ID      (high byte, low byte)
-                           0,1,1};      // application version (major, minor, bugfix)
+                           0x00,0x06,   // board ID            (high byte, low byte)
+                           2,           // board revision
+                           0x00,0x07,   // application ID      (high byte, low byte)
+                           0,2,0};      // application version (major, minor, bugfix)
 
 // --- Module global variables -------------------------------------------------
 

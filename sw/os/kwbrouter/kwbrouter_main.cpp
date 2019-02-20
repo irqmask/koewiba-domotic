@@ -234,7 +234,8 @@ int main (int argc, char* argv[])
         Router* router = new Router();
 
         RConnSerial* serconn = new RConnSerial(&mainloop);
-        serconn->Open("/dev/ttyUSB0", 57600);
+        serconn->Open(options.serial_device, options.serial_baudrate);
+
         router->AddConnection(serconn);
 
         // open new server and let-every connection auto-connect to router

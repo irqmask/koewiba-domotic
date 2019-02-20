@@ -80,8 +80,15 @@ uint8_t test_eeprom_run(void)
     uint8_t rc = 1;
     
     switch (g_state) {
+    case eTEST_EEP_IDLE:
+        rc = 255;
+        break;
+
     case eTEST_EEP_WRITE:
-        eep_write(g_curr_byte, 1, &g_databyte);
+        if (eep_write(g_curr_byte, 1, &g_databyte) != 1) {
+            g_state = eTEST_EEP_FINISHED;
+            break;
+        }
         g_wanted_crc16 = crc_16_next_byte(g_wanted_crc16, g_databyte);
         g_databyte++;
         g_databyte ^= 0xFF;
@@ -95,7 +102,10 @@ uint8_t test_eeprom_run(void)
         break;
         
     case eTEST_EEP_READ:
-        eep_read(g_curr_byte, 1, &g_databyte);
+        if (eep_read(g_curr_byte, 1, &g_databyte) != 1) {
+            g_state = eTEST_EEP_FINISHED;
+            break;
+        }
         g_read_crc16 = crc_16_next_byte(g_read_crc16, g_databyte);
         g_curr_byte++;
         if (g_curr_byte >= EEPROM_SIZE) {
@@ -108,6 +118,7 @@ uint8_t test_eeprom_run(void)
         
     case eTEST_EEP_FINISHED:
         rc = 0;
+        g_state = eTEST_EEP_IDLE;
         break;
 
     default:

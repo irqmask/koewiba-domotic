@@ -107,7 +107,7 @@ uint16_t eep_read (uint16_t eep_address, uint16_t count, uint8_t* buffer)
 
     if (eep_address + count > EEPROM_SIZE) return 0;
 
-    uint16_t timeout = 0xFFFF;
+    uint8_t timeout = 0xFF;
     while (eep_check_statusregister(eEEP_WIP) != 0 && (timeout-- > 0));
     if (timeout == 0) return 0;
 
@@ -143,7 +143,7 @@ uint16_t eep_write (uint16_t eep_address, uint16_t count, const uint8_t* buffer)
         uint8_t addressH = (0xFF00 & eep_address) >> 8;
         uint8_t addressL = (0x00FF & eep_address);
 
-        uint16_t timeout = 0xFFFF;
+        uint8_t timeout = 0xFF;
         while (eep_check_statusregister(eEEP_WIP) != 0 && (timeout-- > 0));
         if (timeout == 0) continue;
 

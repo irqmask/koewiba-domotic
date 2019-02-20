@@ -2,17 +2,7 @@
  * @addtogroup ZAGWIRE
  * @brief Zagwire protocol decoder for TSIC temperature sensors.
  *
- * Contains functions to send and receive data over the SPI interface. Two
- * versions exist: A blocking version which halts the application until the data
- * is transmitted and a non-blocking version, which does the transmission in
- * background. In this case optional start and end-callbacks are called at the
- * beginning and at the end of the transmission.
- *
- * Only use the non-blocking option if the CPU frequency is at least times 10
- * faster than the SPI frequency. Otherwise the control overhead takes more CPU
- * time than the transmission itself.
- *
- * Supports pcbconfig.h for individual PCB settings of the SPI pinout.
+ * Supports pcbconfig.h for individual PCB settings of the Zagwire interface.
  * Supports appconfig.h for individual settings depending on the application.
  *
  * @{

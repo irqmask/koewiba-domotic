@@ -1,0 +1,7 @@
+Revision A:
+-------------------
+<n/a>
+
+Revision B:
+-------------------
+- WAGO243 pin-holes are too tight

@@ -1,66 +1,36 @@
-"Id";"Designator";"Package";"Quantity";"Designation";"Supplier and ref";
-1;"U1,U2";"SO16N";2;"74HC595";;;
-2;"U3";"SO8N";1;"25LC256";;;
-3;"U6";"SO8N";1;"MAX487ECSA";;;
-4;"J13";"WAGO243";1;"WAGO 243-723";;;
-5;"J14";"WAGO243";1;"WAGO 243-724";;;
-6;"J15";"WAGO243";1;"WAGO 243-721";;;
-7;"J16";"WAGO243";1;"WAGO 243-722";;;
-8;"U7";"AM1S-XXXX_SIL4";1;"AM1S-2405";;;
-9;"J12";"HEADER_6";1;"CONN-ISP-6";;;
-10;"D23,D25,D27,D29,D31";"LED_RM2.54mm_D3mm";5;"yellow, 2,1V/2mA";;;
-11;"D24,D26,D28,D30,D32";"LED_RM2.54mm_D3mm";5;"green, 2,2V/2mA";;;
-12;"REL5,REL1,REL2,REL3,REL4,REL6,REL7,REL8,REL9,REL10";"finder_34.51_1xUM";10;"FINDER_34.51.7.024";;;
-13;"J2,J3,J4,J5,J6";"WAGO2081-1122";5;"WAGO 2081-1122";;;
-14;"R20,R7,R8,R9,R10,R11,R12,R17,R18,R19,R32,R33,R34";"R_0805";13;"100";;;
-15;"R15,R1,R2,R3,R4,R5,R6,R13,R14,R16,R31,R35,R36";"R_0805";13;"10k";;;
-16;"Q7,Q1,Q2,Q3,Q4,Q5,Q6,Q8,Q9,Q10";"SOT23-3";10;"BSS138";;;
-17;"D11,D12,D13,D14,D15,D16,D17,D18,D19,D20";"SOT23-3";10;"BAT54S";;;
-18;"D22";"D_SOT143";1;"SEMTECH SR05";;;
-19;"F2";"R_1812";1;"FUSE";;;
-20;"J1";"WAGO2081-1122";1;"CONN_2X1";;;
-21;"J7,J8,J9,J10,J11";"WAGO233-4";5;"WAGO 233-504";;;
-22;"LOGO1,LOGO2";"Symbol_OSHW-Logo_Copper";2;"OPEN_HARDWARE_1";;;
-23;"LOGO4";"Symbol_OSHW-Logo_SilkScreen";1;"Open Hardware";;;
-24;"C1,C2,C3,C4,C9";"C_0805";5;"100nF";;;
-25;"C5,C6";"C_0805";2;"18pF";;;
-26;"C7";"C_0805";1;"4,7nF";;;
-27;"C8";"C_1206";1;"100µF / 6V";;;
-28;"D1,D2,D3,D4,D5,D6,D7,D8,D9,D10";"D_SOD323";10;"1N4148";;;
-29;"D21";"D_MINIMELF";1;"ZD";;;
-30;"R21,R22,R23,R24,R25,R26,R27,R28,R29,R30";"R_0805";10;"4k7";;;
-31;"U5";"CRY_HC49_SMD";1;"7,3728MHz";;;
-32;"J17,J18";"CONN1_6.35";2;"CONN_1";;;
-33;"R37,R38,R39,R40,R41,R42,R43,R44,R45,R46";"R_0805";10;"1k5";;;
-34;"J19";"Testpoint_1mm";1;"tp_output_motor_0_up";;;
-35;"J20";"Testpoint_1mm";1;"tp_output_motor_on";;;
-36;"J21";"Testpoint_1mm";1;"tp_output_motor_1_up";;;
-37;"J22";"Testpoint_1mm";1;"tp_output_motor_1_on";;;
-38;"J23";"Testpoint_1mm";1;"tp_output_motor_2_up";;;
-39;"J24";"Testpoint_1mm";1;"tp_output_motor_2_on";;;
-40;"J25";"Testpoint_1mm";1;"tp_output_motor_3_up";;;
-41;"J26";"Testpoint_1mm";1;"tp_output_motor_3_on";;;
-42;"J27";"Testpoint_1mm";1;"tp_output_motor_4_up";;;
-43;"J28";"Testpoint_1mm";1;"tp_output_motor_4_on";;;
-44;"J29";"Testpoint_1mm";1;"tp_cseep";;;
-45;"J30";"Testpoint_1mm";1;"tp_vcc";;;
-46;"J31";"Testpoint_1mm";1;"tp_gnd";;;
-47;"J32";"Testpoint_1mm";1;"tp_output_button_0_up";;;
-48;"J33";"Testpoint_1mm";1;"tp_output_button_0_down";;;
-49;"J34";"Testpoint_1mm";1;"tp_output_button_1_up";;;
-50;"J35";"Testpoint_1mm";1;"tp_output_button_1_down";;;
-51;"J36";"Testpoint_1mm";1;"tp_output_button_2_up";;;
-52;"J37";"Testpoint_1mm";1;"tp_output_button_2_down";;;
-53;"J38";"Testpoint_1mm";1;"tp_output_button_3_up";;;
-54;"J39";"Testpoint_1mm";1;"tp_output_button_3_down";;;
-55;"J40";"Testpoint_1mm";1;"tp_output_button_4_up";;;
-56;"J41";"Testpoint_1mm";1;"tp_output_button_4_down";;;
-57;"J42";"Testpoint_1mm";1;"tp_output_latch";;;
-58;"J43";"Testpoint_1mm";1;"tp_output_data";;;
-59;"J44";"Testpoint_1mm";1;"tp_output_clock";;;
-60;"J45";"Testpoint_1mm";1;"tp_output_reset";;;
-61;"J46";"Testpoint_1mm";1;"tp_miso";;;
-62;"J47";"Testpoint_1mm";1;"tp_txden";;;
-63;"J48";"Testpoint_1mm";1;"tp_txd";;;
-64;"J49";"Testpoint_1mm";1;"tp_rxd";;;
-65;"U4";"TQFP-32_7x7mm_Pitch0.8mm";1;"ATMEGA328-TQFP32";;;
+Id,Designator,Package,Quantity,Designation
+24,"C1,C2,C3,C4,C9",C_0805,5,100nF
+25,"C5,C6",C_0805,2,18pF
+26,C7,C_0805,1,"4,7nF"
+27,C8,C_1206,1,100µF / 6V
+28,"D1,D2,D3,D4,D5,D6,D7,D8,D9,D10",D_SOD323,10,1N4148
+17,"D11,D12,D13,D14,D15,D16,D17,D18,D19,D20",SOT23-3,10,BAT54S
+29,D21,D_MINIMELF,1,ZD
+18,D22,D_SOT143,1,SEMTECH SR05
+10,"D23,D25,D27,D29,D31",LED_RM2.54mm_D3mm,5,"yellow, 2,1V/2mA"
+11,"D24,D26,D28,D30,D32",LED_RM2.54mm_D3mm,5,"green, 2,2V/2mA"
+19,F2,R_1812,1,FUSE
+20,J1,WAGO2081-1122,1,CONN_2X1
+9,J12,HEADER_6,1,CONN-ISP-6
+4,J13,WAGO243,1,WAGO 243-723
+5,J14,WAGO243,1,WAGO 243-724
+6,J15,WAGO243,1,WAGO 243-721
+7,J16,WAGO243,1,WAGO 243-722
+32,"J17,J18",CONN1_6.35,2,CONN_1
+34,J19,Testpoint_1mm,1,tp_output_motor_0_up
+13,"J2,J3,J4,J5,J6",WAGO2081-1122,5,WAGO 2081-1122
+21,"J7,J8,J9,J10,J11",WAGO233-4,5,WAGO 233-504
+22,"LOGO1,LOGO2",Symbol_OSHW-Logo_Copper,2,OPEN_HARDWARE_1
+23,LOGO4,Symbol_OSHW-Logo_SilkScreen,1,Open Hardware
+16,"Q7,Q1,Q2,Q3,Q4,Q5,Q6,Q8,Q9,Q10",SOT23-3,10,BSS138
+15,"R15,R1,R2,R3,R4,R5,R6,R13,R14,R16,R31,R35,R36",R_0805,13,10k
+14,"R20,R7,R8,R9,R10,R11,R12,R17,R18,R19,R32,R33,R34",R_0805,13,100
+30,"R21,R22,R23,R24,R25,R26,R27,R28,R29,R30",R_0805,10,4k7
+33,"R37,R38,R39,R40,R41,R42,R43,R44,R45,R46",R_0805,10,1k5
+12,"REL5,REL1,REL2,REL3,REL4,REL6,REL7,REL8,REL9,REL10",finder_34.51_1xUM,10,FINDER_34.51.7.024
+1,"U1,U2",SO16N,2,74HC595
+2,U3,SO8N,1,25LC256
+65,U4,TQFP-32_7x7mm_Pitch0.8mm,1,ATMEGA328-TQFP32
+31,U5,CRY_HC49_SMD,1,"7,3728MHz"
+3,U6,SO8N,1,MAX487ECSA
+8,U7,AM1S-XXXX_SIL4,1,AM1S-2405

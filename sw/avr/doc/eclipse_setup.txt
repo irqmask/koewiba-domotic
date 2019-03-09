@@ -1,0 +1,9 @@
+Setup linked-folders in Eclipse:
+Menu -> Window -> Preferences -> General -> Workspace -> Linked Resources
+
+KWB_INCLUDE -> /sw/include
+KWB_SHARED -> /sw/shared
+KWB_AVR_INCLUDE -> sw/avr/include
+KWB_AVR_SHARED -> sw/avr/shared
+KWB_AVR_BOOTLOADER -> sw/avr/bootloader
+KWB_AVR_BLINDCTRL -> sw/avr/blind-control

@@ -222,6 +222,10 @@ static bool process_receiving(msg_serial_t* msg_serial, char new_char)
             reset_incomming_on_error(msg_serial);
         } else {
             // message received
+            if (msg_serial->incomming_num_received) msg_serial->incomming_num_received--;
+            msg_serial->incomming_buffer[msg_serial->incomming_num_received] = '\0';
+            log_msg(LOG_VERBOSE2, "SERIAL R %s", msg_serial->incomming_buffer);
+
             msg_serial->incomming_num_received = 0;
             msg_serial->incomming_state = eSER_RECV_STATE_IDLE;
             return true;
@@ -332,7 +336,7 @@ int msg_ser_open (msg_serial_t*   msg_serial,
 
         msg_serial->fd = sys_serial_open(device);
         if (msg_serial->fd == INVALID_FD) {
-            log_sys_error("msg_serial: error opening serial connection");
+            log_sys_error("msg_serial: error opening serial connection to device %s", device);
             rc = eERR_SYSTEM;
             break;
         }
@@ -396,7 +400,7 @@ int msg_ser_send (msg_serial_t* msg_serial, msg_t* message)
             log_error("msg_serial: error encoding serial message!");
             rc = eMSG_ERR_SIZE;
         } else {
-            log_msg(LOG_VERBOSE2, "SERIAL %s", msg_serial->ser_data);
+            log_msg(LOG_VERBOSE2, "SERIAL S %s", msg_serial->ser_data);
             msg_serial->ser_data_written = sys_serial_send(msg_serial->fd,
                                                            (void*)msg_serial->ser_data,
                                                            msg_serial->ser_data_length);

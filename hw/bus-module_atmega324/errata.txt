@@ -10,4 +10,4 @@ Revision B:
 - R2...4 shall be 100Ohms instead of 1k
 - WAGO243 pin-holes are too tight
 - Use 100µF multilayer ceramic capacitor instead of electrolytic capacitor
-
+- need pull-down resistor ~10k for TXEN signal if it is not constantly driven by outer circuit

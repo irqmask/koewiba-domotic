@@ -44,13 +44,14 @@
 #include "cmddef_common.h"
 #include "moddef_common.h"
 
+#include "alarmclock.h"
 #include "bus.h"
-#include "clock.h"
 #include "gdisplay.h"
 #include "eeprom_spi.h"
 #include "led_debug.h"
 #include "register.h"
 #include "spi.h"
+#include "timer.h"
 #include "zagwire.h"
 
 // --- Definitions -------------------------------------------------------------
@@ -60,7 +61,7 @@
 // --- Local variables ---------------------------------------------------------
 
 static sBus_t           g_bus;
-static clock_timer_t    g_LED_timer;
+static timer_data_t     g_LED_timer;
 
 // --- Global variables --------------------------------------------------------
 
@@ -168,7 +169,7 @@ int main(void)
 
     LED_STATUS_DDR |= (1<<LED_STATUS);
     LED_ERROR_DDR |= (1<<LED_ERROR);
-    clk_initialize();
+    timer_initialize();
 
     // initialize keys
     PINC &= ~(1<<PC2 | 1<<PC1 | 1<<PC0);
@@ -187,7 +188,7 @@ int main(void)
     sei();
 
     gdisp_set_startline(0);
-    clk_timer_start(&g_LED_timer, CLOCK_MS_2_TICKS(1000));
+    timer_start(&g_LED_timer, TIMER_MS_2_TICKS(1000));
     LED_ERROR_OFF; LED_STATUS_OFF;
 
     gdisp_goto_col_line(0, 0);
@@ -242,8 +243,8 @@ int main(void)
         }
 
         // toggle status LED once a second
-        if (clk_timer_is_elapsed(&g_LED_timer)) {
-            clk_timer_start(&g_LED_timer, CLOCK_MS_2_TICKS(1000));
+        if (timer_is_elapsed(&g_LED_timer)) {
+            timer_start(&g_LED_timer, TIMER_MS_2_TICKS(1000));
             LED_STATUS_TOGGLE;
             if (eep_test_running == 1) {
                 uint8_t val = test_eeprom_get_progress();

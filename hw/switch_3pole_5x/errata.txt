@@ -1,0 +1,8 @@
+Revision B
+ - Input connectors too close together
+ - Footprints of motor connectors shall be rotatd 180°. Release buttons shall not be covered by cable when installed.
+ - LED holes are too tight.
+ 
+Revision A
+ - wrong ATMEGA328 footprint!
+ - WAGO243 hole too tight

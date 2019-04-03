@@ -165,7 +165,7 @@ int main(void)
 {
     uint8_t msglen = 0, pinc, oldpinc;
     uint8_t msg[BUS_MAXRECVMSGLEN];
-    uint16_t sender = 0, module_id = 0x20;//, temperature = 0;
+    uint16_t sender = 0, module_id = 0x20, raw_temp = 0, temperature = 0;
 
     LED_STATUS_DDR |= (1<<LED_STATUS);
     LED_ERROR_DDR |= (1<<LED_ERROR);
@@ -211,7 +211,6 @@ int main(void)
     // start temperature measurement
     gdisp_goto_col_line(0, 4);
     gdisp_put_text("Temperature:       °C");
-    zagw_start_reception();
 
     // start main-loop and process incoming and outgoing messages
     // ------------------------------------------------------
@@ -267,12 +266,11 @@ int main(void)
         oldpinc = pinc;
 
         // read and display temperature
-        ///@ zagwire gets currently disturbed by interrupts
-        /*if (zagw_receive() == 1) {
+        if (zagw_get_raw(&raw_temp) == true) {
             gdisp_goto_col_line(76, 4);
-            temperature = zagw_get_temperature();
+            temperature = zagw_get_temperature(raw_temp);
             draw_temp(temperature);
-        }*/
+        }
     }
 
     return 0;

@@ -80,11 +80,6 @@
 
 // --- Type definitions --------------------------------------------------------
 
-//! Zagwire status bits.
-typedef enum zagw_status {
-    ZAGW_eNewValue = 0,
-} ZAGW_eStatus;
-
 // --- Local variables ---------------------------------------------------------
 
 // --- Global variables --------------------------------------------------------
@@ -99,13 +94,9 @@ typedef enum zagw_status {
 
 void            zagw_initialize    (void);
 
-void            zagw_start_reception(void);
+bool            zagw_get_raw       (uint16_t* val);
 
-uint8_t         zagw_receive        (void);
-
-uint16_t        zagw_get_bits       (void);
-
-uint16_t        zagw_get_temperature(void);
+uint16_t        zagw_get_temperature(uint16_t raw);
 
 #endif // _ZAGWIRE_H_
 /** @} */

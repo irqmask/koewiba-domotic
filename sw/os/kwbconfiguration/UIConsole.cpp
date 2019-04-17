@@ -28,6 +28,7 @@
 
 #include "prjconf.h"
 
+#include <ctime>
 #include <iostream>
 #include <string>
 
@@ -193,6 +194,8 @@ void UIMain::display()
     std::cout << " (5) write register" << std::endl;
     //std::cout << " (6) backup all registers" << std::endl;
     //std::cout << " (7) restore all registers" << std::endl;
+    std::cout << " (t) set time (according to system time)" << std::endl;
+    std::cout << " (z) read time" << std::endl;
     std::cout << " (x) leave application" << std::endl;
 }
 
@@ -208,7 +211,12 @@ void UIMain::onMenuChoice()
     case '5':
         writeRegister();
         break;
-        
+    case 't':
+        setTime();
+        break;
+    case 'z':
+        getTime();
+        break;
     default:
         UIConsole::onMenuChoice();
         break;
@@ -273,6 +281,74 @@ void UIMain::writeRegister()
     } else {   
         std::cout << "verification failed: written " << value << " read " << read_back_value << "!" << std::endl; 
     }
+}
+
+void UIMain::setTime()
+{
+    uint16_t selected_module_id = app.getSelectedModule();
+    int year = 0, month = 0, day = 0, dow = 0, hour = 0, minute = 0, second = 0;
+    bool success = false;
+
+    do {
+        if (selected_module_id == 0) {
+            selectModule();
+            selected_module_id = app.getSelectedModule();
+            if (selected_module_id == 0) {
+                std::cout << "no module selected!" << std::endl;
+                break;
+            }
+        }
+
+        std::time_t t = std::time(0);
+        std:tm* now = std::localtime(&t);
+        year = now->tm_year + 1900;
+        month = now->tm_mon + 1;
+        day = now->tm_mday;
+        dow = now->tm_wday;
+        hour = now->tm_hour;
+        minute = now->tm_min;
+        second = now->tm_sec;
+
+        if (!app.writeRegister(223, year)) break;
+        if (!app.writeRegister(224, month)) break;
+        if (!app.writeRegister(225, day)) break;
+        if (!app.writeRegister(226, dow)) break;
+        if (!app.writeRegister(227, hour)) break;
+        if (!app.writeRegister(228, minute)) break;
+        if (!app.writeRegister(229, second)) break;
+
+        fprintf(stdout, "Set time of module ID: 0x%04X %04d-%02d-%02d dow %d %02d:%02d:%02d\n", selected_module_id, year, month, day, dow, hour, minute, second);
+        success = true;
+    } while (false);
+    if (!success) fprintf(stdout, "Get time of module ID: 0x%04X FAILED\n", selected_module_id);
+}
+
+void UIMain::getTime()
+{
+    uint16_t selected_module_id = app.getSelectedModule();
+    int year = 0, month = 0, day = 0, dow = 0, hour = 0, minute = 0, second = 0;
+    bool success = false;
+
+    do {
+        if (selected_module_id == 0) {
+            selectModule();
+            selected_module_id = app.getSelectedModule();
+            if (selected_module_id == 0) {
+                std::cout << "no module selected!" << std::endl;
+                break;
+            }
+        }
+        if (!app.readRegister(223, year)) break;
+        if (!app.readRegister(224, month)) break;
+        if (!app.readRegister(225, day)) break;
+        if (!app.readRegister(226, dow)) break;
+        if (!app.readRegister(227, hour)) break;
+        if (!app.readRegister(228, minute)) break;
+        if (!app.readRegister(229, second)) break;
+        fprintf(stdout, "Get time of module ID: 0x%04X %04d-%02d-%02d dow %d %02d:%02d:%02d\n", selected_module_id, year, month, day, dow, hour, minute, second);
+        success = true;
+    } while (false);
+    if (!success) fprintf(stdout, "Get time of module ID: 0x%04X FAILED\n", selected_module_id);
 }
 
 // -----------------------------------------------------------------------------

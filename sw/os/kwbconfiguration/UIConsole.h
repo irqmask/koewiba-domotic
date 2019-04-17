@@ -85,6 +85,8 @@ private:
     void selectModule();
     void readRegister();
     void writeRegister();
+    void setTime();
+    void getTime();
 };
 
 // -----------------------------------------------------------------------------

@@ -161,8 +161,8 @@ void dt_initialize(void)
  * @param[in]   hour    Hour to set. Possible values are 0..23.
  * @param[in]   minute  Minute to set. Possible values are 0..59.
  * @param[in]   second  Second to set. Possible values are 0..59.
- * @param[in]   dow     Day of week. Possible values are 
- *                      CLK_MONDAY .. CLK_SUNDAY.
+ * @param[in]   dow     Day of week since sunday. Possible values are
+ *                      DT_SUNDAY .. DT_SATURDAY.
  * @note Number of days per month and appropriate weekday is not checked here!
  */
 void dt_set(uint16_t year, uint8_t month, uint8_t day,
@@ -189,11 +189,11 @@ void dt_set(uint16_t year, uint8_t month, uint8_t day,
  * @param[out]  minute  Minute to set. Possible values are 0..59.
  * @param[out]  second  Second to set. Possible values are 0..59.
  * @param[out]  dow     Day of week. Possible values are
- *                      DT_MONDAY .. DT_SUNDAY.
+ *                      DT_SUNDAY .. DT_SATURDAY.
  */
 void dt_get(uint16_t *year, uint8_t *month, uint8_t *day,
-               uint8_t *hour, uint8_t *minute, uint8_t *second,
-               dt_day_of_week_t *dow)
+            uint8_t *hour, uint8_t *minute, uint8_t *second,
+            dt_day_of_week_t *dow)
 {
     uint16_t dummy16;
     uint8_t dummy8;
@@ -270,7 +270,7 @@ dt_day_of_week_t dt_get_day_of_week(void)
  */
 void dt_set_day_of_week(dt_day_of_week_t dow)
 {
-    if (dow >= DT_MONDAY && dow <= DT_SUNDAY) {
+    if (dow >= DT_SUNDAY && dow <= DT_SATURDAY) {
         g_dtdata.dow = dow;
     }
 }

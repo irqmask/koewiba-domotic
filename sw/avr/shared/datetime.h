@@ -36,15 +36,15 @@
 
 // --- Type definitions --------------------------------------------------------
 
-//! Enumeration of days of week.
+//! Enumeration of days of week. Days since sunday.
 typedef enum _dayofweek_t {
+    DT_SUNDAY,
     DT_MONDAY,
     DT_TUESDAY,
     DT_WEDNESDAY,
     DT_THURSDAY,
     DT_FRIDAY,
     DT_SATURDAY,
-    DT_SUNDAY
 } dt_day_of_week_t;
 
 //! structure to hold local date and time.

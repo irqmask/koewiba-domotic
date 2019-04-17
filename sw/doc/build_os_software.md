@@ -23,7 +23,7 @@ Create thridparty folder, build and install thirdparty libraries
 Build libsafec:
 
     
-    scp libsafec-10052013.tar.gz pi@192.168.10.102:/home/pi/koewiba-domotic/sw/os/3rd_party
+    scp libsafec-10052013.tar.gz pi@192.168.X.Y:/home/pi/koewiba-domotic/sw/os/3rd_party
     tar -xvvf libsafec-10052013.tar.gz
     mv libsafec-10052013 libsafec  
     cd libsafec

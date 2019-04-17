@@ -165,6 +165,7 @@ bool        app_register_get        (uint8_t                reg_no,
         // registers in ROM/RAM
         case APP_eReg_Year:
             *(uint16_t*)pvalue = dt_get_year();
+            *preg_type = eRegType_U16;
             break;
 
         case APP_eReg_Month:

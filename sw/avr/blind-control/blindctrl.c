@@ -52,6 +52,8 @@ typedef struct {
     uint8_t         current_position;
     //! Desired position in percent 0% = open 100% = fully closed.
     uint8_t         position_setpoint;
+    //! Position before movement started in percent 0% = open 100% = fully closed.
+    uint8_t         last_position;
     //! Delay time in timer ticks (1/100sec) until movement starts after applying
     //! power.
     uint8_t         reaction_delay;
@@ -71,6 +73,8 @@ typedef struct {
 static blind_control_t g_blind_control[BLIND_COUNT];
 // indicator if blinds are currently moving.
 static uint8_t g_blinds_active = 0;
+// timer to send updates while moving
+static timer_data_t g_notify_timer;
 
 // --- Global variables --------------------------------------------------------
 
@@ -162,6 +166,47 @@ static void send_position_setpoint (uint8_t index, sBus_t* bus)
     bus_send_message(bus, BUS_BRDCSTADR, 3, msg);
 }
 
+/**
+ * Update the current position of the blind.
+ *
+ * @param[in]   index   Index of the blind.
+ */
+static void update_current_position (uint8_t index)
+{
+    uint16_t elapsed_ticks, total_ticks;
+    int32_t  temp;
+
+    // blind has been stopped, before finishing movement.
+    // calculate new position of the blind, depending on the
+    // elapsed movement time.
+    elapsed_ticks = timer_get_elapsed_ticks(&g_blind_control[index].blindtimer);
+    // remove reaction delay time, when blinds are not moving
+    if (elapsed_ticks > g_blind_control[index].reaction_delay) {
+        elapsed_ticks -= g_blind_control[index].reaction_delay;
+    } else {
+        elapsed_ticks = 0;
+    }
+
+    // calculate new current position
+    if (g_blind_control[index].position_setpoint > g_blind_control[index].last_position) {
+        total_ticks = g_blind_control[index].duration_close;
+        temp = 100;
+        temp *= elapsed_ticks;
+        temp /= total_ticks;
+        g_blind_control[index].current_position =
+            g_blind_control[index].last_position + temp;
+        if (((int32_t)g_blind_control[index].last_position + temp) > 100) g_blind_control[index].current_position = 100;
+    } else {
+        total_ticks = g_blind_control[index].duration_open;
+        temp = 100;
+        temp *= elapsed_ticks;
+        temp /= total_ticks;
+        g_blind_control[index].current_position =
+            g_blind_control[index].last_position - temp;
+        if (((int32_t)g_blind_control[index].last_position - temp) < 0) g_blind_control[index].current_position = 0;
+    }
+}
+
 // --- Module global functions -------------------------------------------------
 
 // --- Global functions --------------------------------------------------------
@@ -180,6 +225,7 @@ void blind_reset            (uint8_t index)
     // time.
     g_blind_control[index].current_position = 50;
     g_blind_control[index].position_setpoint = 50;
+    g_blind_control[index].last_position = 50;
 }
 
 /**
@@ -221,41 +267,12 @@ void blind_move_to_position (uint8_t index, uint8_t new_position)
  */
 void blind_stop             (uint8_t index)
 {
-    uint16_t elapsed_ticks, total_ticks;
-    int32_t  temp;
-
     if (index >= BLIND_COUNT) return;
     motor_stop(index);
     if (g_blind_control[index].blind_state != idle && g_blind_control[index].blind_state != stopping) {
         g_blind_control[index].blind_state = stopping;
 
-        // blind has been stopped, before finishing movement.
-        // calculate new position of the blind, depending on the
-        // elapsed movement time.
-        elapsed_ticks = timer_get_elapsed_ticks(&g_blind_control[index].blindtimer);
-        // remove reaction delay time, when blinds are not moving
-        if (elapsed_ticks > g_blind_control[index].reaction_delay) {
-            elapsed_ticks -= g_blind_control[index].reaction_delay;
-        } else {
-            elapsed_ticks = 0;
-        }
-
-        // calculate new current position
-        if (g_blind_control[index].position_setpoint > g_blind_control[index].current_position) {
-            total_ticks = g_blind_control[index].duration_close;
-            temp = 100;
-            temp *= elapsed_ticks;
-            temp /= total_ticks;
-            if (temp + (int32_t)g_blind_control[index].current_position > 100) g_blind_control[index].current_position = 100;
-            else g_blind_control[index].current_position += temp;
-        } else {
-            total_ticks = g_blind_control[index].duration_open;
-            temp = 100;
-            temp *= elapsed_ticks;
-            temp /= total_ticks;
-            if (temp > (int32_t)g_blind_control[index].current_position) g_blind_control[index].current_position = 0;
-            else g_blind_control[index].current_position -= temp;
-        }
+        update_current_position(index);
 
         g_blind_control[index].position_setpoint = g_blind_control[index].current_position;
     }
@@ -396,17 +413,13 @@ bool blind_is_moving                (uint8_t index)
 void blinds_initialize      (void)
 {
     for (uint8_t index=0; index<BLIND_COUNT; index++) {
-        g_blind_control[index].blind_state = idle;
-        // current blind position is unknown. assume 50% so that driving in both
-        // directions is still possible. 0% or 100% will apply each full up or down
-        // time.
-        g_blind_control[index].current_position = 50;
-        g_blind_control[index].position_setpoint = 50;
+        blind_reset(index);
         g_blind_control[index].reaction_delay = 0;
         g_blind_control[index].duration_open = TIMER_MS_2_TICKS(1000);
         g_blind_control[index].duration_close = TIMER_MS_2_TICKS(1000);
     }
     g_blinds_active = 0;
+    timer_start(&g_notify_timer, TIMER_MS_2_TICKS(1000));
 }
 
 /**
@@ -434,8 +447,10 @@ void blinds_background      (sBus_t* bus)
             if (timer_is_elapsed(&g_blind_control[index].blindtimer)) {
                 motor_stop(index);
                 g_blind_control[index].current_position = g_blind_control[index].position_setpoint;
+                g_blind_control[index].last_position = g_blind_control[index].position_setpoint;
                 g_blind_control[index].blind_state = stopping;
             }
+
             break;
 
         case stopping:
@@ -446,6 +461,26 @@ void blinds_background      (sBus_t* bus)
                 g_blinds_active &= ~(1<<index);
             }
             break;
+        }
+    }
+
+    if (timer_is_elapsed(&g_notify_timer)) {
+        timer_start(&g_notify_timer, TIMER_MS_2_TICKS(1000));
+        for (uint8_t index=0; index<BLIND_COUNT; index++) {
+            switch (g_blind_control[index].blind_state) {
+            case idle:
+                break;
+
+            case moving_up:
+                // fall-through to moving_down
+            case moving_down:
+                update_current_position(index);
+                send_current_position(index, bus);
+                break;
+
+            case stopping:
+                break;
+            }
         }
     }
 }

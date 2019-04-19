@@ -21,6 +21,7 @@
 #include "cmddef_common.h"
 #include "queue.h"
 #include "serialcomm.h"
+#include "sleepmode.h"
 
 // --- Definitions -------------------------------------------------------------
 
@@ -121,6 +122,7 @@ static bgw_state_t bgw_send_message_to_bus (sBus_t* bus, scomm_phy_t* rs232_phy)
 
     // wake-up bus
     if (eMod_Sleeping == bus->eModuleState) {
+        sleep_request(false);
         bus_send_wakeupbyte(bus);
         bus->eModuleState = eMod_Running;
         bus_flush_bus(bus);
@@ -225,6 +227,7 @@ void bgw_forward_serial_msg (sBus_t* bus, scomm_phy_t* rs232_phy)
                 break;
             }
             q_flush_bytes(&rs232_phy->recvQ, 10);
+            sleep_request(false);
             g_curr_state = eBGW_WAIT_COMPLETE;
         }
         break;
@@ -259,52 +262,75 @@ void bgw_forward_serial_msg (sBus_t* bus, scomm_phy_t* rs232_phy)
 /**
  * Forward a message from bus to serial line.
  *
- * @param[in] Handle to bus.
- * @param[in] Handle to serial line.
+ * @param[in]   bus     Handle to bus.
+ * @param[in]   serial  Handle to serial line.
+ * @param[out]  sender  Sender of received message.
+ * @param[out]  len     Length of received message.
+ * @param[out]  msg     Message payload.
  *
- * @returns TURE, if message was correctly read from bus and sent to serial
- * line transmit buffer.
+ * @returns true if a message for the gateway module was received.
  */
-bool bgw_forward_bus_msg (sBus_t *bus, scomm_phy_t *serial)
+bool bgw_forward_bus_msg (sBus_t *bus, scomm_phy_t *serial,
+                          uint16_t* sender, uint8_t* len, uint8_t* msg)
 {
-    uint8_t  len = 0;
-    uint8_t  length = 0;
-    uint16_t sender = 0,
-             receiver = 0;
+    bool     msg_for_me, msg_for_bus;
+    uint8_t  l_curr;
+    uint8_t  l_expected;
+    uint16_t s, r;
 
     do {
+        msg_for_me = false;
+
         // is there a new message pending?
-        if (bus->msg_receive_state != eBUS_RECV_MESSAGE) {
-            return false;
+        if (bus->msg_receive_state != eBUS_RECV_MESSAGE) break;
+
+        s = bus->sRecvMsg.uSender;
+        r = bus->sRecvMsg.uReceiver;
+        l_expected = bus->sRecvMsg.length - 4;
+
+        msg_for_bus = true;
+        if (r == bus->sCfg.uOwnAddress) {
+            msg_for_me = true;
+            msg_for_bus = false;
         }
-        sender   = bus->sRecvMsg.uSender;
-        receiver = bus->sRecvMsg.uReceiver;
-        length   = bus->sRecvMsg.length - 4;
-        // create message header on serial send queue
-        convert_and_enqueue_byte(&serial->sendQ, (uint8_t)((sender & 0xFF00)>>8));
-        convert_and_enqueue_byte(&serial->sendQ, (uint8_t)( sender & 0x00FF));
-        convert_and_enqueue_byte(&serial->sendQ, (uint8_t)((receiver & 0xFF00)>>8));
-        convert_and_enqueue_byte(&serial->sendQ, (uint8_t)( receiver & 0x00FF));
-        convert_and_enqueue_byte(&serial->sendQ, length);
-        // convert and copy message data
-        while (len < length) {
-            convert_and_enqueue_byte(&serial->sendQ, bus->sRecvMsg.auBuf[5 + len]);
-            len ++;
+        if (r == BUS_BRDCSTADR) {
+            msg_for_me = true;
         }
-        // finally end message with a newline char.
-        q_put_byte(&serial->sendQ, '\n');
-        serial_phy_initiate_sending(serial);
+
+        if (msg_for_me) {
+            l_curr = 0;
+            // copy message data
+            while (l_curr < l_expected) {
+                msg[l_curr] = bus->sRecvMsg.auBuf[5 + l_curr];
+                l_curr++;
+            }
+            *sender = s;
+            *len = l_curr;
+        }
+
+        if (msg_for_bus) {
+            l_curr = 0;
+            // create message header on serial send queue
+            convert_and_enqueue_byte(&serial->sendQ, (uint8_t)((s & 0xFF00)>>8));
+            convert_and_enqueue_byte(&serial->sendQ, (uint8_t)( s & 0x00FF));
+            convert_and_enqueue_byte(&serial->sendQ, (uint8_t)((r & 0xFF00)>>8));
+            convert_and_enqueue_byte(&serial->sendQ, (uint8_t)( r & 0x00FF));
+            convert_and_enqueue_byte(&serial->sendQ, l_expected);
+            // convert and copy message data
+            while (l_curr < l_expected) {
+                convert_and_enqueue_byte(&serial->sendQ, bus->sRecvMsg.auBuf[5 + l_curr]);
+                l_curr++;
+            }
+            // finally end message with a newline char.
+            q_put_byte(&serial->sendQ, '\n');
+            serial_phy_initiate_sending(serial);
+        }
+
         // reset bus to IDLE state, so we are ready to receive the next message
         bus->msg_receive_state = eBUS_RECV_NOTHING;
         bus->sRecvMsg.length = 0;
         bus->sRecvMsg.uOverallLength = 0;
         bus->eState = eBus_Idle;
-
-        if (eCMD_SLEEP == bus->sRecvMsg.auBuf[5]) {
-            //sleep_pinchange2_enable();
-            bus_sleep(bus);
-            //sleep_pinchange2_disable();
-        }
     } while ( false );
-    return true;
+    return msg_for_me;
 }

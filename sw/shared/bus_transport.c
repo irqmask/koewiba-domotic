@@ -12,7 +12,7 @@
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
 /*
- * Copyright (C) 2018  christian <irqmask@web.de>
+ * Copyright (C) 2019  christian <irqmask@web.de>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

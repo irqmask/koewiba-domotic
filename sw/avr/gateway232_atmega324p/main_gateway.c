@@ -121,11 +121,7 @@ static inline void interpret_message (uint16_t sender, uint8_t msglen, uint8_t* 
 #endif
 
     case eCMD_SLEEP:
-        activate_wakeup_interrupt();
-        LED_STATUS_OFF;
-        LED_ERROR_OFF;
         bus_sleep(&g_bus);
-        deactivate_wakeup_interrupt();
         break;
 
     case eCMD_RESET:
@@ -171,8 +167,7 @@ int main(void)
     while (1) {
         // check for message and read it
         if (bus_get_message(&g_bus)) {
-            bgw_forward_bus_msg(&g_bus, &g_serial_phy);
-            if (bus_read_message(&g_bus, &sender, &msglen, msg)) {
+            if (bgw_forward_bus_msg(&g_bus, &g_serial_phy, &sender, &msglen, msg)) {
                 interpret_message(sender, msglen, msg);
             }
         }
@@ -183,6 +178,12 @@ int main(void)
             LED_ERROR_OFF;
             LED_STATUS_TOGGLE;
             timer_start(&g_LED_timer, TIMER_MS_2_TICKS(1000));
+        }
+
+        if (sleep_check_and_goodnight() == true) {
+            // bus gone to sleep and now woken up
+            // wait for first pending byte, then set module to running state
+            g_bus.eState = eBus_InitWait;
         }
     }
     return 0;

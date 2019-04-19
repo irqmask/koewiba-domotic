@@ -182,7 +182,6 @@ int main(void)
 
         if (sleep_check_and_goodnight() == true) {
             // bus gone to sleep and now woken up
-            bus_flush_bus(&g_bus);   // Clean bus-buffer
             // wait for first pending byte, then set module to running state
             g_bus.eState = eBus_InitWait;
         }

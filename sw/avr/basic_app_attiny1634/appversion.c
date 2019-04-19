@@ -32,7 +32,7 @@ const unsigned char app_versioninfo[MOD_LEN_CONTROLLERID + MOD_LEN_BOARDID + MOD
                            0x00,0x03,   // board ID
                            1,           // board revision
                            0x00,0x05,   // application ID
-                           0,1,2};      // application version
+                           0,1,3};      // application version
 
 // --- Module global variables -------------------------------------------------
 

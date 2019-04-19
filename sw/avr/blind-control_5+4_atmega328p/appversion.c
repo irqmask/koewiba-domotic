@@ -48,7 +48,7 @@ const unsigned char app_versioninfo[MOD_LEN_CONTROLLERID + MOD_LEN_BOARDID + MOD
                            0xF0,0x00,   // board ID            (high byte, low byte)
                            1,           // board revision
                            0xF0,0x00,   // application ID      (high byte, low byte)
-                           0,2,0};      // application version (major, minor, bugfix)
+                           0,2,1};      // application version (major, minor, bugfix)
 
 // --- Module global variables -------------------------------------------------
 

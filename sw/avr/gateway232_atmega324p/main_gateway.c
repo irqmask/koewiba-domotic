@@ -171,8 +171,7 @@ int main(void)
     while (1) {
         // check for message and read it
         if (bus_get_message(&g_bus)) {
-            bgw_forward_bus_msg(&g_bus, &g_serial_phy);
-            if (bus_read_message(&g_bus, &sender, &msglen, msg)) {
+            if (bgw_forward_bus_msg(&g_bus, &g_serial_phy, &sender, &msglen, msg)) {
                 interpret_message(sender, msglen, msg);
             }
         }

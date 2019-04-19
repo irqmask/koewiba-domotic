@@ -27,7 +27,6 @@
 
 #include <util/delay.h>
 
-#include "led_debug.h"
 #include "timer.h"
 
 #include "sleepmode.h"
@@ -94,7 +93,6 @@ bool sleep_check_and_goodnight(void)
         sleep_pinchange_enable();
         sleep_set_mode(SLEEP_MODE_IDLE);
 
-        LED_ERROR_OFF;
         sleep_mode();
 
         // ...sleeping... zzzZZZ
@@ -103,7 +101,6 @@ bool sleep_check_and_goodnight(void)
         sleep_pinchange_disable();
         // enable timer
         timer_sleep(false);
-        LED_ERROR_ON;
 
         return true;
     }

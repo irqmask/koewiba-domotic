@@ -13,16 +13,11 @@
 
 #include "prjconf.h"
 
-#ifdef PRJCONF_UC_AVR
-# include <avr/io.h>
-# include <avr/sleep.h>
-# include <util/delay.h>
-#endif
-
 #include "bus.h"
 #include "bus_scheduler.h"
 #include "bus_intern.h"
 #include "led_debug.h"
+#include "sleepmode.h"
 
 // --- Definitions -------------------------------------------------------------
 
@@ -336,19 +331,10 @@ void bus_schedule_check_and_set_sleep (sBus_t* psBus)
 {
     if (eMod_Sleeping == psBus->eModuleState) {
         if (bus_trp_send_sleepcmd(psBus)) {
-            timer_control(false); // disable clock-timer, otherwise
-                                  // IRQ will cause immediate wake-up.
-
-            // sleep till byte is received.
-#ifdef PRJCONF_UC_AVR
-            set_sleep_mode(SLEEP_MODE_IDLE);
-            sleep_mode();
-
-            _delay_ms(1); // wait for sys-clock becoming stable
-#endif
+            sleep_request(true);
+            sleep_check_and_goodnight();
             bus_flush_bus(psBus); // Clean bus-buffer
             psBus->eModuleState = eMod_Running;
-            timer_control(true); // enable clock-timer
         }
     }
 }

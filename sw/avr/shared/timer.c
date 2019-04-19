@@ -67,7 +67,6 @@ static bool remove_timer(timer_data_t* timer_instance)
     return false;
 }
 
-
 /**
  * Timer interrupt. Increase clock and iterate through running timers list.
  */
@@ -115,22 +114,26 @@ void timer_initialize(void)
 }
 
 /**
- * Start/Stop Clock-Timer
+ * Set timer into sleepmode.
  *
- * @param[in] start
- * boolean for starting/stopping the timer (true = start)
+ * @param[in]   shall_sleep     true, time enters sleepmode
+ *
+ * @note Some application may need the timer to wake-up the controller.
+ *       Therefore place a definition TIMER_WAKEUP in appconfig.c and set it to 1.
  */
-void timer_control(bool start)
+void timer_sleep(bool shall_sleep)
 {
+#if TIMER_WAKEUP==0
     static uint8_t tccr1b = 0;
 
-    if (start) {
-        if (0==tccr1b) return;
-        REG_TIMER0_TCCRB = tccr1b;
-    } else {
+    if (shall_sleep) {
         tccr1b = REG_TIMER0_TCCRB;
         REG_TIMER0_TCCRB &= ~((1<<REGBIT_TIMER0_CS2) | (1<<REGBIT_TIMER0_CS1) | (1<<REGBIT_TIMER0_CS0));
+    } else {
+        if (0==tccr1b) return;
+        REG_TIMER0_TCCRB = tccr1b;
     }
+#endif
 }
 
 /**
@@ -193,7 +196,6 @@ bool timer_is_elapsed(timer_data_t* timer_instance)
         return false;
     }
 }
-
 
 /**
  * Check if timer is running.

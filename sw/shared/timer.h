@@ -19,6 +19,10 @@
 
 #include "prjtypes.h"
 
+#ifdef HAS_APPCONFIG_H
+ #include "appconfig.h"
+#endif
+
 // --- Definitions -------------------------------------------------------------
 
 #define TIMER_COUNT             8
@@ -49,7 +53,7 @@ typedef struct _timer_data {
 
 void timer_initialize       (void);
 
-void timer_control          (bool start);
+void timer_sleep            (bool shall_sleep);
 
 bool timer_start            (timer_data_t* timer_instance, uint16_t ticks);
 

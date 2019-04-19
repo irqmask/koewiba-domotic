@@ -9,11 +9,24 @@
  * @todo    1. Describe file purpose
  * @todo    2. Implement a queue of received messages instead of only one
             message. Many nodes can send one node a message.
- * @todo    3. Decide if an outgoing message queue is needed. For the first step
-            surely not.
- * @todo    4. Further improvements :-)
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
+/*
+ * Copyright (C) 2018  christian <irqmask@web.de>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 // --- Include section ---------------------------------------------------------
 
@@ -382,6 +395,7 @@ bool bus_trp_send_and_receive (sBus_t* psBus)
 
     case eBus_InitWait:
         if (bus_phy_data_received(&psBus->sPhy)) {
+            sleep_request(false);
             psBus->eState = eBus_Idle;
             psBus->eModuleState = eMod_Running;
         } else {
@@ -618,6 +632,7 @@ bool bus_send_message (sBus_t*    psBus,
     do {
         // wake-up bus
         if(eMod_Sleeping == psBus->eModuleState) {
+            sleep_request(false);
         	bus_send_wakeupbyte(psBus);
         	psBus->eModuleState = eMod_Running;
         	bus_flush_bus(psBus);
@@ -726,22 +741,8 @@ bool bus_is_idle (sBus_t*       psBus)
 void bus_sleep (sBus_t*       psBus)
 {
 	psBus->eModuleState = eMod_Sleeping;
-    // disable clock-timer, otherwise IRQ will cause immediate wakeup.
-	timer_control(false);
 
-	// sleep till byte is received.
-	sleep_set_mode(SLEEP_MODE_IDLE);
-	sleep_activate();
-
-	// ...sleeping... zzzZZZ
-
-	sleep_delay_ms(1);      // wait for sys-clock becoming stable
-
-	bus_flush_bus(psBus);   // Clean bus-buffer
-	timer_control(true);      // enable timer
-
-	// wait for first pending byte, then set module to running state
-	psBus->eState = eBus_InitWait;
+	sleep_request(true);
 }
 
 /**

@@ -59,9 +59,10 @@
 #define sleep_pinchange_enable()
 #define sleep_pinchange_disable()
 #define sleep_set_mode(m)
-#define sleep_activate()
 #define sleep_delay_ms(t)
+#define sleep_request(a)
 #define sleep_prevent(a,b)
+#define sleep_check_and_goodnight() (false)
 #endif
 
 // --- Type definitions --------------------------------------------------------
@@ -81,9 +82,11 @@
 
 #ifdef PRJCONF_UC_AVR
 
-void sleep_activate(void);
+void sleep_request(bool shall_sleep);
 
 void sleep_prevent(uint8_t prevent_mask, uint8_t on);
+
+bool sleep_check_and_goodnight(void);
 
 #endif
 

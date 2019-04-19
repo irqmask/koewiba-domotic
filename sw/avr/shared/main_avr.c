@@ -12,6 +12,22 @@
  *
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
+/*
+ * Copyright (C) 2019  christian <irqmask@web.de>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 // --- Include section ---------------------------------------------------------
 
@@ -111,9 +127,7 @@ static inline void interpret_message (uint16_t sender, uint8_t msglen, uint8_t* 
 #endif
 
     case eCMD_SLEEP:
-        sleep_pinchange_enable();
         bus_sleep(&g_bus);
-        sleep_pinchange_disable();
         break;
 
     case eCMD_RESET:
@@ -165,6 +179,13 @@ int main(void)
             }
         }
         app_background(&g_bus);
+
+        if (sleep_check_and_goodnight() == true) {
+            // bus gone to sleep and now woken up
+            bus_flush_bus(&g_bus);   // Clean bus-buffer
+            // wait for first pending byte, then set module to running state
+            g_bus.eState = eBus_InitWait;
+        }
     }
     return 0;
 }

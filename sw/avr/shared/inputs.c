@@ -10,7 +10,7 @@
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
 /*
- * Copyright (C) 2018  christian <irqmask@web.de>
+ * Copyright (C) 2019  christian <irqmask@web.de>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,15 +30,11 @@
 
 #include <avr/io.h>
 
-#include "inputs.h"
 #include "timer.h"
 
-// --- Definitions -------------------------------------------------------------
+#include "inputs.h"
 
-#define INPUT_UP_PIN            PC4
-#define INPUT_DOWN_PIN          PC3
-#define INPUT_WINDOW_PIN	    PC2
-#define NBR_OF_INPUTS           3
+// --- Definitions -------------------------------------------------------------
 
 #define INPUT_DEBOUNCE_TIME     80
 #define INPUT_TIMER_INTERVAL    (INPUT_DEBOUNCE_TIME / 8)
@@ -47,7 +43,7 @@
 
 // --- Local variables ---------------------------------------------------------
 
-static timer_data_t          g_input_timer;
+static timer_data_t     g_input_timer;
 static uint8_t          g_debounce_array[NBR_OF_INPUTS];
 static bool             g_last_state[NBR_OF_INPUTS];
 
@@ -56,37 +52,6 @@ static bool             g_last_state[NBR_OF_INPUTS];
 // --- Module global variables -------------------------------------------------
 
 // --- Local functions ---------------------------------------------------------
-
-static bool input_active           (uint8_t input_nbr)
-{
-    // Inputs have negative logic, due to pull-up resistor.
-    // An input is activated, when the input is electrically low.
-    return (g_debounce_array[input_nbr] == 0xFF);
-}
-
-static bool input_on_activation    (uint8_t input_nbr)
-{
-    bool temp;
-
-    temp = input_active(input_nbr);
-    if (g_last_state[input_nbr] != temp) {
-        g_last_state[input_nbr] = temp;
-        return temp;
-    }
-    return false;
-}
-
-/*static bool input_on_deactivation  (uint8_t input_nbr)
-{
-    bool temp;
-
-    temp = input_active(input_nbr);
-    if (g_last_state[input_nbr] != temp) {
-        g_last_state[input_nbr] = temp;
-        return !temp;
-    }
-    return false;
-}*/
 
 // --- Module global functions -------------------------------------------------
 
@@ -99,12 +64,12 @@ void input_initialize       (void)
 {
     uint8_t n;
 
-    DDRC &= ~((1<<INPUT_UP_PIN) | (1<<INPUT_DOWN_PIN) | (1<<INPUT_WINDOW_PIN));
+    INPUT_DDR &= ~((1<<INPUT_0_PIN) | (1<<INPUT_1_PIN) | (1<<INPUT_2_PIN));
     // activate internal pull-up resistors
-    PORTC |= ((1<<INPUT_UP_PIN) | (1<<INPUT_DOWN_PIN) | (1<<INPUT_WINDOW_PIN));
+    INPUT_PORT |= ((1<<INPUT_0_PIN) | (1<<INPUT_1_PIN) | (1<<INPUT_2_PIN));
 
     // activate pin-change-interrupts for the inputs
-    PCMSK1 |= ((1<<PCINT12) | (1<<PCINT11) | (1<<PCINT10));
+    INPUT_PCMSK |= INPUT_PCMSK_VAL;
 
     // clear debounce array
     for(n=0; n<NBR_OF_INPUTS; n++) {
@@ -114,36 +79,57 @@ void input_initialize       (void)
     timer_start(&g_input_timer, TIMER_MS_2_TICKS(INPUT_TIMER_INTERVAL));
 }
 
-bool input_up               (void)
-{
-    //return ((PINC & (1<<INPUT_UP_PIN)) == 0);
-    return input_on_activation(2);
-}
-
-bool input_down             (void)
-{
-    //return ((PINC & (1<<INPUT_DOWN_PIN)) == 0);
-    return input_on_activation(1);
-}
-
-bool input_window_closed    (void)
-{
-    //return ((PINC & (1<<INPUT_WINDOW_PIN)) == 0);
-    return input_active(0);
-}
-
 void input_background       (void)
 {
-    uint8_t n;
+    uint8_t n, pin;
 
     if (timer_is_elapsed(&g_input_timer)) {
         timer_start(&g_input_timer, TIMER_MS_2_TICKS(INPUT_TIMER_INTERVAL));
         // this part is called every INPUT_TIMER_INTERVAL milliseconds.
-        for(n=2; n<2+NBR_OF_INPUTS; n++) {
-            g_debounce_array[n-2] <<= 1;
-            g_debounce_array[n-2] |= (PINC & (1<<n)) ? 1:0;
+        for(n=0; n<NBR_OF_INPUTS; n++) {
+            switch (n)
+            {
+            case 0: pin = 1<<INPUT_0_PIN; break;
+            case 1: pin = 1<<INPUT_1_PIN; break;
+            case 2: pin = 1<<INPUT_2_PIN; break;
+            default: pin = 0; break;
+            }
+            g_debounce_array[n] <<= 1;
+            g_debounce_array[n] |= (INPUT_PIN & pin) ? 1:0;
         }
     }
 }
+
+
+bool input_active           (uint8_t input_nbr)
+{
+    // Inputs have negative logic, due to pull-up resistor.
+    // An input is activated, when the input is electrically low.
+    return (g_debounce_array[input_nbr] == 0xFF);
+}
+
+bool input_on_activation    (uint8_t input_nbr)
+{
+    bool temp;
+
+    temp = input_active(input_nbr);
+    if (g_last_state[input_nbr] != temp) {
+        g_last_state[input_nbr] = temp;
+        return temp;
+    }
+    return false;
+}
+
+/* bool input_on_deactivation  (uint8_t input_nbr)
+{
+    bool temp;
+
+    temp = input_active(input_nbr);
+    if (g_last_state[input_nbr] != temp) {
+        g_last_state[input_nbr] = temp;
+        return !temp;
+    }
+    return false;
+}*/
 
 /** @} */

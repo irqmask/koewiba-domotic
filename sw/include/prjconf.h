@@ -56,6 +56,7 @@
       defined (__AVR_ATmega328P__) || \
       defined (__AVR_ATmega324P__) || \
       defined (__AVR_ATmega324A__) || \
+      defined (__AVR_ATmega324PA__) || \
       defined (__AVR_ATtiny1634__)
     #define PRJCONF_UC_AVR  1
 #else

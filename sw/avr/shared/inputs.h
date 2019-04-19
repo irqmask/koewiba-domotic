@@ -34,7 +34,32 @@
 
 #include <stdbool.h>
 
+#ifdef HAS_PCBCONFIG_H
+ #include "pcbconfig.h"
+#endif
+#ifdef HAS_APPCONFIG_H
+ #include "appconfig.h"
+#endif
+
 // --- Definitions -------------------------------------------------------------
+
+/**
+ * @subsection INPUTS_PCBCONFIG
+ * Configure input Pinout.
+ * @{
+ */
+#ifndef INPUTS_PCBCONFIG
+ #define INPUTS_PCBCONFIG   1
+ #define INPUT_PORT         PORTC
+ #define INPUT_DDR          DDRC
+ #define INPUT_PIN          PINC
+ #define INPUT_0_PIN        PC0
+ #define INPUT_1_PIN        PC1
+ #define INPUT_2_PIN        PC2
+ #define INPUT_PCMSK        PCMSK1
+ #define INPUT_PCMSK_VAL    ((1<<PCINT8) | (1<<PCINT9) | (1<<PCINT10))
+ #define NBR_OF_INPUTS      3
+#endif // INPUTS_PCBCONFIG
 
 // --- Type definitions --------------------------------------------------------
 
@@ -52,13 +77,11 @@
 
 void input_initialize       (void);
 
-bool input_up               (void);
-
-bool input_down             (void);
-
-bool input_window_closed    (void);
-
 void input_background       (void);
+
+bool input_active           (uint8_t input_nbr);
+
+bool input_on_activation    (uint8_t input_nbr);
 
 #endif /* _INPUTS_H_ */
 /** @} */

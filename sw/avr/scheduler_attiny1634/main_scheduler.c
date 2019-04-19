@@ -189,8 +189,10 @@ int main(void)
 
     io_initialize();
     timer_initialize();
-    //register_set_u16(MOD_eReg_ModuleID, 0x001);
     register_get(MOD_eReg_ModuleID, 0, &module_id);
+    if (module_id != 1) {
+        register_set_u16(MOD_eReg_ModuleID, 0x001);
+    }
     bus_configure(&g_bus, module_id); // configure a bus node with address 1
     bus_scheduler_initialize(&g_bus, &g_sched, 0);// initialize bus on UART 0
 

@@ -49,7 +49,8 @@
 
 // --- Local variables ---------------------------------------------------------
 
-static const uint8_t g_eepreg_updowntimer_block_size = APP_eCfg_TimeDown1_Minute - APP_eCfg_TimeUp1_Weekdays + 1;
+static const uint8_t g_eep_updowntimer_block_size = APP_eCfg_TimeDown1_Minute - APP_eCfg_TimeUp1_Weekdays + 1;
+static const uint8_t g_reg_updowntimer_block_size = APP_eReg_TimeDown1_Unused1 - APP_eReg_TimeUp1_Weekday + 1;
 
 // --- Global variables --------------------------------------------------------
 
@@ -70,12 +71,12 @@ void        app_register_load       (void)
 
     // load up/down times
     for (idx=0; idx<APP_UPDOWNTIMER_COUNT; idx++) {
-        alarm_set_hour             (idx*2,   eeprom_read_byte(&register_eeprom_array[idx * g_eepreg_updowntimer_block_size + APP_eCfg_TimeUp1_Hour]));
-        alarm_set_minute           (idx*2,   eeprom_read_byte(&register_eeprom_array[idx * g_eepreg_updowntimer_block_size + APP_eCfg_TimeUp1_Minute]));
-        alarm_set_days_of_week_mask(idx*2,   eeprom_read_byte(&register_eeprom_array[idx * g_eepreg_updowntimer_block_size + APP_eCfg_TimeUp1_Weekdays]));
-        alarm_set_hour             (idx*2+1, eeprom_read_byte(&register_eeprom_array[idx * g_eepreg_updowntimer_block_size + APP_eCfg_TimeDown1_Hour]));
-        alarm_set_minute           (idx*2+1, eeprom_read_byte(&register_eeprom_array[idx * g_eepreg_updowntimer_block_size + APP_eCfg_TimeDown1_Minute]));
-        alarm_set_days_of_week_mask(idx*2+1, eeprom_read_byte(&register_eeprom_array[idx * g_eepreg_updowntimer_block_size + APP_eCfg_TimeDown1_Weekdays]));
+        alarm_set_hour             (idx*2,   eeprom_read_byte(&register_eeprom_array[idx * g_eep_updowntimer_block_size + APP_eCfg_TimeUp1_Hour]));
+        alarm_set_minute           (idx*2,   eeprom_read_byte(&register_eeprom_array[idx * g_eep_updowntimer_block_size + APP_eCfg_TimeUp1_Minute]));
+        alarm_set_days_of_week_mask(idx*2,   eeprom_read_byte(&register_eeprom_array[idx * g_eep_updowntimer_block_size + APP_eCfg_TimeUp1_Weekdays]));
+        alarm_set_hour             (idx*2+1, eeprom_read_byte(&register_eeprom_array[idx * g_eep_updowntimer_block_size + APP_eCfg_TimeDown1_Hour]));
+        alarm_set_minute           (idx*2+1, eeprom_read_byte(&register_eeprom_array[idx * g_eep_updowntimer_block_size + APP_eCfg_TimeDown1_Minute]));
+        alarm_set_days_of_week_mask(idx*2+1, eeprom_read_byte(&register_eeprom_array[idx * g_eep_updowntimer_block_size + APP_eCfg_TimeDown1_Weekdays]));
     }
 }
 
@@ -129,8 +130,8 @@ bool        app_register_get        (uint8_t                reg_no,
             break;
         }
     } else if (reg_no >= APP_eReg_TimeUp1_Weekday && reg_no <= APP_eReg_TimeDown4_Unused1) {
-        updown_timerblock_idx = (reg_no - APP_eReg_TimeUp1_Weekday) / (APP_eReg_TimeDown4_Unused1 - APP_eReg_TimeUp1_Weekday + 1);
-        reg_no -= (updown_timerblock_idx * (APP_eReg_TimeDown4_Unused1 - APP_eReg_TimeUp1_Weekday + 1));
+        updown_timerblock_idx = (reg_no - APP_eReg_TimeUp1_Weekday) / g_reg_updowntimer_block_size;
+        reg_no -= (updown_timerblock_idx * g_reg_updowntimer_block_size);
         switch (reg_no) {
         // registers saved in EEProm
         case APP_eReg_TimeUp1_Weekday:
@@ -247,39 +248,39 @@ void        app_register_set        (uint8_t                reg_no,
             break;
         }
     } else if (reg_no >= APP_eReg_TimeUp1_Weekday && reg_no <= APP_eReg_TimeDown4_Unused1) {
-        updown_timerblock_idx = (reg_no - APP_eReg_TimeUp1_Weekday) / (APP_eReg_TimeDown4_Unused1 - APP_eReg_TimeUp1_Weekday + 1);
-        reg_no -= (updown_timerblock_idx * (APP_eReg_TimeDown4_Unused1 - APP_eReg_TimeUp1_Weekday + 1));
+        updown_timerblock_idx = (reg_no - APP_eReg_TimeUp1_Weekday) / g_reg_updowntimer_block_size;
+        reg_no -= (updown_timerblock_idx * g_reg_updowntimer_block_size);
         value8 = value & 0x000000FF;
         switch (reg_no) {
         // registers saved in EEProm
         case APP_eReg_TimeUp1_Weekday:
             alarm_set_days_of_week_mask(updown_timerblock_idx*2, value8);
-            eeprom_write_byte(&register_eeprom_array[updown_timerblock_idx * g_eepreg_updowntimer_block_size + APP_eCfg_TimeUp1_Weekdays], value8);
+            eeprom_write_byte(&register_eeprom_array[updown_timerblock_idx * g_eep_updowntimer_block_size + APP_eCfg_TimeUp1_Weekdays], value8);
             break;
 
         case APP_eReg_TimeUp1_Hour:
             alarm_set_hour(updown_timerblock_idx*2, value8);
-            eeprom_write_byte(&register_eeprom_array[updown_timerblock_idx * g_eepreg_updowntimer_block_size + APP_eCfg_TimeUp1_Hour], value8);
+            eeprom_write_byte(&register_eeprom_array[updown_timerblock_idx * g_eep_updowntimer_block_size + APP_eCfg_TimeUp1_Hour], value8);
             break;
 
         case APP_eReg_TimeUp1_Minute:
             alarm_set_minute(updown_timerblock_idx*2, value8);
-            eeprom_write_byte(&register_eeprom_array[updown_timerblock_idx * g_eepreg_updowntimer_block_size + APP_eCfg_TimeUp1_Minute], value8);
+            eeprom_write_byte(&register_eeprom_array[updown_timerblock_idx * g_eep_updowntimer_block_size + APP_eCfg_TimeUp1_Minute], value8);
             break;
 
         case APP_eReg_TimeDown1_Weekday:
             alarm_set_days_of_week_mask(updown_timerblock_idx*2+1, value8);
-            eeprom_write_byte(&register_eeprom_array[updown_timerblock_idx * g_eepreg_updowntimer_block_size + APP_eCfg_TimeDown1_Weekdays], value8);
+            eeprom_write_byte(&register_eeprom_array[updown_timerblock_idx * g_eep_updowntimer_block_size + APP_eCfg_TimeDown1_Weekdays], value8);
             break;
 
         case APP_eReg_TimeDown1_Hour:
             alarm_set_hour(updown_timerblock_idx*2+1, value8);
-            eeprom_write_byte(&register_eeprom_array[updown_timerblock_idx * g_eepreg_updowntimer_block_size + APP_eCfg_TimeDown1_Hour], value8);
+            eeprom_write_byte(&register_eeprom_array[updown_timerblock_idx * g_eep_updowntimer_block_size + APP_eCfg_TimeDown1_Hour], value8);
             break;
 
         case APP_eReg_TimeDown1_Minute:
             alarm_set_minute(updown_timerblock_idx*2+1, value8);
-            eeprom_write_byte(&register_eeprom_array[updown_timerblock_idx * g_eepreg_updowntimer_block_size + APP_eCfg_TimeDown1_Minute], value8);
+            eeprom_write_byte(&register_eeprom_array[updown_timerblock_idx * g_eep_updowntimer_block_size + APP_eCfg_TimeDown1_Minute], value8);
             break;
 
         default:

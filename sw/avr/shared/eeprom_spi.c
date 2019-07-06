@@ -15,6 +15,7 @@
  // --- Include section ---------------------------------------------------------
 
 #include <avr/io.h>
+#include <util/delay.h>
 #include "eeprom_spi.h"
 #include "prjtypes.h"
 #include "spi.h"
@@ -108,7 +109,7 @@ uint16_t eep_read (uint16_t eep_address, uint16_t count, uint8_t* buffer)
     if (eep_address + count > EEPROM_SIZE) return 0;
 
     uint8_t timeout = 0xFF;
-    while (eep_check_statusregister(eEEP_WIP) != 0 && (timeout-- > 0));
+    while (eep_check_statusregister(eEEP_WIP) != 0 && (timeout-- > 0))  _delay_us(5);
     if (timeout == 0) return 0;
 
     EEP_SPI_CS_ACTIVATE;
@@ -144,7 +145,7 @@ uint16_t eep_write (uint16_t eep_address, uint16_t count, const uint8_t* buffer)
         uint8_t addressL = (0x00FF & eep_address);
 
         uint8_t timeout = 0xFF;
-        while (eep_check_statusregister(eEEP_WIP) != 0 && (timeout-- > 0));
+        while (eep_check_statusregister(eEEP_WIP) != 0 && (timeout-- > 0)) _delay_us(5);
         if (timeout == 0) continue;
 
         EEP_SPI_CS_ACTIVATE;

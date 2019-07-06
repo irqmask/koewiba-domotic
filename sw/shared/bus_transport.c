@@ -622,10 +622,10 @@ bool bus_read_message_verbose (sBus_t*   psBus,
  * @returns true, if the message has successfully been queued.
  * @note Use bus_is_idle() to check if message is successfully transmitted.
  */
-bool bus_send_message (sBus_t*    psBus,
-                       uint16_t   uReceiver,
-                       uint8_t    uLen,
-                       uint8_t*   puMsg)
+bool bus_send_message (sBus_t*          psBus,
+                       uint16_t         uReceiver,
+                       uint8_t          uLen,
+                       const uint8_t*   puMsg)
 {
     uint8_t  overall_msg_len;
 

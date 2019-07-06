@@ -50,30 +50,28 @@
 #ifndef PRJCONF_UC_AVR
 uint16_t crc_16_next_byte (uint16_t crc, uint8_t a)
 {
-	int i;
+    int i;
 
-	crc ^= a;
-	for (i = 0; i < 8; ++i)
-	{
-	    if (crc & 1)
-		crc = (crc >> 1) ^ 0xA001;
-	    else
-		crc = (crc >> 1);
-	}
-
-	return crc;
+    crc ^= a;
+    for (i = 0; i < 8; ++i) {
+        if (crc & 1)
+            crc = (crc >> 1) ^ 0xA001;
+        else
+            crc = (crc >> 1);
+    }
+    return crc;
 }
 #endif
 
 /**
  * Calculate CRC16 checksum.
  */
-uint16_t crc_calc16(uint8_t* data, uint8_t len)
+uint16_t crc_calc16(const uint8_t* data, uint8_t len)
 {
     uint16_t crc = CRC_START_VALUE;
 
     while (len--) {
-    	crc = crc_16_next_byte(crc, *data++);
+        crc = crc_16_next_byte(crc, *data++);
     }
     return crc;
 }

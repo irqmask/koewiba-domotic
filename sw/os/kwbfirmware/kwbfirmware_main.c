@@ -234,6 +234,7 @@ static void print_usage (void)
 
 static void print_progress (uint8_t progress, void* arg)
 {
+    log_msg(LOG_STATUS, "Update progress %d", progress);
     log_msg(KWB_LOG_INFO, "Update progress %d", progress);
 }
 
@@ -257,6 +258,8 @@ int main (int argc, char* argv[])
     firmwareupdate_t    firmware;
 
     do {
+        log_set_mask(LOG_STANDARD_MASK | LOG_STATUS | LOG_USERDEFINED | LOG_VERBOSE1 | LOG_VERBOSE2);
+        
         // set default options for kwbrouter
         set_options(&options,
                     "/dev/ttyUSB0",                 // no serial device, use vbusd as default
@@ -290,9 +293,14 @@ int main (int argc, char* argv[])
                     sys_sleep_ms(100);
                 } else if (rc == eERR_NONE) {
                     log_msg(LOG_STATUS, "FIRMWARE UPDATE SUCCESSFULL!");
+                    log_msg(LOG_STATUS, "Bootloader flags %02X", firmware.bldflags);
                     end_application = true;
                 } else {
                     log_msg(LOG_STATUS, "FIRMWARE UPDATE FAILED!");
+                    log_msg(LOG_STATUS, "CRC expected %04X CRC calculated %04X", 
+                            firmware.node_crc_calculated, firmware.node_crc_expected);
+                    log_msg(LOG_STATUS, "Bootloader flags %02X", firmware.bldflags);
+                    
                     end_application = true;
                 }
             }

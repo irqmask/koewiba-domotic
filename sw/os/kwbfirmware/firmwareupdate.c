@@ -336,7 +336,7 @@ static int send_block_end_message (firmwareupdate_t* fwu)
     msg.data[1] = (crc & 0xFF00) >> 8;
     msg.data[2] = (crc & 0x00FF);
     msg.length = 3;
-
+    log_msg(LOG_VERBOSE2, "CRC to be expected by node = 0x%4X", crc);
     rc = msg_ser_send(&fwu->msg_serial, &msg);
     return rc;
 }
@@ -587,6 +587,9 @@ int firmware_update_run (firmwareupdate_t* fwu)
         break;
     case eFWU_CRC_INFO:
         if (fwu->block_info_received) {
+            log_msg(LOG_VERBOSE2, "CRC expected by node = 0x%4X", fwu->node_crc_expected);
+            log_msg(LOG_VERBOSE2, "CRC calculated by node = 0x%4X", fwu->node_crc_calculated);
+            
             if (fwu->node_crc_expected == fwu->node_crc_calculated) {
                 if (fwu->reset_target_node) {
                     fwu->curr_state = eFWU_RESET_NODE;

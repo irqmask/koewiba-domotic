@@ -241,13 +241,14 @@ bool block_message_end (sBus_t* bus, uint16_t sender, uint8_t msglen, uint8_t* m
 			break;
 		}
 	} while (false);
-    if (ret != true) {
+    send_block_info_message(bus, sender,
+                            g_bd.crc_host,
+                            g_bd.crc_local,
+                            g_bd.received);
+	if (ret != true) {
     	send_nak_message (bus, sender, eCMD_BLOCK_END);
     }
-	send_block_info_message(bus, sender,
-							g_bd.crc_host,
-							g_bd.crc_local,
-							g_bd.received);
+
     return ret;
 }
 

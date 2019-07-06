@@ -67,8 +67,8 @@ typedef enum {
     eSTORAGE_NONE           = 0,
     eSTORAGE_EEPROM_INT     = 1,
     eSTORAGE_EEPROM_EXT     = 2,
-    eSTORAGE_DISPLAY        = 3, // data for display memory
-    eSTORAGE_SCOMM          = 4  // data stream output to serial interface
+    eSTORAGE_DISPLAY        = 3,    // data for display memory
+    eSTORAGE_SCOMM          = 4     // data stream output to serial interface
 } blkdata_destination_t;
 
 

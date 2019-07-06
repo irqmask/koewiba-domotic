@@ -235,7 +235,7 @@ bool    bus_read_message_verbose            (sBus_t*        psBus,
 bool 	bus_send_message                    (sBus_t*        psBus,
                                              uint16_t       uReceiver,
                                              uint8_t        uLen,
-                                             uint8_t*       puMsg);
+                                             const uint8_t* puMsg);
 
 bool 	bus_is_idle                         (sBus_t*        psBus);
 

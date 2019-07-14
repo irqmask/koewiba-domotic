@@ -187,7 +187,7 @@ void UIMain::display()
     std::cout << std::endl;
     std::cout << "Main Menu" << std::endl;
     std::cout << "--------------------------------------------------" << std::endl;
-    //std::cout << " (1) detect modules" << std::endl;
+    std::cout << " (1) detect modules" << std::endl;
     std::cout << " (2) select module" << std::endl;
     //std::cout << " (3) update firmware" << std::endl;
     std::cout << " (4) read register" << std::endl;
@@ -202,6 +202,9 @@ void UIMain::display()
 void UIMain::onMenuChoice()
 {   
     switch (this->last_choice) {
+    case '1':
+        detectModules();
+        break;
     case '2':
         selectModule();
         break;
@@ -221,6 +224,30 @@ void UIMain::onMenuChoice()
         UIConsole::onMenuChoice();
         break;
     }
+}
+
+void UIMain::detectModules()
+{
+    app.detectModules();
+    auto modules = app.getDetectedModules();
+    if (modules.size() == 0) {
+        std::cout << "No modules detected!" << std::endl;
+        return; 
+    }
+    
+    std::cout << "Node ID | Ctrl ID             | Board  |     | App ID | App Version " << std::endl;
+    std::cout << "        |                     | ID     | Rev |        |             " << std::endl;
+    std::cout << "--------+---------------------+--------+-----+--------+-------------" << std::endl;
+    for (ActionQueryModules::Module m : modules) {
+        printf("0x%04X  | 0x%02X 0x%02X 0x%02X 0x%02X | 0x%04X | %3d | 0x%04X | %d.%d.%d", 
+               m.nodeId, 
+               m.version.controller_id[0], m.version.controller_id[1],
+               m.version.controller_id[2], m.version.controller_id[3],
+               m.version.board_id, m.version.board_rev,
+               m.version.app_id, 
+               m.version.version[0], m.version.version[1], m.version.version[2]);
+    }
+    std::cout << std::endl;
 }
 
 void UIMain::selectModule()

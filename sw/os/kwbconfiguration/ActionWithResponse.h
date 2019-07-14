@@ -57,6 +57,7 @@ protected:
     virtual bool filterResponse(msg_t& message) = 0;
     virtual void handleResponse(msg_t& message) = 0;
     
+    void log_module_info();
     bool     messageReceived; //!< Flag if message has been received.
     msg_t    receivedMessage; //!< Message, which has been received during this action.
 };

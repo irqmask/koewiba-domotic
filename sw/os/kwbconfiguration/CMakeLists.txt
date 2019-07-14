@@ -72,6 +72,7 @@ set (kwbconfiguration_SRCS
     Action.h
     ActionRequest.h
     ActionWithResponse.h
+    ActionQueryModules.h
     ActionReadRegister.h
     ActionWriteRegister.h
     Application.h
@@ -84,6 +85,7 @@ set (kwbconfiguration_SRCS
     Action.cpp
     ActionRequest.cpp
     ActionWithResponse.cpp
+    ActionQueryModules.cpp
     ActionReadRegister.cpp
     ActionWriteRegister.cpp
     Application.cpp

@@ -2,13 +2,13 @@
  * @addtogroup KWBCONFIGURATION
  *
  * @{
- * @file    Application.h
- * @brief   Application frontend. 
+ * @file    ActionQueryModules.h
+ * @brief   Action: Query version information of a bus module and wait for the answer. 
  *
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
 /*
- * Copyright (C) 2017  christian <irqmask@web.de>
+ * Copyright (C) 2019  christian <irqmask@web.de>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,17 +27,15 @@
 
 // --- Include section ---------------------------------------------------------
 
-#include "prjconf.h"
+#include <vector>
 
-#include <iostream>
-#include <list>
+#include "prjconf.h"
 
 // include
 #include "prjtypes.h"
+#include "moddef_common.h"
 
-#include "ActionQueryModules.h"
-#include "MsgEndpoint.h"
-#include "MsgBroker.h"
+#include "ActionWithResponse.h"
 
 // --- Definitions -------------------------------------------------------------
 
@@ -49,32 +47,25 @@
 
 // --- Class definition --------------------------------------------------------
 
-class Application {
+class ActionQueryModules : public ActionWithResponse {
 public:
-    Application(MsgEndpoint& msgep, MsgBroker& broker, bool& endApplication);
+    struct Module {
+    public: 
+        uint16_t nodeId;
+        version_info_t version; 
+    };
+        
+    ActionQueryModules(MsgEndpoint& msgep, MsgBroker& broker, uint16_t nodeId=0);
     
-    bool detectModules();
-    std::vector<ActionQueryModules::Module> getDetectedModules();
-    void selectModule(uint16_t nodeid);
-    uint16_t getSelectedModule();
-    
-    bool readRegister(uint8_t registerId, int& value);
-    bool writeRegister(uint8_t registerId, int value);
-    bool verifyRegister(uint8_t registerId, int value, int& readValue);
-    int getLastRegisterValue();
-    
-    void endApplication();
+    std::vector<Module> getModules();   
+    virtual bool waitForResponse() override;
     
 protected:
-    std::vector<ActionQueryModules::Module> detected_modules;
-    uint16_t            selected_module;
-    MsgBroker&          msgBroker;
-    MsgEndpoint&        msgEndpoint;
-    bool&               end_application;
+    virtual bool formMessage();
+    virtual bool filterResponse(msg_t& message) override;
+    virtual void handleResponse(msg_t& message) override;
+    
+    std::vector<Module> modules;
 };
-
-// -----------------------------------------------------------------------------
-
-
 
 /** @} */

@@ -81,7 +81,9 @@ public:
 protected:
     virtual void display();
     virtual void onMenuChoice();
+
 private:
+    void detectModules();
     void selectModule();
     void readRegister();
     void writeRegister();

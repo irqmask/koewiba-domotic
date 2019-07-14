@@ -48,6 +48,7 @@
 #include "kwb_defines.h"
 
 #include "Application.h"
+#include "ActionQueryModules.h"
 #include "ActionReadRegister.h"
 #include "ActionWriteRegister.h"
 
@@ -77,12 +78,19 @@ Application::Application(MsgEndpoint&   msgep,
     this->detected_modules.clear();
 }
 
-void Application::detectModules()
+bool Application::detectModules()
 {
+    bool rc = false;
     this->detected_modules.clear();
+    ActionQueryModules action_query_modules(msgEndpoint, msgBroker, BUS_BRDCSTADR);
+    if ((rc = action_query_modules.start()) == true) {
+        rc = action_query_modules.waitForResponse();
+    }
+    this->detected_modules = action_query_modules.getModules();
+    return rc;
 }
 
-std::list<uint16_t> Application::getDetectedModules()
+std::vector<ActionQueryModules::Module> Application::getDetectedModules()
 {
     return this->detected_modules;
 }

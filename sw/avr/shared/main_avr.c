@@ -32,6 +32,7 @@
 // --- Include section ---------------------------------------------------------
 
 #include <avr/interrupt.h>
+#include <avr/pgmspace.h>
 #include <avr/wdt.h>
 
 #include "bus.h"
@@ -98,6 +99,21 @@ void init_wdt(void)
 }
 #endif
 
+extern const unsigned char app_versioninfo[MOD_LEN_CONTROLLERID + MOD_LEN_BOARDID + MOD_LEN_BOARDREV + MOD_LEN_APPID + MOD_LEN_APPVER];
+
+/// send the version information
+static inline void answer_version_info_request (uint16_t sender)
+{
+    uint8_t msg[sizeof(app_versioninfo) + 1], i;
+
+    msg[0] = eCMD_STATE_VERSION;
+    for (i=0; i<sizeof(app_versioninfo); i++) {
+        msg[i + 1] = pgm_read_byte(&app_versioninfo[i]);
+    }
+    bus_send_message(&g_bus, sender, sizeof(msg), msg);
+}
+
+/// first entry point to interpret incoming messages.
 static inline void interpret_message (uint16_t sender, uint8_t msglen, uint8_t* msg)
 {
     switch (msg[0]) {
@@ -109,6 +125,12 @@ static inline void interpret_message (uint16_t sender, uint8_t msglen, uint8_t* 
         // fallthrough
     case eCMD_SET_REG_32BIT:
         register_do_command(&g_bus, sender, msglen, msg);
+        break;
+
+    case eCMD_REQUEST_INFO_OF_TYPE:
+        if (msglen == 2 && msg[1] == eINFO_VERSION) {
+            answer_version_info_request(sender);
+        }
         break;
 
 #ifndef NO_BLOCK_MESSAGE

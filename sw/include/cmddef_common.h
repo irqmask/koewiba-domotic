@@ -42,8 +42,11 @@ typedef enum {
     eCMD_STATE_16BIT            = 0x03, //!< Send 16bit state data.
     eCMD_STATE_32BIT            = 0x04, //!< Send 32bit state data.
     eCMD_STATE_DATE_TIME        = 0x05, //!< Send date/time data.
-
+    eCMD_STATE_VERSION          = 0x06, //!< Send firmware version.
     eCMD_REQUEST_REG            = 0x10, //!< Request register value.
+    eCMD_REQUEST_INFO_OF_TYPE   = 0x11, //!< Request information (more complex
+                                        //!< than register content, like
+                                        //!< date-time or version)
     eCMD_SET_REG_8BIT           = 0x12, //!< Set 8bit register value.
     eCMD_SET_REG_16BIT          = 0x13, //!< Set 16bit register value.
     eCMD_SET_REG_32BIT          = 0x14, //!< Set 32bit register value.
@@ -62,15 +65,21 @@ typedef enum {
     eCMD_RESET                  = 0xFE, //!< Reset module.
 } cmd_common_t;
 
+//! information type
+typedef enum {
+    eINFO_NONE                  = 0,    //!< undefined
+    eINFO_VERSION               = 1,    //!< version information
+    eINFO_DATETIME              = 2,    //!< date and time information
+} info_type_t;
+
 //! destinations for block data.
 typedef enum {
-    eSTORAGE_NONE           = 0,
-    eSTORAGE_EEPROM_INT     = 1,
-    eSTORAGE_EEPROM_EXT     = 2,
-    eSTORAGE_DISPLAY        = 3,    // data for display memory
-    eSTORAGE_SCOMM          = 4     // data stream output to serial interface
+    eSTORAGE_NONE               = 0,    //!< data type not defined
+    eSTORAGE_EEPROM_INT         = 1,    //!< data for internal eeprom
+    eSTORAGE_EEPROM_EXT         = 2,    //!< data for external eeprom
+    eSTORAGE_DISPLAY            = 3,    //!< data for display memory
+    eSTORAGE_SCOMM              = 4     //!< data stream output to serial interface
 } blkdata_destination_t;
-
 
 // --- Local variables ---------------------------------------------------------
 

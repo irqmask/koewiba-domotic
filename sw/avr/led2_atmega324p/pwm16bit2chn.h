@@ -28,6 +28,8 @@
 
 // --- Definitions -------------------------------------------------------------
 
+#define PWM_MAX_CHANNEL 2   //!< Supported number of PWM channels
+
 // --- Type definitions --------------------------------------------------------
 
 // --- Local variables ---------------------------------------------------------
@@ -41,6 +43,8 @@
 // --- Module global functions -------------------------------------------------
 
 // --- Global functions --------------------------------------------------------
+
+void pwm16bit_init(void);
 
 void pwm16bit_channel_init (uint8_t chn);
 

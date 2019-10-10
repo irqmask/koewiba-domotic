@@ -61,12 +61,17 @@ bool        app_register_get        (uint8_t                reg_no,
 
     switch (reg_no) {
     // registers saved in EEProm
-    // TODO add handler for with application specific registers here!
+    case APP_eReg_CHN0_SetPoint:
+        *(uint8_t*)pvalue = eeprom_read_byte(&register_eeprom_array[APP_eCfg_CHN0_SetPoint]);
+        break;
+
+    case APP_eReg_CHN1_SetPoint:
+        *(uint8_t*)pvalue = eeprom_read_byte(&register_eeprom_array[APP_eCfg_CHN1_SetPoint]);
+        break;
 
     // registers in ROM/RAM
     default:
         return false;
-        break;
     }
     return true;
 }
@@ -74,16 +79,21 @@ bool        app_register_get        (uint8_t                reg_no,
 void        app_register_set        (uint8_t                reg_no,
                                      uint32_t               value)
 {
-    uint16_t    tempval16;
-    uint8_t     tempval;
+    uint8_t     value8;
 
-    tempval16 = (uint16_t)(value & 0x0000FFFF);
-    tempval = (uint8_t)(value & 0x000000FF);
+    value8 = (uint8_t)(value & 0x000000FF);
 
     switch (reg_no) {
     // registers saved in EEProm
-    // TODO add handler for with application specific registers here!
+    case APP_eReg_CHN0_SetPoint:
+        eeprom_write_byte(&register_eeprom_array[APP_eCfg_CHN0_SetPoint], value8);
+        app_led_set_intensity(0, value8);
+        break;
 
+    case APP_eReg_CHN1_SetPoint:
+        eeprom_write_byte(&register_eeprom_array[APP_eCfg_CHN1_SetPoint], value8);
+        app_led_set_intensity(1, value8);
+        break;
 
     // registers in ROM/RAM
 

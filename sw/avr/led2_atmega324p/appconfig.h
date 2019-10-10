@@ -43,16 +43,15 @@
 //! Application specific layout of registers
 typedef enum appregisters {
     // registers saved in EEProm
-    APP_eReg_TODO00 = MOD_eReg_FirstAppSpecific, //!< Register mapping: remote address 0 (16bit)
-
-    // insert application specific registers here
+    APP_eReg_CHN0_SetPoint = MOD_eReg_FirstAppSpecific,
+    APP_eReg_CHN1_SetPoint,
     APP_eReg_Last
 } eRegisters_t;
 
 //! Application specific layout of non volatile parameters (internal EEProm)
 typedef enum appconfig {
-    APP_eCfg_TODO00 = MOD_eCfg_FirstAppSpecific,
-    // insert application specific configuration here
+    APP_eCfg_CHN0_SetPoint = MOD_eCfg_FirstAppSpecific,
+    APP_eCfg_CHN1_SetPoint,
     APP_eCfg_Last
 } eConfiguration_t;
 
@@ -69,6 +68,12 @@ extern const unsigned char app_versioninfo[];
 // --- Module global functions -------------------------------------------------
 
 // --- Global functions --------------------------------------------------------
+
+void        app_register_set        (uint8_t                reg_no,
+                                     uint32_t               value);
+
+void        app_led_set_intensity   (uint8_t                channel,
+                                     uint8_t                intensity);
 
 #endif /* _APPCONFIG_H_ */
 /** @} */

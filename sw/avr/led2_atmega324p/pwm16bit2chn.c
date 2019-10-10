@@ -24,13 +24,13 @@
 
 // --- Include section ---------------------------------------------------------
 
+#include <avr/io.h>
+
 #include "prjtypes.h"
 
 #include "pwm16bit2chn.h"
 
 // --- Definitions -------------------------------------------------------------
-
-#define PWM_MAX_CHANNEL 2   //!< Supported number of PWM channels
 
 // --- Type definitions --------------------------------------------------------
 
@@ -47,14 +47,42 @@
 // --- Global functions --------------------------------------------------------
 
 /**
+ * Initialize PWM.
+ *
+ * Fast PWM TOP=ICRn
+ * WGM13    WGM12   WGM11    WGM10
+ *     1        1       1        0
+ *
+ * Prescaler = 1024
+ *  CS12    CS11    CS10
+ *     0       1       0
+ */
+void pwm16bit_init(void)
+{
+   TCCR1A = (1 << WGM11);
+   TCCR1B = (1 << WGM13) | (1 << WGM12) | (1 << CS10);
+   ICR1H = 0xFF;
+   ICR1L = 0xFF;
+}
+
+/**
  * Initialize PWM channel.
+ *
+ * Clear output on compare match.
  * @param[in] chn Channel number starting at 0.
  */
 void pwm16bit_channel_init (uint8_t chn) 
 {
-    if (chn >= PWM_MAX_CHANNEL) return;
-    
-    //TODO insert PWM specific initializations here!
+    switch (chn) {
+    case 0:
+        TCCR1A |= (1 << COM1A1);
+        break;
+    case 1:
+        TCCR1A |= (1 << COM1B1);
+        break;
+    default:
+        break;
+    }
 }
 
 /**
@@ -64,7 +92,18 @@ void pwm16bit_channel_init (uint8_t chn)
  */
 void pwm16bit_channel_set (uint8_t chn, uint16_t dutycycle)
 {
-    if (chn >= PWM_MAX_CHANNEL) return;
+    switch (chn) {
+    case 0:
+        OCR1AH = (dutycycle >> 8);
+        OCR1AL = (dutycycle & 0x00FF);
+        break;
+    case 1:
+        OCR1BH = (dutycycle >> 8);
+        OCR1BL = (dutycycle & 0x00FF);
+        break;
+    default:
+        break;
+    }
 }
 
 /** @} */

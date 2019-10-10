@@ -53,5 +53,7 @@ void led2_init (void);
 
 void led2_background (void);
 
+void led2_set_intensity(uint8_t channel, uint8_t intensity);
+
 #endif /* _APPCONFIG_H_ */
 /** @} */

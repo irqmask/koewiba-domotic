@@ -36,9 +36,9 @@
 // ----------------------------------------------------------------------------
 
 #define BUS_PCBCONFIG       1
-#define BUS_DDR_ENASND0     DDRD
-#define BUS_PORT_ENASND0    PORTD
-#define BUS_ENASND0         PD4
+#define BUS_DDR_ENASND0     DDRB
+#define BUS_PORT_ENASND0    PORTB
+#define BUS_ENASND0         PB3
 
 #define SPI_PCBCONFIG       1
 #define SPI_DDR_MOSI        DDRB

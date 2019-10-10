@@ -33,6 +33,7 @@
 #include "led2chn.h"
 #include "prjtypes.h"
 #include "register.h"
+#include "sleepmode.h"
 #include "timer.h"
 
 // --- Definitions -------------------------------------------------------------
@@ -181,6 +182,9 @@ void app_init (void)
     g_led_setpoint[1] = 0;
     g_channel_change_dir[0] = 1;
     g_channel_change_dir[1] = 0;
+
+    // workaround, don't sleep
+    sleep_prevent(1<<0, 1);
 }
 
 /**

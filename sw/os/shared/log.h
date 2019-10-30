@@ -49,6 +49,8 @@ extern "C" {
 #define LOG_VERBOSE3    0x00000080
 #define LOG_VERBOSE4    0x00000100
 
+#define LOG_STANDARD_MASK (LOG_ERROR | LOG_WARNING | LOG_INFO)
+    
 #define LOG_MAX_MESSAGE_LENGTH 256
 
 // --- Type definitions --------------------------------------------------------

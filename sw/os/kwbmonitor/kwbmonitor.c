@@ -98,9 +98,9 @@ void monitor_parse_message (uint8_t new_byte, bus_history_t* history)
         // check address receiver
         if (new_byte & 0x80) {
             msgstatus = eMSG_ERROR;
-        } else
+        } else {
             history->message[history->current_msg_bytes] = new_byte;
-
+        }
     } else if (history->current_msg_bytes == 4) {
         // extended address
         history->message[history->current_msg_bytes] = new_byte;
@@ -138,7 +138,7 @@ void monitor_parse_message (uint8_t new_byte, bus_history_t* history)
         case eMSG_NOTHING:
             break;
         case eMSG_ERROR:
-            strcat_s(buffer, sizeof(buffer)-1, "| ERR stray bytes\r\n");
+            strcat_s(buffer, sizeof(buffer)-1, "| ERR stray\r\n");
             printf("%s", buffer);
             break;
 
@@ -148,18 +148,17 @@ void monitor_parse_message (uint8_t new_byte, bus_history_t* history)
             break;
 
         case eMSG_EMPTY:
-            strcat_s(buffer, sizeof(buffer)-1, "| EMPTY MESSAGE\r\n");
+            strcat_s(buffer, sizeof(buffer)-1, "| EMPTY MSG\r\n");
             if (g_display_empty_msg) printf("%s", buffer);
             break;
 
         case eMSG_COMPLETE:
-            strcat_s(buffer, sizeof(buffer)-1, "| MESSAGE");
             if (history->expected_CRC != calcedcrc) {
-                snprintf(part, sizeof(part)-1, "  BAD CRC %x %x %d\r\n", history->expected_CRC, calcedcrc, crclen);
+                snprintf(part, sizeof(part)-1, "| MSG BADCRC %04x %04x\r\n", history->expected_CRC, calcedcrc);
+                strcat_s(buffer, sizeof(buffer)-1, part);
             } else {
-                snprintf(part, sizeof(part)-1, " GOOD CRC %x %x %d\r\n", history->expected_CRC, calcedcrc, crclen);
+                strcat_s(buffer, sizeof(buffer)-1, "| MESSAGE\r\n");
             }
-            strcat_s(buffer, sizeof(buffer)-1, part);
             printf("%s", buffer);
             break;
 

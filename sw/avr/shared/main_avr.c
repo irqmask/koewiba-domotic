@@ -12,19 +12,36 @@
  *
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
+/*
+ * Copyright (C) 2019  christian <irqmask@web.de>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 // --- Include section ---------------------------------------------------------
 
 #include <avr/interrupt.h>
+#include <avr/pgmspace.h>
 #include <avr/wdt.h>
 
 #include "bus.h"
-#include "clock.h"
 #include "cmddef_common.h"
 #include "moddef_common.h"
 #include "queue.h"
 #include "register.h"
 #include "sleepmode.h"
+#include "timer.h"
 
 #ifndef NO_BLOCK_MESSAGE
  #include "block_message.h"
@@ -82,6 +99,21 @@ void init_wdt(void)
 }
 #endif
 
+extern const unsigned char app_versioninfo[MOD_LEN_CONTROLLERID + MOD_LEN_BOARDID + MOD_LEN_BOARDREV + MOD_LEN_APPID + MOD_LEN_APPVER];
+
+/// send the version information
+static inline void answer_version_info_request (uint16_t sender)
+{
+    uint8_t msg[sizeof(app_versioninfo) + 1], i;
+
+    msg[0] = eCMD_STATE_VERSION;
+    for (i=0; i<sizeof(app_versioninfo); i++) {
+        msg[i + 1] = pgm_read_byte(&app_versioninfo[i]);
+    }
+    bus_send_message(&g_bus, sender, sizeof(msg), msg);
+}
+
+/// first entry point to interpret incoming messages.
 static inline void interpret_message (uint16_t sender, uint8_t msglen, uint8_t* msg)
 {
     switch (msg[0]) {
@@ -93,6 +125,12 @@ static inline void interpret_message (uint16_t sender, uint8_t msglen, uint8_t* 
         // fallthrough
     case eCMD_SET_REG_32BIT:
         register_do_command(&g_bus, sender, msglen, msg);
+        break;
+
+    case eCMD_REQUEST_INFO_OF_TYPE:
+        if (msglen == 2 && msg[1] == eINFO_VERSION) {
+            answer_version_info_request(sender);
+        }
         break;
 
 #ifndef NO_BLOCK_MESSAGE
@@ -111,9 +149,7 @@ static inline void interpret_message (uint16_t sender, uint8_t msglen, uint8_t* 
 #endif
 
     case eCMD_SLEEP:
-        sleep_pinchange_enable();
         bus_sleep(&g_bus);
-        sleep_pinchange_disable();
         break;
 
     case eCMD_RESET:
@@ -142,7 +178,7 @@ int main(void)
     uint8_t msg[BUS_MAXRECVMSGLEN];
     uint16_t sender = 0, module_id = 0x7F;
 
-    clk_initialize();
+    timer_initialize();
 
     register_get(MOD_eReg_ModuleID, 0, &module_id);
     bus_configure(&g_bus, module_id);
@@ -165,6 +201,12 @@ int main(void)
             }
         }
         app_background(&g_bus);
+
+        if (sleep_check_and_goodnight() == true) {
+            // bus gone to sleep and now woken up
+            // wait for first pending byte, then set module to running state
+            g_bus.eState = eBus_InitWait;
+        }
     }
     return 0;
 }

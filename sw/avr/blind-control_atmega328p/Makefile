@@ -11,24 +11,26 @@ include ../buildscripts/lib/lib_outputdirs.mk
 SRC = ../shared/bus_transport.c \
       ../shared/crc16.c \
       ../shared/queue.c \
+      shared/alarmclock.c \
       shared/block_message.c \
       shared/bus_phy.c \
-      shared/clock.c \
+      shared/datetime.c \
       shared/eeprom_spi.c \
       shared/led_debug.c \
       shared/main_avr.c \
       shared/register.c \
       shared/sleepmode.c \
+      shared/timer.c \
+      blind-control/blindctrl.c \
+      blind-control/motor.c \
       blind-control_atmega328p/application.c \
       blind-control_atmega328p/appregister.c \
       blind-control_atmega328p/appversion.c \
-      blind-control_atmega328p/blindctrl.c \
-      blind-control_atmega328p/datetime.c \
       blind-control_atmega328p/inputs.c \
-      blind-control_atmega328p/motor.c \
 
 # Place -I options here
 INCDIRS = -I. \
+          -I../blind-control \
           -I../shared \
           -I../../include \
           -I../../shared

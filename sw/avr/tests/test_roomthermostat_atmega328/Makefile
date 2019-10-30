@@ -13,7 +13,6 @@ SRC = ../shared/bus_transport.c \
       ../shared/queue.c \
       shared/block_message.c \
       shared/bus_phy.c \
-      shared/clock.c \
       shared/disp_sh1106.c \
       shared/eeprom_spi.c \
       shared/gdisplay.c \
@@ -22,6 +21,7 @@ SRC = ../shared/bus_transport.c \
       shared/led_debug.c \
       shared/register.c \
       shared/sleepmode.c \
+      shared/timer.c \
       shared/zagwire.c \
       tests/test_roomthermostat_atmega328/appregister.c \
       tests/test_roomthermostat_atmega328/appversion.c \

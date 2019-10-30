@@ -43,6 +43,7 @@
 #define MOD_LEN_BOARDREV        1
 #define MOD_LEN_APPID           2
 #define MOD_LEN_APPVER          3
+#define MOD_VERSIONINFO_LEN     (MOD_LEN_CONTROLLERID + MOD_LEN_BOARDID + MOD_LEN_BOARDREV + MOD_LEN_APPID + MOD_LEN_APPVER)
 
 //! Application's version items in #app_versioninfo
 //! @see BOARD_IDs, APP_IDs, APP_VERSIONING
@@ -187,6 +188,15 @@ typedef enum {
     eBldFlagUnused,
     eBldFlagAppProgram
 } eBldStatusFlags_t;
+
+//! Module version information
+typedef struct {
+    uint8_t controller_id[MOD_LEN_CONTROLLERID]; //!< ID / signature of Microcontroller.
+    uint16_t board_id;      //!< Hardware ID of board/pcb
+    uint8_t board_rev;      //!< Hardware revision of board/pcb
+    uint16_t app_id;        //!< Software ID of application.
+    uint8_t version[MOD_LEN_APPVER]; //!< Major, Minor, Bugfix version.
+} version_info_t;
 
 // --- Local variables ---------------------------------------------------------
 

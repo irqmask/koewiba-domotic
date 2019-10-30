@@ -11,16 +11,16 @@
 
 #include "bus.h"
 #include "block_message.h"
-#include "clock.h"
 #include "cmddef_common.h"
 #include "crc16.h"
 #include "eeprom_spi.h"
 #include "moddef_common.h"
 #include "prjtypes.h"
 #include "register.h"
+#include "timer.h"
 
-static clock_timer_t	g_timer; 	//!< transmission timer to detect timeouts
-static block_data_t   	g_bd; 		//!< status data of current_transmission
+static timer_data_t     g_timer;    //!< transmission timer to detect timeouts
+static block_data_t     g_bd;       //!< status data of current_transmission
 
 static void send_ack_message (sBus_t* bus, uint16_t receiver,
 		                      uint8_t parent_cmd)
@@ -183,7 +183,7 @@ bool block_message_start (sBus_t* bus, uint16_t sender, uint8_t msglen, uint8_t*
 		}
 	} while (false);
 	if (ret == true) {
-		clk_timer_start(&g_timer, CLOCK_MS_2_TICKS(10000));
+		timer_start(&g_timer, TIMER_MS_2_TICKS(10000));
 	} else {
 		send_nak_message(bus, sender, eCMD_BLOCK_START);
 	}
@@ -212,7 +212,7 @@ bool block_message_data (sBus_t* bus, uint16_t sender, uint8_t msglen, uint8_t* 
 		}
 	} while (false);
     if (ret == true) {
-    	clk_timer_start(&g_timer, CLOCK_MS_2_TICKS(10000));
+    	timer_start(&g_timer, TIMER_MS_2_TICKS(10000));
     	send_ack_message(bus, sender, eCMD_BLOCK_DATA);
     } else {
     	send_nak_message(bus, sender, eCMD_BLOCK_DATA);
@@ -241,19 +241,20 @@ bool block_message_end (sBus_t* bus, uint16_t sender, uint8_t msglen, uint8_t* m
 			break;
 		}
 	} while (false);
-    if (ret != true) {
+    send_block_info_message(bus, sender,
+                            g_bd.crc_host,
+                            g_bd.crc_local,
+                            g_bd.received);
+	if (ret != true) {
     	send_nak_message (bus, sender, eCMD_BLOCK_END);
     }
-	send_block_info_message(bus, sender,
-							g_bd.crc_host,
-							g_bd.crc_local,
-							g_bd.received);
+
     return ret;
 }
 
 void block_data_reset (void)
 {
-    clk_timer_stop(&g_timer);
+    timer_stop(&g_timer);
     g_bd.blocktype    = eSTORAGE_NONE;
     g_bd.sender       = 0;
     g_bd.startaddress = 0x00000000;
@@ -273,5 +274,5 @@ void block_data_reset (void)
  */
 bool block_timer_elapsed (void)
 {
-    return (clk_timer_is_running(&g_timer) && clk_timer_is_elapsed(&g_timer));
+    return (timer_is_running(&g_timer) && timer_is_elapsed(&g_timer));
 }

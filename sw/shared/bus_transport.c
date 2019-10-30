@@ -9,11 +9,24 @@
  * @todo    1. Describe file purpose
  * @todo    2. Implement a queue of received messages instead of only one
             message. Many nodes can send one node a message.
- * @todo    3. Decide if an outgoing message queue is needed. For the first step
-            surely not.
- * @todo    4. Further improvements :-)
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
+/*
+ * Copyright (C) 2019  christian <irqmask@web.de>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 // --- Include section ---------------------------------------------------------
 
@@ -25,9 +38,9 @@
 
 #include "bus_intern.h"
 #include "cmddef_common.h"
-#include "clock.h"
 #include "crc16.h"
 #include "sleepmode.h"
+#include "timer.h"
 
 // --- Definitions -------------------------------------------------------------
 
@@ -135,21 +148,20 @@ static bool receive (sBus_t* psBus)
                     break;
                 }
                 psBus->sRecvMsg.uReceiver = u;
-                // hello, is it me you are looking for (or broadcast-message)?
-                if ((psBus->sCfg.router_mode) ||
-                    (BUS_BRDCSTADR == u) ||
-                    (u == psBus->sCfg.uOwnNodeAddress)) {
-                    // nothing more to do here.
-                } else {
-                    // we are not interested in this message
-                    psBus->eState = eBus_ReceivingPassive;
-                }
 
             // 5. byte: EA - Extended address 4bit sender in higher nibble, 4bit receiver in lower nibble.
             } else if (psBus->sRecvMsg.uOverallLength == 4) {
                 psBus->sRecvMsg.uSender |= (((uint16_t)u & 0x00F0) << 4);
                 psBus->sRecvMsg.uReceiver |= (((uint16_t)u & 0x000F) << 8);
-                // TODO check receiver address again
+                // hello, is it me you are looking for (or broadcast-message or router)?
+                if (psBus->sCfg.router_mode ||
+                    psBus->sRecvMsg.uReceiver == BUS_BRDCSTADR ||
+                    psBus->sRecvMsg.uReceiver == psBus->sCfg.uOwnAddress) {
+                    // nothing more to do here.
+                } else {
+                    // we are not interested in this message
+                    psBus->eState = eBus_ReceivingPassive;
+                }
 
             // receive data (5th byte till length + 3(SY+AS+LE) - 2(CRC))
             } else if (psBus->sRecvMsg.uOverallLength > 4) {
@@ -193,7 +205,7 @@ static bool receive (sBus_t* psBus)
                 psBus->msg_receive_state = eBUS_RECV_FOREIGN_MESSAGE;
                 reset_bus(psBus);
                 // wait for ACK of receiver of foreign message
-                clk_timer_start(&psBus->ack_timeout, CLOCK_MS_2_TICKS(BUS_ACK_TIMEOUT));
+                timer_start(&psBus->ack_timeout, TIMER_MS_2_TICKS(BUS_ACK_TIMEOUT));
                 psBus->eState = eBus_AckWaitReceiving;
             }
         }
@@ -318,7 +330,7 @@ static void wait_for_ack_passive (sBus_t* psBus)
     uint8_t u;
 
     do {
-        if (clk_timer_is_elapsed(&psBus->ack_timeout)) {
+        if (timer_is_elapsed(&psBus->ack_timeout)) {
             // timeout. go back to idle
             reset_bus(psBus);
             break;
@@ -383,6 +395,7 @@ bool bus_trp_send_and_receive (sBus_t* psBus)
 
     case eBus_InitWait:
         if (bus_phy_data_received(&psBus->sPhy)) {
+            sleep_request(false);
             psBus->eState = eBus_Idle;
             psBus->eModuleState = eMod_Running;
         } else {
@@ -609,16 +622,17 @@ bool bus_read_message_verbose (sBus_t*   psBus,
  * @returns true, if the message has successfully been queued.
  * @note Use bus_is_idle() to check if message is successfully transmitted.
  */
-bool bus_send_message (sBus_t*    psBus,
-                       uint16_t   uReceiver,
-                       uint8_t    uLen,
-                       uint8_t*   puMsg)
+bool bus_send_message (sBus_t*          psBus,
+                       uint16_t         uReceiver,
+                       uint8_t          uLen,
+                       const uint8_t*   puMsg)
 {
     uint8_t  overall_msg_len;
 
     do {
         // wake-up bus
         if(eMod_Sleeping == psBus->eModuleState) {
+            sleep_request(false);
         	bus_send_wakeupbyte(psBus);
         	psBus->eModuleState = eMod_Running;
         	bus_flush_bus(psBus);
@@ -727,22 +741,8 @@ bool bus_is_idle (sBus_t*       psBus)
 void bus_sleep (sBus_t*       psBus)
 {
 	psBus->eModuleState = eMod_Sleeping;
-    // disable clock-timer, otherwise IRQ will cause immediate wakeup.
-	clk_control(false);
 
-	// sleep till byte is received.
-	sleep_set_mode(SLEEP_MODE_IDLE);
-	sleep_activate();
-
-	// ...sleeping... zzzZZZ
-
-	sleep_delay_ms(1);      // wait for sys-clock becoming stable
-
-	bus_flush_bus(psBus);   // Clean bus-buffer
-	clk_control(true);      // enable clock-timer
-
-	// wait for first pending byte, then set module to running state
-	psBus->eState = eBus_InitWait;
+	sleep_request(true);
 }
 
 /**

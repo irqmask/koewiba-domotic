@@ -35,9 +35,9 @@
 			<locationURI>KWB_AVR_SHARED</locationURI>
 		</link>
 		<link>
-			<name>blind-control</name>
+			<name>blindcontrol</name>
 			<type>2</type>
-			<locationURI>KWB_AVR_BLINDCTRL</locationURI>
+			<locationURI>KWB_AVR_BLINDCONTROL</locationURI>
 		</link>
 		<link>
 			<name>include</name>

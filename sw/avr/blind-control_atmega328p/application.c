@@ -1,35 +1,47 @@
 /**
- * @addtogroup BASIC_APP_ATMEGA328
+ * @addtogroup BLINDCONTROL
  * @addtogroup APPLICATION
  * @brief Application specific code of "blind-control_atmega328p" project.
  *
  * Contains application specific initialization, command-interpreter, 
  * register code and background loop.
  * 
- * @todo Implement control of motor relays
- * @todo Implement blind statemachines
- * @todo Implement key-debounce
- * @todo Implement window open/close notifications
- * @todo Implement date and time functions
- * @todo Implement general register receive functions
- *
  * @{
  * @file    application.c
  * @brief   Application specific code of "blind-control_atmega328p" project.
  *
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
+/*
+ * Copyright (C) 2018  christian <irqmask@web.de>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 // --- Include section ---------------------------------------------------------
 
 #include "prjtypes.h"
 
+#include "alarmclock.h"
 #include "blindctrl.h"
 #include "bus.h"
 #include "cmddef_common.h"
+#include "datetime.h"
 #include "inputs.h"
 #include "motor.h"
 #include "register.h"
+#include "timer.h"
 
 // --- Definitions -------------------------------------------------------------
 
@@ -39,6 +51,7 @@
 
 static bool g_window_state = false;
 static bool g_last_window_state = true;
+static timer_data_t g_seconds_timer;
 
 // --- Global variables --------------------------------------------------------
 
@@ -72,13 +85,17 @@ extern void        app_register_load       (void);
 void app_init (void) 
 {
     input_initialize();
-    motor_initialize();
-    blind_initialize();
+    motors_initialize();
+    blinds_initialize();
+    dt_initialize();
+
     // load application parameters
     app_register_load();
     // initialize window statemachine
     g_window_state = false;
     g_last_window_state = !g_window_state;
+
+    timer_start(&g_seconds_timer, TIMER_MS_2_TICKS(1000));
 }
 
 /**
@@ -88,9 +105,12 @@ void app_init (void)
  */
 void app_on_command (uint16_t sender, uint8_t msglen, uint8_t* msg)
 {
+    uint8_t blind_index = 0;
+
     switch (msg[0]) {
     case APP_eCmd_Stop:
-        blind_stop();
+        blind_index = msg[1];
+        if (blind_index < BLIND_COUNT) blind_stop(blind_index);
         break;
 
     default:
@@ -108,10 +128,10 @@ void app_background (sBus_t* bus)
     input_background();
 
     if (input_up()) {
-        blind_move_to_position(100);
+        blind_move_to_position(0, 100);
     }
     if (input_down()) {
-        blind_move_to_position(0);
+        blind_move_to_position(0, 0);
     }
 
     // check window position
@@ -121,8 +141,33 @@ void app_background (sBus_t* bus)
         send_window_state(bus);
     }
 
-    motor_background();
-    blind_background(bus);
+    motors_background();
+    blinds_background(bus);
+
+    if (timer_is_elapsed(&g_seconds_timer)) {
+        timer_start(&g_seconds_timer, TIMER_MS_2_TICKS(1000));
+        dt_tick_second();
+    }
+}
+
+/**
+ *  Check every minute if one of the up/down alarms triggers.
+ */
+void app_on_minute(void)
+{
+    int8_t alarm_idx = -1;
+    bool move_up = false;
+
+    if (alarm_check(&alarm_idx)) {
+        if (blind_is_moving(0) == false) {
+            move_up = ((alarm_idx % 2) == 0);
+            if (move_up) {
+                blind_move_to_position(0, 0);
+            } else {
+                blind_move_to_position(0, 100);
+            }
+        }
+    }
 }
 
 /** @} */

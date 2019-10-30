@@ -24,7 +24,7 @@
 // --- Module global variables -------------------------------------------------
 
 // --- Local functions ---------------------------------------------------------
-
+#if 0
 /**
  * Toggle the status LED.
  */
@@ -57,7 +57,7 @@ void dbg_error_LED_off (void)
 {
 	LED_ERROR_PORT &= ~(1<<LED_ERROR);
 }
-
+#endif
 // --- Module global functions -------------------------------------------------
 
 // --- Global functions --------------------------------------------------------

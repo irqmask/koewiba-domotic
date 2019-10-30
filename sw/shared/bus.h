@@ -15,8 +15,8 @@
 // --- Include section ---------------------------------------------------------
 
 #include "prjtypes.h"
-#include "clock.h"
 #include "queue.h"
+#include "timer.h"
 
 #ifdef HAS_APPCONFIG_H
  #include "appconfig.h"
@@ -192,7 +192,7 @@ typedef struct bus {
     queue_t             tx_queue;                       //!< transmit queue for outgoing messages.
     uint8_t             tx_queue_data[100];             //!< transmit queue data storage.
     uint8_t             auEmptyMsg[BUS_EMPTY_MSG_LEN];  //!< pre-compiled empty message.
-    clock_timer_t       ack_timeout;                    //!< ack timeout
+    timer_data_t        ack_timeout;                    //!< ack timeout
 } sBus_t;
 
 // --- Local variables ---------------------------------------------------------
@@ -235,7 +235,7 @@ bool    bus_read_message_verbose            (sBus_t*        psBus,
 bool 	bus_send_message                    (sBus_t*        psBus,
                                              uint16_t       uReceiver,
                                              uint8_t        uLen,
-                                             uint8_t*       puMsg);
+                                             const uint8_t* puMsg);
 
 bool 	bus_is_idle                         (sBus_t*        psBus);
 

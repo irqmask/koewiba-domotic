@@ -1,18 +1,19 @@
 /**
- * @addtogroup DATETIME
- * @brief Public interface of date and time module.
+ * @addtogroup SN74595
+ * @brief This module contains functions to control a 74595 latch.
  *
- * This module contains functions to manage date and time.
+ * This module contains functions to control a 74595 latch using SPI0 and
+ * additional latch and output-enable pins.
  *
  * @{
- * @file    datetime.h
- * @brief   This module contains functions to manage date and time.
+ * @file    sn74595.h
+ * @brief   This module contains functions to control a 74595 latch.
  *
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
 
-#ifndef _DATETIME_H_
-#define _DATETIME_H_
+#ifndef _SN74595_H_
+#define _SN74595_H_
 
 // --- Include section ---------------------------------------------------------
 
@@ -21,28 +22,6 @@
 // --- Definitions -------------------------------------------------------------
 
 // --- Type definitions --------------------------------------------------------
-
-typedef enum weekday {
-	eMONDAY,
-	eTUESDAY,
-	eWEDNESDAY,
-	eTHURSDAY,
-	eFRIDAY,
-	eSATURDAY,
-	eSUNDAY
-} weekday_t;
-
-//! Time-out timer runtime-data.
-typedef struct datetime {
-    uint16_t 		year;
-    uint8_t			month;
-    uint8_t			day;
-    weekday_t		day_of_week;
-
-    uint8_t			hour;
-    uint8_t         minute;
-    uint8_t         second;
-} datetime_t;
 
 // --- Local variables ---------------------------------------------------------
 
@@ -56,7 +35,15 @@ typedef struct datetime {
 
 // --- Global functions --------------------------------------------------------
 
-void dat_initialize        (void);
+void sn74595_initialize     (void);
 
-#endif /* _DATETIME_H_ */
+void sn74595_latch          (void);
+
+void sn74595_OE_on          (void);
+
+void sn74595_OE_off         (void);
+
+void sn74595_send           (uint8_t data);
+
+#endif /* _SN74595_H_ */
 /** @} */

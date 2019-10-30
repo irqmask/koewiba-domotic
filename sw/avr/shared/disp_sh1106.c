@@ -138,12 +138,18 @@ void sh1106_nop (void)
 void sh1106_initialize (void)
 {
     // set port data directions and initial levels
+    DISP_DDR_RES |= (1<<DISP_RES);
     DISP_DDR_A0 |= (1<<DISP_A0);
     DISP_DDR_SS |= (1<<DISP_SS);
     DISP_PORT_A0 &= ~(1<<DISP_A0);
     DISP_PORT_SS |= (1<<DISP_SS);
 
+    // reset the display
+    DISP_PORT_RES &= ~(1<<DISP_RES);
     _delay_us(10);
+    DISP_PORT_RES |= (1<<DISP_RES);
+    _delay_us(25);
+
     sh1106_display_on(0);
     sh1106_disp_reverse(0);
     write_command(0xD5);        // set display clock div

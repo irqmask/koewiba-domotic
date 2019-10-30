@@ -1,11 +1,11 @@
 EESchema-LIBRARY Version 2.4
 #encoding utf-8
 #
-# display:Graphic-OLED-Display_4wireSPI
+# display_Graphic-OLED-Display_4wireSPI
 #
-DEF display:Graphic-OLED-Display_4wireSPI MOD 0 40 Y Y 1 F N
+DEF display_Graphic-OLED-Display_4wireSPI MOD 0 40 Y Y 1 F N
 F0 "MOD" -5 850 50 H V C CNN
-F1 "display:Graphic-OLED-Display_4wireSPI" -5 750 50 H V C CNN
+F1 "display_Graphic-OLED-Display_4wireSPI" -5 750 50 H V C CNN
 F2 "" -5 0 60 H I C CNN
 F3 "" -5 0 60 H I C CNN
 DRAW
@@ -27,11 +27,11 @@ X CS 7 300 0 100 U 40 40 1 1 I I
 ENDDRAW
 ENDDEF
 #
-# logo:OPEN_HARDWARE_1
+# logo_OPEN_HARDWARE_1
 #
-DEF logo:OPEN_HARDWARE_1 LOGO 0 40 Y Y 1 F N
+DEF logo_OPEN_HARDWARE_1 LOGO 0 40 Y Y 1 F N
 F0 "LOGO" 0 275 60 H V C CNN
-F1 "logo:OPEN_HARDWARE_1" 0 -225 60 H V C CNN
+F1 "logo_OPEN_HARDWARE_1" 0 -225 60 H V C CNN
 F2 "" 0 0 50 H I C CNN
 F3 "" 0 0 50 H I C CNN
 DRAW
@@ -39,11 +39,11 @@ P 277 0 1 0 132 -171 130 -170 125 -167 118 -162 109 -156 100 -150 93 -146 88 -14
 ENDDRAW
 ENDDEF
 #
-# modules:bus-module_atmega328_revB
+# modules_bus-module_atmega328_revB
 #
-DEF modules:bus-module_atmega328_revB MOD 0 40 Y Y 1 F N
+DEF modules_bus-module_atmega328_revB MOD 0 40 Y Y 1 F N
 F0 "MOD" -150 -150 40 H V C CNN
-F1 "modules:bus-module_atmega328_revB" 100 0 40 V V C CNN
+F1 "modules_bus-module_atmega328_revB" 100 0 40 V V C CNN
 F2 "" 0 -150 60 H V C CNN
 F3 "" 0 -150 60 H V C CNN
 $FPLIST
@@ -84,11 +84,11 @@ X PC5 9 -550 100 100 R 40 40 1 1 I
 ENDDRAW
 ENDDEF
 #
-# power:GND
+# power_GND
 #
-DEF ~power:GND #PWR 0 10 Y Y 1 F P
+DEF ~power_GND #PWR 0 10 Y Y 1 F P
 F0 "#PWR" 0 -200 50 H I C CNN
-F1 "power:GND" 0 -110 50 H I C CNN
+F1 "power_GND" 0 -110 50 H I C CNN
 F2 "" 0 0 50 H I C CNN
 F3 "" 0 0 50 H I C CNN
 DRAW
@@ -100,11 +100,11 @@ X GND 1 0 0 0 U 40 40 1 1 W N
 ENDDRAW
 ENDDEF
 #
-# power:VCC
+# power_VCC
 #
-DEF power:VCC #PWR 0 0 Y Y 1 F P
+DEF power_VCC #PWR 0 0 Y Y 1 F P
 F0 "#PWR" 0 175 50 H I C CNN
-F1 "power:VCC" 0 100 50 H V C CNN
+F1 "power_VCC" 0 100 50 H V C CNN
 F2 "" 0 0 50 H I C CNN
 F3 "" 0 0 50 H I C CNN
 DRAW
@@ -114,11 +114,11 @@ X VCC 1 0 0 0 U 20 20 0 0 W N
 ENDDRAW
 ENDDEF
 #
-# sensors:TSIC206_SOIC8
+# sensors_TSIC206_SOIC8
 #
-DEF sensors:TSIC206_SOIC8 U 0 40 Y Y 1 F N
+DEF sensors_TSIC206_SOIC8 U 0 40 Y Y 1 F N
 F0 "U" 0 350 50 H V C CNN
-F1 "sensors:TSIC206_SOIC8" 0 225 50 H V C CNN
+F1 "sensors_TSIC206_SOIC8" 0 225 50 H V C CNN
 F2 "SOIC8" 0 -250 25 H I C CNN
 F3 "" 0 0 50 H I C CNN
 ALIAS TSIC306_SOIC8
@@ -149,11 +149,11 @@ X GND 4 100 -400 100 U 40 40 1 1 O
 ENDDRAW
 ENDDEF
 #
-# standard:C
+# standard_C
 #
-DEF standard:C C 0 40 N N 1 F N
+DEF standard_C C 0 40 N N 1 F N
 F0 "C" 50 50 50 H V L CNN
-F1 "standard:C" 0 -125 50 H V C CNN
+F1 "standard_C" 0 -125 50 H V C CNN
 F2 "" 0 0 60 H V C CNN
 F3 "" 0 0 60 H V C CNN
 DRAW
@@ -172,11 +172,11 @@ X 2 2 100 0 75 L 50 50 1 1 I
 ENDDRAW
 ENDDEF
 #
-# standard:PushButton_SPST_NO
+# standard_PushButton_SPST_NO
 #
-DEF standard:PushButton_SPST_NO S 0 0 N N 1 F N
+DEF standard_PushButton_SPST_NO S 0 0 N N 1 F N
 F0 "S" 150 -75 50 H V C BNN
-F1 "standard:PushButton_SPST_NO" 150 125 50 H V C BNN
+F1 "standard_PushButton_SPST_NO" 150 125 50 H V C BNN
 F2 "" 0 0 60 H V C CNN
 F3 "" 0 0 60 H V C CNN
 DRAW
@@ -188,6 +188,20 @@ P 2 0 1 0 150 25 180 60 N
 P 2 0 1 0 160 40 160 100 N
 X ~ 1 0 0 100 R 40 40 1 1 I
 X ~ 2 300 0 100 L 40 40 1 1 I
+ENDDRAW
+ENDDEF
+#
+# standard_R
+#
+DEF standard_R R 0 40 N N 1 F N
+F0 "R" 0 -100 50 H V C CNN
+F1 "standard_R" 0 0 50 H V C CNN
+F2 "" 0 0 60 H V C CNN
+F3 "" 0 0 60 H V C CNN
+DRAW
+S -150 50 150 -50 0 1 0 N
+X 1 1 -200 0 50 R 40 40 1 1 P
+X 2 2 200 0 50 L 40 40 1 1 P
 ENDDRAW
 ENDDEF
 #

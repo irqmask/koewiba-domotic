@@ -74,7 +74,7 @@ typedef enum {
  * 0x0003 bus-module_attiny1634
  * 0x0004 gateway_usb
  * 0x0005 motor_switch_3pole
- * 0x000x (not available yet - room-thermostat)
+ * 0x0006 room-thermostat
  * 0x000x (not available yet - heater-control)
  * 0x000x (not available yet - 8keys)
  * 0x000x (not available yet - io88)
@@ -97,6 +97,7 @@ typedef enum {
  * 0x0004 basic_app_atmega328(p)
  * 0x0005 basic_app_attiny1634
  * 0x0006 blind-control_atmega328(p)
+ * 0x0007 roomthermostat_atmega328(p)
  * ...
  * 0xEFFF (last common application)
  * 0xF000 (first user specific application)

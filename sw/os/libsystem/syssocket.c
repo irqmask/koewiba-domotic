@@ -168,7 +168,7 @@ sys_fd_t sys_socket_open_server_tcp (uint16_t port)
         return rc;
     }
 
-    rc = listen (fd, 32);
+    rc = listen (fd, 3);
     if (rc < 0) {
         perror("listen tcp server");
         close(fd);
@@ -198,16 +198,17 @@ sys_fd_t sys_socket_open_client_tcp (const char* socketaddress, uint16_t port)
     }
 
     sockinfo.sin_family = AF_INET;
-    if (inet_pton(AF_INET, socketaddress, &sockinfo.sin_addr) < 0) {
+    if (inet_pton(AF_INET, socketaddress, &sockinfo.sin_addr.s_addr) < 0) {
         rc = errno;
         perror("unable to convert address to IPv4 address!");
         close(fd);
         return rc;
     }
+    sockinfo.sin_port = htons(port);
 
     rc = connect(fd, (struct sockaddr *) &sockinfo, sizeof(sockinfo));
     if (rc < 0) {
-        perror("connect to tcp client");
+        perror("unable to connect to tcp client");
         close(fd);
         return rc;
     }
@@ -342,6 +343,7 @@ void sys_socket_get_name (sys_fd_t fd, char* address, size_t addr_len, uint16_t*
     union {
         struct sockaddr  common;
         struct sockaddr_un af_unix;
+        struct sockaddr_in af_inet;
     } sockinfo;
 
     socklen_t len = sizeof(sockinfo);
@@ -355,6 +357,8 @@ void sys_socket_get_name (sys_fd_t fd, char* address, size_t addr_len, uint16_t*
             if (port != NULL) *port = 0;
             break;
         case AF_INET:
+            inet_ntop(AF_INET, &sockinfo.af_inet.sin_addr, address, addr_len);
+            if (port != NULL) *port = ntohs(sockinfo.af_inet.sin_port);
             break;
         default:
             break;

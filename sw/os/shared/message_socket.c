@@ -204,6 +204,7 @@ int msg_s_open_server (msg_socket_t*   msg_socket,
         assert(msg_socket != NULL);
         assert(ioloop != NULL);
 
+        msg_socket->port = port;
         if (port == 0) {
             if (address == NULL) {
                 log_error("unix socket server address not set!");
@@ -214,6 +215,7 @@ int msg_s_open_server (msg_socket_t*   msg_socket,
                       sizeof(msg_socket->address),
                       address,
                       strlen(address));
+
             fd = sys_socket_open_server_unix(msg_socket->address);
             if (fd <= INVALID_FD) {
                 log_sys_error("unable to open unix socket server at path=%s", address);

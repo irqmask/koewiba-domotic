@@ -33,6 +33,7 @@
 #include <string.h>
 
 #include "ioloop.h"
+#include "log.h"
 #include "message_socket.h"
 #include "syssocket.h"
 
@@ -78,7 +79,7 @@ static msg_endpoint_t* msg_new_endpoint (msg_socket_t* msg_socket,
     do {
         ep = (msg_endpoint_t*)calloc(1, sizeof(msg_endpoint_t));
         if (ep == NULL) {
-            perror("new message transport endpoint could not be created");
+            log_sys_error("new message transport endpoint could not be created");
             break;
         }
 
@@ -128,12 +129,12 @@ static int32_t msg_read (void* arg)
         if (rc == 0) {
             // connection closed
             msg_s_close_connection(msg_socket, ep);
-            fprintf(stderr, "connection closed\n");
+            log_info("connection closed");
             break;
         }
 
         if (rc != sizeof(message)) {
-            perror("invaid size of incomming message");
+            log_sys_error("invaid size of incomming message");
             break;
         }
 
@@ -143,10 +144,6 @@ static int32_t msg_read (void* arg)
         }
     } while (0);
     return 0;
-}
-
-static void msg_ready_to_write (void* arg)
-{
 }
 
 static int32_t msg_accept_endpoint (void* arg)
@@ -163,7 +160,7 @@ static int32_t msg_accept_endpoint (void* arg)
         // get file descriptor of new client connection
         ep->fd = sys_socket_accept(msg_socket->well_known_fd);
         if (ep->fd <= INVALID_FD) {
-            perror("server not accepting new endpoint");
+            log_sys_error("server not accepting new endpoint");
             msg_delete_endpoint(msg_socket, ep);
             break;
         }
@@ -178,7 +175,7 @@ static int32_t msg_accept_endpoint (void* arg)
         // register new connection to ioloop
         ioloop_register_fd(msg_socket->ioloop, ep->fd, eIOLOOP_EV_READ, msg_read, (void*)ep);
 
-        fprintf(stderr, "connection accepted from %s:%d\n", address, port);
+        log_info("connection accepted from %s:%d\n", address, port);
     } while (0);
     return 0;
 }
@@ -206,28 +203,33 @@ int msg_s_open_server (msg_socket_t*   msg_socket,
     do {
         assert(msg_socket != NULL);
         assert(ioloop != NULL);
-        assert(address != NULL);
-
-        msg_socket->ioloop = ioloop;
-
-        strncpy_s(msg_socket->address,
-                  sizeof(msg_socket->address),
-                  address,
-                  strlen(address));
 
         if (port == 0) {
+            if (address == NULL) {
+                log_error("unix socket server address not set!");
+                rc = eERR_BAD_PARAMETER;
+                break;
+            }
+            strncpy_s(msg_socket->address,
+                      sizeof(msg_socket->address),
+                      address,
+                      strlen(address));
             fd = sys_socket_open_server_unix(msg_socket->address);
             if (fd <= INVALID_FD) {
+                log_sys_error("unable to open unix socket server at path=%s", address);
                 rc = eERR_SYSTEM;
                 break;
             }
-            sys_socket_set_blocking(fd, false);
         } else {
-            rc = eERR_NOT_IMPLEMENTED;
-            // TODO: insert tcp server code
-            break;
+            fd = sys_socket_open_server_tcp(msg_socket->port);
+            if (fd <= INVALID_FD) {
+                log_sys_error("unable to open tcp socket server at port=%d", port);
+                rc = eERR_SYSTEM;
+                break;
+            }
         }
-
+        sys_socket_set_blocking(fd, false);
+        msg_socket->ioloop = ioloop;
         msg_socket->well_known_fd = fd;
         ioloop_register_fd(ioloop, fd, eIOLOOP_EV_READ, msg_accept_endpoint, (void*)msg_socket);
     } while (0);
@@ -248,8 +250,6 @@ int msg_s_open_client (msg_socket_t*   msg_socket,
         assert(ioloop != NULL);
         assert(address != NULL);
 
-        msg_socket->ioloop = ioloop;
-
         strncpy_s(msg_socket->address,
                   sizeof(msg_socket->address),
                   address,
@@ -259,21 +259,27 @@ int msg_s_open_client (msg_socket_t*   msg_socket,
         if (port == 0) {
             fd = sys_socket_open_client_unix(msg_socket->address);
             if (fd <= INVALID_FD) {
+                log_sys_error("unable to connect client to unix socket server! address=%s",
+                              msg_socket->address);
                 rc = eERR_SYSTEM;
                 break;
             }
-            sys_socket_set_blocking(fd, false);
         } else {
-            rc = eERR_NOT_IMPLEMENTED;
-            // TODO: insert tcp client code
-            break;
+            fd = sys_socket_open_client_tcp(msg_socket->address, msg_socket->port);
+            if (fd <= INVALID_FD) {
+                log_sys_error("unable to connect client to tcp socket server! address=%s port=%d",
+                              msg_socket->address, msg_socket->port);
+                rc = eERR_SYSTEM;
+                break;
+            }
         }
 
+        msg_socket->ioloop = ioloop;
+        sys_socket_set_blocking(fd, false);
         ep = msg_new_endpoint(msg_socket, eMSG_EP_COMM);
         if (ep == NULL) break;
         ep->fd = fd;
         ep->msg_socket = msg_socket;
-
         ioloop_register_fd(ioloop, fd, eIOLOOP_EV_READ, msg_read, (void*)ep);
     } while (0);
     return rc;

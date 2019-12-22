@@ -42,10 +42,10 @@
 // will be called from /ref MESSAGE_SOCKET when a complete message has been
 // received and is passed to the common OnIncommingMessage() handler for all
 // type of connections.
-static void incommingMessageHdl(msg_t* message, void* reference, void* arg)
+static void incomingMessageHdl(msg_t* message, void* reference, void* arg)
 {
     RConnSocketClient* sockcon = (RConnSocketClient*)arg;
-    sockcon->OnIncommingMessage(message);
+    sockcon->OnIncomingMessage(message);
 }
 
 // will be called from /ref MESSAGE_SOCKET when a connection is closed. 
@@ -58,7 +58,7 @@ static void closeConnectionHdl(const char* address, uint16_t port, void* referen
 // --- Class member functions --------------------------------------------------
 
 /**
- * @todo consolidate constructors into one with default values.
+ * default constructor.
  */
 RConnSocketClient::RConnSocketClient() : ep(NULL),
                                          socket(NULL)
@@ -66,7 +66,6 @@ RConnSocketClient::RConnSocketClient() : ep(NULL),
     msg_s_init(&this->local_socket);
     this->socket = &this->local_socket;
     memset(this->name, 0, sizeof(name));
-    snprintf(this->name, sizeof(name-1), "USOCK");
 }
 
 /**
@@ -74,7 +73,8 @@ RConnSocketClient::RConnSocketClient() : ep(NULL),
  *
  * @param[in]   server      Pointer to the server.
  * @param[in]   ep          Endpoint of established socket-connection.
- * @todo remove address and port from interface. It is only used for logging purposes. Let server do it.
+ * @param[in]   address     Path and name to unix-socket ot TCP/IP address.
+ * @param[in]   port        0 for unix-socket or well-known TCP/IP port number.
  */
 RConnSocketClient::RConnSocketClient(msg_socket_t* server, msg_endpoint_t* ep, const char* address, uint16_t port)
 {
@@ -82,10 +82,28 @@ RConnSocketClient::RConnSocketClient(msg_socket_t* server, msg_endpoint_t* ep, c
     this->ep = ep;
     this->ioloop = server->ioloop;
     memset(this->name, 0, sizeof(name));
-    snprintf(this->name, sizeof(name-1), "USOCK");
-    msg_s_set_incomming_handler(this->socket, incommingMessageHdl, this);
+    snprintf(this->name, sizeof(name-1), "%s:%d", address, port);
+    msg_s_set_incomming_handler(this->socket, incomingMessageHdl, this);
     msg_s_set_closeconnection_handler(ep, closeConnectionHdl, this);
     log_msg(LOG_STATUS, "%s New client socket connection %s:%d", this->name, address, port);
+}
+
+/**
+ * Initializes a socket connection which has been accepted by the socket server.
+ *
+ * @param[in]   server      Pointer to the server.
+ * @param[in]   ep          Endpoint of established socket-connection.
+ * @param[in]   address     Path and name to unix-socket ot TCP/IP address.
+ * @param[in]   port        0 for unix-socket or well-known TCP/IP port number.
+ */
+RConnSocketClient::RConnSocketClient(ioloop_t* ioloop, const char* address, uint16_t port)
+{
+    this->socket = &this->local_socket;
+    this->ioloop = ioloop;
+    this->ep = nullptr;
+    memset(this->name, 0, sizeof(name));
+    snprintf(this->name, sizeof(name-1), "%s:%d", address, port);
+    msg_s_set_incomming_handler(this->socket, incomingMessageHdl, this);
 }
 
 /**
@@ -97,7 +115,7 @@ RConnSocketClient::~RConnSocketClient()
 }
 
 /** 
- * Open a socket connection either to a UNIX socket or to a TCP socket.
+ * Open a socket connection either to a UNIX socket or to a TCP socket server.
  *
  * @param[in]   address     Path and name to unix-socket ot TCP/IP address.
  * @param[in]   port        0 for unix-socket or well-known TCP/IP port number.
@@ -109,7 +127,7 @@ int RConnSocketClient::Open(const char* address, int port)
     int retval;
 
     this->socket = &this->local_socket;
-    msg_s_set_incomming_handler(this->socket, incommingMessageHdl, this);
+    msg_s_set_incomming_handler(this->socket, incomingMessageHdl, this);
     retval = msg_s_open_client(this->socket, ioloop, address, port);
     if (retval == eERR_NONE) {
         this->ep = this->socket->first_ep; // clients only have one endpoint

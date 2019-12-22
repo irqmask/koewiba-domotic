@@ -77,6 +77,8 @@ void log_add_mask (log_mask_t logmask);
 
 void log_msg (log_mask_t logmask, const char* logmessage, ...);
 
+void log_info(const char* logmessage, ...);
+
 void log_warning(const char* logmessage, ...);
 
 void log_error (const char* logmessage, ...);

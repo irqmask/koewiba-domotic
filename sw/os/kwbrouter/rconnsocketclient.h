@@ -48,6 +48,7 @@ private:
 
 public:
     RConnSocketClient();
+    RConnSocketClient(ioloop_t* ioloop, const char* address, uint16_t port);
     RConnSocketClient(msg_socket_t* server, msg_endpoint_t* ep, const char* address, uint16_t port);
     ~RConnSocketClient();
 

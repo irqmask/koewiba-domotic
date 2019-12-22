@@ -42,7 +42,7 @@
 static void incommingMessageHdl(msg_t* message, void* reference, void* arg)
 {
     RConnSerial* sercon = (RConnSerial*)arg;
-    sercon->OnIncommingMessage(message);
+    sercon->OnIncomingMessage(message);
 }
 
 // --- Class member functions --------------------------------------------------
@@ -128,7 +128,7 @@ int RConnSerial::Send(msg_t* message)
  * @param[in]   message     Received message. The message is only valid 
  *                          during the lifetime of this function.
  */
-void RConnSerial::OnIncommingMessage(msg_t* message)
+void RConnSerial::OnIncomingMessage(msg_t* message)
 {
     log_msg(LOG_VERBOSE1, "%6s --> message received", this->GetName());
     msg_log("SERIALRECV", *message);

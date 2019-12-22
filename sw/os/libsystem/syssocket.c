@@ -31,7 +31,9 @@
 #if defined (PRJCONF_UNIX) || \
     defined (PRJCONF_POSIX) || \
     defined (PRJCONF_LINUX)
+  #include <arpa/inet.h>
   #include <fcntl.h>
+  #include <netinet/in.h>
   #include <safe_lib.h>
   #include <sys/ioctl.h>
   #include <sys/socket.h>
@@ -128,7 +130,7 @@ sys_fd_t sys_socket_open_client_unix (const char* socketname)
 
     rc = connect(fd, (struct sockaddr *) &sockinfo, sockinfolen);
     if (rc != 0) {
-        perror("open unix client connect");
+        perror("connect to unix client");
         close(fd);
         return rc;
     }
@@ -140,16 +142,81 @@ sys_fd_t sys_socket_open_client_unix (const char* socketname)
 #endif
 }
 
-sys_fd_t sys_socket_open_server_tcp (const char* socketaddress, uint16_t port)
+sys_fd_t sys_socket_open_server_tcp (uint16_t port)
 {
-    //TODO implement
+#if defined (PRJCONF_UNIX) || \
+    defined (PRJCONF_POSIX) || \
+    defined (PRJCONF_LINUX)
+    int                 rc;
+    sys_fd_t            fd;
+    struct sockaddr_in  sockinfo;
+
+    fd = socket(AF_INET, SOCK_STREAM, 0);
+    if (fd < 0) {
+        perror("open tcp client socket");
+        return fd;
+    }
+
+    sockinfo.sin_family = AF_INET;
+    sockinfo.sin_addr.s_addr = INADDR_ANY;
+    sockinfo.sin_port = htons(port);
+
+    rc = bind(fd, (struct sockaddr *)&sockinfo, sizeof(sockinfo));
+    if (rc < 0) {
+        perror("bind tcp server");
+        close(fd);
+        return rc;
+    }
+
+    rc = listen (fd, 32);
+    if (rc < 0) {
+        perror("listen tcp server");
+        close(fd);
+        return rc;
+    }
+
+    return fd;
+#elif defined (PRJCONF_WINDOWS)
+    //TODO implement windows version
     return INVALID_FD;
+#endif
 }
 
 sys_fd_t sys_socket_open_client_tcp (const char* socketaddress, uint16_t port)
 {
+#if defined (PRJCONF_UNIX) || \
+    defined (PRJCONF_POSIX) || \
+    defined (PRJCONF_LINUX)
+    int                 rc;
+    sys_fd_t            fd;
+    struct sockaddr_in  sockinfo;
+
+    fd = socket(AF_INET, SOCK_STREAM, 0);
+    if (fd < 0) {
+        perror("open tcp client socket");
+        return fd;
+    }
+
+    sockinfo.sin_family = AF_INET;
+    if (inet_pton(AF_INET, socketaddress, &sockinfo.sin_addr) < 0) {
+        rc = errno;
+        perror("unable to convert address to IPv4 address!");
+        close(fd);
+        return rc;
+    }
+
+    rc = connect(fd, (struct sockaddr *) &sockinfo, sizeof(sockinfo));
+    if (rc < 0) {
+        perror("connect to tcp client");
+        close(fd);
+        return rc;
+    }
+
+    return fd;
+#else
     //TODO implement
     return INVALID_FD;
+#endif
 }
 
 void sys_socket_close (sys_fd_t fd)
@@ -167,11 +234,9 @@ sys_fd_t sys_socket_accept (sys_fd_t server_fd)
 #if defined (PRJCONF_UNIX) || \
     defined (PRJCONF_POSIX) || \
     defined (PRJCONF_LINUX)
-    struct sockaddr_un  sockinfo;
-    socklen_t           sockinfolen = sizeof(sockinfo);
     sys_fd_t            fd;
 
-    fd = accept (server_fd, (struct sockaddr *)&sockinfo, &sockinfolen);
+    fd = accept (server_fd, NULL, 0);
     return fd;
 #elif defined (PRJCONF_WINDOWS)
     //TODO implement windows version

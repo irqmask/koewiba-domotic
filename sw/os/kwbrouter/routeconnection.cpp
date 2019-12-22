@@ -104,7 +104,7 @@ int RouteConnection::Send(msg_t* message)
  *
  * @param[in]   message     Incomming message.
  */
-void RouteConnection::OnIncommingMessage(msg_t* message)
+void RouteConnection::OnIncomingMessage(msg_t* message)
 {
     log_msg(LOG_VERBOSE1, "%6s --> message received", this->GetName());
     msg_log("???RECV", *message);

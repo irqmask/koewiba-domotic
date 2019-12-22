@@ -53,7 +53,7 @@ sys_fd_t sys_socket_open_server_unix (const char* socketname);
 
 sys_fd_t sys_socket_open_client_unix (const char* socketname);
 
-sys_fd_t sys_socket_open_server_tcp (const char* socketaddress, uint16_t port);
+sys_fd_t sys_socket_open_server_tcp (uint16_t port);
 
 sys_fd_t sys_socket_open_client_tcp (const char* socketaddress, uint16_t port);
 

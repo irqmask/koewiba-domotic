@@ -49,7 +49,7 @@ public:
     void Close();
 
     int Send(msg_t* message);
-    void OnIncommingMessage(msg_t* message);
+    void OnIncomingMessage(msg_t* message);
 };
 
 #endif // RCONNSERIAL_H

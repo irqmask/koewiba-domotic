@@ -72,12 +72,15 @@ using namespace std;
 
 //! Stores default and interpreted command-line arguments
 typedef struct options {
-    char        serial_device[256];     //! Name of the serial device connection.
-    int         serial_baudrate;        //! Baudrate for the serial connection.
-    char        router_address[256];    //! Address of the router or unix socket
-    uint16_t    router_port;            //! Listening port of the router
-    bool        serial_device_set;      //! Flag, if a serial device is configured.
-    bool        router_address_set;     //! Flag, if a router is configured.
+    char        serial_device[256];         //! Name of the serial device connection.
+    int         serial_baudrate;            //! Baudrate for the serial connection.
+    char        unix_address[256];          //! Address of the unix socket for
+                                            //! local socket communication.
+    char        remote_router_address[256]; //! TCP address of the router to connect to.
+    uint16_t    router_server_port;         //! Listening port of the router
+    bool        serial_device_set;          //! Flag, if a serial device is configured.
+    bool        router_server_configured;   //! Flag, if router as server is configured.
+    bool        router_client_configured;   //! Flag, if router as client is configured.
 } options_t;
 
 // --- Local variables ---------------------------------------------------------
@@ -94,8 +97,9 @@ typedef struct options {
 static void set_options (options_t*     options,
                          const char*    serial_device,
                          int            serial_baudrate,
-                         const char*    router_address,
-                         uint16_t       router_port)
+                         const char*    unix_address,
+                         const char*    remote_router_address,
+                         uint16_t       router_server_port)
 {
     memset(options, 0, sizeof(options_t));
 
@@ -103,10 +107,15 @@ static void set_options (options_t*     options,
         strcpy_s(options->serial_device, sizeof(options->serial_device), serial_device);
     }
     options->serial_baudrate = serial_baudrate;
-    if (router_address != NULL) {
-        strcpy_s(options->router_address, sizeof(options->router_address), router_address);
+
+    if (unix_address != NULL) {
+        strcpy_s(options->unix_address, sizeof(options->unix_address), unix_address);
     }
-    options->router_port = router_port;
+
+    if (remote_router_address != NULL) {
+        strcpy_s(options->remote_router_address, sizeof(options->remote_router_address), remote_router_address);
+    }
+    options->router_server_port = router_server_port;
 }
 
 // @todo consider using reference instead of pointer so the lifetime pf option 
@@ -115,6 +124,9 @@ static bool parse_commandline_options (int argc, char* argv[], options_t* option
 {
     bool                    rc = true;
     int                     c;
+    bool router_address_set = false;
+    bool router_port_set = false;
+
 
     while (1) {
         c = getopt(argc, argv, "d:b:a:p:v:w:n:");
@@ -131,13 +143,14 @@ static bool parse_commandline_options (int argc, char* argv[], options_t* option
             options->serial_baudrate = atoi(optarg);
             break;
         case 'a':
-            log_msg(KWB_LOG_INFO, "router address %s", optarg);
-            strcpy_s(options->router_address, sizeof(options->router_address), optarg);
-            options->router_address_set = true;
+            log_msg(KWB_LOG_INFO, "remote router address %s", optarg);
+            strcpy_s(options->remote_router_address, sizeof(options->remote_router_address), optarg);
+            router_address_set = true;
             break;
         case 'p':
-            log_msg(KWB_LOG_INFO, "router port %s", optarg);
-            options->router_port = atoi(optarg);
+            log_msg(KWB_LOG_INFO, "router server port %s", optarg);
+            options->router_server_port = atoi(optarg);
+            router_port_set = true;
             break;
 
         default:
@@ -145,20 +158,40 @@ static bool parse_commandline_options (int argc, char* argv[], options_t* option
             break;
         }
     }
+    if (router_address_set && router_port_set) {
+        options->router_server_configured = false;
+        options->router_client_configured = true;
+    }
+    else if (router_port_set) {
+        options->router_server_configured = true;
+        options->router_client_configured = false;
+    }
+    else {
+        options->router_server_configured = false;
+        options->router_client_configured = false;
+    }
+
     return rc;
 }
 
 // check for missing and given arguments which are mutual exclusive and validate the values.
 static bool validate_options(options_t* options)
 {
-    bool    rc = false,
-            serial_device_set = false,
-            vbusd_address_set = false;
+    bool    rc = false;
 
     do {
         // minimum address is "/a": unix socket with name "a" in the root directory
-        if (strnlen(options->router_address, sizeof(options->router_address)) < 2) {
-            log_error("Missing router address!");
+        if (strnlen(options->unix_address, sizeof(options->unix_address)) < 2) {
+            log_error("Missing unix socket address!");
+            break;
+        }
+        if (options->router_client_configured &&
+            strnlen(options->remote_router_address, sizeof(options->remote_router_address)) < 2) {
+            log_error("Missing remote router address!");
+            break;
+        }
+        if (options->router_server_configured && options->router_server_port == 0) {
+            log_error("Missing router server port!");
             break;
         }
         if (options->serial_device_set &&
@@ -178,9 +211,9 @@ static void print_usage (void)
     fprintf(stderr, "\nUsage:\n");
     fprintf(stderr, "kwbrouter [-a <address>] [-p <port>] [-d <device>] [-b <baudrate>] [-v <vbusd address>] [-w <vbusd port>] [-n <node address>]\n\n");
     fprintf(stderr, "Arguments:\n");
-    fprintf(stderr, " -a <address>        Address of kwbrouter server. Default: /tmp/kwbr.usk\n");
-    fprintf(stderr, " -p <port>           Port number of kwbrouter server. Default: 0\n");
-    fprintf(stderr, " -d <device>         Device of serial bus connection.\n");
+    fprintf(stderr, " -a <remote_address> As client: Address of remote kwbrouter server. e.g. 192.168.178.100:54321\n");
+    fprintf(stderr, " -p <server_port>    As server: Port number to listen to.\n");
+    fprintf(stderr, " -d <device>         Device of serial bus connection. e.g. /dev/ttyUSB0\n");
     fprintf(stderr, " -b <baudrate>       Baudrate of serial bus connection. Default: 57600\n");
 }
 
@@ -191,7 +224,7 @@ static void create_unix_socket_file(options_t* options)
 {
     FILE* file_handle;
 
-    file_handle = fopen(options->router_address, "w+");
+    file_handle = fopen(options->remote_router_address, "w+");
     if (file_handle != NULL) fclose(file_handle);
 }
 
@@ -219,7 +252,8 @@ int main (int argc, char* argv[])
                     "",                 // no serial device
                     57600,              // baudrate, if not given
                     "/tmp/kwbr.usk",    // default address of kwbrouter socket
-                    0);                 // port 0: use unix sockets
+                    "",                 // no default tcp-client address
+                    0);                 // no default server port
 
         // parse and validate commandline options
         if (parse_commandline_options(argc, argv, &options) == false ||
@@ -233,58 +267,55 @@ int main (int argc, char* argv[])
 
         Router* router = new Router();
 
-        RConnSerial* serconn = new RConnSerial(&mainloop);
-        serconn->Open(options.serial_device, options.serial_baudrate);
+        RConnSerial* serconn = nullptr;
+        if (options.serial_device_set) {
+            serconn = new RConnSerial(&mainloop);
+            serconn->Open(options.serial_device, options.serial_baudrate);
+            router->AddConnection(serconn);
+        }
 
-        router->AddConnection(serconn);
+        RConnSocketClient* sockconn = nullptr;
+        if (options.router_client_configured) {
+            sockconn = new RConnSocketClient(&mainloop, options.remote_router_address, options.router_server_port);
+            sockconn->Open(options.remote_router_address, options.router_server_port);
+            router->AddConnection(sockconn);
+        }
 
         // open new server and let-every connection auto-connect to router
         create_unix_socket_file(&options);
-        SocketServer* server = new SocketServer(&mainloop, router);
-        server->Open(options.router_address, options.router_port);
+        SocketServer* unix_socket_server = new SocketServer(&mainloop, router);
+        unix_socket_server->Open(options.unix_address, 0);
 
-       // RConnSocketServer server = new
- /*
-        route_init(&router);
-
-        // initialize network routing
-        msg_s_init(&msg_socket);
-        if ((rc = msg_s_open_server(&msg_socket, &mainloop, "/tmp/kwb.usk", 0)) != eERR_NONE) {
-            break;
+        SocketServer* socket_server = nullptr;
+        if (options.router_server_configured) {
+            socket_server = new SocketServer(&mainloop, router);
+            socket_server->Open("", options.router_server_port);
         }
-        msg_s_set_incomming_handler(&msg_socket, handle_incomming_msg, &router);
-        msg_s_set_newconnection_handler(&msg_socket, handle_new_connection, &router);
-        // add route for every client of unix socket
-        ep = msg_s_get_endpoint(&msg_socket, 0, eMSG_EP_COMM);
 
-        // initialize bus routing
-        msg_b_init(&msg_bus, 0);
-        if (options.serial_device_set) {
-            address = options.serial_device;
-            port = options.serial_baudrate;
-            serial = true;
-        } else {
-            address = options.vbusd_address;
-            port = options.vbusd_port;
-            serial = false;
-        }
-        rc = msg_b_open(&msg_bus, &mainloop, options.own_node_address, serial,
-                        address, port);
-        if (rc != eERR_NONE) break;
-        msg_b_set_incomming_handler(&msg_bus, handle_incomming_msg, &router);
-        route_add(&router, 1, 65535, address, port, eROUTE_TYPE_SERIAL, &msg_bus);
-*/
         log_msg(KWB_LOG_STATUS, "entering mainloop...\n");
         while (!end_application) {
             ioloop_run_once(&mainloop);
         }
 
-        server->Close();
-        delete server;
+        unix_socket_server->Close();
+        delete unix_socket_server;
 
-        router->RemoveConnection(serconn);
-        serconn->Close();
-        delete serconn;
+        if (socket_server != nullptr) {
+            socket_server->Close();
+            delete socket_server;
+        }
+
+        if (sockconn != nullptr) {
+            router->RemoveConnection(sockconn);
+            sockconn->Close();
+            delete sockconn;
+        }
+
+        if (serconn != nullptr) {
+            router->RemoveConnection(serconn);
+            serconn->Close();
+            delete serconn;
+        }
 
         delete router;
     } while (0);

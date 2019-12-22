@@ -53,7 +53,7 @@ public:
 
     void SetIncommingHandler(msg_incom_func_t func, void* arg);
     void ClearIncommingHandler();
-    void OnIncommingMessage(msg_t* message);
+    void OnIncomingMessage(msg_t* message);
 
     void SetConnectionHandler(msg_conn_func_t func, void* arg);
     void ClearConnectionHandler();

@@ -47,12 +47,6 @@ extern "C" {
 
 // --- Type definitions --------------------------------------------------------
 
-//! Possible message endpoint types TODO still needed?
-typedef enum msg_ep_type {
-    eMSG_EP_SERVER = 0, //!< Endpoint socket connection
-    eMSG_EP_COMM,       //!< Endpoint serial connection
-} msg_ep_type_t;
-
 typedef struct msg_endpoint msg_endpoint_t;
 
 //! Structure holding all information for a socket connection for kwb messages.
@@ -113,8 +107,7 @@ void msg_s_set_incomming_handler (msg_socket_t* msg_socket,
                                   void* arg);
 
 msg_endpoint_t* msg_s_get_endpoint (msg_socket_t*   msg_socket,
-                                    int             index,
-                                    uint32_t        flags);
+                                    int             index);
 
 int msg_s_send (msg_endpoint_t*    recv_ep,
                 msg_t*             message);

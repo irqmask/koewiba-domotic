@@ -101,7 +101,7 @@ int main (int argc, char* argv[])
         if ((rc = msg_s_open_client(&msg_socket, &mainloop, "/tmp/kwbr.usk", 0)) != eERR_NONE) {
             break;
         }
-        msg_ep = msg_s_get_endpoint(&msg_socket, 0, 0);
+        msg_ep = msg_s_get_endpoint(&msg_socket, 0);
         msg_s_set_closeconnection_handler(msg_ep, on_close_connection, NULL);
         log_msg(KWB_LOG_STATUS, "entering mainloop...");
         while (!g_end_application) {

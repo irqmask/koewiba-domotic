@@ -54,7 +54,6 @@
  */
 typedef struct msg_endpoint {
     msg_endpoint_t* next;           //!< Next element in linked list.
-    msg_ep_type_t   type;           //!< Connection-type. See #msg_ep_type_t.
     msg_socket_t*   msg_socket;     //!< Information about public socket server.
     sys_fd_t        fd;             //!< Handle to established connection.
     //! handler for closed connections, called when connection is closed.
@@ -71,8 +70,7 @@ typedef struct msg_endpoint {
 
 // --- Local functions ---------------------------------------------------------
 
-static msg_endpoint_t* msg_new_endpoint (msg_socket_t* msg_socket,
-                                         msg_ep_type_t type)
+static msg_endpoint_t* msg_new_endpoint (msg_socket_t* msg_socket)
 {
     msg_endpoint_t* ep = NULL;
 
@@ -85,7 +83,6 @@ static msg_endpoint_t* msg_new_endpoint (msg_socket_t* msg_socket,
 
         ep->fd = INVALID_FD;
         ep->msg_socket = msg_socket;
-        ep->type = type;
 
         // insert new endpoint at the beginning of the list of endpoints
         ep->next = msg_socket->first_ep;
@@ -154,11 +151,11 @@ static int32_t msg_accept_endpoint (void* arg)
     uint16_t port = 0;
 
     do {
-        ep = msg_new_endpoint(msg_socket, eMSG_EP_COMM);
+        ep = msg_new_endpoint(msg_socket);
         if (ep == NULL) break;
 
         // get file descriptor of new client connection
-        ep->fd = sys_socket_accept(msg_socket->well_known_fd);
+        ep->fd = sys_socket_accept(msg_socket->well_known_fd, address, sizeof(address), &port);
         if (ep->fd <= INVALID_FD) {
             log_sys_error("server not accepting new endpoint");
             msg_delete_endpoint(msg_socket, ep);
@@ -167,7 +164,6 @@ static int32_t msg_accept_endpoint (void* arg)
 
         // get address and port of accepted connection and pass it to appications
         // new connection handler.
-        sys_socket_get_name(ep->fd, address, sizeof(address), &port);
         if (msg_socket->new_connection_handler != NULL) {
             msg_socket->new_connection_handler(address, port, ep, msg_socket->new_connection_arg);
         }
@@ -278,7 +274,7 @@ int msg_s_open_client (msg_socket_t*   msg_socket,
 
         msg_socket->ioloop = ioloop;
         sys_socket_set_blocking(fd, false);
-        ep = msg_new_endpoint(msg_socket, eMSG_EP_COMM);
+        ep = msg_new_endpoint(msg_socket);
         if (ep == NULL) break;
         ep->fd = fd;
         ep->msg_socket = msg_socket;
@@ -331,27 +327,20 @@ void msg_s_set_incomming_handler (msg_socket_t* msg_socket, msg_incom_func_t fun
 }
 
 msg_endpoint_t* msg_s_get_endpoint (msg_socket_t*   msg_socket,
-                                    int             index,
-                                    uint32_t        flags)
+                                    int             index)
 {
     msg_endpoint_t* ep = NULL;
     int             found_ep = 0;
 
     assert (msg_socket != NULL);
 
-    do {
-        ep = msg_socket->first_ep;
-        if (flags == 0) flags = 0xFFFFFFFF;
+    ep = msg_socket->first_ep;
 
-        while (ep != NULL) {
-            if ((1<<ep->type) & flags) {
-                if (index == found_ep) break;
-                found_ep++;
-            }
-            ep = ep->next;
-        }
-    } while (0);
-
+    while (ep != NULL) {
+        if (index == found_ep) break;
+        found_ep++;
+        ep = ep->next;
+    }
     return ep;
 }
 

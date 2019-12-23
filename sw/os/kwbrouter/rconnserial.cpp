@@ -55,7 +55,7 @@ RConnSerial::RConnSerial()
 {
     msg_ser_init(&this->serial);
     memset(this->name, 0, sizeof(name));
-    snprintf(this->name, sizeof(name-1), "SERIAL");
+    snprintf(this->name, sizeof(name) - 1, "SERIAL");
 }
 
 /**
@@ -68,7 +68,7 @@ RConnSerial::RConnSerial(ioloop_t* ioloop)
 {
     msg_ser_init(&this->serial);
     memset(this->name, 0, sizeof(name));
-    snprintf(this->name, sizeof(name-1), "SERIAL");
+    snprintf(this->name, sizeof(name) - 1, "SERIAL");
     this->ioloop = ioloop;
 }
 

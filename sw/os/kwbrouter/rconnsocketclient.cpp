@@ -81,11 +81,10 @@ RConnSocketClient::RConnSocketClient(msg_socket_t* server, msg_endpoint_t* ep, c
     this->socket = server;
     this->ep = ep;
     this->ioloop = server->ioloop;
-    memset(this->name, 0, sizeof(name));
-    snprintf(this->name, sizeof(name-1), "%s:%d", address, port);
+    memset(this->name, 0, sizeof(this->name));
+    snprintf(this->name, sizeof(this->name) - 1, "%s:%d", address, port);
     msg_s_set_incomming_handler(this->socket, incomingMessageHdl, this);
     msg_s_set_closeconnection_handler(ep, closeConnectionHdl, this);
-    log_msg(LOG_STATUS, "%s New client socket connection %s:%d", this->name, address, port);
 }
 
 /**
@@ -101,8 +100,8 @@ RConnSocketClient::RConnSocketClient(ioloop_t* ioloop, const char* address, uint
     this->socket = &this->local_socket;
     this->ioloop = ioloop;
     this->ep = nullptr;
-    memset(this->name, 0, sizeof(name));
-    snprintf(this->name, sizeof(name-1), "%s:%d", address, port);
+    memset(this->name, 0, sizeof(this->name));
+    snprintf(this->name, sizeof(this->name) - 1, "%s:%d", address, port);
     msg_s_set_incomming_handler(this->socket, incomingMessageHdl, this);
 }
 

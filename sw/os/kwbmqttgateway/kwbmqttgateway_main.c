@@ -264,7 +264,7 @@ int kwb_socket_setup(ioloop_t* ioloop, options_t* options)
         if ((retval = msg_s_open_client(&g_kwb_socket, ioloop, "/tmp/kwbr.usk", 0)) != eERR_NONE) {
             break;
         }
-        g_kwb_socket_ep = msg_s_get_endpoint(&g_kwb_socket, 0, 0);
+        g_kwb_socket_ep = msg_s_get_endpoint(&g_kwb_socket, 0);
         msg_s_set_closeconnection_handler(g_kwb_socket_ep, on_kwb_close_connection, NULL);
     } while (0);
 

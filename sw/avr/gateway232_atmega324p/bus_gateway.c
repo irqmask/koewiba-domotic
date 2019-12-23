@@ -273,41 +273,51 @@ void bgw_forward_serial_msg (sBus_t* bus, scomm_phy_t* rs232_phy)
 bool bgw_forward_bus_msg (sBus_t *bus, scomm_phy_t *serial,
                           uint16_t* sender, uint8_t* len, uint8_t* msg)
 {
-    bool     msg_for_me;
+    bool     msg_for_me, msg_for_others;
     uint8_t  l_curr;
     uint8_t  l_expected;
     uint16_t s, r;
 
-    do {
-        msg_for_me = false;
+    msg_for_me = false;
 
+    do {
         // is there a new message pending?
         if (bus->msg_receive_state != eBUS_RECV_MESSAGE) break;
 
+        msg_for_others = true;
         s = bus->sRecvMsg.uSender;
         r = bus->sRecvMsg.uReceiver;
         l_expected = bus->sRecvMsg.length - 4;
 
-        if (r == bus->sCfg.uOwnAddress || r == BUS_BRDCSTADR) {
+        if ((r == bus->sCfg.uOwnAddress) ||
+            (r == BUS_BRDCSTADR)) {
             msg_for_me = true;
+        }
+        else if (r == (bus->sCfg.uOwnAddress & BUS_SEGBRDCSTMASK)) {
+            msg_for_me = true;
+            msg_for_others = false;
         }
 
         l_curr = 0;
-        // create message header on serial send queue
-        convert_and_enqueue_byte(&serial->sendQ, (uint8_t)((s & 0xFF00)>>8));
-        convert_and_enqueue_byte(&serial->sendQ, (uint8_t)( s & 0x00FF));
-        convert_and_enqueue_byte(&serial->sendQ, (uint8_t)((r & 0xFF00)>>8));
-        convert_and_enqueue_byte(&serial->sendQ, (uint8_t)( r & 0x00FF));
-        convert_and_enqueue_byte(&serial->sendQ, l_expected);
+        if (msg_for_others) {
+            // create message header on serial send queue
+            convert_and_enqueue_byte(&serial->sendQ, (uint8_t)((s & 0xFF00)>>8));
+            convert_and_enqueue_byte(&serial->sendQ, (uint8_t)( s & 0x00FF));
+            convert_and_enqueue_byte(&serial->sendQ, (uint8_t)((r & 0xFF00)>>8));
+            convert_and_enqueue_byte(&serial->sendQ, (uint8_t)( r & 0x00FF));
+            convert_and_enqueue_byte(&serial->sendQ, l_expected);
+        }
         // convert and copy message data
         while (l_curr < l_expected) {
-            convert_and_enqueue_byte(&serial->sendQ, bus->sRecvMsg.auBuf[5 + l_curr]);
+            if (msg_for_others) convert_and_enqueue_byte(&serial->sendQ, bus->sRecvMsg.auBuf[5 + l_curr]);
             if (msg_for_me) msg[l_curr] = bus->sRecvMsg.auBuf[5 + l_curr];
             l_curr++;
         }
         // finally end message with a newline char.
-        q_put_byte(&serial->sendQ, '\n');
-        serial_phy_initiate_sending(serial);
+        if (msg_for_others) {
+            q_put_byte(&serial->sendQ, '\n');
+            serial_phy_initiate_sending(serial);
+        }
         if (msg_for_me) {
             *sender = s;
             *len = l_curr;

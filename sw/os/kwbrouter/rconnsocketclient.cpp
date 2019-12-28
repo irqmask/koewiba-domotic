@@ -60,8 +60,8 @@ static void closeConnectionHdl(const char* address, uint16_t port, void* referen
 /**
  * default constructor.
  */
-RConnSocketClient::RConnSocketClient() : ep(NULL),
-                                         socket(NULL)
+RConnSocketClient::RConnSocketClient() : ep(nullptr),
+                                         socket(nullptr)
 {
     msg_s_init(&this->local_socket);
     this->socket = &this->local_socket;

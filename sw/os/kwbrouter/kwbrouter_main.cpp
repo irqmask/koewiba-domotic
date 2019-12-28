@@ -268,37 +268,85 @@ int main (int argc, char* argv[])
         Router* router = new Router();
 
         RConnSerial* serconn = nullptr;
-        if (options.serial_device_set) {
+        do {
+            if (!options.serial_device_set) break;
             serconn = new RConnSerial(&mainloop);
-            serconn->Open(options.serial_device, options.serial_baudrate);
+            if (serconn == nullptr) {
+                log_error("Unable to allocate serial connection object!");
+                break;
+            }
+            rc = serconn->Open(options.serial_device, options.serial_baudrate);
+            if (rc != 0) {
+                log_error("Opening serial connection to %s failed with error %d!", options.serial_device, rc);
+                delete serconn;
+                serconn = nullptr;
+                break;
+            }
             router->AddConnection(serconn);
-        }
+        } while (0);
 
         RConnSocketClient* sockconn = nullptr;
-        if (options.router_client_configured) {
+        do {
+            if (!options.router_client_configured) break;
             sockconn = new RConnSocketClient(&mainloop, options.remote_router_address, options.router_server_port);
-            sockconn->Open(options.remote_router_address, options.router_server_port);
+            if (sockconn == nullptr) {
+                log_error("Unable to allocate socket connection object!");
+                break;
+            }
+            rc = sockconn->Open(options.remote_router_address, options.router_server_port);
+            if (rc != 0) {
+                log_error("Opening socket connection to %s failed with error %d!", options.remote_router_address, rc);
+                delete sockconn;
+                sockconn = nullptr;
+                break;
+            }
             router->AddConnection(sockconn);
-        }
+        } while (0);
 
-        // open new server and let-every connection auto-connect to router
-        create_unix_socket_file(&options);
-        SocketServer* unix_socket_server = new SocketServer(&mainloop, router);
-        unix_socket_server->Open(options.unix_address, 0);
+        SocketServer* unix_socket_server = nullptr;
+        do {
+            // open new server and let-every connection auto-connect to router
+            create_unix_socket_file(&options);
+            unix_socket_server = new SocketServer(&mainloop, router);
+            if (unix_socket_server == nullptr) {
+                log_error("Unable to allocate unix-socket connection object!");
+                break;
+            }
+            rc = unix_socket_server->Open(options.unix_address, 0);
+            if (rc != 0) {
+                log_error("Unable to open unix-socket connection at %s, error %d!", options.unix_address, rc);
+                delete unix_socket_server;
+                unix_socket_server = nullptr;
+                break;
+            }
+        } while (0);
 
         SocketServer* socket_server = nullptr;
-        if (options.router_server_configured) {
+        do {
+            if (!options.router_server_configured) break;
             socket_server = new SocketServer(&mainloop, router);
-            socket_server->Open("", options.router_server_port);
-        }
+            if (socket_server == nullptr) {
+                log_error("Unable to allocate socket server object!");
+                break;
+            }
+            rc = socket_server->Open("", options.router_server_port);
+            if (rc != 0) {
+                log_error("Unable to open socket server listening at port %d, error %d!", options.router_server_port, rc);
+                delete socket_server;
+                socket_server = nullptr;
+                break;
+            }
+        } while (0);
 
         log_msg(KWB_LOG_STATUS, "entering mainloop...\n");
         while (!end_application) {
             ioloop_run_once(&mainloop);
         }
 
-        unix_socket_server->Close();
-        delete unix_socket_server;
+        if (unix_socket_server != nullptr) {
+            unix_socket_server->Close();
+            delete unix_socket_server;
+        }
 
         if (socket_server != nullptr) {
             socket_server->Close();
@@ -317,7 +365,9 @@ int main (int argc, char* argv[])
             delete serconn;
         }
 
-        delete router;
+        if (router != nullptr) {
+            delete router;
+        }
     } while (0);
     return rc;
 }

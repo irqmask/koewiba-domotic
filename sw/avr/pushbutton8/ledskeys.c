@@ -18,6 +18,7 @@
 
 #include "appconfig.h"
 #include "pcbconfig.h"
+#include "sleepmode.h"
 
 #include "sn74595.h"
 #include "spi.h"
@@ -158,6 +159,7 @@ void leds_keys_init (void)
 void leds_keys_background (void)
 {
     uint8_t flashed_leds;
+
     if (timer_is_elapsed(&g_timer)) {
         key_pressed = keys_read();
 
@@ -169,6 +171,8 @@ void leds_keys_background (void)
 
         sn74595_send(g_led_data | flashed_leds);
         timer_start(&g_timer, TIMER_MS_2_TICKS(150));
+
+        if(key_pressed != 0xFF) sleep_prevent(0x01, 0); // Reset sleep prevention bit as soon as pinchange-interrupt is processed.
     }
 }
 

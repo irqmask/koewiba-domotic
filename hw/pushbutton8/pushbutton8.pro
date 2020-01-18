@@ -1,4 +1,4 @@
-update=Fr 30 Mär 2018 22:32:23 CEST
+update=Sa 18 Jan 2020 12:50:36 CET
 version=1
 last_client=kicad
 [pcbnew]
@@ -39,7 +39,7 @@ LibName7=/media/sharedwin/kicad/01symbols/standard
 [schematic_editor]
 version=1
 PageLayoutDescrFile=
-PlotDirectoryName=
+PlotDirectoryName=~/koewiba-domotic/hw/pushbutton8/
 SubpartIdSeparator=0
 SubpartFirstId=65
 NetFmtName=

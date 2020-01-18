@@ -18,10 +18,13 @@
 #include "moddef_common.h"
 
 #include "appconfig.h"
+#include "sleepmode.h"
 
 #include "bus.h"
 #include "ledskeys.h"
 #include "register.h"
+
+#include "avr/io.h"
 
 // --- Definitions -------------------------------------------------------------
 
@@ -67,6 +70,7 @@ static void app_check_keys (sBus_t* bus)
     for (index=0; index<APP_NUM_KEYS; index++) {
         if (pressed_keys & (1<<index)) {
             on_keypress_send(bus, index);
+
         }
     }
 }
@@ -90,6 +94,17 @@ void app_init (void)
     //app_register_load();
     leds_keys_init();
 }
+
+/**
+ * Application specific ISR for pin change interrupt.
+ *
+ * The value of PCIFR is for determining, which register has to be checked for the source of interrupt.
+ */
+void app_on_pinchangeinterrupt(uint8_t pinchange_interruptflags)
+{
+    sleep_prevent(0x01, 1); // prevent process from sleeping till pinchange event has been processed.
+}
+
 
 /**
  * Application specific command interpreter code.

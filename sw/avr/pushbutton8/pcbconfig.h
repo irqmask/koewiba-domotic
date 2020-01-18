@@ -21,13 +21,26 @@
 #define BUS_DDR_ENASND0     DDRD
 #define BUS_PORT_ENASND0    PORTD
 #define BUS_ENASND0         PD2
-#define BUS_DDR_DISRCV0     DDRD
-#define BUS_PORT_DISRCV0    PORTD
-#define BUS_DISRCV0         PD3
-#define TXRXEN0_SEPERATE    1
 
-#define SPI_SCK_DDR         PORTC
-#define SPI_SCK_PIN         PC1
+#define SPI_PCBCONFIG  1
+//! Defines the DDR of a port which contains the MOSI signal.
+#define SPI_DDR_MOSI   DDRB
+//! Defines the DDR of a port which contains the MISO signal.
+#define SPI_DDR_MISO   DDRB
+//! Defines the DDR of a port which contains the SCK signal.
+#define SPI_DDR_SCK    DDRB
+//! Defines the DDR of a port which contains the standard slave select signal.
+#define SPI_DDR_SS     DDRB
+//! Defines the PORT which contains the standard slave select signal.
+#define SPI_PORT_SS    PORTB
+//! Defines the MOSI pin.
+#define SPI_MOSI       PB3
+//! Defines the MISO pin.
+#define SPI_MISO       PB4
+//! Defines the SCK pin.
+#define SPI_SCK        PB5
+//! Defines the SS (slave select) pin.
+#define SPI_SS         PB2
 
 // Pin assignments of board keys and LEDs
 #define LEDSKEYS_PCBCONFIG  1

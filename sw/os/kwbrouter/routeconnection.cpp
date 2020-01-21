@@ -35,14 +35,16 @@
  * This base-class by itself is useless, because it implements no usable
  * connection for sending and receiving messages.
  */
-RouteConnection::RouteConnection() : extOnIncommingMsg((msg_incom_func_t)NULL),
-                                     extOnIncommingMsgArg(NULL),
-                                     ioloop((ioloop_t*)NULL)
+RouteConnection::RouteConnection() : extOnIncommingMsg((msg_incom_func_t)nullptr),
+                                     extOnIncommingMsgArg(nullptr),
+                                     extOnConnectionClosed(nullptr),
+                                     extOnConnectionClosedArg(nullptr),
+                                     ioloop((ioloop_t*)nullptr)
 {
     ///@todo replace memset / snprintf with const string. Rename the name into type-name.
     ///@todo maybe consider adding a name for the connection sing proper c++ string functions.
     memset(this->name, 0, sizeof(name));
-    snprintf(name, sizeof(name-1), "RC");
+    snprintf(name, sizeof(name) - 1, "RC");
 }
 
 /**
@@ -79,8 +81,8 @@ void RouteConnection::SetIncommingHandler(msg_incom_func_t func, void* arg)
  */
 void RouteConnection::ClearIncommingHandler()
 {
-    extOnIncommingMsg = (msg_incom_func_t)NULL;
-    extOnIncommingMsgArg = NULL;
+    extOnIncommingMsg = (msg_incom_func_t)nullptr;
+    extOnIncommingMsgArg = nullptr;
 }
 
 /**
@@ -108,7 +110,7 @@ void RouteConnection::OnIncomingMessage(msg_t* message)
 {
     log_msg(LOG_VERBOSE1, "%6s --> message received", this->GetName());
     msg_log("???RECV", *message);
-    if (this->extOnIncommingMsg != NULL) {
+    if (this->extOnIncommingMsg != nullptr) {
         this->extOnIncommingMsg(message, this, this->extOnIncommingMsgArg);
     }
 }
@@ -132,8 +134,8 @@ void RouteConnection::SetConnectionHandler(msg_conn_func_t func, void* arg)
  */
 void RouteConnection::ClearConnectionHandler()
 {
-    this->extOnConnectionClosed = NULL;
-    this->extOnConnectionClosedArg = NULL;
+    this->extOnConnectionClosed = nullptr;
+    this->extOnConnectionClosedArg = nullptr;
 }
 
 /**
@@ -142,7 +144,7 @@ void RouteConnection::ClearConnectionHandler()
 void RouteConnection::OnConnectionClosed()
 {
     log_msg(LOG_STATUS, "%s Client connection closed", this->GetName());
-    if (this->extOnConnectionClosed != NULL) {
+    if (this->extOnConnectionClosed != nullptr) {
         this->extOnConnectionClosed("", 0, this, this->extOnConnectionClosedArg);
     }
     // do nothing else at this point. the class may be deleted right now.

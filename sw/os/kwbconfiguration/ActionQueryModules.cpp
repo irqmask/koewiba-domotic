@@ -86,6 +86,7 @@ bool ActionQueryModules::formMessage()
     messageToSend.data[0] = eCMD_REQUEST_INFO_OF_TYPE;
     messageToSend.data[1] = eINFO_VERSION;
     modules.clear();
+    return true;
 }
 
 

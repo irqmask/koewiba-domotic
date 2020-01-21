@@ -278,10 +278,11 @@ int main (int argc, char* argv[])
         ioloop_init(&mainloop);
         ioloop_set_default_timeout(&mainloop, 1);
 
-        firmware_update_init(&firmware, &mainloop, options.serial_device, options.serial_baudrate);
+        rc = firmware_update_init(&firmware, &mainloop, options.serial_device, options.serial_baudrate);
+        if (rc != eERR_NONE) break;
+
         firmware_register_progress_func(&firmware, print_progress, NULL);
 
-        if (rc != eERR_NONE) break;
         rc = firmware_update_start(&firmware, options.filename, options.node_address);
         if (rc != eERR_NONE) break;
 

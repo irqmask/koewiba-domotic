@@ -269,6 +269,7 @@ static void ioloop_check_timer (ioloop_t* ioloop)
     while (timer != NULL) {
         // iterate over all timers which are expired.
         if (timer->expiration_time <= now) {
+            new_interval = 0;
             if (timer->callback) {
                 new_interval = timer->callback(timer->arg);
             }
@@ -276,14 +277,17 @@ static void ioloop_check_timer (ioloop_t* ioloop)
             // timer is removed, if callback returns negative interval or if
             // timer is non-run_cyclic.
             // interval time remains unchanged, if return value of callback is 0.
-            if (timer->run_cyclic && new_interval >= 0) {
-                if (new_interval > 0) timer->interval_ticks = new_interval;
+            if (timer->run_cyclic && new_interval > 0) {
+                timer->interval_ticks = new_interval;
                 timer->expiration_time += timer->interval_ticks;
                 ioloop_insert_timer(ioloop, timer);
-            } else {
+            } else {              
                 free(timer);
             }
-        } else break;
+            // iterate over whole list again
+            timer = ioloop->first_timer;
+            continue;
+        }
         timer = timer->next;
     }
 }

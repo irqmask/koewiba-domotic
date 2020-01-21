@@ -188,7 +188,7 @@ int msg2mqtt(msg_t* message, char* topic, size_t max_topic_len, char* msgtext, s
     case eCMD_BLOCK_RESET:
     case eCMD_ACK:
     case eCMD_NAK:
-        retval = eERR_UNSUPPORTED_MESSAGE;
+        retval = eERR_UNSUPPORTED;
         log_warning("msg2mqtt() Message %d not supported for MQTT", message->data[0]);
         break;
 
@@ -223,7 +223,7 @@ int msg2mqtt(msg_t* message, char* topic, size_t max_topic_len, char* msgtext, s
         break;
 
     default:
-        retval = eERR_UNKNOWN_MESSAGE;
+        retval = eERR_UNKNOWN;
         log_warning("msg2mqtt() Unkown message %d", message->data[0]);
         break;
     }

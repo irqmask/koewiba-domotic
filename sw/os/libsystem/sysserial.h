@@ -137,9 +137,9 @@ int sys_serial_set_params (sys_fd_t            fd,
                            sys_ser_stopbits_t  stopbits,
                            sys_ser_flowctrl_t  flowcontrol);
 
-size_t sys_serial_send (sys_fd_t fd, void* buf, size_t bufsize);
+ssize_t sys_serial_send (sys_fd_t fd, void* buf, size_t bufsize);
 
-size_t sys_serial_recv (sys_fd_t fd, void* buf, size_t bufsize);
+ssize_t sys_serial_recv (sys_fd_t fd, void* buf, size_t bufsize);
 
 void sys_serial_flush (sys_fd_t fd);
 

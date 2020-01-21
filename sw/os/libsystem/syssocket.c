@@ -279,7 +279,7 @@ sys_fd_t sys_socket_accept (sys_fd_t server_fd, char* address, size_t address_le
 #endif
 }
 
-size_t sys_socket_recv (sys_fd_t fd, void* buffer, size_t buffersize)
+ssize_t sys_socket_recv (sys_fd_t fd, void* buffer, size_t buffersize)
 {
 #if defined (PRJCONF_UNIX) || \
     defined (PRJCONF_POSIX) || \
@@ -291,7 +291,7 @@ size_t sys_socket_recv (sys_fd_t fd, void* buffer, size_t buffersize)
 #endif
 }
 
-size_t sys_socket_send (sys_fd_t fd, void* buffer, size_t buffersize)
+ssize_t sys_socket_send (sys_fd_t fd, void* buffer, size_t buffersize)
 {
 #if defined (PRJCONF_UNIX) || \
     defined (PRJCONF_POSIX) || \

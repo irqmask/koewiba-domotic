@@ -97,7 +97,7 @@ int mqtt_split_topic(char* topic,
                      char** msgtype,
                      char** remaining_topic)
 {
-    int retval = eERR_UNKNOWN_MESSAGE;
+    int retval = eERR_UNKNOWN;
     char *slash_pos = topic;
     char *senderstr, *receiverstr;
 
@@ -149,14 +149,14 @@ int mqtt2msg_state_8bit(char* topic, char* msgtext, msg_t* message)
 
         value = strtoul(topic, NULL, 16);
         if (value > UCHAR_MAX || errno != 0) {
-            retval = eERR_UNKNOWN_MESSAGE;
+            retval = eERR_UNKNOWN;
             break;
         }
         message->data[1] = value;
 
         value = strtoul(msgtext, NULL, 10);
         if (value > UCHAR_MAX || errno != 0) {
-            retval = eERR_UNKNOWN_MESSAGE;
+            retval = eERR_UNKNOWN;
             break;
         }
         message->data[2] = value;
@@ -175,14 +175,14 @@ int mqtt2msg_state_16bit(char* topic, char* msgtext, msg_t* message)
 
         value = strtoul(topic, NULL, 16);
         if (value > UCHAR_MAX || errno != 0) {
-            retval = eERR_UNKNOWN_MESSAGE;
+            retval = eERR_UNKNOWN;
             break;
         }
         message->data[1] = value;
 
         value = strtoul(msgtext, NULL, 10);
         if (value > USHRT_MAX || errno != 0) {
-            retval = eERR_UNKNOWN_MESSAGE;
+            retval = eERR_UNKNOWN;
             break;
         }
         message->data[2] = (value >> 8) & 0x000000FF;
@@ -202,14 +202,14 @@ int mqtt2msg_state_32bit(char* topic, char* msgtext, msg_t* message)
 
         value = strtoul(topic, NULL, 16);
         if (value > UCHAR_MAX || errno != 0) {
-            retval = eERR_UNKNOWN_MESSAGE;
+            retval = eERR_UNKNOWN;
             break;
         }
         message->data[1] = value;
 
         value = strtoul(msgtext, NULL, 10);
-        if (value > UINT_MAX || errno != 0) {
-            retval = eERR_UNKNOWN_MESSAGE;
+        if (value == UINT_MAX || errno != 0) {
+            retval = eERR_UNKNOWN;
             break;
         }
         message->data[2] = (value >> 24) & 0x000000FF;
@@ -231,7 +231,7 @@ int mqtt2msg_request_reg(char* topic, char* msgtext, msg_t* message)
 
         value = strtoul(msgtext, NULL, 16);
         if (value > UCHAR_MAX || errno != 0) {
-            retval = eERR_UNKNOWN_MESSAGE;
+            retval = eERR_UNKNOWN;
             break;
         }
         message->data[1] = value;
@@ -250,14 +250,14 @@ int mqtt2msg_setreg_8bit(char* topic, char* msgtext, msg_t* message)
 
         value = strtoul(topic, NULL, 16);
         if (value > UCHAR_MAX || errno != 0) {
-            retval = eERR_UNKNOWN_MESSAGE;
+            retval = eERR_UNKNOWN;
             break;
         }
         message->data[1] = value;
 
         value = strtoul(msgtext, NULL, 10);
         if (value > UCHAR_MAX || errno != 0) {
-            retval = eERR_UNKNOWN_MESSAGE;
+            retval = eERR_UNKNOWN;
             break;
         }
         message->data[2] = value;
@@ -276,14 +276,14 @@ int mqtt2msg_setreg_16bit(char* topic, char* msgtext, msg_t* message)
 
         value = strtoul(topic, NULL, 16);
         if (value > UCHAR_MAX || errno != 0) {
-            retval = eERR_UNKNOWN_MESSAGE;
+            retval = eERR_UNKNOWN;
             break;
         }
         message->data[1] = value;
 
         value = strtoul(msgtext, NULL, 10);
         if (value > USHRT_MAX || errno != 0) {
-            retval = eERR_UNKNOWN_MESSAGE;
+            retval = eERR_UNKNOWN;
             break;
         }
         message->data[2] = (value >> 8) & 0x000000FF;
@@ -303,14 +303,14 @@ int mqtt2msg_setreg_32bit(char* topic, char* msgtext, msg_t* message)
 
         value = strtoul(topic, NULL, 16);
         if (value > UCHAR_MAX || errno != 0) {
-            retval = eERR_UNKNOWN_MESSAGE;
+            retval = eERR_UNKNOWN;
             break;
         }
         message->data[1] = value;
 
         value = strtoul(msgtext, NULL, 10);
-        if (value > UINT_MAX || errno != 0) {
-            retval = eERR_UNKNOWN_MESSAGE;
+        if (value == UINT_MAX || errno != 0) {
+            retval = eERR_UNKNOWN;
             break;
         }
         message->data[2] = (value >> 24) & 0x000000FF;
@@ -348,7 +348,7 @@ int mqtt2msg_subscribe(struct mosquitto* mosq)
 
 int mqtt2msg(char* topic, char* msgtext, msg_t* message)
 {
-    int retval = eERR_UNKNOWN_MESSAGE;
+    int retval = eERR_UNKNOWN;
 
     uint16_t sender = 0, receiver = 0;
     char *msgtype = NULL, *remaining_topic = NULL;

@@ -89,7 +89,7 @@ int mosquitto_connect_to_ioloop(app_handles_t* h)
     do {
         fd = (sys_fd_t)mosquitto_socket(h->mosq);
         if (fd == INVALID_FD) {
-            retval = eERR_INVALID_FD;
+            retval = eERR_RESOURCE;
             break;
         }
         ioloop_register_fd(h->ioloop, fd, eIOLOOP_EV_READ, on_read_handler, h);

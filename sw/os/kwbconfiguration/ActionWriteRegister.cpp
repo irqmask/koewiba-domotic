@@ -49,6 +49,7 @@ ActionWriteRegister::ActionWriteRegister(MsgEndpoint& msgep,
                                          uint16_t     nodeId,
                                          uint8_t      registerId) : ActionRequest(msgep, broker, nodeId),
                                                                     registerId(registerId),
+                                                                    registerFormat(eCMD_NAK),
                                                                     value(0)
 {
 }

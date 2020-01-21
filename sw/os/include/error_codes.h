@@ -45,14 +45,17 @@ typedef enum {
     eRUNNING = -1,
     eERR_NONE = 0,
     eERR_NOT_IMPLEMENTED = ERROR_GENERIC,
-    eERR_MALLOC, // out of memory
+    /// A resource (memory, device etc.) is not available
+    eERR_RESOURCE,
+    /// A System error has occurred
     eERR_SYSTEM,
-    eERR_BAD_PARAMETER,
-    eERR_INVALID_FD,
+    /// A invalid parameter has been passed into a method / function
+    eERR_BAD_PARAMETER,   
+    /// An operation or process failed
     eERR_PROCESS_FAILED,
     eERR_3RD_PARTY_FUNC_FAILED,
-    eERR_UNSUPPORTED_MESSAGE,
-    eERR_UNKNOWN_MESSAGE
+    eERR_UNSUPPORTED,
+    eERR_UNKNOWN
 } gen_errors_t;
 
 // --- Local variables ---------------------------------------------------------

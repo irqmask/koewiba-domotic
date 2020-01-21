@@ -275,7 +275,10 @@ int msg_s_open_client (msg_socket_t*   msg_socket,
         msg_socket->ioloop = ioloop;
         sys_socket_set_blocking(fd, false);
         ep = msg_new_endpoint(msg_socket);
-        if (ep == NULL) break;
+        if (ep == NULL) {
+            sys_socket_close(fd);
+            break;
+        }
         ep->fd = fd;
         ep->msg_socket = msg_socket;
         ioloop_register_fd(ioloop, fd, eIOLOOP_EV_READ, msg_read, (void*)ep);
@@ -349,7 +352,11 @@ int msg_s_send (msg_endpoint_t* recv_ep, msg_t* message)
     assert(recv_ep != NULL);
     assert(message != NULL);
 
-    sys_socket_send(recv_ep->fd, (void*)message, sizeof(msg_t));
+
+    if (sys_socket_send(recv_ep->fd, (void*)message, sizeof(msg_t)) != sizeof(msg_t)) {
+        log_sys_error("Failed to send message!");
+        return eERR_SYSTEM;
+    }
 
     return eERR_NONE;
 }

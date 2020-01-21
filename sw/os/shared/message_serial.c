@@ -421,7 +421,8 @@ int msg_ser_send (msg_serial_t* msg_serial, msg_t* message)
 int msg_ser_continue_sending (msg_serial_t* msg_serial)
 {
     int rc = eERR_NONE;
-    size_t to_send = 0, written = 0;
+    size_t to_send = 0;
+    ssize_t written = 0;
 
     assert(msg_serial != NULL);
 

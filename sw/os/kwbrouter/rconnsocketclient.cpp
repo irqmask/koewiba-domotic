@@ -78,6 +78,7 @@ RConnSocketClient::RConnSocketClient() : ep(nullptr),
  */
 RConnSocketClient::RConnSocketClient(msg_socket_t* server, msg_endpoint_t* ep, const char* address, uint16_t port)
 {
+    msg_s_init(&this->local_socket);
     this->socket = server;
     this->ep = ep;
     this->ioloop = server->ioloop;

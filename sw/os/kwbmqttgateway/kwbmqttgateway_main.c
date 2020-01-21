@@ -171,7 +171,7 @@ void on_mqtt_message(struct mosquitto* mosq, void *userdata, const struct mosqui
     msg_t kwbmsg;
 
     if (message->payloadlen) {
-        log_msg(KWB_LOG_INTERCOMM, "MQTTRECV %s %s\n", message->topic, message->payload);
+        log_msg(KWB_LOG_INTERCOMM, "MQTTRECV %s %s\n", message->topic, (char*)message->payload);
         memset(&kwbmsg, 0, sizeof(kwbmsg));
         if (mqtt2msg(message->topic, message->payload, &kwbmsg) == eERR_NONE) {
             msg_s_send(g_kwb_socket_ep, &kwbmsg);
@@ -212,7 +212,7 @@ int mosquitto_setup()
     g_handles.mosq = mosquitto_new("kwbmqttgateway", true, NULL);
     if (!g_handles.mosq) {
         log_error("MQTT Out of memory while opening mosquitto handle.");
-        return eERR_MALLOC;
+        return eERR_RESOURCE;
     }
 
     mosquitto_connect_callback_set(g_handles.mosq, on_mqtt_connect);

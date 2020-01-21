@@ -188,6 +188,7 @@ sys_fd_t sys_socket_open_server_tcp (uint16_t port)
         return fd;
     }
 
+    memset(&sockinfo, 0, sizeof(sockinfo));
     sockinfo.sin_family = AF_INET;
     sockinfo.sin_addr.s_addr = INADDR_ANY;
     sockinfo.sin_port = htons(port);
@@ -228,6 +229,7 @@ sys_fd_t sys_socket_open_client_tcp (const char* socketaddress, uint16_t port)
         return fd;
     }
 
+    memset(&sockinfo, 0, sizeof(sockinfo));
     sockinfo.sin_family = AF_INET;
     if (inet_pton(AF_INET, socketaddress, &sockinfo.sin_addr.s_addr) < 0) {
         rc = errno;

@@ -277,8 +277,10 @@ static void ioloop_check_timer (ioloop_t* ioloop)
             // timer is removed, if callback returns negative interval or if
             // timer is non-run_cyclic.
             // interval time remains unchanged, if return value of callback is 0.
-            if (timer->run_cyclic && new_interval > 0) {
-                timer->interval_ticks = new_interval;
+            if (timer->run_cyclic && new_interval >= 0) {
+                if (new_interval > 0) {
+                    timer->interval_ticks = new_interval;
+                }
                 timer->expiration_time += timer->interval_ticks;
                 ioloop_insert_timer(ioloop, timer);
             } else {              

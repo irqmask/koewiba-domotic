@@ -63,7 +63,9 @@ static int on_read_handler(void* arg)
     app_handles_t* h = (app_handles_t*)arg;
 
     rc = mosquitto_loop_read(h->mosq, 1);
-    log_error("mosquitto_loop_read returned error %d: %s", rc, mosquitto_strerror(rc));
+    if (rc != 0) {
+        log_error("mosquitto_loop_read returned error %d: %s", rc, mosquitto_strerror(rc));
+    }
 
     return 0;
 }
@@ -79,7 +81,9 @@ static int on_write_handler(void* arg)
     app_handles_t* h = (app_handles_t*)arg;
 
     rc = mosquitto_loop_write(h->mosq, 1);
-    log_error("mosquitto_loop_write returned error %d: %s", rc, mosquitto_strerror(rc));
+    if (rc != 0) {
+        log_error("mosquitto_loop_write returned error %d: %s", rc, mosquitto_strerror(rc));
+    }
 
     mosquitto_ioloop_suspend_write(h);
     return 0;

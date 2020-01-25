@@ -87,7 +87,14 @@ bool                g_end_application = false;  //!< flag, if mainloop shall be 
 
 // --- Local functions ---------------------------------------------------------
 
-// funciton to set default options.
+/**
+ * Set kwbmqttgateway run options via function call.
+ * Function can be used to set default parameters.
+ *
+ * @param[out]  options         Stucture where options are stored in.
+ * @param[in]   router_address  Address of kwbrouter server.
+ * @param[in]   router_port     Port number of kwbrouter server.
+ */
 static void set_options (options_t*     options,
                          const char*    router_address,
                          uint16_t       router_port)
@@ -100,6 +107,17 @@ static void set_options (options_t*     options,
     options->router_port = router_port;
 }
 
+/**
+ * Parse the command line options and save results in options.
+ *
+ * @param[in]   argc    Count of command line options.
+ * @param[in]   argv    Command line arguments.
+ * @param[out]  options Stucture where options are stored in.
+ *
+ * @returns true, if command line options have been parsed successfully or no
+ *          options have been read (in this case, default parameters will be
+ *          used).
+ */
 static bool parse_commandline_options (int argc, char* argv[], options_t* options)
 {
     bool                    rc = true;
@@ -128,7 +146,12 @@ static bool parse_commandline_options (int argc, char* argv[], options_t* option
     return rc;
 }
 
-// check for missing and given arguments which are mutual exclusive and validate the values.
+/**
+ * Check for missing and given arguments which are mutual exclusive and validate the values.
+ *
+ * @param[in] options   Structure of options to check.
+ * @returns true, if the options are valid.
+ */
 static bool validate_options(options_t* options)
 {
     bool    rc = false;
@@ -144,7 +167,9 @@ static bool validate_options(options_t* options)
     return rc;
 }
 
-// explain briefly the command-line arguments of the application 
+/**
+ * Explain briefly the command-line arguments of the application
+ */
 static void print_usage (void)
 {
     fprintf(stderr, "\nUsage:\n");
@@ -154,7 +179,9 @@ static void print_usage (void)
     fprintf(stderr, " -p <port>           Port number of kwbrouter server. Default: 0\n");
 }
 
-// writes the version of the mosquitto library to log-file.
+/**
+ * Writes the version of the mosquitto client library to log-file.
+ */
 static void log_mqtt_version(void)
 {
     int major = 0, minor = 0, bugfix = 0;
@@ -182,6 +209,12 @@ void on_mqtt_message(struct mosquitto* mosq, void *userdata, const struct mosqui
     }
 }
 
+/**
+ * Called when this client got connected to the MQTT server.
+ * @param[in]   mosq        Mosquitto handle.
+ * @param[in]   userdata    Pointer to user defined data.
+ * @param[in]   result      MQTT error: reason for disconnect.
+ */
 void on_mqtt_connect(struct mosquitto* mosq, void *userdata, int result)
 {
     if (!result) {
@@ -193,7 +226,25 @@ void on_mqtt_connect(struct mosquitto* mosq, void *userdata, int result)
     }
 }
 
-void my_subscribe_callback(struct mosquitto* mosq, void *userdata, int mid, int qos_count, const int *granted_qos)
+/**
+ * Called when this client gets disconnected from the MQTT server.
+ * @param[in]   mosq        Mosquitto handle.
+ * @param[in]   userdata    Pointer to user defined data.
+ * @param[in]   result      MQTT error: reason for disconnect.
+ */
+void on_mqtt_disconnect(struct mosquitto* mosq, void *userdata, int result)
+{
+    (void)mosq;
+    (void)userdata;
+
+    if (result != 0) {
+        log_error("MQTT unexpected disconnected. Error code %d: %s", result,  mosquitto_strerror(result));
+    } else {
+        log_info("MQTT disconnected!");
+    }
+}
+
+void on_mqtt_topic_subscribed(struct mosquitto* mosq, void *userdata, int mid, int qos_count, const int *granted_qos)
 {
     int i;
 
@@ -207,7 +258,6 @@ int mosquitto_setup()
 {
     const char* mqtt_address = "localhost";
     const int mqtt_port = 1883;
-    uint16_t mid = 0;
 
     g_handles.mosq = mosquitto_new("kwbmqttgateway", true, NULL);
     if (!g_handles.mosq) {
@@ -217,9 +267,9 @@ int mosquitto_setup()
 
     mosquitto_connect_callback_set(g_handles.mosq, on_mqtt_connect);
     mosquitto_message_callback_set(g_handles.mosq, on_mqtt_message);
-    mosquitto_subscribe_callback_set(g_handles.mosq, my_subscribe_callback);
+    mosquitto_subscribe_callback_set(g_handles.mosq, on_mqtt_topic_subscribed);
 
-    if (mosquitto_connect(g_handles.mosq, mqtt_address, mqtt_port, 60)){
+    if (mosquitto_connect(g_handles.mosq, mqtt_address, mqtt_port, 60)) {
         log_error("MQTT Unable to connect to mosquitto server %s:%d", mqtt_address, mqtt_port);
         return eERR_SYSTEM;
     }

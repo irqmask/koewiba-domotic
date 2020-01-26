@@ -132,7 +132,7 @@ static void set_options (options_t*     options,
 }
 
 /**
- * Read command line options and save results in options.
+ * Parse the command line options and save results in options.
  *
  * @param[in]   argc    Count of command line options.
  * @param[in]   argv    Command line arguments.

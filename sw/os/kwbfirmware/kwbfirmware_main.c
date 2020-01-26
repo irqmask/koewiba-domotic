@@ -75,7 +75,7 @@ typedef struct options {
     bool        router_address_set; //!< Flag: is set, router address has been
                                     //!< configured in the command line options.
     char        filename[256];
-    uint16_t    node_address;
+    uint16_t    node_address;       //!< own node address
 } options_t;
 
 // --- Local variables ---------------------------------------------------------
@@ -119,7 +119,7 @@ static void set_options (options_t*     options,
 }
 
 /**
- * Read command line options and save results in options.
+ * Parse the command line options and save results in options.
  *
  * @param[in]   argc    Count of command line options.
  * @param[in]   argv    Command line arguments.

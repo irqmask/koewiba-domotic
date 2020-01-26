@@ -244,6 +244,15 @@ void on_mqtt_disconnect(struct mosquitto* mosq, void *userdata, int result)
     }
 }
 
+/**
+ * Called on successful subscription of a topic.
+ * Passed information is just logged.
+ * @param[in]   mosq        Mosquitto connection handle
+ * @param[in]   userdata
+ * @param[in]   mid
+ * @param[in]   qos_count
+ * @param[in]   granted_qos
+ */
 void on_mqtt_topic_subscribed(struct mosquitto* mosq, void *userdata, int mid, int qos_count, const int *granted_qos)
 {
     int i;
@@ -256,28 +265,43 @@ void on_mqtt_topic_subscribed(struct mosquitto* mosq, void *userdata, int mid, i
 
 int mosquitto_setup()
 {
+    struct mosquitto* mosq = NULL;
     const char* mqtt_address = "localhost";
     const int mqtt_port = 1883;
 
-    g_handles.mosq = mosquitto_new("kwbmqttgateway", true, NULL);
-    if (!g_handles.mosq) {
+    g_handles.mqtt_disconnected = true;
+    g_handles.mosq = NULL;
+
+    mosq = mosquitto_new("kwbmqttgateway", true, NULL);
+    if (mosq == NULL) {
         log_error("MQTT Out of memory while opening mosquitto handle.");
         return eERR_RESOURCE;
     }
 
-    mosquitto_connect_callback_set(g_handles.mosq, on_mqtt_connect);
-    mosquitto_message_callback_set(g_handles.mosq, on_mqtt_message);
-    mosquitto_subscribe_callback_set(g_handles.mosq, on_mqtt_topic_subscribed);
+    mosquitto_connect_callback_set(mosq, on_mqtt_connect);
+    mosquitto_message_callback_set(mosq, on_mqtt_message);
+    mosquitto_subscribe_callback_set(mosq, on_mqtt_topic_subscribed);
 
-    if (mosquitto_connect(g_handles.mosq, mqtt_address, mqtt_port, 60)) {
+    if (mosquitto_connect(mosq, mqtt_address, mqtt_port, 60)) {
+        mosquitto_destroy(mosq);
+        mosq = NULL;
         log_error("MQTT Unable to connect to mosquitto server %s:%d", mqtt_address, mqtt_port);
         return eERR_SYSTEM;
     }
-
+    g_handles.mosq = mosq;
+    g_handles.mqtt_disconnected = false;
     log_msg(KWB_LOG_INFO, "MQTT mosquitto_setup() connecting to ioloop");
     return mosquitto_connect_to_ioloop(&g_handles);
 }
 
+/**
+ * Callback for incoming messages from kwbrouter.
+ * Converts message to MQTT and forwards it to the MQTT broker.
+ *
+ * @param[in]   message     Received message.
+ * @param[in]   reference   Optional reference, registered with this callback.
+ * @param[in]   arg         Optional additional argument registered with this callback.
+ */
 void on_kwb_incomming_message(msg_t* message, void* reference, void* arg)
 {
     char topic[256], msgtext[256];
@@ -298,12 +322,27 @@ void on_kwb_incomming_message(msg_t* message, void* reference, void* arg)
     mosquitto_ioloop_suspend_write(&g_handles);
 }
 
+/**
+ * This function is called when the connection to the kwbrouter is closed.
+ * @param[in]   address     Address of connetion which was closed.
+ * @param[in]   port        Portnumber of connection which was closed.
+ * @param[in]   reference   Optional reference, registered with this callback.
+ * @param[in]   arg         Optional additional argument registered with this callback.
+ */
 void on_kwb_close_connection(const char* address, uint16_t port, void* reference, void* arg)
 {
     log_msg(KWB_LOG_STATUS, "MQTT connection closed. address=%s port=%d", address, port);
     g_end_application = true;
 }
 
+/**
+ * Setup socket connection to kwbrouter.
+ *
+ * @param ioloop[in]    ioloop to connect to.
+ * @param options[in]   Pointer to global options structure.
+ *
+ * @return 0 if successful, otherwise errorcode.
+ */
 int kwb_socket_setup(ioloop_t* ioloop, options_t* options)
 {
     int retval = eERR_NONE;
@@ -325,6 +364,14 @@ int kwb_socket_setup(ioloop_t* ioloop, options_t* options)
 
 // --- Global functions --------------------------------------------------------
 
+/**
+ * Main entry point of kwbmqttgateway.
+ *
+ * @param[in]   argc    Number of arguments
+ * @param[in]   argv    List of arguments
+ *
+ * @return 0 if application ended without error.
+ */
 int main (int argc, char* argv[])
 {
     int             rc = eERR_NONE;
@@ -337,7 +384,7 @@ int main (int argc, char* argv[])
         log_msg(KWB_LOG_INFO, "kwbmqttgateway...");
 
         g_handles.ioloop = &mainloop;
-        // set default options for nkwbmqttgateway
+        // set default options for kwbmqttgateway
         set_options(&options,
                     "/tmp/kwbr.usk",    // default address of nkwbmqttgateway socket
                     0);                 // port 0: use unix sockets
@@ -363,6 +410,11 @@ int main (int argc, char* argv[])
         log_msg(KWB_LOG_STATUS, "entering mainloop...");
         while (!g_end_application) {
             ioloop_run_once(g_handles.ioloop);
+            // issue a re-connect to mqtt server
+            if (g_handles.mosq != NULL && g_handles.mqtt_disconnected) {
+                g_handles.mqtt_disconnected = false;
+                mosquitto_reconnect(g_handles.mosq);
+            }
         }
         mosquitto_destroy(g_handles.mosq);
         mosquitto_lib_cleanup();

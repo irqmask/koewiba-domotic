@@ -65,6 +65,9 @@ static int on_read_handler(void* arg)
     rc = mosquitto_loop_read(h->mosq, 1);
     if (rc != 0) {
         log_error("mosquitto_loop_read returned error %d: %s", rc, mosquitto_strerror(rc));
+        if (rc == MOSQ_ERR_NO_CONN || rc == MOSQ_ERR_CONN_LOST) {
+            h->mqtt_disconnected = true;
+        }
     }
 
     return 0;
@@ -83,6 +86,9 @@ static int on_write_handler(void* arg)
     rc = mosquitto_loop_write(h->mosq, 1);
     if (rc != 0) {
         log_error("mosquitto_loop_write returned error %d: %s", rc, mosquitto_strerror(rc));
+        if (rc == MOSQ_ERR_NO_CONN || rc == MOSQ_ERR_CONN_LOST) {
+            h->mqtt_disconnected = true;
+        }
     }
 
     mosquitto_ioloop_suspend_write(h);
@@ -102,6 +108,9 @@ static int on_misc_handler(void* arg)
     rc = mosquitto_loop_misc(h->mosq);
     if (rc != 0) {
         log_error("mosquitto_loop_misc returned error %d: %s", rc, mosquitto_strerror(rc));
+        if (rc == MOSQ_ERR_NO_CONN || rc == MOSQ_ERR_CONN_LOST) {
+            h->mqtt_disconnected = true;
+        }
     }
 
     return 0;

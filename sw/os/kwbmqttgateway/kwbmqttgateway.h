@@ -48,6 +48,7 @@
 typedef struct _app_handles_t {
     ioloop_t*           ioloop;     //!< IO background loop /ref IOLOOP ioloop.
     struct mosquitto*   mosq;       //!< Global mosquitto handle.
+    bool                mqtt_disconnected; //!< Flag if MQTT got disconnected
 } app_handles_t;
 
 // --- Local variables ---------------------------------------------------------

@@ -151,7 +151,7 @@ static bool parse_commandline_options (int argc, char* argv[], options_t* option
 
 
     while (1) {
-        c = getopt(argc, argv, "d:b:a:p:v:w:n:");
+        c = getopt(argc, argv, "d:b:a:p:o:");
         if (c == -1) break;
 
         switch (c) {

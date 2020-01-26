@@ -26,6 +26,8 @@
 
 #include <stdio.h>
 #include <string.h>
+
+#include "bus.h"
 #include "log.h"
 
 #include "routeconnection.h"
@@ -35,14 +37,13 @@
  * This base-class by itself is useless, because it implements no usable
  * connection for sending and receiving messages.
  */
-RouteConnection::RouteConnection() : extOnIncommingMsg((msg_incom_func_t)nullptr),
-                                     extOnIncommingMsgArg(nullptr),
-                                     extOnConnectionClosed(nullptr),
-                                     extOnConnectionClosedArg(nullptr),
-                                     ioloop((ioloop_t*)nullptr)
+RouteConnection::RouteConnection() : extOnIncommingMsg((msg_incom_func_t)nullptr)
+                                   , extOnIncommingMsgArg(nullptr)
+                                   , extOnConnectionClosed(nullptr)
+                                   , extOnConnectionClosedArg(nullptr)
+                                   , ioloop((ioloop_t*)nullptr)
+                                   , segmentAddress(0)
 {
-    ///@todo replace memset / snprintf with const string. Rename the name into type-name.
-    ///@todo maybe consider adding a name for the connection sing proper c++ string functions.
     memset(this->name, 0, sizeof(name));
     snprintf(name, sizeof(name) - 1, "RC");
 }
@@ -83,6 +84,37 @@ void RouteConnection::ClearIncommingHandler()
 {
     extOnIncommingMsg = (msg_incom_func_t)nullptr;
     extOnIncommingMsgArg = nullptr;
+}
+
+void RouteConnection::SetSegmentAddress(uint16_t segment_address)
+{
+    segmentAddress = segment_address & BUS_SEGBRDCSTMASK;
+}
+
+/**
+ * Get the segment address.
+ * @return segment address.
+ */
+uint16_t RouteConnection::GetSegmentAddress()
+{
+    return segmentAddress;
+}
+
+/**
+ * Checks if given address is in the range of the connections segment.
+ *
+ * Currently used only for serial connections to check if address is in the
+ * targeted bus-segment.
+ * @param[in] node_address  Address to check. If segment address is set to 0,
+ *                          every address is considered beeing in this segment.
+ * @returns true if address is in the bus segment, otherwise false.
+ */
+bool RouteConnection::AddressIsInConnectionsSegment(uint16_t node_address)
+{
+    if ((segmentAddress == 0) ||
+        (node_address == 0) ||
+        ((node_address & BUS_SEGBRDCSTMASK) == segmentAddress)) return true;
+    return false;
 }
 
 /**
@@ -149,5 +181,6 @@ void RouteConnection::OnConnectionClosed()
     }
     // do nothing else at this point. the class may be deleted right now.
 }
+
 
 /** @} */

@@ -44,6 +44,7 @@ protected:
     void*               extOnConnectionClosedArg;
     ioloop_t*           ioloop;
     char                name[32];
+    uint16_t            segmentAddress;     //!< segment address of connection
 
 public:
     RouteConnection();
@@ -59,6 +60,10 @@ public:
     void ClearConnectionHandler();
     virtual void OnConnectionClosed();
 
+    void SetSegmentAddress(uint16_t segment_address);
+    uint16_t GetSegmentAddress();
+
+    virtual bool AddressIsInConnectionsSegment(uint16_t node_address);
     virtual int Send(msg_t* message);
 };
 

@@ -81,6 +81,7 @@ typedef struct options {
     bool        serial_device_set;          //! Flag, if a serial device is configured.
     bool        router_server_configured;   //! Flag, if router as server is configured.
     bool        router_client_configured;   //! Flag, if router as client is configured.
+    uint16_t    own_node_address;           //!< own node address
 } options_t;
 
 // --- Local variables ---------------------------------------------------------
@@ -91,15 +92,26 @@ typedef struct options {
 
 // --- Local functions ---------------------------------------------------------
 
-// used to preset the option structure with valid argument values.
-// @todo consider using reference instead of pointer so the lifetime pf option 
-//       structure is clear to the programmer.
+/**
+ * Set kwbrouter run options via function call.
+ * Function can be used to set default parameters.
+ *
+ * @param[out]  options         Stucture where options are stored in.
+ * @param[in]   serial_device   Device of serial connection to RS232 gateway.
+ * @param[in]   serial_baudrate Baudrate of serial connection to RS232 gateway.
+ * @param[in]   unix_address    Address of file for unix sockets.
+ * @param[in]   remote_router_address   Address of peer kwbrouter which acts as a server.
+ *                                      With this address set, this kwbrouter is a client to another kwbrouter which acts as server.
+ * @param[in]   router_server_port      Portnumber to use when listzening as server or connecting to as client.
+ * @param[in]   own_node_id     Address of node over which this software communicates to the bus.
+ */
 static void set_options (options_t*     options,
                          const char*    serial_device,
                          int            serial_baudrate,
                          const char*    unix_address,
                          const char*    remote_router_address,
-                         uint16_t       router_server_port)
+                         uint16_t       router_server_port,
+                         uint16_t       own_node_id)
 {
     memset(options, 0, sizeof(options_t));
 
@@ -116,10 +128,20 @@ static void set_options (options_t*     options,
         strcpy_s(options->remote_router_address, sizeof(options->remote_router_address), remote_router_address);
     }
     options->router_server_port = router_server_port;
+    options->own_node_address = own_node_id;
 }
 
-// @todo consider using reference instead of pointer so the lifetime pf option 
-//       structure is clear to the programmer.
+/**
+ * Parse the command line options and save results in options.
+ *
+ * @param[in]   argc    Count of command line options.
+ * @param[in]   argv    Command line arguments.
+ * @param[out]  options Stucture where options are stored in.
+ *
+ * @returns true, if command line options have been parsed successfully or no
+ *          options have been read (in this case, default parameters will be
+ *          used).
+ */
 static bool parse_commandline_options (int argc, char* argv[], options_t* options)
 {
     bool                    rc = true;
@@ -152,7 +174,9 @@ static bool parse_commandline_options (int argc, char* argv[], options_t* option
             options->router_server_port = atoi(optarg);
             router_port_set = true;
             break;
-
+        case 'o':
+            options->own_node_address = atoi(optarg);
+            break;
         default:
             rc = false;
             break;
@@ -174,7 +198,12 @@ static bool parse_commandline_options (int argc, char* argv[], options_t* option
     return rc;
 }
 
-// check for missing and given arguments which are mutual exclusive and validate the values.
+/**
+ * Check for missing and given arguments which are mutual exclusive and validate the values.
+ *
+ * @param[in] options   Structure of options to check.
+ * @returns true, if the options are valid, otherwise false.
+ */
 static bool validate_options(options_t* options)
 {
     bool    rc = false;
@@ -205,7 +234,9 @@ static bool validate_options(options_t* options)
     return rc;
 }
 
-// explain briefly the command-line arguments of the application 
+/**
+ * Explain briefly the command-line arguments of the application.
+ */
 static void print_usage (void)
 {
     fprintf(stderr, "\nUsage:\n");
@@ -215,11 +246,14 @@ static void print_usage (void)
     fprintf(stderr, " -p <server_port>    As server: Port number to listen to.\n");
     fprintf(stderr, " -d <device>         Device of serial bus connection. e.g. /dev/ttyUSB0\n");
     fprintf(stderr, " -b <baudrate>       Baudrate of serial bus connection. Default: 57600\n");
+    fprintf(stderr, " -o <node address>   Own node address (has to be the same address as connected gateway module)\n");
 }
 
-// name speeks for itself. A file is needed to open a unix socket otherwise 
-// you'll get "file not found" error.
-//@todo consider moving this into /ref MESSAGE_SOCKET module.
+/**
+ * Name speeks for itself. A file is needed to open a unix socket otherwise
+ * you'll get "file not found" error.
+ * @todo consider moving this into /ref MESSAGE_SOCKET module.
+ */
 static void create_unix_socket_file(options_t* options)
 {
     FILE* file_handle;
@@ -253,7 +287,8 @@ int main (int argc, char* argv[])
                     57600,              // baudrate, if not given
                     "/tmp/kwbr.usk",    // default address of kwbrouter socket
                     "",                 // no default tcp-client address
-                    0);                 // no default server port
+                    0,                  // no default server port
+                    0);                 // no defaul own node address.
 
         // parse and validate commandline options
         if (parse_commandline_options(argc, argv, &options) == false ||
@@ -275,6 +310,7 @@ int main (int argc, char* argv[])
                 log_error("Unable to allocate serial connection object!");
                 break;
             }
+            serconn->SetSegmentAddress(options.own_node_address);
             rc = serconn->Open(options.serial_device, options.serial_baudrate);
             if (rc != 0) {
                 log_error("Opening serial connection to %s failed with error %d!", options.serial_device, rc);

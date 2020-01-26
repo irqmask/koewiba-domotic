@@ -98,6 +98,7 @@ void Router::DistributeMessage(msg_t* message, RouteConnection* sender)
 {
     for (auto conn : connections) {
         if (conn == sender) continue;
+        if (!conn->AddressIsInConnectionsSegment(message->receiver)) continue;
         conn->Send(message);
     }
 }

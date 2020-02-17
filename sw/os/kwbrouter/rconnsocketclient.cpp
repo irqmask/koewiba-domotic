@@ -151,6 +151,7 @@ int RConnSocketClient::Send(msg_t* message)
 //----------------------------------------------------------------------------
 bool RConnSocketClient::IsSender(void *reference)
 {
+    log_info("this ep %s is %p, looking for %p", this->GetName(), ep, reference);
     return ((msg_endpoint_t*)reference == this->ep);
 }
 

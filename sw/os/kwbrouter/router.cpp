@@ -44,8 +44,7 @@
 void onIncommingMessage(msg_t* message, void* reference, void* arg)
 {
     Router* router = (Router*)arg;
-    RouteConnection* sender = (RouteConnection*)reference;
-    router->DistributeMessage(message, sender);
+    router->DistributeMessage(message, reference);
 }
 
 // --- Class member functions --------------------------------------------------
@@ -97,6 +96,7 @@ void Router::RemoveConnection(RouteConnection* connection)
  */
 void Router::DistributeMessage(msg_t* message, void* reference)
 {
+    log_info("ROUTE from ep: %p", reference);
     for (auto conn : connections) {
         if (conn->IsSender(reference)) continue;
         if (!conn->AddressIsInConnectionsSegment(message->receiver)) continue;

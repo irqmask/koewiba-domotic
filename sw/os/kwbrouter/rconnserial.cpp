@@ -48,17 +48,6 @@ static void incommingMessageHdl(msg_t* message, void* reference, void* arg)
 // --- Class member functions --------------------------------------------------
 
 /**
- * Constructs a serial router connection object without usage of the ioloop
- * background routine.
- */
-RConnSerial::RConnSerial()
-{
-    msg_ser_init(&this->serial);
-    memset(this->name, 0, sizeof(name));
-    snprintf(this->name, sizeof(name) - 1, "SERIAL");
-}
-
-/**
  * Constructs a serial router connection object with usage of the ioloop
  * background routine.
  *
@@ -68,7 +57,7 @@ RConnSerial::RConnSerial(ioloop_t* ioloop)
 {
     msg_ser_init(&this->serial);
     memset(this->name, 0, sizeof(name));
-    snprintf(this->name, sizeof(name) - 1, "SERIAL");
+    snprintf(this->name, sizeof(name) - 1, "SER");
     this->ioloop = ioloop;
 }
 
@@ -106,35 +95,18 @@ void RConnSerial::Close()
     msg_ser_close(&this->serial);
 }
 
-/**
- * Send a message of type msg_t over the serial line.
- *
- * @param[in]   message     Message to be sent.
- *
- * @returns 0 when successful, otherwise error code.
- */
+//----------------------------------------------------------------------------
 int RConnSerial::Send(msg_t* message)
 {
-    log_msg(LOG_VERBOSE1, "%6s <-- message sent", this->GetName());
-    msg_log("SERIALSEND", *message);
+    log_msg(LOG_VERBOSE1, "SER %15s <-- message sent", this->GetName());
     return msg_ser_send(&this->serial, message);
 }
 
-/**
- * This callback is called when an incomming message from the serial line is 
- * received. The message will be forwarded to the extOnIncommingMsg() handler
- * of class RouteConnection.
- *
- * @param[in]   message     Received message. The message is only valid 
- *                          during the lifetime of this function.
- */
+//----------------------------------------------------------------------------
 void RConnSerial::OnIncomingMessage(msg_t* message)
 {
-    log_msg(LOG_VERBOSE1, "%6s --> message received", this->GetName());
-    msg_log("SERIALRECV", *message);
-    if (this->extOnIncommingMsg != NULL) {
-        this->extOnIncommingMsg(message, this, this->extOnIncommingMsgArg);
-    }
+    log_msg(LOG_VERBOSE1, "SER %15s --> message received", this->GetName());
+    RouteConnection::OnIncomingMessage(message);
 }
 
 /** @} */

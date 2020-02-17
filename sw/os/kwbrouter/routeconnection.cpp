@@ -128,8 +128,6 @@ bool RouteConnection::AddressIsInConnectionsSegment(uint16_t node_address)
  */
 int RouteConnection::Send(msg_t* message)
 {
-    log_msg(LOG_VERBOSE1, "%6s <-- message sent", this->GetName());
-    msg_log("???SEND", *message);
     return 0;
 }
 
@@ -140,8 +138,6 @@ int RouteConnection::Send(msg_t* message)
  */
 void RouteConnection::OnIncomingMessage(msg_t* message)
 {
-    log_msg(LOG_VERBOSE1, "%6s --> message received", this->GetName());
-    msg_log("???RECV", *message);
     if (this->extOnIncommingMsg != nullptr) {
         this->extOnIncommingMsg(message, this, this->extOnIncommingMsgArg);
     }

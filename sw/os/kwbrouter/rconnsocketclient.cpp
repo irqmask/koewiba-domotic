@@ -58,17 +58,6 @@ static void closeConnectionHdl(const char* address, uint16_t port, void* referen
 // --- Class member functions --------------------------------------------------
 
 /**
- * default constructor.
- */
-RConnSocketClient::RConnSocketClient() : ep(nullptr),
-                                         socket(nullptr)
-{
-    msg_s_init(&this->local_socket);
-    this->socket = &this->local_socket;
-    memset(this->name, 0, sizeof(name));
-}
-
-/**
  * Initializes a socket connection which has been accepted by the socket server.
  *
  * @param[in]   server      Pointer to the server.
@@ -152,23 +141,21 @@ void RConnSocketClient::Close()
     log_msg(KWB_LOG_STATUS, "%s close connection", this->GetName());
 }
 
-/**
- * Send a KWB message over established socket connection.
- *
- * @param[in]   message     Message to be sent.
- *
- * @returns 0 if successfull, otherwise error-code.
- */
+//----------------------------------------------------------------------------
 int RConnSocketClient::Send(msg_t* message)
 {
-    log_msg(LOG_VERBOSE1, "%6s <-- message sent", this->GetName());
-    msg_log("SOCKETSEND", *message);
+    log_msg(LOG_VERBOSE1, "SOCK %15s <-- message sent", this->GetName());
     return msg_s_send(ep, message);
 }
 
-/**
- * Called by external "OnClose" event
- */
+//----------------------------------------------------------------------------
+void RConnSocketClient::OnIncomingMessage(msg_t* message)
+{
+    log_msg(LOG_VERBOSE1, "SOCK %15s --> message received", this->GetName());
+    RouteConnection::OnIncomingMessage(message);
+}
+
+//----------------------------------------------------------------------------
 void RConnSocketClient::OnConnectionClosed()
 {
     this->ep = NULL;

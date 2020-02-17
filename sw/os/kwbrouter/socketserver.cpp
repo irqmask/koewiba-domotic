@@ -34,7 +34,7 @@
 static void new_connection(const char* address, uint16_t port, void* reference, void* arg)
 {
     SocketServer* server = (SocketServer*)arg;
-    server->OnNewConnection((msg_endpoint_t*)reference);
+    server->OnNewConnection((msg_endpoint_t*)reference, address, port);
 }
 
 // callback from /refMESSAGE_SOCKET socket-server when a connection has been
@@ -131,9 +131,9 @@ void SocketServer::Close()
  * @param[in]   endpoint    Pointer to endpoint structure which holds
  *                          information about the established connection.
  */
-void SocketServer::OnNewConnection(msg_endpoint_t* endpoint)
+void SocketServer::OnNewConnection(msg_endpoint_t* endpoint, const char* address, uint16_t port)
 {
-    RConnSocketClient *newconn = new RConnSocketClient(&this->server, endpoint, this->server.address, this->server.port);
+    RConnSocketClient *newconn = new RConnSocketClient(&this->server, endpoint, address, port);
     newconn->SetConnectionHandler(close_connection, this);
     clients.push_back(newconn);
     if (this->router != NULL) {

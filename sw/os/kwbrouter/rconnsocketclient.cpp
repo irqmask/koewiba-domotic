@@ -121,9 +121,9 @@ int RConnSocketClient::Open(const char* address, int port)
     if (retval == eERR_NONE) {
         this->ep = this->socket->first_ep; // clients only have one endpoint
         msg_s_set_closeconnection_handler(this->ep, closeConnectionHdl, this);
-        log_msg(KWB_LOG_STATUS, "%s open connection to %s:%d", this->GetName(), address, port);
+        log_msg(KWB_LOG_STATUS, "SOCKET %21s open connection to %s:%d", this->GetName(), address, port);
     } else {
-        log_error("%s opening connection to %s:%d failed", this->GetName(), address, port);
+        log_error("SOCKET %21s opening connection to %s:%d failed", this->GetName(), address, port);
     }
     
     return retval;
@@ -138,20 +138,20 @@ void RConnSocketClient::Close()
         msg_s_close_connection(this->socket, this->ep);
         this->ep = NULL;
     }
-    log_msg(KWB_LOG_STATUS, "%s close connection", this->GetName());
+    log_msg(KWB_LOG_STATUS, "SOCKET %21s close connection", this->GetName());
 }
 
 //----------------------------------------------------------------------------
 int RConnSocketClient::Send(msg_t* message)
 {
-    log_msg(LOG_VERBOSE1, "SOCK %15s <-- message sent", this->GetName());
+    log_msg(LOG_VERBOSE1, "SOCKET %21s <-- message sent", this->GetName());
     return msg_s_send(ep, message);
 }
 
 //----------------------------------------------------------------------------
 void RConnSocketClient::OnIncomingMessage(msg_t* message)
 {
-    log_msg(LOG_VERBOSE1, "SOCK %15s --> message received", this->GetName());
+    log_msg(LOG_VERBOSE1, "SOCKET %21s --> message received", this->GetName());
     RouteConnection::OnIncomingMessage(message);
 }
 

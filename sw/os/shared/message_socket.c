@@ -77,7 +77,7 @@ static msg_endpoint_t* msg_new_endpoint (msg_socket_t* msg_socket)
     do {
         ep = (msg_endpoint_t*)calloc(1, sizeof(msg_endpoint_t));
         if (ep == NULL) {
-            log_sys_error("new message transport endpoint could not be created");
+            log_sys_error("SOCKET New message transport endpoint could not be created");
             break;
         }
 
@@ -126,12 +126,12 @@ static int32_t msg_read (void* arg)
         if (rc == 0) {
             // connection closed
             msg_s_close_connection(msg_socket, ep);
-            log_info("connection closed");
+            log_info("SOCKET Connection closed");
             break;
         }
 
         if (rc != sizeof(message)) {
-            log_sys_error("invaid size of incomming message");
+            log_sys_error("SOCKET Invaid size of incoming message");
             break;
         }
 
@@ -157,7 +157,7 @@ static int32_t msg_accept_endpoint (void* arg)
         // get file descriptor of new client connection
         ep->fd = sys_socket_accept(msg_socket->well_known_fd, address, sizeof(address), &port);
         if (ep->fd <= INVALID_FD) {
-            log_sys_error("server not accepting new endpoint");
+            log_sys_error("SOCKET Server not accepting new endpoint");
             msg_delete_endpoint(msg_socket, ep);
             break;
         }
@@ -171,7 +171,7 @@ static int32_t msg_accept_endpoint (void* arg)
         // register new connection to ioloop
         ioloop_register_fd(msg_socket->ioloop, ep->fd, eIOLOOP_EV_READ, msg_read, (void*)ep);
 
-        log_info("connection accepted from %s:%d\n", address, port);
+        log_info("SOCKET Connection accepted from %s:%d\n", address, port);
     } while (0);
     return 0;
 }
@@ -203,7 +203,7 @@ int msg_s_open_server (msg_socket_t*   msg_socket,
         msg_socket->port = port;
         if (port == 0) {
             if (address == NULL) {
-                log_error("unix socket server address not set!");
+                log_error("SOCKET Unix socket server address not set!");
                 rc = eERR_BAD_PARAMETER;
                 break;
             }
@@ -214,14 +214,14 @@ int msg_s_open_server (msg_socket_t*   msg_socket,
 
             fd = sys_socket_open_server_unix(msg_socket->address);
             if (fd <= INVALID_FD) {
-                log_sys_error("unable to open unix socket server at path=%s", address);
+                log_sys_error("SOCKET Unable to open unix socket server at path=%s", address);
                 rc = eERR_SYSTEM;
                 break;
             }
         } else {
             fd = sys_socket_open_server_tcp(msg_socket->port);
             if (fd <= INVALID_FD) {
-                log_sys_error("unable to open tcp socket server at port=%d", port);
+                log_sys_error("SOCKET Unable to open tcp socket server at port=%d", port);
                 rc = eERR_SYSTEM;
                 break;
             }
@@ -257,7 +257,7 @@ int msg_s_open_client (msg_socket_t*   msg_socket,
         if (port == 0) {
             fd = sys_socket_open_client_unix(msg_socket->address);
             if (fd <= INVALID_FD) {
-                log_sys_error("unable to connect client to unix socket server! address=%s",
+                log_sys_error("SOCKET Unable to connect client to unix socket server! address=%s",
                               msg_socket->address);
                 rc = eERR_SYSTEM;
                 break;
@@ -265,7 +265,7 @@ int msg_s_open_client (msg_socket_t*   msg_socket,
         } else {
             fd = sys_socket_open_client_tcp(msg_socket->address, msg_socket->port);
             if (fd <= INVALID_FD) {
-                log_sys_error("unable to connect client to tcp socket server! address=%s port=%d",
+                log_sys_error("SOCKET Unable to connect client to tcp socket server! address=%s port=%d",
                               msg_socket->address, msg_socket->port);
                 rc = eERR_SYSTEM;
                 break;
@@ -354,7 +354,7 @@ int msg_s_send (msg_endpoint_t* recv_ep, msg_t* message)
 
 
     if (sys_socket_send(recv_ep->fd, (void*)message, sizeof(msg_t)) != sizeof(msg_t)) {
-        log_sys_error("Failed to send message!");
+        log_sys_error("SOCKET Send failed!");
         return eERR_SYSTEM;
     }
 

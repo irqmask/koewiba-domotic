@@ -98,14 +98,14 @@ void RConnSerial::Close()
 //----------------------------------------------------------------------------
 int RConnSerial::Send(msg_t* message)
 {
-    log_msg(LOG_VERBOSE1, "SER %15s <-- message sent", this->GetName());
+    log_msg(LOG_VERBOSE1, "SERIAL %21s <-- message sent", this->GetName());
     return msg_ser_send(&this->serial, message);
 }
 
 //----------------------------------------------------------------------------
 void RConnSerial::OnIncomingMessage(msg_t* message)
 {
-    log_msg(LOG_VERBOSE1, "SER %15s --> message received", this->GetName());
+    log_msg(LOG_VERBOSE1, "SERIAL %21s --> message received", this->GetName());
     RouteConnection::OnIncomingMessage(message);
 }
 

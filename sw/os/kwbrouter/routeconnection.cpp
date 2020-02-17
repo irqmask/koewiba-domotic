@@ -171,7 +171,7 @@ void RouteConnection::ClearConnectionHandler()
  */
 void RouteConnection::OnConnectionClosed()
 {
-    log_msg(LOG_STATUS, "%s Client connection closed", this->GetName());
+    log_msg(LOG_STATUS, "CONNEC %s Client connection closed", this->GetName());
     if (this->extOnConnectionClosed != nullptr) {
         this->extOnConnectionClosed("", 0, this, this->extOnConnectionClosedArg);
     }

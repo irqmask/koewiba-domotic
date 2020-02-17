@@ -95,10 +95,10 @@ void Router::RemoveConnection(RouteConnection* connection)
  * Distributes a received message from one connection to all other connection.
  * The message is not echoed back to the sender.
  */
-void Router::DistributeMessage(msg_t* message, RouteConnection* sender)
+void Router::DistributeMessage(msg_t* message, void* reference)
 {
     for (auto conn : connections) {
-        if (conn == sender) continue;
+        if (conn->IsSender(reference)) continue;
         if (!conn->AddressIsInConnectionsSegment(message->receiver)) continue;
         conn->Send(message);
     }

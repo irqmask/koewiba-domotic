@@ -55,7 +55,8 @@ public:
     void Close();
 
     virtual int Send(msg_t* message) override;
-    virtual void OnIncomingMessage(msg_t* message) override;
+    virtual bool IsSender(void* reference) override;
+    virtual void OnIncomingMessage(msg_t* message, void* reference) override;
     virtual void OnConnectionClosed() override;
 };
 

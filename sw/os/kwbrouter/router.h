@@ -60,7 +60,7 @@ public:
     void AddConnection(RouteConnection* connection);
     void RemoveConnection(RouteConnection* connection);
 
-    void DistributeMessage(msg_t* message, RouteConnection* sender);
+    void DistributeMessage(msg_t* message, void* reference);
 };
 
 #endif // ROUTER_H

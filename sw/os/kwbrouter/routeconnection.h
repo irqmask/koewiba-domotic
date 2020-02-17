@@ -54,7 +54,7 @@ public:
 
     void SetIncommingHandler(msg_incom_func_t func, void* arg);
     void ClearIncommingHandler();
-    virtual void OnIncomingMessage(msg_t* message);
+    virtual void OnIncomingMessage(msg_t* message, void* reference);
 
     void SetConnectionHandler(msg_conn_func_t func, void* arg);
     void ClearConnectionHandler();
@@ -63,7 +63,23 @@ public:
     void SetSegmentAddress(uint16_t segment_address);
     uint16_t GetSegmentAddress();
 
+    /**
+     * @param reference Reference pointer to check.
+     * @returns true, if given reference represents this connection.
+     */
+    virtual bool IsSender(void* reference);
+
+    /**
+     * Checks if given address is in the range of the connections segment.
+     *
+     * Currently used only for serial connections to check if address is in the
+     * targeted bus-segment.
+     * @param[in] node_address  Address to check. If segment address is set to 0,
+     *                          every address is considered beeing in this segment.
+     * @returns true if address is in the bus segment, otherwise false.
+     */
     virtual bool AddressIsInConnectionsSegment(uint16_t node_address);
+
     virtual int Send(msg_t* message);
 };
 

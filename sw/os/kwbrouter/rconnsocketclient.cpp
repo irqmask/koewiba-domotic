@@ -45,7 +45,7 @@
 static void incomingMessageHdl(msg_t* message, void* reference, void* arg)
 {
     RConnSocketClient* sockcon = (RConnSocketClient*)arg;
-    sockcon->OnIncomingMessage(message, reference);
+    sockcon->OnIncomingMessage(message);
 }
 
 // will be called from /ref MESSAGE_SOCKET when a connection is closed. 
@@ -149,17 +149,10 @@ int RConnSocketClient::Send(msg_t* message)
 }
 
 //----------------------------------------------------------------------------
-bool RConnSocketClient::IsSender(void *reference)
-{
-    log_info("this ep %s is %p, looking for %p", this->GetName(), ep, reference);
-    return ((msg_endpoint_t*)reference == this->ep);
-}
-
-//----------------------------------------------------------------------------
-void RConnSocketClient::OnIncomingMessage(msg_t* message, void* reference)
+void RConnSocketClient::OnIncomingMessage(msg_t* message)
 {
     log_msg(LOG_VERBOSE1, "SOCKET %21s --> message received", this->GetName());
-    RouteConnection::OnIncomingMessage(message, reference);
+    RouteConnection::OnIncomingMessage(message);
 }
 
 //----------------------------------------------------------------------------

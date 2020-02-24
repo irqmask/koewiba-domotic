@@ -72,15 +72,15 @@ using namespace std;
 
 //! Stores default and interpreted command-line arguments
 typedef struct options {
-    char        serial_device[256];         //! Name of the serial device connection.
-    int         serial_baudrate;            //! Baudrate for the serial connection.
-    char        unix_address[256];          //! Address of the unix socket for
-                                            //! local socket communication.
-    char        remote_router_address[256]; //! TCP address of the router to connect to.
-    uint16_t    router_server_port;         //! Listening port of the router
-    bool        serial_device_set;          //! Flag, if a serial device is configured.
-    bool        router_server_configured;   //! Flag, if router as server is configured.
-    bool        router_client_configured;   //! Flag, if router as client is configured.
+    char        serial_device[256];         //!< Name of the serial device connection.
+    int         serial_baudrate;            //!< Baudrate for the serial connection.
+    char        unix_address[256];          //!< Address of the unix socket for
+                                            //!< local socket communication.
+    char        remote_router_address[256]; //!< TCP address of the router to connect to.
+    uint16_t    router_server_port;         //!< Listening port of the router
+    bool        serial_device_set;          //!< Flag, if a serial device is configured.
+    bool        router_server_configured;   //!< Flag, if router as server is configured.
+    bool        router_client_configured;   //!< Flag, if router as client is configured.
     uint16_t    own_node_address;           //!< own node address
 } options_t;
 

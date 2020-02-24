@@ -100,13 +100,15 @@ uint16_t RouteConnection::GetSegmentAddress()
     return segmentAddress;
 }
 
-//----------------------------------------------------------------------------
-bool RouteConnection::IsSender(void *reference)
-{
-    return false;
-}
-
-//----------------------------------------------------------------------------
+/**
+ * Checks if given address is in the range of the connections segment.
+ *
+ * Currently used only for serial connections to check if address is in the
+ * targeted bus-segment.
+ * @param[in] node_address  Address to check. If segment address is set to 0,
+ *                          every address is considered beeing in this segment.
+ * @returns true if address is in the bus segment, otherwise false.
+ */
 bool RouteConnection::AddressIsInConnectionsSegment(uint16_t node_address)
 {
     if ((segmentAddress == 0) ||
@@ -134,7 +136,7 @@ int RouteConnection::Send(msg_t* message)
  *
  * @param[in]   message     Incomming message.
  */
-void RouteConnection::OnIncomingMessage(msg_t* message, void* reference)
+void RouteConnection::OnIncomingMessage(msg_t* message)
 {
     if (this->extOnIncommingMsg != nullptr) {
         this->extOnIncommingMsg(message, this, this->extOnIncommingMsgArg);

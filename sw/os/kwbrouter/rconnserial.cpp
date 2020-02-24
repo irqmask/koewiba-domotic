@@ -42,7 +42,7 @@
 static void incommingMessageHdl(msg_t* message, void* reference, void* arg)
 {
     RConnSerial* sercon = (RConnSerial*)arg;
-    sercon->OnIncomingMessage(message, reference);
+    sercon->OnIncomingMessage(message);
 }
 
 // --- Class member functions --------------------------------------------------
@@ -103,16 +103,10 @@ int RConnSerial::Send(msg_t* message)
 }
 
 //----------------------------------------------------------------------------
-bool RConnSerial::IsSender(void *reference)
-{
-    return ((msg_serial_t*)reference == &this->serial);
-}
-
-//----------------------------------------------------------------------------
-void RConnSerial::OnIncomingMessage(msg_t* message, void* reference)
+void RConnSerial::OnIncomingMessage(msg_t* message)
 {
     log_msg(LOG_VERBOSE1, "SERIAL %21s --> message received", this->GetName());
-    RouteConnection::OnIncomingMessage(message, reference);
+    RouteConnection::OnIncomingMessage(message);
 }
 
 /** @} */

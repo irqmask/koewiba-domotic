@@ -63,6 +63,15 @@ public:
     void SetSegmentAddress(uint16_t segment_address);
     uint16_t GetSegmentAddress();
 
+    /**
+     * Checks if given address is in the range of the connections segment.
+     *
+     * Currently used only for serial connections to check if address is in the
+     * targeted bus-segment.
+     * @param[in] node_address  Address to check. If segment address is set to 0,
+     *                          every address is considered beeing in this segment.
+     * @returns true if address is in the bus segment, otherwise false.
+     */
     virtual bool AddressIsInConnectionsSegment(uint16_t node_address);
     virtual int Send(msg_t* message);
 };

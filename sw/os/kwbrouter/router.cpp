@@ -97,7 +97,6 @@ void Router::RemoveConnection(RouteConnection* connection)
  */
 void Router::DistributeMessage(msg_t* message, RouteConnection* sender)
 {
-    log_info("ROUTE from ep: %p", sender);
     for (auto conn : connections) {
         if (conn == sender) continue;
         if (!conn->AddressIsInConnectionsSegment(message->receiver)) continue;

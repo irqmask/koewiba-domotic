@@ -47,6 +47,12 @@ class Router
 private:
     std::list<RouteConnection*> connections;
 
+    /**
+     * Log current list of connections.
+     * @param[in]   current     Mark current connection(optional)
+     */
+    void ListConnections(RouteConnection* current);
+
 public:
     Router();
     ~Router();

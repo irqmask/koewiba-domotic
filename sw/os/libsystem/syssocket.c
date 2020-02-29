@@ -31,7 +31,9 @@
 #if defined (PRJCONF_UNIX) || \
     defined (PRJCONF_POSIX) || \
     defined (PRJCONF_LINUX)
+  #include <arpa/inet.h>
   #include <fcntl.h>
+  #include <netinet/in.h>
   #include <safe_lib.h>
   #include <sys/ioctl.h>
   #include <sys/socket.h>
@@ -49,6 +51,12 @@
 
 // --- Type definitions --------------------------------------------------------
 
+typedef union {
+    struct sockaddr  common;
+    struct sockaddr_un af_unix;
+    struct sockaddr_in af_inet;
+} sockinfo_t;
+
 // --- Local variables ---------------------------------------------------------
 
 // --- Global variables --------------------------------------------------------
@@ -56,6 +64,31 @@
 // --- Module global variables -------------------------------------------------
 
 // --- Local functions ---------------------------------------------------------
+
+
+static void sys_socket_get_address (sockinfo_t* sockinfo, char* address, size_t addr_len, uint16_t* port)
+{
+#if defined (PRJCONF_UNIX) || \
+    defined (PRJCONF_POSIX) || \
+    defined (PRJCONF_LINUX)
+
+    switch (sockinfo->common.sa_family) {
+    case AF_UNIX:
+        if (address != NULL) strcpy_s(address, addr_len, sockinfo->af_unix.sun_path);
+        if (port != NULL) *port = 0;
+        break;
+    case AF_INET:
+        inet_ntop(AF_INET, &sockinfo->af_inet.sin_addr, address, addr_len);
+        if (port != NULL) *port = ntohs(sockinfo->af_inet.sin_port);
+        break;
+    default:
+        break;
+    }
+
+#elif defined (PRJCONF_WINDOWS)
+    //TODO implement windows version
+#endif
+}
 
 // --- Module global functions -------------------------------------------------
 
@@ -128,7 +161,7 @@ sys_fd_t sys_socket_open_client_unix (const char* socketname)
 
     rc = connect(fd, (struct sockaddr *) &sockinfo, sockinfolen);
     if (rc != 0) {
-        perror("open unix client connect");
+        perror("connect to unix client");
         close(fd);
         return rc;
     }
@@ -140,16 +173,84 @@ sys_fd_t sys_socket_open_client_unix (const char* socketname)
 #endif
 }
 
-sys_fd_t sys_socket_open_server_tcp (const char* socketaddress, uint16_t port)
+sys_fd_t sys_socket_open_server_tcp (uint16_t port)
 {
-    //TODO implement
+#if defined (PRJCONF_UNIX) || \
+    defined (PRJCONF_POSIX) || \
+    defined (PRJCONF_LINUX)
+    int                 rc;
+    sys_fd_t            fd;
+    struct sockaddr_in  sockinfo;
+
+    fd = socket(AF_INET, SOCK_STREAM, 0);
+    if (fd < 0) {
+        perror("open tcp client socket");
+        return fd;
+    }
+
+    memset(&sockinfo, 0, sizeof(sockinfo));
+    sockinfo.sin_family = AF_INET;
+    sockinfo.sin_addr.s_addr = INADDR_ANY;
+    sockinfo.sin_port = htons(port);
+
+    rc = bind(fd, (struct sockaddr *)&sockinfo, sizeof(sockinfo));
+    if (rc < 0) {
+        perror("bind tcp server");
+        close(fd);
+        return rc;
+    }
+
+    rc = listen (fd, 3);
+    if (rc < 0) {
+        perror("listen tcp server");
+        close(fd);
+        return rc;
+    }
+
+    return fd;
+#elif defined (PRJCONF_WINDOWS)
+    //TODO implement windows version
     return INVALID_FD;
+#endif
 }
 
 sys_fd_t sys_socket_open_client_tcp (const char* socketaddress, uint16_t port)
 {
+#if defined (PRJCONF_UNIX) || \
+    defined (PRJCONF_POSIX) || \
+    defined (PRJCONF_LINUX)
+    int                 rc;
+    sys_fd_t            fd;
+    struct sockaddr_in  sockinfo;
+
+    fd = socket(AF_INET, SOCK_STREAM, 0);
+    if (fd < 0) {
+        perror("open tcp client socket");
+        return fd;
+    }
+
+    memset(&sockinfo, 0, sizeof(sockinfo));
+    sockinfo.sin_family = AF_INET;
+    if (inet_pton(AF_INET, socketaddress, &sockinfo.sin_addr.s_addr) < 0) {
+        rc = errno;
+        perror("unable to convert address to IPv4 address!");
+        close(fd);
+        return rc;
+    }
+    sockinfo.sin_port = htons(port);
+
+    rc = connect(fd, (struct sockaddr *) &sockinfo, sizeof(sockinfo));
+    if (rc < 0) {
+        perror("unable to connect to tcp client");
+        close(fd);
+        return rc;
+    }
+
+    return fd;
+#else
     //TODO implement
     return INVALID_FD;
+#endif
 }
 
 void sys_socket_close (sys_fd_t fd)
@@ -162,16 +263,17 @@ void sys_socket_close (sys_fd_t fd)
 #endif
 }
 
-sys_fd_t sys_socket_accept (sys_fd_t server_fd)
+sys_fd_t sys_socket_accept (sys_fd_t server_fd, char* address, size_t address_len, uint16_t* port)
 {
 #if defined (PRJCONF_UNIX) || \
     defined (PRJCONF_POSIX) || \
     defined (PRJCONF_LINUX)
-    struct sockaddr_un  sockinfo;
-    socklen_t           sockinfolen = sizeof(sockinfo);
-    sys_fd_t            fd;
+    sys_fd_t    fd;
+    sockinfo_t  sockinfo;
+    socklen_t   sockinfolen = sizeof(sockinfo_t);
 
-    fd = accept (server_fd, (struct sockaddr *)&sockinfo, &sockinfolen);
+    fd = accept(server_fd, (struct sockaddr*)&sockinfo, &sockinfolen);
+    sys_socket_get_address(&sockinfo, address, address_len, port);
     return fd;
 #elif defined (PRJCONF_WINDOWS)
     //TODO implement windows version
@@ -179,7 +281,7 @@ sys_fd_t sys_socket_accept (sys_fd_t server_fd)
 #endif
 }
 
-size_t sys_socket_recv (sys_fd_t fd, void* buffer, size_t buffersize)
+ssize_t sys_socket_recv (sys_fd_t fd, void* buffer, size_t buffersize)
 {
 #if defined (PRJCONF_UNIX) || \
     defined (PRJCONF_POSIX) || \
@@ -191,7 +293,7 @@ size_t sys_socket_recv (sys_fd_t fd, void* buffer, size_t buffersize)
 #endif
 }
 
-size_t sys_socket_send (sys_fd_t fd, void* buffer, size_t buffersize)
+ssize_t sys_socket_send (sys_fd_t fd, void* buffer, size_t buffersize)
 {
 #if defined (PRJCONF_UNIX) || \
     defined (PRJCONF_POSIX) || \
@@ -264,37 +366,6 @@ void sys_socket_set_blocking (sys_fd_t fd, bool blocking)
             break;
         }
     } while (0);
-#elif defined (PRJCONF_WINDOWS)
-    //TODO implement windows version
-#endif
-}
-
-void sys_socket_get_name (sys_fd_t fd, char* address, size_t addr_len, uint16_t* port)
-{
-#if defined (PRJCONF_UNIX) || \
-    defined (PRJCONF_POSIX) || \
-    defined (PRJCONF_LINUX)
-    union {
-        struct sockaddr  common;
-        struct sockaddr_un af_unix;
-    } sockinfo;
-
-    socklen_t len = sizeof(sockinfo);
-
-    if (getsockname(fd, (struct sockaddr *)&sockinfo, &len) == -1)
-        perror("getsockname");
-    else {
-        switch (sockinfo.common.sa_family) {
-        case AF_UNIX:
-            if (address != NULL) strcpy_s(address, addr_len, sockinfo.af_unix.sun_path);
-            if (port != NULL) *port = 0;
-            break;
-        case AF_INET:
-            break;
-        default:
-            break;
-        }
-    }
 #elif defined (PRJCONF_WINDOWS)
     //TODO implement windows version
 #endif

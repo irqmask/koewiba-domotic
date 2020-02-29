@@ -58,7 +58,7 @@ typedef struct ioloop_timer {
     ioloop_timer_t*         next;
     int32_t                 id;
     uint16_t                interval_ticks;
-    uint16_t                expiration_time;
+    uint16_t                last_hit;
     bool                    run_cyclic;
     ioloop_event_type_t     eventtype;
     ioloop_event_func_t     callback;
@@ -193,7 +193,7 @@ static void ioloop_insert_timer (ioloop_t* ioloop, ioloop_timer_t* timer)
         curr_timer = ioloop->first_timer;
         prev_timer = NULL;
         while (curr_timer != NULL) {
-            if (curr_timer->expiration_time >= timer->expiration_time) {
+            if ((curr_timer->last_hit + curr_timer->interval_ticks) >= (timer->last_hit + timer->interval_ticks)) {
                 timer->next = curr_timer;
                 if (prev_timer != NULL) {
                     // insert in between
@@ -231,6 +231,10 @@ static void ioloop_remove_timer (ioloop_t* ioloop, ioloop_timer_t* timer)
     }
 }
 
+/**
+ * Get current time and convert it into ticks.
+ * @returns current time in ticks.
+ */
 static uint16_t ioloop_get_current_ticks (void)
 {
     sys_time_t      now;
@@ -243,9 +247,14 @@ static uint16_t ioloop_get_current_ticks (void)
     return (uint16_t) now;
 }
 
+/**
+ * Calculate number of ticks from now until next timeout
+ * @param[in]   ioloop      ioloop handle
+ * @returns time in ticks until next timer timeout.
+ */
 static uint16_t ioloop_get_next_timeout (ioloop_t* ioloop)
 {
-    uint16_t now;
+    uint16_t now, diff;
 
     // no timer registered? -> default value 1s
     if (ioloop->first_timer == NULL) {
@@ -254,13 +263,19 @@ static uint16_t ioloop_get_next_timeout (ioloop_t* ioloop)
 
     // get difference time to now from first registered timer
     now = ioloop_get_current_ticks();
-    if (now > ioloop->first_timer->expiration_time) return 1;
-    else return ioloop->first_timer->expiration_time - now;
+    diff = now - ioloop->first_timer->last_hit;
+    if (diff > ioloop->first_timer->interval_ticks) return 1;
+    else return (ioloop->first_timer->interval_ticks - diff);
 }
 
+/**
+ * Loop over registered timers, check timeout, call registered callbacks on timeout.
+ * @param[in]   ioloop      ioloop handle
+ */
 static void ioloop_check_timer (ioloop_t* ioloop)
 {
-    uint16_t        new_interval, now;
+    int32_t         new_interval;
+    uint16_t        now, diff;
     ioloop_timer_t* timer;
 
     now = ioloop_get_current_ticks();
@@ -268,7 +283,9 @@ static void ioloop_check_timer (ioloop_t* ioloop)
 
     while (timer != NULL) {
         // iterate over all timers which are expired.
-        if (timer->expiration_time <= now) {
+        diff = now - timer->last_hit;
+        if (diff >= timer->interval_ticks) {
+            new_interval = 0;
             if (timer->callback) {
                 new_interval = timer->callback(timer->arg);
             }
@@ -277,13 +294,19 @@ static void ioloop_check_timer (ioloop_t* ioloop)
             // timer is non-run_cyclic.
             // interval time remains unchanged, if return value of callback is 0.
             if (timer->run_cyclic && new_interval >= 0) {
-                if (new_interval > 0) timer->interval_ticks = new_interval;
-                timer->expiration_time += timer->interval_ticks;
+                if (new_interval > 0) {
+                    if (new_interval > INT16_MAX) new_interval = INT16_MAX;
+                    timer->interval_ticks = new_interval;
+                }
+                timer->last_hit += timer->interval_ticks;
                 ioloop_insert_timer(ioloop, timer);
             } else {
                 free(timer);
             }
-        } else break;
+            // iterate over whole list again
+            timer = ioloop->first_timer;
+            continue;
+        }
         timer = timer->next;
     }
 }
@@ -389,7 +412,7 @@ int32_t ioloop_register_timer (ioloop_t*            ioloop,
         timer->arg = arg;
 
         now = ioloop_get_current_ticks();
-        timer->expiration_time = now + timer->interval_ticks;
+        timer->last_hit = now;
 
         ioloop_insert_timer(ioloop, timer);
     } while (0);
@@ -452,7 +475,11 @@ void ioloop_run_once (ioloop_t* ioloop)
     memcpy(&write_fds, &ioloop->write_fd_set, sizeof(fd_set));
 
     // calculate next timeout
-    timeout_us = (1000000 * ioloop_get_next_timeout(ioloop)) / CLOCK_TICKS_PER_SECOND;
+    timeout_us = ioloop_get_next_timeout(ioloop);
+    timeout_us *= 1000000;
+    timeout_us /= CLOCK_TICKS_PER_SECOND;
+
+    // if both tv_sec and tv_usec are zero select returns immediately
     timeout.tv_sec = timeout_us / 1000000;
     timeout.tv_usec = timeout_us % 1000000;
 

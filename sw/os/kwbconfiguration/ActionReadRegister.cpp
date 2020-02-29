@@ -74,6 +74,7 @@ bool ActionReadRegister::formMessage()
     messageToSend.length = 2;
     messageToSend.data[0] = eCMD_REQUEST_REG;
     messageToSend.data[1] = registerId;
+    return true;
 }
 
 bool ActionReadRegister::filterResponse(msg_t& message)

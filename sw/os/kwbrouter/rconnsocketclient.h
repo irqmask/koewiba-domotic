@@ -47,15 +47,16 @@ private:
                                     //!< given by constructor.
 
 public:
-    RConnSocketClient();
+    RConnSocketClient(ioloop_t* ioloop, const char* address, uint16_t port);
     RConnSocketClient(msg_socket_t* server, msg_endpoint_t* ep, const char* address, uint16_t port);
     ~RConnSocketClient();
 
     int Open(const char* address, int port);
     void Close();
 
-    int Send(msg_t* message);
-    void OnConnectionClosed();
+    virtual int Send(msg_t* message) override;
+    virtual void OnIncomingMessage(msg_t* message) override;
+    virtual void OnConnectionClosed() override;
 };
 
 #endif // RCONNSOCKETCLIENT_H

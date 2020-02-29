@@ -41,15 +41,14 @@ private:
     msg_serial_t serial;    //!< Concrete serial connetion.
 
 public:
-    RConnSerial();
     RConnSerial(ioloop_t* ioloop);
     ~RConnSerial();
 
     int Open(const char* device, int baudrate);
     void Close();
 
-    int Send(msg_t* message);
-    void OnIncommingMessage(msg_t* message);
+    virtual int Send(msg_t* message) override;
+    virtual void OnIncomingMessage(msg_t* message) override;
 };
 
 #endif // RCONNSERIAL_H

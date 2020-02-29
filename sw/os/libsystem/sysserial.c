@@ -319,7 +319,7 @@ int sys_serial_set_params (sys_fd_t            fd,
     return rc;
 }
 
-size_t sys_serial_send (sys_fd_t fd, void* buf, size_t bufsize)
+ssize_t sys_serial_send (sys_fd_t fd, void* buf, size_t bufsize)
 {
 #if defined (PRJCONF_UNIX) || \
     defined (PRJCONF_POSIX) || \
@@ -335,7 +335,7 @@ size_t sys_serial_send (sys_fd_t fd, void* buf, size_t bufsize)
 #endif
 }
 
-size_t sys_serial_recv (sys_fd_t fd, void* buf, size_t bufsize)
+ssize_t sys_serial_recv (sys_fd_t fd, void* buf, size_t bufsize)
 {
 #if defined (PRJCONF_UNIX) || \
     defined (PRJCONF_POSIX) || \

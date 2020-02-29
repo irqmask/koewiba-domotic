@@ -397,7 +397,7 @@ int msg_ser_send (msg_serial_t* msg_serial, msg_t* message)
 
         msg_serial->ser_data_length = format_serial_message(msg_serial->ser_data, sizeof(msg_serial->ser_data), message);
         if (msg_serial->ser_data_length == 0) {
-            log_error("msg_serial: error encoding serial message!");
+            log_error("SERIAL error encoding serial message!");
             rc = eMSG_ERR_SIZE;
         } else {
             log_msg(LOG_VERBOSE2, "SERIAL S %s", msg_serial->ser_data);
@@ -405,7 +405,7 @@ int msg_ser_send (msg_serial_t* msg_serial, msg_t* message)
                                                            (void*)msg_serial->ser_data,
                                                            msg_serial->ser_data_length);
             if (msg_serial->ser_data_written < 0) {
-                log_sys_error("msg_serial: serial send failed!");
+                log_sys_error("SERIAL Send failed!");
                 rc = eERR_SYSTEM;
             } else if (msg_serial->ser_data_written < msg_serial->ser_data_length) {
                 log_warning("SERIAL Not all bytes written");
@@ -421,7 +421,8 @@ int msg_ser_send (msg_serial_t* msg_serial, msg_t* message)
 int msg_ser_continue_sending (msg_serial_t* msg_serial)
 {
     int rc = eERR_NONE;
-    size_t to_send = 0, written = 0;
+    size_t to_send = 0;
+    ssize_t written = 0;
 
     assert(msg_serial != NULL);
 
@@ -431,7 +432,7 @@ int msg_ser_continue_sending (msg_serial_t* msg_serial)
                                   &msg_serial->ser_data[msg_serial->ser_data_written],
                                   to_send);
         if (written < 0) {
-            log_sys_error("msg_serial: serial send failed!");
+            log_sys_error("SERIAL Send failed!");
             rc = eERR_SYSTEM;
         } else {
             msg_serial->ser_data_written += written;

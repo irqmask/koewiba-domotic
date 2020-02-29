@@ -57,7 +57,7 @@ public:
     int Open(const char* address, uint16_t port);
     void Close();
 
-    void OnNewConnection(msg_endpoint_t* endpoint);
+    void OnNewConnection(msg_endpoint_t* endpoint, const char* address, uint16_t port);
     void OnCloseConnection(RConnSocketClient* client);
 };
 

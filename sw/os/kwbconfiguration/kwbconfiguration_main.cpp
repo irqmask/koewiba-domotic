@@ -132,7 +132,7 @@ static void set_options (options_t*     options,
 }
 
 /**
- * Read command line options and save results in options.
+ * Parse the command line options and save results in options.
  *
  * @param[in]   argc    Count of command line options.
  * @param[in]   argv    Command line arguments.
@@ -272,7 +272,7 @@ int main (int argc, char* argv[])
         ioloop_set_default_timeout(&mainloop, 1);
                
         MsgBroker broker;
-        MsgEndpoint* ep;
+        MsgEndpoint* ep = nullptr;;
         
         // connect to the bus
         using std::placeholders::_1;
@@ -289,6 +289,11 @@ int main (int argc, char* argv[])
             }
         }
         
+        if (ep == nullptr) {
+            log_error("No connection to gateway or router over serial or TCP/IP was established!");
+            rc = eERR_RESOURCE;
+            break;
+        }
         // instantiate application, ui and its thread
         Application app(*ep, broker, end_application);
         UIMain uimain(app);

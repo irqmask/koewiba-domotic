@@ -106,6 +106,19 @@ void log_msg (log_mask_t logmask, const char* logmessage, ...)
     }
 }
 
+void log_info(const char* logmessage, ...)
+{
+    va_list args;
+
+    if ((LOG_INFO & active_logs) != 0) {
+        va_start(args, logmessage);
+        fprintf(stderr, "INFO      ");
+        vfprintf(stderr, logmessage, args);
+        fprintf(stderr, "\n");
+        va_end(args);
+    }
+}
+
 void log_warning(const char* logmessage, ...)
 {
     va_list args;
@@ -134,13 +147,15 @@ void log_error (const char* logmessage, ...)
 
 void log_sys_error (const char* logmessage, ...)
 {
+    int err = errno;
+
     va_list args;
 
     if ((LOG_ERROR & active_logs) != 0) {
         va_start(args, logmessage);
         fprintf(stderr, "ERROR     ");
         vfprintf(stderr, logmessage, args);
-        fprintf(stderr, " %s", strerror(errno));
+        fprintf(stderr, " %s", strerror(err));
         fprintf(stderr, "\n");
         va_end(args);
     }

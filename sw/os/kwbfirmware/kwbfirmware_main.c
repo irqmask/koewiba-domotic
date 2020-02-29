@@ -75,7 +75,7 @@ typedef struct options {
     bool        router_address_set; //!< Flag: is set, router address has been
                                     //!< configured in the command line options.
     char        filename[256];
-    uint16_t    node_address;
+    uint16_t    node_address;       //!< own node address
 } options_t;
 
 // --- Local variables ---------------------------------------------------------
@@ -119,7 +119,7 @@ static void set_options (options_t*     options,
 }
 
 /**
- * Read command line options and save results in options.
+ * Parse the command line options and save results in options.
  *
  * @param[in]   argc    Count of command line options.
  * @param[in]   argv    Command line arguments.
@@ -278,10 +278,11 @@ int main (int argc, char* argv[])
         ioloop_init(&mainloop);
         ioloop_set_default_timeout(&mainloop, 1);
 
-        firmware_update_init(&firmware, &mainloop, options.serial_device, options.serial_baudrate);
+        rc = firmware_update_init(&firmware, &mainloop, options.serial_device, options.serial_baudrate);
+        if (rc != eERR_NONE) break;
+
         firmware_register_progress_func(&firmware, print_progress, NULL);
 
-        if (rc != eERR_NONE) break;
         rc = firmware_update_start(&firmware, options.filename, options.node_address);
         if (rc != eERR_NONE) break;
 

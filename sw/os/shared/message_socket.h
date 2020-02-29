@@ -47,23 +47,24 @@ extern "C" {
 
 // --- Type definitions --------------------------------------------------------
 
-typedef enum msg_ep_type {
-    eMSG_EP_SERVER = 0,
-    eMSG_EP_COMM,
-} msg_ep_type_t;
-
 typedef struct msg_endpoint msg_endpoint_t;
 
+//! Structure holding all information for a socket connection for kwb messages.
 typedef struct msg_socket {
-    sys_fd_t            well_known_fd;
-    msg_endpoint_t*     first_ep;
-    ioloop_t*           ioloop;
-    char                address[256];
-    uint16_t            port;
-    msg_conn_func_t     new_connection_handler;
-    void*               new_connection_arg;
-    msg_incom_func_t    incomming_handler;
-    void*               incomming_arg;
+    sys_fd_t            well_known_fd;  //!< Listening server's file descriptor
+    msg_endpoint_t*     first_ep;       //!< head of endpoint list
+    ioloop_t*           ioloop;         //!< pointer to ioloop
+    char                address[256];   //!< address of remote server or path to
+                                        //!< unix socket file
+    uint16_t            port;           //!< server port (0 for unix socket server)
+    msg_conn_func_t     new_connection_handler; //!< called whenever a new client
+                                                //!< connected to the server
+    void*               new_connection_arg;     //!< additional argument for
+                                                //!< new_connection_handler callback
+    msg_incom_func_t    incomming_handler;      //!< called whenever a message
+                                                //!< is received.
+    void*               incomming_arg;          //!< additional argument for
+                                                //!< incoming handler callback.
 } msg_socket_t;
 
 // --- Local variables ---------------------------------------------------------
@@ -106,8 +107,7 @@ void msg_s_set_incomming_handler (msg_socket_t* msg_socket,
                                   void* arg);
 
 msg_endpoint_t* msg_s_get_endpoint (msg_socket_t*   msg_socket,
-                                    int             index,
-                                    uint32_t        flags);
+                                    int             index);
 
 int msg_s_send (msg_endpoint_t*    recv_ep,
                 msg_t*             message);

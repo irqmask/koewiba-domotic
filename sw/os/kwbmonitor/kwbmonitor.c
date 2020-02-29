@@ -60,7 +60,7 @@ void monitor_parse_message (uint8_t new_byte, bus_history_t* history)
         current_time_difference(history, &diff_ms, &remaining_us);
         snprintf(buffer, sizeof(buffer)-1, "%9d.%03d | ", diff_ms, remaining_us);
     }
-    snprintf(part, sizeof(part-1), "%02X ", new_byte);
+    snprintf(part, sizeof(part) - 1, "%02X ", new_byte);
     strcat_s(buffer, sizeof(buffer)-1, part);
 
     // compute status of message

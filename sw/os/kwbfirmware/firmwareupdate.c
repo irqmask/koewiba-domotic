@@ -513,7 +513,7 @@ int firmware_update_start (firmwareupdate_t*    fwu,
         memset(fwu->fw_memory, 0xFF, fwu->fw_size);
         if (fwu->fw_memory == NULL) {
             log_error("Out of memory. Failed to allocate %d bytes", fwu->fw_size);
-            rc = eERR_MALLOC;
+            rc = eERR_RESOURCE;
             break;
         }
 

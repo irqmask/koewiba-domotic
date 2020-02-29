@@ -53,17 +53,17 @@ sys_fd_t sys_socket_open_server_unix (const char* socketname);
 
 sys_fd_t sys_socket_open_client_unix (const char* socketname);
 
-sys_fd_t sys_socket_open_server_tcp (const char* socketaddress, uint16_t port);
+sys_fd_t sys_socket_open_server_tcp (uint16_t port);
 
 sys_fd_t sys_socket_open_client_tcp (const char* socketaddress, uint16_t port);
 
 void sys_socket_close (sys_fd_t fd);
 
-sys_fd_t sys_socket_accept (sys_fd_t server_fd);
+sys_fd_t sys_socket_accept (sys_fd_t server_fd, char* address, size_t address_len, uint16_t* port);
 
-size_t sys_socket_send (sys_fd_t fd, void* buffer, size_t buffersize);
+ssize_t sys_socket_send (sys_fd_t fd, void* buffer, size_t buffersize);
 
-size_t sys_socket_recv (sys_fd_t fd, void* buffer, size_t buffersize);
+ssize_t sys_socket_recv (sys_fd_t fd, void* buffer, size_t buffersize);
 
 void sys_socket_flush (sys_fd_t fd);
 
@@ -72,8 +72,6 @@ size_t sys_socket_get_pending_sendq (sys_fd_t fd);
 size_t sys_socket_get_pending_recvq (sys_fd_t fd);
 
 void sys_socket_set_blocking (sys_fd_t fd, bool blocking);
-
-void sys_socket_get_name (sys_fd_t fd, char* address, size_t addr_len, uint16_t* port);
 
 #endif /* _SYSSOCKET_H_ */
 /** @} */

@@ -44,15 +44,12 @@
 void onIncommingMessage(msg_t* message, void* reference, void* arg)
 {
     Router* router = (Router*)arg;
-    RouteConnection* sender = (RouteConnection*)reference;
-    router->DistributeMessage(message, sender);
+    RouteConnection* sending_conn = (RouteConnection*)reference;
+    router->DistributeMessage(message, sending_conn);
 }
 
 // --- Class member functions --------------------------------------------------
 
-/**
- * Currently nothing to do on creation.
- */
 Router::Router()
 {
     connections.clear();
@@ -76,6 +73,8 @@ void Router::AddConnection(RouteConnection* connection)
 {
     connection->SetIncommingHandler(onIncommingMessage, this);
     connections.push_back(connection);
+    log_info("Add new connection:");
+    ListConnections(connection);
 }
 
 /**
@@ -86,6 +85,8 @@ void Router::AddConnection(RouteConnection* connection)
  */
 void Router::RemoveConnection(RouteConnection* connection)
 {
+    log_info("Remove Closed connection:");
+    ListConnections(connection);
     connection->ClearIncommingHandler();
     connections.remove(connection);
 }
@@ -98,7 +99,23 @@ void Router::DistributeMessage(msg_t* message, RouteConnection* sender)
 {
     for (auto conn : connections) {
         if (conn == sender) continue;
+        if (!conn->AddressIsInConnectionsSegment(message->receiver)) continue;
         conn->Send(message);
     }
 }
+
+//----------------------------------------------------------------------------
+void Router::ListConnections(RouteConnection *current)
+{
+    int32_t index = 0;
+    for (auto conn : connections) {
+        if (conn == current) {
+            log_info("%02d: %15s (*)", index, conn->GetName());
+        } else {
+            log_info("%02d: %15s", index, conn->GetName());
+        }
+        index++;
+    }
+}
+
 /** @} */

@@ -202,7 +202,6 @@ void on_mqtt_message(struct mosquitto* mosq, void *userdata, const struct mosqui
         memset(&kwbmsg, 0, sizeof(kwbmsg));
         if (mqtt2msg(message->topic, message->payload, &kwbmsg) == eERR_NONE) {
             msg_s_send(g_kwb_socket_ep, &kwbmsg);
-            msg_log("SOCKETSEND", kwbmsg);
         }
     } else {
         log_msg(LOG_STATUS, "MQTT %s (null)\n", message->topic);
@@ -308,7 +307,6 @@ void on_kwb_incomming_message(msg_t* message, void* reference, void* arg)
     int mid = 0;
     int mrc;
 
-    msg_log("SOCKETRECV", *message);
     if (msg2mqtt(message, topic, sizeof(topic), msgtext, sizeof(msgtext)) != eERR_NONE) {
         return;
     }

@@ -257,6 +257,7 @@ static int32_t msg_read (void* arg)
 
         // handle complete message
         if (message_complete && msg_serial->incomming_handler != NULL) {
+            msg_log("SERIAL R", &msg_serial->incomming_message);
             msg_serial->incomming_handler(&msg_serial->incomming_message,
                                           msg_serial,
                                           msg_serial->incomming_arg);
@@ -410,6 +411,10 @@ int msg_ser_send (msg_serial_t* msg_serial, msg_t* message)
             } else if (msg_serial->ser_data_written < msg_serial->ser_data_length) {
                 log_warning("SERIAL Not all bytes written");
                 rc = eRUNNING;
+            }
+
+            if (rc == eRUNNING || rc == eERR_NONE) {
+                msg_log("SERIAL S", &msg_serial->incomming_message);
             }
         }
     } while (false);

@@ -55,7 +55,6 @@ ActionRequest::ActionRequest(MsgEndpoint  &msgep,
 bool ActionRequest::start()
 {
     if (formMessage()) {
-        msg_log("MSG S", messageToSend);
         return msgEndpoint.sendMessage(messageToSend);
     }
     return false;

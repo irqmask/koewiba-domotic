@@ -101,9 +101,7 @@ bool ActionQueryModules::filterResponse(msg_t& message)
 
 
 void ActionQueryModules::handleResponse(msg_t& message)
-{
-    msg_log("MSG R", message);
-    
+{  
     Module new_module;
     
     new_module.nodeId = message.sender;

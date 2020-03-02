@@ -134,7 +134,7 @@ static int32_t msg_read (void* arg)
             log_sys_error("SOCKET Invaid size of incoming message");
             break;
         }
-
+        msg_log("SOCKET R", &message);
         // handle message
         if (msg_socket->incomming_handler != NULL) {
             msg_socket->incomming_handler(&message, ep, msg_socket->incomming_arg);
@@ -357,7 +357,7 @@ int msg_s_send (msg_endpoint_t* recv_ep, msg_t* message)
         log_sys_error("SOCKET Send failed!");
         return eERR_SYSTEM;
     }
-
+    msg_log("SOCKET S", message);
     return eERR_NONE;
 }
 

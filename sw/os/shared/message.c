@@ -60,13 +60,13 @@
 
 // --- Global functions --------------------------------------------------------
 
-void msg_log (const char* keyword, msg_t message)
+void msg_log (const char *keyword, msg_t *message)
 {
     bool first_line = true;
     uint8_t remaining_length, ii, bytes_in_line;
     char logline[256], tmp[256];
 
-    remaining_length = message.length;
+    remaining_length = message->length;
     ii = 0;
     bytes_in_line = 0;
 
@@ -74,16 +74,16 @@ void msg_log (const char* keyword, msg_t message)
         if (bytes_in_line == 0) {
             if (first_line == true) {
                 first_line = false;
-                snprintf(logline, sizeof(logline), "%04X %04X %2d ", message.sender, message.receiver, message.length);
+                snprintf(logline, sizeof(logline), "%04X %04X %2d ", message->sender, message->receiver, message->length);
             } else {
                 snprintf(logline, sizeof(logline), "             ");
             }
         }
 
         if (remaining_length > 1 && bytes_in_line < 16) {
-            snprintf(tmp, sizeof(tmp), "%02X ", message.data[ii]);
+            snprintf(tmp, sizeof(tmp), "%02X ", message->data[ii]);
         } else {
-            snprintf(tmp, sizeof(tmp), "%02X", message.data[ii]);
+            snprintf(tmp, sizeof(tmp), "%02X", message->data[ii]);
         }
         strcat_s(logline, sizeof(logline), tmp);
         bytes_in_line++;

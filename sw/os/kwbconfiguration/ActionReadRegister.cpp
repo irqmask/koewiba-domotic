@@ -93,7 +93,6 @@ bool ActionReadRegister::filterResponse(msg_t& message)
 
 void ActionReadRegister::handleResponse(msg_t& message)
 {
-    msg_log("MSG R", message);
     receivedMessage = message;
     messageReceived = true;
 }

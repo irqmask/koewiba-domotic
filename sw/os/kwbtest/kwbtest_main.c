@@ -72,7 +72,7 @@ bool   g_end_application = false;
 
 static void handle_message(msg_t* message, void* reference, void* arg)
 {
-    msg_log("RECV", *message);
+    msg_log("RECV", message);
 }
 
 static void on_close_connection(const char* address, uint16_t port, void* reference, void* arg)

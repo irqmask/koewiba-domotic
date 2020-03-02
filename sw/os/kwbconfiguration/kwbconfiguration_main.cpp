@@ -252,6 +252,9 @@ int main (int argc, char* argv[])
     options_t           options;
     ioloop_t            mainloop;
 
+    log_set_mask(0xFFFFFFFF & ~LOG_VERBOSE2);
+    log_msg(KWB_LOG_INFO, "kwbconfiguration...");
+
     do {
         // set default options for kwbrouter
         set_options(&options,

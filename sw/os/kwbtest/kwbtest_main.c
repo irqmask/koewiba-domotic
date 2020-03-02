@@ -92,8 +92,8 @@ int main (int argc, char* argv[])
     msg_endpoint_t* msg_ep;
 
     do {
-        log_msg(KWB_LOG_INFO, "kwbtest...");
         log_set_mask(0xFFFFFFFF);
+        log_msg(KWB_LOG_INFO, "kwbtest...");
         ioloop_init(&mainloop);
 
         msg_s_init(&msg_socket);

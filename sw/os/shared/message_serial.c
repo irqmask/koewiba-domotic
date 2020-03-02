@@ -224,8 +224,7 @@ static bool process_receiving(msg_serial_t* msg_serial, char new_char)
             // message received
             if (msg_serial->incomming_num_received) msg_serial->incomming_num_received--;
             msg_serial->incomming_buffer[msg_serial->incomming_num_received] = '\0';
-            log_msg(LOG_VERBOSE2, "SERIAL R %s", msg_serial->incomming_buffer);
-
+            log_msg(LOG_VERBOSE2, "SERIAL R RAW %s", msg_serial->incomming_buffer);
             msg_serial->incomming_num_received = 0;
             msg_serial->incomming_state = eSER_RECV_STATE_IDLE;
             return true;
@@ -401,7 +400,7 @@ int msg_ser_send (msg_serial_t* msg_serial, msg_t* message)
             log_error("SERIAL error encoding serial message!");
             rc = eMSG_ERR_SIZE;
         } else {
-            log_msg(LOG_VERBOSE2, "SERIAL S %s", msg_serial->ser_data);
+            log_msg(LOG_VERBOSE2, "SERIAL S RAW %s", msg_serial->ser_data);
             msg_serial->ser_data_written = sys_serial_send(msg_serial->fd,
                                                            (void*)msg_serial->ser_data,
                                                            msg_serial->ser_data_length);
@@ -414,7 +413,7 @@ int msg_ser_send (msg_serial_t* msg_serial, msg_t* message)
             }
 
             if (rc == eRUNNING || rc == eERR_NONE) {
-                msg_log("SERIAL S", &msg_serial->incomming_message);
+                msg_log("SERIAL S", message);
             }
         }
     } while (false);

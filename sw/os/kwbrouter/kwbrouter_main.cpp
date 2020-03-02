@@ -278,7 +278,7 @@ int main (int argc, char* argv[])
 
     do {
         // all logs on
-        log_set_mask(0xFFFFFFFF);
+        log_set_mask(0xFFFFFFFF & ~LOG_VERBOSE2);
         log_msg(KWB_LOG_INFO, "kwbrouter...");
 
         // set default options for kwbrouter

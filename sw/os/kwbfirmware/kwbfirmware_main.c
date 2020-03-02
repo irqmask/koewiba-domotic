@@ -258,9 +258,10 @@ int main (int argc, char* argv[])
     firmwareupdate_t    firmware;
 
     do {
-        log_set_mask(LOG_STANDARD_MASK | LOG_STATUS | LOG_USERDEFINED | LOG_VERBOSE1 | LOG_VERBOSE2);
+        log_set_mask(0xFFFFFFFF & ~LOG_VERBOSE2);
+        log_msg(KWB_LOG_INFO, "kwbfirmware...");
         
-        // set default options for kwbrouter
+        // set default options for kwbfirmware
         set_options(&options,
                     "/dev/ttyUSB0",                 // no serial device, use vbusd as default
                     57600,              // baudrate, if not given

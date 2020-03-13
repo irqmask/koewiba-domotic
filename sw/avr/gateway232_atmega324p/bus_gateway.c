@@ -291,7 +291,7 @@ bool bgw_forward_bus_msg (sBus_t *bus, scomm_phy_t *serial,
 
         if (r == bus->sCfg.uOwnAddress) {
             msg_for_me = true;
-           msg_for_others = false;
+            msg_for_others = false;
         } 
         else if (r == (bus->sCfg.uOwnAddress & BUS_SEGBRDCSTMASK)) {
             msg_for_me = true;

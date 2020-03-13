@@ -289,13 +289,16 @@ bool bgw_forward_bus_msg (sBus_t *bus, scomm_phy_t *serial,
         r = bus->sRecvMsg.uReceiver;
         l_expected = bus->sRecvMsg.length - 4;
 
-        if ((r == bus->sCfg.uOwnAddress) ||
-            (r == BUS_BRDCSTADR)) {
+        if (r == bus->sCfg.uOwnAddress) {
             msg_for_me = true;
-        }
+           msg_for_others = false;
+        } 
         else if (r == (bus->sCfg.uOwnAddress & BUS_SEGBRDCSTMASK)) {
             msg_for_me = true;
             msg_for_others = false;
+        }
+        else if (r == BUS_BRDCSTADR) {
+            msg_for_me = true;
         }
 
         l_curr = 0;

@@ -2,8 +2,8 @@
  * @addtogroup UNITTESTS
  *
  * @{
- * @file    tests.c
- * @brief   This module contains the table of test-suites
+ * @file    unittests_main.c
+ * @brief   Test application for unittests of os code
  *
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
@@ -12,11 +12,7 @@
 
 #include "prjconf.h"
 
-#include "CUnit/CUnit.h"
-
-// include
-#include "prjtypes.h"
-
+#include <gtest/gtest.h>
 
 // --- Definitions -------------------------------------------------------------
 
@@ -26,20 +22,6 @@
 
 // --- Global variables --------------------------------------------------------
 
-extern int libsystem_threads_init (void);
-extern int libsystem_threads_cleanup (void);
-extern CU_TestInfo test_libsystem_threads[];
-
-extern int libsystem_time_init (void);
-extern int libsystem_time_cleanup (void);
-extern CU_TestInfo test_libsystem_time[];
-
-CU_SuiteInfo test_suites[] = {
-    { "libsystem_threads", libsystem_threads_init, libsystem_threads_cleanup, NULL, NULL, test_libsystem_threads },
-    { "libsystem_time",    libsystem_time_init,    libsystem_time_cleanup,    NULL, NULL, test_libsystem_time    },
-    CU_SUITE_INFO_NULL,
-};
-
 // --- Module global variables -------------------------------------------------
 
 // --- Local functions ---------------------------------------------------------
@@ -47,5 +29,11 @@ CU_SuiteInfo test_suites[] = {
 // --- Module global functions -------------------------------------------------
 
 // --- Global functions --------------------------------------------------------
+
+int main (int argc, char* argv[])
+{
+    testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
+}
 
 /** @} */

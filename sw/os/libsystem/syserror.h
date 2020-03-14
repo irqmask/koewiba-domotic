@@ -41,6 +41,10 @@
   #include <windows.h>
 #endif
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // --- Definitions -------------------------------------------------------------
 
 // --- Type definitions --------------------------------------------------------
@@ -59,6 +63,10 @@
 
 void sys_err_get_as_string (char* buffer, size_t buffersize);
 void sys_err_print_last (void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _SYSERROR_H_ */
 /** @} */

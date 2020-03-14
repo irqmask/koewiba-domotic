@@ -1,10 +1,11 @@
 # KWB Router
-cmake_minimum_required (VERSION 2.6)
+cmake_minimum_required (VERSION 3.0)
 
 include_directories (
     ../../include
     ../../shared
     ../include
+    ../libkwb
     ../libsystem
     ../shared
     ${CMAKE_CURRENT_BINARY_DIR}
@@ -49,20 +50,6 @@ set (os_include_SRCS
     ../include/error_codes.h
 )
 
-set (os_shared_SRCS
-    ../shared/ioloop.h
-    ../shared/log.h
-    ../shared/message.h
-    ../shared/message_serial.h
-    ../shared/message_socket.h
-
-    ../shared/ioloop.c
-    ../shared/log.c
-    ../shared/message.c
-    ../shared/message_serial.c
-    ../shared/message_socket.c
-)
-
 set (kwbrouter_SRCS
     router.h
     routeconnection.h
@@ -91,12 +78,12 @@ source_group(os\\shared FILES ${os_shared_SRCS})
 # ---------------------------------------------------------
 if (WIN32)
     add_executable ( kwbrouter
-        ${include_SRCS} ${shared_SRCS} ${os_include_SRCS} ${os_shared_SRCS} ${kwbrouter_SRCS} )
+        ${include_SRCS} ${shared_SRCS} ${os_include_SRCS} ${kwbrouter_SRCS} )
     install ( TARGETS kwbrouter
               RUNTIME DESTINATION . )
 else (WIN32)
     add_executable ( kwbrouter
-        ${include_SRCS} ${shared_SRCS} ${os_include_SRCS} ${os_shared_SRCS} ${kwbrouter_SRCS} )
+        ${include_SRCS} ${shared_SRCS} ${os_include_SRCS} ${kwbrouter_SRCS} )
     install ( TARGETS kwbrouter
               RUNTIME DESTINATION bin )
 endif (WIN32)
@@ -105,6 +92,7 @@ set_property(TARGET kwbrouter PROPERTY CXX_STANDARD 11)
 
 # Link libraries
 # ---------------------------------------------------------
+target_link_libraries (kwbrouter libkwb)
 target_link_libraries (kwbrouter libsystem)
 
 if (WIN32)

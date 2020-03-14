@@ -10,9 +10,9 @@
 
 // --- Include section ---------------------------------------------------------
 
-#include "prjconf.h"
+#include "gtest/gtest.h"
 
-#include "CUnit/CUnit.h"
+#include "prjconf.h"
 
 // include
 #include "prjtypes.h"
@@ -27,13 +27,6 @@
 
 // --- Global variables --------------------------------------------------------
 
-void test_libsystem_time_1 (void);
-
-CU_TestInfo test_libsystem_time[] = {
-    { "time1", test_libsystem_time_1 },
-    CU_TEST_INFO_NULL,
-};
-
 // --- Module global variables -------------------------------------------------
 
 // --- Local functions ---------------------------------------------------------
@@ -42,17 +35,7 @@ CU_TestInfo test_libsystem_time[] = {
 
 // --- Global functions --------------------------------------------------------
 
-int libsystem_time_init (void)
-{
-    return CUE_SUCCESS;
-}
-
-int libsystem_time_cleanup (void)
-{
-    return CUE_SUCCESS;
-}
-
-void test_libsystem_time_1 (void)
+TEST(libsystem, time_1)
 {
     sys_time_t start, end, diff;
 
@@ -61,10 +44,9 @@ void test_libsystem_time_1 (void)
     end = sys_time_get_usecs();
 
     diff = end - start;
-    printf("diff is: %lld\n", diff) ;
 
-    CU_ASSERT(diff > 99 * 1000);
-    CU_ASSERT(diff < 110 * 1000);
+    ASSERT_GT(diff, 99 * 1000);
+    ASSERT_LT(diff, 110 * 1000);
 }
 
 /** @} */

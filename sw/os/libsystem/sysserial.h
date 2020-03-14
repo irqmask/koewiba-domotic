@@ -36,6 +36,10 @@
 
 #include "system.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // --- Definitions -------------------------------------------------------------
 
 // --- Type definitions --------------------------------------------------------
@@ -150,6 +154,10 @@ size_t sys_serial_get_pending_recvq (sys_fd_t fd);
 void sys_serial_set_blocking (sys_fd_t fd, bool blocking);
 
 sys_ser_baudrate_t sys_serial_baudrate (int baudrate);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _SYSSERIAL_H_ */
 /** @} */

@@ -33,6 +33,10 @@
 
 #include "system.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // --- Definitions -------------------------------------------------------------
 
 // --- Type definitions --------------------------------------------------------
@@ -72,6 +76,10 @@ size_t sys_socket_get_pending_sendq (sys_fd_t fd);
 size_t sys_socket_get_pending_recvq (sys_fd_t fd);
 
 void sys_socket_set_blocking (sys_fd_t fd, bool blocking);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _SYSSOCKET_H_ */
 /** @} */

@@ -2,34 +2,22 @@
  * @addtogroup UNITTESTS
  *
  * @{
- * @file    unittests_main.c
- * @brief   Test application for unittests of os code
+ * @file    test_libsystem_threads.c
+ * @brief   This module contains the unittests for: libsystem/threads.
  *
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
 
 // --- Include section ---------------------------------------------------------
 
+#include "gtest/gtest.h"
+
 #include "prjconf.h"
-
-#include <assert.h>
-#include <stdio.h>
-#include <stdlib.h>
-
-#include <CUnit/CUnit.h>
-#include <CUnit/Basic.h>
-#include <CUnit/Console.h>
 
 // include
 #include "prjtypes.h"
-
-// os/include
-#include "error_codes.h"
-
-// os/libsystem
-#include "sysgetopt.h"
+// libsystem
 #include "systhread.h"
-#include "sysserial.h"
 #include "systime.h"
 
 // --- Definitions -------------------------------------------------------------
@@ -40,7 +28,7 @@
 
 // --- Global variables --------------------------------------------------------
 
-extern CU_SuiteInfo test_suites[];
+int g_thread_value = 0;
 
 // --- Module global variables -------------------------------------------------
 
@@ -50,20 +38,19 @@ extern CU_SuiteInfo test_suites[];
 
 // --- Global functions --------------------------------------------------------
 
-int main (int argc, char* argv[])
+
+void* test1_thread(void* user_arg)
 {
-    int             rc = eERR_NONE;
+    g_thread_value = 42;
+    return NULL;
+}
 
-    printf("\nunittests...\n");
-    if ((rc = CU_initialize_registry()) != CUE_SUCCESS) return rc;
-
-    do {
-        if ((rc = CU_register_suites(test_suites)) != CUE_SUCCESS) break;
-        CU_basic_set_mode(CU_BRM_VERBOSE);
-        CU_basic_run_tests();
-    } while (0);
-    CU_cleanup_registry();
-    return rc;
+TEST(libsystem, threads_1)
+{
+    g_thread_value = 0;
+    sys_thread_start(test1_thread);
+    sys_sleep_ms(10);
+    ASSERT_EQ(g_thread_value , 42);
 }
 
 /** @} */

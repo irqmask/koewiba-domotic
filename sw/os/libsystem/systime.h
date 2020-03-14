@@ -43,6 +43,10 @@
   #include <windows.h>
 #endif
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // --- Definitions -------------------------------------------------------------
 
 #if defined (PRJCONF_UNIX) || \
@@ -70,6 +74,10 @@ typedef uint64_t sys_time_t;
 // --- Global functions --------------------------------------------------------
 
 sys_time_t sys_time_get_usecs (void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _SYSTIME_H_ */
 /** @} */

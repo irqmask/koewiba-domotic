@@ -1,10 +1,11 @@
 # KWB Monitor
-cmake_minimum_required (VERSION 2.8)
+cmake_minimum_required (VERSION 3.0)
 
 include_directories (
     ../../include
     ../../shared
     ../include
+    ../libkwb
     ../libsystem
     ../shared
     ${CMAKE_CURRENT_BINARY_DIR}
@@ -55,14 +56,6 @@ set (os_include_SRCS
     ../include/error_codes.h
 )
 
-set (os_shared_SRCS
-    ../shared/log.h
-    ../shared/message.h
-    ../shared/vos.h
-
-    ../shared/vos.c
-)
-
 set (kwbmonitor_SRCS
     kwbmonitor.h
 
@@ -94,6 +87,7 @@ set_property(TARGET kwbmonitor PROPERTY CXX_STANDARD 11)
 
 # Link libraries
 # ---------------------------------------------------------
+target_link_libraries (kwbmonitor libkwb)
 target_link_libraries (kwbmonitor libsystem)
 if (WIN32)
 

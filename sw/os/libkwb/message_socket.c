@@ -34,6 +34,7 @@
 
 #include "ioloop.h"
 #include "log.h"
+#include "message.h"
 #include "message_socket.h"
 #include "syssocket.h"
 

@@ -1,10 +1,12 @@
-# libsystem
+# libkwb
 cmake_minimum_required (VERSION 3.0)
 
 include_directories (
     .
     ../include
+    ../libsystem
     ../../include
+    ../../shared
     ${CMAKE_CURRENT_BINARY_DIR}
 )
 
@@ -34,31 +36,27 @@ set (include_SRCS
     ../../include/prjtypes.h
 )
 
-set (libsystem_SRCS
-    system.h
-    sysconsole.h
-    syserror.h
-    sysgetopt.h
-    sysserial.h
-    syssocket.h
-    systhread.h
-    systime.h
+set (libkwb_SRCS
+    ioloop.h
+    log.h
+    message.h
+    message_serial.h
+    message_socket.h
+    vos.h
 
-    sysconsole.c
-    syserror.c
-    sysgetopt.c
-    sysserial.c
-    syssocket.c
-    systime.c
+    ioloop.c
+    log.c
+    message.c
+    message_serial.c
+    message_socket.c
+    vos.c
 )
 
 # source groups
 # ---------------------------------------------------------
-source_group(\\ FILES ${libsystem_SRCS})
+source_group(\\ FILES ${libkwb_SRCS})
 source_group(include FILES ${include_SRCS})
 
 # library
 # ---------------------------------------------------------
-add_library (libsystem ${include_SRCS} ${libsystem_SRCS})
-
-set_property(TARGET libsystem PROPERTY CXX_STANDARD 11)
+add_library (libkwb ${include_SRCS} ${libkwb_SRCS})

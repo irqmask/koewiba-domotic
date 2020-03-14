@@ -40,6 +40,10 @@
 #  include <unistd.h>
 #endif
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // --- Definitions -------------------------------------------------------------
 
 #if defined (PRJCONF_WINDOWS)
@@ -53,7 +57,7 @@
 
 #  define sys_thread_start(func)    do{                 \
                                         pthread_t tid;   \
-                                        pthread_create(&tid, NULL, (func), NULL);\
+                                        pthread_create(&tid, NULL, func, NULL);\
                                     }while(0);
 #endif
 
@@ -70,6 +74,10 @@
 // --- Module global functions -------------------------------------------------
 
 // --- Global functions --------------------------------------------------------
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _SYSTHREAD_H_ */
 /** @} */

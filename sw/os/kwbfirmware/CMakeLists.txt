@@ -1,10 +1,11 @@
 # KWB Firmware
-cmake_minimum_required (VERSION 2.6)
+cmake_minimum_required (VERSION 3.0)
 
 include_directories (
     ../../include
     ../../shared
     ../include
+    ../libkwb
     ../libsystem
     ../shared
     ${CMAKE_CURRENT_BINARY_DIR}
@@ -56,18 +57,6 @@ set (os_include_SRCS
     ../include/error_codes.h
 )
 
-set (os_shared_SRCS
-    ../shared/ioloop.h
-    ../shared/log.h
-    ../shared/message.h
-    ../shared/message_serial.h
-
-    ../shared/ioloop.c
-    ../shared/log.c
-    ../shared/message.c
-    ../shared/message_serial.c
-)
-
 set (kwbfirmware_SRCS
     firmwareupdate.h
     ihex.h
@@ -88,11 +77,11 @@ source_group(os\\shared FILES ${os_shared_SRCS})
 # executable
 # ---------------------------------------------------------
 if (WIN32)
-    add_executable ( kwbfirmware ${include_SRCS} ${shared_SRCS} ${os_include_SRCS} ${os_shared_SRCS} ${kwbfirmware_SRCS} )
+    add_executable ( kwbfirmware ${include_SRCS} ${shared_SRCS} ${os_include_SRCS} ${kwbfirmware_SRCS} )
     install ( TARGETS kwbfirmware
               RUNTIME DESTINATION . )
 else (WIN32)
-    add_executable ( kwbfirmware ${include_SRCS} ${shared_SRCS} ${os_include_SRCS} ${os_shared_SRCS} ${kwbfirmware_SRCS} )
+    add_executable ( kwbfirmware ${include_SRCS} ${shared_SRCS} ${os_include_SRCS} ${kwbfirmware_SRCS} )
     install ( TARGETS kwbfirmware
               RUNTIME DESTINATION bin )
 endif (WIN32)
@@ -101,6 +90,7 @@ set_property(TARGET kwbfirmware PROPERTY CXX_STANDARD 11)
 
 # Link libraries
 # ---------------------------------------------------------
+target_link_libraries (kwbfirmware libkwb)
 target_link_libraries (kwbfirmware libsystem)
 if (WIN32)
 

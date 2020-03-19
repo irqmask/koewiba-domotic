@@ -121,7 +121,7 @@ typedef enum appregisters {
     APP_eReg_TimeDown4_Unused2,
     APP_eReg_TimeDown4_Unused1,
 
-    APP_eReg_WindowState = 46,  //!< State of the window
+    APP_eReg_WindowState = 196, //!< State of the window
 
     APP_eReg_Year = 223,        //!< Current year.
     APP_eReg_Month,             //!< Current month.

@@ -45,9 +45,17 @@
                             							
                             <builder id="de.innot.avreclipse.target.builder.winavr.base.315393068" managedBuildOn="false" name="AVR GNU Make Builder.Default" superClass="de.innot.avreclipse.target.builder.winavr.base"/>
                             							
-                            <tool id="de.innot.avreclipse.tool.assembler.winavr.base.624036866" name="AVR Assembler" superClass="de.innot.avreclipse.tool.assembler.winavr.base"/>
+                            <tool id="de.innot.avreclipse.tool.assembler.winavr.base.624036866" name="AVR Assembler" superClass="de.innot.avreclipse.tool.assembler.winavr.base">
+                                								
+                                <inputType id="de.innot.avreclipse.tool.assembler.input.1918197873" superClass="de.innot.avreclipse.tool.assembler.input"/>
+                                							
+                            </tool>
                             							
-                            <tool id="de.innot.avreclipse.tool.compiler.winavr.base.418799370" name="AVR Compiler" superClass="de.innot.avreclipse.tool.compiler.winavr.base"/>
+                            <tool id="de.innot.avreclipse.tool.compiler.winavr.base.418799370" name="AVR Compiler" superClass="de.innot.avreclipse.tool.compiler.winavr.base">
+                                								
+                                <inputType id="de.innot.avreclipse.compiler.winavr.input.2074425574" name="C Source Files" superClass="de.innot.avreclipse.compiler.winavr.input"/>
+                                							
+                            </tool>
                             							
                             <tool id="de.innot.avreclipse.tool.cppcompiler.base.115742400" name="AVR C++ Compiler" superClass="de.innot.avreclipse.tool.cppcompiler.base"/>
                             							
@@ -84,5 +92,63 @@
     </storageModule>
     	
     <storageModule moduleId="org.eclipse.cdt.core.LanguageSettingsProviders"/>
+    	
+    <storageModule moduleId="refreshScope"/>
+    	
+    <storageModule moduleId="org.eclipse.cdt.make.core.buildtargets">
+        		
+        <buildTargets>
+            			
+            <target name="clean" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
+                				
+                <buildCommand>make</buildCommand>
+                				
+                <buildArguments/>
+                				
+                <buildTarget>clean</buildTarget>
+                				
+                <stopOnError>true</stopOnError>
+                				
+                <useDefaultCommand>true</useDefaultCommand>
+                				
+                <runAllBuilders>true</runAllBuilders>
+                			
+            </target>
+            			
+            <target name="make" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
+                				
+                <buildCommand>make</buildCommand>
+                				
+                <buildArguments/>
+                				
+                <buildTarget/>
+                				
+                <stopOnError>true</stopOnError>
+                				
+                <useDefaultCommand>true</useDefaultCommand>
+                				
+                <runAllBuilders>true</runAllBuilders>
+                			
+            </target>
+            			
+            <target name="program" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
+                				
+                <buildCommand>make</buildCommand>
+                				
+                <buildArguments/>
+                				
+                <buildTarget>program</buildTarget>
+                				
+                <stopOnError>true</stopOnError>
+                				
+                <useDefaultCommand>true</useDefaultCommand>
+                				
+                <runAllBuilders>true</runAllBuilders>
+                			
+            </target>
+            		
+        </buildTargets>
+        	
+    </storageModule>
     
 </cproject>

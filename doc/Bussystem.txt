@@ -50,6 +50,21 @@ Timing auf dem Bus
 Bei einer Geschwindigkeit von 38400 Baud hat ein Bit eine Dauer von 0,026ms. Ein Byte bestehend aus 8bit und 1 Startbit hat eine Dauer von 0,234ms.
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Nachrichtenformate auf dem Bus
 -------------------------------
 
@@ -108,6 +123,18 @@ Damit dürfen keine zwei Teilnehmer mit identischen unteren 7bits der Adresse in 
 Die Adresse für Nachrichten an alle "Broadcasts" ist 0b0111 1111 1111 = 0x7FF.
 Die Adresse für Nachrichten an alle Teilnehmer eines Segments ist 0b0111 1111 = 0x7F.
 Der Busteilnehmer, welcher das Takten des Busses übernimmt, also der Master, hat die Adresse 1.
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 Routing

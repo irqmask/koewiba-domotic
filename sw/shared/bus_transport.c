@@ -714,19 +714,6 @@ bool bus_send_ack_message (sBus_t* psBus, uint16_t uReceiver)
 }
 
 /**
- * Send a message.
- *
- * @param[in]   psBus      Handle of the bus.
- * @param[in]   len        (Netto) Length of the message.
- * @param[in]   recH/L     Receiver address (High/Low-Byte) of the message.
- * @param[in]   *msg       message pointer.
- *
- * @returns true, if the message has successfully been queued.
- * @note Use bus_is_idle() to check if message is successfully transmitted.
- */
-
-
-/**
  * Check if bus is in IDLE state.
  *
  * @param[in]   psBus       Handle of the bus.

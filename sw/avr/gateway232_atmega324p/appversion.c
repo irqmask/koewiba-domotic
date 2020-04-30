@@ -32,7 +32,7 @@ const unsigned char app_versioninfo[MOD_VERSIONINFO_LEN] __attribute__((section(
                            0x00,0x01,   // board ID            (high byte, low byte)
                            1,           // board revision
                            0x00,0x02,   // application ID      (high byte, low byte)
-                           0,2,0};      // application version (major, minor, bugfix)
+                           0,2,1};      // application version (major, minor, bugfix)
 
 // --- Module global variables -------------------------------------------------
 

@@ -30,6 +30,7 @@
 #include <avr/eeprom.h>
 #include <avr/io.h>
 
+#include "cmddef_common.h"
 #include "led2chn.h"
 #include "prjtypes.h"
 #include "register.h"
@@ -62,11 +63,12 @@
 
 // --- Type definitions --------------------------------------------------------
 
+//! States of the LED controller (for all channels)
 typedef enum {
-    APP_IDLE,
-    APP_LED_ON,
-    APP_LED_CHANGING,
-    APP_LED_OFF
+    APP_IDLE,			//!< Nothing is currently changing
+    APP_LED_ON,			//!< LEDs are switched on.
+    APP_LED_CHANGING,   //!< LEDs intensity is changing due to keypress.
+    APP_LED_OFF			//!< LEDs are switched off.
 } app_states_t;
 
 // --- Local variables ---------------------------------------------------------
@@ -82,6 +84,8 @@ static uint8_t g_new_intensity_timeout = 0;
 static int8_t g_channel_change_dir[APP_MAX_CHANNEL];
 
 // --- Global variables --------------------------------------------------------
+
+extern sBus_t  g_bus;
 
 // --- Module global variables -------------------------------------------------
 
@@ -157,6 +161,18 @@ static void leds_cycle_intensity(void)
     }
 }
 
+static void send_intensity_setpoint (sBus_t* bus, uint8_t channel)
+{
+    uint8_t msg[4];
+
+    if (channel > APP_MAX_CHANNEL) return;
+
+    msg[0] = eCMD_STATE_8BIT;
+    msg[1] = APP_eReg_IntensityChn0SetPoint + channel;
+    msg[2] = g_led_setpoint[channel];
+    bus_send_message(bus, BUS_BRDCSTADR, 3, msg);
+}
+
 // --- Module global functions -------------------------------------------------
 
 // --- Global functions --------------------------------------------------------
@@ -215,8 +231,8 @@ void app_background (void)
         button_background();
         if (button_is_long_pressed()) {
             if (g_state == APP_LED_OFF) {
-                g_led_setpoint[0] = eeprom_read_byte(&register_eeprom_array[APP_eCfg_CHN0_SetPoint]);
-                g_led_setpoint[1] = eeprom_read_byte(&register_eeprom_array[APP_eCfg_CHN1_SetPoint]);
+            	app_register_get(APP_eReg_IntensityChn0Store, NULL, &g_led_setpoint[0]);
+            	app_register_get(APP_eReg_IntensityChn1Store, NULL, &g_led_setpoint[1]);
             }
             g_state = APP_LED_CHANGING;
             leds_cycle_intensity();
@@ -227,8 +243,8 @@ void app_background (void)
             case APP_IDLE:
             case APP_LED_OFF:
                 g_state = APP_LED_ON;
-                g_led_setpoint[0] = eeprom_read_byte(&register_eeprom_array[APP_eCfg_CHN0_SetPoint]);
-                g_led_setpoint[1] = eeprom_read_byte(&register_eeprom_array[APP_eCfg_CHN1_SetPoint]);
+            	app_register_get(APP_eReg_IntensityChn0Store, NULL, &g_led_setpoint[0]);
+            	app_register_get(APP_eReg_IntensityChn1Store, NULL, &g_led_setpoint[1]);
                 break;
 
             case APP_LED_ON:
@@ -249,8 +265,8 @@ void app_background (void)
                g_new_intensity_timeout--;
                if (g_new_intensity_timeout == 0) {
                    // save intensity
-                   app_register_set(APP_eReg_CHN0_SetPoint, g_led_setpoint[0]);
-                   app_register_set(APP_eReg_CHN1_SetPoint, g_led_setpoint[1]);
+                   app_register_set(APP_eReg_IntensityChn0Store, g_led_setpoint[0]);
+                   app_register_set(APP_eReg_IntensityChn1Store, g_led_setpoint[1]);
                }
            }
         }
@@ -277,6 +293,22 @@ void app_background (void)
 
 }
 
+/**
+ * Get intensity set-point.
+ * @param[in] channel	Channel index starting with 0.
+ * @returns Channel intensity set-point.
+ */
+uint8_t app_led_get_intensity(uint8_t channel)
+{
+    if (channel > APP_MAX_CHANNEL) return 0;
+    return g_led_setpoint[channel];
+}
+
+/**
+ * Set intensity set-point. LED channels will start changing to this set-point.
+ * @param[in] channel	Channel index starting with 0.
+ * @param[in] intensity	Intensity value, Range 0..255.
+ */
 void app_led_set_intensity(uint8_t channel, uint8_t intensity)
 {
     if (channel > APP_MAX_CHANNEL) return;
@@ -287,6 +319,7 @@ void app_led_set_intensity(uint8_t channel, uint8_t intensity)
     else {
         g_state = APP_LED_ON;
     }
+    send_intensity_setpoint(&g_bus, channel);
 }
 
 /** @} */

@@ -17,6 +17,7 @@
 // --- Include section ---------------------------------------------------------
 
 #include "prjtypes.h"
+#include "moddef_common.h"
 
 #ifdef HAS_PCBCONFIG_H
  #include "pcbconfig.h"
@@ -32,15 +33,6 @@
 #define REG_MAX_MAPPINGS    32  //!< Maximum number of register mappings.
 
 // --- Type definitions --------------------------------------------------------
-
-//! Type of a register
-typedef enum regtype {
-    eRegType_Unkown,        //!< unknown register type
-    eRegType_U8,            //!< 8bit register type
-    eRegType_U16,           //!< 16bit register type
-    eRegType_U32,           //!< 32bit register type
-    eRegType_Last
-} eRegType_t;
 
 // --- Local variables ---------------------------------------------------------
 

@@ -60,13 +60,27 @@ bool        app_register_get        (uint8_t                reg_no,
     *preg_type = eRegType_U8;
 
     switch (reg_no) {
+    case APP_eReg_IntensityChn0Current:
+    	break;
+
+    case APP_eReg_IntensityChn1Current:
+    	break;
+
+    case APP_eReg_IntensityChn0SetPoint:
+    	*(uint8_t*)pvalue = app_led_get_intensity(0);
+    	break;
+
+    case APP_eReg_IntensityChn1SetPoint:
+    	*(uint8_t*)pvalue = app_led_get_intensity(1);
+    	break;
+
     // registers saved in EEProm
-    case APP_eReg_CHN0_SetPoint:
-        *(uint8_t*)pvalue = eeprom_read_byte(&register_eeprom_array[APP_eCfg_CHN0_SetPoint]);
+    case APP_eReg_IntensityChn0Store:
+        *(uint8_t*)pvalue = eeprom_read_byte(&register_eeprom_array[APP_eCfg_IntensityChn0Store]);
         break;
 
-    case APP_eReg_CHN1_SetPoint:
-        *(uint8_t*)pvalue = eeprom_read_byte(&register_eeprom_array[APP_eCfg_CHN1_SetPoint]);
+    case APP_eReg_IntensityChn1Store:
+        *(uint8_t*)pvalue = eeprom_read_byte(&register_eeprom_array[APP_eCfg_IntensityChn1Store]);
         break;
 
     // registers in ROM/RAM
@@ -84,14 +98,30 @@ void        app_register_set        (uint8_t                reg_no,
     value8 = (uint8_t)(value & 0x000000FF);
 
     switch (reg_no) {
+    case APP_eReg_IntensityChn0Current:
+    	// read-only register
+    	break;
+
+    case APP_eReg_IntensityChn1Current:
+    	// read-only register
+    	break;
+
+    case APP_eReg_IntensityChn0SetPoint:
+        app_led_set_intensity(0, value8);
+    	break;
+
+    case APP_eReg_IntensityChn1SetPoint:
+        app_led_set_intensity(1, value8);
+    	break;
+
     // registers saved in EEProm
-    case APP_eReg_CHN0_SetPoint:
-        eeprom_write_byte(&register_eeprom_array[APP_eCfg_CHN0_SetPoint], value8);
+    case APP_eReg_IntensityChn0Store:
+        eeprom_write_byte(&register_eeprom_array[APP_eCfg_IntensityChn0Store], value8);
         app_led_set_intensity(0, value8);
         break;
 
-    case APP_eReg_CHN1_SetPoint:
-        eeprom_write_byte(&register_eeprom_array[APP_eCfg_CHN1_SetPoint], value8);
+    case APP_eReg_IntensityChn1Store:
+        eeprom_write_byte(&register_eeprom_array[APP_eCfg_IntensityChn1Store], value8);
         app_led_set_intensity(1, value8);
         break;
 

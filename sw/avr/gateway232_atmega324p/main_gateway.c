@@ -12,6 +12,7 @@
 
 #include <avr/io.h>
 #include <avr/interrupt.h>
+#include <avr/pgmspace.h>
 #include <avr/wdt.h>
 
 #include "appconfig.h"
@@ -45,6 +46,7 @@ static timer_data_t g_LED_timer;
 
 // --- Global variables --------------------------------------------------------
 
+extern const unsigned char app_versioninfo[];
 static sBus_t   g_bus;
 scomm_phy_t     g_serial_phy;
 
@@ -92,6 +94,18 @@ void deactivate_wakeup_interrupt(void)
 
 }
 
+/// send the version information
+static inline void answer_version_info_request (uint16_t sender)
+{
+    uint8_t msg[MOD_VERSIONINFO_LEN + 1], i;
+
+    msg[0] = eCMD_STATE_VERSION;
+    for (i=0; i<MOD_VERSIONINFO_LEN; i++) {
+        msg[i + 1] = pgm_read_byte(&app_versioninfo[i]);
+    }
+    bus_send_message(&g_bus, sender, sizeof(msg), msg);
+}
+
 static inline void interpret_message (uint16_t sender, uint8_t msglen, uint8_t* msg)
 {
     switch (msg[0]) {
@@ -103,6 +117,12 @@ static inline void interpret_message (uint16_t sender, uint8_t msglen, uint8_t* 
         // fallthrough
     case eCMD_SET_REG_32BIT:
         register_do_command(&g_bus, sender, msglen, msg);
+        break;
+
+    case eCMD_REQUEST_INFO_OF_TYPE:
+        if (msglen == 2 && msg[1] == eINFO_VERSION) {
+            answer_version_info_request(sender);
+        }
         break;
 
 #ifndef NO_BLOCK_MESSAGE

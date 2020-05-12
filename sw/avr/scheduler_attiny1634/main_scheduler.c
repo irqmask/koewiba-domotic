@@ -98,7 +98,8 @@ static inline void interpret_message (uint16_t sender, uint8_t msglen, uint8_t* 
 
     case eCMD_REQUEST_INFO_OF_TYPE:
         if (msglen == 2 && msg[1] == eINFO_VERSION) {
-            answer_version_info_request(sender);
+            ///@ todo reimplement when crash fixed
+            // answer_version_info_request(sender);
         }
         break;
 

@@ -172,7 +172,7 @@ static bool parse_commandline_options (int argc, char* argv[], options_t* option
             break;
         case 'o':
             log_msg(KWB_LOG_INFO, "own node id %s", optarg);
-            options->own_node_id = atoi(optarg);
+            options->own_node_id = strtol(optarg, NULL, 0);
             break;
         case 'v':
             log_add_mask(KWB_LOG_INTERCOMM | KWB_LOG_VERBOSE1 | KWB_LOG_VERBOSE2);

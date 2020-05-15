@@ -158,7 +158,7 @@ static bool parse_commandline_options (int argc, char* argv[], options_t* option
             options->router_port = atoi(optarg);
             break;
         case 'n':
-            options->node_address = atoi(optarg);
+            options->node_address = strtol(optarg, NULL, 0);
             break;
         case 'f':
             strcpy_s(options->filename, sizeof(options->filename), optarg);

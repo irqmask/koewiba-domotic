@@ -175,7 +175,7 @@ static bool parse_commandline_options (int argc, char* argv[], options_t* option
             router_port_set = true;
             break;
         case 'o':
-            options->own_node_address = atoi(optarg);
+            options->own_node_address = strtol(optarg, NULL, 0);
             break;
         default:
             rc = false;

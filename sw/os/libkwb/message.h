@@ -75,6 +75,18 @@ typedef void (*msg_conn_func_t)(const char* address, uint16_t port, void* refere
 
 // --- Global functions --------------------------------------------------------
 
+/**
+ * @param[in] message       Message to convert.
+ * @param[in] max_length    Maximum number of data bytes to convert to string.
+ * @returns Converted message as string.
+ * @note This function is not thread-safe!
+ */
+const char* msg_to_string(msg_t *message, uint8_t max_length);
+
+/**
+ * @param[in] keyword       Keyword to add to log message.
+ * @param[in] message       Message to log.
+ */
 void msg_log (const char *keyword, msg_t *message);
 
 #ifdef __cplusplus

@@ -100,6 +100,7 @@ void Router::DistributeMessage(msg_t* message, RouteConnection* sender)
     for (auto conn : connections) {
         if (conn == sender) continue;
         if (!conn->AddressIsInConnectionsSegment(message->receiver)) continue;
+        log_info("ROUTE FROM %s NODE %04X VIA %d TO NODE %04X msg %s", sender->GetName(), message->sender, conn->GetName(), message->receiver, msg_to_string(message, 16));
         conn->Send(message);
     }
 }

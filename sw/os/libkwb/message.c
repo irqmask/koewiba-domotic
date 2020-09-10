@@ -60,11 +60,45 @@
 
 // --- Global functions --------------------------------------------------------
 
+const char* msg_to_string(msg_t *message, uint8_t max_length)
+{
+    uint8_t remaining_length, ii;
+    static char logline[1024];
+    char tmp[256];
+
+    assert(message != NULL);
+
+    remaining_length = message->length;
+    if (remaining_length > max_length) remaining_length = max_length;
+    logline[0] = '\0';
+    ii = 0;
+
+    snprintf(logline, sizeof(logline), "%04X %04X %2d ", message->sender, message->receiver, message->length);
+
+    while (remaining_length) {
+        if (remaining_length > 1) {
+            snprintf(tmp, sizeof(tmp), "%02X ", message->data[ii]);
+        } else {
+            if (message->length > max_length) {
+                snprintf(tmp, sizeof(tmp), "%02X ...", message->data[ii]);
+            } else {
+                snprintf(tmp, sizeof(tmp), "%02X", message->data[ii]);
+            }
+        }
+        strcat_s(logline, sizeof(logline), tmp);
+        remaining_length--;
+        ii++;
+    }
+    return logline;
+}
+
 void msg_log (const char *keyword, msg_t *message)
 {
     bool first_line = true;
     uint8_t remaining_length, ii, bytes_in_line;
     char logline[256], tmp[256];
+
+    assert(message != NULL);
 
     remaining_length = message->length;
     ii = 0;

@@ -37,6 +37,10 @@ set (include_SRCS
 )
 
 set (libkwb_SRCS
+    connection.h
+    connection_serial.h
+    connection_socket.h
+    exceptions.h
     ioloop.h
     log.h
     message.h
@@ -44,6 +48,10 @@ set (libkwb_SRCS
     message_socket.h
     vos.h
 
+    connection.cpp
+    connection_serial.cpp
+    connection_socket.cpp
+    exceptions.cpp
     ioloop.c
     log.c
     message.c

@@ -324,6 +324,26 @@ void ioloop_init (ioloop_t* ioloop)
     ioloop->update_required = true;
 }
 
+void ioloop_close(ioloop_t* ioloop)
+{
+    ioloop_connection_t* conn = NULL;
+    ioloop_timer_t* timer = NULL;
+
+    assert(ioloop != NULL);
+
+    while (ioloop->first_conn != NULL) {
+        conn = ioloop->first_conn;
+        ioloop->first_conn = conn->next;
+        free(conn);
+    }
+
+    while (ioloop->first_timer != NULL) {
+        timer = ioloop->first_timer;
+        ioloop->first_timer = timer->next;
+        free(timer);
+    }
+}
+
 void ioloop_register_fd (ioloop_t*              ioloop,
                          sys_fd_t               fd,
                          ioloop_event_type_t    eventtype,
@@ -504,6 +524,9 @@ void ioloop_run_once (ioloop_t* ioloop)
                     conn->callback(conn->arg);
                 }
             }
+
+            // prevent reusing conn when ioloop needs an update
+            if (ioloop->update_required) break;
 
             conn = conn->next;
         }

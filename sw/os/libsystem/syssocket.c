@@ -188,6 +188,15 @@ sys_fd_t sys_socket_open_server_tcp (uint16_t port)
         return fd;
     }
 
+    // allow port to be reused. Especially for tests where the server is opened / closed in a short interval.
+    int so_reuseport = 1;
+    rc = setsockopt(fd, SOL_SOCKET, SO_REUSEPORT, &so_reuseport, sizeof (so_reuseport));
+    if (rc < 0) {
+        perror("setsockopt SO_REUSEPORT");
+        close(fd);
+        return rc;
+    }
+
     memset(&sockinfo, 0, sizeof(sockinfo));
     sockinfo.sin_family = AF_INET;
     sockinfo.sin_addr.s_addr = INADDR_ANY;
@@ -293,7 +302,7 @@ ssize_t sys_socket_recv (sys_fd_t fd, void* buffer, size_t buffersize)
 #endif
 }
 
-ssize_t sys_socket_send (sys_fd_t fd, void* buffer, size_t buffersize)
+ssize_t sys_socket_send (sys_fd_t fd, const void* buffer, size_t buffersize)
 {
 #if defined (PRJCONF_UNIX) || \
     defined (PRJCONF_POSIX) || \

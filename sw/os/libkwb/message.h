@@ -87,7 +87,7 @@ const char* msg_to_string(msg_t *message, uint8_t max_length);
  * @param[in] keyword       Keyword to add to log message.
  * @param[in] message       Message to log.
  */
-void msg_log (const char *keyword, msg_t *message);
+void msg_log (const char *keyword, const msg_t *message);
 
 #ifdef __cplusplus
 }

@@ -75,6 +75,8 @@ log_mask_t log_get_mask (void);
 
 void log_add_mask (log_mask_t logmask);
 
+void log_add_prefix (const char* pref);
+
 void log_msg (log_mask_t logmask, const char* logmessage, ...);
 
 void log_info(const char* logmessage, ...);

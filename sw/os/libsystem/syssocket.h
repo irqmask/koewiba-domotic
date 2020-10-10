@@ -65,7 +65,7 @@ void sys_socket_close (sys_fd_t fd);
 
 sys_fd_t sys_socket_accept (sys_fd_t server_fd, char* address, size_t address_len, uint16_t* port);
 
-ssize_t sys_socket_send (sys_fd_t fd, void* buffer, size_t buffersize);
+ssize_t sys_socket_send (sys_fd_t fd, const void* buffer, size_t buffersize);
 
 ssize_t sys_socket_recv (sys_fd_t fd, void* buffer, size_t buffersize);
 

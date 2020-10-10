@@ -100,6 +100,8 @@ typedef struct ioloop {
 
 void ioloop_init (ioloop_t* ioloop);
 
+void ioloop_close(ioloop_t* ioloop);
+
 void ioloop_register_fd (ioloop_t* ioloop,
                          sys_fd_t fd,
                          ioloop_event_type_t eventtype,

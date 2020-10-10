@@ -64,6 +64,11 @@ set (os_include_SRCS
 set (unittests_SRCS
     test_libsystem_threads.cpp
     test_libsystem_time.cpp
+    
+    test_libkwb_connection.cpp
+    test_libkwb_connection_serial.cpp
+    test_libkwb_connection_socket.cpp
+    
     unittests_main.cpp
 )
 

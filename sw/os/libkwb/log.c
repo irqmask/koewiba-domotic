@@ -53,6 +53,8 @@
 
 static log_mask_t active_logs = (LOG_ERROR | LOG_WARNING | LOG_STATUS);
 
+static const char* prefix = "";
+
 // --- Global variables --------------------------------------------------------
 
 // --- Module global variables -------------------------------------------------
@@ -91,6 +93,16 @@ void log_add_mask (log_mask_t logmask)
 }
 
 /**
+ * Add a prefix to every log message.
+ * @param[in]   pref    Prefix o be added. It needs to be a static and constant
+ *                      string. It will not be copied!
+ */
+void log_add_prefix (const char* pref)
+{
+    prefix = pref;
+}
+
+/**
  * Log a message if there are matches between the message logmask and the
  * global active logmask.
  */
@@ -100,6 +112,7 @@ void log_msg (log_mask_t logmask, const char* logmessage, ...)
 
     if ((logmask & active_logs) != 0) {
         va_start(args, logmessage);
+        fprintf(stderr, "%s", prefix);
         vfprintf(stderr, logmessage, args);
         fprintf(stderr, "\n");
         va_end(args);
@@ -112,6 +125,7 @@ void log_info(const char* logmessage, ...)
 
     if ((LOG_INFO & active_logs) != 0) {
         va_start(args, logmessage);
+        fprintf(stderr, "%s", prefix);
         fprintf(stderr, "INFO      ");
         vfprintf(stderr, logmessage, args);
         fprintf(stderr, "\n");
@@ -125,6 +139,7 @@ void log_warning(const char* logmessage, ...)
 
     if ((LOG_WARNING & active_logs) != 0) {
         va_start(args, logmessage);
+        fprintf(stderr, "%s", prefix);
         fprintf(stderr, "WARNING   ");
         vfprintf(stderr, logmessage, args);
         fprintf(stderr, "\n");
@@ -138,6 +153,7 @@ void log_error (const char* logmessage, ...)
 
     if ((LOG_ERROR & active_logs) != 0) {
         va_start(args, logmessage);
+        fprintf(stderr, "%s", prefix);
         fprintf(stderr, "ERROR     ");
         vfprintf(stderr, logmessage, args);
         fprintf(stderr, "\n");
@@ -153,6 +169,7 @@ void log_sys_error (const char* logmessage, ...)
 
     if ((LOG_ERROR & active_logs) != 0) {
         va_start(args, logmessage);
+        fprintf(stderr, "%s", prefix);
         fprintf(stderr, "ERROR     ");
         vfprintf(stderr, logmessage, args);
         fprintf(stderr, " %s", strerror(err));

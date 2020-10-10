@@ -60,7 +60,7 @@
 
 // --- Global functions --------------------------------------------------------
 
-const char* msg_to_string(msg_t *message, uint8_t max_length)
+const char* msg_to_string(const msg_t *message, uint8_t max_length)
 {
     uint8_t remaining_length, ii;
     static char logline[1024];

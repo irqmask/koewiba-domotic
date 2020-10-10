@@ -41,10 +41,12 @@ public:
      * Initializes a socket connection which has been accepted by the socket server.
      *
      * @param[in]   ioloop      Pointer to ioloop.
-     * @param[in]   address     address and port of socket connection of TCP/IP
-     *                          address, e.g. 127.0.0.1:1234ddress.
+     * @param[in]   address     Address and port of socket connection of TCP/IP
+     *                          address, e.g. 127.0.0.1:1234.
+     * @param[in]   fd          File descriptor of established connection (optional
+     *                          for server usage)
      */
-    ConnectionSocket(ioloop_t *io, std::string uri);
+    ConnectionSocket(ioloop_t *io, std::string uri, sys_fd_t fd = INVALID_FD);
 
     /**
      * Closes active connection.
@@ -82,8 +84,6 @@ protected:
      * Close the connection to the socket.
      */
     void close();
-
-
 
     /**
      * Receive pending data. Call onIncomingMessage() for each completely

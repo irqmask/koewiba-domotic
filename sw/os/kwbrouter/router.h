@@ -32,7 +32,7 @@
 #include <list>
 #include <stddef.h>
 
-#include "routeconnection.h"
+#include "connection.h"
 
 /**
  * The router takes incomming message from a connection and routes it to 
@@ -45,22 +45,22 @@
 class Router
 {
 private:
-    std::list<RouteConnection*> connections;
+    std::list<Connection*> connections;
 
     /**
      * Log current list of connections.
      * @param[in]   current     Mark current connection(optional)
      */
-    void ListConnections(RouteConnection* current);
+    void listConnections(Connection* current);
 
 public:
     Router();
     ~Router();
 
-    void AddConnection(RouteConnection* connection);
-    void RemoveConnection(RouteConnection* connection);
+    void addConnection(Connection* connection);
+    void removeConnection(Connection* connection);
 
-    void DistributeMessage(msg_t* message, RouteConnection* sender);
+    void distributeMessage(const msg_t & message, Connection* sender);
 };
 
 #endif // ROUTER_H

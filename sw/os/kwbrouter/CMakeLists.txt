@@ -52,15 +52,9 @@ set (os_include_SRCS
 
 set (kwbrouter_SRCS
     router.h
-    routeconnection.h
-    rconnserial.h
-    rconnsocketclient.h
     socketserver.h
 
     router.cpp
-    routeconnection.cpp
-    rconnserial.cpp
-    rconnsocketclient.cpp
     socketserver.cpp
 
     kwbrouter_main.cpp

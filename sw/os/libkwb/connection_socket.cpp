@@ -61,8 +61,9 @@ static void closeConnectionHdl(const std::string & uri, void* reference, void* a
 // --- Class member functions --------------------------------------------------
 
 //----------------------------------------------------------------------------
-ConnectionSocket::ConnectionSocket(ioloop_t* io, std::string uri)
+ConnectionSocket::ConnectionSocket(ioloop_t* io, std::string uri, sys_fd_t fd)
     : Connection(io, uri)
+    , fd(fd)
 {
     open();
 }
@@ -99,22 +100,24 @@ void ConnectionSocket::getAddressAndPort(std::string uri, std::string & address,
 void ConnectionSocket::open()
 {
     do {
-        std::string address;
-        uint16_t port = 0;
-        getAddressAndPort(uri, address, port);
-        if (port == 0) {
-            fd = sys_socket_open_client_unix(address.c_str());
-            if (fd <= INVALID_FD) {
-                int err = errno;
-                throw ConnectionFailed(LOC, "SOCKET Unable to connect client to unix socket server! address=%s syserror=%d %s",
-                                       address.c_str(), err, strerror(err));
-            }
-        } else {
-            fd = sys_socket_open_client_tcp(address.c_str(), port);
-            if (fd <= INVALID_FD) {
-                int err = errno;
-                throw ConnectionFailed(LOC, "SOCKET Unable to connect client to tcp socket server! address=%s port=%d syserror=%d %s",
-                                       address.c_str(), port, err, strerror(err));
+        if (fd == INVALID_FD) {
+            std::string address;
+            uint16_t port = 0;
+            getAddressAndPort(uri, address, port);
+            if (port == 0) {
+                fd = sys_socket_open_client_unix(address.c_str());
+                if (fd <= INVALID_FD) {
+                    int err = errno;
+                    throw ConnectionFailed(LOC, "SOCKET Unable to connect client to unix socket server! address=%s syserror=%d %s",
+                                           address.c_str(), err, strerror(err));
+                }
+            } else {
+                fd = sys_socket_open_client_tcp(address.c_str(), port);
+                if (fd <= INVALID_FD) {
+                    int err = errno;
+                    throw ConnectionFailed(LOC, "SOCKET Unable to connect client to tcp socket server! address=%s port=%d syserror=%d %s",
+                                           address.c_str(), port, err, strerror(err));
+                }
             }
         }
 

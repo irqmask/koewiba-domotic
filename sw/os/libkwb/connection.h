@@ -42,15 +42,6 @@ typedef void (*conn_func_t)(const std::string & uri, void* reference, void* arg)
  */
 class Connection
 {
-protected:
-    incom_func_t        extOnIncommingMsg;
-    void*               extOnIncommingMsgArg;
-    conn_func_t         extOnConnectionClosed;
-    void*               extOnConnectionClosedArg;
-    ioloop_t*           ioloop;
-    std::string         uri;
-    uint16_t            segmentAddress;     //!< segment address of connection
-
 public:
     /**
      * Default constructor. Initializes data for methods in this base class.
@@ -137,6 +128,15 @@ public:
      * @throws OperationFailed, if message was not completely sent.
      */
     virtual void send(const msg_t & message);
+
+protected:
+    incom_func_t        extOnIncommingMsg;
+    void*               extOnIncommingMsgArg;
+    conn_func_t         extOnConnectionClosed;
+    void*               extOnConnectionClosedArg;
+    ioloop_t*           ioloop;
+    std::string         uri;
+    uint16_t            segmentAddress;     //!< segment address of connection
 };
 
 /** @} */

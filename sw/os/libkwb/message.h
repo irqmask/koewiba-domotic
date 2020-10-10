@@ -81,7 +81,7 @@ typedef void (*msg_conn_func_t)(const char* address, uint16_t port, void* refere
  * @returns Converted message as string.
  * @note This function is not thread-safe!
  */
-const char* msg_to_string(msg_t *message, uint8_t max_length);
+const char* msg_to_string(const msg_t *message, uint8_t max_length);
 
 /**
  * @param[in] keyword       Keyword to add to log message.

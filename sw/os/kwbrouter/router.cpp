@@ -35,17 +35,17 @@
 /**
  * Callback to be called by incomming message handlers of all connections.
  *
- * @param[in]   message     Pointer to message to be distributed.
+ * @param[in]   message     Message to be distributed.
  * @param[in]   reference   Reference to sender of the message.
  * @param[in]   arg         Has to be a pointer to router class.
  * @todo pass message as reference instead of pointer to clarify its lifetime.
  * @todo replace typeless reference with connection type.
  */
-void onIncommingMessage(msg_t* message, void* reference, void* arg)
+void onIncomingMessage(const msg_t & message, void* reference, void* arg)
 {
     Router* router = (Router*)arg;
-    RouteConnection* sending_conn = (RouteConnection*)reference;
-    router->DistributeMessage(message, sending_conn);
+    Connection* sending_conn = (Connection*)reference;
+    router->distributeMessage(message, sending_conn);
 }
 
 // --- Class member functions --------------------------------------------------
@@ -69,12 +69,12 @@ Router::~Router()
  *
  * @param[in]   connection  Connection to be added.
  */
-void Router::AddConnection(RouteConnection* connection)
+void Router::addConnection(Connection* connection)
 {
     connections.push_back(connection);
-    connection->SetIncommingHandler(onIncommingMessage, this);
+    connection->setIncomingHandler(onIncomingMessage, this);
     log_info("Add new connection:");
-    ListConnections(connection);
+    listConnections(connection);
 }
 
 /**
@@ -83,11 +83,11 @@ void Router::AddConnection(RouteConnection* connection)
  *
  * @param[in]   connection  Connection to be removed.
  */
-void Router::RemoveConnection(RouteConnection* connection)
+void Router::removeConnection(Connection* connection)
 {
     log_info("Remove Closed connection:");
-    ListConnections(connection);
-    connection->ClearIncommingHandler();
+    listConnections(connection);
+    connection->clearIncomingHandler();
     connections.remove(connection);
 }
 
@@ -95,25 +95,25 @@ void Router::RemoveConnection(RouteConnection* connection)
  * Distributes a received message from one connection to all other connection.
  * The message is not echoed back to the sender.
  */
-void Router::DistributeMessage(msg_t* message, RouteConnection* sender)
+void Router::distributeMessage(const msg_t & message, Connection* sender)
 {
     for (auto conn : connections) {
         if (conn == sender) continue;
-        if (!conn->AddressIsInConnectionsSegment(message->receiver)) continue;
-        log_info("ROUTE FROM %s NODE %04X VIA %s TO NODE %04X msg %s", sender->GetName(), message->sender, conn->GetName(), message->receiver, msg_to_string(message, 16));
-        conn->Send(message);
+        if (!conn->addressIsInConnectionsSegment(message.receiver)) continue;
+        log_info("ROUTE FROM %s NODE %04X VIA %s TO NODE %04X msg %s", sender->getName(), message.sender, conn->getName(), message.receiver, msg_to_string(&message, 16));
+        conn->send(message);
     }
 }
 
 //----------------------------------------------------------------------------
-void Router::ListConnections(RouteConnection *current)
+void Router::listConnections(Connection *current)
 {
     int32_t index = 0;
     for (auto conn : connections) {
         if (conn == current) {
-            log_info("%02d: %15s (*)", index, conn->GetName());
+            log_info("%02d: %15s (*)", index, conn->getName().c_str());
         } else {
-            log_info("%02d: %15s", index, conn->GetName());
+            log_info("%02d: %15s", index, conn->getName().c_str());
         }
         index++;
     }

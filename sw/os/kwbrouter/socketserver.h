@@ -29,9 +29,7 @@
 
 #include <list>
 
-#include "message_socket.h"
-
-#include "rconnsocketclient.h"
+#include "connection_socket.h"
 #include "router.h"
 
 /**
@@ -42,23 +40,25 @@
  */
 class SocketServer
 {
-private:
-    std::list<RConnSocketClient*> clients;
-    ioloop_t*                   ioloop;
-    Router*                     router;
-    msg_socket_t                server;
-
 public:
-    SocketServer();
-    SocketServer(ioloop_t* iol);
     SocketServer(ioloop_t* iol, Router* r);
     ~SocketServer();
 
-    int Open(const char* address, uint16_t port);
-    void Close();
+    void open(const char* address, uint16_t port);
+    void close();
 
-    void OnNewConnection(msg_endpoint_t* endpoint, const char* address, uint16_t port);
-    void OnCloseConnection(RConnSocketClient* client);
+    void onNewConnection(ConnectionSocket *connection);
+    void onCloseConnection(ConnectionSocket *connection);
+
+protected:
+    SocketServer();
+    static int acceptConnection(void *arg);
+    static void lostConnection(const std::string & uri, void *reference, void *arg);
+
+    std::list<ConnectionSocket*> clients;   ///< list of connected clients
+    ioloop_t*                   ioloop;     ///< reference to ioloop
+    Router*                     router;     ///< reference to router
+    sys_fd_t                    fd;         ///< Server file descriptor
 };
 
 #endif // SOCKETSERVER_H

@@ -454,7 +454,7 @@ int firmware_update_init (firmwareupdate_t* fwu,
         rc = msg_ser_open(&fwu->msg_serial, ioloop, device, baudrate);
         if (rc != eERR_NONE) break;
 
-        msg_ser_set_incomming_handler(&fwu->msg_serial, handle_incomming_messages, fwu);
+        msg_ser_set_incoming_handler(&fwu->msg_serial, handle_incomming_messages, fwu);
         // default: reset target node after update
         fwu->reset_target_node = 1;
         fwu->progress_thd = 5;

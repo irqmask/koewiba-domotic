@@ -71,8 +71,8 @@ Router::~Router()
  */
 void Router::AddConnection(RouteConnection* connection)
 {
-    connection->SetIncommingHandler(onIncommingMessage, this);
     connections.push_back(connection);
+    connection->SetIncommingHandler(onIncommingMessage, this);
     log_info("Add new connection:");
     ListConnections(connection);
 }

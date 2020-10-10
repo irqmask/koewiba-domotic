@@ -83,7 +83,7 @@ int RConnSerial::Open(const char* device, int baudrate)
     int retval = 0;
 
     retval = msg_ser_open(&this->serial, this->ioloop, device, baudrate);
-    msg_ser_set_incomming_handler(&this->serial, incommingMessageHdl, this);
+    msg_ser_set_incoming_handler(&this->serial, incommingMessageHdl, this);
     return retval;
 }
 

@@ -110,31 +110,31 @@ static int convert_char_to_nibble (char single_char, uint8_t* nibble)
     return 0;
 }
 
-static void reset_incomming_on_error(msg_serial_t* msg_serial)
+static void reset_incoming_on_error(msg_serial_t* msg_serial)
 {
     uint8_t ii;
     char strbuf1[1024], strbuf2[1024], single_char[2];
 
     // log faulty message
-    snprintf(strbuf1, sizeof(strbuf1)-1, "SERIAL Incomming message corrupt: \"");
+    snprintf(strbuf1, sizeof(strbuf1)-1, "SERIAL Incoming message corrupt: \"");
     single_char[1] = '\0';
-    for (ii=0; ii<msg_serial->incomming_num_received; ii++) {
-        switch (msg_serial->incomming_buffer[ii]) {
+    for (ii=0; ii<msg_serial->incoming_num_received; ii++) {
+        switch (msg_serial->incoming_buffer[ii]) {
         case '\n': strcat_s(strbuf1, sizeof(strbuf1), "<NL>"); break;
         case '\r': strcat_s(strbuf1, sizeof(strbuf1), "<CR>"); break;
         default:
-            single_char[0] =  msg_serial->incomming_buffer[ii];
+            single_char[0] =  msg_serial->incoming_buffer[ii];
             strcat_s(strbuf1, sizeof(strbuf1), single_char);
             break;
         }
     }
-    snprintf(strbuf2, sizeof(strbuf2)-1, "\" total length = %d, message length = %d\n", msg_serial->incomming_num_received, msg_serial->incomming_message.length);
+    snprintf(strbuf2, sizeof(strbuf2)-1, "\" total length = %d, message length = %d\n", msg_serial->incoming_num_received, msg_serial->incoming_message.length);
     strcat_s(strbuf1, sizeof(strbuf1), strbuf2);
     log_error(strbuf1);
 
-    // reset incomming state
-    msg_serial->incomming_num_received = 0;
-    msg_serial->incomming_state = eSER_RECV_STATE_IDLE;
+    // reset incoming state
+    msg_serial->incoming_num_received = 0;
+    msg_serial->incoming_state = eSER_RECV_STATE_IDLE;
 }
 
 static bool process_receiving(msg_serial_t* msg_serial, char new_char)
@@ -142,98 +142,98 @@ static bool process_receiving(msg_serial_t* msg_serial, char new_char)
     uint8_t digit, nibble, index;
 
     // first byte of new message received
-    if (msg_serial->incomming_state == eSER_RECV_STATE_IDLE) {
-        msg_serial->incomming_state = eSER_RECV_STATE_SENDER;
-        msg_serial->incomming_message.sender = 0;
-        msg_serial->incomming_message.receiver = 0;
-        msg_serial->incomming_message.length = 0;
+    if (msg_serial->incoming_state == eSER_RECV_STATE_IDLE) {
+        msg_serial->incoming_state = eSER_RECV_STATE_SENDER;
+        msg_serial->incoming_message.sender = 0;
+        msg_serial->incoming_message.receiver = 0;
+        msg_serial->incoming_message.length = 0;
     }
 
-    msg_serial->incomming_buffer[msg_serial->incomming_num_received++] = new_char;
-    // below this line incomming_num_received is counting from 1!
+    msg_serial->incoming_buffer[msg_serial->incoming_num_received++] = new_char;
+    // below this line incoming_num_received is counting from 1!
 
     // decode received
-    switch (msg_serial->incomming_state) {
+    switch (msg_serial->incoming_state) {
     case eSER_RECV_STATE_SENDER:
-        digit = 4 - msg_serial->incomming_num_received;
+        digit = 4 - msg_serial->incoming_num_received;
         if (convert_char_to_nibble(new_char, &nibble) != 0) {
             log_error("Error in state eSER_RECV_STATE_SENDER!");
-            reset_incomming_on_error(msg_serial);
+            reset_incoming_on_error(msg_serial);
             break;
         } else {
-            msg_serial->incomming_message.sender |= (nibble << (4*digit));
+            msg_serial->incoming_message.sender |= (nibble << (4*digit));
         }
-        if (msg_serial->incomming_num_received >= 4) {
-            msg_serial->incomming_state = eSER_RECV_STATE_RECEIVER;
+        if (msg_serial->incoming_num_received >= 4) {
+            msg_serial->incoming_state = eSER_RECV_STATE_RECEIVER;
         }
         break;
 
     case eSER_RECV_STATE_RECEIVER:
-        digit = 8 - msg_serial->incomming_num_received;
+        digit = 8 - msg_serial->incoming_num_received;
         if (convert_char_to_nibble(new_char, &nibble) != 0) {
             log_error("Error in state eSER_RECV_STATE_RECEIVER!");
-            reset_incomming_on_error(msg_serial);
+            reset_incoming_on_error(msg_serial);
             break;
         } else {
-            msg_serial->incomming_message.receiver |= (nibble << (4*digit));
+            msg_serial->incoming_message.receiver |= (nibble << (4*digit));
         }
-        if (msg_serial->incomming_num_received >= 8) {
-            msg_serial->incomming_state = eSER_RECV_STATE_LENGTH;
+        if (msg_serial->incoming_num_received >= 8) {
+            msg_serial->incoming_state = eSER_RECV_STATE_LENGTH;
         }
         break;
 
     case eSER_RECV_STATE_LENGTH:
-        digit = 10 - msg_serial->incomming_num_received;
+        digit = 10 - msg_serial->incoming_num_received;
         if (convert_char_to_nibble(new_char, &nibble) != 0) {
             log_error("Error in state eSER_RECV_STATE_LENGTH char %x!", new_char);
-            reset_incomming_on_error(msg_serial);
+            reset_incoming_on_error(msg_serial);
             break;
         } else {
-            msg_serial->incomming_message.length |= (nibble << (4*digit));
+            msg_serial->incoming_message.length |= (nibble << (4*digit));
         }
-        if (msg_serial->incomming_num_received >= 10) {
-            msg_serial->incomming_state = eSER_RECV_STATE_DATA;
+        if (msg_serial->incoming_num_received >= 10) {
+            msg_serial->incoming_state = eSER_RECV_STATE_DATA;
         }
         break;
 
     case eSER_RECV_STATE_DATA:
-        digit = msg_serial->incomming_num_received % 2; // digit sequence: 1010...
-        index = (msg_serial->incomming_num_received - 11) / 2;
+        digit = msg_serial->incoming_num_received % 2; // digit sequence: 1010...
+        index = (msg_serial->incoming_num_received - 11) / 2;
         if (convert_char_to_nibble(new_char, &nibble) != 0) {
             log_error("Error in state eSER_RECV_STATE_DATA!");
-            reset_incomming_on_error(msg_serial);
+            reset_incoming_on_error(msg_serial);
             break;
         } else {
-            if (digit == 1) msg_serial->incomming_message.data[index] = 0;
-            msg_serial->incomming_message.data[index] |= (nibble << (4*digit));
+            if (digit == 1) msg_serial->incoming_message.data[index] = 0;
+            msg_serial->incoming_message.data[index] |= (nibble << (4*digit));
         }
-        if (index + 1 == msg_serial->incomming_message.length && digit == 0) {
-            msg_serial->incomming_state = eSER_RECV_STATE_NEWLINE;
-        } else if (index + 1 > msg_serial->incomming_message.length){
+        if (index + 1 == msg_serial->incoming_message.length && digit == 0) {
+            msg_serial->incoming_state = eSER_RECV_STATE_NEWLINE;
+        } else if (index + 1 > msg_serial->incoming_message.length){
             log_error("Error in state eSER_RECV_STATE_DATA!");
-            reset_incomming_on_error(msg_serial);
+            reset_incoming_on_error(msg_serial);
         }
         break;
 
     case eSER_RECV_STATE_NEWLINE:
-        if (msg_serial->incomming_num_received != (msg_serial->incomming_message.length * 2 + 11) ||
+        if (msg_serial->incoming_num_received != (msg_serial->incoming_message.length * 2 + 11) ||
             new_char != '\n') {
             log_error("Error in state eSER_RECV_STATE_NEWLINE!");
-            reset_incomming_on_error(msg_serial);
+            reset_incoming_on_error(msg_serial);
         } else {
             // message received
-            if (msg_serial->incomming_num_received) msg_serial->incomming_num_received--;
-            msg_serial->incomming_buffer[msg_serial->incomming_num_received] = '\0';
-            log_msg(LOG_VERBOSE2, "SERIAL R RAW %s", msg_serial->incomming_buffer);
-            msg_serial->incomming_num_received = 0;
-            msg_serial->incomming_state = eSER_RECV_STATE_IDLE;
+            if (msg_serial->incoming_num_received) msg_serial->incoming_num_received--;
+            msg_serial->incoming_buffer[msg_serial->incoming_num_received] = '\0';
+            log_msg(LOG_VERBOSE2, "SERIAL R RAW %s", msg_serial->incoming_buffer);
+            msg_serial->incoming_num_received = 0;
+            msg_serial->incoming_state = eSER_RECV_STATE_IDLE;
             return true;
         }
         break;
 
     default:
-        log_error("Wrong receive state: %d", msg_serial->incomming_state);
-        reset_incomming_on_error(msg_serial);
+        log_error("Wrong receive state: %d", msg_serial->incoming_state);
+        reset_incoming_on_error(msg_serial);
         break;
     }
     return false;
@@ -255,11 +255,11 @@ static int32_t msg_read (void* arg)
         } while (!message_complete);
 
         // handle complete message
-        if (message_complete && msg_serial->incomming_handler != NULL) {
-            msg_log("SERIAL R", &msg_serial->incomming_message);
-            msg_serial->incomming_handler(&msg_serial->incomming_message,
+        if (message_complete && msg_serial->incoming_handler != NULL) {
+            msg_log("SERIAL R", &msg_serial->incoming_message);
+            msg_serial->incoming_handler(&msg_serial->incoming_message,
                                           msg_serial,
-                                          msg_serial->incomming_arg);
+                                          msg_serial->incoming_arg);
         }
     } while (0);
     return 0;
@@ -369,12 +369,12 @@ void msg_ser_close (msg_serial_t* msg_serial)
     }
 }
 
-void msg_ser_set_incomming_handler (msg_serial_t* msg_serial, msg_incom_func_t func, void* arg)
+void msg_ser_set_incoming_handler (msg_serial_t* msg_serial, msg_incom_func_t func, void* arg)
 {
     assert(msg_serial != NULL);
 
-    msg_serial->incomming_handler = func;
-    msg_serial->incomming_arg = arg;
+    msg_serial->incoming_handler = func;
+    msg_serial->incoming_arg = arg;
 }
 
 int msg_ser_send (msg_serial_t* msg_serial, msg_t* message)

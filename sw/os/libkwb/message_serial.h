@@ -59,14 +59,14 @@ typedef struct msg_serial {
     ioloop_t*           ioloop;
     char                device[256];
     int                 baudrate;
-    msg_incom_func_t    incomming_handler;
-    void*               incomming_arg;
+    msg_incom_func_t    incoming_handler;
+    void*               incoming_arg;
 
     // buffer for incomming messages
-    char                incomming_buffer[MAX_SERIAL_MSG_SIZE*2];
-    msg_t               incomming_message;
-    uint8_t             incomming_state;
-    uint8_t             incomming_num_received;
+    char                incoming_buffer[MAX_SERIAL_MSG_SIZE*2];
+    msg_t               incoming_message;
+    uint8_t             incoming_state;
+    uint8_t             incoming_num_received;
 
     // buffer for outgoing messages
     char                ser_data[MAX_SERIAL_MSG_SIZE];
@@ -95,7 +95,7 @@ int msg_ser_open    (msg_serial_t*  msg_serial,
 
 void msg_ser_close  (msg_serial_t*  msg_serial);
 
-void msg_ser_set_incomming_handler (msg_serial_t* msg_serial,
+void msg_ser_set_incoming_handler (msg_serial_t* msg_serial,
                                     msg_incom_func_t func,
                                     void* arg);
 

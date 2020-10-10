@@ -64,7 +64,7 @@ MsgEndpointSerial::MsgEndpointSerial(ioloop_t&      ioloop,
                                                                 baudrate(baudrate)
 {
     msg_ser_init(&this->msgSerialHandle);
-    msg_ser_set_incomming_handler(&this->msgSerialHandle, incommingMessageHdl, this);
+    msg_ser_set_incoming_handler(&this->msgSerialHandle, incommingMessageHdl, this);
 }
 
 /**

@@ -75,6 +75,20 @@ static void handle_message(msg_t* message, void* reference, void* arg)
     msg_log("RECV", message);
 }
 
+static void send_message(msg_endpoint_t* ep, uint16_t sender, uint16_t receiver, uint32_t message_type)
+{
+    msg_t message;
+    message.sender = sender;
+    message.receiver = receiver;
+    switch (message_type) {
+    default:
+        message.length = 1;
+        message.data[0] = 0x24; // request version
+        break;
+    }
+    msg_s_send(ep, &message);
+}
+
 static void on_close_connection(const char* address, uint16_t port, void* reference, void* arg)
 {
     g_end_application = true;
@@ -90,6 +104,7 @@ int main (int argc, char* argv[])
     ioloop_t        mainloop;
     msg_socket_t    msg_socket;
     msg_endpoint_t* msg_ep;
+    int state = 1;
 
     do {
         log_set_mask(0xFFFFFFFF);
@@ -106,6 +121,10 @@ int main (int argc, char* argv[])
         log_msg(KWB_LOG_STATUS, "entering mainloop...");
         while (!g_end_application) {
             ioloop_run_once(&mainloop);
+            if (state == 1) {
+                send_message(msg_ep, 0x0501, 0x0110, 0);
+                state = 0;
+            }
         }
         //msg_s_close_connection(&msg_socket);
     } while (0);

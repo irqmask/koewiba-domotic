@@ -66,21 +66,28 @@ typedef union {
 // --- Local functions ---------------------------------------------------------
 
 
-static void sys_socket_get_address (sockinfo_t* sockinfo, char* address, size_t addr_len, uint16_t* port)
+static void sys_socket_get_address (sys_fd_t fd, sockinfo_t* sockinfo, char* address, size_t addr_len, uint16_t* port)
 {
 #if defined (PRJCONF_UNIX) || \
     defined (PRJCONF_POSIX) || \
     defined (PRJCONF_LINUX)
+    struct sockaddr_storage ss;
+    socklen_t sslen = sizeof(struct sockaddr_storage);
 
     switch (sockinfo->common.sa_family) {
     case AF_UNIX:
-        if (address != NULL) strcpy_s(address, addr_len, sockinfo->af_unix.sun_path);
+        if (getsockname(fd, (struct sockaddr *)&ss, &sslen) == 0) {
+            struct sockaddr_un *un = (struct sockaddr_un *)&ss;
+            if (address != NULL) strcpy_s(address, addr_len, un->sun_path);
+        }
         if (port != NULL) *port = 0;
         break;
+
     case AF_INET:
         inet_ntop(AF_INET, &sockinfo->af_inet.sin_addr, address, addr_len);
         if (port != NULL) *port = ntohs(sockinfo->af_inet.sin_port);
         break;
+
     default:
         break;
     }
@@ -282,7 +289,7 @@ sys_fd_t sys_socket_accept (sys_fd_t server_fd, char* address, size_t address_le
     socklen_t   sockinfolen = sizeof(sockinfo_t);
 
     fd = accept(server_fd, (struct sockaddr*)&sockinfo, &sockinfolen);
-    sys_socket_get_address(&sockinfo, address, address_len, port);
+    sys_socket_get_address(fd, &sockinfo, address, address_len, port);
     return fd;
 #elif defined (PRJCONF_WINDOWS)
     //TODO implement windows version

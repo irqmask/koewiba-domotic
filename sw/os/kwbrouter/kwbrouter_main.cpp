@@ -331,7 +331,7 @@ int main (int argc, char* argv[])
             }
         }
         catch (Exception & e) {
-            log_error("Opening socket connection to %s: failed with exception %s!", uriss.str(), e.what());
+            log_error("Opening socket connection to %s: failed with exception %s!", uriss.str().c_str(), e.what());
             sockconn = nullptr;
         }
 

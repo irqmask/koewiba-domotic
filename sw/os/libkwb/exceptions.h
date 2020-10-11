@@ -8,7 +8,7 @@
 #define NOEXCEPT noexcept
 #define LOC __FILE__, __LINE__, __FUNCTION__
 
-class Exception : std::exception
+class Exception : public std::exception
 {
 public:
     Exception(const char* file, uint32_t line, const char* function);
@@ -41,7 +41,7 @@ void Exception::compileErrorMessage(const char* format, ...)
 }
 
 
-class InvalidParameter : Exception
+class InvalidParameter : public Exception
 {
 public:
 	template <class... Args>
@@ -53,7 +53,7 @@ public:
 };
 
 
-class OperationFailed : Exception
+class OperationFailed : public Exception
 {
 public: 
     template <class... Args>
@@ -65,7 +65,7 @@ public:
 };
 
 
-class ResourceMissing : Exception
+class ResourceMissing : public Exception
 {
 public:
     template <class... Args>
@@ -77,7 +77,7 @@ public:
 };
 
 
-class ConnectionFailed : Exception
+class ConnectionFailed : public Exception
 {
 public:
     template <class... Args>

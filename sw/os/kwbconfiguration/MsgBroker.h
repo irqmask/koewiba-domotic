@@ -35,19 +35,21 @@
 // include
 #include "prjtypes.h"
 
+// libkwb
+#include "connection.h"
 #include "message.h"
 
 // --- Definitions -------------------------------------------------------------
 
 // --- Type definitions --------------------------------------------------------
 
-typedef std::function<bool(msg_t&)> msg_filter_t;
-typedef std::function<void(msg_t&)> msg_handler_t;
+typedef std::function<bool(const msg_t&)> msg_filter_t;
+//typedef std::function<void(msg_t&)> msg_handler_t;
 
 typedef struct {
     void*           reference;      //! Reference to identify this entry
     msg_filter_t    msg_filter;
-    msg_handler_t   msg_handler;
+    incom_func_t    msg_handler;
 } msg_filter_data_t;
 
 // --- Local variables ---------------------------------------------------------
@@ -59,8 +61,8 @@ typedef struct {
 class MsgBroker {
 public:
     MsgBroker();
-    void handleIncommingMessage(msg_t& message);
-    void registerForResponse(void* reference, msg_filter_t& filter_func, msg_handler_t& handler_func);
+    void handleIncomingMessage(const msg_t & message, void* reference);
+    void registerForResponse(void* reference, msg_filter_t& filter_func, incom_func_t& handler_func);
     void unregisterForResponse(void* reference);
     
 protected:

@@ -48,9 +48,10 @@
 
 // --- Class implementation  ---------------------------------------------------
 
-ActionQueryModules::ActionQueryModules(MsgEndpoint& msgep, 
-                                       MsgBroker&   broker, 
-                                       uint16_t     nodeId) : ActionWithResponse(msgep, broker, nodeId)
+ActionQueryModules::ActionQueryModules(Connection   &conn,
+                                       MsgBroker    &broker,
+                                       uint16_t     nodeId)
+    : ActionWithResponse(conn, broker, nodeId)
 {
 }
 
@@ -81,7 +82,7 @@ std::vector<ActionQueryModules::Module> ActionQueryModules::getModules()
 bool ActionQueryModules::formMessage()
 {
     messageToSend.receiver = nodeId;
-    messageToSend.sender = msgEndpoint.getOwnNodeId();
+    messageToSend.sender = connection.getOwnNodeId();
     messageToSend.length = 2;
     messageToSend.data[0] = eCMD_REQUEST_INFO_OF_TYPE;
     messageToSend.data[1] = eINFO_VERSION;
@@ -90,7 +91,7 @@ bool ActionQueryModules::formMessage()
 }
 
 
-bool ActionQueryModules::filterResponse(msg_t& message)
+bool ActionQueryModules::filterResponse(const msg_t& message)
 {
     if (message.length >= (MOD_VERSIONINFO_LEN + 1) &&
         message.data[0] == eCMD_STATE_VERSION) {
@@ -100,7 +101,7 @@ bool ActionQueryModules::filterResponse(msg_t& message)
 }
 
 
-void ActionQueryModules::handleResponse(msg_t& message)
+void ActionQueryModules::handleResponse(const msg_t & message, void* reference)
 {  
     Module new_module;
     

@@ -44,18 +44,20 @@
 
 // --- Class implementation  ---------------------------------------------------
 
-ActionRequest::ActionRequest(MsgEndpoint  &msgep, 
+ActionRequest::ActionRequest(Connection   &conn,
                              MsgBroker    &broker, 
-                             uint16_t     nodeId) : Action(msgep, broker),
-                                                    nodeId(nodeId),
-                                                    messageToSend({0})
+                             uint16_t     nodeId)
+    : Action(conn, broker)
+    , nodeId(nodeId)
+    , messageToSend({0})
 {
 }
 
 bool ActionRequest::start()
 {
     if (formMessage()) {
-        return msgEndpoint.sendMessage(messageToSend);
+        connection.send(messageToSend);
+        return true;
     }
     return false;
 }

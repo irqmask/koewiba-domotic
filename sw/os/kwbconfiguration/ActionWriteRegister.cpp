@@ -44,13 +44,14 @@
 
 // --- Class implementation  ---------------------------------------------------
 
-ActionWriteRegister::ActionWriteRegister(MsgEndpoint& msgep, 
-                                         MsgBroker&   broker, 
+ActionWriteRegister::ActionWriteRegister(Connection   &conn,
+                                         MsgBroker    &broker,
                                          uint16_t     nodeId,
-                                         uint8_t      registerId) : ActionRequest(msgep, broker, nodeId),
-                                                                    registerId(registerId),
-                                                                    registerFormat(eCMD_NAK),
-                                                                    value(0)
+                                         uint8_t      registerId)
+    : ActionRequest(conn, broker, nodeId)
+    , registerId(registerId)
+    , registerFormat(eCMD_NAK)
+    , value(0)
 {
 }
 
@@ -68,7 +69,7 @@ bool ActionWriteRegister::formMessage()
 {
     if (nodeId == 0) return false;
     messageToSend.receiver = nodeId;
-    messageToSend.sender = msgEndpoint.getOwnNodeId();
+    messageToSend.sender = connection.getOwnNodeId();
     messageToSend.data[0] = registerFormat;
     messageToSend.data[1] = registerId;
 

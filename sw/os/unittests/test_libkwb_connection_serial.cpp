@@ -62,10 +62,14 @@ protected:
     }
 
 public:
+    void incomingCallback(const msg_t & message, void* reference);
+    void closeCallback(const std::string & uri, void* reference);
+
     /// Counter how often the incoming callback has been called
-    static int          incomingCallbackCalled;
+    int                 incomingCallbackCalled;
     /// Counter how often the close callback has been called
-    static int          closeCallbackCalled;
+    int                 closeCallbackCalled;
+
     /// Last received message
     static msg_t        incomingMessage;
     /// Catched sent message
@@ -104,11 +108,20 @@ protected:
     static void pipeRecvThread(ConnectionSerialTest *reference);
 };
 
-int ConnectionSerialTest::incomingCallbackCalled;
-int ConnectionSerialTest::closeCallbackCalled;
 msg_t ConnectionSerialTest::incomingMessage;
 char ConnectionSerialTest::outgoingMessage[256];
 constexpr char ConnectionSerialTest::PIPE_DEVICE_NAME[];
+
+void ConnectionSerialTest::incomingCallback(const msg_t & message, void* reference)
+{
+    this->incomingCallbackCalled++;
+    memcpy(&this->incomingMessage, &message, sizeof(msg_t));
+}
+
+void ConnectionSerialTest::closeCallback(const std::string & uri, void* reference)
+{
+    this->closeCallbackCalled++;
+}
 
 void ConnectionSerialTest::startEchoThread()
 {
@@ -189,18 +202,6 @@ void ConnectionSerialTest::pipeRecvThread(ConnectionSerialTest *reference)
         sys_serial_close(pfd.fd);
 }
 
-static void incoming_callback(const msg_t & message, void* reference, void* arg)
-{
-    ConnectionSerialTest* conn = (ConnectionSerialTest*)reference;
-    conn->incomingCallbackCalled++;
-    memcpy(&conn->incomingMessage, &message, sizeof(msg_t));
-}
-
-static void close_callback(const std::string & uri, void* reference, void* arg)
-{
-    ConnectionSerialTest::closeCallbackCalled++;
-}
-
 TEST_F(ConnectionSerialTest, fail_to_connect)
 {
     std::shared_ptr<ConnectionSerial> conn;
@@ -214,7 +215,12 @@ TEST_F(ConnectionSerialTest, connect_and_close)
     startEchoThread();
     ASSERT_NO_THROW(conn = std::make_shared<ConnectionSerial>(&iol, PIPE_DEVICE_NAME, false));
     ASSERT_NE(nullptr, conn);
-    conn->setConnectionHandler(close_callback, this);
+
+    using std::placeholders::_1;
+    using std::placeholders::_2;
+    conn_func_t closeCallbackFunc = std::bind(&ConnectionSerialTest::closeCallback, this, _1, _2);
+    conn->setConnectionHandler(closeCallbackFunc);
+
     ASSERT_STREQ(PIPE_DEVICE_NAME, conn->getName().c_str());
     runIOLoopFor(std::chrono::milliseconds(100));
     conn.reset();
@@ -230,7 +236,10 @@ TEST_F(ConnectionSerialTest, remote_close)
     startEchoThread();
     ASSERT_NO_THROW(conn = std::make_shared<ConnectionSerial>(&iol, PIPE_DEVICE_NAME, false));
     ASSERT_NE(nullptr, conn);
-    conn->setConnectionHandler(close_callback, this);
+
+    conn_func_t closeCallbackFunc = std::bind(&ConnectionSerialTest::closeCallback, this, _1, _2);
+    conn->setConnectionHandler(closeCallbackFunc);
+
     runIOLoopFor(std::chrono::milliseconds(100));
     stopEchoThread();
     runIOLoopFor(std::chrono::milliseconds(500));
@@ -246,7 +255,12 @@ TEST_F(ConnectionSerialTest, send)
     startEchoThread();
     ASSERT_NO_THROW(conn = std::make_shared<ConnectionSerial>(nullptr, PIPE_DEVICE_NAME, false));
     ASSERT_NE(nullptr, conn);
-    conn->setIncomingHandler(incoming_callback, this);
+
+    using std::placeholders::_1;
+    using std::placeholders::_2;
+    incom_func_t incomingCallbackFunc = std::bind(&ConnectionSerialTest::incomingCallback, this, _1, _2);
+    conn->setIncomingHandler(incomingCallbackFunc);
+
     msg_t message;
     message.sender = 0x0001;
     message.receiver = 0x0002;
@@ -269,7 +283,11 @@ TEST_F(ConnectionSerialTest, receive)
     std::shared_ptr<ConnectionSerial> conn;
     ASSERT_NO_THROW(conn = std::make_shared<ConnectionSerial>(&iol, PIPE_DEVICE_NAME, false));
     ASSERT_NE(nullptr, conn);
-    conn->setIncomingHandler(incoming_callback, this);
+
+    using std::placeholders::_1;
+    using std::placeholders::_2;
+    incom_func_t incomingCallbackFunc = std::bind(&ConnectionSerialTest::incomingCallback, this, _1, _2);
+    conn->setIncomingHandler(incomingCallbackFunc);
 
     simpleSend("0002000108BFBEBDBCBBBAB9B8\n");
     runIOLoopFor(std::chrono::milliseconds(100));

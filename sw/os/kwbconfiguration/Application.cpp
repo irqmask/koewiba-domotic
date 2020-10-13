@@ -68,12 +68,13 @@
 
 // --- Global functions --------------------------------------------------------
 
-Application::Application(MsgEndpoint&   msgep, 
-                         MsgBroker&     broker, 
-                         bool&          end) : end_application(end),
-                                               msgEndpoint(msgep),
-                                               msgBroker(broker),
-                                               selected_module(0)
+Application::Application(Connection     &conn,
+                         MsgBroker      &broker,
+                         bool           &end)
+    : endApplication(end)
+    , msgEndpoint(conn)
+    , msgBroker(broker)
+    , selectedModule(0)
 {
     this->detected_modules.clear();
 }
@@ -97,18 +98,18 @@ std::vector<ActionQueryModules::Module> Application::getDetectedModules()
 
 void Application::selectModule(uint16_t module_id)
 {
-    this->selected_module = module_id;
+    this->selectedModule = module_id;
 }
 
 uint16_t Application::getSelectedModule()
 {
-    return this->selected_module;
+    return this->selectedModule;
 }
 
 bool Application::readRegister(uint8_t registerId, int& value)
 {
     bool rc = false;
-    ActionReadRegister action_read_reg(msgEndpoint, msgBroker, selected_module, registerId);
+    ActionReadRegister action_read_reg(msgEndpoint, msgBroker, selectedModule, registerId);
     if ((rc = action_read_reg.start()) == true) {
         rc = action_read_reg.waitForResponse();
     }
@@ -119,7 +120,7 @@ bool Application::readRegister(uint8_t registerId, int& value)
 bool Application::writeRegister(uint8_t registerId, int value)
 {
     bool rc = false;
-    ActionWriteRegister action_write_reg(msgEndpoint, msgBroker, selected_module, registerId);
+    ActionWriteRegister action_write_reg(msgEndpoint, msgBroker, selectedModule, registerId);
     action_write_reg.setValue(value);
     
     // hack, remove when register layout is known to the program
@@ -141,10 +142,10 @@ int Application::getLastRegisterValue()
     return 0;
 }
 
-void Application::endApplication()
+void Application::end()
 {
     std::cout << "ending..." << std::endl;
-    end_application = true;
+    endApplication = true;
 }
 
 /** @} */

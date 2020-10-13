@@ -44,15 +44,6 @@
  */
 class Router
 {
-private:
-    std::list<Connection*> connections;
-
-    /**
-     * Log current list of connections.
-     * @param[in]   current     Mark current connection(optional)
-     */
-    void listConnections(Connection* current);
-
 public:
     Router();
     ~Router();
@@ -61,6 +52,17 @@ public:
     void removeConnection(Connection* connection);
 
     void distributeMessage(const msg_t & message, Connection* sender);
+
+protected:
+    void onIncomingMessage(const msg_t & message, void* reference);
+
+    /**
+     * Log current list of connections.
+     * @param[in]   current     Mark current connection(optional)
+     */
+    void listConnections(Connection* current);
+
+    std::list<Connection*> connections;
 };
 
 #endif // ROUTER_H

@@ -44,15 +44,17 @@
 
 // --- Class implementation  ---------------------------------------------------
 
-ActionWithResponse::ActionWithResponse(MsgEndpoint  &msgep, 
+ActionWithResponse::ActionWithResponse(Connection   &conn,
                                        MsgBroker    &broker, 
-                                       uint16_t     nodeId) : ActionRequest(msgep, broker, nodeId),
-                                                              receivedMessage({0}),
-                                                              messageReceived(false)
+                                       uint16_t     nodeId)
+    : ActionRequest(conn, broker, nodeId)
+    , receivedMessage({0})
+    , messageReceived(false)
 {
     using std::placeholders::_1;
-    std::function<bool(msg_t&)> filterResponseFunc = std::bind(&ActionWithResponse::filterResponse, this, _1); 
-    std::function<void(msg_t&)> handleResponseFunc = std::bind(&ActionWithResponse::handleResponse, this, _1); 
+    using std::placeholders::_2;
+    msg_filter_t filterResponseFunc = std::bind(&ActionWithResponse::filterResponse, this, _1);
+    incom_func_t handleResponseFunc = std::bind(&ActionWithResponse::handleResponse, this, _1, _2);
  
     msgBroker.registerForResponse(this, filterResponseFunc, handleResponseFunc);
 }

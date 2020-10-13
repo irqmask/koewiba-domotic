@@ -53,7 +53,7 @@ public:
 protected:
     SocketServer();
     static int acceptConnection(void *arg);
-    static void lostConnection(const std::string & uri, void *reference, void *arg);
+    void lostConnection(const std::string & uri, void *reference);
 
     std::list<ConnectionSocket*> clients;   ///< list of connected clients
     ioloop_t*                   ioloop;     ///< reference to ioloop

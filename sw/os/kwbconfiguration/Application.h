@@ -35,8 +35,11 @@
 // include
 #include "prjtypes.h"
 
+// libkwb
+
+
+#include "connection.h"
 #include "ActionQueryModules.h"
-#include "MsgEndpoint.h"
 #include "MsgBroker.h"
 
 // --- Definitions -------------------------------------------------------------
@@ -51,7 +54,7 @@
 
 class Application {
 public:
-    Application(MsgEndpoint& msgep, MsgBroker& broker, bool& endApplication);
+    Application(Connection& conn, MsgBroker& broker, bool& endApplication);
     
     bool detectModules();
     std::vector<ActionQueryModules::Module> getDetectedModules();
@@ -63,14 +66,14 @@ public:
     bool verifyRegister(uint8_t registerId, int value, int& readValue);
     int getLastRegisterValue();
     
-    void endApplication();
+    void end();
     
 protected:
     std::vector<ActionQueryModules::Module> detected_modules;
-    uint16_t            selected_module;
-    MsgBroker&          msgBroker;
-    MsgEndpoint&        msgEndpoint;
-    bool&               end_application;
+    uint16_t            selectedModule;
+    MsgBroker           &msgBroker;
+    Connection          &msgEndpoint;
+    bool                &endApplication;
 };
 
 // -----------------------------------------------------------------------------

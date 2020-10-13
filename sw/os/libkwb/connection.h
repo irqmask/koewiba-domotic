@@ -26,13 +26,16 @@
 #pragma once
 
 #include <cstdint>
+#include <functional>
 #include <string>
 
 #include "ioloop.h"
 #include "message.h"
 
-typedef void (*incom_func_t)(const msg_t & message, void* reference, void* arg);
-typedef void (*conn_func_t)(const std::string & uri, void* reference, void* arg);
+class Connection;
+
+typedef std::function<void(const msg_t & message, void* reference)> incom_func_t;
+typedef std::function<void(const std::string & uri, void* reference)> conn_func_t;
 
 /**
  * Base class for connections to or from which messages are routed by the 
@@ -61,12 +64,11 @@ public:
     virtual const std::string getName();
 
     /**
-     * Register "incomming message" callback.
+     * Register "incoming message" callback.
      *
      * @param[in]   func        Function of type #msg_incom_func_t to be called.
-     * @param[in]   arg         Optional argument which is passed to the callback.
      */
-    void setIncomingHandler(incom_func_t func, void* arg);
+    void setIncomingHandler(incom_func_t func);
 
     /**
      * Unregister "incomming message" callback. No function will be called when
@@ -86,9 +88,8 @@ public:
      * is closed.
      *
      * @param[in]   func        Function of type #msg_conn_func_t to be called.
-     * @param[in]   arg         Optional argument which is passed to the callback.
      */
-    void setConnectionHandler(conn_func_t func, void* arg);
+    void setConnectionHandler(conn_func_t func);
 
     /**
      * Unregister "OnClose" callback. No function will be called when connection
@@ -101,7 +102,16 @@ public:
      */
     virtual void onConnectionClosed();
 
-    void setSegmentAddress(uint16_t segment_address);
+    /**
+     * Set node id of corresponding bus-gateway
+     * @param[in] nodeId    Node id to set.
+     */
+    void setOwnNodeId(uint16_t nodeId);
+
+    /**
+     * @returns Node id of corresponding bus-gateway
+     */
+    uint16_t getOwnNodeId();
 
     /**
      * Get the segment address.
@@ -136,7 +146,8 @@ protected:
     void*               extOnConnectionClosedArg;
     ioloop_t*           ioloop;
     std::string         uri;
-    uint16_t            segmentAddress;     //!< segment address of connection
+    uint16_t            ownNodeId;      //!< segment address of connection
+    uint16_t            segmentId;      //!< segment address of connection
 };
 
 /** @} */

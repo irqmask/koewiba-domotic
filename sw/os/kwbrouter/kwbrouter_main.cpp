@@ -312,7 +312,7 @@ int main (int argc, char* argv[])
                     log_error("Unable to allocate serial connection object!");
                     break;
                 }
-                serconn->setSegmentAddress(options.own_node_address);
+                serconn->setOwnNodeId(options.own_node_address);
                 router->addConnection(serconn);
             }
         }

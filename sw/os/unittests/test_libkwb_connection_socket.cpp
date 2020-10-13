@@ -61,8 +61,10 @@ protected:
     }
 
 public:
-    static int incomingCallbackCalled;
-    static int closeCallbackCalled;
+    void incomingCallback(const msg_t & message, void* reference);
+    void closeCallback(const std::string & uri, void* reference);
+    int incomingCallbackCalled;
+    int closeCallbackCalled;
 
 protected:
     /// IOLoop object where all connections are registered
@@ -90,8 +92,15 @@ protected:
     static void clientThread(ConnectionSocketTest *reference);
 };
 
-int ConnectionSocketTest::incomingCallbackCalled;
-int ConnectionSocketTest::closeCallbackCalled;
+void ConnectionSocketTest::incomingCallback(const msg_t & message, void* reference)
+{
+    ConnectionSocketTest::incomingCallbackCalled++;
+}
+
+void ConnectionSocketTest::closeCallback(const std::string & uri, void* reference)
+{
+    ConnectionSocketTest::closeCallbackCalled++;
+}
 
 void ConnectionSocketTest::startEchoThread(bool server)
 {
@@ -163,16 +172,6 @@ void ConnectionSocketTest::clientThread(ConnectionSocketTest *reference)
 
 }
 
-static void incoming_callback(const msg_t & message, void* reference, void* arg)
-{
-    ConnectionSocketTest::incomingCallbackCalled++;
-}
-
-static void close_callback(const std::string & uri, void* reference, void* arg)
-{
-    ConnectionSocketTest::closeCallbackCalled++;
-}
-
 TEST_F(ConnectionSocketTest, parseURI)
 {
     std::string address = "";
@@ -201,7 +200,12 @@ TEST_F(ConnectionSocketTest, connect_and_close)
     startEchoThread(true);
     ASSERT_NO_THROW(conn = std::make_shared<ConnectionSocket>(&iol, "127.0.0.1:12345"));
     ASSERT_NE(nullptr, conn);
-    conn->setConnectionHandler(close_callback, this);
+
+    using std::placeholders::_1;
+    using std::placeholders::_2;
+    conn_func_t closeCallbackFunc = std::bind(&ConnectionSocketTest::closeCallback, this, _1, _2);
+    conn->setConnectionHandler(closeCallbackFunc);
+
     ASSERT_STREQ("127.0.0.1:12345", conn->getName().c_str());
     runIOLoopFor(std::chrono::milliseconds(100));
     conn.reset();
@@ -217,7 +221,12 @@ TEST_F(ConnectionSocketTest, remote_close)
     startEchoThread(true);
     ASSERT_NO_THROW(conn = std::make_shared<ConnectionSocket>(&iol, "127.0.0.1:12345"));
     ASSERT_NE(nullptr, conn);
-    conn->setConnectionHandler(close_callback, this);
+
+    using std::placeholders::_1;
+    using std::placeholders::_2;
+    conn_func_t closeCallbackFunc = std::bind(&ConnectionSocketTest::closeCallback, this, _1, _2);
+    conn->setConnectionHandler(closeCallbackFunc);
+
     runIOLoopFor(std::chrono::milliseconds(100));
     stopEchoThread();
     runIOLoopFor(std::chrono::milliseconds(100));
@@ -232,7 +241,12 @@ TEST_F(ConnectionSocketTest, send_and_receive)
     startEchoThread(true);
     ASSERT_NO_THROW(conn = std::make_shared<ConnectionSocket>(&iol, "127.0.0.1:12345"));
     ASSERT_NE(nullptr, conn);
-    conn->setIncomingHandler(incoming_callback, this);
+
+    using std::placeholders::_1;
+    using std::placeholders::_2;
+    incom_func_t incomingCallbackFunc = std::bind(&ConnectionSocketTest::incomingCallback, this, _1, _2);
+    conn->setIncomingHandler(incomingCallbackFunc);
+
     msg_t message;
     message.sender = 0x0001;
     message.receiver = 0x0002;

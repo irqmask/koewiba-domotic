@@ -50,56 +50,59 @@ protected:
     // void TearDown() override {}
 
 public:
-    static int incomingCallbackCalled;
-    static int closeCallbackCalled;
+    void incomingCallback(const msg_t & message, void* reference);
+    void closeCallback(const std::string & uri, void* reference);
 
+    int incomingCallbackCalled;
+    int closeCallbackCalled;
 };
 
-int ConnectionTest::incomingCallbackCalled;
-int ConnectionTest::closeCallbackCalled;
-
-static void incoming_callback(const msg_t & message, void* reference, void* arg)
+void ConnectionTest::incomingCallback(const msg_t & message, void* reference)
 {
-    ConnectionTest::incomingCallbackCalled++;
+    incomingCallbackCalled++;
 }
 
-static void close_callback(const std::string & uri, void* reference, void* arg)
+void ConnectionTest::closeCallback(const std::string & uri, void* reference)
 {
-    ConnectionTest::closeCallbackCalled++;
+    closeCallbackCalled++;
 }
 
-TEST(ConnectionTest, instantiate)
+TEST_F(ConnectionTest, instantiate)
 {
     std::shared_ptr<Connection> conn = std::make_shared<Connection>(nullptr, std::string("test1"));
     ASSERT_STREQ("test1", conn->getName().c_str());
     conn.reset();
 }
 
-TEST(ConnectionTest, callbacks)
+TEST_F(ConnectionTest, callbacks)
 {
     std::shared_ptr<Connection> conn = std::make_shared<Connection>(nullptr, std::string("test2"));
     msg_t message = {0}; // content not important right now
     conn->onIncomingMessage(message);
-    ASSERT_EQ(0, ConnectionTest::incomingCallbackCalled);
+    ASSERT_EQ(0, incomingCallbackCalled);
 
-    conn->setIncomingHandler(incoming_callback, this);
+    using std::placeholders::_1;
+    using std::placeholders::_2;
+    incom_func_t incomingCallbackFunc = std::bind(&ConnectionTest::incomingCallback, this, _1, _2);
+    conn->setIncomingHandler(incomingCallbackFunc);
     conn->onIncomingMessage(message);
-    ASSERT_EQ(1, ConnectionTest::incomingCallbackCalled);
+    ASSERT_EQ(1, incomingCallbackCalled);
 
     conn->clearIncomingHandler();
     conn->onIncomingMessage(message);
-    ASSERT_EQ(1, ConnectionTest::incomingCallbackCalled);
+    ASSERT_EQ(1, incomingCallbackCalled);
 
     conn->onConnectionClosed();
-    ASSERT_EQ(0, ConnectionTest::closeCallbackCalled);
+    ASSERT_EQ(0, closeCallbackCalled);
 
-    conn->setConnectionHandler(close_callback, this);
+    conn_func_t closeCallbackFunc = std::bind(&ConnectionTest::closeCallback, this, _1, _2);
+    conn->setConnectionHandler(closeCallbackFunc);
     conn->onConnectionClosed();
-    ASSERT_EQ(1, ConnectionTest::closeCallbackCalled);
+    ASSERT_EQ(1, closeCallbackCalled);
 
     conn->clearConnectionHandler();
     conn->onConnectionClosed();
-    ASSERT_EQ(1, ConnectionTest::closeCallbackCalled);
+    ASSERT_EQ(1, closeCallbackCalled);
     conn.reset();
 }
 /** @} */

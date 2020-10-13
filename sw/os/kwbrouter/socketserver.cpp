@@ -182,18 +182,19 @@ int SocketServer::acceptConnection(void *arg)
         return 0;
     }
 
-    conn->setConnectionHandler(SocketServer::lostConnection, server);
+    using std::placeholders::_1;
+    using std::placeholders::_2;
+    conn_func_t lostConnectionFunc = std::bind(&SocketServer::lostConnection, server, _1, _2);
+    conn->setConnectionHandler(lostConnectionFunc);
     server->onNewConnection(conn);
     return 0;
 }
 
-void SocketServer::lostConnection(const std::string & uri, void *reference, void *arg)
+void SocketServer::lostConnection(const std::string & uri, void *reference)
 {
     (uri);
     ConnectionSocket *conn = static_cast<ConnectionSocket*>(reference);
-    SocketServer *server = static_cast<SocketServer*>(arg);
-
-    server->onCloseConnection(conn);
+    this->onCloseConnection(conn);
 }
 
 /** @} */

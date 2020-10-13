@@ -165,7 +165,7 @@ void UIConsole::onMenuChoice()
 {
     switch (this->last_choice) {
     case 'x': 
-        app.endApplication();
+        app.end();
         this->leave_menu = true; 
         break;
     default:

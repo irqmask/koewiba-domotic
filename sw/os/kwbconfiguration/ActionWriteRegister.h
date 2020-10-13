@@ -47,7 +47,7 @@
 
 class ActionWriteRegister : public ActionRequest {
 public:
-    ActionWriteRegister(MsgEndpoint& msgep, MsgBroker& broker, uint16_t nodeId=0, uint8_t registerId=0);
+    ActionWriteRegister(Connection & conn, MsgBroker & broker, uint16_t nodeId = 0, uint8_t registerId = 0);
     
     void setRegisterId(uint8_t registerId);
     uint8_t getRegisterId();

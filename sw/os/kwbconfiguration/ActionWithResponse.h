@@ -46,7 +46,7 @@
 
 class ActionWithResponse : public ActionRequest {
 public:
-    ActionWithResponse(MsgEndpoint &msgep, MsgBroker &broker, uint16_t nodeId=0);
+    ActionWithResponse(Connection &conn, MsgBroker &broker, uint16_t nodeId=0);
     
     virtual void cancel();
     virtual bool waitForResponse();
@@ -54,8 +54,8 @@ public:
     
 protected:
     virtual bool formMessage() = 0;
-    virtual bool filterResponse(msg_t& message) = 0;
-    virtual void handleResponse(msg_t& message) = 0;
+    virtual bool filterResponse(const msg_t & message) = 0;
+    virtual void handleResponse(const msg_t & message, void* reference) = 0;
     
     void log_module_info();
     bool     messageReceived; //!< Flag if message has been received.

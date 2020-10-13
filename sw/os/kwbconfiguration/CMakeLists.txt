@@ -67,8 +67,6 @@ set (kwbconfiguration_SRCS
     Application.h
     kwbconfiguration_version.h
     MsgBroker.h
-    MsgEndpoint.h
-    MsgEndpointSerial.h
     UIConsole.h
 
     Action.cpp
@@ -80,8 +78,6 @@ set (kwbconfiguration_SRCS
     Application.cpp
     kwbconfiguration_main.cpp
     MsgBroker.cpp
-    MsgEndpoint.cpp
-    MsgEndpointSerial.cpp
     UIConsole.cpp
 )
 

@@ -29,6 +29,7 @@
  */
 
 #include <cstring>
+#include <sstream>
 
 // include 
 #include "kwb_defines.h"
@@ -72,6 +73,12 @@ ConnectionSerial::ConnectionSerial(ioloop_t* io, std::string uri, bool configure
 ConnectionSerial::~ConnectionSerial()
 {
     close();
+}
+
+//----------------------------------------------------------------------------
+uint32_t ConnectionSerial::getBaudrate()
+{
+    return this->baudrate;
 }
 
 //----------------------------------------------------------------------------

@@ -46,7 +46,7 @@
 
 class ActionReadRegister : public ActionWithResponse {
 public:
-    ActionReadRegister(MsgEndpoint& msgep, MsgBroker& broker, uint16_t nodeId=0, uint8_t registerId=0);
+    ActionReadRegister(Connection & conn, MsgBroker & broker, uint16_t nodeId=0, uint8_t registerId=0);
     
     void setRegisterId(uint8_t registerId);
     uint8_t getRegisterId();
@@ -56,8 +56,8 @@ public:
 protected:
     uint8_t registerId;
     virtual bool formMessage();
-    virtual bool filterResponse(msg_t& message);
-    virtual void handleResponse(msg_t& message);
+    virtual bool filterResponse(const msg_t & message);
+    virtual void handleResponse(const msg_t & message, void* reference);
 };
 
 /** @} */

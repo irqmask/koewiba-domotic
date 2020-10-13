@@ -34,7 +34,7 @@
 // include
 #include "prjtypes.h"
 #include "MsgBroker.h"
-#include "MsgEndpoint.h"
+#include "connection.h"
 
 // --- Definitions -------------------------------------------------------------
 
@@ -48,7 +48,7 @@
 
 class Action {
 public:
-    Action(MsgEndpoint &msgep, MsgBroker &broker);
+    Action(Connection &conn, MsgBroker &broker);
 
     virtual bool start() = 0;
     virtual void cancel() = 0;
@@ -57,7 +57,7 @@ public:
     
 protected:
     MsgBroker                   &msgBroker;
-    MsgEndpoint                 &msgEndpoint;
+    Connection                  &connection;
     std::chrono::duration<int>  timeout;
     bool                        timeout_elapsed;
 };

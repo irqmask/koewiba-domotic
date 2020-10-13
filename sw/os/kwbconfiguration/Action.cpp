@@ -42,10 +42,11 @@
 
 // --- Class implementation  ---------------------------------------------------
 using namespace std::chrono_literals;
-Action::Action(MsgEndpoint &msgep, MsgBroker &broker) : msgBroker(broker), 
-                                                        msgEndpoint(msgep),
-                                                        timeout(5s),
-                                                        timeout_elapsed(false)
+Action::Action(Connection &conn, MsgBroker &broker)
+    : msgBroker(broker)
+    , connection(conn)
+    , timeout(5s)
+    , timeout_elapsed(false)
 {
 }
 

@@ -32,6 +32,7 @@
 
 #include <functional>
 #include <iostream>
+#include <sstream>
 #include <thread>
 
 #include <assert.h>
@@ -56,7 +57,10 @@
 #include "error_codes.h"
 #include "kwb_defines.h"
 
-// os/shared
+// os/libkwb
+#include "connection_serial.h"
+#include "connection_socket.h"
+#include "exceptions.h"
 #include "ioloop.h"
 #include "log.h"
 #include "message_serial.h"
@@ -67,8 +71,6 @@
 
 #include "Application.h"
 #include "MsgBroker.h"
-#include "MsgEndpointSerial.h"
-
 #include "UIConsole.h"
 #include "ActionReadRegister.h"
 
@@ -124,10 +126,12 @@ static void set_options (options_t*     options,
         strcpy_s(options->serial_device, sizeof(options->serial_device), serial_device);
     }
     options->serial_baudrate = serial_baudrate;
+
     if (router_address != NULL) {
         strcpy_s(options->router_address, sizeof(options->router_address), router_address);
-    }
+    }   
     options->router_port = router_port;
+
     options->own_node_id = own_node_id;
 }
 
@@ -182,6 +186,7 @@ static bool parse_commandline_options (int argc, char* argv[], options_t* option
             break;
         }
     }
+
     return rc;
 }
 
@@ -193,9 +198,7 @@ static bool parse_commandline_options (int argc, char* argv[], options_t* option
  */
  static bool validate_options(options_t* options)
 {
-    bool    rc = false,
-            serial_device_set = false,
-            vbusd_address_set = false;
+    bool    rc = false;
 
     do {
         // minimum address is "/a": unix socket with name "a" in the root directory
@@ -203,8 +206,9 @@ static bool parse_commandline_options (int argc, char* argv[], options_t* option
             log_error("Missing router address!\n");
             break;
         }
-        if (!options->serial_device_set || strnlen(options->serial_device, sizeof(options->serial_device)) < 2) {
-            log_error("Invalid or missing serial connection device!\n");
+        if (options->serial_device_set &&
+            strnlen(options->serial_device, sizeof(options->serial_device)) < 2) {
+            log_error("Invalid serial device path!");
             break;
         }
         rc = true;
@@ -275,30 +279,49 @@ int main (int argc, char* argv[])
         ioloop_set_default_timeout(&mainloop, 1);
                
         MsgBroker broker;
-        MsgEndpoint* ep = nullptr;;
+        std::shared_ptr<Connection> conn;
         
         // connect to the bus
         using std::placeholders::_1;
-        if (options.serial_device_set) {
-            log_msg(KWB_LOG_STATUS, "Own node Id is 0x%04X", options.own_node_id);
-            
-            MsgEndpointSerial* msgep_serial = new MsgEndpointSerial(mainloop, options.own_node_id, options.serial_device, options.serial_baudrate);            
-            if (msgep_serial->connect()) {
-                log_msg(KWB_LOG_STATUS, "Connected to serial interface %s with baudrate %d", options.serial_device, options.serial_baudrate);
+        using std::placeholders::_2;
+        incom_func_t handleIncomingMessageFunc = std::bind(&MsgBroker::handleIncomingMessage, &broker, _1, _2);
 
-                std::function<void(msg_t&)> handleIncommingSerialMessageFunc = std::bind(&MsgBroker::handleIncommingMessage, &broker, _1); 
-                msgep_serial->registerForIncommingMessages(handleIncommingSerialMessageFunc);
-                ep = msgep_serial;
+        log_msg(KWB_LOG_STATUS, "Own node Id is 0x%04X", options.own_node_id);
+
+        if (options.serial_device_set) {
+            try {
+                auto conn_serial = std::make_shared<ConnectionSerial>(&mainloop, options.serial_device);
+                log_msg(KWB_LOG_STATUS, "Connected to serial interface %s with baudrate %d", conn_serial->getName().c_str(), conn_serial->getBaudrate());
+                conn = conn_serial;
+            }
+            catch (Exception & e) {
+                log_error("Unable to connecto to serial device %s\n%s", options.serial_device, e.what());
+            }
+        }
+        else if (options.router_address_set) {
+            try {
+                std::stringstream uriss;
+                uriss << options.router_address << ":" << options.router_port;
+                auto conn_socket = std::make_shared<ConnectionSocket>(&mainloop, uriss.str());
+                log_msg(KWB_LOG_STATUS, "Connected to router over socket interface %s", conn_socket->getName().c_str());
+                conn = conn_socket;
+            }
+            catch (Exception & e) {
+                log_error("Unable to connecto to socket %s:%d\n%s", options.router_address, options.router_port, e.what());
             }
         }
         
-        if (ep == nullptr) {
+        if (conn == nullptr) {
             log_error("No connection to gateway or router over serial or TCP/IP was established!");
             rc = eERR_RESOURCE;
             break;
         }
+
+        conn->setIncomingHandler(handleIncomingMessageFunc);
+        conn->setOwnNodeId(options.own_node_id);
+
         // instantiate application, ui and its thread
-        Application app(*ep, broker, end_application);
+        Application app(*conn, broker, end_application);
         UIMain uimain(app);
 
         std::thread ui_thread(&UIMain::run, &uimain);

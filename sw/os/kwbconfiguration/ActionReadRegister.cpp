@@ -48,11 +48,12 @@
 
 // --- Class implementation  ---------------------------------------------------
 
-ActionReadRegister::ActionReadRegister(MsgEndpoint& msgep, 
-                                       MsgBroker&   broker, 
+ActionReadRegister::ActionReadRegister(Connection   &msgep,
+                                       MsgBroker    &broker,
                                        uint16_t     nodeId,
-                                       uint8_t      registerId) : ActionWithResponse(msgep, broker, nodeId),
-                                                                  registerId(registerId)
+                                       uint8_t      registerId)
+    : ActionWithResponse(msgep, broker, nodeId)
+    , registerId(registerId)
 {
 }
 
@@ -70,14 +71,14 @@ bool ActionReadRegister::formMessage()
 {
     if (nodeId == 0) return false;
     messageToSend.receiver = nodeId;
-    messageToSend.sender = msgEndpoint.getOwnNodeId();
+    messageToSend.sender = connection.getOwnNodeId();
     messageToSend.length = 2;
     messageToSend.data[0] = eCMD_REQUEST_REG;
     messageToSend.data[1] = registerId;
     return true;
 }
 
-bool ActionReadRegister::filterResponse(msg_t& message)
+bool ActionReadRegister::filterResponse(const msg_t& message)
 {
     if (message.sender == nodeId &&
         message.length >= 3 &&
@@ -91,7 +92,7 @@ bool ActionReadRegister::filterResponse(msg_t& message)
     return false;
 }
 
-void ActionReadRegister::handleResponse(msg_t& message)
+void ActionReadRegister::handleResponse(const msg_t & message, void* reference)
 {
     receivedMessage = message;
     messageReceived = true;

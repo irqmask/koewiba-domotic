@@ -46,7 +46,7 @@
 
 class ActionRequest : public Action {
 public:
-    ActionRequest(MsgEndpoint &msgep, MsgBroker &broker, uint16_t nodeId=0);
+    ActionRequest(Connection & conn, MsgBroker & broker, uint16_t nodeId = 0);
     
     bool start();
     virtual void cancel();
@@ -58,7 +58,7 @@ public:
 protected:
     virtual bool formMessage() = 0;
     
-    uint16_t nodeId; //! ID of node to perform action with.
+    uint16_t nodeId;        //!< ID of node to perform action with.
     msg_t    messageToSend; //!< Message to be sent during this action.
 };
 

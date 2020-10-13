@@ -32,22 +32,6 @@
 
 // --- Local functions ---------------------------------------------------------
 
-/**
- * Callback to be called by incomming message handlers of all connections.
- *
- * @param[in]   message     Message to be distributed.
- * @param[in]   reference   Reference to sender of the message.
- * @param[in]   arg         Has to be a pointer to router class.
- * @todo pass message as reference instead of pointer to clarify its lifetime.
- * @todo replace typeless reference with connection type.
- */
-void onIncomingMessage(const msg_t & message, void* reference, void* arg)
-{
-    Router* router = (Router*)arg;
-    Connection* sending_conn = (Connection*)reference;
-    router->distributeMessage(message, sending_conn);
-}
-
 // --- Class member functions --------------------------------------------------
 
 Router::Router()
@@ -65,6 +49,19 @@ Router::~Router()
 }
 
 /**
+ * Callback to be called by incomming message handlers of all connections.
+ *
+ * @param[in]   message     Message to be distributed.
+ * @param[in]   reference   Reference to sender of the message.
+ * @todo replace typeless reference with connection type.
+ */
+void Router::onIncomingMessage(const msg_t & message, void* reference)
+{
+    Connection* sending_conn = static_cast<Connection*>(reference);
+    this->distributeMessage(message, sending_conn);
+}
+
+/**
  * Adds a connection to/from which messages are routed.
  *
  * @param[in]   connection  Connection to be added.
@@ -72,7 +69,10 @@ Router::~Router()
 void Router::addConnection(Connection* connection)
 {
     connections.push_back(connection);
-    connection->setIncomingHandler(onIncomingMessage, this);
+    using std::placeholders::_1;
+    using std::placeholders::_2;
+    incom_func_t handleIncomingMessageFunc = std::bind(&Router::onIncomingMessage, this, _1, _2);
+    connection->setIncomingHandler(handleIncomingMessageFunc);
     log_info("Add new connection:");
     listConnections(connection);
 }

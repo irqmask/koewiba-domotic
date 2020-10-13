@@ -58,6 +58,11 @@ public:
     ~ConnectionSerial();
 
     /**
+     * @returns baudrate of established connection.
+     */
+    uint32_t getBaudrate();
+
+    /**
      * Send a KWB messgae over the serial connection.
      * @param[in]   message     KWB message to be sent
      */

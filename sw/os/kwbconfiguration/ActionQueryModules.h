@@ -55,15 +55,15 @@ public:
         version_info_t version; 
     };
         
-    ActionQueryModules(MsgEndpoint& msgep, MsgBroker& broker, uint16_t nodeId=0);
+    ActionQueryModules(Connection & conn, MsgBroker & broker, uint16_t nodeId=0);
     
     std::vector<Module> getModules();   
     virtual bool waitForResponse() override;
     
 protected:
     virtual bool formMessage();
-    virtual bool filterResponse(msg_t& message) override;
-    virtual void handleResponse(msg_t& message) override;
+    virtual bool filterResponse(const msg_t & message) override;
+    virtual void handleResponse(const msg_t & message, void* reference) override;
     
     std::vector<Module> modules;
 };

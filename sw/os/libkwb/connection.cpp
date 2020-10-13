@@ -40,7 +40,7 @@ Connection::Connection(ioloop_t *io, std::string uri)
     , extOnConnectionClosedArg(nullptr)
     , ioloop(io)
     , uri(uri)
-    , segmentAddress(0)
+    , segmentId(0)
 {
 }
 
@@ -56,68 +56,71 @@ const std::string Connection::getName()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Connection::setIncomingHandler(incom_func_t func, void* arg)
+void Connection::setIncomingHandler(incom_func_t func)
 {
     extOnIncommingMsg = func;
-    extOnIncommingMsgArg = arg;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void Connection::clearIncomingHandler()
 {
     extOnIncommingMsg = nullptr;
-    extOnIncommingMsgArg = nullptr;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void Connection::onIncomingMessage(const msg_t & message)
 {
     if (this->extOnIncommingMsg != nullptr) {
-        this->extOnIncommingMsg(message, this, this->extOnIncommingMsgArg);
+        this->extOnIncommingMsg(message, this);
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Connection::setConnectionHandler(conn_func_t func, void* arg)
+void Connection::setConnectionHandler(conn_func_t func)
 {
     this->extOnConnectionClosed = func;
-    this->extOnConnectionClosedArg = arg;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void Connection::clearConnectionHandler()
 {
     this->extOnConnectionClosed = nullptr;
-    this->extOnConnectionClosedArg = nullptr;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void Connection::onConnectionClosed()
 {
     if (this->extOnConnectionClosed != nullptr) {
-        this->extOnConnectionClosed(uri, this, this->extOnConnectionClosedArg);
+        this->extOnConnectionClosed(uri, this);
     }
     // do nothing else at this point. the class may be deleted right now.
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Connection::setSegmentAddress(uint16_t segment_address)
+void Connection::setOwnNodeId(uint16_t nodeId)
 {
-    segmentAddress = segment_address & BUS_SEGBRDCSTMASK;
+    this->ownNodeId = nodeId;
+    this->segmentId = nodeId & BUS_SEGBRDCSTMASK;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+uint16_t Connection::getOwnNodeId()
+{
+    return this->ownNodeId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 uint16_t Connection::getSegmentAddress()
 {
-    return segmentAddress;
+    return this->segmentId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 bool Connection::addressIsInConnectionsSegment(uint16_t node_address)
 {
-    if ((segmentAddress == 0) ||
+    if ((segmentId == 0) ||
         (node_address == 0) ||
-        ((node_address & BUS_SEGBRDCSTMASK) == segmentAddress)) return true;
+        ((node_address & BUS_SEGBRDCSTMASK) == segmentId)) return true;
     return false;
 }
 

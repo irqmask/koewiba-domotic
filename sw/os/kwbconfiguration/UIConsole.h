@@ -3,7 +3,7 @@
  *
  * @{
  * @file    UIConsole.h
- * @brief   UI for console. 
+ * @brief   UI for console.
  *
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
@@ -23,7 +23,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#pragma once 
+#pragma once
 
 // --- Include section ---------------------------------------------------------
 
@@ -45,17 +45,18 @@
 
 // --- Class definition --------------------------------------------------------
 
-class UIConsole {
+class UIConsole
+{
 public:
     UIConsole(Application &app);
-    
+
     void run();
-    
+
 protected:
     virtual void display();
     virtual void queryInput();
     virtual void onMenuChoice();
-    
+
     virtual char queryChar(std::string queryText);
     virtual uint32_t queryU32(std::string query_text, uint32_t lowest_allowed, uint32_t highest_allowed);
     virtual uint16_t queryU16(std::string query_text, uint16_t lowest_allowed, uint16_t highest_allowed);
@@ -65,19 +66,20 @@ protected:
     virtual int8_t queryI8(std::string query_text, int8_t lowest_allowed, int8_t highest_allowed);
 
 
-    
+
     char        last_choice;
     bool        leave_menu;
-    
+
     Application &app;
 };
 
 // -----------------------------------------------------------------------------
 
-class UIMain: public UIConsole {
+class UIMain: public UIConsole
+{
 public:
     UIMain(Application &app);
-    
+
 protected:
     virtual void display();
     virtual void onMenuChoice();
@@ -93,10 +95,11 @@ private:
 
 // -----------------------------------------------------------------------------
 
-class UIReadRegister: public UIConsole {
+class UIReadRegister: public UIConsole
+{
 public:
     UIReadRegister(Application &app);
- 
+
 protected:
     virtual void display();
     virtual void onMenuChoice();

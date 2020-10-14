@@ -3,7 +3,7 @@
  *
  * @{
  * @file    ActionQueryModules.cpp
- * @brief   Action: Query a register of a bus module and wait for the answer. 
+ * @brief   Action: Query a register of a bus module and wait for the answer.
  *
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
@@ -23,7 +23,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
- 
+
 // --- Include section ---------------------------------------------------------
 
 #include "prjconf.h"
@@ -58,9 +58,9 @@ ActionQueryModules::ActionQueryModules(Connection   &conn,
 
 bool ActionQueryModules::waitForResponse()
 {
-    bool one_message_received = false, rc; 
-    
-    
+    bool one_message_received = false, rc;
+
+
     do {
         this->messageReceived = false;
         rc = ActionWithResponse::waitForResponse();
@@ -68,7 +68,7 @@ bool ActionQueryModules::waitForResponse()
             one_message_received = true;
         }
     } while (rc);
-    
+
     return one_message_received;
 }
 
@@ -91,7 +91,7 @@ bool ActionQueryModules::formMessage()
 }
 
 
-bool ActionQueryModules::filterResponse(const msg_t& message)
+bool ActionQueryModules::filterResponse(const msg_t &message)
 {
     if (message.length >= (MOD_VERSIONINFO_LEN + 1) &&
         message.data[0] == eCMD_STATE_VERSION) {
@@ -101,10 +101,10 @@ bool ActionQueryModules::filterResponse(const msg_t& message)
 }
 
 
-void ActionQueryModules::handleResponse(const msg_t & message, void* reference)
-{  
+void ActionQueryModules::handleResponse(const msg_t &message, void *reference)
+{
     Module new_module;
-    
+
     new_module.nodeId = message.sender;
     new_module.version.controller_id[0] = message.data[1];
     new_module.version.controller_id[1] = message.data[2];
@@ -116,9 +116,9 @@ void ActionQueryModules::handleResponse(const msg_t & message, void* reference)
     new_module.version.version[0] = message.data[10];
     new_module.version.version[1] = message.data[11];
     new_module.version.version[2] = message.data[12];
-    
+
     modules.push_back(new_module);
-    
+
     messageReceived = true;
 }
 

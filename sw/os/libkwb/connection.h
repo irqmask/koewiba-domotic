@@ -34,13 +34,13 @@
 
 class Connection;
 
-typedef std::function<void(const msg_t & message, void* reference)> incom_func_t;
-typedef std::function<void(const std::string & uri, void* reference)> conn_func_t;
+typedef std::function<void(const msg_t &message, void *reference)> incom_func_t;
+typedef std::function<void(const std::string &uri, void *reference)> conn_func_t;
 
 /**
- * Base class for connections to or from which messages are routed by the 
- * router. 
- * This class itself provides only common used functions for all 
+ * Base class for connections to or from which messages are routed by the
+ * router.
+ * This class itself provides only common used functions for all
  * route-connection types. Do not use it by itself!
  */
 class Connection
@@ -81,7 +81,7 @@ public:
      *
      * @param[in]   message     Incoming message.
      */
-    virtual void onIncomingMessage(const msg_t & message);
+    virtual void onIncomingMessage(const msg_t &message);
 
     /**
      * Register "OnClose" callback, which is called when the connection
@@ -137,14 +137,14 @@ public:
      *
      * @throws OperationFailed, if message was not completely sent.
      */
-    virtual void send(const msg_t & message);
+    virtual void send(const msg_t &message);
 
 protected:
     incom_func_t        extOnIncommingMsg;
-    void*               extOnIncommingMsgArg;
+    void               *extOnIncommingMsgArg;
     conn_func_t         extOnConnectionClosed;
-    void*               extOnConnectionClosedArg;
-    ioloop_t*           ioloop;
+    void               *extOnConnectionClosedArg;
+    ioloop_t           *ioloop;
     std::string         uri;
     uint16_t            ownNodeId;      //!< segment address of connection
     uint16_t            segmentId;      //!< segment address of connection

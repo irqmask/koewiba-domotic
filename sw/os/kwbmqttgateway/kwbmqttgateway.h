@@ -46,8 +46,8 @@
 
 //! Structure of global variables.
 typedef struct _app_handles_t {
-    ioloop_t*           ioloop;     //!< IO background loop /ref IOLOOP ioloop.
-    struct mosquitto*   mosq;       //!< Global mosquitto handle.
+    ioloop_t           *ioloop;     //!< IO background loop /ref IOLOOP ioloop.
+    struct mosquitto   *mosq;       //!< Global mosquitto handle.
     bool                mqtt_disconnected; //!< Flag if MQTT got disconnected
 } app_handles_t;
 
@@ -65,17 +65,17 @@ extern app_handles_t    g_handles;
 
 // --- Global functions --------------------------------------------------------
 
-extern int mosquitto_connect_to_ioloop(app_handles_t* h);
+extern int mosquitto_connect_to_ioloop(app_handles_t *h);
 
-extern void mosquitto_ioloop_suspend_write(app_handles_t* h);
+extern void mosquitto_ioloop_suspend_write(app_handles_t *h);
 
-extern int msg2mqtt(msg_t* message,
-                    char* topic, size_t max_topic_len,
-                    char* msgtext, size_t max_msgtext_len);
+extern int msg2mqtt(msg_t *message,
+                    char *topic, size_t max_topic_len,
+                    char *msgtext, size_t max_msgtext_len);
 
-extern int mqtt2msg_subscribe(struct mosquitto* mosq);
+extern int mqtt2msg_subscribe(struct mosquitto *mosq);
 
-extern int mqtt2msg(char* topic, char* msgtext, msg_t* message);
+extern int mqtt2msg(char *topic, char *msgtext, msg_t *message);
 
 #endif // _KWBMQTTGATEWAY_H_
 /** @} */

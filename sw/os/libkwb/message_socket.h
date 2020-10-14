@@ -52,19 +52,19 @@ typedef struct msg_endpoint msg_endpoint_t;
 //! Structure holding all information for a socket connection for kwb messages.
 typedef struct msg_socket {
     sys_fd_t            well_known_fd;  //!< Listening server's file descriptor
-    msg_endpoint_t*     first_ep;       //!< head of endpoint list
-    ioloop_t*           ioloop;         //!< pointer to ioloop
+    msg_endpoint_t     *first_ep;       //!< head of endpoint list
+    ioloop_t           *ioloop;         //!< pointer to ioloop
     char                address[256];   //!< address of remote server or path to
-                                        //!< unix socket file
+    //!< unix socket file
     uint16_t            port;           //!< server port (0 for unix socket server)
     msg_conn_func_t     new_connection_handler; //!< called whenever a new client
-                                                //!< connected to the server
-    void*               new_connection_arg;     //!< additional argument for
-                                                //!< new_connection_handler callback
+    //!< connected to the server
+    void               *new_connection_arg;     //!< additional argument for
+    //!< new_connection_handler callback
     msg_incom_func_t    incomming_handler;      //!< called whenever a message
-                                                //!< is received.
-    void*               incomming_arg;          //!< additional argument for
-                                                //!< incoming handler callback.
+    //!< is received.
+    void               *incomming_arg;          //!< additional argument for
+    //!< incoming handler callback.
 } msg_socket_t;
 
 // --- Local variables ---------------------------------------------------------
@@ -79,38 +79,38 @@ typedef struct msg_socket {
 
 // --- Global functions --------------------------------------------------------
 
-void msg_s_init (msg_socket_t* msg_router);
+void msg_s_init(msg_socket_t *msg_router);
 
-int msg_s_open_server (msg_socket_t*   msg_socket,
-                       ioloop_t*       ioloop,
-                       const char*     address,
-                       uint16_t        port);
+int msg_s_open_server(msg_socket_t   *msg_socket,
+                      ioloop_t       *ioloop,
+                      const char     *address,
+                      uint16_t        port);
 
-int msg_s_open_client (msg_socket_t*   msg_socket,
-                       ioloop_t*       ioloop,
-                       const char*     address,
-                       uint16_t        port);
+int msg_s_open_client(msg_socket_t   *msg_socket,
+                      ioloop_t       *ioloop,
+                      const char     *address,
+                      uint16_t        port);
 
-void msg_s_close_connection (msg_socket_t* msg_socket,
-                             msg_endpoint_t* ep);
+void msg_s_close_connection(msg_socket_t *msg_socket,
+                            msg_endpoint_t *ep);
 
-void msg_s_set_newconnection_handler (msg_socket_t* msg_socket,
-                                      msg_conn_func_t func,
-                                      void* arg);
+void msg_s_set_newconnection_handler(msg_socket_t *msg_socket,
+                                     msg_conn_func_t func,
+                                     void *arg);
 
-void msg_s_set_closeconnection_handler (msg_endpoint_t* ep,
-                                        msg_conn_func_t func,
-                                        void* arg);
+void msg_s_set_closeconnection_handler(msg_endpoint_t *ep,
+                                       msg_conn_func_t func,
+                                       void *arg);
 
-void msg_s_set_incomming_handler (msg_socket_t* msg_socket,
-                                  msg_incom_func_t func,
-                                  void* arg);
+void msg_s_set_incomming_handler(msg_socket_t *msg_socket,
+                                 msg_incom_func_t func,
+                                 void *arg);
 
-msg_endpoint_t* msg_s_get_endpoint (msg_socket_t*   msg_socket,
-                                    int             index);
+msg_endpoint_t *msg_s_get_endpoint(msg_socket_t   *msg_socket,
+                                   int             index);
 
-int msg_s_send (msg_endpoint_t*    recv_ep,
-                msg_t*             message);
+int msg_s_send(msg_endpoint_t    *recv_ep,
+               msg_t             *message);
 
 #ifdef __cplusplus
 }

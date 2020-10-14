@@ -23,7 +23,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
- 
+
 // --- Include section ---------------------------------------------------------
 
 #include "prjconf.h"
@@ -31,18 +31,18 @@
 #if defined (PRJCONF_UNIX) || \
     defined (PRJCONF_POSIX) || \
     defined (PRJCONF_LINUX)
-  #include <arpa/inet.h>
-  #include <fcntl.h>
-  #include <netinet/in.h>
-  #include <safe_lib.h>
-  #include <sys/ioctl.h>
-  #include <sys/socket.h>
-  #include <sys/un.h>
-  #include <termios.h>
-  #include <unistd.h>
+    #include <arpa/inet.h>
+    #include <fcntl.h>
+    #include <netinet/in.h>
+    #include <safe_lib.h>
+    #include <sys/ioctl.h>
+    #include <sys/socket.h>
+    #include <sys/un.h>
+    #include <termios.h>
+    #include <unistd.h>
 #elif defined (PRJCONF_WINDOWS)
-  #include <windows.h>
-  #include <winsock.h>
+    #include <windows.h>
+    #include <winsock.h>
 #endif
 
 #include "syssocket.h"
@@ -66,7 +66,7 @@ typedef union {
 // --- Local functions ---------------------------------------------------------
 
 
-static void sys_socket_get_address (sys_fd_t fd, sockinfo_t* sockinfo, char* address, size_t addr_len, uint16_t* port)
+static void sys_socket_get_address(sys_fd_t fd, sockinfo_t *sockinfo, char *address, size_t addr_len, uint16_t *port)
 {
 #if defined (PRJCONF_UNIX) || \
     defined (PRJCONF_POSIX) || \
@@ -78,14 +78,20 @@ static void sys_socket_get_address (sys_fd_t fd, sockinfo_t* sockinfo, char* add
     case AF_UNIX:
         if (getsockname(fd, (struct sockaddr *)&ss, &sslen) == 0) {
             struct sockaddr_un *un = (struct sockaddr_un *)&ss;
-            if (address != NULL) strcpy_s(address, addr_len, un->sun_path);
+            if (address != NULL) {
+                strcpy_s(address, addr_len, un->sun_path);
+            }
         }
-        if (port != NULL) *port = 0;
+        if (port != NULL) {
+            *port = 0;
+        }
         break;
 
     case AF_INET:
         inet_ntop(AF_INET, &sockinfo->af_inet.sin_addr, address, addr_len);
-        if (port != NULL) *port = ntohs(sockinfo->af_inet.sin_port);
+        if (port != NULL) {
+            *port = ntohs(sockinfo->af_inet.sin_port);
+        }
         break;
 
     default:
@@ -101,7 +107,7 @@ static void sys_socket_get_address (sys_fd_t fd, sockinfo_t* sockinfo, char* add
 
 // --- Global functions --------------------------------------------------------
 
-sys_fd_t sys_socket_open_server_unix (const char* socketname)
+sys_fd_t sys_socket_open_server_unix(const char *socketname)
 {
 #if defined (PRJCONF_UNIX) || \
     defined (PRJCONF_POSIX) || \
@@ -132,7 +138,7 @@ sys_fd_t sys_socket_open_server_unix (const char* socketname)
         return rc;
     }
 
-    rc = listen (fd, 32);
+    rc = listen(fd, 32);
     if (rc < 0) {
         perror("open unix server listen");
         close(fd);
@@ -146,7 +152,7 @@ sys_fd_t sys_socket_open_server_unix (const char* socketname)
 #endif
 }
 
-sys_fd_t sys_socket_open_client_unix (const char* socketname)
+sys_fd_t sys_socket_open_client_unix(const char *socketname)
 {
 #if defined (PRJCONF_UNIX) || \
     defined (PRJCONF_POSIX) || \
@@ -180,7 +186,7 @@ sys_fd_t sys_socket_open_client_unix (const char* socketname)
 #endif
 }
 
-sys_fd_t sys_socket_open_server_tcp (uint16_t port)
+sys_fd_t sys_socket_open_server_tcp(uint16_t port)
 {
 #if defined (PRJCONF_UNIX) || \
     defined (PRJCONF_POSIX) || \
@@ -197,7 +203,7 @@ sys_fd_t sys_socket_open_server_tcp (uint16_t port)
 
     // allow port to be reused. Especially for tests where the server is opened / closed in a short interval.
     int so_reuseport = 1;
-    rc = setsockopt(fd, SOL_SOCKET, SO_REUSEPORT, &so_reuseport, sizeof (so_reuseport));
+    rc = setsockopt(fd, SOL_SOCKET, SO_REUSEPORT, &so_reuseport, sizeof(so_reuseport));
     if (rc < 0) {
         perror("setsockopt SO_REUSEPORT");
         close(fd);
@@ -216,7 +222,7 @@ sys_fd_t sys_socket_open_server_tcp (uint16_t port)
         return rc;
     }
 
-    rc = listen (fd, 3);
+    rc = listen(fd, 3);
     if (rc < 0) {
         perror("listen tcp server");
         close(fd);
@@ -230,7 +236,7 @@ sys_fd_t sys_socket_open_server_tcp (uint16_t port)
 #endif
 }
 
-sys_fd_t sys_socket_open_client_tcp (const char* socketaddress, uint16_t port)
+sys_fd_t sys_socket_open_client_tcp(const char *socketaddress, uint16_t port)
 {
 #if defined (PRJCONF_UNIX) || \
     defined (PRJCONF_POSIX) || \
@@ -269,9 +275,9 @@ sys_fd_t sys_socket_open_client_tcp (const char* socketaddress, uint16_t port)
 #endif
 }
 
-void sys_socket_close (sys_fd_t fd)
+void sys_socket_close(sys_fd_t fd)
 {
-    #if defined (PRJCONF_UNIX) || \
+#if defined (PRJCONF_UNIX) || \
     defined (PRJCONF_POSIX) || \
     defined (PRJCONF_LINUX)
     close(fd);
@@ -279,7 +285,7 @@ void sys_socket_close (sys_fd_t fd)
 #endif
 }
 
-sys_fd_t sys_socket_accept (sys_fd_t server_fd, char* address, size_t address_len, uint16_t* port)
+sys_fd_t sys_socket_accept(sys_fd_t server_fd, char *address, size_t address_len, uint16_t *port)
 {
 #if defined (PRJCONF_UNIX) || \
     defined (PRJCONF_POSIX) || \
@@ -288,7 +294,7 @@ sys_fd_t sys_socket_accept (sys_fd_t server_fd, char* address, size_t address_le
     sockinfo_t  sockinfo;
     socklen_t   sockinfolen = sizeof(sockinfo_t);
 
-    fd = accept(server_fd, (struct sockaddr*)&sockinfo, &sockinfolen);
+    fd = accept(server_fd, (struct sockaddr *)&sockinfo, &sockinfolen);
     sys_socket_get_address(fd, &sockinfo, address, address_len, port);
     return fd;
 #elif defined (PRJCONF_WINDOWS)
@@ -297,7 +303,7 @@ sys_fd_t sys_socket_accept (sys_fd_t server_fd, char* address, size_t address_le
 #endif
 }
 
-ssize_t sys_socket_recv (sys_fd_t fd, void* buffer, size_t buffersize)
+ssize_t sys_socket_recv(sys_fd_t fd, void *buffer, size_t buffersize)
 {
 #if defined (PRJCONF_UNIX) || \
     defined (PRJCONF_POSIX) || \
@@ -309,7 +315,7 @@ ssize_t sys_socket_recv (sys_fd_t fd, void* buffer, size_t buffersize)
 #endif
 }
 
-ssize_t sys_socket_send (sys_fd_t fd, const void* buffer, size_t buffersize)
+ssize_t sys_socket_send(sys_fd_t fd, const void *buffer, size_t buffersize)
 {
 #if defined (PRJCONF_UNIX) || \
     defined (PRJCONF_POSIX) || \
@@ -321,7 +327,7 @@ ssize_t sys_socket_send (sys_fd_t fd, const void* buffer, size_t buffersize)
 #endif
 }
 
-void sys_socket_flush (sys_fd_t fd)
+void sys_socket_flush(sys_fd_t fd)
 {
 #if defined (PRJCONF_UNIX) || \
     defined (PRJCONF_POSIX) || \
@@ -332,7 +338,7 @@ void sys_socket_flush (sys_fd_t fd)
 #endif
 }
 
-size_t sys_socket_get_pending_sendq (sys_fd_t fd)
+size_t sys_socket_get_pending_sendq(sys_fd_t fd)
 {
 #if defined (PRJCONF_UNIX) || \
     defined (PRJCONF_POSIX) || \
@@ -347,7 +353,7 @@ size_t sys_socket_get_pending_sendq (sys_fd_t fd)
 #endif
 }
 
-size_t sys_socket_get_pending_recvq (sys_fd_t fd)
+size_t sys_socket_get_pending_recvq(sys_fd_t fd)
 {
 #if defined (PRJCONF_UNIX) || \
     defined (PRJCONF_POSIX) || \
@@ -362,7 +368,7 @@ size_t sys_socket_get_pending_recvq (sys_fd_t fd)
 #endif
 }
 
-void sys_socket_set_blocking (sys_fd_t fd, bool blocking)
+void sys_socket_set_blocking(sys_fd_t fd, bool blocking)
 {
 #if defined (PRJCONF_UNIX) || \
     defined (PRJCONF_POSIX) || \
@@ -370,13 +376,17 @@ void sys_socket_set_blocking (sys_fd_t fd, bool blocking)
     int opts;
 
     do {
-        opts = fcntl(fd ,F_GETFL);
+        opts = fcntl(fd, F_GETFL);
         if (opts < 0) {
             perror("fcntl(F_GETFL)");
             break;
         }
-        if (blocking) opts &= ~O_NONBLOCK;
-        else opts = (opts | O_NONBLOCK);
+        if (blocking) {
+            opts &= ~O_NONBLOCK;
+        }
+        else {
+            opts = (opts | O_NONBLOCK);
+        }
         if (fcntl(fd, F_SETFL, opts) < 0) {
             perror("fcntl(F_SETFL)");
             break;

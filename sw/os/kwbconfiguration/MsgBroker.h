@@ -3,7 +3,7 @@
  *
  * @{
  * @file    MsgBroker.h
- * @brief   Broker which sorts incomming messages to running actions. 
+ * @brief   Broker which sorts incomming messages to running actions.
  *
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
@@ -23,7 +23,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#pragma once 
+#pragma once
 
 // --- Include section ---------------------------------------------------------
 
@@ -43,11 +43,11 @@
 
 // --- Type definitions --------------------------------------------------------
 
-typedef std::function<bool(const msg_t&)> msg_filter_t;
+typedef std::function<bool(const msg_t &)> msg_filter_t;
 //typedef std::function<void(msg_t&)> msg_handler_t;
 
 typedef struct {
-    void*           reference;      //! Reference to identify this entry
+    void           *reference;      //! Reference to identify this entry
     msg_filter_t    msg_filter;
     incom_func_t    msg_handler;
 } msg_filter_data_t;
@@ -58,13 +58,14 @@ typedef struct {
 
 // --- Class definition --------------------------------------------------------
 
-class MsgBroker {
+class MsgBroker
+{
 public:
     MsgBroker();
-    void handleIncomingMessage(const msg_t & message, void* reference);
-    void registerForResponse(void* reference, msg_filter_t& filter_func, incom_func_t& handler_func);
-    void unregisterForResponse(void* reference);
-    
+    void handleIncomingMessage(const msg_t &message, void *reference);
+    void registerForResponse(void *reference, msg_filter_t &filter_func, incom_func_t &handler_func);
+    void unregisterForResponse(void *reference);
+
 protected:
     std::vector<msg_filter_data_t> response_handlers;
 };

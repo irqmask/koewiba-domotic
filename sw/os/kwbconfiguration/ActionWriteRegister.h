@@ -3,7 +3,7 @@
  *
  * @{
  * @file    ActionWriteRegister.h
- * @brief   Action: Write a register of a bus module. 
+ * @brief   Action: Write a register of a bus module.
  *
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
@@ -23,7 +23,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#pragma once 
+#pragma once
 
 // --- Include section ---------------------------------------------------------
 
@@ -45,24 +45,25 @@
 
 // --- Class definition --------------------------------------------------------
 
-class ActionWriteRegister : public ActionRequest {
+class ActionWriteRegister : public ActionRequest
+{
 public:
-    ActionWriteRegister(Connection & conn, MsgBroker & broker, uint16_t nodeId = 0, uint8_t registerId = 0);
-    
+    ActionWriteRegister(Connection &conn, MsgBroker &broker, uint16_t nodeId = 0, uint8_t registerId = 0);
+
     void setRegisterId(uint8_t registerId);
     uint8_t getRegisterId();
-    
+
     void setValue(int value);
     int getValue();
-    
+
     void setRegisterFormat(cmd_common_t format);
     cmd_common_t getRegisterFormat();
-    
+
 protected:
     uint8_t         registerId;
     cmd_common_t    registerFormat;
     int             value;
-    
+
     virtual bool formMessage();
 };
 

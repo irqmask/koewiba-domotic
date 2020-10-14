@@ -3,7 +3,7 @@
  *
  * @{
  * @file    socketserver.h
- * @brief   Wrapper class to provide a server for UNIX sockets or TCP sockets 
+ * @brief   Wrapper class to provide a server for UNIX sockets or TCP sockets
  *          using the /ref MESSAGE_SOCKET module.
  *
  * @author  Christian Verhalen
@@ -41,10 +41,10 @@
 class SocketServer
 {
 public:
-    SocketServer(ioloop_t* iol, Router* r);
+    SocketServer(ioloop_t *iol, Router *r);
     ~SocketServer();
 
-    void open(const char* address, uint16_t port);
+    void open(const char *address, uint16_t port);
     void close();
 
     void onNewConnection(ConnectionSocket *connection);
@@ -53,11 +53,11 @@ public:
 protected:
     SocketServer();
     static int acceptConnection(void *arg);
-    void lostConnection(const std::string & uri, void *reference);
+    void lostConnection(const std::string &uri, void *reference);
 
-    std::list<ConnectionSocket*> clients;   ///< list of connected clients
-    ioloop_t*                   ioloop;     ///< reference to ioloop
-    Router*                     router;     ///< reference to router
+    std::list<ConnectionSocket *> clients;  ///< list of connected clients
+    ioloop_t                   *ioloop;     ///< reference to ioloop
+    Router                     *router;     ///< reference to router
     sys_fd_t                    fd;         ///< Server file descriptor
 };
 

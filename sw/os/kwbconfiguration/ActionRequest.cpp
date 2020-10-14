@@ -3,7 +3,7 @@
  *
  * @{
  * @file    ActionRequest.cpp
- * @brief   Base-class of an action to be performed with a bus-module. 
+ * @brief   Base-class of an action to be performed with a bus-module.
  *
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
@@ -23,7 +23,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
- 
+
 // --- Include section ---------------------------------------------------------
 
 #include <chrono>
@@ -45,7 +45,7 @@
 // --- Class implementation  ---------------------------------------------------
 
 ActionRequest::ActionRequest(Connection   &conn,
-                             MsgBroker    &broker, 
+                             MsgBroker    &broker,
                              uint16_t     nodeId)
     : Action(conn, broker)
     , nodeId(nodeId)

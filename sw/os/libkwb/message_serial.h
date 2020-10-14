@@ -52,18 +52,18 @@ extern "C" {
 
 // --- Type definitions --------------------------------------------------------
 
-typedef void (*msg_newconn_func_t)(char* address, uint16_t port, void* reference, void* arg);
+typedef void (*msg_newconn_func_t)(char *address, uint16_t port, void *reference, void *arg);
 
 typedef struct msg_serial {
     sys_fd_t            fd;
-    ioloop_t*           ioloop;
+    ioloop_t           *ioloop;
     char                device[256];
     int                 baudrate;
     msg_incom_func_t    incoming_handler;
-    void*               incoming_arg;
+    void               *incoming_arg;
 
     // buffer for incomming messages
-    char                incoming_buffer[MAX_SERIAL_MSG_SIZE*2];
+    char                incoming_buffer[MAX_SERIAL_MSG_SIZE * 2];
     msg_t               incoming_message;
     uint8_t             incoming_state;
     uint8_t             incoming_num_received;
@@ -86,25 +86,25 @@ typedef struct msg_serial {
 
 // --- Global functions --------------------------------------------------------
 
-void msg_ser_init   (msg_serial_t*  msg_serial);
+void msg_ser_init(msg_serial_t  *msg_serial);
 
-int msg_ser_open    (msg_serial_t*  msg_serial,
-                     ioloop_t*      ioloop,
-                     const char*    device,
-                     int            baudrate);
+int msg_ser_open(msg_serial_t  *msg_serial,
+                 ioloop_t      *ioloop,
+                 const char    *device,
+                 int            baudrate);
 
-void msg_ser_close  (msg_serial_t*  msg_serial);
+void msg_ser_close(msg_serial_t  *msg_serial);
 
-void msg_ser_set_incoming_handler (msg_serial_t* msg_serial,
-                                    msg_incom_func_t func,
-                                    void* arg);
+void msg_ser_set_incoming_handler(msg_serial_t *msg_serial,
+                                  msg_incom_func_t func,
+                                  void *arg);
 
-int msg_ser_send    (msg_serial_t*  msg_serial,
-                     msg_t*         message);
+int msg_ser_send(msg_serial_t  *msg_serial,
+                 msg_t         *message);
 
-int msg_ser_continue_sending (msg_serial_t* msg_serial);
+int msg_ser_continue_sending(msg_serial_t *msg_serial);
 
-bool msg_ser_is_tx_empty (msg_serial_t* msg_serial);
+bool msg_ser_is_tx_empty(msg_serial_t *msg_serial);
 
 #ifdef __cplusplus
 }

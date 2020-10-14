@@ -39,14 +39,14 @@ extern "C" {
 
 // --- Type definitions --------------------------------------------------------
 
-/** 
- * Write byte callback function type. A function with this interface is called 
+/**
+ * Write byte callback function type. A function with this interface is called
  * every time a byte has to be written into target memory.
  * @param[in]   address     Address in target memory.
  * @param[in]   byte        Byte to be written.
  * @param[in]   arg         User defined argument.
- */ 
-typedef void (*ihex_write_byte_func)(uint32_t address, uint8_t byte, void* arg);
+ */
+typedef void (*ihex_write_byte_func)(uint32_t address, uint8_t byte, void *arg);
 
 typedef enum {
     e_ihex_eof = -1,
@@ -75,19 +75,19 @@ typedef enum {
 
 // --- Global functions --------------------------------------------------------
 
-int32_t ihex_read_file (const char*             filename,
-                        uint32_t*               start_address,
-                        uint32_t*               first_address,
-                        uint32_t*               last_address,
-                        ihex_write_byte_func    write_byte_func,
-                        void*                   arg);
+int32_t ihex_read_file(const char             *filename,
+                       uint32_t               *start_address,
+                       uint32_t               *first_address,
+                       uint32_t               *last_address,
+                       ihex_write_byte_func    write_byte_func,
+                       void                   *arg);
 
-int32_t ihex_read_file_mem (const char*         filename,
-                            uint32_t*           start_address,
-                            uint32_t*           first_address,
-                            uint32_t*           last_address,
-                            uint8_t*            target_memory,
-                            uint32_t            target_memory_size);
+int32_t ihex_read_file_mem(const char         *filename,
+                           uint32_t           *start_address,
+                           uint32_t           *first_address,
+                           uint32_t           *last_address,
+                           uint8_t            *target_memory,
+                           uint32_t            target_memory_size);
 
 #ifdef __cplusplus
 }

@@ -30,7 +30,7 @@
 
 #include <cstring>
 
-// include 
+// include
 #include "kwb_defines.h"
 // libsystem
 #include "syssocket.h"
@@ -45,23 +45,23 @@
 // will be called from /ref MESSAGE_SOCKET when a complete message has been
 // received and is passed to the common OnIncomingMessage() handler for all
 // type of connections.
-static void incomingMessageHdl(const msg_t & message, void* reference, void* arg)
+static void incomingMessageHdl(const msg_t &message, void *reference, void *arg)
 {
-    ConnectionSocket* sockcon = (ConnectionSocket*)arg;
+    ConnectionSocket *sockcon = (ConnectionSocket *)arg;
     sockcon->onIncomingMessage(message);
 }
 
-// will be called from /ref MESSAGE_SOCKET when a connection is closed. 
-static void closeConnectionHdl(const std::string & uri, void* reference, void* arg)
+// will be called from /ref MESSAGE_SOCKET when a connection is closed.
+static void closeConnectionHdl(const std::string &uri, void *reference, void *arg)
 {
-    ConnectionSocket* sockcon = (ConnectionSocket*)arg;
+    ConnectionSocket *sockcon = (ConnectionSocket *)arg;
     sockcon->onConnectionClosed();
 }
 
 // --- Class member functions --------------------------------------------------
 
 //----------------------------------------------------------------------------
-ConnectionSocket::ConnectionSocket(ioloop_t* io, std::string uri, sys_fd_t fd)
+ConnectionSocket::ConnectionSocket(ioloop_t *io, std::string uri, sys_fd_t fd)
     : Connection(io, uri)
     , fd(fd)
 {
@@ -75,11 +75,12 @@ ConnectionSocket::~ConnectionSocket()
 }
 
 //----------------------------------------------------------------------------
-void ConnectionSocket::getAddressAndPort(std::string uri, std::string & address, uint16_t & port)
+void ConnectionSocket::getAddressAndPort(std::string uri, std::string &address, uint16_t &port)
 {
     size_t pos;
-    if ((pos = uri.find_first_of(":")) == std::string::npos)
+    if ((pos = uri.find_first_of(":")) == std::string::npos) {
         throw InvalidParameter(LOC, "Invalid URI: %s!", uri.c_str());
+    }
 
     address = uri.substr(0, pos);
 
@@ -88,11 +89,12 @@ void ConnectionSocket::getAddressAndPort(std::string uri, std::string & address,
     try {
         temp = std::stoul(portstr);
     }
-    catch (std::exception & e) {
+    catch (std::exception &e) {
         throw InvalidParameter(LOC, "Invalid port number in URI %s", uri.c_str());
     }
-    if (temp > UINT16_MAX)
+    if (temp > UINT16_MAX) {
         throw InvalidParameter(LOC, "Invalid port number in URI %s", uri.c_str());
+    }
     port = (uint16_t)temp;
 }
 
@@ -111,7 +113,8 @@ void ConnectionSocket::open()
                     throw ConnectionFailed(LOC, "SOCKET Unable to connect client to unix socket server! address=%s syserror=%d %s",
                                            address.c_str(), err, strerror(err));
                 }
-            } else {
+            }
+            else {
                 fd = sys_socket_open_client_tcp(address.c_str(), port);
                 if (fd <= INVALID_FD) {
                     int err = errno;
@@ -122,8 +125,9 @@ void ConnectionSocket::open()
         }
 
         sys_socket_set_blocking(fd, false);
-        if (ioloop != nullptr)
+        if (ioloop != nullptr) {
             ioloop_register_fd(ioloop, fd, eIOLOOP_EV_READ, ConnectionSocket::receiveCallback, this);
+        }
 
         log_msg(KWB_LOG_STATUS, "SOCKET open connection to %s", this->getName().c_str());
     } while (0);
@@ -133,17 +137,18 @@ void ConnectionSocket::open()
 void ConnectionSocket::close()
 {
     if (fd != INVALID_FD) {
-        if (ioloop != nullptr)
+        if (ioloop != nullptr) {
             ioloop_unregister_fd(ioloop, fd, eIOLOOP_EV_UNKNOWN);
+        }
 
-        sys_socket_close (fd);
+        sys_socket_close(fd);
         fd = INVALID_FD;
         log_msg(KWB_LOG_STATUS, "SOCKET close connection to %s", this->getName().c_str());
     }
 }
 
 //----------------------------------------------------------------------------
-void ConnectionSocket::send(const msg_t & message)
+void ConnectionSocket::send(const msg_t &message)
 {
     ssize_t sent = sys_socket_send(fd, &message, sizeof(msg_t));
     if (sent != sizeof(msg_t)) {
@@ -179,7 +184,7 @@ void ConnectionSocket::receive()
 //----------------------------------------------------------------------------
 int32_t ConnectionSocket::receiveCallback(void *context)
 {
-    reinterpret_cast<ConnectionSocket*>(context)->receive();
+    reinterpret_cast<ConnectionSocket *>(context)->receive();
     return 0;
 }
 /** @} */

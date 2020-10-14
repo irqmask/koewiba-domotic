@@ -49,9 +49,9 @@
 typedef struct msg_bus {
     uint16_t            own_address;
     vos_t               vos;
-    ioloop_t*           ioloop;
+    ioloop_t           *ioloop;
     msg_incom_func_t    incomming_handler;
-    void*               incomming_arg;
+    void               *incomming_arg;
 
     sBus_t              bus;
     sSched_t            scheduler;
@@ -69,20 +69,20 @@ typedef struct msg_bus {
 
 // --- Global functions --------------------------------------------------------
 
-vos_t* msg_b_get_uart (uint8_t uart_index);
+vos_t *msg_b_get_uart(uint8_t uart_index);
 
-void msg_b_init (msg_bus_t* msg_bus, uint8_t uart_index);
+void msg_b_init(msg_bus_t *msg_bus, uint8_t uart_index);
 
-int msg_b_open (msg_bus_t*     msg_bus,
-                ioloop_t*      ioloop,
-                uint16_t       own_address,
-                bool           open_serial,
-                const char*    device_or_address,
-                int            baudrate_or_port);
+int msg_b_open(msg_bus_t     *msg_bus,
+               ioloop_t      *ioloop,
+               uint16_t       own_address,
+               bool           open_serial,
+               const char    *device_or_address,
+               int            baudrate_or_port);
 
-void msg_b_set_incomming_handler (msg_bus_t* msg_bus, msg_incom_func_t func, void* arg);
+void msg_b_set_incomming_handler(msg_bus_t *msg_bus, msg_incom_func_t func, void *arg);
 
-void msg_b_send (msg_bus_t* msg_bus, msg_t* message);
+void msg_b_send(msg_bus_t *msg_bus, msg_t *message);
 
 #endif /* _MESSAGE_BUS_H_ */
 /** @} */

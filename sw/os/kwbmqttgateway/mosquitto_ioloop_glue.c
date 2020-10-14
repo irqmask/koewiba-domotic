@@ -57,10 +57,10 @@
  * @param[in] Ponter to structure carrying application handles.
  * @returns always 0 meaning ioloop shall continue calling this callback.
  */
-static int on_read_handler(void* arg)
+static int on_read_handler(void *arg)
 {
     int rc = 0;
-    app_handles_t* h = (app_handles_t*)arg;
+    app_handles_t *h = (app_handles_t *)arg;
 
     rc = mosquitto_loop_read(h->mosq, 1);
     if (rc != 0) {
@@ -78,10 +78,10 @@ static int on_read_handler(void* arg)
  * @param[in] Ponter to structure carrying application handles.
  * @returns always 0 meaning ioloop shall continue calling this callback.
  */
-static int on_write_handler(void* arg)
+static int on_write_handler(void *arg)
 {
     int rc;
-    app_handles_t* h = (app_handles_t*)arg;
+    app_handles_t *h = (app_handles_t *)arg;
 
     rc = mosquitto_loop_write(h->mosq, 1);
     if (rc != 0) {
@@ -100,10 +100,10 @@ static int on_write_handler(void* arg)
  * @param[in] Ponter to structure carrying application handles.
  * @returns always 0 meaning ioloop shall continue calling this callback.
  */
-static int on_misc_handler(void* arg)
+static int on_misc_handler(void *arg)
 {
     int rc = 0;
-    app_handles_t* h = (app_handles_t*)arg;
+    app_handles_t *h = (app_handles_t *)arg;
 
     rc = mosquitto_loop_misc(h->mosq);
     if (rc != 0) {
@@ -125,7 +125,7 @@ static int on_misc_handler(void* arg)
  * @param[in] structure carrying all network (kwb and mqtt) handles of the application.
  * @returns 0 if successful otherwise error-code.
  */
-int mosquitto_connect_to_ioloop(app_handles_t* h)
+int mosquitto_connect_to_ioloop(app_handles_t *h)
 {
     int retval = eERR_NONE;
     sys_fd_t fd = INVALID_FD;
@@ -143,20 +143,23 @@ int mosquitto_connect_to_ioloop(app_handles_t* h)
     return retval;
 }
 
-/** 
+/**
  * Check if a MQTTmessage has to be written. If not suspend write callbacks.
  * @param[in] structure carrying all network (kwb and mqtt) handles of the application.
  */
-void mosquitto_ioloop_suspend_write(app_handles_t* h)
+void mosquitto_ioloop_suspend_write(app_handles_t *h)
 {
     sys_fd_t fd;
 
     fd = (sys_fd_t)mosquitto_socket(h->mosq);
-    if (fd == INVALID_FD) return;
+    if (fd == INVALID_FD) {
+        return;
+    }
 
     if (mosquitto_want_write(h->mosq) == true) {
         ioloop_register_fd(h->ioloop, fd, eIOLOOP_EV_WRITE, on_write_handler, h->mosq);
-    } else {
+    }
+    else {
         ioloop_unregister_fd(h->ioloop, fd, eIOLOOP_EV_WRITE);
     }
 }

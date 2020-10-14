@@ -3,7 +3,7 @@
  *
  * @{
  * @file    socketserver.cpp
- * @brief   Wrapper class to provide a server for UNIX sockets or TCP sockets 
+ * @brief   Wrapper class to provide a server for UNIX sockets or TCP sockets
  *          using the /ref MESSAGE_SOCKET module.
  *
  * @author  Christian Verhalen
@@ -40,10 +40,10 @@
 // --- Local functions ---------------------------------------------------------
 
 // callback from socket-server when a connection has been closed.
-static void close_connection(const char* address, uint16_t port, void* reference, void* arg)
+static void close_connection(const char *address, uint16_t port, void *reference, void *arg)
 {
-    SocketServer* server = static_cast<SocketServer*>(arg);
-    ConnectionSocket* client = static_cast<ConnectionSocket*>(reference);
+    SocketServer *server = static_cast<SocketServer *>(arg);
+    ConnectionSocket *client = static_cast<ConnectionSocket *>(reference);
     server->onCloseConnection(client);
 }
 
@@ -63,21 +63,21 @@ SocketServer::SocketServer()
 /**
  * Initialize the socket server.
  *
- * @param[in]   iol         Pointer to ioloop. Needed to connect a 
+ * @param[in]   iol         Pointer to ioloop. Needed to connect a
  *                          /refMESSAGE_SOCKET server-socket to
  *                          /refIOLOOP background io loop.
- * @param[in]   r           Pointer to router, which will be informed about a 
+ * @param[in]   r           Pointer to router, which will be informed about a
  *                          new connection to a client connected to the server.
  *                          The client will be added automatically to the routing list.
  */
-SocketServer::SocketServer(ioloop_t* iol, Router* r)
+SocketServer::SocketServer(ioloop_t *iol, Router *r)
 {
     SocketServer();
     this->ioloop = iol;
     this->router = r;
 }
 
-/** 
+/**
  * When a socket server is destroyed, close all remaining open connections
  * before.
  */
@@ -87,8 +87,8 @@ SocketServer::~SocketServer()
 }
 
 /**
- * Opens a new listening socket for either unix sockets or tcp sockets. If the 
- * port number is 0, a UNIX socket of name address will be opened otherwise a 
+ * Opens a new listening socket for either unix sockets or tcp sockets. If the
+ * port number is 0, a UNIX socket of name address will be opened otherwise a
  * TCP port.
  *
  * @param[in]   address     Name of unix socket or address of tcp socket.
@@ -96,13 +96,14 @@ SocketServer::~SocketServer()
  *
  * @returns eERR_None, if successful otherwise error code of #gen_errors_t.
  */
-void SocketServer::open(const char* address, uint16_t port)
+void SocketServer::open(const char *address, uint16_t port)
 {
     int retval;
 
     if (port == 0) {
         this->fd = sys_socket_open_server_unix(address);
-    } else {
+    }
+    else {
         this->fd = sys_socket_open_server_tcp(port);
     }
 
@@ -121,11 +122,11 @@ void SocketServer::open(const char* address, uint16_t port)
  */
 void SocketServer::close()
 {
-    for(auto client : clients) {
+    for (auto client : clients) {
         if (this->router != NULL) {
             this->router->removeConnection(client);
         }
-        delete(client);
+        delete (client);
     }
     clients.clear();
 }
@@ -134,7 +135,7 @@ void SocketServer::close()
  * Called when a new connection has been established.
  * @param[in]   endpoint    Pointer to established connection.
  */
-void SocketServer::onNewConnection(ConnectionSocket* connection)
+void SocketServer::onNewConnection(ConnectionSocket *connection)
 {
     clients.push_back(connection);
     if (this->router != nullptr) {
@@ -143,10 +144,10 @@ void SocketServer::onNewConnection(ConnectionSocket* connection)
 }
 
 /**
- * Call this function, when a client connection closes, so the client 
+ * Call this function, when a client connection closes, so the client
  * can be removed from client list.
  */
-void SocketServer::onCloseConnection(ConnectionSocket* connection)
+void SocketServer::onCloseConnection(ConnectionSocket *connection)
 {
     if (this->router != nullptr) {
         this->router->removeConnection(connection);
@@ -157,7 +158,7 @@ void SocketServer::onCloseConnection(ConnectionSocket* connection)
 
 int SocketServer::acceptConnection(void *arg)
 {
-    SocketServer* server = static_cast<SocketServer*>(arg);
+    SocketServer *server = static_cast<SocketServer *>(arg);
     char address[256];
     uint16_t port;
     sys_fd_t newFd;
@@ -173,11 +174,11 @@ int SocketServer::acceptConnection(void *arg)
     uriss << address << ":" << port;
 
     // create new connection
-    ConnectionSocket* conn = nullptr;
+    ConnectionSocket *conn = nullptr;
     try {
         conn = new ConnectionSocket(server->ioloop, uriss.str(), newFd);
     }
-    catch (std::exception & e) {
+    catch (std::exception &e) {
         sys_socket_close(newFd);
         return 0;
     }
@@ -190,10 +191,10 @@ int SocketServer::acceptConnection(void *arg)
     return 0;
 }
 
-void SocketServer::lostConnection(const std::string & uri, void *reference)
+void SocketServer::lostConnection(const std::string &uri, void *reference)
 {
     (uri);
-    ConnectionSocket *conn = static_cast<ConnectionSocket*>(reference);
+    ConnectionSocket *conn = static_cast<ConnectionSocket *>(reference);
     this->onCloseConnection(conn);
 }
 

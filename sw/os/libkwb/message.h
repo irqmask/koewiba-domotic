@@ -40,9 +40,9 @@ extern "C" {
 // --- Definitions -------------------------------------------------------------
 
 #if (BUS_MAXSENDMSGLEN > BUS_MAXRECVMSGLEN)
- #define MAX_MSG_SIZE   BUS_MAXSENDMSGLEN
+#define MAX_MSG_SIZE   BUS_MAXSENDMSGLEN
 #else
- #define MAX_MSG_SIZE   BUS_MAXRECVMSGLEN
+#define MAX_MSG_SIZE   BUS_MAXRECVMSGLEN
 #endif
 
 // --- Type definitions --------------------------------------------------------
@@ -60,8 +60,8 @@ typedef struct msg {
     uint16_t    crc;
 } msg_t;
 
-typedef void (*msg_incom_func_t)(msg_t* message, void* reference, void* arg);
-typedef void (*msg_conn_func_t)(const char* address, uint16_t port, void* reference, void* arg);
+typedef void (*msg_incom_func_t)(msg_t *message, void *reference, void *arg);
+typedef void (*msg_conn_func_t)(const char *address, uint16_t port, void *reference, void *arg);
 
 // --- Local variables ---------------------------------------------------------
 
@@ -81,13 +81,13 @@ typedef void (*msg_conn_func_t)(const char* address, uint16_t port, void* refere
  * @returns Converted message as string.
  * @note This function is not thread-safe!
  */
-const char* msg_to_string(const msg_t *message, uint8_t max_length);
+const char *msg_to_string(const msg_t *message, uint8_t max_length);
 
 /**
  * @param[in] keyword       Keyword to add to log message.
  * @param[in] message       Message to log.
  */
-void msg_log (const char *keyword, const msg_t *message);
+void msg_log(const char *keyword, const msg_t *message);
 
 #ifdef __cplusplus
 }

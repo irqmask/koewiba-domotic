@@ -38,9 +38,9 @@
 #if defined (PRJCONF_UNIX) || \
     defined (PRJCONF_POSIX) || \
     defined (PRJCONF_LINUX)
-  #include <sys/time.h>
+    #include <sys/time.h>
 #elif defined (PRJCONF_WINDOWS)
-  #include <windows.h>
+    #include <windows.h>
 #endif
 
 #ifdef __cplusplus
@@ -52,9 +52,9 @@ extern "C" {
 #if defined (PRJCONF_UNIX) || \
     defined (PRJCONF_POSIX) || \
     defined (PRJCONF_LINUX)
-  #define sys_sleep_ms(x) do{usleep((x)*1000);}while(0)
+#define sys_sleep_ms(x) do{usleep((x)*1000);}while(0)
 #elif defined (PRJCONF_WINDOWS)
-  #define sys_sleep_ms(x) do{Sleep(x);}while(0)
+#define sys_sleep_ms(x) do{Sleep(x);}while(0)
 #endif
 
 // --- Type definitions --------------------------------------------------------
@@ -73,7 +73,7 @@ typedef uint64_t sys_time_t;
 
 // --- Global functions --------------------------------------------------------
 
-sys_time_t sys_time_get_usecs (void);
+sys_time_t sys_time_get_usecs(void);
 
 #ifdef __cplusplus
 }

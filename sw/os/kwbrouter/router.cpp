@@ -55,9 +55,9 @@ Router::~Router()
  * @param[in]   reference   Reference to sender of the message.
  * @todo replace typeless reference with connection type.
  */
-void Router::onIncomingMessage(const msg_t & message, void* reference)
+void Router::onIncomingMessage(const msg_t &message, void *reference)
 {
-    Connection* sending_conn = static_cast<Connection*>(reference);
+    Connection *sending_conn = static_cast<Connection *>(reference);
     this->distributeMessage(message, sending_conn);
 }
 
@@ -66,7 +66,7 @@ void Router::onIncomingMessage(const msg_t & message, void* reference)
  *
  * @param[in]   connection  Connection to be added.
  */
-void Router::addConnection(Connection* connection)
+void Router::addConnection(Connection *connection)
 {
     connections.push_back(connection);
     using std::placeholders::_1;
@@ -78,12 +78,12 @@ void Router::addConnection(Connection* connection)
 }
 
 /**
- * Removes a connection from the routing list and unregisteres the router's 
+ * Removes a connection from the routing list and unregisteres the router's
  * callback from the connection.
  *
  * @param[in]   connection  Connection to be removed.
  */
-void Router::removeConnection(Connection* connection)
+void Router::removeConnection(Connection *connection)
 {
     log_info("Remove Closed connection:");
     listConnections(connection);
@@ -95,12 +95,17 @@ void Router::removeConnection(Connection* connection)
  * Distributes a received message from one connection to all other connection.
  * The message is not echoed back to the sender.
  */
-void Router::distributeMessage(const msg_t & message, Connection* sender)
+void Router::distributeMessage(const msg_t &message, Connection *sender)
 {
     for (auto conn : connections) {
-        if (conn == sender) continue;
-        if (!conn->addressIsInConnectionsSegment(message.receiver)) continue;
-        log_info("ROUTE FROM %s NODE %04X VIA %s TO NODE %04X msg %s", sender->getName().c_str(), message.sender, conn->getName().c_str(), message.receiver, msg_to_string(&message, 16));
+        if (conn == sender) {
+            continue;
+        }
+        if (!conn->addressIsInConnectionsSegment(message.receiver)) {
+            continue;
+        }
+        log_info("ROUTE FROM %s NODE %04X VIA %s TO NODE %04X msg %s", sender->getName().c_str(), message.sender,
+                 conn->getName().c_str(), message.receiver, msg_to_string(&message, 16));
         conn->send(message);
     }
 }
@@ -112,7 +117,8 @@ void Router::listConnections(Connection *current)
     for (auto conn : connections) {
         if (conn == current) {
             log_info("%02d: %15s (*)", index, conn->getName().c_str());
-        } else {
+        }
+        else {
             log_info("%02d: %15s", index, conn->getName().c_str());
         }
         index++;

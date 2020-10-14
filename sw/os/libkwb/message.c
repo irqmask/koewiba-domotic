@@ -35,7 +35,7 @@
 #if defined (PRJCONF_UNIX) || \
     defined (PRJCONF_POSIX) || \
     defined (PRJCONF_LINUX)
-  #include <safe_lib.h>
+    #include <safe_lib.h>
 #endif
 
 #include "kwb_defines.h"
@@ -60,7 +60,7 @@
 
 // --- Global functions --------------------------------------------------------
 
-const char* msg_to_string(const msg_t *message, uint8_t max_length)
+const char *msg_to_string(const msg_t *message, uint8_t max_length)
 {
     uint8_t remaining_length, ii;
     static char logline[1024];
@@ -69,7 +69,9 @@ const char* msg_to_string(const msg_t *message, uint8_t max_length)
     assert(message != NULL);
 
     remaining_length = message->length;
-    if (remaining_length > max_length) remaining_length = max_length;
+    if (remaining_length > max_length) {
+        remaining_length = max_length;
+    }
     logline[0] = '\0';
     ii = 0;
 
@@ -78,10 +80,12 @@ const char* msg_to_string(const msg_t *message, uint8_t max_length)
     while (remaining_length) {
         if (remaining_length > 1) {
             snprintf(tmp, sizeof(tmp), "%02X ", message->data[ii]);
-        } else {
+        }
+        else {
             if (message->length > max_length) {
                 snprintf(tmp, sizeof(tmp), "%02X ...", message->data[ii]);
-            } else {
+            }
+            else {
                 snprintf(tmp, sizeof(tmp), "%02X", message->data[ii]);
             }
         }
@@ -92,7 +96,7 @@ const char* msg_to_string(const msg_t *message, uint8_t max_length)
     return logline;
 }
 
-void msg_log (const char *keyword, const msg_t *message)
+void msg_log(const char *keyword, const msg_t *message)
 {
     bool first_line = true;
     uint8_t remaining_length, ii, bytes_in_line;
@@ -109,14 +113,16 @@ void msg_log (const char *keyword, const msg_t *message)
             if (first_line == true) {
                 first_line = false;
                 snprintf(logline, sizeof(logline), "%04X %04X %2d ", message->sender, message->receiver, message->length);
-            } else {
+            }
+            else {
                 snprintf(logline, sizeof(logline), "             ");
             }
         }
 
         if (remaining_length > 1 && bytes_in_line < 16) {
             snprintf(tmp, sizeof(tmp), "%02X ", message->data[ii]);
-        } else {
+        }
+        else {
             snprintf(tmp, sizeof(tmp), "%02X", message->data[ii]);
         }
         strcat_s(logline, sizeof(logline), tmp);

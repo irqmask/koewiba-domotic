@@ -130,30 +130,30 @@ typedef enum sys_ser_flowctrl {
 
 // --- Global functions --------------------------------------------------------
 
-sys_fd_t sys_serial_open (const char* device);
+sys_fd_t sys_serial_open(const char *device);
 
-void sys_serial_close (sys_fd_t fd);
+void sys_serial_close(sys_fd_t fd);
 
-int sys_serial_set_params (sys_fd_t            fd,
-                           sys_ser_baudrate_t  baudrate,
-                           sys_ser_databits_t  databits,
-                           sys_ser_parity_t    parity,
-                           sys_ser_stopbits_t  stopbits,
-                           sys_ser_flowctrl_t  flowcontrol);
+int sys_serial_set_params(sys_fd_t            fd,
+                          sys_ser_baudrate_t  baudrate,
+                          sys_ser_databits_t  databits,
+                          sys_ser_parity_t    parity,
+                          sys_ser_stopbits_t  stopbits,
+                          sys_ser_flowctrl_t  flowcontrol);
 
-ssize_t sys_serial_send (sys_fd_t fd, const void* buf, size_t bufsize);
+ssize_t sys_serial_send(sys_fd_t fd, const void *buf, size_t bufsize);
 
-ssize_t sys_serial_recv (sys_fd_t fd, void* buf, size_t bufsize);
+ssize_t sys_serial_recv(sys_fd_t fd, void *buf, size_t bufsize);
 
-void sys_serial_flush (sys_fd_t fd);
+void sys_serial_flush(sys_fd_t fd);
 
-size_t sys_serial_get_pending_sendq (sys_fd_t fd);
+size_t sys_serial_get_pending_sendq(sys_fd_t fd);
 
-size_t sys_serial_get_pending_recvq (sys_fd_t fd);
+size_t sys_serial_get_pending_recvq(sys_fd_t fd);
 
-void sys_serial_set_blocking (sys_fd_t fd, bool blocking);
+void sys_serial_set_blocking(sys_fd_t fd, bool blocking);
 
-sys_ser_baudrate_t sys_serial_baudrate (uint32_t baudrate);
+sys_ser_baudrate_t sys_serial_baudrate(uint32_t baudrate);
 
 #ifdef __cplusplus
 }

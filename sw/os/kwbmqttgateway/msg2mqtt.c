@@ -56,37 +56,37 @@
 
 // --- Global functions --------------------------------------------------------
 
-void msg2mqtt_regstate_8bit(msg_t* message, char* topic, size_t max_topic_len, char* msgtext, size_t max_msgtext_len)
+void msg2mqtt_regstate_8bit(msg_t *message, char *topic, size_t max_topic_len, char *msgtext, size_t max_msgtext_len)
 {
-    snprintf(topic, max_topic_len-1, "kwb/%04X/%04X/state8bit/%02X",
+    snprintf(topic, max_topic_len - 1, "kwb/%04X/%04X/state8bit/%02X",
              message->sender, message->receiver, message->data[1]);
-    topic[max_topic_len-1] = '\0';
-    snprintf(msgtext, max_msgtext_len-1, "%d",
+    topic[max_topic_len - 1] = '\0';
+    snprintf(msgtext, max_msgtext_len - 1, "%d",
              message->data[2]);
-    msgtext[max_msgtext_len-1] = '\0';
+    msgtext[max_msgtext_len - 1] = '\0';
 }
 
-void msg2mqtt_regstate_16bit(msg_t* message, char* topic, size_t max_topic_len, char* msgtext, size_t max_msgtext_len)
+void msg2mqtt_regstate_16bit(msg_t *message, char *topic, size_t max_topic_len, char *msgtext, size_t max_msgtext_len)
 {
     uint16_t value;
 
-    snprintf(topic, max_topic_len-1, "kwb/%04X/%04X/state16bit/%02X",
+    snprintf(topic, max_topic_len - 1, "kwb/%04X/%04X/state16bit/%02X",
              message->sender, message->receiver, message->data[1]);
-    topic[max_topic_len-1] = '\0';
+    topic[max_topic_len - 1] = '\0';
     value = message->data[2];
     value <<= 8;
     value |= message->data[3];
-    snprintf(msgtext, max_msgtext_len-1, "%d", value);
-    msgtext[max_msgtext_len-1] = '\0';
+    snprintf(msgtext, max_msgtext_len - 1, "%d", value);
+    msgtext[max_msgtext_len - 1] = '\0';
 }
 
-void msg2mqtt_regstate_32bit(msg_t* message, char* topic, size_t max_topic_len, char* msgtext, size_t max_msgtext_len)
+void msg2mqtt_regstate_32bit(msg_t *message, char *topic, size_t max_topic_len, char *msgtext, size_t max_msgtext_len)
 {
     uint32_t value;
 
-    snprintf(topic, max_topic_len-1, "kwb/%04X/%04X/state32bit/%02X",
+    snprintf(topic, max_topic_len - 1, "kwb/%04X/%04X/state32bit/%02X",
              message->sender, message->receiver, message->data[1]);
-    topic[max_topic_len-1] = '\0';
+    topic[max_topic_len - 1] = '\0';
     value = message->data[2];
     value <<= 8;
     value |= message->data[3];
@@ -94,18 +94,18 @@ void msg2mqtt_regstate_32bit(msg_t* message, char* topic, size_t max_topic_len, 
     value |= message->data[4];
     value <<= 8;
     value |= message->data[5];
-    snprintf(msgtext, max_msgtext_len-1, "%d", value);
-    msgtext[max_msgtext_len-1] = '\0';
+    snprintf(msgtext, max_msgtext_len - 1, "%d", value);
+    msgtext[max_msgtext_len - 1] = '\0';
 }
 
-void msg2mqtt_request_reg(msg_t* message, char* topic, size_t max_topic_len, char* msgtext, size_t max_msgtext_len)
+void msg2mqtt_request_reg(msg_t *message, char *topic, size_t max_topic_len, char *msgtext, size_t max_msgtext_len)
 {
-    snprintf(topic, max_topic_len-1, "kwb/%04X/%04X/requestreg",
+    snprintf(topic, max_topic_len - 1, "kwb/%04X/%04X/requestreg",
              message->sender, message->receiver);
-    topic[max_topic_len-1] = '\0';
-    snprintf(msgtext, max_msgtext_len-1, "%02X",
+    topic[max_topic_len - 1] = '\0';
+    snprintf(msgtext, max_msgtext_len - 1, "%02X",
              message->data[1]);
-    msgtext[max_msgtext_len-1] = '\0';
+    msgtext[max_msgtext_len - 1] = '\0';
 }
 
 /**
@@ -113,37 +113,37 @@ void msg2mqtt_request_reg(msg_t* message, char* topic, size_t max_topic_len, cha
  *
  * @param[in]   message KWB set register 8bit message which is transformed into MWTT message.
  */
-void msg2mqtt_set_reg_8bit(msg_t* message, char* topic, size_t max_topic_len, char* msgtext, size_t max_msgtext_len)
+void msg2mqtt_set_reg_8bit(msg_t *message, char *topic, size_t max_topic_len, char *msgtext, size_t max_msgtext_len)
 {
-    snprintf(topic, max_topic_len-1, "kwb/%04X/%04X/setreg8bit/%02X",
+    snprintf(topic, max_topic_len - 1, "kwb/%04X/%04X/setreg8bit/%02X",
              message->sender, message->receiver, message->data[1]);
-    topic[max_topic_len-1] = '\0';
-    snprintf(msgtext, max_msgtext_len-1, "%d",
+    topic[max_topic_len - 1] = '\0';
+    snprintf(msgtext, max_msgtext_len - 1, "%d",
              message->data[2]);
-    msgtext[max_msgtext_len-1] = '\0';
+    msgtext[max_msgtext_len - 1] = '\0';
 }
 
-void msg2mqtt_set_reg_16bit(msg_t* message, char* topic, size_t max_topic_len, char* msgtext, size_t max_msgtext_len)
+void msg2mqtt_set_reg_16bit(msg_t *message, char *topic, size_t max_topic_len, char *msgtext, size_t max_msgtext_len)
 {
     uint16_t value;
 
-    snprintf(topic, max_topic_len-1, "kwb/%04X/%04X/setreg16bit/%02X",
+    snprintf(topic, max_topic_len - 1, "kwb/%04X/%04X/setreg16bit/%02X",
              message->sender, message->receiver, message->data[1]);
-    topic[max_topic_len-1] = '\0';
+    topic[max_topic_len - 1] = '\0';
     value = message->data[2];
     value <<= 8;
     value |= message->data[3];
-    snprintf(msgtext, max_msgtext_len-1, "%d", value);
-    msgtext[max_msgtext_len-1] = '\0';
+    snprintf(msgtext, max_msgtext_len - 1, "%d", value);
+    msgtext[max_msgtext_len - 1] = '\0';
 }
 
-void msg2mqtt_set_reg_32bit(msg_t* message, char* topic, size_t max_topic_len, char* msgtext, size_t max_msgtext_len)
+void msg2mqtt_set_reg_32bit(msg_t *message, char *topic, size_t max_topic_len, char *msgtext, size_t max_msgtext_len)
 {
     uint32_t value;
 
-    snprintf(topic, max_topic_len-1, "kwb/%04X/%04X/setreg32bit/%02X",
+    snprintf(topic, max_topic_len - 1, "kwb/%04X/%04X/setreg32bit/%02X",
              message->sender, message->receiver, message->data[1]);
-    topic[max_topic_len-1] = '\0';
+    topic[max_topic_len - 1] = '\0';
     value = message->data[2];
     value <<= 8;
     value |= message->data[3];
@@ -151,29 +151,29 @@ void msg2mqtt_set_reg_32bit(msg_t* message, char* topic, size_t max_topic_len, c
     value |= message->data[4];
     value <<= 8;
     value |= message->data[5];
-    snprintf(msgtext, max_msgtext_len-1, "%d", value);
-    msgtext[max_msgtext_len-1] = '\0';
+    snprintf(msgtext, max_msgtext_len - 1, "%d", value);
+    msgtext[max_msgtext_len - 1] = '\0';
 }
 
-void msg2mqtt_sleep(msg_t* message, char* topic, size_t max_topic_len, char* msgtext, size_t max_msgtext_len)
+void msg2mqtt_sleep(msg_t *message, char *topic, size_t max_topic_len, char *msgtext, size_t max_msgtext_len)
 {
-    snprintf(topic, max_topic_len-1, "kwb/%04X/%04X",
+    snprintf(topic, max_topic_len - 1, "kwb/%04X/%04X",
              message->sender, message->receiver);
-    topic[max_topic_len-1] = '\0';
-    snprintf(msgtext, max_msgtext_len-1, "SLEEP");
-    msgtext[max_msgtext_len-1] = '\0';
+    topic[max_topic_len - 1] = '\0';
+    snprintf(msgtext, max_msgtext_len - 1, "SLEEP");
+    msgtext[max_msgtext_len - 1] = '\0';
 }
 
-void msg2mqtt_reset(msg_t* message, char* topic, size_t max_topic_len, char* msgtext, size_t max_msgtext_len)
+void msg2mqtt_reset(msg_t *message, char *topic, size_t max_topic_len, char *msgtext, size_t max_msgtext_len)
 {
-    snprintf(topic, max_topic_len-1, "kwb/%04X/%04X",
+    snprintf(topic, max_topic_len - 1, "kwb/%04X/%04X",
              message->sender, message->receiver);
-    topic[max_topic_len-1] = '\0';
-    snprintf(msgtext, max_msgtext_len-1, "RESET");
-    msgtext[max_msgtext_len-1] = '\0';
+    topic[max_topic_len - 1] = '\0';
+    snprintf(msgtext, max_msgtext_len - 1, "RESET");
+    msgtext[max_msgtext_len - 1] = '\0';
 }
 
-int msg2mqtt(msg_t* message, char* topic, size_t max_topic_len, char* msgtext, size_t max_msgtext_len)
+int msg2mqtt(msg_t *message, char *topic, size_t max_topic_len, char *msgtext, size_t max_msgtext_len)
 {
     int retval = eERR_NONE;
 

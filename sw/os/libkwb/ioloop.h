@@ -38,9 +38,9 @@
 #if defined (PRJCONF_UNIX) || \
     defined (PRJCONF_POSIX) || \
     defined (PRJCONF_LINUX)
-  #include <sys/types.h>
+    #include <sys/types.h>
 #elif defined (PRJCONF_WINDOWS)
-  #include <windows.h>
+    #include <windows.h>
 #endif
 
 #include "prjtypes.h"
@@ -61,15 +61,15 @@ typedef enum {
     eIOLOOP_EV_TIMER
 } ioloop_event_type_t;
 
-typedef int32_t (*ioloop_event_func_t)(void* arg);
+typedef int32_t (*ioloop_event_func_t)(void *arg);
 
 typedef struct ioloop_connection ioloop_connection_t;
 
 typedef struct ioloop_timer ioloop_timer_t;
 
 typedef struct ioloop {
-    ioloop_connection_t*    first_conn;
-    ioloop_timer_t*         first_timer;
+    ioloop_connection_t    *first_conn;
+    ioloop_timer_t         *first_timer;
     bool                    update_required;
 #if defined (PRJCONF_UNIX) || \
     defined (PRJCONF_POSIX) || \
@@ -80,7 +80,7 @@ typedef struct ioloop {
 #elif defined (PRJCONF_WINDOWS)
     uint32_t                num_list_entries;
     sys_fd_t                list_of_fds[MAXIMUM_WAIT_OBJECTS];
-    ioloop_connection_t*    list_of_conns[MAXIMUM_WAIT_OBJECTS];
+    ioloop_connection_t    *list_of_conns[MAXIMUM_WAIT_OBJECTS];
 #endif
     int32_t                 next_id;
     uint16_t                default_timeout_ticks;
@@ -98,33 +98,33 @@ typedef struct ioloop {
 
 // --- Global functions --------------------------------------------------------
 
-void ioloop_init (ioloop_t* ioloop);
+void ioloop_init(ioloop_t *ioloop);
 
-void ioloop_close(ioloop_t* ioloop);
+void ioloop_close(ioloop_t *ioloop);
 
-void ioloop_register_fd (ioloop_t* ioloop,
-                         sys_fd_t fd,
-                         ioloop_event_type_t eventtype,
-                         ioloop_event_func_t callback,
-                         void* arg);
+void ioloop_register_fd(ioloop_t *ioloop,
+                        sys_fd_t fd,
+                        ioloop_event_type_t eventtype,
+                        ioloop_event_func_t callback,
+                        void *arg);
 
-void ioloop_unregister_fd (ioloop_t* ioloop,                         
-                           sys_fd_t fd,
-                           ioloop_event_type_t eventtype);
+void ioloop_unregister_fd(ioloop_t *ioloop,
+                          sys_fd_t fd,
+                          ioloop_event_type_t eventtype);
 
-void ioloop_set_default_timeout (ioloop_t* ioloop,
-                                 uint16_t  timeout_ticks);
+void ioloop_set_default_timeout(ioloop_t *ioloop,
+                                uint16_t  timeout_ticks);
 
-int32_t ioloop_register_timer (ioloop_t*            ioloop,
-                               uint16_t             interval_ticks,
-                               bool                 run_cyclic,
-                               ioloop_event_func_t  callback,
-                               void*                arg);
+int32_t ioloop_register_timer(ioloop_t            *ioloop,
+                              uint16_t             interval_ticks,
+                              bool                 run_cyclic,
+                              ioloop_event_func_t  callback,
+                              void                *arg);
 
-void ioloop_unregister_timer (ioloop_t* ioloop,
-                              int32_t   id);
+void ioloop_unregister_timer(ioloop_t *ioloop,
+                             int32_t   id);
 
-void ioloop_run_once (ioloop_t* ioloop);
+void ioloop_run_once(ioloop_t *ioloop);
 
 #ifdef __cplusplus
 }

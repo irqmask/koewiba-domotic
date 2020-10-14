@@ -45,7 +45,8 @@
 // libsystem
 #include "syssocket.h"
 
-class ConnectionSerialTest : public ::testing::Test {
+class ConnectionSerialTest : public ::testing::Test
+{
 protected:
     void SetUp() override
     {
@@ -62,8 +63,8 @@ protected:
     }
 
 public:
-    void incomingCallback(const msg_t & message, void* reference);
-    void closeCallback(const std::string & uri, void* reference);
+    void incomingCallback(const msg_t &message, void *reference);
+    void closeCallback(const std::string &uri, void *reference);
 
     /// Counter how often the incoming callback has been called
     int                 incomingCallbackCalled;
@@ -97,7 +98,7 @@ protected:
 
     /// Send arbitrary data to the pipe
     /// @param[in]  data    Data to be sent. Needs to be 0 terminated!
-    void simpleSend(const char* data);
+    void simpleSend(const char *data);
 
     /// Run ioloop for given time
     /// Timeout may vary due to ioloops own timeout
@@ -112,13 +113,13 @@ msg_t ConnectionSerialTest::incomingMessage;
 char ConnectionSerialTest::outgoingMessage[256];
 constexpr char ConnectionSerialTest::PIPE_DEVICE_NAME[];
 
-void ConnectionSerialTest::incomingCallback(const msg_t & message, void* reference)
+void ConnectionSerialTest::incomingCallback(const msg_t &message, void *reference)
 {
     this->incomingCallbackCalled++;
     memcpy(&this->incomingMessage, &message, sizeof(msg_t));
 }
 
-void ConnectionSerialTest::closeCallback(const std::string & uri, void* reference)
+void ConnectionSerialTest::closeCallback(const std::string &uri, void *reference)
 {
     this->closeCallbackCalled++;
 }
@@ -155,7 +156,7 @@ void ConnectionSerialTest::stopEchoThread()
     }
 }
 
-void ConnectionSerialTest::simpleSend(const char* data)
+void ConnectionSerialTest::simpleSend(const char *data)
 {
     int fd = sys_serial_open(PIPE_DEVICE_NAME);
     if (fd != INVALID_FD) {
@@ -198,8 +199,9 @@ void ConnectionSerialTest::pipeRecvThread(ConnectionSerialTest *reference)
         }
     }
 
-    if (pfd.fd != INVALID_FD)
+    if (pfd.fd != INVALID_FD) {
         sys_serial_close(pfd.fd);
+    }
 }
 
 TEST_F(ConnectionSerialTest, fail_to_connect)
@@ -265,10 +267,14 @@ TEST_F(ConnectionSerialTest, send)
     message.sender = 0x0001;
     message.receiver = 0x0002;
     message.length = 8;
-    message.data[0] = 0x40; message.data[1] = 0x41;
-    message.data[2] = 0x42; message.data[3] = 0x43;
-    message.data[4] = 0x44; message.data[5] = 0x45;
-    message.data[6] = 0x46; message.data[7] = 0x47;
+    message.data[0] = 0x40;
+    message.data[1] = 0x41;
+    message.data[2] = 0x42;
+    message.data[3] = 0x43;
+    message.data[4] = 0x44;
+    message.data[5] = 0x45;
+    message.data[6] = 0x46;
+    message.data[7] = 0x47;
 
     conn->send(message);
     std::this_thread::sleep_for(std::chrono::milliseconds(100));

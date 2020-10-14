@@ -3,7 +3,7 @@
  *
  * @{
  * @file    ActionWriteRegister.cpp
- * @brief   Action: Query a register of a bus module and wait for the answer. 
+ * @brief   Action: Query a register of a bus module and wait for the answer.
  *
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
@@ -23,7 +23,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
- 
+
 // --- Include section ---------------------------------------------------------
 
 #include "prjconf.h"
@@ -64,10 +64,12 @@ uint8_t ActionWriteRegister::getRegisterId()
 {
     return this->registerId;
 }
-    
+
 bool ActionWriteRegister::formMessage()
 {
-    if (nodeId == 0) return false;
+    if (nodeId == 0) {
+        return false;
+    }
     messageToSend.receiver = nodeId;
     messageToSend.sender = connection.getOwnNodeId();
     messageToSend.data[0] = registerFormat;

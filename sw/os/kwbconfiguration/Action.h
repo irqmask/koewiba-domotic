@@ -3,7 +3,7 @@
  *
  * @{
  * @file    Action.h
- * @brief   Base-class of an action to be performed with a bus-module. 
+ * @brief   Base-class of an action to be performed with a bus-module.
  *
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
@@ -23,7 +23,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#pragma once 
+#pragma once
 
 // --- Include section ---------------------------------------------------------
 
@@ -46,7 +46,8 @@
 
 // --- Class definition --------------------------------------------------------
 
-class Action {
+class Action
+{
 public:
     Action(Connection &conn, MsgBroker &broker);
 
@@ -54,7 +55,7 @@ public:
     virtual void cancel() = 0;
     virtual bool isFinished();
     virtual bool hasTimedOut();
-    
+
 protected:
     MsgBroker                   &msgBroker;
     Connection                  &connection;

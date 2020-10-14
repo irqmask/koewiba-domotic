@@ -38,7 +38,7 @@
     defined (PRJCONF_LINUX)
 
 #elif defined (PRJCONF_WINDOWS)
-  #include <windows.h>
+    #include <windows.h>
 #endif
 
 #ifdef __cplusplus
@@ -61,8 +61,8 @@ extern "C" {
 
 // --- Global functions --------------------------------------------------------
 
-void sys_err_get_as_string (char* buffer, size_t buffersize);
-void sys_err_print_last (void);
+void sys_err_get_as_string(char *buffer, size_t buffersize);
+void sys_err_print_last(void);
 
 #ifdef __cplusplus
 }

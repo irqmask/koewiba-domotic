@@ -24,7 +24,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
- 
+
 // --- Include section ---------------------------------------------------------
 
 #include <assert.h>
@@ -49,7 +49,7 @@
 
 // --- Global functions --------------------------------------------------------
 
-int vos_open_serial (vos_t* vos, const char* device, int baudrate)
+int vos_open_serial(vos_t *vos, const char *device, int baudrate)
 {
     int rc = eERR_NONE;
 
@@ -79,7 +79,7 @@ int vos_open_serial (vos_t* vos, const char* device, int baudrate)
     return rc;
 }
 
-int vos_open_vbusd (vos_t* vos, const char* address, uint16_t port)
+int vos_open_vbusd(vos_t *vos, const char *address, uint16_t port)
 {
     int rc = eERR_NONE;
 
@@ -90,7 +90,8 @@ int vos_open_vbusd (vos_t* vos, const char* address, uint16_t port)
 
         if (port == 0) {
             vos->fd = sys_socket_open_client_unix(address);
-        } else {
+        }
+        else {
             vos->fd = sys_socket_open_client_tcp(address, port);
         }
         if (vos->fd <= INVALID_FD) {
@@ -104,7 +105,7 @@ int vos_open_vbusd (vos_t* vos, const char* address, uint16_t port)
     return rc;
 }
 
-void vos_close (vos_t* vos)
+void vos_close(vos_t *vos)
 {
     assert(vos != NULL);
 
@@ -120,7 +121,7 @@ void vos_close (vos_t* vos)
     }
 }
 
-size_t vos_send (vos_t* vos, void* buf, size_t bufsize)
+size_t vos_send(vos_t *vos, void *buf, size_t bufsize)
 {
     assert(vos != NULL);
 
@@ -137,7 +138,7 @@ size_t vos_send (vos_t* vos, void* buf, size_t bufsize)
     }
 }
 
-size_t vos_recv (vos_t* vos, void* buf, size_t bufsize)
+size_t vos_recv(vos_t *vos, void *buf, size_t bufsize)
 {
     assert(vos != NULL);
 
@@ -154,7 +155,7 @@ size_t vos_recv (vos_t* vos, void* buf, size_t bufsize)
     }
 }
 
-void vos_flush (vos_t* vos)
+void vos_flush(vos_t *vos)
 {
     assert(vos != NULL);
 
@@ -170,7 +171,7 @@ void vos_flush (vos_t* vos)
     }
 }
 
-size_t vos_get_pending (vos_t* vos)
+size_t vos_get_pending(vos_t *vos)
 {
     assert(vos != NULL);
 
@@ -187,7 +188,7 @@ size_t vos_get_pending (vos_t* vos)
     }
 }
 
-size_t vos_get_pending_send_bytes (vos_t* vos)
+size_t vos_get_pending_send_bytes(vos_t *vos)
 {
     assert(vos != NULL);
 

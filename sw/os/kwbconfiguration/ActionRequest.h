@@ -3,7 +3,7 @@
  *
  * @{
  * @file    ActionRequest.h
- * @brief   Base-class of an action which sends a request / message to a bus-module. 
+ * @brief   Base-class of an action which sends a request / message to a bus-module.
  *
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
@@ -23,7 +23,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#pragma once 
+#pragma once
 
 // --- Include section ---------------------------------------------------------
 
@@ -44,20 +44,21 @@
 
 // --- Class definition --------------------------------------------------------
 
-class ActionRequest : public Action {
+class ActionRequest : public Action
+{
 public:
-    ActionRequest(Connection & conn, MsgBroker & broker, uint16_t nodeId = 0);
-    
+    ActionRequest(Connection &conn, MsgBroker &broker, uint16_t nodeId = 0);
+
     bool start();
     virtual void cancel();
     virtual bool isFinished();
-        
+
     void setNodeID(uint16_t id);
     uint16_t getNodeID();
-    
+
 protected:
     virtual bool formMessage() = 0;
-    
+
     uint16_t nodeId;        //!< ID of node to perform action with.
     msg_t    messageToSend; //!< Message to be sent during this action.
 };

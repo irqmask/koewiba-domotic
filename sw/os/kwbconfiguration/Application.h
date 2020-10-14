@@ -3,7 +3,7 @@
  *
  * @{
  * @file    Application.h
- * @brief   Application frontend. 
+ * @brief   Application frontend.
  *
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
@@ -23,7 +23,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#pragma once 
+#pragma once
 
 // --- Include section ---------------------------------------------------------
 
@@ -52,22 +52,23 @@
 
 // --- Class definition --------------------------------------------------------
 
-class Application {
+class Application
+{
 public:
-    Application(Connection& conn, MsgBroker& broker, bool& endApplication);
-    
+    Application(Connection &conn, MsgBroker &broker, bool &endApplication);
+
     bool detectModules();
     std::vector<ActionQueryModules::Module> getDetectedModules();
     void selectModule(uint16_t nodeid);
     uint16_t getSelectedModule();
-    
-    bool readRegister(uint8_t registerId, int& value);
+
+    bool readRegister(uint8_t registerId, int &value);
     bool writeRegister(uint8_t registerId, int value);
-    bool verifyRegister(uint8_t registerId, int value, int& readValue);
+    bool verifyRegister(uint8_t registerId, int value, int &readValue);
     int getLastRegisterValue();
-    
+
     void end();
-    
+
 protected:
     std::vector<ActionQueryModules::Module> detected_modules;
     uint16_t            selectedModule;

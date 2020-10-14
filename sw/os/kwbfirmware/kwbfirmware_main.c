@@ -23,7 +23,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
- 
+
 // --- Include section ---------------------------------------------------------
 
 #include "prjconf.h"
@@ -36,8 +36,8 @@
 #if defined (PRJCONF_UNIX) || \
     defined (PRJCONF_POSIX) || \
     defined (PRJCONF_LINUX)
-  #include <safe_lib.h>
-  #include <unistd.h>
+    #include <safe_lib.h>
+    #include <unistd.h>
 #endif
 
 // include
@@ -71,9 +71,9 @@ typedef struct options {
     char        router_address[256];//!< Address of kwbrouter server.
     uint16_t    router_port;        //!< Port number of kwbrouter server.
     bool        serial_device_set;  //!< Flag: if set, serial device has been
-                                    //!< configured in the command line options.
+    //!< configured in the command line options.
     bool        router_address_set; //!< Flag: is set, router address has been
-                                    //!< configured in the command line options.
+    //!< configured in the command line options.
     char        filename[256];
     uint16_t    node_address;       //!< own node address
 } options_t;
@@ -98,12 +98,12 @@ typedef struct options {
  * @param[in]   node_address    Address of node of which the firmware will be
  *                              updated.
  */
-static void set_options (options_t*     options,
-                         const char*    serial_device,
-                         int            serial_baudrate,
-                         const char*    router_address,
-                         uint16_t       router_port,
-                         uint16_t       node_address)
+static void set_options(options_t     *options,
+                        const char    *serial_device,
+                        int            serial_baudrate,
+                        const char    *router_address,
+                        uint16_t       router_port,
+                        uint16_t       node_address)
 {
     memset(options, 0, sizeof(options_t));
 
@@ -129,14 +129,16 @@ static void set_options (options_t*     options,
  *          options have been read (in this case, default parameters will be
  *          used).
  */
-static bool parse_commandline_options (int argc, char* argv[], options_t* options)
+static bool parse_commandline_options(int argc, char *argv[], options_t *options)
 {
     bool                    rc = true;
     int                     c;
 
     while (1) {
         c = getopt(argc, argv, "d:b:a:p:n:f:v");
-        if (c == -1) break;
+        if (c == -1) {
+            break;
+        }
 
         switch (c) {
         case 'd':
@@ -180,7 +182,7 @@ static bool parse_commandline_options (int argc, char* argv[], options_t* option
  * @param[in,out]   options Structure where options are stored in.
  * @returns         true if options are constient and usable, otherwise false.
  */
- static bool validate_options(options_t* options)
+static bool validate_options(options_t *options)
 {
     bool    rc = false,
             serial_device_set = false,
@@ -212,10 +214,11 @@ static bool parse_commandline_options (int argc, char* argv[], options_t* option
 /**
  * Print usage notes to command prompt.
  */
-static void print_usage (void)
+static void print_usage(void)
 {
     fprintf(stderr, "\nUsage:\n");
-    fprintf(stderr, "kwbfirmware [-a <address>] [-p <port>] [-d <device>] [-b <baudrate>] [-n <node address>] [-f <path and filename to hex-file>]\n\n");
+    fprintf(stderr,
+            "kwbfirmware [-a <address>] [-p <port>] [-d <device>] [-b <baudrate>] [-n <node address>] [-f <path and filename to hex-file>]\n\n");
     fprintf(stderr, "Arguments:\n");
     fprintf(stderr, " -a <address>        Address of kwbrouter server. Default: /tmp/kwbr.usk\n");
     fprintf(stderr, " -p <port>           Port number of kwbrouter server. Default: 0\n");
@@ -225,14 +228,14 @@ static void print_usage (void)
     fprintf(stderr, " -f <filename>       Filename of firmware to update.\n");
     fprintf(stderr, " -v                  Verbose logging.\n");
 
-    #ifdef PRJCONF_WINDOWS
+#ifdef PRJCONF_WINDOWS
     fprintf(stderr, "\n" \
-                    "NOTE: serial ports enumerated greater or equal to COM10\n" \
-                    "      should be stated as follows: \\\\.\\COM10\n");
-    #endif // PRJCONF_WINDOWS
+            "NOTE: serial ports enumerated greater or equal to COM10\n" \
+            "      should be stated as follows: \\\\.\\COM10\n");
+#endif // PRJCONF_WINDOWS
 }
 
-static void print_progress (uint8_t progress, void* arg)
+static void print_progress(uint8_t progress, void *arg)
 {
     log_msg(LOG_STATUS, "Update progress %d", progress);
     log_msg(KWB_LOG_INFO, "Update progress %d", progress);
@@ -249,7 +252,7 @@ static void print_progress (uint8_t progress, void* arg)
  * @param[in]   argv    List of command line arguments.
  * @returns     0 if firmware has been updated in target node successfully.
  */
-int main (int argc, char* argv[])
+int main(int argc, char *argv[])
 {
     int                 rc = eERR_NONE;
     options_t           options;
@@ -260,7 +263,7 @@ int main (int argc, char* argv[])
     do {
         log_set_mask(0xFFFFFFFF & ~LOG_VERBOSE2);
         log_msg(KWB_LOG_INFO, "kwbfirmware...");
-        
+
         // set default options for kwbfirmware
         set_options(&options,
                     "/dev/ttyUSB0",                 // no serial device, use vbusd as default
@@ -280,12 +283,16 @@ int main (int argc, char* argv[])
         ioloop_set_default_timeout(&mainloop, 1);
 
         rc = firmware_update_init(&firmware, &mainloop, options.serial_device, options.serial_baudrate);
-        if (rc != eERR_NONE) break;
+        if (rc != eERR_NONE) {
+            break;
+        }
 
         firmware_register_progress_func(&firmware, print_progress, NULL);
 
         rc = firmware_update_start(&firmware, options.filename, options.node_address);
-        if (rc != eERR_NONE) break;
+        if (rc != eERR_NONE) {
+            break;
+        }
 
         while (!end_application) {
             ioloop_run_once(&mainloop);
@@ -293,16 +300,18 @@ int main (int argc, char* argv[])
             if (rc != eRUNNING) {
                 if (rc == eMSG_ERR_BUSY) {
                     sys_sleep_ms(100);
-                } else if (rc == eERR_NONE) {
+                }
+                else if (rc == eERR_NONE) {
                     log_msg(LOG_STATUS, "FIRMWARE UPDATE SUCCESSFULL!");
                     log_msg(LOG_STATUS, "Bootloader flags %02X", firmware.bldflags);
                     end_application = true;
-                } else {
+                }
+                else {
                     log_msg(LOG_STATUS, "FIRMWARE UPDATE FAILED!");
-                    log_msg(LOG_STATUS, "CRC expected %04X CRC calculated %04X", 
+                    log_msg(LOG_STATUS, "CRC expected %04X CRC calculated %04X",
                             firmware.node_crc_calculated, firmware.node_crc_expected);
                     log_msg(LOG_STATUS, "Bootloader flags %02X", firmware.bldflags);
-                    
+
                     end_application = true;
                 }
             }

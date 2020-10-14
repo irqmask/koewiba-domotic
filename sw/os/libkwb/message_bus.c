@@ -23,7 +23,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
- 
+
 // --- Include section ---------------------------------------------------------
 
 #include <assert.h>
@@ -42,7 +42,7 @@
 
 // --- Local variables ---------------------------------------------------------
 
-msg_bus_t* g_uarts[BUSPHY_MAX_DEVICES] = {
+msg_bus_t *g_uarts[BUSPHY_MAX_DEVICES] = {
     NULL, NULL, NULL, NULL
 };
 
@@ -52,9 +52,9 @@ msg_bus_t* g_uarts[BUSPHY_MAX_DEVICES] = {
 
 // --- Local functions ---------------------------------------------------------
 
-static int32_t msg_receive (void* arg)
+static int32_t msg_receive(void *arg)
 {
-    msg_bus_t*  msg_bus = (msg_bus_t*)arg;
+    msg_bus_t  *msg_bus = (msg_bus_t *)arg;
     msg_t       message;
 
     if (bus_get_message(&msg_bus->bus)) {
@@ -80,7 +80,7 @@ static int32_t msg_receive (void* arg)
 
 // --- Global functions --------------------------------------------------------
 
-vos_t* msg_b_get_uart (uint8_t uart_index)
+vos_t *msg_b_get_uart(uint8_t uart_index)
 {
     if (uart_index < BUSPHY_MAX_DEVICES) {
         if (g_uarts[uart_index] != NULL) {
@@ -90,7 +90,7 @@ vos_t* msg_b_get_uart (uint8_t uart_index)
     return NULL;
 }
 
-void msg_b_init (msg_bus_t* msg_bus, uint8_t uart_index)
+void msg_b_init(msg_bus_t *msg_bus, uint8_t uart_index)
 {
     assert(msg_bus != NULL);
 
@@ -101,12 +101,12 @@ void msg_b_init (msg_bus_t* msg_bus, uint8_t uart_index)
     }
 }
 
-int msg_b_open (msg_bus_t*     msg_bus,
-                ioloop_t*      ioloop,
-                uint16_t       own_address,
-                bool           open_serial,
-                const char*    device_or_address,
-                int            baudrate_or_port)
+int msg_b_open(msg_bus_t     *msg_bus,
+               ioloop_t      *ioloop,
+               uint16_t       own_address,
+               bool           open_serial,
+               const char    *device_or_address,
+               int            baudrate_or_port)
 {
     int             rc = eSYS_ERR_NONE;
 
@@ -119,15 +119,16 @@ int msg_b_open (msg_bus_t*     msg_bus,
 
         if (open_serial) {
             rc = vos_open_serial(&msg_bus->vos, device_or_address, baudrate_or_port);
-        } else {
+        }
+        else {
             rc = vos_open_vbusd(&msg_bus->vos, device_or_address, (uint16_t)baudrate_or_port);
         }
         if (rc != eERR_NONE) {
             break;
         }
 
-        ioloop_register_fd(ioloop, msg_bus->vos.fd, eIOLOOP_EV_READ, msg_receive, (void*)msg_bus);
-        ioloop_register_timer(ioloop, 10, true, eIOLOOP_EV_TIMER, msg_receive, (void*)msg_bus);
+        ioloop_register_fd(ioloop, msg_bus->vos.fd, eIOLOOP_EV_READ, msg_receive, (void *)msg_bus);
+        ioloop_register_timer(ioloop, 10, true, eIOLOOP_EV_TIMER, msg_receive, (void *)msg_bus);
 
         clk_initialize();
         bus_configure(&msg_bus->bus, own_address);
@@ -138,7 +139,7 @@ int msg_b_open (msg_bus_t*     msg_bus,
     return rc;
 }
 
-void msg_b_set_incomming_handler (msg_bus_t* msg_bus, msg_incom_func_t func, void* arg)
+void msg_b_set_incomming_handler(msg_bus_t *msg_bus, msg_incom_func_t func, void *arg)
 {
     assert(msg_bus != NULL);
 
@@ -146,7 +147,7 @@ void msg_b_set_incomming_handler (msg_bus_t* msg_bus, msg_incom_func_t func, voi
     msg_bus->incomming_arg = arg;
 }
 
-void msg_b_send (msg_bus_t* msg_bus, msg_t* message)
+void msg_b_send(msg_bus_t *msg_bus, msg_t *message)
 {
     assert(msg_bus != NULL);
     assert(message != NULL);

@@ -23,7 +23,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
- 
+
 // --- Include section ---------------------------------------------------------
 
 #include "prjconf.h"
@@ -35,7 +35,7 @@
 #if defined (PRJCONF_UNIX) || \
     defined (PRJCONF_POSIX) || \
     defined (PRJCONF_LINUX)
-#include <safe_lib.h>
+    #include <safe_lib.h>
 #endif
 
 // include
@@ -70,12 +70,12 @@ bool   g_end_application = false;
 
 // --- Local functions ---------------------------------------------------------
 
-static void handle_message(msg_t* message, void* reference, void* arg)
+static void handle_message(msg_t *message, void *reference, void *arg)
 {
     msg_log("RECV", message);
 }
 
-static void send_message(msg_endpoint_t* ep, uint16_t sender, uint16_t receiver, uint32_t message_type)
+static void send_message(msg_endpoint_t *ep, uint16_t sender, uint16_t receiver, uint32_t message_type)
 {
     msg_t message;
     message.sender = sender;
@@ -89,7 +89,7 @@ static void send_message(msg_endpoint_t* ep, uint16_t sender, uint16_t receiver,
     msg_s_send(ep, &message);
 }
 
-static void on_close_connection(const char* address, uint16_t port, void* reference, void* arg)
+static void on_close_connection(const char *address, uint16_t port, void *reference, void *arg)
 {
     g_end_application = true;
 }
@@ -98,12 +98,12 @@ static void on_close_connection(const char* address, uint16_t port, void* refere
 
 // --- Global functions --------------------------------------------------------
 
-int main (int argc, char* argv[])
+int main(int argc, char *argv[])
 {
     int             rc = eERR_NONE;
     ioloop_t        mainloop;
     msg_socket_t    msg_socket;
-    msg_endpoint_t* msg_ep;
+    msg_endpoint_t *msg_ep;
     int state = 1;
 
     do {

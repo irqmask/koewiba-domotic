@@ -10,7 +10,7 @@
  * Other programs eg a webserver or kwbupload a firmware uploader can connect
  * to kwbrouter to receive or send messages.
  *
- * @todo Add possibility to have two servers simultaneously, one for unix 
+ * @todo Add possibility to have two servers simultaneously, one for unix
  *       sockets, one for tcp sockets.
  * @todo Add possibility for router beeing a client to another router.
  *
@@ -77,7 +77,7 @@ typedef struct options {
     char        serial_device[256];         //!< Name of the serial device connection.
     int         serial_baudrate;            //!< Baudrate for the serial connection.
     char        unix_address[256];          //!< Address of the unix socket for
-                                            //!< local socket communication.
+    //!< local socket communication.
     char        remote_router_address[256]; //!< TCP address of the router to connect to.
     uint16_t    router_server_port;         //!< Listening port of the router
     bool        serial_device_set;          //!< Flag, if a serial device is configured.
@@ -107,13 +107,13 @@ typedef struct options {
  * @param[in]   router_server_port      Portnumber to use when listzening as server or connecting to as client.
  * @param[in]   own_node_id     Address of node over which this software communicates to the bus.
  */
-static void set_options (options_t*     options,
-                         const char*    serial_device,
-                         int            serial_baudrate,
-                         const char*    unix_address,
-                         const char*    remote_router_address,
-                         uint16_t       router_server_port,
-                         uint16_t       own_node_id)
+static void set_options(options_t     *options,
+                        const char    *serial_device,
+                        int            serial_baudrate,
+                        const char    *unix_address,
+                        const char    *remote_router_address,
+                        uint16_t       router_server_port,
+                        uint16_t       own_node_id)
 {
     memset(options, 0, sizeof(options_t));
 
@@ -144,7 +144,7 @@ static void set_options (options_t*     options,
  *          options have been read (in this case, default parameters will be
  *          used).
  */
-static bool parse_commandline_options (int argc, char* argv[], options_t* options)
+static bool parse_commandline_options(int argc, char *argv[], options_t *options)
 {
     bool                    rc = true;
     int                     c;
@@ -154,7 +154,9 @@ static bool parse_commandline_options (int argc, char* argv[], options_t* option
 
     while (1) {
         c = getopt(argc, argv, "d:b:a:p:o:");
-        if (c == -1) break;
+        if (c == -1) {
+            break;
+        }
 
         switch (c) {
         case 'd':
@@ -206,7 +208,7 @@ static bool parse_commandline_options (int argc, char* argv[], options_t* option
  * @param[in] options   Structure of options to check.
  * @returns true, if the options are valid, otherwise false.
  */
-static bool validate_options(options_t* options)
+static bool validate_options(options_t *options)
 {
     bool    rc = false;
 
@@ -239,10 +241,11 @@ static bool validate_options(options_t* options)
 /**
  * Explain briefly the command-line arguments of the application.
  */
-static void print_usage (void)
+static void print_usage(void)
 {
     fprintf(stderr, "\nUsage:\n");
-    fprintf(stderr, "kwbrouter [-a <address>] [-p <port>] [-d <device>] [-b <baudrate>] [-v <vbusd address>] [-w <vbusd port>] [-n <node address>]\n\n");
+    fprintf(stderr,
+            "kwbrouter [-a <address>] [-p <port>] [-d <device>] [-b <baudrate>] [-v <vbusd address>] [-w <vbusd port>] [-n <node address>]\n\n");
     fprintf(stderr, "Arguments:\n");
     fprintf(stderr, " -a <remote_address> As client: Address of remote kwbrouter server. e.g. 192.168.178.100:54321\n");
     fprintf(stderr, " -p <server_port>    As server: Port number to listen to.\n");
@@ -256,12 +259,14 @@ static void print_usage (void)
  * you'll get "file not found" error.
  * @todo consider moving this into /ref MESSAGE_SOCKET module.
  */
-static void create_unix_socket_file(options_t* options)
+static void create_unix_socket_file(options_t *options)
 {
-    FILE* file_handle;
+    FILE *file_handle;
 
     file_handle = fopen(options->remote_router_address, "w+");
-    if (file_handle != NULL) fclose(file_handle);
+    if (file_handle != NULL) {
+        fclose(file_handle);
+    }
 }
 
 // --- Module global functions -------------------------------------------------
@@ -271,7 +276,7 @@ static void create_unix_socket_file(options_t* options)
 /**
  * Entry point into kwbrouter application.
  */
-int main (int argc, char* argv[])
+int main(int argc, char *argv[])
 {
     int             rc = eERR_NONE;
     bool            end_application = false;
@@ -302,9 +307,9 @@ int main (int argc, char* argv[])
 
         ioloop_init(&mainloop);
 
-        Router* router = new Router();
+        Router *router = new Router();
 
-        ConnectionSerial* serconn = nullptr;
+        ConnectionSerial *serconn = nullptr;
         try {
             if (options.serial_device_set) {
                 serconn = new ConnectionSerial(&mainloop, options.serial_device);
@@ -316,12 +321,12 @@ int main (int argc, char* argv[])
                 router->addConnection(serconn);
             }
         }
-        catch (Exception & e) {
+        catch (Exception &e) {
             log_error("Opening serial connection to %s failed with exception %s!", options.serial_device, e.what());
             serconn = nullptr;
         }
 
-        ConnectionSocket* sockconn = nullptr;
+        ConnectionSocket *sockconn = nullptr;
         std::stringstream uriss;
         try {
             if (options.router_client_configured) {
@@ -330,19 +335,19 @@ int main (int argc, char* argv[])
                 router->addConnection(sockconn);
             }
         }
-        catch (Exception & e) {
+        catch (Exception &e) {
             log_error("Opening socket connection to %s: failed with exception %s!", uriss.str().c_str(), e.what());
             sockconn = nullptr;
         }
 
-        SocketServer* unix_socket_server = nullptr;
+        SocketServer *unix_socket_server = nullptr;
         try {
             // open new server and let-every connection auto-connect to router
             create_unix_socket_file(&options);
             unix_socket_server = new SocketServer(&mainloop, router);
             unix_socket_server->open(options.unix_address, 0);
         }
-        catch (Exception & e) {
+        catch (Exception &e) {
             log_error("Unable to open unix-socket connection at %s, error %s!", options.unix_address, e.what());
             if (unix_socket_server) {
                 delete unix_socket_server;
@@ -350,14 +355,14 @@ int main (int argc, char* argv[])
             }
         }
 
-        SocketServer* socket_server = nullptr;
+        SocketServer *socket_server = nullptr;
         try {
             if (options.router_server_configured) {
                 socket_server = new SocketServer(&mainloop, router);
                 socket_server->open("", options.router_server_port);
             }
         }
-        catch (Exception & e) {
+        catch (Exception &e) {
             log_error("Unable to open socket server listening at port %d, error %s!", options.router_server_port, e.what());
             if (socket_server) {
                 delete socket_server;

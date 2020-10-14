@@ -3,7 +3,7 @@
  *
  * @{
  * @file    ActionReadRegister.h
- * @brief   Action: Query a register of a bus module and wait for the answer. 
+ * @brief   Action: Query a register of a bus module and wait for the answer.
  *
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
@@ -23,7 +23,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#pragma once 
+#pragma once
 
 // --- Include section ---------------------------------------------------------
 
@@ -44,20 +44,21 @@
 
 // --- Class definition --------------------------------------------------------
 
-class ActionReadRegister : public ActionWithResponse {
+class ActionReadRegister : public ActionWithResponse
+{
 public:
-    ActionReadRegister(Connection & conn, MsgBroker & broker, uint16_t nodeId=0, uint8_t registerId=0);
-    
+    ActionReadRegister(Connection &conn, MsgBroker &broker, uint16_t nodeId = 0, uint8_t registerId = 0);
+
     void setRegisterId(uint8_t registerId);
     uint8_t getRegisterId();
-    
+
     int getValue();
-    
+
 protected:
     uint8_t registerId;
     virtual bool formMessage();
-    virtual bool filterResponse(const msg_t & message);
-    virtual void handleResponse(const msg_t & message, void* reference);
+    virtual bool filterResponse(const msg_t &message);
+    virtual void handleResponse(const msg_t &message, void *reference);
 };
 
 /** @} */

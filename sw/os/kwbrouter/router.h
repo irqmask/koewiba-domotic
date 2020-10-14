@@ -3,7 +3,7 @@
  *
  * @{
  * @file    router.h
- * @brief   Router takes incomming message from a connection and routes it to 
+ * @brief   Router takes incomming message from a connection and routes it to
  *          all other connections.
  *
  * @author  Christian Verhalen
@@ -35,11 +35,11 @@
 #include "connection.h"
 
 /**
- * The router takes incomming message from a connection and routes it to 
+ * The router takes incomming message from a connection and routes it to
  * all other connections.
- * The router is not thread-safe, it has to be used in a single threaded 
+ * The router is not thread-safe, it has to be used in a single threaded
  * loop.
- * The current design routes an incomming message from one connection to 
+ * The current design routes an incomming message from one connection to
  * all other connections.
  */
 class Router
@@ -48,21 +48,21 @@ public:
     Router();
     ~Router();
 
-    void addConnection(Connection* connection);
-    void removeConnection(Connection* connection);
+    void addConnection(Connection *connection);
+    void removeConnection(Connection *connection);
 
-    void distributeMessage(const msg_t & message, Connection* sender);
+    void distributeMessage(const msg_t &message, Connection *sender);
 
 protected:
-    void onIncomingMessage(const msg_t & message, void* reference);
+    void onIncomingMessage(const msg_t &message, void *reference);
 
     /**
      * Log current list of connections.
      * @param[in]   current     Mark current connection(optional)
      */
-    void listConnections(Connection* current);
+    void listConnections(Connection *current);
 
-    std::list<Connection*> connections;
+    std::list<Connection *> connections;
 };
 
 #endif // ROUTER_H

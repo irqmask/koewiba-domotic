@@ -66,7 +66,7 @@ public:
      * Send a KWB messgae over the serial connection.
      * @param[in]   message     KWB message to be sent
      */
-    virtual void send(const msg_t & message) override;
+    virtual void send(const msg_t &message) override;
 
 protected:
     /**
@@ -99,7 +99,7 @@ protected:
      * @param[in]   offset      Offset in buffer where to start writing
      * @param[in]   byte        Byte to convert
      */
-    void convertByteToAscii (char* buffer, uint8_t* offset, uint8_t byte);
+    void convertByteToAscii(char *buffer, uint8_t *offset, uint8_t byte);
 
     /**
      * Convert a character to a nibble (value 0..15)
@@ -107,7 +107,7 @@ protected:
      * @param[out]  nibble      Converted char as nibble
      * @return 0 if successful
      */
-    int convertCharToNibble(char c, uint8_t* nibble);
+    int convertCharToNibble(char c, uint8_t *nibble);
 
     /**
      * Conver message to serial readable representation
@@ -116,7 +116,7 @@ protected:
      * @param[in]   message     Message to convert to serial
      * @return size of serialized message.
      */
-    size_t formatSerialMessage(char* buffer, uint8_t buffersize, const msg_t & message);
+    size_t formatSerialMessage(char *buffer, uint8_t buffersize, const msg_t &message);
 
     /**
      * Reset incoming message state and buffer.
@@ -149,7 +149,7 @@ protected:
     sys_fd_t    fd;             //!< File descriptor of the serial connection
 
     // buffer for incomming messages
-    char        incomingBuffer[MAX_SERIAL_MSG_SIZE*2];
+    char        incomingBuffer[MAX_SERIAL_MSG_SIZE * 2];
     msg_t       incomingMessage;
     uint8_t     incomingState;
     uint8_t     incomingNumReceived;

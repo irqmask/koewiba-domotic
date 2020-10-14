@@ -37,7 +37,8 @@
 #include "log.h"
 #include "message.h"
 
-class ConnectionTest : public ::testing::Test {
+class ConnectionTest : public ::testing::Test
+{
 protected:
     void SetUp() override
     {
@@ -50,19 +51,19 @@ protected:
     // void TearDown() override {}
 
 public:
-    void incomingCallback(const msg_t & message, void* reference);
-    void closeCallback(const std::string & uri, void* reference);
+    void incomingCallback(const msg_t &message, void *reference);
+    void closeCallback(const std::string &uri, void *reference);
 
     int incomingCallbackCalled;
     int closeCallbackCalled;
 };
 
-void ConnectionTest::incomingCallback(const msg_t & message, void* reference)
+void ConnectionTest::incomingCallback(const msg_t &message, void *reference)
 {
     incomingCallbackCalled++;
 }
 
-void ConnectionTest::closeCallback(const std::string & uri, void* reference)
+void ConnectionTest::closeCallback(const std::string &uri, void *reference)
 {
     closeCallbackCalled++;
 }

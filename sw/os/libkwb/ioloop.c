@@ -33,10 +33,10 @@
 #if defined (PRJCONF_UNIX) || \
     defined (PRJCONF_POSIX) || \
     defined (PRJCONF_LINUX)
-  #include <sys/time.h>
-  #include <sys/types.h>
+    #include <sys/time.h>
+    #include <sys/types.h>
 #elif defined (PRJCONF_WINDOWS)
-  #include <windows.h>
+    #include <windows.h>
 #endif
 
 #include "ioloop.h"
@@ -47,22 +47,22 @@
 // --- Type definitions --------------------------------------------------------
 
 typedef struct ioloop_connection {
-    ioloop_connection_t*    next;
+    ioloop_connection_t    *next;
     sys_fd_t                fd;
     ioloop_event_type_t     eventtype;
     ioloop_event_func_t     callback;
-    void*                   arg;
+    void                   *arg;
 } ioloop_connection_t;
 
 typedef struct ioloop_timer {
-    ioloop_timer_t*         next;
+    ioloop_timer_t         *next;
     int32_t                 id;
     uint16_t                interval_ticks;
     uint16_t                last_hit;
     bool                    run_cyclic;
     ioloop_event_type_t     eventtype;
     ioloop_event_func_t     callback;
-    void*                   arg;
+    void                   *arg;
 } ioloop_timer_t;
 
 // --- Local variables ---------------------------------------------------------
@@ -73,12 +73,12 @@ typedef struct ioloop_timer {
 
 // --- Local functions ---------------------------------------------------------
 
-static ioloop_connection_t* ioloop_new_connection (ioloop_t* ioloop)
+static ioloop_connection_t *ioloop_new_connection(ioloop_t *ioloop)
 {
-    ioloop_connection_t* conn;
+    ioloop_connection_t *conn;
 
     do {
-        conn = (ioloop_connection_t*)calloc(1, sizeof(ioloop_connection_t));
+        conn = (ioloop_connection_t *)calloc(1, sizeof(ioloop_connection_t));
         if (conn == NULL) {
             perror("new ioloop connection could not be created");
             break;
@@ -88,12 +88,12 @@ static ioloop_connection_t* ioloop_new_connection (ioloop_t* ioloop)
     return conn;
 }
 
-static ioloop_timer_t* ioloop_new_timer (ioloop_t* ioloop)
+static ioloop_timer_t *ioloop_new_timer(ioloop_t *ioloop)
 {
-    ioloop_timer_t* timer;
+    ioloop_timer_t *timer;
 
     do {
-        timer = (ioloop_timer_t*)calloc(1, sizeof(ioloop_timer_t));
+        timer = (ioloop_timer_t *)calloc(1, sizeof(ioloop_timer_t));
         if (timer == NULL) {
             perror("new ioloop connection could not be created");
             break;
@@ -103,7 +103,7 @@ static ioloop_timer_t* ioloop_new_timer (ioloop_t* ioloop)
     return timer;
 }
 
-static int32_t ioloop_get_id (ioloop_t* ioloop)
+static int32_t ioloop_get_id(ioloop_t *ioloop)
 {
     int32_t id = -1;
 
@@ -112,16 +112,17 @@ static int32_t ioloop_get_id (ioloop_t* ioloop)
         if (ioloop->next_id == INT32_MAX) {
             // stop generating ids
             ioloop->next_id = -1;
-        } else {
+        }
+        else {
             ioloop->next_id++;
         }
     }
     return id;
 }
 
-static void ioloop_update_fd_sets (ioloop_t* ioloop)
+static void ioloop_update_fd_sets(ioloop_t *ioloop)
 {
-    ioloop_connection_t* conn;
+    ioloop_connection_t *conn;
 
     conn = ioloop->first_conn;
 
@@ -133,7 +134,8 @@ static void ioloop_update_fd_sets (ioloop_t* ioloop)
     while (conn != NULL) {
         if (conn->eventtype == eIOLOOP_EV_READ) {
             FD_SET(conn->fd, &ioloop->read_fd_set);
-        } else if (conn->eventtype == eIOLOOP_EV_WRITE) {
+        }
+        else if (conn->eventtype == eIOLOOP_EV_WRITE) {
             FD_SET(conn->fd, &ioloop->write_fd_set);
         }
         conn = conn->next;
@@ -151,7 +153,7 @@ static void ioloop_update_fd_sets (ioloop_t* ioloop)
     ioloop->update_required = false;
 }
 
-static void ioloop_insert_conn (ioloop_t* ioloop, ioloop_connection_t* conn)
+static void ioloop_insert_conn(ioloop_t *ioloop, ioloop_connection_t *conn)
 {
     // insert at beginning
     conn->next = ioloop->first_conn;
@@ -161,7 +163,7 @@ static void ioloop_insert_conn (ioloop_t* ioloop, ioloop_connection_t* conn)
 /**
  * Remove connection from active connection's list. Connection is not deleted.
  */
-static void ioloop_remove_conn (ioloop_t* ioloop, ioloop_connection_t* conn)
+static void ioloop_remove_conn(ioloop_t *ioloop, ioloop_connection_t *conn)
 {
     ioloop_connection_t *curr_conn, *prev_conn;
 
@@ -171,7 +173,8 @@ static void ioloop_remove_conn (ioloop_t* ioloop, ioloop_connection_t* conn)
         if (curr_conn == conn) {
             if (prev_conn != NULL) {
                 prev_conn->next = curr_conn->next;
-            } else {
+            }
+            else {
                 ioloop->first_conn = curr_conn->next;
             }
         }
@@ -183,13 +186,14 @@ static void ioloop_remove_conn (ioloop_t* ioloop, ioloop_connection_t* conn)
 /**
  * Remove timer into active timer's list.
  */
-static void ioloop_insert_timer (ioloop_t* ioloop, ioloop_timer_t* timer)
+static void ioloop_insert_timer(ioloop_t *ioloop, ioloop_timer_t *timer)
 {
     ioloop_timer_t *curr_timer, *prev_timer;
 
     if (ioloop->first_timer == NULL) {
         ioloop->first_timer = timer;
-    } else {
+    }
+    else {
         curr_timer = ioloop->first_timer;
         prev_timer = NULL;
         while (curr_timer != NULL) {
@@ -198,7 +202,8 @@ static void ioloop_insert_timer (ioloop_t* ioloop, ioloop_timer_t* timer)
                 if (prev_timer != NULL) {
                     // insert in between
                     prev_timer->next = timer;
-                } else {
+                }
+                else {
                     // insert at beginning
                     ioloop->first_timer = timer;
                 }
@@ -212,7 +217,7 @@ static void ioloop_insert_timer (ioloop_t* ioloop, ioloop_timer_t* timer)
 /**
  * Timer is removed from list, not deleted.
  */
-static void ioloop_remove_timer (ioloop_t* ioloop, ioloop_timer_t* timer)
+static void ioloop_remove_timer(ioloop_t *ioloop, ioloop_timer_t *timer)
 {
     ioloop_timer_t *curr_timer, *prev_timer;
 
@@ -222,7 +227,8 @@ static void ioloop_remove_timer (ioloop_t* ioloop, ioloop_timer_t* timer)
         if (curr_timer == timer) {
             if (prev_timer != NULL) {
                 prev_timer->next = curr_timer->next;
-            } else {
+            }
+            else {
                 ioloop->first_timer = curr_timer->next;
             }
         }
@@ -235,7 +241,7 @@ static void ioloop_remove_timer (ioloop_t* ioloop, ioloop_timer_t* timer)
  * Get current time and convert it into ticks.
  * @returns current time in ticks.
  */
-static uint16_t ioloop_get_current_ticks (void)
+static uint16_t ioloop_get_current_ticks(void)
 {
     sys_time_t      now;
 
@@ -252,7 +258,7 @@ static uint16_t ioloop_get_current_ticks (void)
  * @param[in]   ioloop      ioloop handle
  * @returns time in ticks until next timer timeout.
  */
-static uint16_t ioloop_get_next_timeout (ioloop_t* ioloop)
+static uint16_t ioloop_get_next_timeout(ioloop_t *ioloop)
 {
     uint16_t now, diff;
 
@@ -264,19 +270,23 @@ static uint16_t ioloop_get_next_timeout (ioloop_t* ioloop)
     // get difference time to now from first registered timer
     now = ioloop_get_current_ticks();
     diff = now - ioloop->first_timer->last_hit;
-    if (diff > ioloop->first_timer->interval_ticks) return 1;
-    else return (ioloop->first_timer->interval_ticks - diff);
+    if (diff > ioloop->first_timer->interval_ticks) {
+        return 1;
+    }
+    else {
+        return (ioloop->first_timer->interval_ticks - diff);
+    }
 }
 
 /**
  * Loop over registered timers, check timeout, call registered callbacks on timeout.
  * @param[in]   ioloop      ioloop handle
  */
-static void ioloop_check_timer (ioloop_t* ioloop)
+static void ioloop_check_timer(ioloop_t *ioloop)
 {
     int32_t         new_interval;
     uint16_t        now, diff;
-    ioloop_timer_t* timer;
+    ioloop_timer_t *timer;
 
     now = ioloop_get_current_ticks();
     timer = ioloop->first_timer;
@@ -295,12 +305,15 @@ static void ioloop_check_timer (ioloop_t* ioloop)
             // interval time remains unchanged, if return value of callback is 0.
             if (timer->run_cyclic && new_interval >= 0) {
                 if (new_interval > 0) {
-                    if (new_interval > INT16_MAX) new_interval = INT16_MAX;
+                    if (new_interval > INT16_MAX) {
+                        new_interval = INT16_MAX;
+                    }
                     timer->interval_ticks = new_interval;
                 }
                 timer->last_hit += timer->interval_ticks;
                 ioloop_insert_timer(ioloop, timer);
-            } else {
+            }
+            else {
                 free(timer);
             }
             // iterate over whole list again
@@ -315,7 +328,7 @@ static void ioloop_check_timer (ioloop_t* ioloop)
 
 // --- Global functions --------------------------------------------------------
 
-void ioloop_init (ioloop_t* ioloop)
+void ioloop_init(ioloop_t *ioloop)
 {
     assert(ioloop != NULL);
 
@@ -324,10 +337,10 @@ void ioloop_init (ioloop_t* ioloop)
     ioloop->update_required = true;
 }
 
-void ioloop_close(ioloop_t* ioloop)
+void ioloop_close(ioloop_t *ioloop)
 {
-    ioloop_connection_t* conn = NULL;
-    ioloop_timer_t* timer = NULL;
+    ioloop_connection_t *conn = NULL;
+    ioloop_timer_t *timer = NULL;
 
     assert(ioloop != NULL);
 
@@ -344,19 +357,21 @@ void ioloop_close(ioloop_t* ioloop)
     }
 }
 
-void ioloop_register_fd (ioloop_t*              ioloop,
-                         sys_fd_t               fd,
-                         ioloop_event_type_t    eventtype,
-                         ioloop_event_func_t    callback,
-                         void*                  arg)
+void ioloop_register_fd(ioloop_t              *ioloop,
+                        sys_fd_t               fd,
+                        ioloop_event_type_t    eventtype,
+                        ioloop_event_func_t    callback,
+                        void                  *arg)
 {
-    ioloop_connection_t* conn;
+    ioloop_connection_t *conn;
 
     assert(ioloop != NULL);
 
     do {
         conn = ioloop_new_connection(ioloop);
-        if (conn == NULL) break;
+        if (conn == NULL) {
+            break;
+        }
 
         conn->fd        = fd;
         conn->eventtype = eventtype;
@@ -368,23 +383,25 @@ void ioloop_register_fd (ioloop_t*              ioloop,
 #if defined (PRJCONF_UNIX) || \
     defined (PRJCONF_POSIX) || \
     defined (PRJCONF_LINUX)
-        if (fd > ioloop->highest_fd) ioloop->highest_fd = fd;
+        if (fd > ioloop->highest_fd) {
+            ioloop->highest_fd = fd;
+        }
 #endif
     } while (0);
 }
 
-void ioloop_unregister_fd (ioloop_t* ioloop,
-                           sys_fd_t fd,
-                           ioloop_event_type_t eventtype)
+void ioloop_unregister_fd(ioloop_t *ioloop,
+                          sys_fd_t fd,
+                          ioloop_event_type_t eventtype)
 {
-    ioloop_connection_t* conn;
+    ioloop_connection_t *conn;
 
     assert(ioloop != NULL);
 
     conn = ioloop->first_conn;
 
     while (conn != NULL) {
-        if (conn->fd == fd && 
+        if (conn->fd == fd &&
             (eventtype == eIOLOOP_EV_UNKNOWN || conn->eventtype == eventtype)) {
             ioloop_remove_conn(ioloop, conn);
             free(conn);
@@ -395,29 +412,31 @@ void ioloop_unregister_fd (ioloop_t* ioloop,
     ioloop->update_required = true;
 }
 
-void ioloop_set_default_timeout (ioloop_t* ioloop,
-                                 uint16_t  timeout_ticks)
+void ioloop_set_default_timeout(ioloop_t *ioloop,
+                                uint16_t  timeout_ticks)
 {
     assert(ioloop != NULL);
 
     ioloop->default_timeout_ticks = timeout_ticks;
 }
 
-int32_t ioloop_register_timer (ioloop_t*            ioloop,
-                               uint16_t             interval_ticks,
-                               bool                 run_cyclic,
-                               ioloop_event_func_t  callback,
-                               void*                arg)
+int32_t ioloop_register_timer(ioloop_t            *ioloop,
+                              uint16_t             interval_ticks,
+                              bool                 run_cyclic,
+                              ioloop_event_func_t  callback,
+                              void                *arg)
 {
     int32_t         id = -1;
-    ioloop_timer_t* timer;
+    ioloop_timer_t *timer;
     uint16_t        now;
 
     assert(ioloop != NULL);
 
     do {
         timer = ioloop_new_timer(ioloop);
-        if (timer == NULL) break;
+        if (timer == NULL) {
+            break;
+        }
 
         id = ioloop_get_id(ioloop);
         if (id < 0) {
@@ -439,16 +458,18 @@ int32_t ioloop_register_timer (ioloop_t*            ioloop,
     return id;
 }
 
-void ioloop_unregister_timer (ioloop_t* ioloop,
-                              int32_t   id)
+void ioloop_unregister_timer(ioloop_t *ioloop,
+                             int32_t   id)
 {
-    ioloop_timer_t* timer;
+    ioloop_timer_t *timer;
 
     assert(ioloop != NULL);
 
     timer = ioloop->first_timer;
 
-    if (timer == NULL) return;
+    if (timer == NULL) {
+        return;
+    }
 
     while (timer->next != NULL) {
         if (timer->next->id == id) {
@@ -460,14 +481,14 @@ void ioloop_unregister_timer (ioloop_t* ioloop,
     }
 }
 
-void ioloop_run_once (ioloop_t* ioloop)
+void ioloop_run_once(ioloop_t *ioloop)
 {
 #if defined (PRJCONF_UNIX) || \
     defined (PRJCONF_POSIX) || \
     defined (PRJCONF_LINUX)
 
     int                     rc;
-    ioloop_connection_t*    conn;
+    ioloop_connection_t    *conn;
     sys_time_t              timeout_us;
     struct timeval          timeout;
     sys_fd_t                highest_fd;
@@ -486,8 +507,11 @@ void ioloop_run_once (ioloop_t* ioloop)
     // calculate highest fd for select
     if (ioloop->highest_fd > 0) {
         highest_fd = ioloop->highest_fd;
-        if (highest_fd < FD_SETSIZE) highest_fd += 1;
-    } else {
+        if (highest_fd < FD_SETSIZE) {
+            highest_fd += 1;
+        }
+    }
+    else {
         highest_fd = FD_SETSIZE;
     }
 
@@ -518,7 +542,8 @@ void ioloop_run_once (ioloop_t* ioloop)
                     conn->callback != NULL) {
                     conn->callback(conn->arg);
                 }
-            } else if (conn->eventtype == eIOLOOP_EV_WRITE) {
+            }
+            else if (conn->eventtype == eIOLOOP_EV_WRITE) {
                 if (FD_ISSET(conn->fd, &write_fds) &&
                     conn->callback != NULL) {
                     conn->callback(conn->arg);
@@ -526,7 +551,9 @@ void ioloop_run_once (ioloop_t* ioloop)
             }
 
             // prevent reusing conn when ioloop needs an update
-            if (ioloop->update_required) break;
+            if (ioloop->update_required) {
+                break;
+            }
 
             conn = conn->next;
         }
@@ -536,7 +563,7 @@ void ioloop_run_once (ioloop_t* ioloop)
     ioloop_check_timer(ioloop);
 #elif defined (PRJCONF_WINDOWS)
     uint32_t                rc, timeout_ms;
-    ioloop_connection_t*    conn;
+    ioloop_connection_t    *conn;
 
     assert(ioloop != NULL);
 

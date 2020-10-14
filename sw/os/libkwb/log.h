@@ -50,7 +50,7 @@ extern "C" {
 #define LOG_VERBOSE4    0x00000100
 
 #define LOG_STANDARD_MASK (LOG_ERROR | LOG_WARNING | LOG_INFO)
-    
+
 #define LOG_MAX_MESSAGE_LENGTH 256
 
 // --- Type definitions --------------------------------------------------------
@@ -69,23 +69,23 @@ typedef uint32_t log_mask_t;
 
 // --- Global functions --------------------------------------------------------
 
-void log_set_mask (log_mask_t logmask);
+void log_set_mask(log_mask_t logmask);
 
-log_mask_t log_get_mask (void);
+log_mask_t log_get_mask(void);
 
-void log_add_mask (log_mask_t logmask);
+void log_add_mask(log_mask_t logmask);
 
-void log_add_prefix (const char* pref);
+void log_add_prefix(const char *pref);
 
-void log_msg (log_mask_t logmask, const char* logmessage, ...);
+void log_msg(log_mask_t logmask, const char *logmessage, ...);
 
-void log_info(const char* logmessage, ...);
+void log_info(const char *logmessage, ...);
 
-void log_warning(const char* logmessage, ...);
+void log_warning(const char *logmessage, ...);
 
-void log_error (const char* logmessage, ...);
+void log_error(const char *logmessage, ...);
 
-void log_sys_error (const char* logmessage, ...);
+void log_sys_error(const char *logmessage, ...);
 
 #ifdef __cplusplus
 }

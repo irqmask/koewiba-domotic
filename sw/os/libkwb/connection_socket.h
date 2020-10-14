@@ -66,13 +66,13 @@ public:
      * @note This is not a complete implementation of a URI parser as defined
      *       in RFC 3986
      */
-    static void getAddressAndPort(std::string uri, std::string & address, uint16_t & port);
+    static void getAddressAndPort(std::string uri, std::string &address, uint16_t &port);
 
     /**
      * Send a KWB messgae over the socket connection.
      * @param[in]   message     KWB message to be sent
      */
-    virtual void send(const msg_t & message) override;
+    virtual void send(const msg_t &message) override;
 
 protected:
     /**

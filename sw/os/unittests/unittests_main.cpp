@@ -46,7 +46,7 @@
 
 // --- Global functions --------------------------------------------------------
 
-int main (int argc, char* argv[])
+int main(int argc, char *argv[])
 {
     int rc;
     testing::InitGoogleTest(&argc, argv);

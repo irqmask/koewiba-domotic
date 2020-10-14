@@ -46,7 +46,7 @@
 
 // --- Local functions ---------------------------------------------------------
 
-static void debug_log_hex (const uint8_t byte)
+static void debug_log_hex(const uint8_t byte)
 {
     static int count = 0;
     printf("%02X ", byte);
@@ -57,7 +57,7 @@ static void debug_log_hex (const uint8_t byte)
     }
 }
 
-static void debug_log_hex_len (const uint8_t* data, uint8_t len)
+static void debug_log_hex_len(const uint8_t *data, uint8_t len)
 {
     while (len--) {
         debug_log_hex(*data++);
@@ -73,21 +73,23 @@ static void debug_log_hex_len (const uint8_t* data, uint8_t len)
  * @param[in] phy       Handle of bus physical layer.
  * @param[in] uart      Number of the UART. 0=first.
  */
-void bus_phy_initialize(sBusPhy_t* phy, uint8_t uart)
+void bus_phy_initialize(sBusPhy_t *phy, uint8_t uart)
 {
     phy->uCurrentBytesToSend = 0;
     phy->uUart = uart;
     phy->uFlags = 0;
 
     do {
-        if (uart >= BUSPHY_MAX_DEVICES) break;
+        if (uart >= BUSPHY_MAX_DEVICES) {
+            break;
+        }
 
         // sender is initial off, receiver is always on.
         bus_phy_activate_sender(phy, false);
 #ifndef BUS_TXRX_COMBINED
         bus_phy_activate_receiver(phy, true);
 #endif
-    } while ( false );
+    } while (false);
 }
 
 /**
@@ -96,7 +98,7 @@ void bus_phy_initialize(sBusPhy_t* phy, uint8_t uart)
  * @param[in] phy       Handle of bus physical layer.
  * @param[in] activate  true: activate sender, false: deactivate sender.
  */
-void bus_phy_activate_sender(sBusPhy_t* phy, bool activate)
+void bus_phy_activate_sender(sBusPhy_t *phy, bool activate)
 {
     // insert code for sender activation here, if needed.
 }
@@ -108,7 +110,7 @@ void bus_phy_activate_sender(sBusPhy_t* phy, bool activate)
  * @param[in] activate true: activate receiver, false: deactivate receiver.
  */
 #ifndef BUS_TXRX_COMBINED
-void bus_phy_activate_receiver(sBusPhy_t* phy, bool activate)
+void bus_phy_activate_receiver(sBusPhy_t *phy, bool activate)
 {
     // insert code for receiver activation here, if needed.
 }
@@ -124,7 +126,7 @@ void bus_phy_activate_receiver(sBusPhy_t* phy, bool activate)
  *
  * @returns true: sending successfully initiated, otherwise false.
  */
-bool bus_phy_send(sBusPhy_t* phy, const uint8_t* msg, uint8_t len)
+bool bus_phy_send(sBusPhy_t *phy, const uint8_t *msg, uint8_t len)
 {
     bool rc = true;
 
@@ -136,9 +138,10 @@ bool bus_phy_send(sBusPhy_t* phy, const uint8_t* msg, uint8_t len)
     //psPhy->puSendPtr = puMsg;
 
     bus_phy_activate_sender(phy, true);
-    if (vos_send(msg_b_get_uart(phy->uUart), (void*)msg, len) == len) {
+    if (vos_send(msg_b_get_uart(phy->uUart), (void *)msg, len) == len) {
         phy->uFlags &= ~e_uarttxflag;
-    } else {
+    }
+    else {
         perror("bus_phy_send");
         rc = false;
     }
@@ -158,7 +161,7 @@ bool bus_phy_send(sBusPhy_t* phy, const uint8_t* msg, uint8_t len)
  *
  * @returns true:       sending in progress.
  */
-bool bus_phy_sending(sBusPhy_t* phy)
+bool bus_phy_sending(sBusPhy_t *phy)
 {
     return (vos_get_pending_send_bytes(msg_b_get_uart(phy->uUart)) != 0);
 }
@@ -170,7 +173,7 @@ bool bus_phy_sending(sBusPhy_t* phy)
  *
  * @returns true: at least one byte is waiting in receive buffer.
  */
-bool bus_phy_data_received(sBusPhy_t* phy)
+bool bus_phy_data_received(sBusPhy_t *phy)
 {
     return (vos_get_pending(msg_b_get_uart(phy->uUart)) > 0);
 }
@@ -183,7 +186,7 @@ bool bus_phy_data_received(sBusPhy_t* phy)
  *
  * @returns true if a byte has been received, otherwise false.
  */
-bool bus_phy_read_byte(sBusPhy_t* phy, uint8_t *byte)
+bool bus_phy_read_byte(sBusPhy_t *phy, uint8_t *byte)
 {
     bool rc = true;
 
@@ -200,7 +203,7 @@ bool bus_phy_read_byte(sBusPhy_t* phy, uint8_t *byte)
  * @param[in] phy
  * Handle of bus physical layer.
  */
-void bus_phy_flush(sBusPhy_t* phy)
+void bus_phy_flush(sBusPhy_t *phy)
 {
     vos_flush(msg_b_get_uart(phy->uUart));
 }

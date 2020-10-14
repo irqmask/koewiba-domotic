@@ -5,7 +5,7 @@
 
 #include "exceptions.h"
 
-Exception::Exception(const char* file, uint32_t line, const char* function)
+Exception::Exception(const char *file, uint32_t line, const char *function)
     : std::exception()
     , file(file)
     , line(line)
@@ -18,7 +18,7 @@ Exception::Exception(const char* file, uint32_t line, const char* function)
 
 
 
-const char* Exception::what() const NOEXCEPT
+const char *Exception::what() const NOEXCEPT
 {
     return full_message;
 }

@@ -31,7 +31,7 @@
 #include <cstring>
 #include <sstream>
 
-// include 
+// include
 #include "kwb_defines.h"
 // libsystem
 #include "sysserial.h"
@@ -46,23 +46,23 @@
 // will be called when a complete message has been
 // received and is passed to the common OnIncomingMessage() handler for all
 // type of connections.
-static void incomingMessageHdl(const msg_t & message, void* reference, void* arg)
+static void incomingMessageHdl(const msg_t &message, void *reference, void *arg)
 {
-    ConnectionSerial* sercon = (ConnectionSerial*)arg;
+    ConnectionSerial *sercon = (ConnectionSerial *)arg;
     sercon->onIncomingMessage(message);
 }
 
 // will be called from when a connection is closed.
-static void closeConnectionHdl(const std::string & uri, void* reference, void* arg)
+static void closeConnectionHdl(const std::string &uri, void *reference, void *arg)
 {
-    ConnectionSerial* sercon = (ConnectionSerial*)arg;
+    ConnectionSerial *sercon = (ConnectionSerial *)arg;
     sercon->onConnectionClosed();
 }
 
 // --- Class member functions --------------------------------------------------
 
 //----------------------------------------------------------------------------
-ConnectionSerial::ConnectionSerial(ioloop_t* io, std::string uri, bool configure)
+ConnectionSerial::ConnectionSerial(ioloop_t *io, std::string uri, bool configure)
     : Connection(io, uri)
     , baudrate(57600)
 {
@@ -106,25 +106,27 @@ void ConnectionSerial::open(bool configure)
     }
     sys_serial_flush(fd);
 
-    if (ioloop != nullptr)
+    if (ioloop != nullptr) {
         ioloop_register_fd(ioloop, fd, eIOLOOP_EV_READ, ConnectionSerial::receiveCallback, this);
+    }
 }
 
 //----------------------------------------------------------------------------
 void ConnectionSerial::close()
 {
     if (fd != INVALID_FD) {
-        if (ioloop != nullptr)
+        if (ioloop != nullptr) {
             ioloop_unregister_fd(ioloop, fd, eIOLOOP_EV_UNKNOWN);
+        }
 
-        sys_serial_close (fd);
+        sys_serial_close(fd);
         fd = INVALID_FD;
         log_msg(KWB_LOG_STATUS, "SERIAL close connection to %s", this->getName().c_str());
     }
 }
 
 //----------------------------------------------------------------------------
-void ConnectionSerial::send(const msg_t & message)
+void ConnectionSerial::send(const msg_t &message)
 {
     int     rc = eERR_NONE;
 
@@ -142,15 +144,17 @@ void ConnectionSerial::send(const msg_t & message)
         if (outgoingLength == 0) {
             log_error("SERIAL error encoding serial message!");
             rc = eMSG_ERR_SIZE;
-        } else {
+        }
+        else {
             log_msg(LOG_VERBOSE2, "SERIAL S RAW %s", outgoingBuffer);
             outgoingWritten = sys_serial_send(fd,
-                                              (void*)outgoingBuffer,
+                                              (void *)outgoingBuffer,
                                               outgoingLength);
             if (outgoingWritten < 0) {
                 log_sys_error("SERIAL Send failed!");
                 rc = eERR_SYSTEM;
-            } else if (outgoingWritten < outgoingLength) {
+            }
+            else if (outgoingWritten < outgoingLength) {
                 log_warning("SERIAL Not all bytes written");
                 rc = eRUNNING;
             }
@@ -199,52 +203,61 @@ void ConnectionSerial::receive()
 //----------------------------------------------------------------------------
 int32_t ConnectionSerial::receiveCallback(void *context)
 {
-    reinterpret_cast<ConnectionSerial*>(context)->receive();
+    reinterpret_cast<ConnectionSerial *>(context)->receive();
     return 0;
 }
 
 //----------------------------------------------------------------------------
-void ConnectionSerial::convertByteToAscii (char* buffer, uint8_t* offset,
-                                           uint8_t byte)
+void ConnectionSerial::convertByteToAscii(char *buffer, uint8_t *offset,
+                                          uint8_t byte)
 {
     uint8_t nibble;
 
     nibble = byte >> 4;
     if (nibble < 10) {
         buffer[(*offset)++] = nibble + '0';
-    } else {
+    }
+    else {
         buffer[(*offset)++] = nibble + 'A' - 10;
     }
     nibble = byte & 0x0F;
     if (nibble < 10) {
         buffer[(*offset)++] = nibble + '0';
-    } else {
+    }
+    else {
         buffer[(*offset)++] = nibble + 'A' - 10;
     }
 }
 
 //----------------------------------------------------------------------------
-int ConnectionSerial::convertCharToNibble(char c, uint8_t* nibble)
+int ConnectionSerial::convertCharToNibble(char c, uint8_t *nibble)
 {
     if (c >= '0' && c <= '9') {
         *nibble = (uint8_t)(c - '0');
-    } else if (c >= 'a' && c <= 'f') {
+    }
+    else if (c >= 'a' && c <= 'f') {
         *nibble = (uint8_t)(c - ('a' - 10));
-    } else if (c >= 'A' && c <= 'F') {
+    }
+    else if (c >= 'A' && c <= 'F') {
         *nibble = (uint8_t)(c - ('A' - 10));
-    } else {
-        return (uint8_t)-1;
+    }
+    else {
+        return (uint8_t) -1;
     }
     return 0;
 }
 
 //----------------------------------------------------------------------------
-size_t ConnectionSerial::formatSerialMessage(char* buffer, uint8_t buffersize, const msg_t & message)
+size_t ConnectionSerial::formatSerialMessage(char *buffer, uint8_t buffersize, const msg_t &message)
 {
     uint8_t ii, offset = 0;
 
-    if (message.length > MAX_MSG_SIZE)  return 0;
-    if (buffersize < (message.length*2 + 7)) return 0;
+    if (message.length > MAX_MSG_SIZE) {
+        return 0;
+    }
+    if (buffersize < (message.length * 2 + 7)) {
+        return 0;
+    }
     memset(buffer, 0, buffersize);
     // sender
     convertByteToAscii(buffer, &offset, (message.sender & 0xFF00) >> 8);
@@ -255,7 +268,7 @@ size_t ConnectionSerial::formatSerialMessage(char* buffer, uint8_t buffersize, c
     // length
     convertByteToAscii(buffer, &offset, message.length);
     // message
-    for (ii=0; ii<message.length; ii++) {
+    for (ii = 0; ii < message.length; ii++) {
         convertByteToAscii(buffer, &offset, message.data[ii]);
     }
     buffer[offset++] = '\n';
@@ -272,17 +285,22 @@ void ConnectionSerial::resetIncomingOnError()
     // log faulty message
     std::string errMsg = "SERIAL Incoming message corrupt: \"";
     single_char[1] = '\0';
-    for (ii=0; ii<incomingNumReceived; ii++) {
+    for (ii = 0; ii < incomingNumReceived; ii++) {
         switch (incomingBuffer[ii]) {
-        case '\n': errMsg += "<NL>"; break;
-        case '\r': errMsg += "<CR>"; break;
+        case '\n':
+            errMsg += "<NL>";
+            break;
+        case '\r':
+            errMsg += "<CR>";
+            break;
         default:
             single_char[0] =  incomingBuffer[ii];
             errMsg += single_char;
             break;
         }
     }
-    snprintf(strbuf2, sizeof(strbuf2)-1, "\" total length = %d, message length = %d\n", incomingNumReceived, incomingMessage.length);
+    snprintf(strbuf2, sizeof(strbuf2) - 1, "\" total length = %d, message length = %d\n", incomingNumReceived,
+             incomingMessage.length);
     errMsg += strbuf2;
     log_error(errMsg.c_str());
 
@@ -315,8 +333,9 @@ bool ConnectionSerial::processReceiving(char newChar)
             log_error("Error in state eSER_RECV_STATE_SENDER!");
             resetIncomingOnError();
             break;
-        } else {
-            incomingMessage.sender |= (nibble << (4*digit));
+        }
+        else {
+            incomingMessage.sender |= (nibble << (4 * digit));
         }
         if (incomingNumReceived >= 4) {
             incomingState = eSER_RECV_STATE_RECEIVER;
@@ -329,8 +348,9 @@ bool ConnectionSerial::processReceiving(char newChar)
             log_error("Error in state eSER_RECV_STATE_RECEIVER!");
             resetIncomingOnError();
             break;
-        } else {
-            incomingMessage.receiver |= (nibble << (4*digit));
+        }
+        else {
+            incomingMessage.receiver |= (nibble << (4 * digit));
         }
         if (incomingNumReceived >= 8) {
             incomingState = eSER_RECV_STATE_LENGTH;
@@ -343,8 +363,9 @@ bool ConnectionSerial::processReceiving(char newChar)
             log_error("Error in state eSER_RECV_STATE_LENGTH char %x!", newChar);
             resetIncomingOnError();
             break;
-        } else {
-            incomingMessage.length |= (nibble << (4*digit));
+        }
+        else {
+            incomingMessage.length |= (nibble << (4 * digit));
         }
         if (incomingNumReceived >= 10) {
             incomingState = eSER_RECV_STATE_DATA;
@@ -358,13 +379,17 @@ bool ConnectionSerial::processReceiving(char newChar)
             log_error("Error in state eSER_RECV_STATE_DATA!");
             resetIncomingOnError();
             break;
-        } else {
-            if (digit == 1) incomingMessage.data[index] = 0;
-            incomingMessage.data[index] |= (nibble << (4*digit));
+        }
+        else {
+            if (digit == 1) {
+                incomingMessage.data[index] = 0;
+            }
+            incomingMessage.data[index] |= (nibble << (4 * digit));
         }
         if (index + 1 == incomingMessage.length && digit == 0) {
             incomingState = eSER_RECV_STATE_NEWLINE;
-        } else if (index + 1 > incomingMessage.length){
+        }
+        else if (index + 1 > incomingMessage.length) {
             log_error("Error in state eSER_RECV_STATE_DATA!");
             resetIncomingOnError();
         }
@@ -375,9 +400,12 @@ bool ConnectionSerial::processReceiving(char newChar)
             newChar != '\n') {
             log_error("Error in state eSER_RECV_STATE_NEWLINE!");
             resetIncomingOnError();
-        } else {
+        }
+        else {
             // message received
-            if (incomingNumReceived) incomingNumReceived--;
+            if (incomingNumReceived) {
+                incomingNumReceived--;
+            }
             incomingBuffer[incomingNumReceived] = '\0';
             log_msg(LOG_VERBOSE2, "SERIAL R RAW %s", incomingBuffer);
             incomingNumReceived = 0;
@@ -409,7 +437,8 @@ int ConnectionSerial::continueSending()
         if (written < 0) {
             log_sys_error("SERIAL Send failed!");
             rc = eERR_SYSTEM;
-        } else {
+        }
+        else {
             outgoingWritten += written;
             if (outgoingWritten < outgoingLength) {
                 rc = eRUNNING;

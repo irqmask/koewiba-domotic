@@ -3,7 +3,7 @@
  *
  * @{
  * @file    ActionQueryModules.h
- * @brief   Action: Query version information of a bus module and wait for the answer. 
+ * @brief   Action: Query version information of a bus module and wait for the answer.
  *
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
@@ -23,7 +23,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#pragma once 
+#pragma once
 
 // --- Include section ---------------------------------------------------------
 
@@ -47,24 +47,25 @@
 
 // --- Class definition --------------------------------------------------------
 
-class ActionQueryModules : public ActionWithResponse {
+class ActionQueryModules : public ActionWithResponse
+{
 public:
     struct Module {
-    public: 
+    public:
         uint16_t nodeId;
-        version_info_t version; 
+        version_info_t version;
     };
-        
-    ActionQueryModules(Connection & conn, MsgBroker & broker, uint16_t nodeId=0);
-    
-    std::vector<Module> getModules();   
+
+    ActionQueryModules(Connection &conn, MsgBroker &broker, uint16_t nodeId = 0);
+
+    std::vector<Module> getModules();
     virtual bool waitForResponse() override;
-    
+
 protected:
     virtual bool formMessage();
-    virtual bool filterResponse(const msg_t & message) override;
-    virtual void handleResponse(const msg_t & message, void* reference) override;
-    
+    virtual bool filterResponse(const msg_t &message) override;
+    virtual void handleResponse(const msg_t &message, void *reference) override;
+
     std::vector<Module> modules;
 };
 

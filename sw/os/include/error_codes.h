@@ -50,7 +50,7 @@ typedef enum {
     /// A System error has occurred
     eERR_SYSTEM,
     /// A invalid parameter has been passed into a method / function
-    eERR_BAD_PARAMETER,   
+    eERR_BAD_PARAMETER,
     /// An operation or process failed
     eERR_PROCESS_FAILED,
     eERR_3RD_PARTY_FUNC_FAILED,

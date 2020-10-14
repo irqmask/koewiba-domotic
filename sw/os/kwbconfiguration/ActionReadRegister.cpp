@@ -3,7 +3,7 @@
  *
  * @{
  * @file    ActionReadRegister.cpp
- * @brief   Action: Query a register of a bus module and wait for the answer. 
+ * @brief   Action: Query a register of a bus module and wait for the answer.
  *
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
@@ -23,7 +23,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
- 
+
 // --- Include section ---------------------------------------------------------
 
 #include "prjconf.h"
@@ -66,10 +66,12 @@ uint8_t ActionReadRegister::getRegisterId()
 {
     return this->registerId;
 }
-    
+
 bool ActionReadRegister::formMessage()
 {
-    if (nodeId == 0) return false;
+    if (nodeId == 0) {
+        return false;
+    }
     messageToSend.receiver = nodeId;
     messageToSend.sender = connection.getOwnNodeId();
     messageToSend.length = 2;
@@ -78,7 +80,7 @@ bool ActionReadRegister::formMessage()
     return true;
 }
 
-bool ActionReadRegister::filterResponse(const msg_t& message)
+bool ActionReadRegister::filterResponse(const msg_t &message)
 {
     if (message.sender == nodeId &&
         message.length >= 3 &&
@@ -88,11 +90,13 @@ bool ActionReadRegister::filterResponse(const msg_t& message)
          message.data[0] == eCMD_STATE_16BIT ||
          message.data[0] == eCMD_STATE_32BIT ||
          message.data[0] == eCMD_STATE_DATE_TIME) &&
-        message.data[1] == registerId) return true;
+        message.data[1] == registerId) {
+        return true;
+    }
     return false;
 }
 
-void ActionReadRegister::handleResponse(const msg_t & message, void* reference)
+void ActionReadRegister::handleResponse(const msg_t &message, void *reference)
 {
     receivedMessage = message;
     messageReceived = true;
@@ -101,7 +105,7 @@ void ActionReadRegister::handleResponse(const msg_t & message, void* reference)
 int ActionReadRegister::getValue()
 {
     int value = 0;
-    
+
     switch (receivedMessage.data[0]) {
     case eCMD_STATE_8BIT:
         value = receivedMessage.data[2];

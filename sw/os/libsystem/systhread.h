@@ -34,10 +34,10 @@
 #include "prjconf.h"
 
 #ifdef PRJCONF_WINDOWS
-#  include <windows.h>
+    #include <windows.h>
 #else
-#  include <pthread.h>
-#  include <unistd.h>
+    #include <pthread.h>
+    #include <unistd.h>
 #endif
 
 #ifdef __cplusplus

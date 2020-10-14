@@ -44,7 +44,8 @@
 // libsystem
 #include "syssocket.h"
 
-class ConnectionSocketTest : public ::testing::Test {
+class ConnectionSocketTest : public ::testing::Test
+{
 protected:
     void SetUp() override
     {
@@ -61,8 +62,8 @@ protected:
     }
 
 public:
-    void incomingCallback(const msg_t & message, void* reference);
-    void closeCallback(const std::string & uri, void* reference);
+    void incomingCallback(const msg_t &message, void *reference);
+    void closeCallback(const std::string &uri, void *reference);
     int incomingCallbackCalled;
     int closeCallbackCalled;
 
@@ -92,12 +93,12 @@ protected:
     static void clientThread(ConnectionSocketTest *reference);
 };
 
-void ConnectionSocketTest::incomingCallback(const msg_t & message, void* reference)
+void ConnectionSocketTest::incomingCallback(const msg_t &message, void *reference)
 {
     ConnectionSocketTest::incomingCallbackCalled++;
 }
 
-void ConnectionSocketTest::closeCallback(const std::string & uri, void* reference)
+void ConnectionSocketTest::closeCallback(const std::string &uri, void *reference)
 {
     ConnectionSocketTest::closeCallbackCalled++;
 }
@@ -105,10 +106,12 @@ void ConnectionSocketTest::closeCallback(const std::string & uri, void* referenc
 void ConnectionSocketTest::startEchoThread(bool server)
 {
     echoThreadRunning = true;
-    if (server)
+    if (server) {
         echoThread = std::make_shared<std::thread>(serverThread, this);
-    else
+    }
+    else {
         echoThread = std::make_shared<std::thread>(clientThread, this);
+    }
 
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
 }
@@ -160,11 +163,13 @@ void ConnectionSocketTest::serverThread(ConnectionSocketTest *reference)
         }
     }
 
-    if (conn_fd != INVALID_FD)
+    if (conn_fd != INVALID_FD) {
         sys_socket_close(conn_fd);
+    }
 
-    if (server_fd != INVALID_FD)
+    if (server_fd != INVALID_FD) {
         sys_socket_close(server_fd);
+    }
 }
 
 void ConnectionSocketTest::clientThread(ConnectionSocketTest *reference)
@@ -251,8 +256,10 @@ TEST_F(ConnectionSocketTest, send_and_receive)
     message.sender = 0x0001;
     message.receiver = 0x0002;
     message.length = 4;
-    message.data[0] = 42; message.data[0] = 43;
-    message.data[0] = 44; message.data[0] = 45;
+    message.data[0] = 42;
+    message.data[0] = 43;
+    message.data[0] = 44;
+    message.data[0] = 45;
 
     conn->send(message);
 

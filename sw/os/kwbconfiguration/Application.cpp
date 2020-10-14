@@ -3,7 +3,7 @@
  *
  * @{
  * @file    Application.cpp
- * @brief   Application frontend. 
+ * @brief   Application frontend.
  *
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
@@ -23,7 +23,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
- 
+
 // --- Include section ---------------------------------------------------------
 
 #include "prjconf.h"
@@ -36,8 +36,8 @@
 #if defined (PRJCONF_UNIX) || \
     defined (PRJCONF_POSIX) || \
     defined (PRJCONF_LINUX)
-  #include <safe_lib.h>
-  #include <unistd.h>
+    #include <safe_lib.h>
+    #include <unistd.h>
 #endif
 
 // include
@@ -106,7 +106,7 @@ uint16_t Application::getSelectedModule()
     return this->selectedModule;
 }
 
-bool Application::readRegister(uint8_t registerId, int& value)
+bool Application::readRegister(uint8_t registerId, int &value)
 {
     bool rc = false;
     ActionReadRegister action_read_reg(msgEndpoint, msgBroker, selectedModule, registerId);
@@ -122,18 +122,26 @@ bool Application::writeRegister(uint8_t registerId, int value)
     bool rc = false;
     ActionWriteRegister action_write_reg(msgEndpoint, msgBroker, selectedModule, registerId);
     action_write_reg.setValue(value);
-    
+
     // hack, remove when register layout is known to the program
-    if (value > 65535) action_write_reg.setRegisterFormat(eCMD_SET_REG_32BIT);
-    else if (value > 255) action_write_reg.setRegisterFormat(eCMD_SET_REG_16BIT);
-    else action_write_reg.setRegisterFormat(eCMD_SET_REG_8BIT);
+    if (value > 65535) {
+        action_write_reg.setRegisterFormat(eCMD_SET_REG_32BIT);
+    }
+    else if (value > 255) {
+        action_write_reg.setRegisterFormat(eCMD_SET_REG_16BIT);
+    }
+    else {
+        action_write_reg.setRegisterFormat(eCMD_SET_REG_8BIT);
+    }
 
     return action_write_reg.start();
 }
 
-bool Application::verifyRegister(uint8_t registerId, int value, int& readValue)
+bool Application::verifyRegister(uint8_t registerId, int value, int &readValue)
 {
-    if (!readRegister(registerId, readValue) || (value != readValue)) return false;
+    if (!readRegister(registerId, readValue) || (value != readValue)) {
+        return false;
+    }
     return true;
 }
 

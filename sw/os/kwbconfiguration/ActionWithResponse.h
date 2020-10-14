@@ -3,7 +3,7 @@
  *
  * @{
  * @file    ActionWithResponse.h
- * @brief   Base-class of an action which waits for a response to be performed with a bus-module. 
+ * @brief   Base-class of an action which waits for a response to be performed with a bus-module.
  *
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
@@ -23,7 +23,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#pragma once 
+#pragma once
 
 // --- Include section ---------------------------------------------------------
 
@@ -44,19 +44,20 @@
 
 // --- Class definition --------------------------------------------------------
 
-class ActionWithResponse : public ActionRequest {
+class ActionWithResponse : public ActionRequest
+{
 public:
-    ActionWithResponse(Connection &conn, MsgBroker &broker, uint16_t nodeId=0);
-    
+    ActionWithResponse(Connection &conn, MsgBroker &broker, uint16_t nodeId = 0);
+
     virtual void cancel();
     virtual bool waitForResponse();
     virtual bool isFinished();
-    
+
 protected:
     virtual bool formMessage() = 0;
-    virtual bool filterResponse(const msg_t & message) = 0;
-    virtual void handleResponse(const msg_t & message, void* reference) = 0;
-    
+    virtual bool filterResponse(const msg_t &message) = 0;
+    virtual void handleResponse(const msg_t &message, void *reference) = 0;
+
     void log_module_info();
     bool     messageReceived; //!< Flag if message has been received.
     msg_t    receivedMessage; //!< Message, which has been received during this action.

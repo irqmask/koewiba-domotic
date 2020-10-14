@@ -11,24 +11,24 @@
 class Exception : public std::exception
 {
 public:
-    Exception(const char* file, uint32_t line, const char* function);
+    Exception(const char *file, uint32_t line, const char *function);
 
-    virtual const char* what() const NOEXCEPT;
+    virtual const char *what() const NOEXCEPT;
 
 protected:
-    const char* file;
+    const char *file;
     const int line;
-    const char* function;
+    const char *function;
 
     char message[2048];
     char full_message[4096];
 
     template <class... Args>
-    void compileErrorMessage(const char* format, ...);
+    void compileErrorMessage(const char *format, ...);
 };
 
 template <class... Args>
-void Exception::compileErrorMessage(const char* format, ...)
+void Exception::compileErrorMessage(const char *format, ...)
 {
     va_list args;
     va_start(args, format);
@@ -44,20 +44,20 @@ void Exception::compileErrorMessage(const char* format, ...)
 class InvalidParameter : public Exception
 {
 public:
-	template <class... Args>
-	InvalidParameter(const char* file, uint32_t line, const char* function, const char* fmt, Args... args)
+    template <class... Args> InvalidParameter(const char *file, uint32_t line, const char *function, const char *fmt,
+                                              Args... args)
         : Exception(file, line, function)
-	{
-		compileErrorMessage(fmt, args...);
-	};
+    {
+        compileErrorMessage(fmt, args...);
+    };
 };
 
 
 class OperationFailed : public Exception
 {
-public: 
-    template <class... Args>
-    OperationFailed(const char* file, uint32_t line, const char* function, const char* fmt, Args... args)
+public:
+    template <class... Args> OperationFailed(const char *file, uint32_t line, const char *function, const char *fmt,
+                                             Args... args)
         : Exception(file, line, function)
     {
         compileErrorMessage(fmt, args...);
@@ -68,8 +68,8 @@ public:
 class ResourceMissing : public Exception
 {
 public:
-    template <class... Args>
-    ResourceMissing(const char* file, uint32_t line, const char* function, const char* fmt, Args... args)
+    template <class... Args> ResourceMissing(const char *file, uint32_t line, const char *function, const char *fmt,
+                                             Args... args)
         : Exception(file, line, function)
     {
         compileErrorMessage(fmt, args...);
@@ -80,8 +80,8 @@ public:
 class ConnectionFailed : public Exception
 {
 public:
-    template <class... Args>
-    ConnectionFailed(const char* file, uint32_t line, const char* function, const char* fmt, Args... args)
+    template <class... Args> ConnectionFailed(const char *file, uint32_t line, const char *function, const char *fmt,
+                                              Args... args)
         : Exception(file, line, function)
     {
         compileErrorMessage(fmt, args...);

@@ -7,7 +7,7 @@
  *
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
-/* 
+/*
  * Copyright (C) 2017  christian <irqmask@gmx.de>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -68,7 +68,7 @@ void Connection::clearIncomingHandler()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Connection::onIncomingMessage(const msg_t & message)
+void Connection::onIncomingMessage(const msg_t &message)
 {
     if (this->extOnIncommingMsg != nullptr) {
         this->extOnIncommingMsg(message, this);
@@ -120,12 +120,14 @@ bool Connection::addressIsInConnectionsSegment(uint16_t node_address)
 {
     if ((segmentId == 0) ||
         (node_address == 0) ||
-        ((node_address & BUS_SEGBRDCSTMASK) == segmentId)) return true;
+        ((node_address & BUS_SEGBRDCSTMASK) == segmentId)) {
+        return true;
+    }
     return false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Connection::send(const msg_t & message)
+void Connection::send(const msg_t &message)
 {
 }
 

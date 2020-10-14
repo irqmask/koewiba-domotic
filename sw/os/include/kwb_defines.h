@@ -1,7 +1,7 @@
 /**
  * @addtogroup KWB_DEFINES
  * @brief KoeWiBa global definitions.
- * 
+ *
  * This module contains the definition global to the KoeWiBa project.
  *
  * @{

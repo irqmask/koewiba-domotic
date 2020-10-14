@@ -67,23 +67,23 @@ typedef struct vos {
 
 // --- Global functions --------------------------------------------------------
 
-int vos_open_serial (vos_t* vos, const char* device, int baudrate);
+int vos_open_serial(vos_t *vos, const char *device, int baudrate);
 
-int vos_open_vbusd (vos_t* vos, const char* address, uint16_t port);
+int vos_open_vbusd(vos_t *vos, const char *address, uint16_t port);
 
-void vos_close (vos_t* vos);
+void vos_close(vos_t *vos);
 
-int vos_set_params (vos_t* vos, int baudrate);
+int vos_set_params(vos_t *vos, int baudrate);
 
-size_t vos_send (vos_t* vos, void* buf, size_t bufsize);
+size_t vos_send(vos_t *vos, void *buf, size_t bufsize);
 
-size_t vos_recv (vos_t* vos, void* buf, size_t bufsize);
+size_t vos_recv(vos_t *vos, void *buf, size_t bufsize);
 
-void vos_flush (vos_t* vos);
+void vos_flush(vos_t *vos);
 
-size_t vos_get_pending (vos_t* vos);
+size_t vos_get_pending(vos_t *vos);
 
-size_t vos_get_pending_send_bytes (vos_t* vos);
+size_t vos_get_pending_send_bytes(vos_t *vos);
 
 #endif /* _VOS_H_ */
 /** @} */

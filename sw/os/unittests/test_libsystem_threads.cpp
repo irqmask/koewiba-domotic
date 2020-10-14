@@ -55,7 +55,7 @@ int g_thread_value = 0;
 // --- Global functions --------------------------------------------------------
 
 
-void* test1_thread(void* user_arg)
+void *test1_thread(void *user_arg)
 {
     g_thread_value = 42;
     return NULL;
@@ -66,7 +66,7 @@ TEST(libsystem, threads_1)
     g_thread_value = 0;
     sys_thread_start(test1_thread);
     sys_sleep_ms(10);
-    ASSERT_EQ(g_thread_value , 42);
+    ASSERT_EQ(g_thread_value, 42);
 }
 
 /** @} */

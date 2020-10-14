@@ -40,9 +40,9 @@
 
 //! Compare two strings case-insensitive
 #if defined (PRJCONF_WINDOWS)
-#define sys_strcasecmp  _stricmp
+    #define sys_strcasecmp  _stricmp
 #else
-#define sys_strcasecmp  strcasecmp    
+    #define sys_strcasecmp  strcasecmp
 #endif
 
 // --- Type definitions --------------------------------------------------------
@@ -60,8 +60,8 @@
 // --- Global functions --------------------------------------------------------
 
 #if defined (PRJCONF_WINDOWS) && (_MSC_VER) && _MSC_VER < 1900
-//int vsnprintf(char *outBuf, size_t size, const char *format, va_list ap);
-int snprintf(char *outBuf, size_t size, const char *format, ...);
+    //int vsnprintf(char *outBuf, size_t size, const char *format, va_list ap);
+    int snprintf(char *outBuf, size_t size, const char *format, ...);
 #endif
 
 #endif /* _SYSSTRING_H_ */

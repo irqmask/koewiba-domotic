@@ -60,6 +60,7 @@
 
 // --- Global functions --------------------------------------------------------
 
+//----------------------------------------------------------------------------
 const char *msg_to_string(const msg_t *message, uint8_t max_length)
 {
     uint8_t remaining_length, ii;
@@ -96,6 +97,7 @@ const char *msg_to_string(const msg_t *message, uint8_t max_length)
     return logline;
 }
 
+//----------------------------------------------------------------------------
 void msg_log(const char *keyword, const msg_t *message)
 {
     bool first_line = true;

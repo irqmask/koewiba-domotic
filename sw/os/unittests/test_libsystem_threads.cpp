@@ -2,7 +2,7 @@
  * @addtogroup UNITTESTS
  *
  * @{
- * @file    test_libsystem_threads.c
+ * @file    test_libsystem_threads.cpp
  * @brief   This module contains the unittests for: libsystem/threads.
  *
  * @author  Christian Verhalen

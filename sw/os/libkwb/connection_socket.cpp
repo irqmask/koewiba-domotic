@@ -129,7 +129,7 @@ void ConnectionSocket::open()
             ioloop_register_fd(ioloop, fd, eIOLOOP_EV_READ, ConnectionSocket::receiveCallback, this);
         }
 
-        log_msg(KWB_LOG_STATUS, "SOCKET open connection to %s", this->getName().c_str());
+        log_msg(LOG_STATUS, "SOCKET open connection to %s", this->getName().c_str());
     } while (0);
 }
 
@@ -143,7 +143,7 @@ void ConnectionSocket::close()
 
         sys_socket_close(fd);
         fd = INVALID_FD;
-        log_msg(KWB_LOG_STATUS, "SOCKET close connection to %s", this->getName().c_str());
+        log_msg(LOG_STATUS, "SOCKET close connection to %s", this->getName().c_str());
     }
 }
 

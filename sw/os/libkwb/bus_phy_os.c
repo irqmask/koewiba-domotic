@@ -1,10 +1,11 @@
 /**
  * @addtogroup BUS
+ * @{
  * @addtogroup BUS_PHY_OS
+ * @{
+ *
  * @brief Physical layer of bus protocol for operating systems like Linux and
  * Windows.
- *
- * @{
  * @file    bus_phy_os.c
  * @brief   Physical layer of bus protocol.
  * @author  Christian Verhalen

@@ -45,6 +45,7 @@
 
 // --- Definitions -------------------------------------------------------------
 
+//! Maximum buffer size for a log message
 #define LOG_MAX_BUFFER_SIZE (LOG_MAX_MESSAGE_LENGTH + 100)
 
 // --- Type definitions --------------------------------------------------------
@@ -65,47 +66,31 @@ static const char *prefix = "";
 
 // --- Global functions --------------------------------------------------------
 
-/**
- * Set global log-mask.
- * @param[in] logmask Log-mask to set.
- */
+//----------------------------------------------------------------------------
 void log_set_mask(log_mask_t logmask)
 {
     active_logs = logmask;
 }
 
-/**
- * Get global log-mask.
- * @retval Log-mask
- */
+//----------------------------------------------------------------------------
 log_mask_t log_get_mask(void)
 {
     return active_logs;
 }
 
-/**
- * Add logmask to global log-mask.
- * @param[in] logmask Log-mask to add.
- */
+//----------------------------------------------------------------------------
 void log_add_mask(log_mask_t logmask)
 {
     active_logs |= logmask;
 }
 
-/**
- * Add a prefix to every log message.
- * @param[in]   pref    Prefix o be added. It needs to be a static and constant
- *                      string. It will not be copied!
- */
+//----------------------------------------------------------------------------
 void log_add_prefix(const char *pref)
 {
     prefix = pref;
 }
 
-/**
- * Log a message if there are matches between the message logmask and the
- * global active logmask.
- */
+//----------------------------------------------------------------------------
 void log_msg(log_mask_t logmask, const char *logmessage, ...)
 {
     va_list args;
@@ -119,6 +104,7 @@ void log_msg(log_mask_t logmask, const char *logmessage, ...)
     }
 }
 
+//----------------------------------------------------------------------------
 void log_info(const char *logmessage, ...)
 {
     va_list args;
@@ -133,6 +119,7 @@ void log_info(const char *logmessage, ...)
     }
 }
 
+//----------------------------------------------------------------------------
 void log_warning(const char *logmessage, ...)
 {
     va_list args;
@@ -147,6 +134,7 @@ void log_warning(const char *logmessage, ...)
     }
 }
 
+//----------------------------------------------------------------------------
 void log_error(const char *logmessage, ...)
 {
     va_list args;
@@ -161,6 +149,7 @@ void log_error(const char *logmessage, ...)
     }
 }
 
+//----------------------------------------------------------------------------
 void log_sys_error(const char *logmessage, ...)
 {
     int err = errno;

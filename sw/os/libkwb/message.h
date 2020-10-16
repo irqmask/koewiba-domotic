@@ -47,20 +47,28 @@ extern "C" {
 
 // --- Type definitions --------------------------------------------------------
 
+/**
+ * Error codes regarding message handling
+ */
 typedef enum msg_error {
-    eMSG_ERR_SIZE = 500,
-    eMSG_ERR_BUSY,          // send or receive buffer full
+    eMSG_ERR_SIZE = 500,    //!< Size of message exceeds limits
+    eMSG_ERR_BUSY,          //!< send or receive buffer full
 } msg_error_t;
 
+/**
+ * Structure holding a complete message.
+ */
 typedef struct msg {
-    uint16_t    sender;
-    uint16_t    receiver;
-    uint8_t     length;
-    uint8_t     data[MAX_MSG_SIZE];
-    uint16_t    crc;
+    uint16_t    sender;     //!< Sender node-id of the message
+    uint16_t    receiver;   //!< Receiver node-id of the message
+    uint8_t     length;     //!< Length of the message in bytes
+    uint8_t     data[MAX_MSG_SIZE]; //!< message payload
+    uint16_t    crc;        //!< Checksum of the message
 } msg_t;
 
+//! Function pointer type for incoming messages
 typedef void (*msg_incom_func_t)(msg_t *message, void *reference, void *arg);
+//! Function pointer type for closed connections
 typedef void (*msg_conn_func_t)(const char *address, uint16_t port, void *reference, void *arg);
 
 // --- Local variables ---------------------------------------------------------

@@ -142,21 +142,21 @@ static bool parse_commandline_options(int argc, char *argv[], options_t *options
 
         switch (c) {
         case 'd':
-            log_msg(KWB_LOG_INFO, "device %s", optarg);
+            log_msg(LOG_INFO, "device %s", optarg);
             strcpy_s(options->serial_device, sizeof(options->serial_device), optarg);
             options->serial_device_set = true;
             break;
         case 'b':
-            log_msg(KWB_LOG_INFO, "baudrate %s", optarg);
+            log_msg(LOG_INFO, "baudrate %s", optarg);
             options->serial_baudrate = atoi(optarg);
             break;
         case 'a':
-            log_msg(KWB_LOG_INFO, "router address %s", optarg);
+            log_msg(LOG_INFO, "router address %s", optarg);
             strcpy_s(options->router_address, sizeof(options->router_address), optarg);
             options->router_address_set = true;
             break;
         case 'p':
-            log_msg(KWB_LOG_INFO, "router port %s", optarg);
+            log_msg(LOG_INFO, "router port %s", optarg);
             options->router_port = atoi(optarg);
             break;
         case 'n':
@@ -237,8 +237,8 @@ static void print_usage(void)
 
 static void print_progress(uint8_t progress, void *arg)
 {
-    log_msg(LOG_STATUS, "Update progress %d", progress);
-    log_msg(KWB_LOG_INFO, "Update progress %d", progress);
+    log_msg(LOG_INFO, "Update progress %d", progress);
+    log_msg(LOG_INFO, "Update progress %d", progress);
 }
 
 // --- Module global functions -------------------------------------------------
@@ -262,7 +262,7 @@ int main(int argc, char *argv[])
 
     do {
         log_set_mask(0xFFFFFFFF & ~LOG_VERBOSE2);
-        log_msg(KWB_LOG_INFO, "kwbfirmware...");
+        log_msg(LOG_INFO, "kwbfirmware...");
 
         // set default options for kwbfirmware
         set_options(&options,

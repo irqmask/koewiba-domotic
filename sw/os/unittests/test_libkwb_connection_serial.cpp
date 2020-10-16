@@ -45,6 +45,7 @@
 // libsystem
 #include "syssocket.h"
 
+/// Unittests for the serial connection class
 class ConnectionSerialTest : public ::testing::Test
 {
 protected:

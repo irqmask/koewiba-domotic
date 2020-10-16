@@ -46,22 +46,41 @@
 
 // --- Type definitions --------------------------------------------------------
 
+/**
+ * Runtime data of ioloop connections as a chained list
+ */
 typedef struct ioloop_connection {
+    //! next list element or NULL
     ioloop_connection_t    *next;
+    //! File descriptor of connection
     sys_fd_t                fd;
+    //! Eventtypes to react on
     ioloop_event_type_t     eventtype;
+    //! Registered callback function for event type
     ioloop_event_func_t     callback;
+    //! Registered argument for callback function
     void                   *arg;
 } ioloop_connection_t;
 
+/**
+  * Runtime data of ioloop timers as a chained list.
+  */
 typedef struct ioloop_timer {
+    //! next list element or NULL
     ioloop_timer_t         *next;
+    //! Unique id of this timer
     int32_t                 id;
+    //! Ticks until next expiration.
     uint16_t                interval_ticks;
+    //! Last tick count the timer expired
     uint16_t                last_hit;
+    //! Flag if timer shall be reloaded on expiration.
     bool                    run_cyclic;
+    //! Eventtypes to react on
     ioloop_event_type_t     eventtype;
+    //! Registered callback function for event type
     ioloop_event_func_t     callback;
+    //! Registered argument for callback function
     void                   *arg;
 } ioloop_timer_t;
 
@@ -328,6 +347,7 @@ static void ioloop_check_timer(ioloop_t *ioloop)
 
 // --- Global functions --------------------------------------------------------
 
+//----------------------------------------------------------------------------
 void ioloop_init(ioloop_t *ioloop)
 {
     assert(ioloop != NULL);
@@ -337,6 +357,7 @@ void ioloop_init(ioloop_t *ioloop)
     ioloop->update_required = true;
 }
 
+//----------------------------------------------------------------------------
 void ioloop_close(ioloop_t *ioloop)
 {
     ioloop_connection_t *conn = NULL;
@@ -357,6 +378,7 @@ void ioloop_close(ioloop_t *ioloop)
     }
 }
 
+//----------------------------------------------------------------------------
 void ioloop_register_fd(ioloop_t              *ioloop,
                         sys_fd_t               fd,
                         ioloop_event_type_t    eventtype,
@@ -390,6 +412,7 @@ void ioloop_register_fd(ioloop_t              *ioloop,
     } while (0);
 }
 
+//----------------------------------------------------------------------------
 void ioloop_unregister_fd(ioloop_t *ioloop,
                           sys_fd_t fd,
                           ioloop_event_type_t eventtype)
@@ -412,6 +435,7 @@ void ioloop_unregister_fd(ioloop_t *ioloop,
     ioloop->update_required = true;
 }
 
+//----------------------------------------------------------------------------
 void ioloop_set_default_timeout(ioloop_t *ioloop,
                                 uint16_t  timeout_ticks)
 {
@@ -420,6 +444,7 @@ void ioloop_set_default_timeout(ioloop_t *ioloop,
     ioloop->default_timeout_ticks = timeout_ticks;
 }
 
+//----------------------------------------------------------------------------
 int32_t ioloop_register_timer(ioloop_t            *ioloop,
                               uint16_t             interval_ticks,
                               bool                 run_cyclic,
@@ -458,6 +483,7 @@ int32_t ioloop_register_timer(ioloop_t            *ioloop,
     return id;
 }
 
+//----------------------------------------------------------------------------
 void ioloop_unregister_timer(ioloop_t *ioloop,
                              int32_t   id)
 {
@@ -481,6 +507,7 @@ void ioloop_unregister_timer(ioloop_t *ioloop,
     }
 }
 
+//----------------------------------------------------------------------------
 void ioloop_run_once(ioloop_t *ioloop)
 {
 #if defined (PRJCONF_UNIX) || \

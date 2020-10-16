@@ -5,6 +5,7 @@
 
 #include "exceptions.h"
 
+//----------------------------------------------------------------------------
 Exception::Exception(const char *file, uint32_t line, const char *function)
     : std::exception()
     , file(file)
@@ -15,9 +16,7 @@ Exception::Exception(const char *file, uint32_t line, const char *function)
     memset(full_message, sizeof(full_message), 0);
 }
 
-
-
-
+//----------------------------------------------------------------------------
 const char *Exception::what() const NOEXCEPT
 {
     return full_message;

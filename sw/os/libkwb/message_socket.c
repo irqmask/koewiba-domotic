@@ -186,6 +186,7 @@ static int32_t msg_accept_endpoint(void *arg)
 
 // --- Global functions --------------------------------------------------------
 
+//----------------------------------------------------------------------------
 void msg_s_init(msg_socket_t *msg_socket)
 {
     assert(msg_socket != NULL);
@@ -194,6 +195,7 @@ void msg_s_init(msg_socket_t *msg_socket)
     msg_socket->well_known_fd = INVALID_FD;
 }
 
+//----------------------------------------------------------------------------
 int msg_s_open_server(msg_socket_t   *msg_socket,
                       ioloop_t       *ioloop,
                       const char     *address,
@@ -241,6 +243,7 @@ int msg_s_open_server(msg_socket_t   *msg_socket,
     return rc;
 }
 
+//----------------------------------------------------------------------------
 int msg_s_open_client(msg_socket_t   *msg_socket,
                       ioloop_t       *ioloop,
                       const char     *address,
@@ -294,6 +297,7 @@ int msg_s_open_client(msg_socket_t   *msg_socket,
     return rc;
 }
 
+//----------------------------------------------------------------------------
 void msg_s_close_connection(msg_socket_t *msg_socket, msg_endpoint_t *ep)
 {
     assert(msg_socket != NULL);
@@ -313,6 +317,7 @@ void msg_s_close_connection(msg_socket_t *msg_socket, msg_endpoint_t *ep)
     msg_delete_endpoint(msg_socket, ep);
 }
 
+//----------------------------------------------------------------------------
 void msg_s_set_newconnection_handler(msg_socket_t *msg_socket, msg_conn_func_t func, void *arg)
 {
     assert(msg_socket != NULL);
@@ -321,6 +326,7 @@ void msg_s_set_newconnection_handler(msg_socket_t *msg_socket, msg_conn_func_t f
     msg_socket->new_connection_arg = arg;
 }
 
+//----------------------------------------------------------------------------
 void msg_s_set_closeconnection_handler(msg_endpoint_t *ep, msg_conn_func_t func, void *arg)
 {
     assert(ep != NULL);
@@ -329,6 +335,7 @@ void msg_s_set_closeconnection_handler(msg_endpoint_t *ep, msg_conn_func_t func,
     ep->close_connection_arg = arg;
 }
 
+//----------------------------------------------------------------------------
 void msg_s_set_incomming_handler(msg_socket_t *msg_socket, msg_incom_func_t func, void *arg)
 {
     assert(msg_socket != NULL);
@@ -337,6 +344,7 @@ void msg_s_set_incomming_handler(msg_socket_t *msg_socket, msg_incom_func_t func
     msg_socket->incomming_arg = arg;
 }
 
+//----------------------------------------------------------------------------
 msg_endpoint_t *msg_s_get_endpoint(msg_socket_t   *msg_socket,
                                    int             index)
 {
@@ -357,6 +365,7 @@ msg_endpoint_t *msg_s_get_endpoint(msg_socket_t   *msg_socket,
     return ep;
 }
 
+//----------------------------------------------------------------------------
 int msg_s_send(msg_endpoint_t *recv_ep, msg_t *message)
 {
     assert(recv_ep != NULL);

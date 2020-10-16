@@ -69,14 +69,35 @@ typedef uint32_t log_mask_t;
 
 // --- Global functions --------------------------------------------------------
 
+/**
+ * Set global log-mask.
+ * @param[in]   logmask     Log-mask to set.
+ */
 void log_set_mask(log_mask_t logmask);
 
+/**
+ * Get global log-mask.
+ * @retval Log-mask
+ */
 log_mask_t log_get_mask(void);
 
+/**
+ * Add logmask to global log-mask.
+ * @param[in]   logmask     Log-mask to add.
+ */
 void log_add_mask(log_mask_t logmask);
 
+/**
+ * Add a prefix to every log message.
+ * @param[in]   pref        Prefix o be added. It needs to be a static and constant
+ *                          string. It will not be copied!
+ */
 void log_add_prefix(const char *pref);
 
+/**
+ * Log a message if there are matches between the message logmask and the
+ * global active logmask.
+ */
 void log_msg(log_mask_t logmask, const char *logmessage, ...);
 
 void log_info(const char *logmessage, ...);

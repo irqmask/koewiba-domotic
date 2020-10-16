@@ -2,7 +2,7 @@
  * @addtogroup KWBROUTER
  *
  * @{
- * @file    kwbrouter_main.c
+ * @file    kwbrouter_main.cpp
  * @brief   Router for commands received from bus or different nets.
  * kwbrouter routs commands comming from a source to one or more destinations.
  * Source and destination could be kwbrouters on a different IP or serial RS485
@@ -160,21 +160,21 @@ static bool parse_commandline_options(int argc, char *argv[], options_t *options
 
         switch (c) {
         case 'd':
-            log_msg(KWB_LOG_INFO, "device %s", optarg);
+            log_msg(LOG_INFO, "device %s", optarg);
             strcpy_s(options->serial_device, sizeof(options->serial_device), optarg);
             options->serial_device_set = true;
             break;
         case 'b':
-            log_msg(KWB_LOG_INFO, "baudrate %s", optarg);
+            log_msg(LOG_INFO, "baudrate %s", optarg);
             options->serial_baudrate = atoi(optarg);
             break;
         case 'a':
-            log_msg(KWB_LOG_INFO, "remote router address %s", optarg);
+            log_msg(LOG_INFO, "remote router address %s", optarg);
             strcpy_s(options->remote_router_address, sizeof(options->remote_router_address), optarg);
             router_address_set = true;
             break;
         case 'p':
-            log_msg(KWB_LOG_INFO, "router server port %s", optarg);
+            log_msg(LOG_INFO, "router server port %s", optarg);
             options->router_server_port = atoi(optarg);
             router_port_set = true;
             break;
@@ -286,7 +286,7 @@ int main(int argc, char *argv[])
     do {
         // all logs on
         log_set_mask(0xFFFFFFFF & ~LOG_VERBOSE2);
-        log_msg(KWB_LOG_INFO, "kwbrouter...");
+        log_msg(LOG_INFO, "kwbrouter...");
 
         // set default options for kwbrouter
         set_options(&options,
@@ -370,7 +370,7 @@ int main(int argc, char *argv[])
             }
         }
 
-        log_msg(KWB_LOG_STATUS, "entering mainloop...\n");
+        log_msg(LOG_STATUS, "entering mainloop...\n");
         while (!end_application) {
             ioloop_run_once(&mainloop);
         }

@@ -121,7 +121,7 @@ void ConnectionSerial::close()
 
         sys_serial_close(fd);
         fd = INVALID_FD;
-        log_msg(KWB_LOG_STATUS, "SERIAL close connection to %s", this->getName().c_str());
+        log_msg(LOG_STATUS, "SERIAL close connection to %s", this->getName().c_str());
     }
 }
 

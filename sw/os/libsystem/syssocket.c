@@ -51,6 +51,9 @@
 
 // --- Type definitions --------------------------------------------------------
 
+/**
+ * Socket information of different socket classes.
+ */
 typedef union {
     struct sockaddr  common;
     struct sockaddr_un af_unix;

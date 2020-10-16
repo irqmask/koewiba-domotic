@@ -384,6 +384,7 @@ int msg_ser_open(msg_serial_t   *msg_serial,
     return rc;
 }
 
+//----------------------------------------------------------------------------
 void msg_ser_close(msg_serial_t *msg_serial)
 {
     assert(msg_serial != NULL);
@@ -395,6 +396,7 @@ void msg_ser_close(msg_serial_t *msg_serial)
     }
 }
 
+//----------------------------------------------------------------------------
 void msg_ser_set_incoming_handler(msg_serial_t *msg_serial, msg_incom_func_t func, void *arg)
 {
     assert(msg_serial != NULL);
@@ -403,6 +405,7 @@ void msg_ser_set_incoming_handler(msg_serial_t *msg_serial, msg_incom_func_t fun
     msg_serial->incoming_arg = arg;
 }
 
+//----------------------------------------------------------------------------
 int msg_ser_send(msg_serial_t *msg_serial, msg_t *message)
 {
     int     rc = eERR_NONE;
@@ -450,6 +453,7 @@ int msg_ser_send(msg_serial_t *msg_serial, msg_t *message)
     return rc;
 }
 
+//----------------------------------------------------------------------------
 int msg_ser_continue_sending(msg_serial_t *msg_serial)
 {
     int rc = eERR_NONE;
@@ -477,6 +481,7 @@ int msg_ser_continue_sending(msg_serial_t *msg_serial)
     return rc;
 }
 
+//----------------------------------------------------------------------------
 bool msg_ser_is_tx_empty(msg_serial_t *msg_serial)
 {
     int pending_tx = sys_serial_get_pending_sendq(msg_serial->fd);

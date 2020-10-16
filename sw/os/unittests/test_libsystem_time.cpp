@@ -2,7 +2,7 @@
  * @addtogroup UNITTESTS
  *
  * @{
- * @file    test_libsystem_time.c
+ * @file    test_libsystem_time.cpp
  * @brief   This module contains the unittests for: libsystem/time.
  *
  * @author  Christian Verhalen

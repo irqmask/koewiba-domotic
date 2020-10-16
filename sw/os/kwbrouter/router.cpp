@@ -34,38 +34,26 @@
 
 // --- Class member functions --------------------------------------------------
 
+//----------------------------------------------------------------------------
 Router::Router()
 {
     connections.clear();
 }
 
-/**
- * Closes and deletes all remaining connections. (The closing happens
- * in the connection's destructor.
- */
+//----------------------------------------------------------------------------
 Router::~Router()
 {
     connections.clear();
 }
 
-/**
- * Callback to be called by incomming message handlers of all connections.
- *
- * @param[in]   message     Message to be distributed.
- * @param[in]   reference   Reference to sender of the message.
- * @todo replace typeless reference with connection type.
- */
+//----------------------------------------------------------------------------
 void Router::onIncomingMessage(const msg_t &message, void *reference)
 {
     Connection *sending_conn = static_cast<Connection *>(reference);
     this->distributeMessage(message, sending_conn);
 }
 
-/**
- * Adds a connection to/from which messages are routed.
- *
- * @param[in]   connection  Connection to be added.
- */
+//----------------------------------------------------------------------------
 void Router::addConnection(Connection *connection)
 {
     connections.push_back(connection);
@@ -77,12 +65,7 @@ void Router::addConnection(Connection *connection)
     listConnections(connection);
 }
 
-/**
- * Removes a connection from the routing list and unregisteres the router's
- * callback from the connection.
- *
- * @param[in]   connection  Connection to be removed.
- */
+//----------------------------------------------------------------------------
 void Router::removeConnection(Connection *connection)
 {
     log_info("Remove Closed connection:");
@@ -91,10 +74,7 @@ void Router::removeConnection(Connection *connection)
     connections.remove(connection);
 }
 
-/**
- * Distributes a received message from one connection to all other connection.
- * The message is not echoed back to the sender.
- */
+//----------------------------------------------------------------------------
 void Router::distributeMessage(const msg_t &message, Connection *sender)
 {
     for (auto conn : connections) {

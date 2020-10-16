@@ -41,13 +41,49 @@
 class SocketServer
 {
 public:
+    /**
+     * Initialize the socket server.
+     *
+     * @param[in]   iol         Pointer to ioloop. Needed to connect a
+     *                          /refMESSAGE_SOCKET server-socket to
+     *                          /refIOLOOP background io loop.
+     * @param[in]   r           Pointer to router, which will be informed about a
+     *                          new connection to a client connected to the server.
+     *                          The client will be added automatically to the routing list.
+     */
     SocketServer(ioloop_t *iol, Router *r);
+    /**
+     * When a socket server is destroyed, close all remaining open connections
+     * before.
+     */
     ~SocketServer();
 
+    /**
+     * Opens a new listening socket for either unix sockets or tcp sockets. If the
+     * port number is 0, a UNIX socket of name address will be opened otherwise a
+     * TCP port.
+     *
+     * @param[in]   address     Name of unix socket or address of tcp socket.
+     * @param[in]   port        Set to 0 for UNIX sockets, port number for TCP ports.
+     *
+     * @returns eERR_None, if successful otherwise error code of #gen_errors_t.
+     */
     void open(const char *address, uint16_t port);
+    /**
+     * Closes the server. Before all remaining client connections will be closed.
+     */
     void close();
 
+    /**
+     * Called when a new connection has been established.
+     * @param[in]   endpoint    Pointer to established connection.
+     */
     void onNewConnection(ConnectionSocket *connection);
+
+    /**
+     * Call this function, when a client connection closes, so the client
+     * can be removed from client list.
+     */
     void onCloseConnection(ConnectionSocket *connection);
 
 protected:

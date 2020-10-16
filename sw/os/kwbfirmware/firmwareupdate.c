@@ -392,13 +392,13 @@ static int receive_and_check_bldflags(firmwareupdate_t *fwu)
 
     if (fwu->bldflags_received) {
         rc = eERR_NONE;
-        log_msg(LOG_STATUS, "BLDFlags: %d", fwu->bldflags);
+        log_msg(LOG_INFO, "BLDFlags: %d", fwu->bldflags);
         if ((fwu->bldflags & (1 << eBldFlagNewSWProgrammed)) == 0) {
             log_error("BLDFlags: Controller has NOT been flashed!");
             rc = eERR_PROCESS_FAILED;
         }
         else {
-            log_msg(LOG_STATUS, "BLDFlags: Controller has been flashed.");
+            log_msg(LOG_INFO, "BLDFlags: Controller has been flashed.");
         }
         if (fwu->bldflags & (1 << eBldFlagCRCMismatch)) {
             log_error("BLDFlags: Node CRC mismatch for firmware! Firmware not flashed into the controller!");
@@ -416,10 +416,10 @@ static int receive_and_check_bldflags(firmwareupdate_t *fwu)
             log_warning("BLDFlags: Node board type mismatch. Firmware flashed. Check if firmware is suitable for the node board!");
         }
         if (fwu->bldflags & (1 << eBldFlagAppIDChanged)) {
-            log_msg(LOG_STATUS, "BLDFlags: Node application ID changed");
+            log_msg(LOG_INFO, "BLDFlags: Node application ID changed");
         }
         if (fwu->bldflags & (1 << eBldFlagAppIDChanged)) {
-            log_msg(LOG_STATUS, "BLDFlags: Application version changed");
+            log_msg(LOG_INFO, "BLDFlags: Application version changed");
         }
         if (fwu->bldflags & (1 << eBldFlagAppProgram)) {
             log_error("BLDFlags: Node reset not performed!");
@@ -514,11 +514,11 @@ int firmware_update_start(firmwareupdate_t    *fwu,
             break;
         }
         fwu->fw_size = target_last_addr - fwu->fw_firstaddress + 1;
-        log_msg(KWB_LOG_INFO, "target file: %s, module address %d", fwu->filename, fwu->module_address);
-        log_msg(KWB_LOG_INFO, "target start address: 0x%04X", fwu->fw_startaddress);
-        log_msg(KWB_LOG_INFO, "target first address: 0x%04X", fwu->fw_firstaddress);
-        log_msg(KWB_LOG_INFO, "target last address:  0x%04X", target_last_addr);
-        log_msg(KWB_LOG_INFO, "size:                 %d", fwu->fw_size);
+        log_msg(LOG_INFO, "target file: %s, module address %d", fwu->filename, fwu->module_address);
+        log_msg(LOG_INFO, "target start address: 0x%04X", fwu->fw_startaddress);
+        log_msg(LOG_INFO, "target first address: 0x%04X", fwu->fw_firstaddress);
+        log_msg(LOG_INFO, "target last address:  0x%04X", target_last_addr);
+        log_msg(LOG_INFO, "size:                 %d", fwu->fw_size);
 
         // allocate and initialie target memory. Initialize to 0xFF
         // because flash memory is 0xFF when it is erased.

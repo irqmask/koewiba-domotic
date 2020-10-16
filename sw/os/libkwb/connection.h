@@ -34,7 +34,9 @@
 
 class Connection;
 
+//! Function pointer type for incoming messages
 typedef std::function<void(const msg_t &message, void *reference)> incom_func_t;
+//! Function pointer type for closing connections
 typedef std::function<void(const std::string &uri, void *reference)> conn_func_t;
 
 /**
@@ -50,6 +52,9 @@ public:
      * Default constructor. Initializes data for methods in this base class.
      * This base-class by itself is useless, because it implements no usable
      * connection for sending and receiving messages.
+     *
+     * @param[in]   io      Pointer to existing IO-loop instance.
+     * @param[in]   uri     Address or path to device of connection.
      */
     Connection(ioloop_t *io, std::string uri);
 
@@ -104,12 +109,12 @@ public:
 
     /**
      * Set node id of corresponding bus-gateway
-     * @param[in] nodeId    Node id to set.
+     * @param[in] nodeAddress   Node id to set.
      */
-    void setOwnNodeId(uint16_t nodeId);
+    void setOwnNodeId(uint16_t nodeAddress);
 
     /**
-     * @returns Node id of corresponding bus-gateway
+     * @returns Node address of corresponding bus-gateway
      */
     uint16_t getOwnNodeId();
 
@@ -124,11 +129,11 @@ public:
      *
      * Currently used only for serial connections to check if address is in the
      * targeted bus-segment.
-     * @param[in] node_address  Address to check. If segment address is set to 0,
+     * @param[in] nodeAddress   Address to check. If segment address is set to 0,
      *                          every address is considered beeing in this segment.
      * @returns true if address is in the bus segment, otherwise false.
      */
-    virtual bool addressIsInConnectionsSegment(uint16_t node_address);
+    virtual bool addressIsInConnectionsSegment(uint16_t nodeAddress);
 
     /**
      * Send the message over the established route-connection.
@@ -140,14 +145,22 @@ public:
     virtual void send(const msg_t &message);
 
 protected:
-    incom_func_t        extOnIncommingMsg;
-    void               *extOnIncommingMsgArg;
+    //! Callback which will be called for each incoming message.
+    incom_func_t        extOnIncomingMsg;
+    //! Optional callback argument when messages arrive.
+    void               *extOnIncomingMsgArg;
+    //! Callback which will be called for each closed connection.
     conn_func_t         extOnConnectionClosed;
+    //! Optional callback argument when the connection is closed.
     void               *extOnConnectionClosedArg;
+    //! IO-loop instance
     ioloop_t           *ioloop;
+    //! Address or path to device of connection
     std::string         uri;
-    uint16_t            ownNodeId;      //!< segment address of connection
-    uint16_t            segmentId;      //!< segment address of connection
+    //! Node-id represented by this connection
+    uint16_t            ownNodeId;
+    //! Segment address of connection
+    uint16_t            segmentId;
 };
 
 /** @} */

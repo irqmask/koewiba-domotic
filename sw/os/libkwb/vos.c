@@ -49,6 +49,7 @@
 
 // --- Global functions --------------------------------------------------------
 
+//----------------------------------------------------------------------------
 int vos_open_serial(vos_t *vos, const char *device, int baudrate)
 {
     int rc = eERR_NONE;
@@ -79,6 +80,7 @@ int vos_open_serial(vos_t *vos, const char *device, int baudrate)
     return rc;
 }
 
+//----------------------------------------------------------------------------
 int vos_open_vbusd(vos_t *vos, const char *address, uint16_t port)
 {
     int rc = eERR_NONE;
@@ -105,6 +107,7 @@ int vos_open_vbusd(vos_t *vos, const char *address, uint16_t port)
     return rc;
 }
 
+//----------------------------------------------------------------------------
 void vos_close(vos_t *vos)
 {
     assert(vos != NULL);
@@ -121,6 +124,7 @@ void vos_close(vos_t *vos)
     }
 }
 
+//----------------------------------------------------------------------------
 size_t vos_send(vos_t *vos, void *buf, size_t bufsize)
 {
     assert(vos != NULL);
@@ -138,6 +142,7 @@ size_t vos_send(vos_t *vos, void *buf, size_t bufsize)
     }
 }
 
+//----------------------------------------------------------------------------
 size_t vos_recv(vos_t *vos, void *buf, size_t bufsize)
 {
     assert(vos != NULL);
@@ -155,6 +160,7 @@ size_t vos_recv(vos_t *vos, void *buf, size_t bufsize)
     }
 }
 
+//----------------------------------------------------------------------------
 void vos_flush(vos_t *vos)
 {
     assert(vos != NULL);
@@ -171,6 +177,7 @@ void vos_flush(vos_t *vos)
     }
 }
 
+//----------------------------------------------------------------------------
 size_t vos_get_pending(vos_t *vos)
 {
     assert(vos != NULL);
@@ -188,6 +195,7 @@ size_t vos_get_pending(vos_t *vos)
     }
 }
 
+//----------------------------------------------------------------------------
 size_t vos_get_pending_send_bytes(vos_t *vos)
 {
     assert(vos != NULL);

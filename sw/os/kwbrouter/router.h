@@ -45,15 +45,45 @@
 class Router
 {
 public:
+    /**
+     * ctor
+     */
     Router();
+    /**
+     * Closes and deletes all remaining connections. (The closing happens
+     * in the connection's destructor.
+     */
     ~Router();
 
+    /**
+     * Adds a connection to/from which messages are routed.
+     *
+     * @param[in]   connection  Connection to be added.
+     */
     void addConnection(Connection *connection);
+
+    /**
+     * Removes a connection from the routing list and unregisteres the router's
+     * callback from the connection.
+     *
+     * @param[in]   connection  Connection to be removed.
+     */
     void removeConnection(Connection *connection);
 
+    /**
+     * Distributes a received message from one connection to all other connection.
+     * The message is not echoed back to the sender.
+     */
     void distributeMessage(const msg_t &message, Connection *sender);
 
 protected:
+    /**
+     * Callback to be called by incomming message handlers of all connections.
+     *
+     * @param[in]   message     Message to be distributed.
+     * @param[in]   reference   Reference to sender of the message.
+     * @todo replace typeless reference with connection type.
+     */
     void onIncomingMessage(const msg_t &message, void *reference);
 
     /**
@@ -62,6 +92,7 @@ protected:
      */
     void listConnections(Connection *current);
 
+    //! List of all established connections
     std::list<Connection *> connections;
 };
 

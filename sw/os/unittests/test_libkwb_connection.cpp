@@ -37,6 +37,7 @@
 #include "log.h"
 #include "message.h"
 
+/// Unittests for the connection class
 class ConnectionTest : public ::testing::Test
 {
 protected:

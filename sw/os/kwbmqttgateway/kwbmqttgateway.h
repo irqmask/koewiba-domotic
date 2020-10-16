@@ -2,7 +2,7 @@
  * @addtogroup KWBMQTTGATEWAY
  *
  * @{
- * @file    kwbmqttgatewayh
+ * @file    kwbmqttgateway.h
  * @brief   Common datastructures and functions used in kwbmqttgateway.
  *
  * @author  Christian Verhalen

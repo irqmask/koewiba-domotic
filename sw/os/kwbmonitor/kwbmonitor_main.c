@@ -178,9 +178,7 @@ static bool parse_commandline_options(int          argc,
 
 static bool validate_options(options_t *options)
 {
-    bool    rc = false,
-            serial_device_set = false,
-            vbusd_address_set = false;
+    bool    rc = false;
 
     do {
         // minimum address is "/a": unix socket with name "a" in the root directory
@@ -262,3 +260,5 @@ int main(int argc, char *argv[])
 
     return rc;
 }
+
+/** @} */

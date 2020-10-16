@@ -1,10 +1,11 @@
 /**
  * @addtogroup CLOCK
- * @addtogroup CLOCK_LINUX
- * @brief System clock for linux based bus modules.
- *
  * @{
- * @file    clock_linux.c
+ * @addtogroup CLOCK_OS
+ * @{
+ *
+ * @brief System clock for linux based bus modules.
+ * @file    timer_os.c
  * @brief   System clock for linux based bus modules.
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
@@ -34,6 +35,10 @@
 
 // --- Type definitions --------------------------------------------------------
 
+/**
+ * Timer runtime data structure
+ * Stucture holding
+ */
 typedef struct clock {
     sys_time_t          starttime;
     clock_timer_t      *timer;
@@ -41,6 +46,7 @@ typedef struct clock {
 
 // --- Local variables ---------------------------------------------------------
 
+//! List of running timers.
 static local_clock_timer_t g_running_timers[CLOCK_NUM_TIMER];
 
 // --- Global variables --------------------------------------------------------
@@ -66,6 +72,11 @@ static bool register_timer(clock_timer_t *timer)
     return false;
 }
 
+/**
+ * Calculate elapsed ticks since start
+ * @param[in]   starttime   Timestamp of beginning of time period to be measured
+ * @return Ticks since starttime. On error 0.
+ */
 static uint16_t elapsed_ticks(sys_time_t starttime)
 {
     sys_time_t diff, curr;
@@ -119,8 +130,7 @@ void clk_initialize(void)
 /**
  * Start/Stop Clock-Timer
  *
- * @param[in] start
- * BOOLean for starting/stopping the timer (true = start)
+ * @param[in]   start   Flag for starting/stopping the timer (true = start)
  */
 void clk_control(bool start)
 {
@@ -130,10 +140,8 @@ void clk_control(bool start)
 /**
  * (Re)Start a count-down timer.
  *
- * @param[in] psTimer
- * Pointer to timer structure.
- * @param[in] uTime
- * Time in ticks. Convert from millisconds to ticks with
+ * @param[in]   timer   Pointer to timer structure.
+ * @param[in]   ticks   Time in ticks. Convert from millisconds to ticks with
  * CLOCK_MS_2_TICKS macro.
  *
  * @returns true, if timer has been (re)started, otherwise false.
@@ -152,8 +160,7 @@ bool clk_timer_start(clock_timer_t *timer, uint16_t ticks)
 /**
  * Check if timer elapsed.
  *
- * @param[in] psTimer
- * Pointer to timer structure.
+ * @param[in]   timer   Pointer to timer structure.
  *
  * @returns true, if time is over, otherwise false.
  */
@@ -197,4 +204,5 @@ uint16_t clk_timers_next_expiration(void)
     return diff;
 }
 
+/** @} */
 /** @} */

@@ -72,6 +72,8 @@ bool   g_end_application = false;
 
 static void handle_message(msg_t *message, void *reference, void *arg)
 {
+    (reference);
+    (arg);
     msg_log("RECV", message);
 }
 
@@ -91,6 +93,10 @@ static void send_message(msg_endpoint_t *ep, uint16_t sender, uint16_t receiver,
 
 static void on_close_connection(const char *address, uint16_t port, void *reference, void *arg)
 {
+    (address);
+    (port);
+    (reference);
+    (arg);
     g_end_application = true;
 }
 
@@ -100,6 +106,8 @@ static void on_close_connection(const char *address, uint16_t port, void *refere
 
 int main(int argc, char *argv[])
 {
+    (argc);
+    (argv);
     int             rc = eERR_NONE;
     ioloop_t        mainloop;
     msg_socket_t    msg_socket;
@@ -108,7 +116,7 @@ int main(int argc, char *argv[])
 
     do {
         log_set_mask(0xFFFFFFFF);
-        log_msg(KWB_LOG_INFO, "kwbtest...");
+        log_msg(LOG_INFO, "kwbtest...");
         ioloop_init(&mainloop);
 
         msg_s_init(&msg_socket);
@@ -118,7 +126,7 @@ int main(int argc, char *argv[])
         }
         msg_ep = msg_s_get_endpoint(&msg_socket, 0);
         msg_s_set_closeconnection_handler(msg_ep, on_close_connection, NULL);
-        log_msg(KWB_LOG_STATUS, "entering mainloop...");
+        log_msg(LOG_STATUS, "entering mainloop...");
         while (!g_end_application) {
             ioloop_run_once(&mainloop);
             if (state == 1) {

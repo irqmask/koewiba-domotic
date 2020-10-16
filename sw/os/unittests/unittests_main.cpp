@@ -2,7 +2,7 @@
  * @addtogroup UNITTESTS
  *
  * @{
- * @file    unittests_main.c
+ * @file    unittests_main.cpp
  * @brief   Test application for unittests of os code
  *
  * @author  Christian Verhalen

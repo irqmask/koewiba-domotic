@@ -145,8 +145,10 @@ protected:
         eSER_RECV_STATE_NEWLINE
     };
 
-    uint32_t    baudrate;       //!< Baudrate of serial device
-    sys_fd_t    fd;             //!< File descriptor of the serial connection
+    //! Baudrate of serial device
+    uint32_t    baudrate;
+    //! File descriptor of the serial connection
+    sys_fd_t    fd;
 
     // buffer for incomming messages
     char        incomingBuffer[MAX_SERIAL_MSG_SIZE * 2];

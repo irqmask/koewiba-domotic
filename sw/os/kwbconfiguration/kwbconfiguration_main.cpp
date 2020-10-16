@@ -2,7 +2,7 @@
  * @addtogroup KWBCONFIGURATION
  *
  * @{
- * @file    kwbconfiguration_main.c
+ * @file    kwbconfiguration_main.cpp
  * @brief   Configure the modules, registers and applications of the KWB system.
  * This is the configuration software running in terminal to be usable in
  * headless systems over SSH.
@@ -159,25 +159,25 @@ static bool parse_commandline_options(int argc, char *argv[], options_t *options
 
         switch (c) {
         case 'd':
-            log_msg(KWB_LOG_INFO, "device %s", optarg);
+            log_msg(LOG_INFO, "device %s", optarg);
             strcpy_s(options->serial_device, sizeof(options->serial_device), optarg);
             options->serial_device_set = true;
             break;
         case 'b':
-            log_msg(KWB_LOG_INFO, "baudrate %s", optarg);
+            log_msg(LOG_INFO, "baudrate %s", optarg);
             options->serial_baudrate = atoi(optarg);
             break;
         case 'a':
-            log_msg(KWB_LOG_INFO, "router address %s", optarg);
+            log_msg(LOG_INFO, "router address %s", optarg);
             strcpy_s(options->router_address, sizeof(options->router_address), optarg);
             options->router_address_set = true;
             break;
         case 'p':
-            log_msg(KWB_LOG_INFO, "router port %s", optarg);
+            log_msg(LOG_INFO, "router port %s", optarg);
             options->router_port = atoi(optarg);
             break;
         case 'o':
-            log_msg(KWB_LOG_INFO, "own node id %s", optarg);
+            log_msg(LOG_INFO, "own node id %s", optarg);
             options->own_node_id = strtol(optarg, NULL, 0);
             break;
         case 'v':
@@ -259,7 +259,7 @@ int main(int argc, char *argv[])
     ioloop_t            mainloop;
 
     log_set_mask(0xFFFFFFFF & ~LOG_VERBOSE2);
-    log_msg(KWB_LOG_INFO, "kwbconfiguration...");
+    log_msg(LOG_INFO, "kwbconfiguration...");
 
     do {
         // set default options for kwbrouter
@@ -288,12 +288,12 @@ int main(int argc, char *argv[])
         using std::placeholders::_2;
         incom_func_t handleIncomingMessageFunc = std::bind(&MsgBroker::handleIncomingMessage, &broker, _1, _2);
 
-        log_msg(KWB_LOG_STATUS, "Own node Id is 0x%04X", options.own_node_id);
+        log_msg(LOG_STATUS, "Own node Id is 0x%04X", options.own_node_id);
 
         if (options.serial_device_set) {
             try {
                 auto conn_serial = std::make_shared<ConnectionSerial>(&mainloop, options.serial_device);
-                log_msg(KWB_LOG_STATUS, "Connected to serial interface %s with baudrate %d", conn_serial->getName().c_str(),
+                log_msg(LOG_STATUS, "Connected to serial interface %s with baudrate %d", conn_serial->getName().c_str(),
                         conn_serial->getBaudrate());
                 conn = conn_serial;
             }
@@ -306,7 +306,7 @@ int main(int argc, char *argv[])
                 std::stringstream uriss;
                 uriss << options.router_address << ":" << options.router_port;
                 auto conn_socket = std::make_shared<ConnectionSocket>(&mainloop, uriss.str());
-                log_msg(KWB_LOG_STATUS, "Connected to router over socket interface %s", conn_socket->getName().c_str());
+                log_msg(LOG_STATUS, "Connected to router over socket interface %s", conn_socket->getName().c_str());
                 conn = conn_socket;
             }
             catch (Exception &e) {

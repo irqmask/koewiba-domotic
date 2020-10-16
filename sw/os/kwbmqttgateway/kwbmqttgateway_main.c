@@ -131,12 +131,12 @@ static bool parse_commandline_options(int argc, char *argv[], options_t *options
 
         switch (c) {
         case 'a':
-            log_msg(KWB_LOG_INFO, "router address %s", optarg);
+            log_msg(LOG_INFO, "router address %s", optarg);
             strcpy_s(options->router_address, sizeof(options->router_address), optarg);
             options->router_address_set = true;
             break;
         case 'p':
-            log_msg(KWB_LOG_INFO, "router port %s", optarg);
+            log_msg(LOG_INFO, "router port %s", optarg);
             options->router_port = atoi(optarg);
             break;
 
@@ -189,7 +189,7 @@ static void log_mqtt_version(void)
     int major = 0, minor = 0, bugfix = 0;
 
     mosquitto_lib_version(&major, &minor, &bugfix);
-    log_msg(LOG_STATUS, "MQTT Mosquitto client library version %d.%d.%d", major, minor, bugfix);
+    log_msg(LOG_INFO, "MQTT Mosquitto client library version %d.%d.%d", major, minor, bugfix);
 }
 
 /**
@@ -207,7 +207,7 @@ void on_mqtt_message(struct mosquitto *mosq, void *userdata, const struct mosqui
         }
     }
     else {
-        log_msg(LOG_STATUS, "MQTT %s (null)\n", message->topic);
+        log_msg(LOG_INFO, "MQTT %s (null)\n", message->topic);
     }
 }
 
@@ -220,7 +220,7 @@ void on_mqtt_message(struct mosquitto *mosq, void *userdata, const struct mosqui
 void on_mqtt_connect(struct mosquitto *mosq, void *userdata, int result)
 {
     if (!result) {
-        log_msg(KWB_LOG_STATUS, "MQTT connected. Result %d", result);
+        log_msg(LOG_STATUS, "MQTT connected. Result %d", result);
         /* Subscribe to broker information topics on successful connect. */
         mqtt2msg_subscribe(mosq);
     }
@@ -261,9 +261,9 @@ void on_mqtt_topic_subscribed(struct mosquitto *mosq, void *userdata, int mid, i
 {
     int i;
 
-    log_msg(KWB_LOG_STATUS, "MQTT subscribed (mid: %d): %d", mid, granted_qos[0]);
+    log_msg(LOG_STATUS, "MQTT subscribed (mid: %d): %d", mid, granted_qos[0]);
     for (i = 1; i < qos_count; i++) {
-        log_msg(LOG_STATUS, ", %d", granted_qos[i]);
+        log_msg(LOG_INFO, ", %d", granted_qos[i]);
     }
 }
 
@@ -294,7 +294,7 @@ int mosquitto_setup()
     }
     g_handles.mosq = mosq;
     g_handles.mqtt_disconnected = false;
-    log_msg(KWB_LOG_INFO, "MQTT mosquitto_setup() connecting to ioloop");
+    log_msg(LOG_INFO, "MQTT mosquitto_setup() connecting to ioloop");
     return mosquitto_connect_to_ioloop(&g_handles);
 }
 
@@ -334,7 +334,7 @@ void on_kwb_incomming_message(msg_t *message, void *reference, void *arg)
  */
 void on_kwb_close_connection(const char *address, uint16_t port, void *reference, void *arg)
 {
-    log_msg(KWB_LOG_STATUS, "MQTT connection closed. address=%s port=%d", address, port);
+    log_msg(LOG_STATUS, "MQTT connection closed. address=%s port=%d", address, port);
     g_end_application = true;
 }
 
@@ -384,7 +384,7 @@ int main(int argc, char *argv[])
     do {
         // all logs on
         log_set_mask(0xFFFFFFFF & ~LOG_VERBOSE2);
-        log_msg(KWB_LOG_INFO, "kwbmqttgateway...");
+        log_msg(LOG_INFO, "kwbmqttgateway...");
 
         g_handles.ioloop = &mainloop;
         // set default options for kwbmqttgateway
@@ -414,7 +414,7 @@ int main(int argc, char *argv[])
             break;
         }
 
-        log_msg(KWB_LOG_STATUS, "entering mainloop...");
+        log_msg(LOG_STATUS, "entering mainloop...");
         while (!g_end_application) {
             ioloop_run_once(g_handles.ioloop);
             // issue a re-connect to mqtt server

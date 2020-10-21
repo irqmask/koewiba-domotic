@@ -1,4 +1,5 @@
-/**
+/* OBSOLETE, DO NOT USE FOR FUTURE PROJECTS.
+ *
  * @addtogroup VBUSD_OR_SERIAL
  * @brief "vbus or serial": Module to switch between a vbusd connection and a
  *        serial connection.

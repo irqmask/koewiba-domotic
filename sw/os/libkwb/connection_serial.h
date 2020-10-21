@@ -45,7 +45,7 @@ public:
     /**
      * Open and initializes a serial connection.
      *
-     * @param[in]   ioloop      Pointer to ioloop.
+     * @param[in]   io          Pointer to ioloop.
      * @param[in]   uri         Devicename of serial device.
      * @param[in]   configure   Configure serial parameters e.g. baudrate (default true)
      */
@@ -71,6 +71,8 @@ public:
 protected:
     /**
      * Open the connection to the serial device.
+     * @param[in]   configure   (optional) Configure serial device (baudrate
+     *                          etc.) The default value is true.
      */
     void open(bool configure = true);
 
@@ -132,10 +134,13 @@ protected:
 
     /**
      * Continue sending.
+     * @returns eERR_NONE if outgoing message was completely sent, eRUNNING if
+     *          message is still being sent or eERR_SYSTEM if sending failed.
      */
     int continueSending();
 
 protected:
+    //! States of receiving portions of a message
     enum receiveState {
         eSER_RECV_STATE_IDLE,
         eSER_RECV_STATE_SENDER,
@@ -150,15 +155,20 @@ protected:
     //! File descriptor of the serial connection
     sys_fd_t    fd;
 
-    // buffer for incomming messages
+    //! Buffer for incoming messages
     char        incomingBuffer[MAX_SERIAL_MSG_SIZE * 2];
+    //! Complete received incoming message
     msg_t       incomingMessage;
-    uint8_t     incomingState;
+    //! Incoming message state
+    receiveState incomingState;
+    //! Received bytes of currently incoming message
     uint8_t     incomingNumReceived;
 
-    // buffer for outgoing messages
+    //! Buffer for outgoing messages
     char        outgoingBuffer[MAX_SERIAL_MSG_SIZE];
+    //! Length in bytes of outgoing message
     size_t      outgoingLength;
+    //! Number of bytes written of currently outgoing message.
     size_t      outgoingWritten;
 };
 

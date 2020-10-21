@@ -73,6 +73,10 @@ public:
     /**
      * Distributes a received message from one connection to all other connection.
      * The message is not echoed back to the sender.
+     *
+     * @param[in]   message     Incoming message which shall be distributed to
+     *                          the other connections.
+     * @param[in]   sender      Sender of the message.
      */
     void distributeMessage(const msg_t &message, Connection *sender);
 

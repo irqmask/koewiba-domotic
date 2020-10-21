@@ -40,8 +40,8 @@ public:
     /**
      * Initializes a socket connection which has been accepted by the socket server.
      *
-     * @param[in]   ioloop      Pointer to ioloop.
-     * @param[in]   address     Address and port of socket connection of TCP/IP
+     * @param[in]   io          Pointer to ioloop.
+     * @param[in]   uri         Address and port of socket connection of TCP/IP
      *                          address, e.g. 127.0.0.1:1234.
      * @param[in]   fd          File descriptor of established connection (optional
      *                          for server usage)

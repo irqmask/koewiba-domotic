@@ -39,6 +39,8 @@ extern "C" {
 
 // --- Definitions -------------------------------------------------------------
 
+//! Longest message payload size in bytes. Maximum from BUS_MAXSENDMSGLEN and
+//! BUS_MAXRECVMSGLEN
 #if (BUS_MAXSENDMSGLEN > BUS_MAXRECVMSGLEN)
 #define MAX_MSG_SIZE   BUS_MAXSENDMSGLEN
 #else

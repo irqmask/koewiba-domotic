@@ -49,6 +49,7 @@
 class ConnectionSerialTest : public ::testing::Test
 {
 protected:
+    /// SetUp is called before each test is started
     void SetUp() override
     {
         log_set_mask(0xFFFFFFFF);
@@ -58,40 +59,48 @@ protected:
         ioloop_init(&iol);
     }
 
+    /// TearDown is called after each test is finished
     void TearDown() override
     {
         ioloop_close(&iol);
     }
 
 public:
+    /// Handler for incoming message events
+    /// @param[in]  message     incoming message
+    /// @param[in]  reference   (unused here)
     void incomingCallback(const msg_t &message, void *reference);
+
+    /// Handler for close connection events
+    /// Is called when the connection gets closed remotely
+    /// @param[in]  uri         (unused here)
+    /// @param[in]  reference   (unused here)
     void closeCallback(const std::string &uri, void *reference);
 
     /// Counter how often the incoming callback has been called
-    int                 incomingCallbackCalled;
+    int incomingCallbackCalled;
     /// Counter how often the close callback has been called
-    int                 closeCallbackCalled;
+    int closeCallbackCalled;
 
     /// Last received message
-    static msg_t        incomingMessage;
+    static msg_t incomingMessage;
     /// Catched sent message
-    static char         outgoingMessage[256];
+    static char outgoingMessage[256];
 
 protected:
     /// Name of pipe device used for testing
     static constexpr char PIPE_DEVICE_NAME[] = "/tmp/kwb_test_pipe";
 
     /// IOLoop object where all connections are registered
-    ioloop_t            iol;
+    ioloop_t iol;
 
     /// Thread acting as relay comunication partner
     std::shared_ptr<std::thread> echoThread;
 
     /// Flag to keep recho thread running
-    bool                echoThreadRunning;
+    bool echoThreadRunning;
 
     /// Start the echo thread.
-    /// @param[in] server True, starts thread as server otherwise as client.
     void startEchoThread();
 
     /// Stop the echo thread.
@@ -107,6 +116,7 @@ protected:
     void runIOLoopFor(std::chrono::milliseconds duration);
 
     /// Echo thread
+    /// @param[in]  reference   Reference to the object of this test class.
     static void pipeRecvThread(ConnectionSerialTest *reference);
 };
 
@@ -114,17 +124,20 @@ msg_t ConnectionSerialTest::incomingMessage;
 char ConnectionSerialTest::outgoingMessage[256];
 constexpr char ConnectionSerialTest::PIPE_DEVICE_NAME[];
 
+//----------------------------------------------------------------------------
 void ConnectionSerialTest::incomingCallback(const msg_t &message, void *reference)
 {
     this->incomingCallbackCalled++;
     memcpy(&this->incomingMessage, &message, sizeof(msg_t));
 }
 
+//----------------------------------------------------------------------------
 void ConnectionSerialTest::closeCallback(const std::string &uri, void *reference)
 {
     this->closeCallbackCalled++;
 }
 
+//----------------------------------------------------------------------------
 void ConnectionSerialTest::startEchoThread()
 {
     char command[256] = {0};
@@ -149,6 +162,7 @@ void ConnectionSerialTest::startEchoThread()
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
 }
 
+//----------------------------------------------------------------------------
 void ConnectionSerialTest::stopEchoThread()
 {
     echoThreadRunning = false;
@@ -157,6 +171,7 @@ void ConnectionSerialTest::stopEchoThread()
     }
 }
 
+//----------------------------------------------------------------------------
 void ConnectionSerialTest::simpleSend(const char *data)
 {
     int fd = sys_serial_open(PIPE_DEVICE_NAME);
@@ -166,6 +181,7 @@ void ConnectionSerialTest::simpleSend(const char *data)
     }
 }
 
+//----------------------------------------------------------------------------
 void ConnectionSerialTest::runIOLoopFor(std::chrono::milliseconds duration)
 {
     auto start = std::chrono::high_resolution_clock::now();
@@ -176,6 +192,7 @@ void ConnectionSerialTest::runIOLoopFor(std::chrono::milliseconds duration)
     } while (std::chrono::duration_cast<std::chrono::seconds>(current - start) < duration);
 }
 
+//----------------------------------------------------------------------------
 void ConnectionSerialTest::pipeRecvThread(ConnectionSerialTest *reference)
 {
     char        c;
@@ -205,6 +222,8 @@ void ConnectionSerialTest::pipeRecvThread(ConnectionSerialTest *reference)
     }
 }
 
+/// @test Test that ConnectionSerial throws an exception if connection cannot
+/// be established.
 TEST_F(ConnectionSerialTest, fail_to_connect)
 {
     std::shared_ptr<ConnectionSerial> conn;
@@ -212,6 +231,8 @@ TEST_F(ConnectionSerialTest, fail_to_connect)
     ASSERT_EQ(nullptr, conn);
 }
 
+/// @test Test that ConnectionSerial is able to establish a connection and shut
+/// it down gracefully.
 TEST_F(ConnectionSerialTest, connect_and_close)
 {
     std::shared_ptr<ConnectionSerial> conn;
@@ -232,6 +253,7 @@ TEST_F(ConnectionSerialTest, connect_and_close)
     ASSERT_EQ(0, closeCallbackCalled);
     ASSERT_EQ(0, incomingCallbackCalled);
 }
+
 /*
 TEST_F(ConnectionSerialTest, remote_close)
 {
@@ -252,6 +274,7 @@ TEST_F(ConnectionSerialTest, remote_close)
 }
 */
 
+/// @test Test to send a message over a serial connection.
 TEST_F(ConnectionSerialTest, send)
 {
     std::shared_ptr<ConnectionSerial> conn;
@@ -285,6 +308,7 @@ TEST_F(ConnectionSerialTest, send)
     stopEchoThread();
 }
 
+/// @test Test to receive a message over a serial connection.
 TEST_F(ConnectionSerialTest, receive)
 {
     std::shared_ptr<ConnectionSerial> conn;

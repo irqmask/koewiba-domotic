@@ -41,6 +41,7 @@
 class ConnectionTest : public ::testing::Test
 {
 protected:
+    /// SetUp is called before each test is started
     void SetUp() override
     {
         log_set_mask(0xFFFFFFFF);
@@ -52,23 +53,37 @@ protected:
     // void TearDown() override {}
 
 public:
+    /// Handler for incoming message events
+    /// @param[in]  message     incoming message
+    /// @param[in]  reference   (unused here)
     void incomingCallback(const msg_t &message, void *reference);
+
+    /// Handler for close connection events
+    /// Is called when the connection gets closed remotely
+    ///
+    /// @param[in]  uri         (unused here)
+    /// @param[in]  reference   (unused here)
     void closeCallback(const std::string &uri, void *reference);
 
+    /// Counter how often the incoming callback has been called
     int incomingCallbackCalled;
+    /// Counter how often the close callback has been called
     int closeCallbackCalled;
 };
 
+//----------------------------------------------------------------------------
 void ConnectionTest::incomingCallback(const msg_t &message, void *reference)
 {
     incomingCallbackCalled++;
 }
 
+//----------------------------------------------------------------------------
 void ConnectionTest::closeCallback(const std::string &uri, void *reference)
 {
     closeCallbackCalled++;
 }
 
+/// @test Test if connection object can be instantiated.
 TEST_F(ConnectionTest, instantiate)
 {
     std::shared_ptr<Connection> conn = std::make_shared<Connection>(nullptr, std::string("test1"));
@@ -76,6 +91,7 @@ TEST_F(ConnectionTest, instantiate)
     conn.reset();
 }
 
+/// @test Test if connection callbas are called appropriately.
 TEST_F(ConnectionTest, callbacks)
 {
     std::shared_ptr<Connection> conn = std::make_shared<Connection>(nullptr, std::string("test2"));

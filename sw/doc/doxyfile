@@ -756,7 +756,7 @@ WARN_IF_DOC_ERROR      = YES
 # parameter documentation, but not about the absence of documentation.
 # The default value is: NO.
 
-WARN_NO_PARAMDOC       = NO
+WARN_NO_PARAMDOC       = YES
 
 # If the WARN_AS_ERROR tag is set to YES then doxygen will immediately stop when
 # a warning is encountered.
@@ -873,8 +873,17 @@ RECURSIVE              = YES
 # Note that relative paths are relative to the directory from which doxygen is
 # run.
 
-EXCLUDE                =
-
+#obsolete files
+EXCLUDE                = ../os/libkwb/vos.c \
+                         ../os/libkwb/vos.h \
+                         ../os/libkwb/message_bus.c \
+                         ../os/libkwb/message_bus.h \
+                         ../os/libkwb/message_serial.c \
+                         ../os/libkwb/message_serial.h \
+                         ../os/libkwb/message_socket.c \
+                         ../os/libkwb/message_socket.h \
+                         ../os/libkwb/timer_os.c
+            
 # The EXCLUDE_SYMLINKS tag can be used to select whether or not files or
 # directories that are symbolic links (a Unix file system feature) are excluded
 # from the input.

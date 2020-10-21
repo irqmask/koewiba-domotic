@@ -48,6 +48,7 @@
 class ConnectionSocketTest : public ::testing::Test
 {
 protected:
+    /// SetUp is called before each test is started
     void SetUp() override
     {
         log_set_mask(0xFFFFFFFF);
@@ -57,20 +58,32 @@ protected:
         ioloop_init(&iol);
     }
 
+    /// TearDown is called after each test is finished
     void TearDown() override
     {
         ioloop_close(&iol);
     }
 
 public:
+    /// Handler for incoming message events
+    /// @param[in]  message     incoming message
+    /// @param[in]  reference   (unused here)
     void incomingCallback(const msg_t &message, void *reference);
+
+    /// Handler for close connection events
+    /// Is called when the connection gets closed remotely
+    /// @param[in]  uri         (unused here)
+    /// @param[in]  reference   (unused here)
     void closeCallback(const std::string &uri, void *reference);
+
+    /// Counter how often the incoming callback has been called
     int incomingCallbackCalled;
+    /// Counter how often the close callback has been called
     int closeCallbackCalled;
 
 protected:
     /// IOLoop object where all connections are registered
-    ioloop_t        iol;
+    ioloop_t iol;
 
     /// Thread acting as relay comunication partner
     std::shared_ptr<std::thread> echoThread;
@@ -80,6 +93,7 @@ protected:
     /// Start the echo thread.
     /// @param[in] server True, starts thread as server otherwise as client.
     void startEchoThread(bool server);
+
     /// Stop the echo thread.
     void stopEchoThread();
 
@@ -89,21 +103,27 @@ protected:
     void runIOLoopFor(std::chrono::milliseconds duration);
 
     /// Echo thread as a server
+    /// @param[in]  reference   Reference to the object of this test class.
     static void serverThread(ConnectionSocketTest *reference);
+
     /// Echo thread as a client
+    /// @param[in]  reference   Reference to the object of this test class.
     static void clientThread(ConnectionSocketTest *reference);
 };
 
+//----------------------------------------------------------------------------
 void ConnectionSocketTest::incomingCallback(const msg_t &message, void *reference)
 {
     ConnectionSocketTest::incomingCallbackCalled++;
 }
 
+//----------------------------------------------------------------------------
 void ConnectionSocketTest::closeCallback(const std::string &uri, void *reference)
 {
     ConnectionSocketTest::closeCallbackCalled++;
 }
 
+//----------------------------------------------------------------------------
 void ConnectionSocketTest::startEchoThread(bool server)
 {
     echoThreadRunning = true;
@@ -117,6 +137,7 @@ void ConnectionSocketTest::startEchoThread(bool server)
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
 }
 
+//----------------------------------------------------------------------------
 void ConnectionSocketTest::stopEchoThread()
 {
     echoThreadRunning = false;
@@ -125,6 +146,7 @@ void ConnectionSocketTest::stopEchoThread()
     }
 }
 
+//----------------------------------------------------------------------------
 void ConnectionSocketTest::runIOLoopFor(std::chrono::milliseconds duration)
 {
     auto start = std::chrono::high_resolution_clock::now();
@@ -135,6 +157,7 @@ void ConnectionSocketTest::runIOLoopFor(std::chrono::milliseconds duration)
     } while (std::chrono::duration_cast<std::chrono::seconds>(current - start) < duration);
 }
 
+//----------------------------------------------------------------------------
 void ConnectionSocketTest::serverThread(ConnectionSocketTest *reference)
 {
     char address[256] = {'\0'};
@@ -173,11 +196,13 @@ void ConnectionSocketTest::serverThread(ConnectionSocketTest *reference)
     }
 }
 
+//----------------------------------------------------------------------------
 void ConnectionSocketTest::clientThread(ConnectionSocketTest *reference)
 {
 
 }
 
+/// @test Test splitting an URI string into IPv4 address and port number.
 TEST_F(ConnectionSocketTest, parseURI)
 {
     std::string address = "";
@@ -200,6 +225,7 @@ TEST_F(ConnectionSocketTest, parseURI)
     ASSERT_EQ(2000, port);
 }
 
+/// @test Test opening and closing a connection
 TEST_F(ConnectionSocketTest, connect_and_close)
 {
     std::shared_ptr<ConnectionSocket> conn;
@@ -221,6 +247,7 @@ TEST_F(ConnectionSocketTest, connect_and_close)
     ASSERT_EQ(0, incomingCallbackCalled);
 }
 
+/// @test Test if socket connecion object recognizes a remotely closed connection.
 TEST_F(ConnectionSocketTest, remote_close)
 {
     std::shared_ptr<ConnectionSocket> conn;
@@ -241,6 +268,7 @@ TEST_F(ConnectionSocketTest, remote_close)
     conn.reset();
 }
 
+/// @test Test sending and receiving over a socket connection
 TEST_F(ConnectionSocketTest, send_and_receive)
 {
     std::shared_ptr<ConnectionSocket> conn;

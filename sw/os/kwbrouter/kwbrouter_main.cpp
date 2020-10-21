@@ -275,6 +275,23 @@ static void create_unix_socket_file(options_t *options)
 
 /**
  * Entry point into kwbrouter application.
+ *
+ * The following arguments can be used:
+ * <pre>
+ * kwbrouter [-a \<address\>] [-p \<port\>] [-d \<device\>] [-b \<baudrate\>] [-v \<vbusd address\>] [-w \<vbusd port\>] [-n \<node address\>]
+ *
+ * Arguments:
+ * -a \<remote_address\> As client: Address of remote kwbrouter server. e.g. 192.168.178.100:54321
+ * -p \<server_port\>    As server: Port number to listen to.
+ * -d \<device\>         Device of serial bus connection. e.g. /dev/ttyUSB0
+ * -b \<baudrate\>       Baudrate of serial bus connection. Default: 57600
+ * -o \<node address\>   Own node address (has to be the same address as connected gateway module)
+ * </pre>
+ *
+ * @param[in]   argc    Number of arguments passed.
+ * @param[in]   argv    List of program arguments.
+ *
+ * @return 0, if successfully executed, otherwise a non-zero value.
  */
 int main(int argc, char *argv[])
 {

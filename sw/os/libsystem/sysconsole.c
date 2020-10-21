@@ -77,6 +77,7 @@ char getche(void)
 
 #endif
 
+//----------------------------------------------------------------------------
 #if defined (PRJCONF_WINDOWS) && (_MSC_VER) && _MSC_VER < 1900
 /*int vsnprintf(char *outBuf, size_t size, const char *format, va_list ap)
 {

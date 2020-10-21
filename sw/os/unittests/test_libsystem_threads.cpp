@@ -44,7 +44,7 @@
 
 // --- Global variables --------------------------------------------------------
 
-int g_thread_value = 0;
+static int g_thread_value = 0;
 
 // --- Module global variables -------------------------------------------------
 
@@ -54,13 +54,13 @@ int g_thread_value = 0;
 
 // --- Global functions --------------------------------------------------------
 
-
-void *test1_thread(void *user_arg)
+static void *test1_thread(void *user_arg)
 {
     g_thread_value = 42;
     return NULL;
 }
 
+/// @test Test to start a thread.
 TEST(libsystem, threads_1)
 {
     g_thread_value = 0;

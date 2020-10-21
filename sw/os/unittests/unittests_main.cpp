@@ -46,6 +46,12 @@
 
 // --- Global functions --------------------------------------------------------
 
+/**
+ * Main entry point of unit tests.
+ * @param[in]   argc    Number of arguments passed.
+ * @param[in]   argv    List of program arguments.
+ * @return 0, if tests passed successfully otherwise non-zero.
+ */
 int main(int argc, char *argv[])
 {
     int rc;

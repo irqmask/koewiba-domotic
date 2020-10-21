@@ -141,7 +141,7 @@ static const int c_stopbits[eSYS_SER_SB_LAST] = {
 
 sys_fd_t sys_serial_open(const char *device)
 {
-    sys_fd_t fd;
+    sys_fd_t fd = INVALID_FD;
 #if defined (PRJCONF_UNIX) || \
     defined (PRJCONF_POSIX) || \
     defined (PRJCONF_LINUX)
@@ -155,6 +155,7 @@ sys_fd_t sys_serial_open(const char *device)
         // without delay (check if other side is properly connected)
         fd = open(device, O_RDWR | O_NOCTTY | O_NDELAY);
         if (fd <= INVALID_FD) {
+            fd = INVALID_FD;
             perror("Unable to open serial device");
             break;
         }
@@ -172,6 +173,7 @@ sys_fd_t sys_serial_open(const char *device)
     return fd;
 }
 
+//----------------------------------------------------------------------------
 void sys_serial_close(sys_fd_t fd)
 {
 #if defined (PRJCONF_UNIX) || \
@@ -183,6 +185,7 @@ void sys_serial_close(sys_fd_t fd)
 #endif
 }
 
+//----------------------------------------------------------------------------
 int sys_serial_set_params(sys_fd_t            fd,
                           sys_ser_baudrate_t  baudrate,
                           sys_ser_databits_t  databits,
@@ -318,6 +321,7 @@ int sys_serial_set_params(sys_fd_t            fd,
     return rc;
 }
 
+//----------------------------------------------------------------------------
 ssize_t sys_serial_send(sys_fd_t fd, const void *buf, size_t bufsize)
 {
 #if defined (PRJCONF_UNIX) || \
@@ -334,6 +338,7 @@ ssize_t sys_serial_send(sys_fd_t fd, const void *buf, size_t bufsize)
 #endif
 }
 
+//----------------------------------------------------------------------------
 ssize_t sys_serial_recv(sys_fd_t fd, void *buf, size_t bufsize)
 {
 #if defined (PRJCONF_UNIX) || \
@@ -349,6 +354,7 @@ ssize_t sys_serial_recv(sys_fd_t fd, void *buf, size_t bufsize)
 #endif
 }
 
+//----------------------------------------------------------------------------
 void sys_serial_flush(sys_fd_t fd)
 {
 #if defined (PRJCONF_UNIX) || \
@@ -360,6 +366,7 @@ void sys_serial_flush(sys_fd_t fd)
 #endif
 }
 
+//----------------------------------------------------------------------------
 size_t sys_serial_get_pending_sendq(sys_fd_t fd)
 {
     size_t pending_bytes = 0;
@@ -377,6 +384,7 @@ size_t sys_serial_get_pending_sendq(sys_fd_t fd)
     return pending_bytes;
 }
 
+//----------------------------------------------------------------------------
 size_t sys_serial_get_pending_recvq(sys_fd_t fd)
 {
     size_t pending_bytes = 0;
@@ -394,6 +402,7 @@ size_t sys_serial_get_pending_recvq(sys_fd_t fd)
     return pending_bytes;
 }
 
+//----------------------------------------------------------------------------
 void sys_serial_set_blocking(sys_fd_t fd, bool blocking)
 {
 #if defined (PRJCONF_UNIX) || \
@@ -410,6 +419,7 @@ void sys_serial_set_blocking(sys_fd_t fd, bool blocking)
 #endif
 }
 
+//----------------------------------------------------------------------------
 sys_ser_baudrate_t sys_serial_baudrate(uint32_t baudrate)
 {
     sys_ser_baudrate_t br = -1;

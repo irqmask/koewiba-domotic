@@ -1,4 +1,6 @@
-/**
+/* OBSOLETE, DO NOT USE FOR FUTURE PROJECTS, REPLACE IN EXISTING PROJECTS WITH
+ * connection_socket.
+ *
  * @addtogroup MESSAGE_SOCKET
  * @brief Transmit bus-messages between KWB applications via unix or inet
  * sockets.

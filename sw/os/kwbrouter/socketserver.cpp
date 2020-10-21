@@ -128,9 +128,9 @@ void SocketServer::onCloseConnection(ConnectionSocket *connection)
 }
 
 //----------------------------------------------------------------------------
-int SocketServer::acceptConnection(void *arg)
+int SocketServer::acceptConnection(void *reference)
 {
-    SocketServer *server = static_cast<SocketServer *>(arg);
+    SocketServer *server = static_cast<SocketServer *>(reference);
     char address[256];
     uint16_t port;
     sys_fd_t newFd;

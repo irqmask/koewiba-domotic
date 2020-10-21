@@ -60,6 +60,7 @@ void sys_err_get_as_string(char *buffer, size_t buffersize)
 }
 #endif
 
+//----------------------------------------------------------------------------
 void sys_err_print_last(void)
 {
     char buffer[256];

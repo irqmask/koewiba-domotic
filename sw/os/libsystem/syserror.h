@@ -61,7 +61,17 @@ extern "C" {
 
 // --- Global functions --------------------------------------------------------
 
+/**
+ * Copy last occurred system error (given by errno) into buffer.
+ *
+ * @param[in]   buffer      Buffer to hold system error message.
+ * @param[in]   buffersize  Maximum size in bytes to store the error string.
+ */
 void sys_err_get_as_string(char *buffer, size_t buffersize);
+
+/**
+ * Print last occurred system error to stderr.
+ */
 void sys_err_print_last(void);
 
 #ifdef __cplusplus

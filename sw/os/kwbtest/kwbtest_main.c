@@ -62,7 +62,7 @@
 
 // --- Local variables ---------------------------------------------------------
 
-bool   g_end_application = false;
+static bool g_end_application = false;
 
 // --- Global variables --------------------------------------------------------
 
@@ -104,6 +104,12 @@ static void on_close_connection(const char *address, uint16_t port, void *refere
 
 // --- Global functions --------------------------------------------------------
 
+/**
+ * Main entry point of kwbtest playground.
+ * @param[in]   argc    Number of arguments passed.
+ * @param[in]   argv    List of program arguments.
+ * @return 0, if successfully executed, otherwise a non-zero value.
+ */
 int main(int argc, char *argv[])
 {
     (argc);

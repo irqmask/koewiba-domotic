@@ -47,14 +47,28 @@ extern "C" {
 // --- Definitions -------------------------------------------------------------
 
 #if defined (PRJCONF_WINDOWS)
+
+/**
+ * Declaration of a thread function.
+ */
 #  define sys_thread_func(name) DWORD WINAPI name( LPVOID p)
 
+/**
+ * Start a thread
+ */
 #  define sys_thread_start(func)    do{                 \
                                         CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)(func), NULL, 0, NULL);\
                                     }while(0);
 #else
+
+/**
+ * Declaration of a thread function.
+ */
 #  define sys_thread_func(name) void *name(void *p)
 
+/**
+ * Start a thread
+ */
 #  define sys_thread_start(func)    do{                 \
                                         pthread_t tid;   \
                                         pthread_create(&tid, NULL, func, NULL);\

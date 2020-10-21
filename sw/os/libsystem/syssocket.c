@@ -55,8 +55,11 @@
  * Socket information of different socket classes.
  */
 typedef union {
+    //! Protocol common socket information
     struct sockaddr  common;
+    //! Socket information of UNIX sockets
     struct sockaddr_un af_unix;
+    //! Socket information of TCP/IP sockets
     struct sockaddr_in af_inet;
 } sockinfo_t;
 
@@ -67,7 +70,6 @@ typedef union {
 // --- Module global variables -------------------------------------------------
 
 // --- Local functions ---------------------------------------------------------
-
 
 static void sys_socket_get_address(sys_fd_t fd, sockinfo_t *sockinfo, char *address, size_t addr_len, uint16_t *port)
 {
@@ -155,6 +157,7 @@ sys_fd_t sys_socket_open_server_unix(const char *socketname)
 #endif
 }
 
+//----------------------------------------------------------------------------
 sys_fd_t sys_socket_open_client_unix(const char *socketname)
 {
 #if defined (PRJCONF_UNIX) || \
@@ -189,6 +192,7 @@ sys_fd_t sys_socket_open_client_unix(const char *socketname)
 #endif
 }
 
+//----------------------------------------------------------------------------
 sys_fd_t sys_socket_open_server_tcp(uint16_t port)
 {
 #if defined (PRJCONF_UNIX) || \
@@ -239,6 +243,7 @@ sys_fd_t sys_socket_open_server_tcp(uint16_t port)
 #endif
 }
 
+//----------------------------------------------------------------------------
 sys_fd_t sys_socket_open_client_tcp(const char *socketaddress, uint16_t port)
 {
 #if defined (PRJCONF_UNIX) || \
@@ -278,6 +283,7 @@ sys_fd_t sys_socket_open_client_tcp(const char *socketaddress, uint16_t port)
 #endif
 }
 
+//----------------------------------------------------------------------------
 void sys_socket_close(sys_fd_t fd)
 {
 #if defined (PRJCONF_UNIX) || \
@@ -288,6 +294,7 @@ void sys_socket_close(sys_fd_t fd)
 #endif
 }
 
+//----------------------------------------------------------------------------
 sys_fd_t sys_socket_accept(sys_fd_t server_fd, char *address, size_t address_len, uint16_t *port)
 {
 #if defined (PRJCONF_UNIX) || \
@@ -306,6 +313,7 @@ sys_fd_t sys_socket_accept(sys_fd_t server_fd, char *address, size_t address_len
 #endif
 }
 
+//----------------------------------------------------------------------------
 ssize_t sys_socket_recv(sys_fd_t fd, void *buffer, size_t buffersize)
 {
 #if defined (PRJCONF_UNIX) || \
@@ -318,6 +326,7 @@ ssize_t sys_socket_recv(sys_fd_t fd, void *buffer, size_t buffersize)
 #endif
 }
 
+//----------------------------------------------------------------------------
 ssize_t sys_socket_send(sys_fd_t fd, const void *buffer, size_t buffersize)
 {
 #if defined (PRJCONF_UNIX) || \
@@ -330,6 +339,7 @@ ssize_t sys_socket_send(sys_fd_t fd, const void *buffer, size_t buffersize)
 #endif
 }
 
+//----------------------------------------------------------------------------
 void sys_socket_flush(sys_fd_t fd)
 {
 #if defined (PRJCONF_UNIX) || \
@@ -341,6 +351,7 @@ void sys_socket_flush(sys_fd_t fd)
 #endif
 }
 
+//----------------------------------------------------------------------------
 size_t sys_socket_get_pending_sendq(sys_fd_t fd)
 {
 #if defined (PRJCONF_UNIX) || \
@@ -356,6 +367,7 @@ size_t sys_socket_get_pending_sendq(sys_fd_t fd)
 #endif
 }
 
+//----------------------------------------------------------------------------
 size_t sys_socket_get_pending_recvq(sys_fd_t fd)
 {
 #if defined (PRJCONF_UNIX) || \
@@ -371,6 +383,7 @@ size_t sys_socket_get_pending_recvq(sys_fd_t fd)
 #endif
 }
 
+//----------------------------------------------------------------------------
 void sys_socket_set_blocking(sys_fd_t fd, bool blocking)
 {
 #if defined (PRJCONF_UNIX) || \

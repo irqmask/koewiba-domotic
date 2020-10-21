@@ -52,6 +52,7 @@ public:
      *                          The client will be added automatically to the routing list.
      */
     SocketServer(ioloop_t *iol, Router *r);
+
     /**
      * When a socket server is destroyed, close all remaining open connections
      * before.
@@ -69,6 +70,7 @@ public:
      * @returns eERR_None, if successful otherwise error code of #gen_errors_t.
      */
     void open(const char *address, uint16_t port);
+
     /**
      * Closes the server. Before all remaining client connections will be closed.
      */
@@ -76,19 +78,40 @@ public:
 
     /**
      * Called when a new connection has been established.
-     * @param[in]   endpoint    Pointer to established connection.
+     *
+     * @param[in]   connection  Pointer to established connection.
      */
     void onNewConnection(ConnectionSocket *connection);
 
     /**
      * Call this function, when a client connection closes, so the client
      * can be removed from client list.
+     *
+     * @param[in]   connection  Pointer to established connection.
      */
     void onCloseConnection(ConnectionSocket *connection);
 
 protected:
+    /**
+     * Default constructor.
+     */
     SocketServer();
-    static int acceptConnection(void *arg);
+
+    /**
+     * Callback function which will be called to accept incoming connections.
+     *
+     * @param[in]   reference   Callback reference to the server object.
+     *
+     * @return (unused)Always returs 0 to fulfill ioloops callback sibnature.
+     */
+    static int acceptConnection(void *reference);
+
+    /**
+     * Callback function which will be called when a connection is closed remotely.
+     *
+     * @param[in]   uri         URI of closed connection
+     * @param[in]   reference   Callback reference to the server object.
+     */
     void lostConnection(const std::string &uri, void *reference);
 
     std::list<ConnectionSocket *> clients;  ///< list of connected clients

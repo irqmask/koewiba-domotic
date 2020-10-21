@@ -46,6 +46,7 @@
 
 // --- Definitions -------------------------------------------------------------
 
+//! Invalid handle value
 #if defined (PRJCONF_UNIX) || \
     defined (PRJCONF_POSIX) || \
     defined (PRJCONF_LINUX)
@@ -56,6 +57,7 @@
 
 // --- Type definitions --------------------------------------------------------
 
+//! operating-system specific error codes
 typedef enum {
     eSYS_ERR_NONE = eERR_NONE,
 
@@ -63,6 +65,7 @@ typedef enum {
     eSYS_ERR_SER_CONFIGURE,
 } sys_errors_t;
 
+//! Operating system independent handle value.
 #if defined (PRJCONF_UNIX) || \
     defined (PRJCONF_POSIX) || \
     defined (PRJCONF_LINUX)

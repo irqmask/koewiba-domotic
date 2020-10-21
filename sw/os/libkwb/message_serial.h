@@ -1,4 +1,6 @@
-/**
+/* OBSOLETE, DO NOT USE FOR FUTURE PROJECTS, REPLACE IN EXISTING PROJECTS WITH
+ * connection_serial.
+ *
  * @addtogroup MESSAGE_SERIAL
  * @brief Transmit bus-messages between KWB applications via RS232 to a gateway
  * which routes the messages to/from the bus.

@@ -49,6 +49,11 @@ extern "C" {
 
 // --- Definitions -------------------------------------------------------------
 
+/**
+ * Sleep a given amount of milliseconds
+ *
+ * @param[in]   x   Number of milliseconds to sleep.
+ */
 #if defined (PRJCONF_UNIX) || \
     defined (PRJCONF_POSIX) || \
     defined (PRJCONF_LINUX)
@@ -59,6 +64,7 @@ extern "C" {
 
 // --- Type definitions --------------------------------------------------------
 
+//! Type for timestamps in microseconds
 typedef uint64_t sys_time_t;
 
 // --- Local variables ---------------------------------------------------------
@@ -73,6 +79,9 @@ typedef uint64_t sys_time_t;
 
 // --- Global functions --------------------------------------------------------
 
+/**
+ * @return time in microseconds
+ */
 sys_time_t sys_time_get_usecs(void);
 
 #ifdef __cplusplus

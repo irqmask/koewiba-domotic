@@ -35,12 +35,16 @@
 
 // --- Definitions -------------------------------------------------------------
 
+//! First error number for generic errors
 #define ERROR_GENERIC       100
+//! First error number for errors of libsystem library
 #define ERROR_LIBSYSTEM     200
+//! First error number for user-defined errors.
 #define ERROR_USER1         300
 
 // --- Type definitions --------------------------------------------------------
 
+//! Generic errors
 typedef enum {
     eRUNNING = -1,
     eERR_NONE = 0,

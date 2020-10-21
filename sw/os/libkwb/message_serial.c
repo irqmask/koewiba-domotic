@@ -1,4 +1,6 @@
-/**
+/* OBSOLETE, DO NOT USE FOR FUTURE PROJECTS, REPLACE IN EXISTING PROJECTS WITH
+ * connection_serial.
+ *
  * @addtogroup MESSAGE_SERIAL
  *
  * @{

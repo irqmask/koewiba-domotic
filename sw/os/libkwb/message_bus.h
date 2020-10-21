@@ -1,4 +1,5 @@
-/**
+/* OBSOLETE, DO NOT USE FOR FUTURE PROJECTS.
+ *
  * @addtogroup MESSAGE_BUS
  * @brief Transmit KoeWiBa messages over a serial connection.
  *

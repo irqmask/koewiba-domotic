@@ -51,6 +51,7 @@
 
 // --- Global functions --------------------------------------------------------
 
+/// @test Test function to get timestamp in microseconds
 TEST(libsystem, time_1)
 {
     sys_time_t start, end, diff;

@@ -67,19 +67,24 @@
  * Storage type selected options for this application.
  */
 typedef struct options {
-    char        router_address[256];    //!< address of tcp- or unix socket server.
-    uint16_t    router_port;            //!< port of tcp socket server or 0 for
-    //!< unix socket server.
-    bool        router_address_set;     //!< flag if router address is set and valid.
+    //! address of tcp- or unix socket server.
+    char        router_address[256];
+    //! port of tcp socket server or 0 for unix socket server.
+    uint16_t    router_port;
+    //! flag if router address is set and valid.
+    bool        router_address_set;
 } options_t;
 
 // --- Local variables ---------------------------------------------------------
 
-app_handles_t       g_handles;          //!< stores globally used handles in
-//!< this application.
-msg_socket_t        g_kwb_socket;       //!< handle to established socket connection.
-msg_endpoint_t     *g_kwb_socket_ep;    //!< handle of endpoint of established socket connection.
-bool                g_end_application = false;  //!< flag, if mainloop shall be exited.
+//! stores globally used handles in this application.
+app_handles_t       g_handles;
+//! handle to established socket connection.
+msg_socket_t        g_kwb_socket;
+//! handle of endpoint of established socket connection.
+msg_endpoint_t     *g_kwb_socket_ep;
+//! flag, if mainloop shall be exited.
+bool                g_end_application = false;
 
 // --- Module global variables -------------------------------------------------
 
@@ -194,6 +199,10 @@ static void log_mqtt_version(void)
 
 /**
  * Is called by mqtt library when a mqtt message has been received.
+ *
+ * @param[in]   mosq        (unused)Handle of mosquitto connection
+ * @param[in]   userdata    (unused)
+ * @param[in]   message     Received MQTT topic and MQTT message
  */
 void on_mqtt_message(struct mosquitto *mosq, void *userdata, const struct mosquitto_message *message)
 {
@@ -213,6 +222,7 @@ void on_mqtt_message(struct mosquitto *mosq, void *userdata, const struct mosqui
 
 /**
  * Called when this client got connected to the MQTT server.
+ *
  * @param[in]   mosq        Mosquitto handle.
  * @param[in]   userdata    Pointer to user defined data.
  * @param[in]   result      MQTT error: reason for disconnect.
@@ -231,6 +241,7 @@ void on_mqtt_connect(struct mosquitto *mosq, void *userdata, int result)
 
 /**
  * Called when this client gets disconnected from the MQTT server.
+ *
  * @param[in]   mosq        Mosquitto handle.
  * @param[in]   userdata    Pointer to user defined data.
  * @param[in]   result      MQTT error: reason for disconnect.
@@ -251,11 +262,12 @@ void on_mqtt_disconnect(struct mosquitto *mosq, void *userdata, int result)
 /**
  * Called on successful subscription of a topic.
  * Passed information is just logged.
+ *
  * @param[in]   mosq        Mosquitto connection handle
- * @param[in]   userdata
- * @param[in]   mid
- * @param[in]   qos_count
- * @param[in]   granted_qos
+ * @param[in]   userdata    (unused)
+ * @param[in]   mid         (only logged)
+ * @param[in]   qos_count   MQTT Quality of service count
+ * @param[in]   granted_qos MQTT Granted qualitiy of service.
  */
 void on_mqtt_topic_subscribed(struct mosquitto *mosq, void *userdata, int mid, int qos_count, const int *granted_qos)
 {
@@ -267,6 +279,10 @@ void on_mqtt_topic_subscribed(struct mosquitto *mosq, void *userdata, int mid, i
     }
 }
 
+/**
+ * Setup connection to mosquitto server.
+ * @return eERR_None if successful, otherwise error code.
+ */
 int mosquitto_setup()
 {
     struct mosquitto *mosq = NULL;
@@ -327,6 +343,7 @@ void on_kwb_incomming_message(msg_t *message, void *reference, void *arg)
 
 /**
  * This function is called when the connection to the kwbrouter is closed.
+ *
  * @param[in]   address     Address of connetion which was closed.
  * @param[in]   port        Portnumber of connection which was closed.
  * @param[in]   reference   Optional reference, registered with this callback.
@@ -341,8 +358,8 @@ void on_kwb_close_connection(const char *address, uint16_t port, void *reference
 /**
  * Setup socket connection to kwbrouter.
  *
- * @param ioloop[in]    ioloop to connect to.
- * @param options[in]   Pointer to global options structure.
+ * @param[in]   ioloop      ioloop to connect to.
+ * @param[in]   options     Pointer to global options structure.
  *
  * @return 0 if successful, otherwise errorcode.
  */

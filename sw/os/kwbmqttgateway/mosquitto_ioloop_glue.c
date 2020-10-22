@@ -54,7 +54,7 @@
 
 /**
  * Callback whenever the registered socket for this callback is able to be read.
- * @param[in] Ponter to structure carrying application handles.
+ * @param[in]   arg         Pointer to structure carrying application handles.
  * @returns always 0 meaning ioloop shall continue calling this callback.
  */
 static int on_read_handler(void *arg)
@@ -75,7 +75,7 @@ static int on_read_handler(void *arg)
 
 /**
  * Callback whenever the registered socket for this callback is able to be written.
- * @param[in] Ponter to structure carrying application handles.
+ * @param[in]   arg     Pointer to structure carrying application handles.
  * @returns always 0 meaning ioloop shall continue calling this callback.
  */
 static int on_write_handler(void *arg)
@@ -97,7 +97,7 @@ static int on_write_handler(void *arg)
 
 /**
  * Callback called in a cyclic interval for MQTT housekeeping.
- * @param[in] Ponter to structure carrying application handles.
+ * @param[in]   arg     Pointer to structure carrying application handles.
  * @returns always 0 meaning ioloop shall continue calling this callback.
  */
 static int on_misc_handler(void *arg)
@@ -122,7 +122,7 @@ static int on_misc_handler(void *arg)
 
 /**
  * Connect MQTT to ioloop.
- * @param[in] structure carrying all network (kwb and mqtt) handles of the application.
+ * @param[in]   h       Structure carrying all network (kwb and mqtt) handles of the application.
  * @returns 0 if successful otherwise error-code.
  */
 int mosquitto_connect_to_ioloop(app_handles_t *h)
@@ -145,7 +145,7 @@ int mosquitto_connect_to_ioloop(app_handles_t *h)
 
 /**
  * Check if a MQTTmessage has to be written. If not suspend write callbacks.
- * @param[in] structure carrying all network (kwb and mqtt) handles of the application.
+ * @param[in]   h       Structure carrying all network (kwb and mqtt) handles of the application.
  */
 void mosquitto_ioloop_suspend_write(app_handles_t *h)
 {

@@ -44,11 +44,15 @@
 // --- Type definitions --------------------------------------------------------
 
 typedef std::function<bool(const msg_t &)> msg_filter_t;
-//typedef std::function<void(msg_t&)> msg_handler_t;
 
+//! Hold callbacks and reference to filter incomin messages to convey it to
+//! interested entities.
 typedef struct {
-    void           *reference;      //! Reference to identify this entry
+    //! Reference to identify this entry
+    void           *reference;
+    //! Filter function
     msg_filter_t    msg_filter;
+    //! Incoming message handler
     incom_func_t    msg_handler;
 } msg_filter_data_t;
 
@@ -58,6 +62,10 @@ typedef struct {
 
 // --- Class definition --------------------------------------------------------
 
+/**
+ * Message broker class. Used to sort incoming messages to pending requests that
+ * have been made before.
+ */
 class MsgBroker
 {
 public:

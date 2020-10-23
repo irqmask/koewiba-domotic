@@ -50,29 +50,32 @@
 
 ActionReadRegister::ActionReadRegister(Connection   &msgep,
                                        MsgBroker    &broker,
-                                       uint16_t     nodeId,
+                                       uint16_t     moduleAddr,
                                        uint8_t      registerId)
-    : ActionWithResponse(msgep, broker, nodeId)
+    : ActionWithResponse(msgep, broker, moduleAddr)
     , registerId(registerId)
 {
 }
 
+//----------------------------------------------------------------------------
 void ActionReadRegister::setRegisterId(uint8_t registerId)
 {
     this->registerId = registerId;
 }
 
+//----------------------------------------------------------------------------
 uint8_t ActionReadRegister::getRegisterId()
 {
     return this->registerId;
 }
 
+//----------------------------------------------------------------------------
 bool ActionReadRegister::formMessage()
 {
-    if (nodeId == 0) {
+    if (moduleAddr == 0) {
         return false;
     }
-    messageToSend.receiver = nodeId;
+    messageToSend.receiver = moduleAddr;
     messageToSend.sender = connection.getOwnNodeId();
     messageToSend.length = 2;
     messageToSend.data[0] = eCMD_REQUEST_REG;
@@ -80,9 +83,10 @@ bool ActionReadRegister::formMessage()
     return true;
 }
 
+//----------------------------------------------------------------------------
 bool ActionReadRegister::filterResponse(const msg_t &message)
 {
-    if (message.sender == nodeId &&
+    if (message.sender == moduleAddr &&
         message.length >= 3 &&
         (message.data[0] == eCMD_STATE_TYPELESS ||
          message.data[0] == eCMD_STATE_BITFIELDS ||
@@ -96,12 +100,14 @@ bool ActionReadRegister::filterResponse(const msg_t &message)
     return false;
 }
 
+//----------------------------------------------------------------------------
 void ActionReadRegister::handleResponse(const msg_t &message, void *reference)
 {
     receivedMessage = message;
     messageReceived = true;
 }
 
+//----------------------------------------------------------------------------
 int ActionReadRegister::getValue()
 {
     int value = 0;

@@ -46,8 +46,8 @@
 
 ActionWithResponse::ActionWithResponse(Connection   &conn,
                                        MsgBroker    &broker,
-                                       uint16_t     nodeId)
-    : ActionRequest(conn, broker, nodeId)
+                                       uint16_t     moduleAddr)
+    : ActionRequest(conn, broker, moduleAddr)
     , receivedMessage({0})
 , messageReceived(false)
 {
@@ -59,16 +59,19 @@ ActionWithResponse::ActionWithResponse(Connection   &conn,
     msgBroker.registerForResponse(this, filterResponseFunc, handleResponseFunc);
 }
 
+//----------------------------------------------------------------------------
 void ActionWithResponse::cancel()
 {
     msgBroker.unregisterForResponse(this);
 }
 
+//----------------------------------------------------------------------------
 bool ActionWithResponse::isFinished()
 {
-    return timeout_elapsed || messageReceived;
+    return timeoutOccurred || messageReceived;
 }
 
+//----------------------------------------------------------------------------
 bool ActionWithResponse::waitForResponse()
 {
     auto start = std::chrono::high_resolution_clock::now();
@@ -77,7 +80,7 @@ bool ActionWithResponse::waitForResponse()
         auto elapsed = std::chrono::high_resolution_clock::now() - start;
         std::this_thread::yield(); // better wait for an event
         if (elapsed > timeout) {
-            timeout_elapsed = true;
+            timeoutOccurred = true;
             cancel();
             break;
         }

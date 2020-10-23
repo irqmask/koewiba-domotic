@@ -66,6 +66,7 @@ UIConsole::UIConsole(Application &app) : app(app)
     this->last_choice = '\0';
 }
 
+//----------------------------------------------------------------------------
 void UIConsole::run()
 {
     while (!this->leave_menu) {
@@ -75,10 +76,12 @@ void UIConsole::run()
     }
 }
 
+//----------------------------------------------------------------------------
 void UIConsole::display()
 {
 }
 
+//----------------------------------------------------------------------------
 uint32_t UIConsole::queryU32(std::string query_text, uint32_t lowest_allowed = 0, uint32_t highest_allowed = UINT_MAX)
 {
     bool input_is_valid = false;
@@ -105,16 +108,19 @@ uint32_t UIConsole::queryU32(std::string query_text, uint32_t lowest_allowed = 0
     return value;
 }
 
+//----------------------------------------------------------------------------
 uint16_t UIConsole::queryU16(std::string query_text, uint16_t lowest_allowed = 0, uint16_t highest_allowed = USHRT_MAX)
 {
     return (uint16_t)queryU32(query_text, lowest_allowed, highest_allowed);
 }
 
+//----------------------------------------------------------------------------
 uint8_t UIConsole::queryU8(std::string query_text, uint8_t lowest_allowed = 0, uint8_t highest_allowed = UCHAR_MAX)
 {
     return (uint8_t)queryU32(query_text, lowest_allowed, highest_allowed);
 }
 
+//----------------------------------------------------------------------------
 int32_t UIConsole::queryI32(std::string query_text, int32_t lowest_allowed = INT_MIN, int32_t highest_allowed = INT_MAX)
 {
     bool input_is_valid = false;
@@ -141,17 +147,20 @@ int32_t UIConsole::queryI32(std::string query_text, int32_t lowest_allowed = INT
     return value;
 }
 
+//----------------------------------------------------------------------------
 int16_t UIConsole::queryI16(std::string query_text, int16_t lowest_allowed = SHRT_MIN,
                             int16_t highest_allowed = SHRT_MAX)
 {
     return (int16_t)queryI32(query_text, lowest_allowed, highest_allowed);
 }
 
+//----------------------------------------------------------------------------
 int8_t UIConsole::queryI8(std::string query_text, int8_t lowest_allowed = CHAR_MIN, int8_t highest_allowed = CHAR_MAX)
 {
     return (int8_t)queryI32(query_text, lowest_allowed, highest_allowed);
 }
 
+//----------------------------------------------------------------------------
 char UIConsole::queryChar(std::string query_text)
 {
     char c;
@@ -161,11 +170,13 @@ char UIConsole::queryChar(std::string query_text)
     return c;
 }
 
+//----------------------------------------------------------------------------
 void UIConsole::queryInput()
 {
     last_choice = queryChar("Please make a choice: ");
 }
 
+//----------------------------------------------------------------------------
 void UIConsole::onMenuChoice()
 {
     switch (this->last_choice) {
@@ -185,6 +196,7 @@ UIMain::UIMain(Application &app) : UIConsole(app)
 {
 }
 
+//----------------------------------------------------------------------------
 void UIMain::display()
 {
     std::cout << std::endl;
@@ -204,6 +216,7 @@ void UIMain::display()
     std::cout << " (x) leave application" << std::endl;
 }
 
+//----------------------------------------------------------------------------
 void UIMain::onMenuChoice()
 {
     switch (this->last_choice) {
@@ -231,6 +244,7 @@ void UIMain::onMenuChoice()
     }
 }
 
+//----------------------------------------------------------------------------
 void UIMain::detectModules()
 {
     app.detectModules();
@@ -255,11 +269,13 @@ void UIMain::detectModules()
     std::cout << std::endl;
 }
 
+//----------------------------------------------------------------------------
 void UIMain::selectModule()
 {
     app.selectModule(queryU16("Please enter module ID: ", 0x0001, 0x7F7F));
 }
 
+//----------------------------------------------------------------------------
 void UIMain::readRegister()
 {
     uint16_t selected_module_id = app.getSelectedModule();
@@ -285,6 +301,7 @@ void UIMain::readRegister()
     }
 }
 
+//----------------------------------------------------------------------------
 void UIMain::writeRegister()
 {
     uint16_t selected_module_id = app.getSelectedModule();
@@ -318,6 +335,7 @@ void UIMain::writeRegister()
     }
 }
 
+//----------------------------------------------------------------------------
 void UIMain::setTime()
 {
     uint16_t selected_module_id = app.getSelectedModule();
@@ -335,7 +353,7 @@ void UIMain::setTime()
         }
 
         std::time_t t = std::time(0);
-std:
+
         tm *now = std::localtime(&t);
         year = now->tm_year + 1900;
         month = now->tm_mon + 1;
@@ -376,6 +394,7 @@ std:
     }
 }
 
+//----------------------------------------------------------------------------
 void UIMain::getTime()
 {
     uint16_t selected_module_id = app.getSelectedModule();
@@ -418,35 +437,6 @@ void UIMain::getTime()
     } while (false);
     if (!success) {
         fprintf(stdout, "Get time of module ID: 0x%04X FAILED\n", selected_module_id);
-    }
-}
-
-// -----------------------------------------------------------------------------
-
-UIReadRegister::UIReadRegister(Application &app) : UIConsole(app)
-{
-}
-
-void UIReadRegister::display()
-{
-    std::cout << g_strProgram << " V" << PGM_VERSION << std::endl;
-    std::cout << std::endl;
-    std::cout << "Read Register of module " << std::endl;
-    std::cout << "--------------------------------------------------" << std::endl;
-
-    std::cout << " (l) list possible registers" << std::endl;
-    std::cout << " (2) set register" << std::endl;
-    std::cout << " (3) backup all registers" << std::endl;
-    std::cout << " (4) restore all registers" << std::endl;
-    std::cout << " (x) leave application" << std::endl;
-}
-
-void UIReadRegister::onMenuChoice()
-{
-    switch (this->last_choice) {
-    default:
-        UIConsole::onMenuChoice();
-        break;
     }
 }
 

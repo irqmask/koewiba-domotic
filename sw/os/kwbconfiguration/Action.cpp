@@ -41,22 +41,25 @@
 // --- Global variables --------------------------------------------------------
 
 // --- Class implementation  ---------------------------------------------------
+
 using namespace std::chrono_literals;
 Action::Action(Connection &conn, MsgBroker &broker)
     : msgBroker(broker)
     , connection(conn)
     , timeout(5s)
-    , timeout_elapsed(false)
+    , timeoutOccurred(false)
 {
 }
 
+//----------------------------------------------------------------------------
 bool Action::isFinished()
 {
     return true;
 }
 
+//----------------------------------------------------------------------------
 bool Action::hasTimedOut()
 {
-    return timeout_elapsed;
+    return timeoutOccurred;
 }
 /** @} */

@@ -55,7 +55,7 @@ ActionQueryModules::ActionQueryModules(Connection   &conn,
 {
 }
 
-
+//----------------------------------------------------------------------------
 bool ActionQueryModules::waitForResponse()
 {
     bool one_message_received = false, rc;
@@ -72,16 +72,16 @@ bool ActionQueryModules::waitForResponse()
     return one_message_received;
 }
 
-
+//----------------------------------------------------------------------------
 std::vector<ActionQueryModules::Module> ActionQueryModules::getModules()
 {
     return modules;
 }
 
-
+//----------------------------------------------------------------------------
 bool ActionQueryModules::formMessage()
 {
-    messageToSend.receiver = nodeId;
+    messageToSend.receiver = moduleAddr;
     messageToSend.sender = connection.getOwnNodeId();
     messageToSend.length = 2;
     messageToSend.data[0] = eCMD_REQUEST_INFO_OF_TYPE;
@@ -90,7 +90,7 @@ bool ActionQueryModules::formMessage()
     return true;
 }
 
-
+//----------------------------------------------------------------------------
 bool ActionQueryModules::filterResponse(const msg_t &message)
 {
     if (message.length >= (MOD_VERSIONINFO_LEN + 1) &&
@@ -100,7 +100,7 @@ bool ActionQueryModules::filterResponse(const msg_t &message)
     return false;
 }
 
-
+//----------------------------------------------------------------------------
 void ActionQueryModules::handleResponse(const msg_t &message, void *reference)
 {
     Module new_module;

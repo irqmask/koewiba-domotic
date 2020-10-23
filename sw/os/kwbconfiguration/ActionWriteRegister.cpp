@@ -46,31 +46,34 @@
 
 ActionWriteRegister::ActionWriteRegister(Connection   &conn,
                                          MsgBroker    &broker,
-                                         uint16_t     nodeId,
+                                         uint16_t     moduleAddr,
                                          uint8_t      registerId)
-    : ActionRequest(conn, broker, nodeId)
+    : ActionRequest(conn, broker, moduleAddr)
     , registerId(registerId)
     , registerFormat(eCMD_NAK)
     , value(0)
 {
 }
 
+//----------------------------------------------------------------------------
 void ActionWriteRegister::setRegisterId(uint8_t registerId)
 {
     this->registerId = registerId;
 }
 
+//----------------------------------------------------------------------------
 uint8_t ActionWriteRegister::getRegisterId()
 {
     return this->registerId;
 }
 
+//----------------------------------------------------------------------------
 bool ActionWriteRegister::formMessage()
 {
-    if (nodeId == 0) {
+    if (moduleAddr == 0) {
         return false;
     }
-    messageToSend.receiver = nodeId;
+    messageToSend.receiver = moduleAddr;
     messageToSend.sender = connection.getOwnNodeId();
     messageToSend.data[0] = registerFormat;
     messageToSend.data[1] = registerId;
@@ -98,21 +101,25 @@ bool ActionWriteRegister::formMessage()
     return true;
 }
 
+//----------------------------------------------------------------------------
 void ActionWriteRegister::setValue(int value)
 {
     this->value = value;
 }
 
+//----------------------------------------------------------------------------
 int ActionWriteRegister::getValue()
 {
     return value;
 }
 
+//----------------------------------------------------------------------------
 void ActionWriteRegister::setRegisterFormat(cmd_common_t format)
 {
     registerFormat = format;
 }
 
+//----------------------------------------------------------------------------
 cmd_common_t ActionWriteRegister::getRegisterFormat()
 {
     return registerFormat;

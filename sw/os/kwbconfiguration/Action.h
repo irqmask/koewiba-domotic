@@ -46,21 +46,52 @@
 
 // --- Class definition --------------------------------------------------------
 
+/**
+ * Base-class for "actions". An action in this context is a command / response
+ * sequence. The action is finished  when the command has been sent and a
+ * response has been received.
+ */
 class Action
 {
 public:
+    /**
+     * Constructor
+     * @param[in]   conn        Reference to established connection to a
+     *                          KWB bus os router
+     * @param[in]   broker      Reference to message broker.
+     */
     Action(Connection &conn, MsgBroker &broker);
 
+    /**
+     * Start the action.
+     * @returns true, it the action was started successfully, otherwise false.
+     */
     virtual bool start() = 0;
+
+    /**
+     * Cancel the running action.
+     */
     virtual void cancel() = 0;
+
+    /**
+     * @returns true if the action is finished, otherwise false.
+     */
     virtual bool isFinished();
+
+    /**
+     * @returns true if the action has timed out, otherwise false.
+     */
     virtual bool hasTimedOut();
 
 protected:
+    //! Reference to message broker.
     MsgBroker                   &msgBroker;
+    //! Reference to established connection.
     Connection                  &connection;
+    //! Duration until action times out.
     std::chrono::duration<int>  timeout;
-    bool                        timeout_elapsed;
+    //! Flag if timeout occurred.
+    bool                        timeoutOccurred;
 };
 
 /** @} */

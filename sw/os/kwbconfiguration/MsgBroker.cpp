@@ -48,12 +48,14 @@ MsgBroker::MsgBroker()
     this->response_handlers.clear();
 }
 
+//----------------------------------------------------------------------------
 void MsgBroker::registerForResponse(void *reference, msg_filter_t &filter_func, incom_func_t &handler_func)
 {
     msg_filter_data_t filter = { reference, filter_func, handler_func };
     this->response_handlers.push_back(filter);
 }
 
+//----------------------------------------------------------------------------
 void MsgBroker::unregisterForResponse(void *reference)
 {
     std::vector<msg_filter_data_t> &l = this->response_handlers;
@@ -71,6 +73,7 @@ void MsgBroker::unregisterForResponse(void *reference)
     }
 }
 
+//----------------------------------------------------------------------------
 void MsgBroker::handleIncomingMessage(const msg_t &message, void *reference)
 {
     (reference);

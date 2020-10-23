@@ -79,6 +79,7 @@ Application::Application(Connection     &conn,
     this->detected_modules.clear();
 }
 
+//----------------------------------------------------------------------------
 bool Application::detectModules()
 {
     bool rc = false;
@@ -91,21 +92,25 @@ bool Application::detectModules()
     return rc;
 }
 
+//----------------------------------------------------------------------------
 std::vector<ActionQueryModules::Module> Application::getDetectedModules()
 {
     return this->detected_modules;
 }
 
+//----------------------------------------------------------------------------
 void Application::selectModule(uint16_t module_id)
 {
     this->selectedModule = module_id;
 }
 
+//----------------------------------------------------------------------------
 uint16_t Application::getSelectedModule()
 {
     return this->selectedModule;
 }
 
+//----------------------------------------------------------------------------
 bool Application::readRegister(uint8_t registerId, int &value)
 {
     bool rc = false;
@@ -117,6 +122,7 @@ bool Application::readRegister(uint8_t registerId, int &value)
     return rc;
 }
 
+//----------------------------------------------------------------------------
 bool Application::writeRegister(uint8_t registerId, int value)
 {
     bool rc = false;
@@ -137,6 +143,7 @@ bool Application::writeRegister(uint8_t registerId, int value)
     return action_write_reg.start();
 }
 
+//----------------------------------------------------------------------------
 bool Application::verifyRegister(uint8_t registerId, int value, int &readValue)
 {
     if (!readRegister(registerId, readValue) || (value != readValue)) {
@@ -145,11 +152,13 @@ bool Application::verifyRegister(uint8_t registerId, int value, int &readValue)
     return true;
 }
 
+//----------------------------------------------------------------------------
 int Application::getLastRegisterValue()
 {
     return 0;
 }
 
+//----------------------------------------------------------------------------
 void Application::end()
 {
     std::cout << "ending..." << std::endl;

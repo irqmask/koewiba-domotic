@@ -46,13 +46,14 @@
 
 ActionRequest::ActionRequest(Connection   &conn,
                              MsgBroker    &broker,
-                             uint16_t     nodeId)
+                             uint16_t     moduleAddr)
     : Action(conn, broker)
-    , nodeId(nodeId)
+    , moduleAddr(moduleAddr)
     , messageToSend({0})
 {
 }
 
+//----------------------------------------------------------------------------
 bool ActionRequest::start()
 {
     if (formMessage()) {
@@ -62,13 +63,15 @@ bool ActionRequest::start()
     return false;
 }
 
+//----------------------------------------------------------------------------
 void ActionRequest::cancel()
 {
 }
 
+//----------------------------------------------------------------------------
 bool ActionRequest::isFinished()
 {
-    return timeout_elapsed;
+    return timeoutOccurred;
 }
 
 /** @} */

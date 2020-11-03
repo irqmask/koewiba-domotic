@@ -27,6 +27,7 @@
 bool g_display_empty_msg = true;
 bool g_display_token_msg = true;
 
+//----------------------------------------------------------------------------
 static void current_time_difference(bus_history_t *history, uint32_t *diff_ms, uint32_t *remaining_us)
 {
     sys_time_t diff_us;
@@ -36,6 +37,7 @@ static void current_time_difference(bus_history_t *history, uint32_t *diff_ms, u
     *remaining_us = (uint32_t)(diff_us - (*diff_ms * 1000));
 }
 
+//----------------------------------------------------------------------------
 void monitor_init(bus_history_t *history)
 {
     history->time_start = sys_time_get_usecs();
@@ -45,6 +47,7 @@ void monitor_init(bus_history_t *history)
     history->last_message_status = eMSG_NOTHING;
 }
 
+//----------------------------------------------------------------------------
 void monitor_parse_message(uint8_t new_byte, bus_history_t *history)
 {
     char        buffer[1024], part[256];
@@ -188,6 +191,7 @@ void monitor_parse_message(uint8_t new_byte, bus_history_t *history)
     }
 }
 
+//----------------------------------------------------------------------------
 void monitor_toggle_display_empty_message(void)
 {
     if (g_display_empty_msg) {
@@ -198,6 +202,7 @@ void monitor_toggle_display_empty_message(void)
     }
 }
 
+//----------------------------------------------------------------------------
 void monitor_toggle_display_token_message(void)
 {
     if (g_display_token_msg) {

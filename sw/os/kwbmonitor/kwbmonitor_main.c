@@ -61,13 +61,18 @@
 
 // --- Type definitions --------------------------------------------------------
 
+/**
+ * Structure of kwbconfiguration runtime options.
+ */
 typedef struct options {
-    char        serial_device[256];
-    int         serial_baudrate;
-    char        vbusd_address[256];
-    uint16_t    vbusd_port;
-    bool        serial_device_set;
-    bool        vbusd_address_set;
+    char        serial_device[256]; //!< Device of serial connection to RS232 gateway.
+    int         serial_baudrate;    //!< Baudrate of serial connection to RS232 gateway.
+    char        vbusd_address[256]; //!< IPv4 address of virtual bus
+    uint16_t    vbusd_port;         //!< IPv4 port of virtual bus
+    bool        serial_device_set;  //!< Flag: if set, serial device has been
+                                    //!< configured in the command line options.
+    bool        vbusd_address_set;  //!< Flag: if set, virtual bus has been
+                                    //!< configured in the command line options.
 } options_t;
 
 // --- Local variables ---------------------------------------------------------
@@ -81,6 +86,9 @@ static vos_t            g_vos;
 
 // --- Local functions ---------------------------------------------------------
 
+/**
+ * Monitor functionality runs in a thread.
+ */
 sys_thread_func(reader_thread)
 {
     uint8_t new_byte = 0;
@@ -100,6 +108,7 @@ sys_thread_func(reader_thread)
     return 0;
 }
 
+//----------------------------------------------------------------------------
 static void print_usage(void)
 {
     fprintf(stderr, "\nkwbmonitor - KoeWiBa bus monitor on a byte level\n");
@@ -118,6 +127,7 @@ static void print_usage(void)
 #endif // PRJCONF_WINDOWS
 }
 
+//----------------------------------------------------------------------------
 static void set_options(options_t     *options,
                         const char    *serial_device,
                         int            serial_baudrate,
@@ -136,6 +146,7 @@ static void set_options(options_t     *options,
     options->vbusd_port = vbusd_port;
 }
 
+//----------------------------------------------------------------------------
 static bool parse_commandline_options(int          argc,
                                       char        *argv[],
                                       options_t   *options)
@@ -176,6 +187,7 @@ static bool parse_commandline_options(int          argc,
     return rc;
 }
 
+//----------------------------------------------------------------------------
 static bool validate_options(options_t *options)
 {
     bool    rc = false;
@@ -201,6 +213,13 @@ static bool validate_options(options_t *options)
 
 // --- Global functions --------------------------------------------------------
 
+/**
+ * main entry point of kwbmonitor.
+ *
+ * @param[in]   argc    Number of command line arguments.
+ * @param[in]   argv    List of command line arguments.
+ * @returns     0 if kwbmonitor run successfully.
+ */
 int main(int argc, char *argv[])
 {
     char cc;

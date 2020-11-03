@@ -87,9 +87,9 @@ typedef struct options {
     char        router_address[256];//!< Address of kwbrouter server.
     uint16_t    router_port;        //!< Port number of kwbrouter server.
     bool        serial_device_set;  //!< Flag: if set, serial device has been
-    //!< configured in the command line options.
+                                    //!< configured in the command line options.
     bool        router_address_set; //!< Flag: is set, router address has been
-    //!< configured in the command line options.
+                                    //!< configured in the command line options.
     uint16_t    own_node_id;        //!< Node ID of node over which this software
     //!< communicates.
 } options_t;

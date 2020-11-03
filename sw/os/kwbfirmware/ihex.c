@@ -37,32 +37,50 @@
 
 // --- Type definitions --------------------------------------------------------
 
+/**
+ * possible addressing modes in an ihex file.
+ */
 typedef enum {
     eADDRESSMODE_SEGMENT,
     eADDRESSMODE_LINEAR
 } e_addressmode_t;
 
-//! temporary data, which is used during file parsing
+/**
+ * temporary data, which is used during file parsing
+ */
 typedef struct ihex_data {
     // temporary line data
+    //! length in char of the line
     uint8_t         line_data_length;
-    uint16_t        line_offset;        //!< line load offset
-    uint8_t         line_checksum;      //!< current checksum of a line
+    //! line load offset
+    uint16_t        line_offset;
+    //! current checksum of a line
+    uint8_t         line_checksum;
 
     // data during parsing the whole files
+    //! addressing mode, segment or linear
     e_addressmode_t mode;
+    //! offset set by extended segmend address record of an IHEX file.
     uint32_t        global_offset;
 
     // resulting data
+    //! Start address of the program in the IHEX file
     uint32_t        start_address;
+    //! Addressing mode of start address
     e_addressmode_t start_address_mode;
+    //! First address of used target memory
     uint32_t        first_address;
+    //! Last address of used target memory
     uint32_t        last_address;
 } ihex_data_t;
 
-// temporary data, which is used by the simple memory-writer function
+/**
+ * temporary data, which is used by the simple memory-writer function
+ */
 typedef struct meminfo {
+    //! Pointer to memory to write into
     uint8_t *ptr;
+    //! Size of memory block to write into
     uint32_t size;
 } meminfo_t;
 
@@ -406,7 +424,8 @@ static int32_t read_line(FILE                  *file,
 }
 
 // helper function, which is used to read the IHEX file completely into memory.
-void write_byte_to_mem(uint32_t address, uint8_t byte, void *arg)
+//----------------------------------------------------------------------------
+static void write_byte_to_mem(uint32_t address, uint8_t byte, void *arg)
 {
     meminfo_t *mem = arg;
 
@@ -421,29 +440,11 @@ void write_byte_to_mem(uint32_t address, uint8_t byte, void *arg)
 
 // --- Global functions --------------------------------------------------------
 
-/**
- * Read an Intel Hex file. For each byte the write_byte_func() is caĺled.
- *
- * @param[in]   filename        Path and filename of Intel HEX file.
- * @param[out]  pstart_address  Address in target memory of the program entry
- *                              point.
- * @param[out]  pfirst_address  First (lowest) address in target memory which
- *                              is filled by the IHEX file.
- * @param[out]  plast_address   Last (highest) address in target memory which is
- *                              filled by the IHEX file.
- * @param[in]   write_byte_func Callback function which is called for every byte
- *                              to by written @see ihex_write_byte_func for
- *                              details.
- * @param[in]   arg             User defined argument which is passed to the
- *                              write_byte_func.
- *
- * @returns     0 if the IHEX file has been successfully read in, otherwise false.
- */
 int32_t ihex_read_file(const char             *filename,
                        uint32_t               *pstart_address,
                        uint32_t               *pfirst_address,
                        uint32_t               *plast_address,
-                       ihex_write_byte_func    write_byte_func,
+                       ihex_write_byte_func   write_byte_func,
                        void                   *arg)
 {
     int32_t     retval;
@@ -498,25 +499,7 @@ int32_t ihex_read_file(const char             *filename,
     return retval;
 }
 
-
-/**
- * Read an Intel Hex file. For each byte the write_byte_func() is caĺled.
- *
- * @param[in]   filename        Path and filename of Intel HEX file.
- * @param[out]  pstart_address  Address in target memory of the program entry
- *                              point.
- * @param[out]  pfirst_address  First (lowest) address in target memory which
- *                              is filled by the IHEX file.
- * @param[out]  plast_address   Last (highest) address in target memory which is
- *                              filled by the IHEX file.
- * @param[in]   target_memory   Byte pointer to the target memory, into which
- *                              the IHEX file content is written.
- * @param[in]   target_memory_size Size of target memory. If the size of the
- *                              IHEX file contnt exceeds the target memoy size,
- *                              the read process is stopped.
- *
- * @returns     0 if the IHEX file has been successfully read in, otherwise false.
- */
+//----------------------------------------------------------------------------
 int32_t ihex_read_file_mem(const char             *filename,
                            uint32_t               *pstart_address,
                            uint32_t               *pfirst_address,

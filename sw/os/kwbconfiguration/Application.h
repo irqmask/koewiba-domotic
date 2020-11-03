@@ -36,8 +36,6 @@
 #include "prjtypes.h"
 
 // libkwb
-
-
 #include "connection.h"
 #include "ActionQueryModules.h"
 #include "MsgBroker.h"
@@ -52,18 +50,69 @@
 
 // --- Class definition --------------------------------------------------------
 
+/**
+ * Application interface to UI of every action the application can perform.
+ */
 class Application
 {
 public:
+    /**
+     * @brief Application
+     * @param[in]   conn            Reference to connection to kwbrouter or serial gateway
+     * @param[in]   broker          Reference to message broker
+     * @param[out]  endApplication  Flag that application shall be terminated
+     */
     Application(Connection &conn, MsgBroker &broker, bool &endApplication);
 
+    /**
+     * Detect all modules in the system.
+     * Each module reports with it's version information.
+     *
+     * @return true, if modules have been detected, otherwise false
+     */
     bool detectModules();
+
+    /**
+     * Get a list of detected modules and their version information.
+     *
+     * This method can be called after detectModules() has been called before.
+     * @return List of module information.
+     */
     std::vector<ActionQueryModules::Module> getDetectedModules();
-    void selectModule(uint16_t nodeid);
+
+    /**
+     * Select the module to work with.
+     *
+     * @param[in]   moduleAddr      The address of the module
+     */
+    void selectModule(uint16_t moduleAddr);
+
+    /**
+     * @return the address of the current selected module
+     */
     uint16_t getSelectedModule();
 
+    /**
+     * Read from a register of a module.
+     *
+     * @param[in]   registerId  Id of the register to read.
+     * @param[out]  value       The read value
+     *
+     * @return true, if the register has successfully been read, otherwise false.
+     */
     bool readRegister(uint8_t registerId, int &value);
+
+    /**
+     * Write into a register of a module.
+     *
+     * @param[in]   registerId  Id of the register to write.
+     * @param[in]   value       Value to write into the register
+     *
+     * @return true, if the value has successfully been written into the register,
+     *         otherwise false.
+     */
     bool writeRegister(uint8_t registerId, int value);
+
     bool verifyRegister(uint8_t registerId, int value, int &readValue);
     int getLastRegisterValue();
 

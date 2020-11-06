@@ -43,6 +43,7 @@
 
 // --- Type definitions --------------------------------------------------------
 
+//! Callback type for filter functions.
 typedef std::function<bool(const msg_t &)> msg_filter_t;
 
 //! Hold callbacks and reference to filter incomin messages to convey it to
@@ -69,12 +70,39 @@ typedef struct {
 class MsgBroker
 {
 public:
+    /**
+     * Default constructor
+     */
     MsgBroker();
+
+    /**
+     * Handler for incoming message. Will distribute the messges to registered
+     * listeners.
+     *
+     * @param[in]   message     Incoming message
+     * @param[in]   reference   Reference to connection which received the
+     *                          message.
+     */
     void handleIncomingMessage(const msg_t &message, void *reference);
+
+    /**
+     * @brief registerForResponse
+     * @param[in]   reference   Pointer to object which registered for response
+     * @param[in]   filter_func Filter function to select messages to be conveyed
+     * @param[in]   handler_func Message haandler function to which the filtered
+     *                           message is passed to.
+     */
     void registerForResponse(void *reference, msg_filter_t &filter_func, incom_func_t &handler_func);
+
+    /**
+     * Un-register from listening to messages.
+     *
+     * @param[in]   reference   Pointer to object which registered for response
+     */
     void unregisterForResponse(void *reference);
 
 protected:
+    //! List of registered response filter/handlers.
     std::vector<msg_filter_data_t> response_handlers;
 };
 

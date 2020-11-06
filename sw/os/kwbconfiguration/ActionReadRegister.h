@@ -78,7 +78,7 @@ public:
      */
     int getValue();
 
-protected:   
+protected:
     virtual bool formMessage() override;
     virtual bool filterResponse(const msg_t &message) override;
     virtual void handleResponse(const msg_t &message, void *reference) override;

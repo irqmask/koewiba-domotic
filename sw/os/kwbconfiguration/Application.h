@@ -113,17 +113,26 @@ public:
      */
     bool writeRegister(uint8_t registerId, int value);
 
+    /**
+     * Verify a register value against a given value.
+     *
+     * @param[in]   registerId  Register Id to read the value from
+     * @param[in]   value       Expected value
+     * @param[out]  readValue   Value read from the register
+     *
+     * @return true, if the read value matches the expected value, otherwise false.
+     */
     bool verifyRegister(uint8_t registerId, int value, int &readValue);
-    int getLastRegisterValue();
-
-    void end();
 
 protected:
+    //! List of detected modules. Filled by detectModules() command.
     std::vector<ActionQueryModules::Module> detected_modules;
+    //! Currently selected module
     uint16_t            selectedModule;
+    //! Referenc to message broker
     MsgBroker           &msgBroker;
+    //! Reference to connection to the KWB sytsem
     Connection          &msgEndpoint;
-    bool                &endApplication;
 };
 
 // -----------------------------------------------------------------------------

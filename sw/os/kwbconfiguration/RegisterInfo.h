@@ -45,9 +45,17 @@
 
 // --- Class definition --------------------------------------------------------
 
+/**
+ * Contains information (id, unit, description, ...) of an application's
+ * register.
+ */
 class RegisterInfo
 {
 public:
+
+    /**
+     * Default constructor.
+     */
     RegisterInfo();
 
 protected:

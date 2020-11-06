@@ -66,16 +66,22 @@
  * Structure of kwbfirmware runtime options.
  */
 typedef struct options {
-    char        serial_device[256]; //!< Device of serial connection to RS232 gateway.
-    int         serial_baudrate;    //!< Baudrate of serial connection to RS232 gateway.
-    char        router_address[256];//!< Address of kwbrouter server.
-    uint16_t    router_port;        //!< Port number of kwbrouter server.
-    bool        serial_device_set;  //!< Flag: if set, serial device has been
-    //!< configured in the command line options.
-    bool        router_address_set; //!< Flag: is set, router address has been
-    //!< configured in the command line options.
+    //! Device of serial connection to RS232 gateway.
+    char        serial_device[256];
+    //! Baudrate of serial connection to RS232 gateway.
+    int         serial_baudrate;
+    //! Address of kwbrouter server.
+    char        router_address[256];
+    //! Port number of kwbrouter server.
+    uint16_t    router_port;
+    //! Flag: if set, serial device has been configured in the command line options.
+    bool        serial_device_set;
+    //! Flag: is set, router address has been configured in the command line options.
+    bool        router_address_set;
+    //! Path and name of firmware ihex-file to upload.
     char        filename[256];
-    uint16_t    node_address;       //!< own node address
+    //! own node address
+    uint16_t    node_address;
 } options_t;
 
 // --- Local variables ---------------------------------------------------------

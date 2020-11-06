@@ -71,8 +71,7 @@
 Application::Application(Connection     &conn,
                          MsgBroker      &broker,
                          bool           &end)
-    : endApplication(end)
-    , msgEndpoint(conn)
+    : msgEndpoint(conn)
     , msgBroker(broker)
     , selectedModule(0)
 {
@@ -150,19 +149,6 @@ bool Application::verifyRegister(uint8_t registerId, int value, int &readValue)
         return false;
     }
     return true;
-}
-
-//----------------------------------------------------------------------------
-int Application::getLastRegisterValue()
-{
-    return 0;
-}
-
-//----------------------------------------------------------------------------
-void Application::end()
-{
-    std::cout << "ending..." << std::endl;
-    endApplication = true;
 }
 
 /** @} */

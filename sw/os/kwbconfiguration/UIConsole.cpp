@@ -48,6 +48,7 @@
 
 // --- Local variables ---------------------------------------------------------
 
+//! application name
 const std::string g_strProgram = "kwbconfiguration";
 
 // --- Global variables --------------------------------------------------------
@@ -181,7 +182,6 @@ void UIConsole::onMenuChoice()
 {
     switch (this->last_choice) {
     case 'x':
-        app.end();
         this->leave_menu = true;
         break;
     default:

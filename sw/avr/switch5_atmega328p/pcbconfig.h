@@ -62,6 +62,25 @@
 // Application specific pin assignments
 // ----------------------------------------------------------------------------
 
+// switch inputs
+#define INPUT_PCBCONFIG     1
+#define INPUT_NUM_PINS      5
+#define INPUT_PORT_PIN0     PINC
+#define INPUT_DDR_PIN0      DDRC
+#define INPUT_PIN0          PC4
+#define INPUT_PORT_PIN1     PINC
+#define INPUT_DDR_PIN1      DDRC
+#define INPUT_PIN1          PC3
+#define INPUT_PORT_PIN2     PINC
+#define INPUT_DDR_PIN2      DDRC
+#define INPUT_PIN2          PC2
+#define INPUT_PORT_PIN3     PINC
+#define INPUT_DDR_PIN3      DDRC
+#define INPUT_PIN3          PC1
+#define INPUT_PORT_PIN4     PINC
+#define INPUT_DDR_PIN4      DDRC
+#define INPUT_PIN4          PC0
+
 // debug LED outputs
 #define LED_PCBCONFIG        1
 #define LED_STATUS           PD6    //!< Yellow status LED

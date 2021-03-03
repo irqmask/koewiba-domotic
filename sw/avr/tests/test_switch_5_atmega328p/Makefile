@@ -1,6 +1,6 @@
 MCU = atmega328p
 FORMAT = ihex
-TARGET = test_roomthermostat_atmega328
+TARGET = test_switch_5_atmega328p
 
 ROOTDIR = $(subst \,/,$(shell pwd))/../..
 include ../../buildscripts/lib/lib_outputdirs.mk
@@ -13,20 +13,17 @@ SRC = ../shared/bus_transport.c \
       ../shared/queue.c \
       shared/block_message.c \
       shared/bus_phy.c \
-      shared/disp_sh1106.c \
       shared/eeprom_spi.c \
-      shared/gdisplay.c \
-      shared/gdisplay_font_x8.c \
-      shared/gdisplay_font_x16.c \
       shared/led_debug.c \
+      shared/main_avr.c \
       shared/register.c \
       shared/sleepmode.c \
       shared/timer.c \
-      shared/zagwire.c \
-      tests/shared/test_eeprom.c \
-      tests/test_roomthermostat_atmega328/appregister.c \
-      tests/test_roomthermostat_atmega328/appversion.c \
-      tests/test_roomthermostat_atmega328/main_test_roomthermostat_atmega328.c
+      tests/test_switch_5_atmega328p/application.c \
+      tests/test_switch_5_atmega328p/appregister.c \
+      tests/test_switch_5_atmega328p/appversion.c \
+      tests/test_switch_5_atmega328p/test_io.c \
+      tests/shared/test_eeprom.c
 
 # Place -I options here
 INCDIRS = -I. \
@@ -37,7 +34,7 @@ INCDIRS = -I. \
 
 LOCAL_CFLAGS = -DF_CPU=7372800 -DHAS_PCBCONFIG_H -DHAS_APPCONFIG_H
 LOCAL_ASFLAGS =
-LOCAL_LDFLAGS =
+LOCAL_LDFLAGS = -T ../../include/avr5_kwb.x
 
 include ../../buildscripts/lib/lib_build_avr.mk
 include ../../buildscripts/lib/lib_program_avr.mk

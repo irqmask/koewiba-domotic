@@ -41,6 +41,8 @@
 #define BUS_MAXSENDMSGLEN   16      //!< Maximum length of a message to be sent.
 #define BUS_MAXRECVMSGLEN   64 + 2  //!< Maximum length of a message to be received.
 
+#define TIMER_WAKEUP        1       //!< Timer shall wake the controller.
+
 // --- Type definitions --------------------------------------------------------
 
 //! Application specific layout of registers

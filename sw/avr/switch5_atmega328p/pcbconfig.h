@@ -65,30 +65,35 @@
 // switch inputs
 #define INPUT_PCBCONFIG     1
 #define INPUT_NUM_PINS      5
-#define INPUT_PORT_PIN0     PINC
-#define INPUT_DDR_PIN0      DDRC
-#define INPUT_PIN0          PC4
-#define INPUT_PORT_PIN1     PINC
-#define INPUT_DDR_PIN1      DDRC
-#define INPUT_PIN1          PC3
-#define INPUT_PORT_PIN2     PINC
-#define INPUT_DDR_PIN2      DDRC
-#define INPUT_PIN2          PC2
-#define INPUT_PORT_PIN3     PINC
-#define INPUT_DDR_PIN3      DDRC
-#define INPUT_PIN3          PC1
-#define INPUT_PORT_PIN4     PINC
-#define INPUT_DDR_PIN4      DDRC
-#define INPUT_PIN4          PC0
+#define INPUT_PORT_0        PORTC
+#define INPUT_PIN_0         PINC
+#define INPUT_DDR_0         DDRC
+#define INPUT_0             PC0
+#define INPUT_PORT_1        PORTC
+#define INPUT_PIN_1         PINC
+#define INPUT_DDR_1         DDRC
+#define INPUT_1             PC1
+#define INPUT_PORT_2        PORTC
+#define INPUT_PIN_2         PINC
+#define INPUT_DDR_2         DDRC
+#define INPUT_2             PC2
+#define INPUT_PORT_3        PORTC
+#define INPUT_PIN_3         PINC
+#define INPUT_DDR_3         DDRC
+#define INPUT_3             PC3
+#define INPUT_PORT_4        PORTC
+#define INPUT_PIN_4         PINC
+#define INPUT_DDR_4         DDRC
+#define INPUT_4             PC4
 
 // debug LED outputs
 #define LED_PCBCONFIG        1
-#define LED_STATUS           PD6    //!< Yellow status LED
-#define LED_ERROR            PD7    //!< Red error LED
-#define LED_STATUS_DDR       DDRD
-#define LED_ERROR_DDR        DDRD
-#define LED_STATUS_PORT      PORTD
-#define LED_ERROR_PORT       PORTD
+#define LED_STATUS           PB0    //!< Yellow status LED
+#define LED_ERROR            PB1    //!< Red error LED
+#define LED_STATUS_DDR       DDRB
+#define LED_ERROR_DDR        DDRB
+#define LED_STATUS_PORT      PORTB
+#define LED_ERROR_PORT       PORTB
 
 // --- Type definitions --------------------------------------------------------
 

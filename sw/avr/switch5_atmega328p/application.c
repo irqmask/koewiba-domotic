@@ -38,6 +38,7 @@
 #include "alarmclock.h"
 #include "datetime.h"
 #include "input.h"
+#include "led_debug.h"
 #include "register.h"
 
 // --- Definitions -------------------------------------------------------------
@@ -91,6 +92,7 @@ void app_send_state(uint8_t chn, bool state)
     
 }
 
+
 void app_toggle_output(uint8_t idx)
 {
     register uint8_t mask = (1<<idx);
@@ -139,7 +141,7 @@ void app_init (void)
     DDRD |= ((1 << PD3) | (1 << PD4) | (1 << PD5) | (1 << PD6) | (1 << PD7));
     PORTD &= ~((1 << PD3) | (1 << PD4) | (1 << PD5) | (1 << PD6) | (1 << PD7));
 
-    //register_set_u16(MOD_eReg_ModuleID, 0x20);
+    // register_set_u16(MOD_eReg_ModuleID, 0x20);
     dt_initialize();
 
     timer_start(&g_seconds_timer, TIMER_MS_2_TICKS(1000));
@@ -149,6 +151,8 @@ void app_init (void)
         app_chn_mode[idx] = 1;
     }
     g_output_shadow = 0;
+    LED_STATUS_DDR |= (1<<LED_STATUS);
+    LED_ERROR_DDR |= (1<<LED_ERROR);
 }
 
 /**
@@ -173,7 +177,6 @@ void app_on_command (uint16_t sender, uint8_t msglen, uint8_t* msg)
  */
 void app_background (void)
 {
-    //TODO insert application specific background routines here!
     if (timer_is_elapsed(&g_seconds_timer)) {
         timer_start(&g_seconds_timer, TIMER_MS_2_TICKS(1000));
         dt_tick_second();

@@ -10,7 +10,7 @@
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
 /*
- * Copyright (C) 2020  christian <irqmask@web.de>
+ * Copyright (C) 2021  christian <irqmask@web.de>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -85,6 +85,25 @@
 #define INPUT_PIN_4         PINC
 #define INPUT_DDR_4         DDRC
 #define INPUT_4             PC4
+
+// relay outputs
+#define OUTPUT_PCBCONFIG     1
+#define OUTPUT_NUM_PINS      5
+#define OUTPUT_PORT_0        PORTD
+#define OUTPUT_DDR_0         DDRD
+#define OUTPUT_0             PD3
+#define OUTPUT_PORT_1        PORTD
+#define OUTPUT_DDR_1         DDRD
+#define OUTPUT_1             PD4
+#define OUTPUT_PORT_2        PORTD
+#define OUTPUT_DDR_2         DDRD
+#define OUTPUT_2             PD5
+#define OUTPUT_PORT_3        PORTD
+#define OUTPUT_DDR_3         DDRD
+#define OUTPUT_3             PD6
+#define OUTPUT_PORT_4        PORTD
+#define OUTPUT_DDR_4         DDRD
+#define OUTPUT_4             PD7
 
 // debug LED outputs
 #define LED_PCBCONFIG        1

@@ -10,7 +10,7 @@
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
 /*
- * Copyright (C) 2020  christian <irqmask@web.de>
+ * Copyright (C) 2021  christian <irqmask@web.de>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -48,8 +48,8 @@
 //! Application specific layout of registers
 typedef enum appregisters {
     // registers saved in EEProm
-    APP_eReg_Chn0_IntensityCurrent = MOD_eReg_FirstAppSpecific,
-    APP_eReg_Chn0_IntensitySetPoint,
+    APP_eReg_Chn0_SwitchCurrent = MOD_eReg_FirstAppSpecific,
+    APP_eReg_Chn0_SwitchSetPoint,
     APP_eReg_Chn0_ThresholdOff,
     APP_eReg_Chn0_ThresholdOn,
     APP_eReg_Chn0_Mode,
@@ -89,8 +89,8 @@ typedef enum appregisters {
     APP_eReg_Chn0_Unused1,
     APP_eReg_Chn0_Unused0,
 
-    APP_eReg_Chn1_IntensityCurrent,
-    APP_eReg_Chn1_IntensitySetPoint,
+    APP_eReg_Chn1_SwitchCurrent,
+    APP_eReg_Chn1_SwitchSetPoint,
     APP_eReg_Chn1_ThresholdOff,
     APP_eReg_Chn1_ThresholdOn,
     APP_eReg_Chn1_Mode,
@@ -130,8 +130,8 @@ typedef enum appregisters {
     APP_eReg_Chn1_Unused1,
     APP_eReg_Chn1_Unused0,
 
-    APP_eReg_Chn2_IntensityCurrent,
-    APP_eReg_Chn2_IntensitySetPoint,
+    APP_eReg_Chn2_SwitchCurrent,
+    APP_eReg_Chn2_SwitchSetPoint,
     APP_eReg_Chn2_ThresholdOff,
     APP_eReg_Chn2_ThresholdOn,
     APP_eReg_Chn2_Mode,
@@ -171,8 +171,8 @@ typedef enum appregisters {
     APP_eReg_Chn2_Unused1,
     APP_eReg_Chn2_Unused0,
 
-    APP_eReg_Chn3_IntensityCurrent,
-    APP_eReg_Chn3_IntensitySetPoint,
+    APP_eReg_Chn3_SwitchCurrent,
+    APP_eReg_Chn3_SwitchSetPoint,
     APP_eReg_Chn3_ThresholdOff,
     APP_eReg_Chn3_ThresholdOn,
     APP_eReg_Chn3_Mode,
@@ -212,8 +212,8 @@ typedef enum appregisters {
     APP_eReg_Chn3_Unused1,
     APP_eReg_Chn3_Unused0,
 
-    APP_eReg_Chn4_IntensityCurrent,
-    APP_eReg_Chn4_IntensitySetPoint,
+    APP_eReg_Chn4_SwitchCurrent,
+    APP_eReg_Chn4_SwitchSetPoint,
     APP_eReg_Chn4_ThresholdOff,
     APP_eReg_Chn4_ThresholdOn,
     APP_eReg_Chn4_Mode,
@@ -267,7 +267,7 @@ typedef enum appregisters {
 } eRegisters_t;
 
 //! Number of registers per channel
-#define APP_REGS_PER_CHN (APP_eReg_Chn0_Unused0 - APP_eReg_Chn0_IntensityCurrent + 1)
+#define APP_REGS_PER_CHN (APP_eReg_Chn0_Unused0 - APP_eReg_Chn0_SwitchCurrent + 1)
 
 //! Application specific layout of non volatile parameters (internal EEProm)
 typedef enum appconfig {

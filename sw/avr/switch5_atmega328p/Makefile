@@ -24,7 +24,8 @@ SRC = ../shared/bus_transport.c \
       shared/timer.c \
       switch5_atmega328p/application.c \
       switch5_atmega328p/appregister.c \
-      switch5_atmega328p/appversion.c
+      switch5_atmega328p/appversion.c \
+      switch5_atmega328p/output.c
 
 # Place -I options here
 INCDIRS = -I. \

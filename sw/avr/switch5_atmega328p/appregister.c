@@ -10,7 +10,7 @@
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
 /*
- * Copyright (C) 2020  christian <irqmask@web.de>
+ * Copyright (C) 2021  christian <irqmask@web.de>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -36,6 +36,7 @@
 
 #include "alarmclock.h"
 #include "datetime.h"
+#include "output.h"
 #include "register.h"
 
 #include "appconfig.h"
@@ -54,20 +55,33 @@
 
 // --- Module global functions -------------------------------------------------
 
+extern void app_send_state(uint8_t chn, uint8_t state);
+
 bool        app_register_get        (uint8_t                reg_no,
                                      eRegType_t*            preg_type,
                                      void*                  pvalue)
 {
     eRegType_t  regtype;
-    uint8_t index;
+    uint8_t chn, idx;
 
     if (preg_type == NULL) preg_type = &regtype;
     if (pvalue == NULL) return false;
     *preg_type = eRegType_U8;
 
     // registers saved in EEProm
-    if (reg_no >= APP_eReg_Chn0_IntensityCurrent && reg_no <= APP_eReg_Chn4_Unused0) {
-        index = (reg_no - APP_eReg_Chn0_IntensityCurrent) * 2;
+    if (reg_no >= APP_eReg_Chn0_SwitchCurrent && reg_no <= APP_eReg_Chn4_Unused0) {
+        chn = (reg_no - APP_eReg_Chn0_SwitchCurrent) / APP_REGS_PER_CHN;
+        idx = reg_no - (chn * APP_REGS_PER_CHN);
+        switch (idx) {
+        case APP_eReg_Chn0_SwitchSetPoint:
+            // fallthrough
+        case APP_eReg_Chn0_SwitchCurrent:
+            *(uint8_t*)pvalue = output_get_value(chn);
+            break;
+
+        default:
+            break;
+        }
         /// todo index += APP_eCfg_RemoteAddr00;
         //*(uint16_t*)pvalue = eeprom_read_word((uint16_t*)&register_eeprom_array[index]);
         //*preg_type = eRegType_U16;
@@ -116,15 +130,22 @@ bool        app_register_get        (uint8_t                reg_no,
 void        app_register_set        (uint8_t                reg_no,
                                      uint32_t               value)
 {
-    uint16_t    tempval16;
-    uint8_t     tempval, index;
+    //@todo cleanup uint16_t    tempval16;
+    uint8_t     chn, index;
 
-    tempval16 = (uint16_t)(value & 0x0000FFFF);
-    tempval = (uint8_t)(value & 0x000000FF);
+    //tempval16 = (uint16_t)(value & 0x0000FFFF);
+    //tempval = (uint8_t)(value & 0x000000FF);
 
-    // registers saved in EEProm
-    if (reg_no >= APP_eReg_Chn0_IntensityCurrent && reg_no <= APP_eReg_Chn4_Unused0) {
-        index = (reg_no - APP_eReg_Chn0_IntensityCurrent);
+    // channel specific registers
+    if (reg_no >= APP_eReg_Chn0_SwitchCurrent && reg_no <= APP_eReg_Chn4_Unused0) {
+        chn = (reg_no - APP_eReg_Chn0_SwitchCurrent) / APP_REGS_PER_CHN;
+        index = reg_no - (chn * APP_REGS_PER_CHN);
+        switch (index) {
+        case APP_eReg_Chn0_SwitchSetPoint:
+            output_set(chn, value);
+            app_send_state(chn, output_get_value(chn));
+            break;
+        }
         /// todo index += APP_eCfg_RemoteAddr00;
         //eeprom_write_word((uint16_t*)&register_eeprom_array[index], tempval16);
     }

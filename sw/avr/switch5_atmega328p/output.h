@@ -1,12 +1,10 @@
 /**
- * @addtogroup SWITCH5_ATMEGA328
- * @addtogroup APPVERSION
- * @brief Version information of "switch5_atmega328" project.
+ * @addtogroup RELAY_OUTPUT
+ * @brief This module contains functions to control the relay output.
+ * signals.
  *
  * @{
- * @file    appversion.c
- * @brief   Version information of "switch5_atmega328" project.
- *
+ * @file    output.h
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
 /*
@@ -25,10 +23,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+#ifndef _OUTPUT_H_
+#define _OUTPUT_H_
+
 // --- Include section ---------------------------------------------------------
 
-#include <avr/io.h>
-#include "moddef_common.h"
+#include "prjtypes.h"
 
 // --- Definitions -------------------------------------------------------------
 
@@ -38,17 +38,6 @@
 
 // --- Global variables --------------------------------------------------------
 
-//! Application's version information
-//! @note The linker sorts the variables upside down. app_controller_id begins at
-//!       the lowest address and app_version begins at the highest address.
-//! @see BOARD_IDs, APP_IDs, APP_VERSIONING
-const unsigned char app_versioninfo[MOD_VERSIONINFO_LEN] __attribute__((section(".versioninfo")))
-                        = {SIGNATURE_0,SIGNATURE_1,SIGNATURE_2,0x00,
-                           0x00,0x07,   // board ID            (high byte, low byte)
-                           1,           // board revision
-                           0x00,0x0A,   // application ID      (high byte, low byte)
-                           0,1,0};      // application version (major, minor, bugfix)
-
 // --- Module global variables -------------------------------------------------
 
 // --- Local functions ---------------------------------------------------------
@@ -57,4 +46,16 @@ const unsigned char app_versioninfo[MOD_VERSIONINFO_LEN] __attribute__((section(
 
 // --- Global functions --------------------------------------------------------
 
+/**
+ * Initialize output data and i/o
+ */
+void output_initialize(void);
+
+void output_set(uint8_t idx, uint8_t v);
+
+void output_toggle(uint8_t idx);
+
+uint8_t output_get_value(uint8_t idx);
+
+#endif // _OUTPUT_H_
 /** @} */

@@ -13,7 +13,7 @@
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
 /*
- * Copyright (C) 2020  christian <irqmask@web.de>
+ * Copyright (C) 2021  christian <irqmask@web.de>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -39,19 +39,22 @@
 #include "datetime.h"
 #include "input.h"
 #include "led_debug.h"
+#include "output.h"
 #include "register.h"
+
+#include "appconfig.h"
+#include "pcbconfig.h"
 
 // --- Definitions -------------------------------------------------------------
 
-#define APP_NUM_CHANNEL 5
+#define APP_NUM_CHANNEL OUTPUT_NUM_PINS
+
+// --- Type definitions --------------------------------------------------------
 
 enum {
     MODE_INPUT_SWITCH_BIT = 0,
     MODE_LAST_BIT
 } app_mode_bits_t;
-
-
-// --- Type definitions --------------------------------------------------------
 
 // --- Local variables ---------------------------------------------------------
 
@@ -60,67 +63,37 @@ static timer_data_t g_input_timer;
 
 static uint8_t app_chn_mode[APP_NUM_CHANNEL];
 
-static uint8_t g_output_shadow;
-
 // --- Global variables --------------------------------------------------------
+
+extern sBus_t g_bus;
 
 // --- Module global variables -------------------------------------------------
 
 // --- Local functions ---------------------------------------------------------
 
-static void output_set(uint8_t idx, bool state)
-{
-    idx += 3; // using D3...D7
-    if (idx > 7) return;
 
-    register uint8_t mask = (1<<idx);
-
-    cli();
-    if (state) {
-        PORTD |= mask;        
-    }
-    else {
-        PORTD &= ~mask;
-    }
-    sei();
-}
 
 // --- Module global functions -------------------------------------------------
 
-void app_send_state(uint8_t chn, bool state)
+void app_send_state(uint8_t chn, uint8_t state)
 {
-    
+    uint8_t reg_no = APP_eReg_Chn0_SwitchCurrent;
+    reg_no += (chn * APP_REGS_PER_CHN);
+    register_send_u8(&g_bus, BUS_BRDCSTADR, reg_no, state);
 }
 
 
 void app_toggle_output(uint8_t idx)
 {
-    register uint8_t mask = (1<<idx);
-    g_output_shadow ^= mask;
-
-    register uint8_t output = ((g_output_shadow & mask) > 0) ? 255 : 0;
-
-    output_set(idx, output);
-    app_send_state(idx, output);
+    output_toggle(idx);
+    app_send_state(idx, output_get_value(idx));
 }
 
 
-void app_set_output(uint8_t idx, bool state)
+void app_set_output(uint8_t idx, uint8_t value)
 {
-    register uint8_t mask = (1<<idx);
-    if (state != ((g_output_shadow & mask) > 0)) {
-        register uint8_t output;
-        if (state) {
-            g_output_shadow |= mask;
-            output = 255;
-        }
-        else {
-            g_output_shadow &= ~mask;
-            output = 0;
-        }
-        output_set(idx, output);
-        app_send_state(idx, output);
-    }
+    output_set(idx, value);
+    app_send_state(idx, output_get_value(idx));
 }
 
 // --- Global functions --------------------------------------------------------
@@ -137,9 +110,7 @@ void app_init (void)
     input_initialize();
     PCMSK1 |= ((1 << PCINT8) | (1 << PCINT9) | (1 << PCINT10) | (1 << PCINT11) | (1 << PCINT12));
 
-    // PORTD 3..7 output
-    DDRD |= ((1 << PD3) | (1 << PD4) | (1 << PD5) | (1 << PD6) | (1 << PD7));
-    PORTD &= ~((1 << PD3) | (1 << PD4) | (1 << PD5) | (1 << PD6) | (1 << PD7));
+    output_initialize();
 
     // register_set_u16(MOD_eReg_ModuleID, 0x20);
     dt_initialize();
@@ -150,7 +121,7 @@ void app_init (void)
     for (uint8_t idx=0; idx<APP_NUM_CHANNEL; idx++) {
         app_chn_mode[idx] = 1;
     }
-    g_output_shadow = 0;
+
     LED_STATUS_DDR |= (1<<LED_STATUS);
     LED_ERROR_DDR |= (1<<LED_ERROR);
 }

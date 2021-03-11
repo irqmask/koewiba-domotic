@@ -226,43 +226,59 @@ void output_initialize(void)
     }
 }
 
-void output_set(uint8_t idx, uint8_t v)
+void output_set(uint8_t chn, uint8_t v)
 {
-    if (idx >= OUTPUT_NUM_PINS) {
+    if (chn >= OUTPUT_NUM_PINS) {
         return;
     }
 
-    if (v > g_data[idx].threshold_on) {
-        g_data[idx].value = 255;
-        output_hw_set(idx, true);
+    if (v > g_data[chn].threshold_on) {
+        g_data[chn].value = 255;
+        output_hw_set(chn, true);
     }
-    if (v < g_data[idx].threshold_off) {
-        g_data[idx].value = 0;
-        output_hw_set(idx, true);
+    if (v < g_data[chn].threshold_off) {
+        g_data[chn].value = 0;
+        output_hw_set(chn, false);
     }
 }
 
-void output_toggle(uint8_t idx)
+void output_toggle(uint8_t chn)
 {
-    if (idx >= OUTPUT_NUM_PINS) {
+    if (chn >= OUTPUT_NUM_PINS) {
         return;
     }
     // toggle to off
-    if (g_data[idx].value > g_data[idx].threshold_on) {
-        g_data[idx].value = 0;
-        output_hw_set(idx, false);
+    if (g_data[chn].value > g_data[chn].threshold_on) {
+        g_data[chn].value = 0;
+        output_hw_set(chn, false);
     }
     // toggle to on
-    else if (g_data[idx].value < g_data[idx].threshold_off) {
-        g_data[idx].value = 255;
-        output_hw_set(idx, true);
+    else if (g_data[chn].value < g_data[chn].threshold_off) {
+        g_data[chn].value = 255;
+        output_hw_set(chn, true);
     }
 }
 
-uint8_t output_get_value(uint8_t idx)
+uint8_t output_get_value(uint8_t chn)
 {
-    if (idx >= OUTPUT_NUM_PINS) {
+    if (chn >= OUTPUT_NUM_PINS) {
         return 0;
     }
-    return g_data[idx].value;
+    return g_data[chn].value;
+}
+
+void output_set_threshold_off(uint8_t chn, uint8_t throff)
+{
+    if (chn >= OUTPUT_NUM_PINS) {
+        return;
+    }
+    g_data[chn].threshold_off = throff;
+}
+
+void output_set_threshold_on(uint8_t chn, uint8_t thron)
+{
+    if (chn >= OUTPUT_NUM_PINS) {
+        return;
+    }
+    g_data[chn].threshold_on = thron;
 }

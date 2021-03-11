@@ -1,10 +1,12 @@
 /**
- * @addtogroup RELAY_OUTPUT
- * @brief This module contains functions to control the relay output.
- * signals.
+ * @addtogroup SWITCH5_ATMEGA328S
+ * @addtogroup APPLICATION
+ * @brief Application module.
  *
  * @{
- * @file    output.h
+ * @file    application.h
+ * @brief   Common header of application module.
+ *
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
 /*
@@ -23,14 +25,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef _OUTPUT_H_
-#define _OUTPUT_H_
+#ifndef _APPLICATION_H_
+#define _APPLICATION_H_
 
 // --- Include section ---------------------------------------------------------
 
 #include "prjtypes.h"
 
 // --- Definitions -------------------------------------------------------------
+
+#define APP_NUM_CHANNEL OUTPUT_NUM_PINS
 
 // --- Type definitions --------------------------------------------------------
 
@@ -40,26 +44,19 @@
 
 // --- Module global variables -------------------------------------------------
 
+extern uint8_t app_chn_mode[APP_NUM_CHANNEL];
+
 // --- Local functions ---------------------------------------------------------
 
 // --- Module global functions -------------------------------------------------
 
+void app_set_mode(uint8_t chn, uint8_t mode);
+
+void app_send_state(uint8_t chn, uint8_t state);
+
+void app_register_load(void);
+
 // --- Global functions --------------------------------------------------------
 
-/**
- * Initialize output data and i/o
- */
-void output_initialize(void);
-
-void output_set(uint8_t idx, uint8_t v);
-
-void output_toggle(uint8_t idx);
-
-uint8_t output_get_value(uint8_t idx);
-
-void output_set_threshold_off(uint8_t chn, uint8_t throff);
-
-void output_set_threshold_on(uint8_t chn, uint8_t thron);
-
-#endif // _OUTPUT_H_
+#endif /* _APPCONFIG_H_ */
 /** @} */

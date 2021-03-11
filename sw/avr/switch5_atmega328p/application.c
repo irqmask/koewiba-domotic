@@ -44,10 +44,9 @@
 
 #include "appconfig.h"
 #include "pcbconfig.h"
+#include "application.h"
 
 // --- Definitions -------------------------------------------------------------
-
-#define APP_NUM_CHANNEL OUTPUT_NUM_PINS
 
 // --- Type definitions --------------------------------------------------------
 
@@ -61,17 +60,15 @@ enum {
 static timer_data_t g_seconds_timer;
 static timer_data_t g_input_timer;
 
-static uint8_t app_chn_mode[APP_NUM_CHANNEL];
+// --- Module global variables -------------------------------------------------
+
+uint8_t app_chn_mode[APP_NUM_CHANNEL];
 
 // --- Global variables --------------------------------------------------------
 
 extern sBus_t g_bus;
 
-// --- Module global variables -------------------------------------------------
-
 // --- Local functions ---------------------------------------------------------
-
-
 
 // --- Module global functions -------------------------------------------------
 
@@ -83,17 +80,25 @@ void app_send_state(uint8_t chn, uint8_t state)
 }
 
 
-void app_toggle_output(uint8_t idx)
+void app_toggle_output(uint8_t chn)
 {
-    output_toggle(idx);
-    app_send_state(idx, output_get_value(idx));
+    output_toggle(chn);
+    app_send_state(chn, output_get_value(chn));
 }
 
 
-void app_set_output(uint8_t idx, uint8_t value)
+void app_set_output(uint8_t chn, uint8_t value)
 {
-    output_set(idx, value);
-    app_send_state(idx, output_get_value(idx));
+    output_set(chn, value);
+    app_send_state(chn, output_get_value(chn));
+}
+
+void app_set_mode(uint8_t chn, uint8_t mode)
+{
+    if (chn >= APP_NUM_CHANNEL) {
+        return;
+    }
+    app_chn_mode[chn] = mode;
 }
 
 // --- Global functions --------------------------------------------------------
@@ -115,12 +120,10 @@ void app_init (void)
     // register_set_u16(MOD_eReg_ModuleID, 0x20);
     dt_initialize();
 
+    app_register_load();
+
     timer_start(&g_seconds_timer, TIMER_MS_2_TICKS(1000));
     timer_start(&g_input_timer, TIMER_MS_2_TICKS(20));
-
-    for (uint8_t idx=0; idx<APP_NUM_CHANNEL; idx++) {
-        app_chn_mode[idx] = 1;
-    }
 
     LED_STATUS_DDR |= (1<<LED_STATUS);
     LED_ERROR_DDR |= (1<<LED_ERROR);

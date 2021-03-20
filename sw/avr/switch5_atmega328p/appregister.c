@@ -66,12 +66,23 @@ void        app_register_load       (void)
         app_chn_mode[chn] = v;
     }
     for (uint8_t chn=0; chn<OUTPUT_NUM_PINS; chn++) {
-        //eeprom_write_byte(&register_eeprom_array[APP_eCfg_Chn0_ThresholdOff + chn * APP_CFG_BYTES_PER_CHN], 64);
-        //eeprom_write_byte(&register_eeprom_array[APP_eCfg_Chn0_ThresholdOn + chn * APP_CFG_BYTES_PER_CHN], 128);
-        v = eeprom_read_byte(&register_eeprom_array[APP_eCfg_Chn0_ThresholdOff + chn * APP_CFG_BYTES_PER_CHN]);
+        uint8_t chn_offset = chn * APP_CFG_BYTES_PER_CHN;
+        //eeprom_write_byte(&register_eeprom_array[APP_eCfg_Chn0_ThresholdOff + chn_offset], 64);
+        //eeprom_write_byte(&register_eeprom_array[APP_eCfg_Chn0_ThresholdOn + chn_offset], 128);
+        v = eeprom_read_byte(&register_eeprom_array[APP_eCfg_Chn0_ThresholdOff + chn_offset]);
         output_set_threshold_off(chn, v);
-        v = eeprom_read_byte(&register_eeprom_array[APP_eCfg_Chn0_ThresholdOn + chn * APP_CFG_BYTES_PER_CHN]);
+        v = eeprom_read_byte(&register_eeprom_array[APP_eCfg_Chn0_ThresholdOn + chn_offset]);
         output_set_threshold_on(chn, v);
+
+        for (uint8_t a=0; a<APP_ONOFFTIMER_COUNT * 2; a++) {
+            // same for off and on
+            v = eeprom_read_byte(&register_eeprom_array[APP_eCfg_Chn0_TimeOn0_Weekday + a * APP_REGS_PER_ALARM + chn_offset]);
+            alarm_set_days_of_week_mask(a + chn * APP_ONOFFTIMER_COUNT * 2, v);
+            v = eeprom_read_byte(&register_eeprom_array[APP_eCfg_Chn0_TimeOn0_Hour + a * APP_REGS_PER_ALARM + chn_offset]);
+            alarm_set_hour(a + chn * APP_ONOFFTIMER_COUNT * 2, v);
+            v = eeprom_read_byte(&register_eeprom_array[APP_eCfg_Chn0_TimeOn0_Minute + a * APP_REGS_PER_ALARM + chn_offset]);
+            alarm_set_minute(a + chn * APP_ONOFFTIMER_COUNT * 2, v);
+        }
     }
 
 }
@@ -81,7 +92,7 @@ bool        app_register_get        (uint8_t                reg_no,
                                      void*                  pvalue)
 {
     eRegType_t  regtype;
-    uint8_t chn, idx;
+    uint8_t chn, index;
 
     if (preg_type == NULL) preg_type = &regtype;
     if (pvalue == NULL) return false;
@@ -90,8 +101,8 @@ bool        app_register_get        (uint8_t                reg_no,
     // registers saved in EEProm
     if (reg_no >= APP_eReg_Chn0_SwitchCurrent && reg_no <= APP_eReg_Chn4_Unused0) {
         chn = (reg_no - APP_eReg_Chn0_SwitchCurrent) / APP_REGS_PER_CHN;
-        idx = reg_no - (chn * APP_REGS_PER_CHN);
-        switch (idx) {
+        index = reg_no - (chn * APP_REGS_PER_CHN);
+        switch (index) {
         case APP_eReg_Chn0_SwitchSetPoint:
             // fallthrough
         case APP_eReg_Chn0_SwitchCurrent:
@@ -113,9 +124,28 @@ bool        app_register_get        (uint8_t                reg_no,
         default:
             break;
         }
-        /// todo index += APP_eCfg_RemoteAddr00;
-        //*(uint16_t*)pvalue = eeprom_read_word((uint16_t*)&register_eeprom_array[index]);
-        //*preg_type = eRegType_U16;
+
+        if (index >= APP_eReg_Chn0_TimeOn0_Weekday && index <= APP_eReg_Chn0_TimeOff3_Minute) {
+            // calculate alarmidx per channel
+            uint8_t alarmidx = (index - APP_eReg_Chn0_TimeOn0_Weekday) / APP_REGS_PER_ALARM;
+            // calculate offset to alarm block in register space
+            uint8_t offset = alarmidx * APP_REGS_PER_ALARM;
+            index -= offset;
+            switch (index) {
+            // same for on and off
+            case APP_eReg_Chn0_TimeOn0_Weekday:
+                *(uint8_t*)pvalue = eeprom_read_byte(&register_eeprom_array[APP_eCfg_Chn0_TimeOn0_Weekday + (chn * APP_CFG_BYTES_PER_CHN) + offset]);
+                break;
+            case APP_eReg_Chn0_TimeOn0_Hour:
+                *(uint8_t*)pvalue = eeprom_read_byte(&register_eeprom_array[APP_eCfg_Chn0_TimeOn0_Hour + (chn * APP_CFG_BYTES_PER_CHN) + offset]);
+                break;
+            case APP_eReg_Chn0_TimeOn0_Minute:
+                *(uint8_t*)pvalue = eeprom_read_byte(&register_eeprom_array[APP_eCfg_Chn0_TimeOn0_Minute + (chn * APP_CFG_BYTES_PER_CHN) + offset]);
+                break;
+            default:
+                break;
+            }
+        }
     }
 
     else {
@@ -196,9 +226,34 @@ void        app_register_set        (uint8_t                reg_no,
         default:
             break;
         }
-        /// todo index += APP_eCfg_RemoteAddr00;
-        //eeprom_write_word((uint16_t*)&register_eeprom_array[index], tempval16);
 
+        if (index >= APP_eReg_Chn0_TimeOn0_Weekday && index <= APP_eReg_Chn0_TimeOff3_Minute) {
+            // calculate alarmidx per channel
+            uint8_t alarmidx = (index - APP_eReg_Chn0_TimeOn0_Weekday) / APP_REGS_PER_ALARM;
+            // calculate offset to alarm block in register space
+            uint8_t offset = alarmidx * APP_REGS_PER_ALARM;
+            index -= offset;
+            switch (index) {
+            // same for on and off
+            case APP_eReg_Chn0_TimeOn0_Weekday:
+                eeprom_write_byte(&register_eeprom_array[APP_eCfg_Chn0_TimeOn0_Weekday + chn * APP_CFG_BYTES_PER_CHN + offset], value8);
+                alarm_set_days_of_week_mask(alarmidx + chn * APP_ONOFFTIMER_COUNT * 2, value8);
+                break;
+
+            case APP_eReg_Chn0_TimeOn0_Hour:
+                eeprom_write_byte(&register_eeprom_array[APP_eCfg_Chn0_TimeOn0_Hour + chn * APP_CFG_BYTES_PER_CHN + offset], value8);
+                alarm_set_hour(alarmidx + chn * APP_ONOFFTIMER_COUNT * 2, value8);
+                break;
+
+            case APP_eReg_Chn0_TimeOn0_Minute:
+                eeprom_write_byte(&register_eeprom_array[APP_eCfg_Chn0_TimeOn0_Minute + chn * APP_CFG_BYTES_PER_CHN + offset], value8);
+                alarm_set_minute(alarmidx + chn * APP_ONOFFTIMER_COUNT * 2, value8);
+                break;
+
+            default:
+                break;
+            }
+        }
     }
     else {
         switch (reg_no) {

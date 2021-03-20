@@ -41,6 +41,32 @@
 #define BUS_MAXSENDMSGLEN   16      //!< Maximum length of a message to be sent.
 #define BUS_MAXRECVMSGLEN   64 + 2  //!< Maximum length of a message to be received.
 
+#define DATETIME_APPCONFIG  1
+#define DATETIME_APP_HAS_ON_MINUTE_FUNCTION 1
+
+
+#define APP_NUM_CHANNEL         5   //!< Number of channels. Always change along
+                                    //!< with number of output channels!
+#define APP_ONOFFTIMER_COUNT    4   //!< Number of on/off pairs per channel.
+#define APP_REGS_PER_ALARM      3   //!< Number of registers per alarmclock
+
+// order of alarms is
+//  0: chn 0 idx 0 on
+//  1: chn 0 idx 0 off
+//  2: chn 0 idx 1 on
+//  3: chn 0 idx 1 off
+//  4: chn 0 idx 2 on
+// ...
+// 36: chn 4 idx 2 on
+// 37: chn 4 idx 2 off
+// 38: chn 4 idx 3 on
+// 39: chn 4 idx 3 off
+
+#define ALARMCLOCK_APPCONFIG    1
+
+//! Number of programmable alarms.
+#define ALARM_COUNT         (APP_NUM_CHANNEL * APP_ONOFFTIMER_COUNT * 2)
+
 #define TIMER_WAKEUP        1       //!< Timer shall wake the controller.
 
 // --- Type definitions --------------------------------------------------------

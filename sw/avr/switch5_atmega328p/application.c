@@ -119,6 +119,7 @@ void app_init (void)
 
     // register_set_u16(MOD_eReg_ModuleID, 0x20);
     dt_initialize();
+    alarm_initialize();
 
     app_register_load();
 
@@ -176,6 +177,26 @@ void app_background (void)
                     app_toggle_output(idx);
                 }
             }
+        }
+    }
+}
+
+/**
+ *  Check every minute if one of the up/down alarms triggers.
+ */
+void app_on_minute(void)
+{
+    int8_t alarm_idx = -1;
+    bool switch_on = false;
+    uint8_t chn = 0;
+
+    if (alarm_check(&alarm_idx)) {
+        chn = alarm_idx / (2 * APP_ONOFFTIMER_COUNT);
+        switch_on = ((alarm_idx % 2) == 0);
+        if (switch_on) {
+            app_set_output(chn, 255);
+        } else {
+            app_set_output(chn, 0);
         }
     }
 }

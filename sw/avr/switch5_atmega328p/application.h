@@ -31,10 +31,9 @@
 // --- Include section ---------------------------------------------------------
 
 #include "prjtypes.h"
+#include "appconfig.h"
 
 // --- Definitions -------------------------------------------------------------
-
-#define APP_NUM_CHANNEL OUTPUT_NUM_PINS
 
 // --- Type definitions --------------------------------------------------------
 

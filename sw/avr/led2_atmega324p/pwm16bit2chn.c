@@ -1,11 +1,11 @@
 /**
  * @addtogroup LED2_ATMEGA324P
  * @addtogroup PWM16BIT
- * @brief 16bit onboard PWM.
+ * @brief 16bit on-board PWM.
  *
  * @{
  * @file pwm16bit2chn.c
- * @brief 16bit onboard PWM.
+ * @brief 16bit on-board PWM.
  *///---------------------------------------------------------------------------
 /*
  * This program is free software: you can redistribute it and/or modify

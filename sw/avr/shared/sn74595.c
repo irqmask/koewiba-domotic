@@ -69,9 +69,11 @@
  */
 void sn74595_initialize    	(void)
 {
+#ifdef LATCH_OE_ENABLED
     LATCH_OE_DDR |= (1<<LATCH_OE_PIN);
-    LATCH_STB_DDR |= (1<<LATCH_STB_PIN);
     sn74595_OE_off();
+#endif
+    LATCH_STB_DDR |= (1<<LATCH_STB_PIN);
     LATCH_STB_PORT &= ~(1<<LATCH_STB_PIN);
 	spi_transmit_blk(0);
 	sn74595_latch();
@@ -86,6 +88,7 @@ void sn74595_latch(void)
     LATCH_STB_PORT &= ~(1<<LATCH_STB_PIN);
 }
 
+#ifdef LATCH_OE_ENABLED
 /**
  * Output enable. If output enabled, data is valid at output lines.
  */
@@ -101,6 +104,7 @@ void sn74595_OE_off(void)
 {
     LATCH_OE_PORT |= (1<<LATCH_OE_PIN);
 }
+#endif
 
 /**
  * Send and latch one data byte.

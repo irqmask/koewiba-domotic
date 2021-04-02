@@ -91,6 +91,7 @@ void sched_reset_node_error(sSched_t* psSched, uint8_t uNodeAddress)
                  if (psSched->uDiscoverNode > BUS_LASTNODE) {
                      psSched->uDiscoverNode = BUS_FIRSTNODE;
                      discover_round_complete = true;
+                     LED_YELLOW_OFF;
                  }
                  // test if node is NOT available
                  nodebyte = psSched->asNodeList.uAddress[psSched->uDiscoverNode >> 3];
@@ -241,6 +242,7 @@ bool bus_schedule_and_get_message (sBus_t* psBus, sSched_t* psSched )
         break;
 
     case eBus_SendingToken:
+    	LED_GREEN_TOGGLE;
         // wait for finished token sending
         if (!bus_phy_sending(&psBus->sPhy)) {
             if (sched_current_node_is_me(psBus, psSched)) {
@@ -259,7 +261,7 @@ bool bus_schedule_and_get_message (sBus_t* psBus, sSched_t* psSched )
                 sched_set_node_error(psSched, psSched->auTokenMsg[1] & 0x7F);
                 // return to IDLE state
                 psBus->eState = eBus_Idle;
-                LED_ERROR_ON;
+                LED_RED_ON;
         }
         break;
 
@@ -330,11 +332,14 @@ bool bus_schedule_and_get_message (sBus_t* psBus, sSched_t* psSched )
 void bus_schedule_check_and_set_sleep (sBus_t* psBus)
 {
     if (eMod_Sleeping == psBus->eModuleState) {
+		LED_YELLOW_ON;
         if (bus_trp_send_sleepcmd(psBus)) {
             sleep_request(true);
+            LED_GREEN_OFF;
             sleep_check_and_goodnight();
             bus_flush_bus(psBus); // Clean bus-buffer
             psBus->eModuleState = eMod_Running;
+			LED_YELLOW_OFF;
         }
     }
 }

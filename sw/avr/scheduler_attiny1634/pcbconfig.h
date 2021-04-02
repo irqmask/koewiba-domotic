@@ -1,6 +1,7 @@
 /**
  * @addtogroup TESTSCHEDULER_PCBCONFIG
- * @brief PCB configuration of the "testscheduler" application.
+ * @addtogroup PCBCONFIG
+ * @brief   PCB configuration of the "testscheduler" application.
  *
  * @{
  * @file    pcbconfig.h
@@ -8,22 +9,6 @@
  *
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
-/*
- * Copyright (C) 2021  christian <irqmask@web.de>
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
 #ifndef _PCBCONFIG_H_
 #define _PCBCONFIG_H_
 
@@ -33,22 +18,13 @@
 
 // --- Definitions -------------------------------------------------------------
 
+// bus-module_attiny1634 specific pin assignments
+// ----------------------------------------------------------------------------
+
 #define BUS_PCBCONFIG 1
-
-#define TXRXEN1_SEPERATE 1
-
-#define BUS_DDR_ENASND0  DDRA
-#define BUS_DDR_ENASND1  DDRA
-#define BUS_DDR_DISRCV0  DDRA
-#define BUS_DDR_DISRCV1  DDRA
-#define BUS_PORT_ENASND0 PORTA
-#define BUS_PORT_ENASND1 PORTA
-#define BUS_PORT_DISRCV0 PORTA
-#define BUS_PORT_DISRCV1 PORTA
-#define BUS_ENASND0      PA6
-#define BUS_ENASND1      PA5
-#define BUS_DISRCV0      PA6
-#define BUS_DISRCV1      PA2
+#define BUS_DDR_ENASND0     DDRA
+#define BUS_PORT_ENASND0    PORTA
+#define BUS_ENASND0         PA6
 
 #define SPI_PCBCONFIG       1
 #define SPI_DDR_MOSI        DDRB
@@ -72,9 +48,16 @@
 
 // Pin assignments of board keys and LEDs
 #define LED_PCBCONFIG       1
-#define LED_ERROR           PA0  //!< Red error LED
-#define LED_ERROR_DDR       DDRA
-#define LED_ERROR_PORT      PORTA
+#define LED_RED       PORTA0  //!< Red LED
+#define LED_YELLOW    PORTA2  //!< Yellow LED
+#define LED_GREEN     PORTA4  //!< Green LED
+
+#define LED_RED_DDR        DDRA
+#define LED_RED_PORT       PORTA
+#define LED_YELLOW_DDR     DDRA
+#define LED_YELLOW_PORT    PORTA
+#define LED_GREEN_DDR      DDRA
+#define LED_GREEN_PORT     PORTA
 
 // --- Type definitions --------------------------------------------------------
 

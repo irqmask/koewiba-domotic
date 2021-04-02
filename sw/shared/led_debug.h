@@ -14,6 +14,7 @@
 
 // --- Include section ---------------------------------------------------------
 #include "prjconf.h"
+#include "pcbconfig.h"
 
 #ifdef PRJCONF_UC_AVR
  #include <avr/io.h>
@@ -46,6 +47,16 @@
  #define LED_STATUS_ON       LED_STATUS_PORT &= ~(1<<LED_STATUS)
  #define LED_STATUS_OFF      LED_STATUS_PORT |=  (1<<LED_STATUS)
  #define LED_STATUS_TOGGLE   LED_STATUS_PORT ^=  (1<<LED_STATUS)
+ #define LED_RED_OFF       	 LED_RED_PORT &= ~(1<<LED_RED)
+ #define LED_RED_TOGGLE    	 LED_RED_PORT ^=  (1<<LED_RED)
+
+ #define LED_YELLOW_ON       LED_YELLOW_PORT |=  (1<<LED_YELLOW)
+ #define LED_YELLOW_OFF      LED_YELLOW_PORT &= ~(1<<LED_YELLOW)
+ #define LED_YELLOW_TOGGLE   LED_YELLOW_PORT ^=  (1<<LED_YELLOW)
+
+ #define LED_GREEN_ON        LED_GREEN_PORT |=  (1<<LED_GREEN)
+ #define LED_GREEN_OFF       LED_GREEN_PORT &= ~(1<<LED_GREEN)
+ #define LED_GREEN_TOGGLE    LED_GREEN_PORT ^=  (1<<LED_GREEN)
  
 #else
  #define LED_ERROR_ON

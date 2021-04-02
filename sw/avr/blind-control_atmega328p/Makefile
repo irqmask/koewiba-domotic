@@ -23,6 +23,7 @@ SRC = ../shared/bus_transport.c \
       shared/timer.c \
       blind-control/blindctrl.c \
       blind-control/motor.c \
+      blind-control/motor_relay_direct.c \
       blind-control_atmega328p/application.c \
       blind-control_atmega328p/appregister.c \
       blind-control_atmega328p/appversion.c \

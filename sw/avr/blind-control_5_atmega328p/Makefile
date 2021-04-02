@@ -1,6 +1,6 @@
 MCU = atmega328p
 FORMAT = ihex
-TARGET = blindcontrol_5+4_atmega328p
+TARGET = blindcontrol_5_atmega328p
 
 ROOTDIR = $(subst \,/,$(shell pwd))/..
 include ../buildscripts/lib/lib_outputdirs.mk
@@ -20,12 +20,14 @@ SRC = ../shared/bus_transport.c \
       shared/main_avr.c \
       shared/register.c \
       shared/sleepmode.c \
+      shared/sn74595.c \
       shared/timer.c \
       blind-control/blindctrl.c \
       blind-control/motor.c \
-      blind-control_5+4_atmega328p/application.c \
-      blind-control_5+4_atmega328p/appregister.c \
-      blind-control_5+4_atmega328p/appversion.c \
+      blind-control/motor_relay_serial.c \
+      blind-control_5_atmega328p/application.c \
+      blind-control_5_atmega328p/appregister.c \
+      blind-control_5_atmega328p/appversion.c \
 
 
 # Place -I options here

@@ -68,14 +68,29 @@
 #define LATCH_STB_PORT      PORTB
 #define LATCH_STB_PIN       PB0
 
+#define MOTOR_PCBCONFIG     1
+//! Number of motors supported by the application
+#define MOTOR_COUNT         5
+#define MOTOR_0_ONOFF       {0x00, 0x40}
+#define MOTOR_0_UPDOWN      {0x00, 0x80}
+#define MOTOR_1_ONOFF       {0x00, 0x10}
+#define MOTOR_1_UPDOWN      {0x00, 0x20}
+#define MOTOR_2_ONOFF       {0x00, 0x04}
+#define MOTOR_2_UPDOWN      {0x00, 0x08}
+#define MOTOR_3_ONOFF       {0x00, 0x01}
+#define MOTOR_3_UPDOWN      {0x00, 0x02}
+#define MOTOR_4_ONOFF       {0x40, 0x00}
+#define MOTOR_4_UPDOWN      {0x80, 0x00}
+#define MOTOR_SWITCH_DELAY  80
+
 // debug LED outputs
-#define LED_PCBCONFIG        1
-#define LED_STATUS           PB1    //!< Yellow status LED
-#define LED_ERROR            PD7    //!< Red error LED
-#define LED_STATUS_DDR       DDRB
-#define LED_ERROR_DDR        DDRD
-#define LED_STATUS_PORT      PORTB
-#define LED_ERROR_PORT       PORTD
+#define LED_PCBCONFIG       1
+#define LED_STATUS          PB1    //!< Yellow status LED
+#define LED_ERROR           PD7    //!< Red error LED
+#define LED_STATUS_DDR      DDRB
+#define LED_ERROR_DDR       DDRD
+#define LED_STATUS_PORT     PORTB
+#define LED_ERROR_PORT      PORTD
 
 // --- Type definitions --------------------------------------------------------
 

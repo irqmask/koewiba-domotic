@@ -1,17 +1,15 @@
 /**
- * @addtogroup BLINDCONTROL_5+4_ATMEGA328
+ * @addtogroup BLINDCONTROL_5_ATMEGA328
  * @addtogroup PCBCONFIG
- * @brief PCB configuration of the "blindcontrol_5+4_atmega328p" application.
+ * @brief PCB configuration of the "blindcontrol_5_atmega328p" application.
  *
  * @{
  * @file    pcbconfig.h
- * @brief   PCB configuration of the "blindcontrol_5+4_atmega328p" application.
+ * @brief   PCB configuration of the "blindcontrol_5_atmega328p" application.
  *
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
 /*
- * Copyright (C) 2018  christian <irqmask@web.de>
- *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -63,70 +61,38 @@
 // Application specific pin assignments
 // ----------------------------------------------------------------------------
 
-// debug LED outputs
-#define LED_PCBCONFIG        1
-#define LED_STATUS           PD7
-#define LED_ERROR
-#define LED_STATUS_DDR       DDRD
-#define LED_ERROR_DDR
-#define LED_STATUS_PORT      PORTD
-#define LED_ERROR_PORT
+#define SN74595_PCBCONFIG   1
+#undef LATCH_OE_ENABLED
+#define LATCH_OE_DDR        DDRD
+#define LATCH_OE_PORT       PORTD
+#define LATCH_OE_PIN        PD7
+#define LATCH_STB_DDR       DDRB
+#define LATCH_STB_PORT      PORTB
+#define LATCH_STB_PIN       PB0
 
-#define MOTOR_PCBCONFIG    1
-
+#define MOTOR_PCBCONFIG     1
 //! Number of motors supported by the application
-#define MOTOR_COUNT 5
+#define MOTOR_COUNT         5
+#define MOTOR_0_ONOFF       {0x00, 0x40}
+#define MOTOR_0_UPDOWN      {0x00, 0x80}
+#define MOTOR_1_ONOFF       {0x00, 0x10}
+#define MOTOR_1_UPDOWN      {0x00, 0x20}
+#define MOTOR_2_ONOFF       {0x00, 0x04}
+#define MOTOR_2_UPDOWN      {0x00, 0x08}
+#define MOTOR_3_ONOFF       {0x00, 0x01}
+#define MOTOR_3_UPDOWN      {0x00, 0x02}
+#define MOTOR_4_ONOFF       {0x40, 0x00}
+#define MOTOR_4_UPDOWN      {0x80, 0x00}
+#define MOTOR_SWITCH_DELAY  80
 
-// motor relay pin assignment
-//  µC | Signal | Description
-//-----+--------+-------------------------------------------
-// PC5 | Rel01  | Motor 0 OnOff
-// PD5 | Rel02  | Motor 0 UpDown
-// PC3 | Rel03  | Motor 1 OnOff
-// PD3 | Rel04  | Motor 1 UpDown
-// PC1 | Rel05  | Motor 2 OnOff
-// PC4 | Rel06  | Motor 2 UpDown
-// PC0 | Rel07  | Motor 3 OnOff
-// PC2 | Rel08  | Motor 3 UpDown
-// PD6 | Rel09  | Motor 4 OnOff
-// PD4 | Rel10  | Motor 4 UpDown
-#define MOTOR_0_ONOFF_PORT     PORTC
-#define MOTOR_0_ONOFF_DDR      DDRC
-#define MOTOR_0_ONOFF_PIN      PC5
-#define MOTOR_0_UPDOWN_PORT    PORTD
-#define MOTOR_0_UPDOWN_DDR     DDRD
-#define MOTOR_0_UPDOWN_PIN     PD5
-
-#define MOTOR_1_ONOFF_PORT     PORTC
-#define MOTOR_1_ONOFF_DDR      DDRC
-#define MOTOR_1_ONOFF_PIN      PC3
-#define MOTOR_1_UPDOWN_PORT    PORTD
-#define MOTOR_1_UPDOWN_DDR     DDRD
-#define MOTOR_1_UPDOWN_PIN     PD3
-
-#define MOTOR_2_ONOFF_PORT     PORTC
-#define MOTOR_2_ONOFF_DDR      DDRC
-#define MOTOR_2_ONOFF_PIN      PC1
-#define MOTOR_2_UPDOWN_PORT    PORTC
-#define MOTOR_2_UPDOWN_DDR     DDRC
-#define MOTOR_2_UPDOWN_PIN     PC4
-
-#define MOTOR_3_ONOFF_PORT     PORTC
-#define MOTOR_3_ONOFF_DDR      DDRC
-#define MOTOR_3_ONOFF_PIN      PC0
-#define MOTOR_3_UPDOWN_PORT    PORTC
-#define MOTOR_3_UPDOWN_DDR     DDRC
-#define MOTOR_3_UPDOWN_PIN     PC2
-
-#define MOTOR_4_ONOFF_PORT     PORTD
-#define MOTOR_4_ONOFF_DDR      DDRD
-#define MOTOR_4_ONOFF_PIN      PD6
-#define MOTOR_4_UPDOWN_PORT    PORTD
-#define MOTOR_4_UPDOWN_DDR     DDRD
-#define MOTOR_4_UPDOWN_PIN     PD4
-
-#define MOTOR_SWITCH_DELAY     80
-
+// debug LED outputs
+#define LED_PCBCONFIG       1
+#define LED_STATUS          PB1
+#define LED_ERROR
+#define LED_STATUS_DDR      DDRB
+#define LED_ERROR_DDR
+#define LED_STATUS_PORT     PORTB
+#define LED_ERROR_PORT
 
 // --- Type definitions --------------------------------------------------------
 

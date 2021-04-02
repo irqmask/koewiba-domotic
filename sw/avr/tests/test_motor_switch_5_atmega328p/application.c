@@ -37,8 +37,6 @@
 
 // --- Definitions -------------------------------------------------------------
 
-#define PATTERN_SIZE 18
-
 #define TEST_EEPROM_MASK    (1<<0)  //!< bit is set if EEProm test succeeds
 #define TEST_RELAY_MASK     (1<<1)  //!< bit is set if relay test succeeds
 
@@ -47,7 +45,7 @@
 // --- Local variables ---------------------------------------------------------
 
 static uint8_t g_test_result_msg[2];
-
+/*
 static const uint8_t g_test_pattern[PATTERN_SIZE][2] = {
         {0xFF, 0xFF},
         {0x55, 0x55},
@@ -68,9 +66,10 @@ static const uint8_t g_test_pattern[PATTERN_SIZE][2] = {
         {0x00, 0x01},
         {0x00, 0x02},
 
-};
+};*/
 
-static uint8_t g_pattern_idx = 0;
+static uint8_t g_loop = 0;
+static uint8_t g_motor = 0;
 static timer_data_t g_pattern_timer;
 
 // --- Global variables --------------------------------------------------------
@@ -89,6 +88,10 @@ extern void test_io_initialize(void);
 extern uint8_t test_io_run(void);
 extern uint8_t test_io_is_ok(void);
 
+extern void motors_relay_initialize(void);
+extern void motor_relay_onoff(uint8_t index, bool onoff);
+extern void motor_relay_updown(uint8_t index, bool updown);
+
 // --- Global functions --------------------------------------------------------
 
 /**
@@ -102,9 +105,8 @@ void app_init (void)
 {
     //TODO insert application specific initializations here!
     register_set_u16(MOD_eReg_ModuleID, 0x21);
-    sn74595_initialize();
-    sn74595_send(0x00);
-    sn74595_send(0x00);
+    motors_relay_initialize();
+
     timer_start(&g_pattern_timer, TIMER_MS_2_TICKS(300));
     //test_eeprom_start();
     //test_io_initialize();
@@ -136,15 +138,52 @@ void app_on_command (uint16_t sender, uint8_t msglen, uint8_t* msg)
  */
 void app_background (sBus_t* g_bus)
 {
-    uint8_t eep_test_running, io_test_running;
+    //uint8_t eep_test_running, io_test_running;
     if (timer_is_elapsed(&g_pattern_timer)) {
         timer_start(&g_pattern_timer, TIMER_MS_2_TICKS(250));
-        sn74595_send(g_test_pattern[g_pattern_idx][1]);
-        sn74595_send(g_test_pattern[g_pattern_idx][0]);
-        g_pattern_idx++;
-        g_pattern_idx %= PATTERN_SIZE;
+        /*if (g_loop % 2) {
+            sn74595_send(0x55);
+            sn74595_send(0x55);
+        }
+        else {
+            sn74595_send(0xAA);
+            sn74595_send(0xAA);
+        }*/
+
+        switch (g_loop) {
+        case 0:
+            motor_relay_onoff(g_motor, false);
+            motor_relay_updown(g_motor, false);
+            break;
+
+        case 1:
+            motor_relay_onoff(g_motor, true);
+            motor_relay_updown(g_motor, false);
+            break;
+
+        case 2:
+            motor_relay_onoff(g_motor, false);
+            motor_relay_updown(g_motor, true);
+            break;
+
+        case 3:
+            motor_relay_onoff(g_motor, true);
+            motor_relay_updown(g_motor, true);
+            break;
+
+        default:
+            g_loop = 0;
+            break;
+        }
+
+        g_motor++;
+        if (g_motor >= MOTOR_COUNT) {
+            g_motor = 0;
+            g_loop++;
+            g_loop %= 4;
+        }
     }
-    eep_test_running = 1; //test_eeprom_run();
+    /* eep_test_running = test_eeprom_run();
     if (eep_test_running == 0) {
         sleep_prevent(TEST_EEPROM_MASK, false);
 
@@ -157,7 +196,7 @@ void app_background (sBus_t* g_bus)
         bus_send_message(g_bus, 0x0000, sizeof(g_test_result_msg), g_test_result_msg);
     }
 
-    /* io_test_running = test_io_run();
+     io_test_running = test_io_run();
     if (io_test_running == 0) {
         sleep_prevent(TEST_RELAY_MASK, false);
 

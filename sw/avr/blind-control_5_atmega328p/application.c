@@ -1,9 +1,9 @@
 /**
- * @addtogroup BLINDCONTROL_5+4_ATMEGA328
+ * @addtogroup BLINDCONTROL_5_ATMEGA328
  * @addtogroup APPLICATION
- * @brief Application specific code of "blind-control_5+4_atmega328p" project.
+ * @brief Application specific code of "blind-control_5_atmega328p" project.
  *
- * Contains application specific initialization, command-interpreter, 
+ * Contains application specific initialization, command-interpreter,
  * register code and background loop.
  *
  * @{
@@ -13,8 +13,6 @@
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
 /*
- * Copyright (C) 2018  christian <irqmask@web.de>
- *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -65,12 +63,12 @@ extern void        app_register_load       (void);
 
 /**
  * Application specific initializations.
- * 
+ *
  * Executed if common code initialization passed.
  * @note Global interrupts are still switched off! Will be switched on in global
  * main after this initialization code.
  */
-void app_init (void) 
+void app_init (void)
 {
     motors_initialize();
     blinds_initialize();
@@ -79,15 +77,12 @@ void app_init (void)
     // load application parameters
     app_register_load();
 
-    DDRB |= (1<<PB0);
-    PORTB &= ~(1<<PB0);// switch off board's 24VDC supply
-
     timer_start(&g_seconds_timer, TIMER_MS_2_TICKS(1000));
 }
 
 /**
  * Application specific command interpreter code.
- * 
+ *
  * Executed if a not-common command is received.
  */
 void app_on_command (uint16_t sender, uint8_t msglen, uint8_t* msg)
@@ -107,20 +102,13 @@ void app_on_command (uint16_t sender, uint8_t msglen, uint8_t* msg)
 
 /**
  * Application specific background code.
- * 
+ *
  * Executed once per main loop cycle.
  */
 void app_background (sBus_t* bus)
 {
     motors_background();
     blinds_background(bus);
-
-    // check if the 24V supply has to be switched on
-    if (blinds_are_moving()) {
-        PORTB |= (1<<PB0);
-    } else {
-        PORTB &= ~(1<<PB0);
-    }
 
     if (timer_is_elapsed(&g_seconds_timer)) {
         timer_start(&g_seconds_timer, TIMER_MS_2_TICKS(1000));

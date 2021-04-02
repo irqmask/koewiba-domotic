@@ -1,17 +1,15 @@
 /**
- * @addtogroup BLINDCONTROL_5+4_ATMEGA328
+ * @addtogroup BLINDCONTROL_5_ATMEGA328
  * @addtogroup APPCONFIG
- * @brief Configuration of modules used in "blindcontrol_5+4_atmega328p" project.
+ * @brief Configuration of modules used in "blindcontrol_5_atmega328p" project.
  *
  * @{
  * @file    appconfig.h
- * @brief   Configuration of modules used in "blindcontrol_5+4_atmega328p" project.
+ * @brief   Configuration of modules used in "blindcontrol_5_atmega328p" project.
  *
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
 /*
- * Copyright (C) 2018  christian <irqmask@web.de>
- *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or

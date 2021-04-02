@@ -92,11 +92,14 @@
 
 // --- Global functions --------------------------------------------------------
 
-void            zagw_initialize    (void);
+void            zagw_initialize     (void);
 
-bool            zagw_get_raw       (uint16_t* val);
+void            zagw_enable         (bool enable);
+
+bool            zagw_get_raw        (uint16_t* val);
 
 uint16_t        zagw_get_temperature(uint16_t raw);
+
 
 #endif // _ZAGWIRE_H_
 /** @} */

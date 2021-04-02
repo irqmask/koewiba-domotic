@@ -2,14 +2,12 @@
  * @addtogroup RELAY_OUTPUT
  * @brief This module contains functions to control the relay output.
  * signals.
- * 
+ *
  * @{
  * @file    output.c
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
 /*
- * Copyright (C) 2021  christian <irqmask@web.de>
- *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -25,24 +23,24 @@
  */
 
 // --- Include section ---------------------------------------------------------
- 
+
 #include <avr/io.h>
 #include <avr/interrupt.h>
- 
+
 #include "output.h"
- 
+
 // --- Definitions -------------------------------------------------------------
- 
+
 #ifdef HAS_PCBCONFIG_H
 #include "pcbconfig.h"
 #endif
 #ifdef HAS_APPCONFIG_H
 #include "appconfig.h"
 #endif
- 
+
 #ifndef OUTPUT_PCBCONFIG
 #define OUTPUT_PCBCONFIG     1
- 
+
 #define OUTPUT_NUM_PINS      8
 #define OUTPUT_PORT_0        PORTD
 #define OUTPUT_DDR_0         DDRD

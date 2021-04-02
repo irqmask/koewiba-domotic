@@ -194,6 +194,23 @@ void            zagw_initialize     (void)
 }
 
 /**
+ * Enable or disable sensor.
+ */
+void zagw_enable(bool enable)
+{
+#ifdef ZAGW_PORT_EN
+    if (enable) {
+        ZAGW_PORT_EN |= (1 << ZAGW_EN);
+    }
+    else {
+        ZAGW_PORT_EN &= ~(1 << ZAGW_EN);
+    }
+#else
+    (void)enable;
+#endif
+}
+
+/**
  * Return last received raw bitvalue of temperature sensor.
  *
  * @param[out]  val     Raw temperature value.

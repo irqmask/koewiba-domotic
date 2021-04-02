@@ -226,7 +226,7 @@ int main (void)
 
     timer_initialize();
 
-    //register_set_u16(MOD_eReg_ModuleID, 0x000E);
+    register_set_u16(MOD_eReg_ModuleID, 0x011);
 
     // configure a bus node with address X
     register_get(MOD_eReg_ModuleID, 0, &module_id);

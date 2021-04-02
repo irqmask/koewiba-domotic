@@ -3,9 +3,9 @@
  * @addtogroup APPLICATION
  * @brief Application specific code of "roomthermostat_atmega328p" project.
  *
- * Contains application specific initialization, command-interpreter, 
+ * Contains application specific initialization, command-interpreter,
  * register code and background loop.
- * 
+ *
  * @{
  * @file    application.c
  * @brief   Application specific code of "roomthermostat_atmega328p" project.
@@ -132,21 +132,22 @@ void draw_time(void)
 
 /**
  * Application specific initializations.
- * 
+ *
  * Executed if common code initialization passed.
  * @note Global interrupts are still switched off! Will be switched on in global
  * main after this initialization code.
  */
-void app_init (void) 
+void app_init (void)
 {
     input_initialize();
     gdisp_initialize();
     zagw_initialize();
+    zagw_enable(true);
     dt_initialize();
     alarm_initialize();
 
     //TODO insert application specific initializations here!
-    //register_set_u16(MOD_eReg_ModuleID, 0x20);
+    //register_set_u16(MOD_eReg_ModuleID, 0x00F);
 
     app_current_temp = 0;
     g_last_temperature = 0;
@@ -160,7 +161,7 @@ void app_init (void)
 
 /**
  * Application specific command interpreter code.
- * 
+ *
  * Executed if a not-common command is received.
  */
 void app_on_command (uint16_t sender, uint8_t msglen, uint8_t* msg)
@@ -174,7 +175,7 @@ void app_on_command (uint16_t sender, uint8_t msglen, uint8_t* msg)
 
 /**
  * Application specific background code.
- * 
+ *
  * Executed once per main loop cycle.
  */
 void app_background (sBus_t* bus)
@@ -228,7 +229,7 @@ void app_background (sBus_t* bus)
 void app_on_minute(void)
 {
     int8_t alarm_idx = -1;
-    draw_time();
+
     if (alarm_check(&alarm_idx)) {
         /// @todo implement timed heater settings
     }

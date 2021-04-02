@@ -82,6 +82,10 @@
 #define ZAGW_PIN_DATA       PINB
 #define ZAGW_DATA           PB0
 
+#define ZAGW_DDR_EN         DDRB    //!< Defines the DDR of a port which contains the Zagwire enable signal.
+#define ZAGW_PORT_EN        PORTB   //!< Defines the PORT which contains the Zagwire enable signal.
+#define ZAGW_EN             PB1     //!< Defines the Zagwire enable pin (output).
+
 // --- Type definitions --------------------------------------------------------
 
 // --- Local variables ---------------------------------------------------------

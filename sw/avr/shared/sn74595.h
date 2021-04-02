@@ -60,5 +60,7 @@ void sn74595_OE_off         (void);
 
 void sn74595_send           (uint8_t data);
 
+void sn74595_send_multiple  (uint8_t *data, uint8_t length);
+
 #endif /* _SN74595_H_ */
 /** @} */

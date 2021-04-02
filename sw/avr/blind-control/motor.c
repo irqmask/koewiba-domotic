@@ -7,7 +7,20 @@
  * @brief   This module contains functions to control the motor relays.
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
-
+/*
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 // --- Include section ---------------------------------------------------------
 
 #include <avr/io.h>
@@ -76,125 +89,11 @@ static motor_control_t g_motor_control[MOTOR_COUNT];
 
 // --- Local functions ---------------------------------------------------------
 
-static void motor_onoff_relay(uint8_t index, bool onoff)
-{
-    if (onoff == true) {
-        switch (index) {
-        case 0: MOTOR_0_ONOFF_PORT |= (1<<MOTOR_0_ONOFF_PIN); break;
-    #if MOTOR_COUNT > 1
-        case 1: MOTOR_1_ONOFF_PORT |= (1<<MOTOR_1_ONOFF_PIN); break;
-    #endif
-    #if MOTOR_COUNT > 2
-        case 2: MOTOR_2_ONOFF_PORT |= (1<<MOTOR_2_ONOFF_PIN); break;
-    #endif
-    #if MOTOR_COUNT > 3
-        case 3: MOTOR_3_ONOFF_PORT |= (1<<MOTOR_3_ONOFF_PIN); break;
-    #endif
-    #if MOTOR_COUNT > 4
-        case 4: MOTOR_4_ONOFF_PORT |= (1<<MOTOR_4_ONOFF_PIN); break;
-    #endif
-    #if MOTOR_COUNT > 5
-        case 5: MOTOR_5_ONOFF_PORT |= (1<<MOTOR_5_ONOFF_PIN); break;
-    #endif
-    #if MOTOR_COUNT > 6
-        case 6: MOTOR_6_ONOFF_PORT |= (1<<MOTOR_6_ONOFF_PIN); break;
-    #endif
-    #if MOTOR_COUNT > 7
-        case 7: MOTOR_7_ONOFF_PORT |= (1<<MOTOR_7_ONOFF_PIN); break;
-    #endif
-        default:
-            break;
-        }
-    } else {
-        switch (index) {
-        case 0: MOTOR_0_ONOFF_PORT &= ~(1<<MOTOR_0_ONOFF_PIN); break;
-    #if MOTOR_COUNT > 1
-        case 1: MOTOR_1_ONOFF_PORT &= ~(1<<MOTOR_1_ONOFF_PIN); break;
-    #endif
-    #if MOTOR_COUNT > 2
-        case 2: MOTOR_2_ONOFF_PORT &= ~(1<<MOTOR_2_ONOFF_PIN); break;
-    #endif
-    #if MOTOR_COUNT > 3
-        case 3: MOTOR_3_ONOFF_PORT &= ~(1<<MOTOR_3_ONOFF_PIN); break;
-    #endif
-    #if MOTOR_COUNT > 4
-        case 4: MOTOR_4_ONOFF_PORT &= ~(1<<MOTOR_4_ONOFF_PIN); break;
-    #endif
-    #if MOTOR_COUNT > 5
-        case 5: MOTOR_5_ONOFF_PORT &= ~(1<<MOTOR_5_ONOFF_PIN); break;
-    #endif
-    #if MOTOR_COUNT > 6
-        case 6: MOTOR_6_ONOFF_PORT &= ~(1<<MOTOR_6_ONOFF_PIN); break;
-    #endif
-    #if MOTOR_COUNT > 7
-        case 7: MOTOR_7_ONOFF_PORT &= ~(1<<MOTOR_7_ONOFF_PIN); break;
-    #endif
-        default:
-            break;
-        }
-    }
-}
-
-static void motor_updown_relay(uint8_t index, bool updown)
-{
-    if (updown == true) {
-        switch (index) {
-        case 0: MOTOR_0_UPDOWN_PORT |= (1<<MOTOR_0_UPDOWN_PIN); break;
-    #if MOTOR_COUNT > 1
-        case 1: MOTOR_1_UPDOWN_PORT |= (1<<MOTOR_1_UPDOWN_PIN); break;
-    #endif
-    #if MOTOR_COUNT > 2
-        case 2: MOTOR_2_UPDOWN_PORT |= (1<<MOTOR_2_UPDOWN_PIN); break;
-    #endif
-    #if MOTOR_COUNT > 3
-        case 3: MOTOR_3_UPDOWN_PORT |= (1<<MOTOR_3_UPDOWN_PIN); break;
-    #endif
-    #if MOTOR_COUNT > 4
-        case 4: MOTOR_4_UPDOWN_PORT |= (1<<MOTOR_4_UPDOWN_PIN); break;
-    #endif
-    #if MOTOR_COUNT > 5
-        case 5: MOTOR_5_UPDOWN_PORT |= (1<<MOTOR_5_UPDOWN_PIN); break;
-    #endif
-    #if MOTOR_COUNT > 6
-        case 6: MOTOR_6_UPDOWN_PORT |= (1<<MOTOR_6_UPDOWN_PIN); break;
-    #endif
-    #if MOTOR_COUNT > 7
-        case 7: MOTOR_7_UPDOWN_PORT |= (1<<MOTOR_7_UPDOWN_PIN); break;
-    #endif
-        default:
-            break;
-        }
-    } else {
-        switch (index) {
-        case 0: MOTOR_0_UPDOWN_PORT &= ~(1<<MOTOR_0_UPDOWN_PIN); break;
-    #if MOTOR_COUNT > 1
-        case 1: MOTOR_1_UPDOWN_PORT &= ~(1<<MOTOR_1_UPDOWN_PIN); break;
-    #endif
-    #if MOTOR_COUNT > 2
-        case 2: MOTOR_2_UPDOWN_PORT &= ~(1<<MOTOR_2_UPDOWN_PIN); break;
-    #endif
-    #if MOTOR_COUNT > 3
-        case 3: MOTOR_3_UPDOWN_PORT &= ~(1<<MOTOR_3_UPDOWN_PIN); break;
-    #endif
-    #if MOTOR_COUNT > 4
-        case 4: MOTOR_4_UPDOWN_PORT &= ~(1<<MOTOR_4_UPDOWN_PIN); break;
-    #endif
-    #if MOTOR_COUNT > 5
-        case 5: MOTOR_5_UPDOWN_PORT &= ~(1<<MOTOR_5_UPDOWN_PIN); break;
-    #endif
-    #if MOTOR_COUNT > 6
-        case 6: MOTOR_6_UPDOWN_PORT &= ~(1<<MOTOR_6_UPDOWN_PIN); break;
-    #endif
-    #if MOTOR_COUNT > 7
-        case 7: MOTOR_7_UPDOWN_PORT &= ~(1<<MOTOR_7_UPDOWN_PIN); break;
-    #endif
-        default:
-            break;
-        }
-    }
-}
-
 // --- Module global functions -------------------------------------------------
+
+extern void motors_relay_initialize(void);
+extern void motor_relay_onoff(uint8_t index, bool onoff);
+extern void motor_relay_updown(uint8_t index, bool updown);
 
 // --- Global functions --------------------------------------------------------
 
@@ -208,7 +107,7 @@ void motor_up               (uint8_t index)
     if (index >= MOTOR_COUNT) return;
     if (g_motor_control[index].motor_state == idle) {
         g_motor_control[index].motor_state = start_moving_up;
-        motor_updown_relay(index, true);
+        motor_relay_updown(index, true);
         timer_start(&g_motor_control[index].propagation_delay, TIMER_MS_2_TICKS(MOTOR_SWITCH_DELAY));
         sleep_prevent(APP_eSLEEPMASK_MOTOR, 1);
     } else {
@@ -226,7 +125,7 @@ void motor_down             (uint8_t index)
     if (index >= MOTOR_COUNT) return;
     if (g_motor_control[index].motor_state == idle) {
         g_motor_control[index].motor_state = start_moving_down;
-        motor_updown_relay(index, false);
+        motor_relay_updown(index, false);
         timer_start(&g_motor_control[index].propagation_delay, TIMER_MS_2_TICKS(MOTOR_SWITCH_DELAY));
         sleep_prevent(APP_eSLEEPMASK_MOTOR, 1);
     } else {
@@ -244,7 +143,7 @@ void motor_stop             (uint8_t index)
     if (index >= MOTOR_COUNT) return;
     if (g_motor_control[index].motor_state != idle) {
         g_motor_control[index].motor_state = stopping;
-        motor_onoff_relay(index, false);
+        motor_relay_onoff(index, false);
         timer_start(&g_motor_control[index].propagation_delay, TIMER_MS_2_TICKS(MOTOR_SWITCH_DELAY));
         sleep_prevent(APP_eSLEEPMASK_MOTOR, 0);
     }
@@ -275,73 +174,9 @@ void motor_set_mode         (uint8_t index, motor_mode_t mode)
  */
 void motors_initialize       (void)
 {
+    motors_relay_initialize();
+
     for (uint8_t index=0; index<MOTOR_COUNT; index++) {
-        switch (index) {
-        case 0:
-            MOTOR_0_ONOFF_DDR |= (1<<MOTOR_0_ONOFF_PIN);
-            MOTOR_0_ONOFF_PORT &= ~(1<<MOTOR_0_ONOFF_PIN);
-            MOTOR_0_UPDOWN_DDR |= (1<<MOTOR_0_UPDOWN_PIN);
-            MOTOR_0_UPDOWN_PORT &= ~(1<<MOTOR_0_UPDOWN_PIN);
-            break;
-    #if MOTOR_COUNT > 1
-        case 1:
-            MOTOR_1_ONOFF_DDR |= (1<<MOTOR_1_ONOFF_PIN);
-            MOTOR_1_ONOFF_PORT &= ~(1<<MOTOR_1_ONOFF_PIN);
-            MOTOR_1_UPDOWN_DDR |= (1<<MOTOR_1_UPDOWN_PIN);
-            MOTOR_1_UPDOWN_PORT &= ~(1<<MOTOR_1_UPDOWN_PIN);
-           break;
-    #endif
-    #if MOTOR_COUNT > 2
-        case 2:
-            MOTOR_2_ONOFF_DDR |= (1<<MOTOR_2_ONOFF_PIN);
-            MOTOR_2_ONOFF_PORT &= ~(1<<MOTOR_2_ONOFF_PIN);
-            MOTOR_2_UPDOWN_DDR |= (1<<MOTOR_2_UPDOWN_PIN);
-            MOTOR_2_UPDOWN_PORT &= ~(1<<MOTOR_2_UPDOWN_PIN);
-            break;
-    #endif
-    #if MOTOR_COUNT > 3
-        case 3:
-            MOTOR_3_ONOFF_DDR |= (1<<MOTOR_3_ONOFF_PIN);
-            MOTOR_3_ONOFF_PORT &= ~(1<<MOTOR_3_ONOFF_PIN);
-            MOTOR_3_UPDOWN_DDR |= (1<<MOTOR_3_UPDOWN_PIN);
-            MOTOR_3_UPDOWN_PORT &= ~(1<<MOTOR_3_UPDOWN_PIN);
-            break;
-    #endif
-    #if MOTOR_COUNT > 4
-        case 4:
-            MOTOR_4_ONOFF_DDR |= (1<<MOTOR_4_ONOFF_PIN);
-            MOTOR_4_ONOFF_PORT &= ~(1<<MOTOR_4_ONOFF_PIN);
-            MOTOR_4_UPDOWN_DDR |= (1<<MOTOR_4_UPDOWN_PIN);
-            MOTOR_4_UPDOWN_PORT &= ~(1<<MOTOR_4_UPDOWN_PIN);
-            break;
-    #endif
-    #if MOTOR_COUNT > 5
-        case 5:
-            MOTOR_5_ONOFF_DDR |= (1<<MOTOR_5_ONOFF_PIN);
-            MOTOR_5_ONOFF_PORT &= ~(1<<MOTOR_5_ONOFF_PIN);
-            MOTOR_5_UPDOWN_DDR |= (1<<MOTOR_5_UPDOWN_PIN);
-            MOTOR_5_UPDOWN_PORT &= ~(1<<MOTOR_5_UPDOWN_PIN);
-            break;
-    #endif
-    #if MOTOR_COUNT > 6
-        case 6:
-            MOTOR_6_ONOFF_DDR |= (1<<MOTOR_6_ONOFF_PIN);
-            MOTOR_6_ONOFF_PORT &= ~(1<<MOTOR_6_ONOFF_PIN);
-            MOTOR_6_UPDOWN_DDR |= (1<<MOTOR_6_UPDOWN_PIN);
-            MOTOR_6_UPDOWN_PORT &= ~(1<<MOTOR_6_UPDOWN_PIN);
-            break;
-    #endif
-    #if MOTOR_COUNT > 7
-        case 7:
-            MOTOR_7_ONOFF_DDR |= (1<<MOTOR_7_ONOFF_PIN);
-            MOTOR_7_ONOFF_PORT &= ~(1<<MOTOR_7_ONOFF_PIN);
-            MOTOR_7_UPDOWN_DDR |= (1<<MOTOR_7_UPDOWN_PIN);
-            MOTOR_7_UPDOWN_PORT &= ~(1<<MOTOR_7_UPDOWN_PIN);
-            break;
-    #endif
-        default:
-            break;
-        }
         g_motor_control[index].motor_state = idle;
         g_motor_control[index].last_motor_state = idle - 1;
     }
@@ -361,7 +196,7 @@ void motors_background       (void)
         case start_moving_up:
             if (timer_is_elapsed(&g_motor_control[index].propagation_delay)) {
                 g_motor_control[index].motor_state = moving_up;
-                motor_onoff_relay(index, true);
+                motor_relay_onoff(index, true);
             }
             break;
 
@@ -371,7 +206,7 @@ void motors_background       (void)
         case start_moving_down:
             if (timer_is_elapsed(&g_motor_control[index].propagation_delay)) {
                 g_motor_control[index].motor_state = moving_down;
-                motor_onoff_relay(index, true);
+                motor_relay_onoff(index, true);
             }
             break;
 
@@ -381,7 +216,7 @@ void motors_background       (void)
         case stopping:
             if (timer_is_elapsed(&g_motor_control[index].propagation_delay)) {
                 g_motor_control[index].motor_state = idle;
-                motor_updown_relay(index, false);
+                motor_relay_updown(index, false);
             }
             break;
 

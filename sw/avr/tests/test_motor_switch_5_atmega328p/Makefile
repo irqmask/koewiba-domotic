@@ -20,6 +20,7 @@ SRC = ../shared/bus_transport.c \
       shared/sleepmode.c \
       shared/sn74595.c \
       shared/timer.c \
+      blind-control/motor_relay_serial.c \
       tests/test_switch_5_atmega328p/application.c \
       tests/test_switch_5_atmega328p/appregister.c \
       tests/test_switch_5_atmega328p/appversion.c \

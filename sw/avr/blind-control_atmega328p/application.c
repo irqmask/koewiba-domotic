@@ -3,9 +3,9 @@
  * @addtogroup APPLICATION
  * @brief Application specific code of "blind-control_atmega328p" project.
  *
- * Contains application specific initialization, command-interpreter, 
+ * Contains application specific initialization, command-interpreter,
  * register code and background loop.
- * 
+ *
  * @{
  * @file    application.c
  * @brief   Application specific code of "blind-control_atmega328p" project.
@@ -13,8 +13,6 @@
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
 /*
- * Copyright (C) 2018  christian <irqmask@web.de>
- *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -77,12 +75,12 @@ extern void        app_register_load       (void);
 
 /**
  * Application specific initializations.
- * 
+ *
  * Executed if common code initialization passed.
  * @note Global interrupts are still switched off! Will be switched on in global
  * main after this initialization code.
  */
-void app_init (void) 
+void app_init (void)
 {
     input_initialize();
     motors_initialize();
@@ -100,7 +98,7 @@ void app_init (void)
 
 /**
  * Application specific command interpreter code.
- * 
+ *
  * Executed if a not-common command is received.
  */
 void app_on_command (uint16_t sender, uint8_t msglen, uint8_t* msg)
@@ -120,7 +118,7 @@ void app_on_command (uint16_t sender, uint8_t msglen, uint8_t* msg)
 
 /**
  * Application specific background code.
- * 
+ *
  * Executed once per main loop cycle.
  */
 void app_background (sBus_t* bus)

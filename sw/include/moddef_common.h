@@ -87,6 +87,7 @@ typedef enum {
  * 0x0005 motor_switch_3pole
  * 0x0006 room-thermostat
  * 0x0007 switch_3pole_5x
+ * 0x0008 motor_switch_3pole_5x
  * 0x000x (not available yet - heater-control)
  * 0x000x (not available yet - 8keys)
  * 0x000x (not available yet - io88)
@@ -113,6 +114,7 @@ typedef enum {
  * 0x0008 led2_atmega324(p)
  * 0x0009 pushbutton8_atmega328(p)
  * 0x000A switch5_atmega328(p)
+ * 0x000B blind-control_5x_atmega328(p)
  * ...
  * 0xEFFF (last common application)
  * 0xF000 (first user specific application)

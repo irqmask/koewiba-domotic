@@ -1,10 +1,10 @@
 /**
  * @addtogroup TEST_MOTOR_SWITCH_5_ATMEGA328
- * @brief PCB configuration of the "test_switch_5_atmega328" application.
+ * @brief PCB configuration of the "test_motor_switch_5_atmega328" application.
  *
  * @{
  * @file    pcbconfig.h
- * @brief   PCB configuration of the "test_switch_5_atmega328" application.
+ * @brief   PCB configuration of the "test_motor_switch_5_atmega328" application.
  *
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------

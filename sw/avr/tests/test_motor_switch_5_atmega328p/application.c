@@ -1,14 +1,14 @@
 /**
  * @addtogroup TEST_MOTOR_SWITCH_5_ATMEGA328
  * @addtogroup APPLICATION
- * @brief Application specific code of "test_switch_5_atmega328" project.
+ * @brief Application specific code of "test_motor_switch_5_atmega328" project.
  *
  * Test hardware: eeprom, inputs, outputs. Therefore connect input 0 - 9 to
  * output 0 - 9.
  *
  * @{
  * @file    application.c
- * @brief   Application specific code of "test_switch_5_atmega328" project.
+ * @brief   Application specific code of "test_motor_switch_5_atmega328" project.
  *
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------

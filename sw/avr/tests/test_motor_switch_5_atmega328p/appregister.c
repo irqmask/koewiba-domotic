@@ -1,11 +1,11 @@
 /**
  * @addtogroup TEST_MOTOR_SWITCH_5_ATMEGA328
  * @addtogroup APPREGISTER
- * @brief Registers of the application "test_switch_5_atmega328".
+ * @brief Registers of the application "test_motor_switch_5_atmega328".
  *
  * @{
  * @file    appregister.h
- * @brief   Registers of the application "test_switch_5_atmega328".
+ * @brief   Registers of the application "test_motor_switch_5_atmega328".
  *
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------

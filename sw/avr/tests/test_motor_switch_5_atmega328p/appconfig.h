@@ -1,11 +1,11 @@
 /**
  * @addtogroup TEST_MOTOR_SWITCH_5POLE_ATMEGA328
  * @addtogroup APPCONFIG
- * @brief Configuration of modules used in "test_switch_5_atmega328" project.
+ * @brief Configuration of modules used in "test_motor_switch_5_atmega328" project.
  *
  * @{
  * @file    appconfig.h
- * @brief   Configuration of modules used in "test_switch_5_atmega328" project.
+ * @brief   Configuration of modules used in "test_motor_switch_5_atmega328" project.
  *
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------

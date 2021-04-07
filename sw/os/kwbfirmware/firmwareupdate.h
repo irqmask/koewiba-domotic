@@ -29,7 +29,7 @@
 
 // --- Include section ---------------------------------------------------------
 
-#include "message_serial.h"
+#include "connection.h"
 #include "systime.h"
 
 // --- Definitions -------------------------------------------------------------
@@ -60,13 +60,34 @@ typedef enum fwu_states {
 typedef void (*fwu_progress_func_t)(uint8_t progress, void *arg);
 
 /**
- * Firmware update process data structure.
+ * Firmware update process.
  */
-typedef struct firmwareupdate {
+class FirmwareUpdate
+{
+public:
+    FirmwareUpdate();
+    FirmwareUpdate(std::shared_ptr<Connection> connection);
+    ~FirmwareUpdate();
+
+    int start(const char *filename, uint16_t module_address);
+
+    int run();
+
+    void close();
+
+    void registerProgressFunc(fwu_progress_func_t func, void *arg);
+
+    void setProgressThd(uint8_t thd);
+
+    uint8_t getBldFlags();
+    uint16_t getNodeCrcCalculated();
+    uint16_t getNodeCrcExpected();
+
+protected:
     //! Current state of firmware-update statemachine.
     fwu_states_t    curr_state;
-    //! Handle of the serial connection.
-    msg_serial_t    msg_serial;
+    //! Handle of the connection.
+    std::shared_ptr<Connection> connection;
     //! Path and filename to the IHEX file.
     char            filename[256];
     //! target module address.
@@ -113,7 +134,21 @@ typedef struct firmwareupdate {
     fwu_progress_func_t progress_func;
     //! optional arguments for progress_func;
     void           *progress_arg;
-} firmwareupdate_t;
+
+    uint16_t calculateCRC16();
+    void parseSetReg8bitMsg(const msg_t &message);
+    void parseBlockInfoMsg(const msg_t &message);
+    void parseBlockAckMsg(const msg_t &message);
+    void parseBlockNakMsg(const msg_t &message);
+    void handleIncomingMessage(const msg_t &message, void *reference);
+
+    int sendBlockStartMessage();
+    int sendBlockDataMessage();
+    int sendBlockEndMessage();
+    int sendResetMessage();
+    int sendRequestBldflagsMessage();
+    int receiveAndCheckBldflags();
+};
 
 // --- Local variables ---------------------------------------------------------
 
@@ -126,26 +161,6 @@ typedef struct firmwareupdate {
 // --- Module global functions -------------------------------------------------
 
 // --- Global functions --------------------------------------------------------
-
-int firmware_update_init(firmwareupdate_t  *fwu,
-                         ioloop_t          *ioloop,
-                         const char        *device,
-                         int                baudrate);
-
-int firmware_update_start(firmwareupdate_t  *fwu,
-                          const char        *filename,
-                          uint16_t           module_address);
-
-int firmware_update_run(firmwareupdate_t  *fwu);
-
-void firmware_update_close(firmwareupdate_t  *fwu);
-
-void firmware_register_progress_func(firmwareupdate_t     *fwu,
-                                     fwu_progress_func_t   func,
-                                     void                 *arg);
-
-void firmware_set_progress_thd(firmwareupdate_t     *fwu,
-                               uint8_t               thd);
 
 #endif // _FIRMWAREUPDATE_H_
 /** @} */

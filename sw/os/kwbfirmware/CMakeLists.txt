@@ -61,9 +61,9 @@ set (kwbfirmware_SRCS
     firmwareupdate.h
     ihex.h
 
-    firmwareupdate.c
+    firmwareupdate.cpp
     ihex.c
-    kwbfirmware_main.c
+    kwbfirmware_main.cpp
 )
 
 # source groups

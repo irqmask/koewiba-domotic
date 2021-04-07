@@ -41,6 +41,8 @@
 
 #include "prjconf.h"
 
+#include <memory>
+
 #include <assert.h>
 #include <malloc.h>
 #include <string.h>
@@ -48,7 +50,9 @@
 #if defined (PRJCONF_UNIX) || \
     defined (PRJCONF_POSIX) || \
     defined (PRJCONF_LINUX)
-    #include <safe_lib.h>
+extern "C" {
+#include <safe_lib.h>
+}
 #endif
 
 #include "cmddef_common.h"
@@ -56,15 +60,17 @@
 
 #include "kwb_defines.h"
 
+#include "connection.h"
 #include "crc16.h"
-#include "firmwareupdate.h"
+#include "exceptions.h"
 #include "ihex.h"
 #include "log.h"
 #include "message.h"
-#include "message_serial.h"
 #include "prjtypes.h"
 #include "sysconsole.h"
 #include "systime.h"
+
+#include "firmwareupdate.h"
 
 // --- Definitions -------------------------------------------------------------
 
@@ -84,7 +90,7 @@
  * @param[in]   data    Pointer to data.
  * @param[in]   length  Length in byte of memory to be logged.
  */
-static void log_hexdump16(log_mask_t logmask, char *keyword, uint8_t *data, uint16_t length)
+static void log_hexdump16(log_mask_t logmask, const char *keyword, const uint8_t *data, uint16_t length)
 {
     char        buffer[LOG_MAX_MESSAGE_LENGTH];
     char        hexbuffer[4];
@@ -114,23 +120,23 @@ static void log_hexdump16(log_mask_t logmask, char *keyword, uint8_t *data, uint
     }
 }
 
-static uint16_t calculate_crc16(firmwareupdate_t *fwu)
+uint16_t FirmwareUpdate::calculateCRC16()
 {
     uint32_t ii;
     uint16_t crc;
 
     crc = CRC_START_VALUE;
-    for (ii = 0; ii < fwu->fw_size; ii++) {
-        crc = crc_16_next_byte(crc, fwu->fw_memory[ii]);
+    for (ii = 0; ii < this->fw_size; ii++) {
+        crc = crc_16_next_byte(crc, this->fw_memory[ii]);
     }
     return crc;
 }
 
-static void parse_set_reg_8bit_msg(msg_t *message, firmwareupdate_t *fwu)
+void FirmwareUpdate::parseSetReg8bitMsg(const msg_t &message)
 {
-    if (message->data[1] == MOD_eReg_BldFlag) {
-        fwu->bldflags = message->data[2];
-        fwu->bldflags_received = 1;
+    if (message.data[1] == MOD_eReg_BldFlag) {
+        this->bldflags = message.data[2];
+        this->bldflags_received = 1;
     }
 }
 
@@ -138,41 +144,41 @@ static void parse_set_reg_8bit_msg(msg_t *message, firmwareupdate_t *fwu)
  * Handles block_info message.
  * Sets current node crc and current node write offset.
  */
-static void parse_block_info_msg(msg_t *message, firmwareupdate_t *fwu)
+void FirmwareUpdate::parseBlockInfoMsg(const msg_t &message)
 {
     uint32_t node_last_address = 0;
     uint16_t node_crc_expected = 0, node_crc_calculated = 0;
 
-    if (message->length >= 9 && fwu != NULL) {
-        node_crc_expected |= (message->data[1] << 8);
-        node_crc_expected |= (message->data[2]);
-        node_crc_calculated |= (message->data[3] << 8);
-        node_crc_calculated |= (message->data[4]);
-        node_last_address |= (message->data[5] << 24);
-        node_last_address |= (message->data[6] << 16);
-        node_last_address |= (message->data[7] << 8);
-        node_last_address |= (message->data[8]);
+    if (message.length >= 9) {
+        node_crc_expected |= (message.data[1] << 8);
+        node_crc_expected |= (message.data[2]);
+        node_crc_calculated |= (message.data[3] << 8);
+        node_crc_calculated |= (message.data[4]);
+        node_last_address |= (message.data[5] << 24);
+        node_last_address |= (message.data[6] << 16);
+        node_last_address |= (message.data[7] << 8);
+        node_last_address |= (message.data[8]);
 
-        fwu->last_node_address = node_last_address;
-        fwu->node_crc_expected = node_crc_expected;
-        fwu->node_crc_calculated = node_crc_calculated;
-        fwu->block_info_received = 1;
+        this->last_node_address = node_last_address;
+        this->node_crc_expected = node_crc_expected;
+        this->node_crc_calculated = node_crc_calculated;
+        this->block_info_received = 1;
     }
 }
 
-static void parse_block_ack_msg(msg_t *message, firmwareupdate_t *fwu)
+void FirmwareUpdate::parseBlockAckMsg(const msg_t &message)
 {
-    if (message->data[1] == eCMD_BLOCK_DATA) {
-        fwu->last_node_offset = (message->data[2] << 8) | message->data[3];
+    if (message.data[1] == eCMD_BLOCK_DATA) {
+        this->last_node_offset = (message.data[2] << 8) | message.data[3];
     }
 }
 
-static void parse_block_nak_msg(msg_t *message, firmwareupdate_t *fwu)
+void FirmwareUpdate::parseBlockNakMsg(const msg_t &message)
 {
-    if (message->data[1] == eCMD_BLOCK_START ||
-        message->data[1] == eCMD_BLOCK_DATA ||
-        message->data[1] == eCMD_BLOCK_END) {
-        fwu->curr_state = eFWU_ERROR_ABORT;
+    if (message.data[1] == eCMD_BLOCK_START ||
+        message.data[1] == eCMD_BLOCK_DATA ||
+        message.data[1] == eCMD_BLOCK_END) {
+        this->curr_state = eFWU_ERROR_ABORT;
     }
 }
 
@@ -184,24 +190,24 @@ static void parse_block_nak_msg(msg_t *message, firmwareupdate_t *fwu)
  * param[in] reference  Pointer to connection from where the message has been received.
  * param[in] arg        Special argument: Pointer to firmware update structure.
  */
-static void handle_incomming_messages(msg_t *message, void *reference, void *arg)
+void FirmwareUpdate::handleIncomingMessage(const msg_t &message, void *reference)
 {
-    log_hexdump16(LOG_VERBOSE1, "BUS I ", message->data, message->length);
+    log_hexdump16(LOG_VERBOSE1, "BUS I ", (const uint8_t *)&message.data, message.length);
 
-    if (message->length > 0) {
+    if (message.length > 0) {
         // incomming command handler
-        switch (message->data[0]) {
+        switch (message.data[0]) {
         case eCMD_STATE_8BIT:
-            parse_set_reg_8bit_msg(message, arg);
+            parseSetReg8bitMsg(message);
             break;
         case eCMD_BLOCK_INFO:
-            parse_block_info_msg(message, arg);
+            parseBlockInfoMsg(message);
             break;
         case eCMD_ACK:
-            parse_block_ack_msg(message, arg);
+            parseBlockAckMsg(message);
             break;
         case eCMD_NAK:
-            parse_block_nak_msg(message, arg);
+            parseBlockNakMsg(message);
             break;
         default:
             break;
@@ -213,31 +219,35 @@ static void handle_incomming_messages(msg_t *message, void *reference, void *arg
  * Send a block start message to the target node. The block start message
  * contains the block-type and the first address in the target memory.
  *
- * @param[in]   fwu     Pointer to firmware update process data.
- *
  * @returns     eERR_NONE if message has been sent successfully, otherwise
  *              errorcode.
  */
-static int send_block_start_message(firmwareupdate_t *fwu)
+int FirmwareUpdate::sendBlockStartMessage()
 {
     int         rc = eRUNNING;
     msg_t       msg;
 
     memset(&msg, 0, sizeof(msg));
-    msg.receiver = fwu->module_address;
+    msg.receiver = this->module_address;
     msg.data[0] = eCMD_BLOCK_START;
     msg.data[1] = 2; // blocktype external EEProm (firmware)
-    msg.data[2] = (fwu->fw_firstaddress & 0xFF000000) >> 24; // first address (32bit) highest byte
-    msg.data[3] = (fwu->fw_firstaddress & 0x00FF0000) >> 16; // first address (32bit)
-    msg.data[4] = (fwu->fw_firstaddress & 0x0000FF00) >> 8;  // first address (32bit)
-    msg.data[5] = (fwu->fw_firstaddress & 0x000000FF);       // first address (32bit) lowest byte
-    msg.data[6] = (fwu->fw_size & 0xFF000000) >> 24; // size of data (32bit) highest byte
-    msg.data[7] = (fwu->fw_size & 0x00FF0000) >> 16; // size of data (32bit)
-    msg.data[8] = (fwu->fw_size & 0x0000FF00) >> 8;  // size of data (32bit)
-    msg.data[9] = (fwu->fw_size & 0x000000FF);       // size of data (32bit) lowest byte
+    msg.data[2] = (this->fw_firstaddress & 0xFF000000) >> 24; // first address (32bit) highest byte
+    msg.data[3] = (this->fw_firstaddress & 0x00FF0000) >> 16; // first address (32bit)
+    msg.data[4] = (this->fw_firstaddress & 0x0000FF00) >> 8;  // first address (32bit)
+    msg.data[5] = (this->fw_firstaddress & 0x000000FF);       // first address (32bit) lowest byte
+    msg.data[6] = (this->fw_size & 0xFF000000) >> 24; // size of data (32bit) highest byte
+    msg.data[7] = (this->fw_size & 0x00FF0000) >> 16; // size of data (32bit)
+    msg.data[8] = (this->fw_size & 0x0000FF00) >> 8;  // size of data (32bit)
+    msg.data[9] = (this->fw_size & 0x000000FF);       // size of data (32bit) lowest byte
     msg.length = 10;
 
-    rc = msg_ser_send(&fwu->msg_serial, &msg);
+    try {
+        this->connection->send(msg);
+    }
+    catch (Exception &e) {
+        log_error("Unable to send block end message: %s", e.what());
+        rc = eERR_PROCESS_FAILED;
+    }
     return rc;
 }
 
@@ -254,7 +264,7 @@ static int send_block_start_message(firmwareupdate_t *fwu)
  * @returns     Otherwise, if an error occurs in a subroutine, the error-code is
  *              returned.
  */
-static int send_block_data_message(firmwareupdate_t *fwu)
+int FirmwareUpdate::sendBlockDataMessage()
 {
     int         rc = eRUNNING;
     uint32_t    remaining, ii, block;
@@ -263,8 +273,8 @@ static int send_block_data_message(firmwareupdate_t *fwu)
 
     do {
         // bytes to send?
-        if (fwu->fw_size > fwu->curr_offset) {
-            remaining = fwu->fw_size - fwu->curr_offset;
+        if (this->fw_size > this->curr_offset) {
+            remaining = this->fw_size - this->curr_offset;
         }
         else {
             rc = eERR_NONE;
@@ -273,10 +283,10 @@ static int send_block_data_message(firmwareupdate_t *fwu)
 
         // prepare message
         memset(&msg, 0, sizeof(msg));
-        msg.receiver = fwu->module_address;
+        msg.receiver = this->module_address;
         msg.data[0] = eCMD_BLOCK_DATA;
-        msg.data[1] = (fwu->curr_offset & 0xFF00) >> 8;
-        msg.data[2] = (fwu->curr_offset & 0x00FF);
+        msg.data[1] = (this->curr_offset & 0xFF00) >> 8;
+        msg.data[2] = (this->curr_offset & 0x00FF);
 
         // calculate data size of the message
         if (remaining > chunksize) {
@@ -288,15 +298,21 @@ static int send_block_data_message(firmwareupdate_t *fwu)
 
         // copy firmware memory chunk into message
         for (ii = 0; ii < block; ii++) {
-            msg.data[3 + ii] = fwu->fw_memory[fwu->curr_offset + ii];
+            msg.data[3 + ii] = this->fw_memory[this->curr_offset + ii];
         }
         msg.length = 3 + block;
 
         // send message and check if all data has been sent
-        fwu->last_offset = fwu->curr_offset;
-        rc = msg_ser_send(&fwu->msg_serial, &msg);
+        this->last_offset = this->curr_offset;
+        try {
+            this->connection->send(msg);
+        }
+        catch (Exception &e) {
+            log_error("Unable to send block data message: %s", e.what());
+            rc = eERR_PROCESS_FAILED;
+        }
         if (rc == eERR_NONE || rc == eRUNNING) {
-            fwu->curr_offset += block;
+            this->curr_offset += block;
             remaining -= block;
         }
         else {
@@ -326,22 +342,28 @@ static int send_block_data_message(firmwareupdate_t *fwu)
  * @returns     eERR_NONE if message has been sent successfully, otherwise
  *              errorcode.
  */
-static int send_block_end_message(firmwareupdate_t *fwu)
+int FirmwareUpdate::sendBlockEndMessage()
 {
     int      rc = eERR_NONE;
     uint16_t crc;
     msg_t    msg;
 
-    crc = calculate_crc16(fwu);
+    crc = calculateCRC16();
 
     memset(&msg, 0, sizeof(msg));
-    msg.receiver = fwu->module_address;
+    msg.receiver = this->module_address;
     msg.data[0] = eCMD_BLOCK_END;
     msg.data[1] = (crc & 0xFF00) >> 8;
     msg.data[2] = (crc & 0x00FF);
     msg.length = 3;
     log_msg(LOG_VERBOSE1, "CRC to be expected by node = 0x%4X", crc);
-    rc = msg_ser_send(&fwu->msg_serial, &msg);
+    try {
+        this->connection->send(msg);
+    }
+    catch (Exception &e) {
+        log_error("Unable to send block end message: %s", e.what());
+        rc =  eERR_PROCESS_FAILED;
+    }
     return rc;
 }
 
@@ -351,17 +373,23 @@ static int send_block_end_message(firmwareupdate_t *fwu)
  * @returns     eERR_NONE if message has been sent successfully, otherwise
  *              errorcode.
  */
-static int send_reset_message(firmwareupdate_t *fwu)
+int FirmwareUpdate::sendResetMessage()
 {
     int      rc = eERR_NONE;
     msg_t    msg;
 
     memset(&msg, 0, sizeof(msg));
-    msg.receiver = fwu->module_address;
+    msg.receiver = this->module_address;
     msg.data[0] = eCMD_RESET;
     msg.length = 1;
 
-    rc = msg_ser_send(&fwu->msg_serial, &msg);
+    try {
+        this->connection->send(msg);
+    }
+    catch (Exception &e) {
+        log_error("Unable to send reset message: %s", e.what());
+        rc =  eERR_PROCESS_FAILED;
+    }
     return rc;
 }
 
@@ -371,57 +399,63 @@ static int send_reset_message(firmwareupdate_t *fwu)
  * @returns     eERR_NONE if message has been sent successfully, otherwise
  *              errorcode.
  */
-static int send_request_bldflags_message(firmwareupdate_t *fwu)
+int FirmwareUpdate::sendRequestBldflagsMessage()
 {
     int      rc = eERR_NONE;
     msg_t    msg;
 
     memset(&msg, 0, sizeof(msg));
-    msg.receiver = fwu->module_address;
+    msg.receiver = this->module_address;
     msg.data[0] = eCMD_REQUEST_REG;
     msg.data[1] = MOD_eReg_BldFlag;
     msg.length = 2;
 
-    rc = msg_ser_send(&fwu->msg_serial, &msg);
+    try {
+        this->connection->send(msg);
+    }
+    catch (Exception &e) {
+        log_error("Unable to send request bldflags message: %s", e.what());
+        rc = eERR_PROCESS_FAILED;
+    }
     return rc;
 }
 
-static int receive_and_check_bldflags(firmwareupdate_t *fwu)
+int FirmwareUpdate::receiveAndCheckBldflags()
 {
     int rc = eRUNNING;
 
-    if (fwu->bldflags_received) {
+    if (this->bldflags_received) {
         rc = eERR_NONE;
-        log_msg(LOG_INFO, "BLDFlags: %d", fwu->bldflags);
-        if ((fwu->bldflags & (1 << eBldFlagNewSWProgrammed)) == 0) {
+        log_msg(LOG_INFO, "BLDFlags: %d", this->bldflags);
+        if ((this->bldflags & (1 << eBldFlagNewSWProgrammed)) == 0) {
             log_error("BLDFlags: Controller has NOT been flashed!");
             rc = eERR_PROCESS_FAILED;
         }
         else {
             log_msg(LOG_INFO, "BLDFlags: Controller has been flashed.");
         }
-        if (fwu->bldflags & (1 << eBldFlagCRCMismatch)) {
+        if (this->bldflags & (1 << eBldFlagCRCMismatch)) {
             log_error("BLDFlags: Node CRC mismatch for firmware! Firmware not flashed into the controller!");
             if (rc <= eERR_NONE) {
                 rc = eERR_PROCESS_FAILED;
             }
         }
-        if (fwu->bldflags & (1 << eBldFlagControllerTypeMismatch)) {
+        if (this->bldflags & (1 << eBldFlagControllerTypeMismatch)) {
             log_error("BLDFlags: Node controller type mismatch. Firmware not flashed into the controller!");
             if (rc <= eERR_NONE) {
                 rc = eERR_PROCESS_FAILED;
             }
         }
-        if (fwu->bldflags & (1 << eBldFlagBoardTypeMismatch)) {
+        if (this->bldflags & (1 << eBldFlagBoardTypeMismatch)) {
             log_warning("BLDFlags: Node board type mismatch. Firmware flashed. Check if firmware is suitable for the node board!");
         }
-        if (fwu->bldflags & (1 << eBldFlagAppIDChanged)) {
+        if (this->bldflags & (1 << eBldFlagAppIDChanged)) {
             log_msg(LOG_INFO, "BLDFlags: Node application ID changed");
         }
-        if (fwu->bldflags & (1 << eBldFlagAppIDChanged)) {
+        if (this->bldflags & (1 << eBldFlagAppIDChanged)) {
             log_msg(LOG_INFO, "BLDFlags: Application version changed");
         }
-        if (fwu->bldflags & (1 << eBldFlagAppProgram)) {
+        if (this->bldflags & (1 << eBldFlagAppProgram)) {
             log_error("BLDFlags: Node reset not performed!");
             if (rc <= eERR_NONE) {
                 rc = eERR_PROCESS_FAILED;
@@ -435,50 +469,44 @@ static int receive_and_check_bldflags(firmwareupdate_t *fwu)
 
 // --- Global functions --------------------------------------------------------
 
+FirmwareUpdate::FirmwareUpdate()
+    : reset_target_node(1)
+    , progress_thd(5)
+{
+}
+
 /**
  * Initialize the firmware update process runtime data, establish a connection
  * to the target node (bus, rs232 or network) and register the communication
  * device at the ioloop module.
  * @note Currently only the connection over a RS232 gateway is supported.
  *
- * @param[in,out]   fwu         Pointer to firmware update process data.
- * @param[in]       ioloop      Pointer to ioloop handler.
- * @param[in]       device      Serial connection device.
- * @param[in]       baudrate    Baudrate of serial connection.
- *
- * @returns         0 if firmware update runtime data and environment is
- *                  successfully initialized.
+ * @param[in]       connection  Pointer to established connection to the KWB system (gateway or router).
  */
-int firmware_update_init(firmwareupdate_t *fwu,
-                         ioloop_t         *ioloop,
-                         const char       *device,
-                         int               baudrate)
+FirmwareUpdate::FirmwareUpdate(std::shared_ptr<Connection> connection)
+    : FirmwareUpdate()
 {
-    int rc = 0;
+    this->connection = connection;
 
-    do {
-        assert(fwu != NULL);
-        memset(fwu, 0, sizeof(firmwareupdate_t));
+    using std::placeholders::_1;
+    using std::placeholders::_2;
+    incom_func_t handle_incoming_message_func = std::bind(&FirmwareUpdate::handleIncomingMessage, this, _1, _2);
+    this->connection->setIncomingHandler(handle_incoming_message_func);
+}
 
-        msg_ser_init(&fwu->msg_serial);
-
-        rc = msg_ser_open(&fwu->msg_serial, ioloop, device, baudrate);
-        if (rc != eERR_NONE) {
-            break;
-        }
-
-        msg_ser_set_incoming_handler(&fwu->msg_serial, handle_incomming_messages, fwu);
-        // default: reset target node after update
-        fwu->reset_target_node = 1;
-        fwu->progress_thd = 5;
-    } while (false);
-    return rc;
+/**
+ * Close and end the firmware update process.
+ */
+FirmwareUpdate::~FirmwareUpdate()
+{
+    if (this->fw_memory != NULL) {
+        free(this->fw_memory);
+    }
 }
 
 /**
  * Start a firmware update process.
  *
- * @param[in,out]   fwu             Pointer to firmware update process data.
  * @param[in]       filename        Path and filename of IHEX file to be sent to
  *                                  the target node.
  * @param[in]       module_address  Module address of the target node.
@@ -488,58 +516,55 @@ int firmware_update_init(firmwareupdate_t *fwu,
  * @returns         eERR_MALLOC if the memory is not sufficient to load the
  *                  IHEX file.
  */
-int firmware_update_start(firmwareupdate_t    *fwu,
-                          const char          *filename,
+int FirmwareUpdate::start(const char          *filename,
                           uint16_t             module_address)
 {
     int rc = eERR_NONE;
     uint32_t target_last_addr;
 
-    assert(fwu != NULL);
-
-    fwu->curr_state = eFWU_IDLE;
-    strcpy_s(fwu->filename, sizeof(fwu->filename), filename);
-    fwu->module_address = module_address;
+    this->curr_state = eFWU_IDLE;
+    strcpy_s(this->filename, sizeof(this->filename), filename);
+    this->module_address = module_address;
 
     do {
         // calculate IHEX target memory size
         target_last_addr = 0;
 
-        rc = ihex_read_file(fwu->filename,
-                            &fwu->fw_startaddress,
-                            &fwu->fw_firstaddress,
+        rc = ihex_read_file(this->filename,
+                            &this->fw_startaddress,
+                            &this->fw_firstaddress,
                             &target_last_addr, NULL, NULL);
         if (rc != eERR_NONE) {
-            log_error("Failed to open %s, error %d", fwu->filename, rc);
+            log_error("Failed to open %s, error %d", this->filename, rc);
             break;
         }
-        fwu->fw_size = target_last_addr - fwu->fw_firstaddress + 1;
-        log_msg(LOG_INFO, "target file: %s, module address %d", fwu->filename, fwu->module_address);
-        log_msg(LOG_INFO, "target start address: 0x%04X", fwu->fw_startaddress);
-        log_msg(LOG_INFO, "target first address: 0x%04X", fwu->fw_firstaddress);
+        this->fw_size = target_last_addr - this->fw_firstaddress + 1;
+        log_msg(LOG_INFO, "target file: %s, module address %d", this->filename, this->module_address);
+        log_msg(LOG_INFO, "target start address: 0x%04X", this->fw_startaddress);
+        log_msg(LOG_INFO, "target first address: 0x%04X", this->fw_firstaddress);
         log_msg(LOG_INFO, "target last address:  0x%04X", target_last_addr);
-        log_msg(LOG_INFO, "size:                 %d", fwu->fw_size);
+        log_msg(LOG_INFO, "size:                 %d", this->fw_size);
 
         // allocate and initialie target memory. Initialize to 0xFF
         // because flash memory is 0xFF when it is erased.
-        fwu->fw_memory = (uint8_t *)malloc(fwu->fw_size);
-        memset(fwu->fw_memory, 0xFF, fwu->fw_size);
-        if (fwu->fw_memory == NULL) {
-            log_error("Out of memory. Failed to allocate %d bytes", fwu->fw_size);
+        this->fw_memory = (uint8_t *)malloc(this->fw_size);
+        memset(this->fw_memory, 0xFF, this->fw_size);
+        if (this->fw_memory == NULL) {
+            log_error("Out of memory. Failed to allocate %d bytes", this->fw_size);
             rc = eERR_RESOURCE;
             break;
         }
 
         // read ihex content to memory
         rc = ihex_read_file_mem(filename, NULL, NULL, NULL,
-                                fwu->fw_memory, fwu->fw_size);
+                                this->fw_memory, this->fw_size);
         if (rc != eERR_NONE) {
-            log_error("Failed to open %s, error %d", fwu->filename, rc);
-            free(&fwu->fw_memory);
-            fwu->fw_memory = NULL;
+            log_error("Failed to open %s, error %d", this->filename, rc);
+            free(&this->fw_memory);
+            this->fw_memory = NULL;
             break;
         }
-        fwu->curr_state = eFWU_START;
+        this->curr_state = eFWU_START;
     } while (false);
     return rc;
 }
@@ -548,102 +573,100 @@ int firmware_update_start(firmwareupdate_t    *fwu,
  * Run the firmware update process. This function has to be called as long as
  * eRUNNING is returned.
  *
- * @param[in,out]   fwu             Pointer to firmware update process data.
- *
  * @returns         eRUNNING if the firmware is still beening transmitted.
  * @returns         eERR_NONE if the firmware has been transmitted completely.
  * @returns         Otherwise, if an error occurs in a subroutine, the errorcode
  *                  is returned.
  */
-int firmware_update_run(firmwareupdate_t *fwu)
+int FirmwareUpdate::run()
 {
     int     rc = eRUNNING;
     uint8_t progress = 0;
 
-    switch (fwu->curr_state) {
+    switch (this->curr_state) {
     case eFWU_IDLE:
         rc = eERR_NONE;
         break;
     case eFWU_START:
         // start the block transfer
-        send_block_start_message(fwu);
-        fwu->curr_state = eFWU_DATA;
+        sendBlockStartMessage();
+        this->curr_state = eFWU_DATA;
         break;
     case eFWU_DATA:
         // send next chunk of data to the node
-        fwu->block_info_received = 0;
-        send_block_data_message(fwu);
-        fwu->curr_state = eFWU_WAIT_ACK;
+        this->block_info_received = 0;
+        sendBlockDataMessage();
+        this->curr_state = eFWU_WAIT_ACK;
         break;
     case eFWU_WAIT_ACK:
         // wait until acknowledge message has been received
-        if (fwu->last_offset == fwu->last_node_offset) {
-            if (fwu->fw_size > fwu->curr_offset) {
-                fwu->curr_state = eFWU_DATA;
+        if (this->last_offset == this->last_node_offset) {
+            if (this->fw_size > this->curr_offset) {
+                this->curr_state = eFWU_DATA;
             }
             else {
-                fwu->curr_state = eFWU_END;
+                this->curr_state = eFWU_END;
             }
             // update progress
-            progress = (uint8_t)(100 * fwu->curr_offset / fwu->fw_size);
-            if ((progress - fwu->last_progress) >= fwu->progress_thd || progress == 100) {
-                fwu->last_progress = progress;
-                if (fwu->progress_func != NULL) {
-                    fwu->progress_func(progress, fwu->progress_arg);
+            progress = (uint8_t)(100 * this->curr_offset / this->fw_size);
+            if ((progress - this->last_progress) >= this->progress_thd || progress == 100) {
+                this->last_progress = progress;
+                if (this->progress_func != NULL) {
+                    this->progress_func(progress, this->progress_arg);
                 }
             }
         }
         break;
     case eFWU_END:
-        fwu->block_info_received = 0;
-        send_block_end_message(fwu);
-        fwu->curr_state = eFWU_CRC_INFO;
+        this->block_info_received = 0;
+        sendBlockEndMessage();
+        this->curr_state = eFWU_CRC_INFO;
         break;
     case eFWU_CRC_INFO:
-        if (fwu->block_info_received) {
-            log_msg(LOG_VERBOSE1, "CRC expected by node = 0x%4X", fwu->node_crc_expected);
-            log_msg(LOG_VERBOSE1, "CRC calculated by node = 0x%4X", fwu->node_crc_calculated);
+        if (this->block_info_received) {
+            log_msg(LOG_VERBOSE1, "CRC expected by node = 0x%4X", this->node_crc_expected);
+            log_msg(LOG_VERBOSE1, "CRC calculated by node = 0x%4X", this->node_crc_calculated);
 
-            if (fwu->node_crc_expected == fwu->node_crc_calculated) {
-                if (fwu->reset_target_node) {
-                    fwu->curr_state = eFWU_RESET_NODE;
+            if (this->node_crc_expected == this->node_crc_calculated) {
+                if (this->reset_target_node) {
+                    this->curr_state = eFWU_RESET_NODE;
                 }
                 else {
-                    fwu->curr_state = eFWU_IDLE;
+                    this->curr_state = eFWU_IDLE;
                 }
             }
             else {
-                fwu->curr_state = eFWU_ERROR_ABORT;
+                this->curr_state = eFWU_ERROR_ABORT;
             }
         }
         break;
     case eFWU_RESET_NODE:
-        send_reset_message(fwu);
-        fwu->curr_state = eFWU_WAIT_AFTER_RESET;
-        fwu->wait_start = sys_time_get_usecs();
+        sendResetMessage();
+        this->curr_state = eFWU_WAIT_AFTER_RESET;
+        this->wait_start = sys_time_get_usecs();
         break;
     case eFWU_WAIT_AFTER_RESET:
         // wait 10 seconds
-        if ((sys_time_get_usecs() - fwu->wait_start) >= 10000 * 1000) {
-            fwu->curr_state = eFWU_BLDFLAGS;
+        if ((sys_time_get_usecs() - this->wait_start) >= 10000 * 1000) {
+            this->curr_state = eFWU_BLDFLAGS;
         }
         break;
     case eFWU_BLDFLAGS:
-        send_request_bldflags_message(fwu);
-        fwu->curr_state = eFWU_WAIT_BLDFLAGS;
-        fwu->wait_start = sys_time_get_usecs();
+        sendRequestBldflagsMessage();
+        this->curr_state = eFWU_WAIT_BLDFLAGS;
+        this->wait_start = sys_time_get_usecs();
         break;
     case eFWU_WAIT_BLDFLAGS:
-        if ((sys_time_get_usecs() - fwu->wait_start) >= 10000 * 1000) {
-            fwu->curr_state = eFWU_ERROR_ABORT;
+        if ((sys_time_get_usecs() - this->wait_start) >= 10000 * 1000) {
+            this->curr_state = eFWU_ERROR_ABORT;
         }
-        if ((rc = receive_and_check_bldflags(fwu)) >= 0) {
-            fwu->curr_state = eFWU_IDLE;
+        if ((rc = receiveAndCheckBldflags()) >= 0) {
+            this->curr_state = eFWU_IDLE;
         }
         break;
     case eFWU_ERROR_ABORT:
         rc = eERR_PROCESS_FAILED;
-        fwu->curr_state = eFWU_IDLE;
+        this->curr_state = eFWU_IDLE;
         break;
     default:
         break;
@@ -653,39 +676,17 @@ int firmware_update_run(firmwareupdate_t *fwu)
 }
 
 /**
- * Close and end the firmware update process. Also the connection to the target
- * node is closed.
- *
- * @param[in,out]   fwu             Pointer to firmware update process data.
- */
-void firmware_update_close(firmwareupdate_t *fwu)
-{
-    assert(fwu != NULL);
-    if (fwu->fw_memory != NULL) {
-        free(fwu->fw_memory);
-        fwu->fw_memory = NULL;
-    }
-    fwu->fw_size = 0;
-    fwu->curr_offset = 0;
-
-    msg_ser_close(&fwu->msg_serial);
-}
-
-/**
  * Register a function which is used to upgrade the progress of the firmware
  * upload.
  *
- * @param[in,out]   fwu             Pointer to firmware update process data.
  * @param[in]       func            Progress update function.
  * @param[in]       arg             Additional information for the func()
  */
-void firmware_register_progress_func(firmwareupdate_t     *fwu,
-                                     fwu_progress_func_t   func,
-                                     void                 *arg)
+void FirmwareUpdate::registerProgressFunc(fwu_progress_func_t   func,
+                                          void                 *arg)
 {
-    assert(fwu != NULL);
-    fwu->progress_func = func;
-    fwu->progress_arg = arg;
+    this->progress_func = func;
+    this->progress_arg = arg;
 }
 
 /**
@@ -694,14 +695,39 @@ void firmware_register_progress_func(firmwareupdate_t     *fwu,
  * The progress update function is called, if the progress increased
  * at least thd since the last call of the progress update function.
  *
- * @param[in,out]   fwu             Pointer to firmware update process data.
  * @param[in]       thd             Threshold.
  */
-void firmware_set_progress_thd(firmwareupdate_t     *fwu,
-                               uint8_t               thd)
+void FirmwareUpdate::setProgressThd(uint8_t               thd)
 {
-    assert(fwu != NULL);
-    fwu->progress_thd = thd;
+    this->progress_thd = thd;
+}
+
+/**
+  * Get the bootloader flags which have been retrieved from the updated module.
+  *
+  * @returns Bootloader flags
+  */
+uint8_t FirmwareUpdate::getBldFlags()
+{
+    return this->bldflags;
+}
+
+/**
+ * Get the calculated CRC of the uploaded firmware
+ * @return Node's calculated CRC of uploaded firmware
+ */
+uint16_t FirmwareUpdate::getNodeCrcCalculated()
+{
+    return this->node_crc_calculated;
+}
+
+/**
+ * Get the expected CRC of uploaded firmware
+ * @return Expected CRC of uploaded firmware
+ */
+uint16_t FirmwareUpdate::getNodeCrcExpected()
+{
+    return this->node_crc_expected;
 }
 
 /** @} */

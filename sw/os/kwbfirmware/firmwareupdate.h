@@ -73,8 +73,6 @@ public:
 
     int run();
 
-    void close();
-
     void registerProgressFunc(fwu_progress_func_t func, void *arg);
 
     void setProgressThd(uint8_t thd);

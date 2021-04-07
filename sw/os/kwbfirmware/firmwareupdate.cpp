@@ -2,7 +2,7 @@
  * @addtogroup FIRMWAREUPDATE
  *
  * @{
- * @file    firmwareupdate.c
+ * @file    firmwareupdate.cpp
  * @brief   Process firmware update of a module.
  *
  * message format for firmware update:
@@ -120,6 +120,11 @@ static void log_hexdump16(log_mask_t logmask, const char *keyword, const uint8_t
     }
 }
 
+/**
+ * Calculate the checksum of firmware in memory using the CRC16 algorithm.
+ *
+ * @return calculated CRC16 checksum.
+ */
 uint16_t FirmwareUpdate::calculateCRC16()
 {
     uint32_t ii;
@@ -132,6 +137,11 @@ uint16_t FirmwareUpdate::calculateCRC16()
     return crc;
 }
 
+/**
+ * Expect a SetReg message and parse it to retrieve the bootloader flags.
+ *
+ * @param[in] message Message to parse
+ */
 void FirmwareUpdate::parseSetReg8bitMsg(const msg_t &message)
 {
     if (message.data[1] == MOD_eReg_BldFlag) {
@@ -143,6 +153,8 @@ void FirmwareUpdate::parseSetReg8bitMsg(const msg_t &message)
 /**
  * Handles block_info message.
  * Sets current node crc and current node write offset.
+ *
+ * @param[in] message Message to parse
  */
 void FirmwareUpdate::parseBlockInfoMsg(const msg_t &message)
 {
@@ -166,6 +178,11 @@ void FirmwareUpdate::parseBlockInfoMsg(const msg_t &message)
     }
 }
 
+/**
+ * Expect a block acknowledge message and advance offset of already sent firmware.
+ *
+ * @param[in] message Message to parse
+ */
 void FirmwareUpdate::parseBlockAckMsg(const msg_t &message)
 {
     if (message.data[1] == eCMD_BLOCK_DATA) {
@@ -173,6 +190,11 @@ void FirmwareUpdate::parseBlockAckMsg(const msg_t &message)
     }
 }
 
+/**
+ * Expect a block not-acknowledge message and abort firmware update.
+ *
+ * @param[in] message Message to parse
+ */
 void FirmwareUpdate::parseBlockNakMsg(const msg_t &message)
 {
     if (message.data[1] == eCMD_BLOCK_START ||
@@ -186,12 +208,12 @@ void FirmwareUpdate::parseBlockNakMsg(const msg_t &message)
  * Message handler for incomming messages.
  * Specific message handlers will be called from here.
  *
- * param[in] message    Message to be parsed.
- * param[in] reference  Pointer to connection from where the message has been received.
- * param[in] arg        Special argument: Pointer to firmware update structure.
+ * @param[in] message    Message to be parsed.
+ * @param[in] reference  Pointer to connection from where the message has been received. (unused)
  */
 void FirmwareUpdate::handleIncomingMessage(const msg_t &message, void *reference)
 {
+    (reference);
     log_hexdump16(LOG_VERBOSE1, "BUS I ", (const uint8_t *)&message.data, message.length);
 
     if (message.length > 0) {
@@ -254,8 +276,6 @@ int FirmwareUpdate::sendBlockStartMessage()
 /**
  * Send a block data message to the target node. The block data message
  * contains an offset in the target memory and up to 32 byte of data.
- *
- * @param[in]   fwu     Pointer to firmware update process data.
  *
  * @returns     eRUNNING if message has been sent successfully and there is
  *              remaining data to be transmitted.
@@ -336,8 +356,6 @@ int FirmwareUpdate::sendBlockDataMessage()
  * contains the checksum of the sent data. The target node is expected to
  * calculate a checksum by itself and compare it to the checksum sent with the
  * block end message.
- *
- * @param[in]   fwu     Pointer to firmware update process data.
  *
  * @returns     eERR_NONE if message has been sent successfully, otherwise
  *              errorcode.
@@ -420,6 +438,13 @@ int FirmwareUpdate::sendRequestBldflagsMessage()
     return rc;
 }
 
+/**
+ * Check if bootloader flags have been received. Pase it if received.
+ *
+ * @returns     eERR_PROCESS_FAILED if bootloader flags signal an unsuccesful update
+ * @returns     eERR_NONE if bootloader flags signal a succesful update
+ * @returns     eRUNNING if bootloader flags haven't been received yet.
+ */
 int FirmwareUpdate::receiveAndCheckBldflags()
 {
     int rc = eRUNNING;
@@ -469,6 +494,9 @@ int FirmwareUpdate::receiveAndCheckBldflags()
 
 // --- Global functions --------------------------------------------------------
 
+/**
+ * standard ctor
+ */
 FirmwareUpdate::FirmwareUpdate()
     : reset_target_node(1)
     , progress_thd(5)

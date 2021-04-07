@@ -2,7 +2,7 @@
  * @addtogroup KWBFIRMWARE
  *
  * @{
- * @file    kwbfirmware_main.c
+ * @file    kwbfirmware_main.cpp
  * @brief   Update firmware of a module.
  *
  * @author  Christian Verhalen

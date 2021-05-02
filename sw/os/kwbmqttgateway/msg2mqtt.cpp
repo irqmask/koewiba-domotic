@@ -2,7 +2,7 @@
  * @addtogroup KWBMQTTGATEWAY
  *
  * @{
- * @file    msg2mqtt.c
+ * @file    msg2mqtt.cpp
  * @brief   Convert koewiba message to mqtt and vice versa.
  *
  * @author  Christian Verhalen

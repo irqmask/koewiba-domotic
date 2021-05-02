@@ -396,7 +396,7 @@ int mqtt2msg_subscribe(struct mosquitto *mosq)
  * @return eERR_NONE if successful, otherwise error code.
  */
 
-int mqtt2msg(char *topic, char *msgtext, msg_t *message)
+int mqtt2msg(const char *topic, const char *msgtext, msg_t *message)
 {
     int retval = eERR_UNKNOWN;
 

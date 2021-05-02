@@ -69,13 +69,13 @@ extern int mosquitto_connect_to_ioloop(app_handles_t *h);
 
 extern void mosquitto_ioloop_suspend_write(app_handles_t *h);
 
-extern int msg2mqtt(msg_t *message,
+extern int msg2mqtt(const msg_t *message,
                     char *topic, size_t max_topic_len,
                     char *msgtext, size_t max_msgtext_len);
 
 extern int mqtt2msg_subscribe(struct mosquitto *mosq);
 
-extern int mqtt2msg(char *topic, char *msgtext, msg_t *message);
+extern int mqtt2msg(const char *topic, const char *msgtext, msg_t *message);
 
 #endif // _KWBMQTTGATEWAY_H_
 /** @} */

@@ -2,7 +2,7 @@
  * @addtogroup KWBMQTTGATEWAY
  *
  * @{
- * @file    kwbmqttgateway_main.c
+ * @file    kwbmqttgateway_main.cpp
  * @brief   Gateway to convert koewiba message to mqtt and vice versa.
  * kwbmqttgateway routes commands comming from a kwbrouter to an mqtt broker.
  * Messages from another MQTT client are aubscribed for and transmitted to a
@@ -31,6 +31,8 @@
 
 #include "prjconf.h"
 
+#include <memory>
+
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -48,14 +50,14 @@
 #include "kwb_defines.h"
 #include "prjtypes.h"
 
-// os/libsystem
-#include "sysgetopt.h"
-
-// os/shared
+// os/libkwb
+#include "connection.h"
 #include "ioloop.h"
 #include "log.h"
 #include "message.h"
-#include "message_socket.h"
+
+// os/libsystem
+#include "sysgetopt.h"
 
 #include "kwbmqttgateway.h"
 
@@ -79,12 +81,10 @@ typedef struct options {
 
 //! stores globally used handles in this application.
 app_handles_t       g_handles;
-//! handle to established socket connection.
-msg_socket_t        g_kwb_socket;
-//! handle of endpoint of established socket connection.
-msg_endpoint_t     *g_kwb_socket_ep;
 //! flag, if mainloop shall be exited.
 bool                g_end_application = false;
+//! currently hold connection to kwbrouter or serial gateway
+std::shared_ptr<Connection> g_conn;
 
 // --- Module global variables -------------------------------------------------
 
@@ -211,8 +211,8 @@ void on_mqtt_message(struct mosquitto *mosq, void *userdata, const struct mosqui
     if (message->payloadlen) {
         log_msg(KWB_LOG_INTERCOMM, "MQTTRECV %s %s\n", message->topic, (char *)message->payload);
         memset(&kwbmsg, 0, sizeof(kwbmsg));
-        if (mqtt2msg(message->topic, message->payload, &kwbmsg) == eERR_NONE) {
-            msg_s_send(g_kwb_socket_ep, &kwbmsg);
+        if (mqtt2msg(message->topic, (const char*)message->payload, &kwbmsg) == eERR_NONE) {
+            g_conn->send(kwbmsg);
         }
     }
     else {

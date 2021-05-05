@@ -32,18 +32,20 @@
 #include "prjconf.h"
 
 #include <memory>
+#include <sstream>
 
+#include <mosquitto.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include "mosquitto.h"
-
 #if defined (PRJCONF_UNIX) || \
     defined (PRJCONF_POSIX) || \
     defined (PRJCONF_LINUX)
-    #include <safe_lib.h>
+extern "C" {
+#include <safe_lib.h>
+}
 #endif
 
 // include
@@ -52,6 +54,8 @@
 
 // os/libkwb
 #include "connection.h"
+#include "connection_socket.h"
+#include "exceptions.h"
 #include "ioloop.h"
 #include "log.h"
 #include "message.h"
@@ -69,6 +73,12 @@
  * Storage type selected options for this application.
  */
 typedef struct options {
+    //! Device of serial connection to RS232 gateway.
+    char        serial_device[256];
+    //! Baudrate of serial connection to RS232 gateway.
+    int         serial_baudrate;
+    //! Flag: if set, serial device has been configured in the command line options.
+    bool        serial_device_set;
     //! address of tcp- or unix socket server.
     char        router_address[256];
     //! port of tcp socket server or 0 for unix socket server.
@@ -320,9 +330,8 @@ int mosquitto_setup()
  *
  * @param[in]   message     Received message.
  * @param[in]   reference   Optional reference, registered with this callback.
- * @param[in]   arg         Optional additional argument registered with this callback.
  */
-void on_kwb_incomming_message(msg_t *message, void *reference, void *arg)
+void on_kwb_incoming_message(const msg_t &message, void *reference)
 {
     char topic[256], msgtext[256];
     int mid = 0;
@@ -344,14 +353,12 @@ void on_kwb_incomming_message(msg_t *message, void *reference, void *arg)
 /**
  * This function is called when the connection to the kwbrouter is closed.
  *
- * @param[in]   address     Address of connetion which was closed.
- * @param[in]   port        Portnumber of connection which was closed.
+ * @param[in]   uri         URI of connetion which was closed.
  * @param[in]   reference   Optional reference, registered with this callback.
- * @param[in]   arg         Optional additional argument registered with this callback.
  */
-void on_kwb_close_connection(const char *address, uint16_t port, void *reference, void *arg)
+void on_kwb_close_connection(const std::string &uri, void *reference)
 {
-    log_msg(LOG_STATUS, "MQTT connection closed. address=%s port=%d", address, port);
+    log_msg(LOG_STATUS, "MQTT connection closed. address=%s", uri.c_str());
     g_end_application = true;
 }
 
@@ -368,13 +375,29 @@ int kwb_socket_setup(ioloop_t *ioloop, options_t *options)
     int retval = eERR_NONE;
 
     do {
-        msg_s_init(&g_kwb_socket);
-        msg_s_set_incomming_handler(&g_kwb_socket, on_kwb_incomming_message, NULL);
-        if ((retval = msg_s_open_client(&g_kwb_socket, ioloop, "/tmp/kwbr.usk", 0)) != eERR_NONE) {
+        // setup connections
+        try {
+            if (options->router_address_set) {
+                std::stringstream uriss;
+                uriss << options->router_address << ":" << options->router_port;
+                auto conn_socket = std::make_shared<ConnectionSocket>(ioloop, uriss.str());
+                log_msg(LOG_STATUS, "Connected to router over socket interface %s", conn_socket->getName().c_str());
+                g_conn = conn_socket;
+            }
+
+            using std::placeholders::_1;
+            using std::placeholders::_2;
+            incom_func_t handle_incoming_message_func = std::bind(&on_kwb_incoming_message, _1, _2);
+            g_conn->setIncomingHandler(handle_incoming_message_func);
+
+            conn_func_t handle_connection_func = std::bind(&on_kwb_close_connection, _1, _2);
+            g_conn->setConnectionHandler(handle_connection_func);
+        }
+        catch (Exception &e) {
+            log_error("Unable to connect! Exception %s\n", e.what());
+            retval = eERR_UNSUPPORTED;
             break;
         }
-        g_kwb_socket_ep = msg_s_get_endpoint(&g_kwb_socket, 0);
-        msg_s_set_closeconnection_handler(g_kwb_socket_ep, on_kwb_close_connection, NULL);
     } while (0);
 
     return retval;

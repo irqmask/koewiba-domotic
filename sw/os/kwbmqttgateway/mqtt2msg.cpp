@@ -58,7 +58,7 @@
 // --- Type definitions --------------------------------------------------------
 
 //! Type of conversion functions to convert from MQTT to kwb.
-typedef int (*mqtt_msg_converter_func)(char *topic, char *msgtext, msg_t *message);
+typedef int (*mqtt_msg_converter_func)(const char *topic, const char *msgtext, msg_t *message);
 
 //! Structure holding message types and topic and a pointer to a function which
 //! knows how to convert to a kwb message.
@@ -73,13 +73,13 @@ typedef struct _mqtt_message_types {
 
 // --- Local variables ---------------------------------------------------------
 
-static int mqtt2msg_state_8bit(char *topic, char *msgtext, msg_t *message);
-static int mqtt2msg_state_16bit(char *topic, char *msgtext, msg_t *message);
-static int mqtt2msg_state_32bit(char *topic, char *msgtext, msg_t *message);
-static int mqtt2msg_request_reg(char *topic, char *msgtext, msg_t *message);
-static int mqtt2msg_setreg_8bit(char *topic, char *msgtext, msg_t *message);
-static int mqtt2msg_setreg_16bit(char *topic, char *msgtext, msg_t *message);
-static int mqtt2msg_setreg_32bit(char *topic, char *msgtext, msg_t *message);
+static int mqtt2msg_state_8bit(const char *topic, const char *msgtext, msg_t *message);
+static int mqtt2msg_state_16bit(const char *topic, const char *msgtext, msg_t *message);
+static int mqtt2msg_state_32bit(const char *topic, const char *msgtext, msg_t *message);
+static int mqtt2msg_request_reg(const char *topic, const char *msgtext, msg_t *message);
+static int mqtt2msg_setreg_8bit(const char *topic, const char *msgtext, msg_t *message);
+static int mqtt2msg_setreg_16bit(const char *topic, const char *msgtext, msg_t *message);
+static int mqtt2msg_setreg_32bit(const char *topic, const char *msgtext, msg_t *message);
 
 //! List of known message types and its converion functions into kwb messages.
 mqtt_msg_types_t g_mqtt_msg_types[] = {
@@ -166,7 +166,7 @@ static int mqtt_split_topic(char *topic,
 }
 
 //----------------------------------------------------------------------------
-static int mqtt2msg_state_8bit(char *topic, char *msgtext, msg_t *message)
+static int mqtt2msg_state_8bit(const char *topic, const char *msgtext, msg_t *message)
 {
     int retval = eERR_NONE;
     uint32_t value;
@@ -193,7 +193,7 @@ static int mqtt2msg_state_8bit(char *topic, char *msgtext, msg_t *message)
 }
 
 //----------------------------------------------------------------------------
-static int mqtt2msg_state_16bit(char *topic, char *msgtext, msg_t *message)
+static int mqtt2msg_state_16bit(const char *topic, const char *msgtext, msg_t *message)
 {
     int retval = eERR_NONE;
     uint32_t value;
@@ -221,7 +221,7 @@ static int mqtt2msg_state_16bit(char *topic, char *msgtext, msg_t *message)
 }
 
 //----------------------------------------------------------------------------
-static int mqtt2msg_state_32bit(char *topic, char *msgtext, msg_t *message)
+static int mqtt2msg_state_32bit(const char *topic, const char *msgtext, msg_t *message)
 {
     int retval = eERR_NONE;
     uint32_t value;
@@ -251,7 +251,7 @@ static int mqtt2msg_state_32bit(char *topic, char *msgtext, msg_t *message)
 }
 
 //----------------------------------------------------------------------------
-static int mqtt2msg_request_reg(char *topic, char *msgtext, msg_t *message)
+static int mqtt2msg_request_reg(const char *topic, const char *msgtext, msg_t *message)
 {
     (topic);
     int retval = eERR_NONE;
@@ -272,7 +272,7 @@ static int mqtt2msg_request_reg(char *topic, char *msgtext, msg_t *message)
 }
 
 //----------------------------------------------------------------------------
-static int mqtt2msg_setreg_8bit(char *topic, char *msgtext, msg_t *message)
+static int mqtt2msg_setreg_8bit(const char *topic, const char *msgtext, msg_t *message)
 {
     int retval = eERR_NONE;
     uint32_t value;
@@ -299,7 +299,7 @@ static int mqtt2msg_setreg_8bit(char *topic, char *msgtext, msg_t *message)
 }
 
 //----------------------------------------------------------------------------
-static int mqtt2msg_setreg_16bit(char *topic, char *msgtext, msg_t *message)
+static int mqtt2msg_setreg_16bit(const char *topic, const char *msgtext, msg_t *message)
 {
     int retval = eERR_NONE;
     uint32_t value;
@@ -327,7 +327,7 @@ static int mqtt2msg_setreg_16bit(char *topic, char *msgtext, msg_t *message)
 }
 
 //----------------------------------------------------------------------------
-static int mqtt2msg_setreg_32bit(char *topic, char *msgtext, msg_t *message)
+static int mqtt2msg_setreg_32bit(const char *topic, const char *msgtext, msg_t *message)
 {
     int retval = eERR_NONE;
     uint32_t value;
@@ -396,7 +396,7 @@ int mqtt2msg_subscribe(struct mosquitto *mosq)
  * @return eERR_NONE if successful, otherwise error code.
  */
 
-int mqtt2msg(const char *topic, const char *msgtext, msg_t *message)
+int mqtt2msg(char *topic, const char *msgtext, msg_t *message)
 {
     int retval = eERR_UNKNOWN;
 

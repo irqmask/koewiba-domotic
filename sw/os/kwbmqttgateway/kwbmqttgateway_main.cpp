@@ -118,6 +118,7 @@ static void set_options(options_t     *options,
 
     if (router_address != NULL) {
         strcpy_s(options->router_address, sizeof(options->router_address), router_address);
+        options->router_address_set = true;
     }
     options->router_port = router_port;
 }
@@ -383,15 +384,15 @@ int kwb_socket_setup(ioloop_t *ioloop, options_t *options)
                 auto conn_socket = std::make_shared<ConnectionSocket>(ioloop, uriss.str());
                 log_msg(LOG_STATUS, "Connected to router over socket interface %s", conn_socket->getName().c_str());
                 g_conn = conn_socket;
+
+                using std::placeholders::_1;
+                using std::placeholders::_2;
+                incom_func_t handle_incoming_message_func = std::bind(&on_kwb_incoming_message, _1, _2);
+                g_conn->setIncomingHandler(handle_incoming_message_func);
+
+                conn_func_t handle_connection_func = std::bind(&on_kwb_close_connection, _1, _2);
+                g_conn->setConnectionHandler(handle_connection_func);
             }
-
-            using std::placeholders::_1;
-            using std::placeholders::_2;
-            incom_func_t handle_incoming_message_func = std::bind(&on_kwb_incoming_message, _1, _2);
-            g_conn->setIncomingHandler(handle_incoming_message_func);
-
-            conn_func_t handle_connection_func = std::bind(&on_kwb_close_connection, _1, _2);
-            g_conn->setConnectionHandler(handle_connection_func);
         }
         catch (Exception &e) {
             log_error("Unable to connect! Exception %s\n", e.what());

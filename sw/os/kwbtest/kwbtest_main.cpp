@@ -28,6 +28,8 @@
 
 #include "prjconf.h"
 
+#include <sstream>
+
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -51,10 +53,11 @@
 #include "systime.h"
 
 // os/shared
+#include "connection_socket.h"
+#include "exceptions.h"
 #include "ioloop.h"
 #include "log.h"
 #include "message.h"
-#include "message_socket.h"
 
 // --- Definitions -------------------------------------------------------------
 
@@ -70,14 +73,13 @@ static bool g_end_application = false;
 
 // --- Local functions ---------------------------------------------------------
 
-static void handle_message(msg_t *message, void *reference, void *arg)
+static void handle_message(const msg_t &message, void *reference)
 {
     (reference);
-    (arg);
-    msg_log("RECV", message);
+    msg_log("RECV", &message);
 }
 
-static void send_message(msg_endpoint_t *ep, uint16_t sender, uint16_t receiver, uint32_t message_type)
+static void send_message(Connection &co, uint16_t sender, uint16_t receiver, uint32_t message_type)
 {
     msg_t message;
     message.sender = sender;
@@ -93,15 +95,13 @@ static void send_message(msg_endpoint_t *ep, uint16_t sender, uint16_t receiver,
         message.data[0] = 0x24; // request version
         break;
     }
-    msg_s_send(ep, &message);
+    co.send(message);
 }
 
-static void on_close_connection(const char *address, uint16_t port, void *reference, void *arg)
+static void on_close_connection(const std::string &uri, void *reference)
 {
-    (address);
-    (port);
+    (uri);
     (reference);
-    (arg);
     g_end_application = true;
 }
 
@@ -121,32 +121,39 @@ int main(int argc, char *argv[])
     (argv);
     int             rc = eERR_NONE;
     ioloop_t        mainloop;
-    msg_socket_t    msg_socket;
-    msg_endpoint_t *msg_ep;
     int state = 1;
 
-    do {
-        log_set_mask(0xFFFFFFFF);
-        log_msg(LOG_INFO, "kwbtest...");
-        ioloop_init(&mainloop);
+    log_set_mask(0xFFFFFFFF);
+    log_msg(LOG_INFO, "kwbtest...");
+    ioloop_init(&mainloop);
 
-        msg_s_init(&msg_socket);
-        msg_s_set_incomming_handler(&msg_socket, handle_message, NULL);
-        if ((rc = msg_s_open_client(&msg_socket, &mainloop, "/tmp/kwbr.usk", 0)) != eERR_NONE) {
-            break;
-        }
-        msg_ep = msg_s_get_endpoint(&msg_socket, 0);
-        msg_s_set_closeconnection_handler(msg_ep, on_close_connection, NULL);
+    try {
+        std::stringstream uriss;
+        uriss << "/tmp/kwb.usk:0";
+        ConnectionSocket conn(&mainloop, uriss.str());
+
+        using std::placeholders::_1;
+        using std::placeholders::_2;
+        incom_func_t handle_incoming_message_func = std::bind(&handle_message, _1, _2);
+        conn.setIncomingHandler(handle_incoming_message_func);
+
+        conn_func_t handle_connection_func = std::bind(&on_close_connection, _1, _2);
+        conn.setConnectionHandler(handle_connection_func);
+
         log_msg(LOG_STATUS, "entering mainloop...");
         while (!g_end_application) {
             ioloop_run_once(&mainloop);
             if (state == 1) {
-                send_message(msg_ep, 0x0501, 0x0110, 2);
+                send_message(conn, 0x0501, 0x0110, 2);
                 state = 0;
             }
         }
-        //msg_s_close_connection(&msg_socket);
-    } while (0);
+    }
+    catch (Exception &e)
+    {
+        log_error(e.what());
+        rc = -1;
+    }
     return rc;
 }
 

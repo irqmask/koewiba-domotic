@@ -242,13 +242,21 @@ uint16_t calc_mqtt_topic_and_payload_crc16(const char* topic, size_t topic_len, 
  */
 bool check_for_echoes(uint16_t message_crc)
 {
+    bool rc = false;
+
+    // check if crc is in list
     std::vector<uint16_t>::iterator found;
     found = std::find(g_list_sent.begin(), g_list_sent.end(), message_crc);
     if (found != g_list_sent.end()) {
         g_list_sent.erase(found);
-        return true;
+        rc = true;
     }
-    return false;
+
+    // limit length of list
+    while (g_list_sent.size() > 100) {
+        g_list_sent.erase(g_list_sent.begin());
+    }
+    return rc;
 }
 
 /**

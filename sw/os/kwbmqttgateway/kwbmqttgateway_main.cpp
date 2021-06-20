@@ -31,8 +31,10 @@
 
 #include "prjconf.h"
 
+#include <algorithm>
 #include <memory>
 #include <sstream>
+#include <vector>
 
 #include <mosquitto.h>
 #include <stdint.h>
@@ -51,6 +53,9 @@ extern "C" {
 // include
 #include "kwb_defines.h"
 #include "prjtypes.h"
+
+// shared
+#include "crc16.h"
 
 // os/libkwb
 #include "connection.h"
@@ -95,6 +100,8 @@ app_handles_t       g_handles;
 bool                g_end_application = false;
 //! currently hold connection to kwbrouter or serial gateway
 std::shared_ptr<Connection> g_conn;
+//! List of sent messages. Message will be removed if MQTT server echoed it back
+std::vector<uint16_t> g_list_sent;
 
 // --- Module global variables -------------------------------------------------
 
@@ -209,6 +216,42 @@ static void log_mqtt_version(void)
 }
 
 /**
+ * Calculate checksum of mqtt topic and payload into single checksum@brief calc_mqtt_topic_and_payload_crc16
+ * @param[in] message   MQTT message structure containing topic and payload.
+ * @returns crc16 of topic and message
+ */
+uint16_t calc_mqtt_topic_and_payload_crc16(const char* topic, size_t topic_len, const char* payload, size_t payload_len)
+{
+    uint16_t crc = 0;
+
+    for (size_t i=0; i<topic_len; i++) {
+        crc = crc_16_next_byte(crc, topic[i]);
+    }
+
+    for (size_t i=0; i<payload_len; i++) {
+        crc = crc_16_next_byte(crc, payload[i]);
+    }
+    return crc;
+}
+
+/**
+ * Check if the message has just been sent.
+ * @param message
+ * @returns true, if message has been sent.
+ * @note Removes message from sent messages list.
+ */
+bool check_for_echoes(uint16_t message_crc)
+{
+    std::vector<uint16_t>::iterator found;
+    found = std::find(g_list_sent.begin(), g_list_sent.end(), message_crc);
+    if (found != g_list_sent.end()) {
+        g_list_sent.erase(found);
+        return true;
+    }
+    return false;
+}
+
+/**
  * Is called by mqtt library when a mqtt message has been received.
  *
  * @param[in]   mosq        (unused)Handle of mosquitto connection
@@ -220,10 +263,15 @@ void on_mqtt_message(struct mosquitto *mosq, void *userdata, const struct mosqui
     msg_t kwbmsg;
 
     if (message->payloadlen) {
-        log_msg(KWB_LOG_INTERCOMM, "MQTTRECV %s %s\n", message->topic, (char *)message->payload);
-        memset(&kwbmsg, 0, sizeof(kwbmsg));
-        if (mqtt2msg(message->topic, (const char*)message->payload, &kwbmsg) == eERR_NONE) {
-            g_conn->send(kwbmsg);
+        uint16_t crc = calc_mqtt_topic_and_payload_crc16(message->topic, strlen(message->topic), (char*)message->payload, message->payloadlen);
+        if (!check_for_echoes(crc)) {
+            log_msg(KWB_LOG_INTERCOMM, "MQTTRECV %s %s\n", message->topic, (char *)message->payload);
+            memset(&kwbmsg, 0, sizeof(kwbmsg));
+            if (mqtt2msg(message->topic, (const char*)message->payload, &kwbmsg) == eERR_NONE) {
+                g_conn->send(kwbmsg);
+            }
+        } else {
+            log_msg(KWB_LOG_INTERCOMM, "MQTTRECV %s %s (ECHOED)\n", message->topic, (char *)message->payload);
         }
     }
     else {
@@ -341,12 +389,17 @@ void on_kwb_incoming_message(const msg_t &message, void *reference)
     if (msg2mqtt(message, topic, sizeof(topic), msgtext, sizeof(msgtext)) != eERR_NONE) {
         return;
     }
-    mrc = mosquitto_publish(g_handles.mosq, &mid, topic, strnlen(msgtext, sizeof(msgtext)), msgtext, 1, false);
+
+    size_t msgtext_len = strnlen(msgtext, sizeof(msgtext));
+    mrc = mosquitto_publish(g_handles.mosq, &mid, topic, msgtext_len, msgtext, 2, false);
     if (mrc != MOSQ_ERR_SUCCESS) {
         log_error("MQTTSEND mosquitto_publish() failed with errorcode %d, topic=%s message=%s", mrc, topic, msgtext);
         return;
     }
-    log_msg(KWB_LOG_INTERCOMM, "MQTTSEND %s %s", topic, msgtext);
+
+    uint16_t crc = calc_mqtt_topic_and_payload_crc16(topic, strlen(topic), msgtext, msgtext_len);
+    g_list_sent.push_back(crc);
+    log_msg(KWB_LOG_INTERCOMM, "MQTTSEND %s %s id %d", topic, msgtext, mid);
     // send message when fd is ready to accept data
     mosquitto_ioloop_suspend_write(&g_handles);
 }

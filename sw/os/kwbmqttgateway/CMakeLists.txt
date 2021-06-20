@@ -61,6 +61,13 @@ set (os_include_SRCS
     ../include/error_codes.h
 )
 
+set (shared_SRCS
+    ../../shared/crc16.h
+
+    ../../shared/crc16.c
+)
+
+
 set (kwbmqttgateway_SRCS
     kwbmqttgateway.h
 

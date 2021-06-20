@@ -372,7 +372,7 @@ int mqtt2msg_subscribe(struct mosquitto *mosq)
     int mrc;
     mqtt_msg_types_t *msg_types = g_mqtt_msg_types;
     while (msg_types->func != NULL) {
-        mrc = mosquitto_subscribe(mosq, NULL, msg_types->topic, 0);
+        mrc = mosquitto_subscribe(mosq, NULL, msg_types->topic, 2);
         if (mrc != MOSQ_ERR_SUCCESS) {
             log_error("mosquitto_subscribe() of topic %s failed with errorcode %d",
                       msg_types->topic, mrc);

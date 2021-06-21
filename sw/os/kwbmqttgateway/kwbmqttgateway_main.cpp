@@ -2,7 +2,7 @@
  * @addtogroup KWBMQTTGATEWAY
  *
  * @{
- * @file    kwbmqttgateway_main.c
+ * @file    kwbmqttgateway_main.cpp
  * @brief   Gateway to convert koewiba message to mqtt and vice versa.
  * kwbmqttgateway routes commands comming from a kwbrouter to an mqtt broker.
  * Messages from another MQTT client are aubscribed for and transmitted to a
@@ -31,31 +31,42 @@
 
 #include "prjconf.h"
 
+#include <algorithm>
+#include <memory>
+#include <sstream>
+#include <vector>
+
+#include <mosquitto.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include "mosquitto.h"
-
 #if defined (PRJCONF_UNIX) || \
     defined (PRJCONF_POSIX) || \
     defined (PRJCONF_LINUX)
-    #include <safe_lib.h>
+extern "C" {
+#include <safe_lib.h>
+}
 #endif
 
 // include
 #include "kwb_defines.h"
 #include "prjtypes.h"
 
-// os/libsystem
-#include "sysgetopt.h"
+// shared
+#include "crc16.h"
 
-// os/shared
+// os/libkwb
+#include "connection.h"
+#include "connection_socket.h"
+#include "exceptions.h"
 #include "ioloop.h"
 #include "log.h"
 #include "message.h"
-#include "message_socket.h"
+
+// os/libsystem
+#include "sysgetopt.h"
 
 #include "kwbmqttgateway.h"
 
@@ -67,6 +78,12 @@
  * Storage type selected options for this application.
  */
 typedef struct options {
+    //! Device of serial connection to RS232 gateway.
+    char        serial_device[256];
+    //! Baudrate of serial connection to RS232 gateway.
+    int         serial_baudrate;
+    //! Flag: if set, serial device has been configured in the command line options.
+    bool        serial_device_set;
     //! address of tcp- or unix socket server.
     char        router_address[256];
     //! port of tcp socket server or 0 for unix socket server.
@@ -79,12 +96,12 @@ typedef struct options {
 
 //! stores globally used handles in this application.
 app_handles_t       g_handles;
-//! handle to established socket connection.
-msg_socket_t        g_kwb_socket;
-//! handle of endpoint of established socket connection.
-msg_endpoint_t     *g_kwb_socket_ep;
 //! flag, if mainloop shall be exited.
 bool                g_end_application = false;
+//! currently hold connection to kwbrouter or serial gateway
+std::shared_ptr<Connection> g_conn;
+//! List of sent messages. Message will be removed if MQTT server echoed it back
+std::vector<uint16_t> g_list_sent;
 
 // --- Module global variables -------------------------------------------------
 
@@ -108,6 +125,7 @@ static void set_options(options_t     *options,
 
     if (router_address != NULL) {
         strcpy_s(options->router_address, sizeof(options->router_address), router_address);
+        options->router_address_set = true;
     }
     options->router_port = router_port;
 }
@@ -198,6 +216,50 @@ static void log_mqtt_version(void)
 }
 
 /**
+ * Calculate checksum of mqtt topic and payload into single checksum@brief calc_mqtt_topic_and_payload_crc16
+ * @param[in] message   MQTT message structure containing topic and payload.
+ * @returns crc16 of topic and message
+ */
+uint16_t calc_mqtt_topic_and_payload_crc16(const char* topic, size_t topic_len, const char* payload, size_t payload_len)
+{
+    uint16_t crc = 0;
+
+    for (size_t i=0; i<topic_len; i++) {
+        crc = crc_16_next_byte(crc, topic[i]);
+    }
+
+    for (size_t i=0; i<payload_len; i++) {
+        crc = crc_16_next_byte(crc, payload[i]);
+    }
+    return crc;
+}
+
+/**
+ * Check if the message has just been sent.
+ * @param message
+ * @returns true, if message has been sent.
+ * @note Removes message from sent messages list.
+ */
+bool check_for_echoes(uint16_t message_crc)
+{
+    bool rc = false;
+
+    // check if crc is in list
+    std::vector<uint16_t>::iterator found;
+    found = std::find(g_list_sent.begin(), g_list_sent.end(), message_crc);
+    if (found != g_list_sent.end()) {
+        g_list_sent.erase(found);
+        rc = true;
+    }
+
+    // limit length of list
+    while (g_list_sent.size() > 100) {
+        g_list_sent.erase(g_list_sent.begin());
+    }
+    return rc;
+}
+
+/**
  * Is called by mqtt library when a mqtt message has been received.
  *
  * @param[in]   mosq        (unused)Handle of mosquitto connection
@@ -209,10 +271,15 @@ void on_mqtt_message(struct mosquitto *mosq, void *userdata, const struct mosqui
     msg_t kwbmsg;
 
     if (message->payloadlen) {
-        log_msg(KWB_LOG_INTERCOMM, "MQTTRECV %s %s\n", message->topic, (char *)message->payload);
-        memset(&kwbmsg, 0, sizeof(kwbmsg));
-        if (mqtt2msg(message->topic, message->payload, &kwbmsg) == eERR_NONE) {
-            msg_s_send(g_kwb_socket_ep, &kwbmsg);
+        uint16_t crc = calc_mqtt_topic_and_payload_crc16(message->topic, strlen(message->topic), (char*)message->payload, message->payloadlen);
+        if (!check_for_echoes(crc)) {
+            log_msg(KWB_LOG_INTERCOMM, "MQTTRECV %s %s\n", message->topic, (char *)message->payload);
+            memset(&kwbmsg, 0, sizeof(kwbmsg));
+            if (mqtt2msg(message->topic, (const char*)message->payload, &kwbmsg) == eERR_NONE) {
+                g_conn->send(kwbmsg);
+            }
+        } else {
+            log_msg(KWB_LOG_INTERCOMM, "MQTTRECV %s %s (ECHOED)\n", message->topic, (char *)message->payload);
         }
     }
     else {
@@ -320,9 +387,8 @@ int mosquitto_setup()
  *
  * @param[in]   message     Received message.
  * @param[in]   reference   Optional reference, registered with this callback.
- * @param[in]   arg         Optional additional argument registered with this callback.
  */
-void on_kwb_incomming_message(msg_t *message, void *reference, void *arg)
+void on_kwb_incoming_message(const msg_t &message, void *reference)
 {
     char topic[256], msgtext[256];
     int mid = 0;
@@ -331,12 +397,17 @@ void on_kwb_incomming_message(msg_t *message, void *reference, void *arg)
     if (msg2mqtt(message, topic, sizeof(topic), msgtext, sizeof(msgtext)) != eERR_NONE) {
         return;
     }
-    mrc = mosquitto_publish(g_handles.mosq, &mid, topic, strnlen(msgtext, sizeof(msgtext)), msgtext, 1, false);
+
+    size_t msgtext_len = strnlen(msgtext, sizeof(msgtext));
+    mrc = mosquitto_publish(g_handles.mosq, &mid, topic, msgtext_len, msgtext, 2, false);
     if (mrc != MOSQ_ERR_SUCCESS) {
         log_error("MQTTSEND mosquitto_publish() failed with errorcode %d, topic=%s message=%s", mrc, topic, msgtext);
         return;
     }
-    log_msg(KWB_LOG_INTERCOMM, "MQTTSEND %s %s", topic, msgtext);
+
+    uint16_t crc = calc_mqtt_topic_and_payload_crc16(topic, strlen(topic), msgtext, msgtext_len);
+    g_list_sent.push_back(crc);
+    log_msg(KWB_LOG_INTERCOMM, "MQTTSEND %s %s id %d", topic, msgtext, mid);
     // send message when fd is ready to accept data
     mosquitto_ioloop_suspend_write(&g_handles);
 }
@@ -344,14 +415,12 @@ void on_kwb_incomming_message(msg_t *message, void *reference, void *arg)
 /**
  * This function is called when the connection to the kwbrouter is closed.
  *
- * @param[in]   address     Address of connetion which was closed.
- * @param[in]   port        Portnumber of connection which was closed.
+ * @param[in]   uri         URI of connetion which was closed.
  * @param[in]   reference   Optional reference, registered with this callback.
- * @param[in]   arg         Optional additional argument registered with this callback.
  */
-void on_kwb_close_connection(const char *address, uint16_t port, void *reference, void *arg)
+void on_kwb_close_connection(const std::string &uri, void *reference)
 {
-    log_msg(LOG_STATUS, "MQTT connection closed. address=%s port=%d", address, port);
+    log_msg(LOG_STATUS, "MQTT connection closed. address=%s", uri.c_str());
     g_end_application = true;
 }
 
@@ -368,13 +437,29 @@ int kwb_socket_setup(ioloop_t *ioloop, options_t *options)
     int retval = eERR_NONE;
 
     do {
-        msg_s_init(&g_kwb_socket);
-        msg_s_set_incomming_handler(&g_kwb_socket, on_kwb_incomming_message, NULL);
-        if ((retval = msg_s_open_client(&g_kwb_socket, ioloop, "/tmp/kwbr.usk", 0)) != eERR_NONE) {
+        // setup connections
+        try {
+            if (options->router_address_set) {
+                std::stringstream uriss;
+                uriss << options->router_address << ":" << options->router_port;
+                auto conn_socket = std::make_shared<ConnectionSocket>(ioloop, uriss.str());
+                log_msg(LOG_STATUS, "Connected to router over socket interface %s", conn_socket->getName().c_str());
+                g_conn = conn_socket;
+
+                using std::placeholders::_1;
+                using std::placeholders::_2;
+                incom_func_t handle_incoming_message_func = std::bind(&on_kwb_incoming_message, _1, _2);
+                g_conn->setIncomingHandler(handle_incoming_message_func);
+
+                conn_func_t handle_connection_func = std::bind(&on_kwb_close_connection, _1, _2);
+                g_conn->setConnectionHandler(handle_connection_func);
+            }
+        }
+        catch (Exception &e) {
+            log_error("Unable to connect! Exception %s\n", e.what());
+            retval = eERR_UNSUPPORTED;
             break;
         }
-        g_kwb_socket_ep = msg_s_get_endpoint(&g_kwb_socket, 0);
-        msg_s_set_closeconnection_handler(g_kwb_socket_ep, on_kwb_close_connection, NULL);
     } while (0);
 
     return retval;

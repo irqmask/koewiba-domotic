@@ -25,8 +25,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "exceptions.h"
 #include "log.h"
 #include "message.h"
+#include "systime.h"
 
 #include "router.h"
 
@@ -77,16 +79,23 @@ void Router::removeConnection(Connection *connection)
 //----------------------------------------------------------------------------
 void Router::distributeMessage(const msg_t &message, Connection *sender)
 {
+
     for (auto conn : connections) {
-        if (conn == sender) {
-            continue;
+        try {
+            if (conn == sender) {
+                continue;
+            }
+            if (!conn->addressIsInConnectionsSegment(message.receiver)) {
+                continue;
+            }
+            log_info("ROUTE FROM %s NODE %04X VIA %s TO NODE %04X msg %s", sender->getName().c_str(), message.sender,
+                     conn->getName().c_str(), message.receiver, msg_to_string(&message, 16));
+            conn->send(message);
         }
-        if (!conn->addressIsInConnectionsSegment(message.receiver)) {
-            continue;
+        catch (Exception &e) {
+            log_error("e.what()");
+            sys_sleep_ms(2000);
         }
-        log_info("ROUTE FROM %s NODE %04X VIA %s TO NODE %04X msg %s", sender->getName().c_str(), message.sender,
-                 conn->getName().c_str(), message.receiver, msg_to_string(&message, 16));
-        conn->send(message);
     }
 }
 

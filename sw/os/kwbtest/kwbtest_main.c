@@ -83,6 +83,11 @@ static void send_message(msg_endpoint_t *ep, uint16_t sender, uint16_t receiver,
     message.sender = sender;
     message.receiver = receiver;
     switch (message_type) {
+    case 2:
+        message.length = 2;
+        message.data[0] = 2;
+        message.data[1] = 1;
+        break;
     default:
         message.length = 1;
         message.data[0] = 0x24; // request version
@@ -136,7 +141,7 @@ int main(int argc, char *argv[])
         while (!g_end_application) {
             ioloop_run_once(&mainloop);
             if (state == 1) {
-                send_message(msg_ep, 0x0501, 0x0110, 0);
+                send_message(msg_ep, 0x0501, 0x0110, 2);
                 state = 0;
             }
         }

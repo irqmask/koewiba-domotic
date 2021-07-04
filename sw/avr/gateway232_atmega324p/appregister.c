@@ -58,15 +58,15 @@ bool        app_register_get        (uint8_t                uRegNo,
                                      void*                  pvValue)
 {
     eRegType_t  regtype;
-    uint8_t index;
+    //uint8_t index;
 
     if (peRegType == NULL) peRegType = &regtype;
     if (pvValue == NULL) return false;
     *peRegType = eRegType_U8;
 
     // registers saved in EEProm
-    if (uRegNo >= APP_eReg_RemoteAddr00 && uRegNo <= APP_eReg_RemoteAddr31) {
-        index = (uRegNo - APP_eReg_RemoteAddr00) * 2;
+    /*if (uRegNo >= APP_eReg_RemoteAddr04 && uRegNo <= APP_eReg_RemoteAddr31) {
+        index = (uRegNo - APP_eReg_RemoteAddr04) * 2;
         index += APP_eCfg_RemoteAddr00;
         *(uint16_t*)pvValue = eeprom_read_word((uint16_t*)&register_eeprom_array[index]);
         *peRegType = eRegType_U16;
@@ -82,22 +82,24 @@ bool        app_register_get        (uint8_t                uRegNo,
         *(uint8_t*)pvValue = eeprom_read_byte(&register_eeprom_array[index]);
     }
     // registers in ROM/RAM
-    else {
+    else {*/
         return false;
-    }
+    /*}
     return true;
+    */
 }
 
 
 void        app_register_set        (uint8_t                uRegNo,
                                      uint32_t               uValue)
 {
-    uint16_t    tempval16;
+	(void)uRegNo;
+	(void)uValue;
+    /*uint16_t    tempval16;
     uint8_t     tempval, index;
 
     tempval16 = (uint16_t)(uValue & 0x0000FFFF);
     tempval = (uint8_t)(uValue & 0x000000FF);
-
     // registers saved in EEProm
     if (uRegNo >= APP_eReg_RemoteAddr00 && uRegNo <= APP_eReg_RemoteAddr31) {
         index = (uRegNo - APP_eReg_RemoteAddr00) * 2;
@@ -113,7 +115,7 @@ void        app_register_set        (uint8_t                uRegNo,
         index = uRegNo - APP_eReg_TargetReg00;
         index += APP_eCfg_TargetReg00;
         eeprom_write_byte(&register_eeprom_array[index], tempval);
-    }
+    }*/
     // registers in ROM/RAM
 }
 

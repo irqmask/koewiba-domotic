@@ -184,10 +184,10 @@ static void check_inputs(void)
 
 	for (uint8_t i=0; i<INPUT_NUM_PINS; i++) {
 		if ((closed & (1<<i)) != 0) {
-			send_input_state(i, 0);
+			send_input_state(i, 1);
 		}
 		else if ((opened & (1<<i)) != 0) {
-            send_input_state(i, 255);
+            send_input_state(i, 0);
         }
 	}
 }

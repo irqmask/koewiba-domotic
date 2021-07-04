@@ -88,8 +88,8 @@ ISR(INTERRUPT_PINCHANGE2)
 
 static void io_initialize(void)
 {
-    DDRA  |= ((0<<DDA7) | (0<<DDA6) | (1<<DDA5) | (1<<DDA4) | (0<<DDA3) | (0<<DDA2) | (0<<DDA1) | (0<<DDA0) );
-    PORTA |= ((0<<PA7)   |  (0<<PA6)  |  (0<<PA5)  |  (0<<PA4)  |  (0<<PA3)  |  (0<<PA2)  |  (0<<PA1)  |  (0<<PA0)  );
+    DDRA  |= ((0<<DDA7) | (0<<DDA6) | (0<<DDA5) | (0<<DDA4) | (0<<DDA3) | (0<<DDA2) | (0<<DDA1) | (0<<DDA0) );
+    PORTA |= ((0<<PA7)  |  (0<<PA6)  |  (0<<PA5)  |  (0<<PA4)  |  (1<<PA3)  |  (1<<PA2)  |  (1<<PA1)  |  (1<<PA0)  );
 
     DDRB  |= ((1<<DDB7) | (0<<DDB6) | (0<<DDB5) | (0<<DDB4) | (0<<DDB3) | (0<<DDB2) | (1<<DDB1) | (1<<DDB0) );
     PORTB |= ((0<<PB7)   |  (0<<PB6)  |  (0<<PB5)  |  (0<<PB4)  |  (0<<PB3)  |  (0<<PB2)  |  (0<<PB1)  |  (0<<PB0)  );
@@ -99,19 +99,6 @@ static void io_initialize(void)
 
     DDRD  |= ((0<<DDD7) | (0<<DDD6) | (1<<DDD5) | (1<<DDD4) | (0<<DDD3) | (0<<DDD2) | (0<<DDD1) | (0<<DDD0) );
     PORTD |= ((0<<PD7)   |  (0<<PD6)  |  (0<<PD5)  |  (0<<PD4)  |  (0<<PD3)  |  (0<<PD2)  |  (0<<PD1)  |  (0<<PD0)  );
-
-    // activate pin-change-interrupts for the inputs
-    PCMSK1 |= ((1<<PCINT12) | (1<<PCINT11) | (1<<PCINT10));
-}
-
-void activate_wakeup_interrupt(void)
-{
-
-}
-
-void deactivate_wakeup_interrupt(void)
-{
-
 }
 
 /// send the version information
@@ -186,21 +173,22 @@ static void send_input_state(uint8_t input, uint8_t value)
 	cmd[1] = APP_eReg_Input1 + input;
 	cmd[2] = value;
 
-	bus_send_message(&g_bus, BUS_BRDCSTADR, sizeof(cmd), cmd);
+	bus_send_message(&g_bus, g_bus.sCfg.uOwnAddress & BUS_SEGBRDCSTMASK, sizeof(cmd), cmd);
 	bgw_send_serial_msg(&g_serial_phy, g_bus.sCfg.uOwnAddress, BUS_BRDCSTADR, sizeof(cmd), cmd);
 }
 
 static void check_inputs(void)
 {
-	uint8_t opened = input_went_high();
+    uint8_t opened = input_went_high();
 	uint8_t closed = input_went_low();
+
 	for (uint8_t i=0; i<INPUT_NUM_PINS; i++) {
-		if ((opened & (1<<i)) != 0) {
-			send_input_state(i, 255);
-		}
-		else if ((closed & (1<<i)) != 0) {
+		if ((closed & (1<<i)) != 0) {
 			send_input_state(i, 0);
 		}
+		else if ((opened & (1<<i)) != 0) {
+            send_input_state(i, 255);
+        }
 	}
 }
 
@@ -228,8 +216,15 @@ int main(void)
     sei();
     LED_STATUS_OFF;
     LED_ERROR_OFF;
+
     timer_start(&g_LED_timer, TIMER_MS_2_TICKS(1000));
     timer_start(&g_input_timer, TIMER_MS_2_TICKS(20));
+    // activate pin-change-interrupts for the inputs
+    PCMSK0 |= ((1<<PCINT3) | (1<<PCINT2) | (1<<PCINT1) | (1<<PCINT0));
+
+    // WORKAROUND: since atmega324 has issues with going to sleep and waking up again.
+    //             root-cause still to be found.
+    sleep_prevent(APP_eSLEEPMASK_GATEWAY, 1);
 
     while (1) {
         // check for message and read it
@@ -241,7 +236,7 @@ int main(void)
         bgw_forward_serial_msg(&g_bus, &g_serial_phy);
 
         if (timer_is_elapsed(&g_input_timer)) {
-            timer_start(&g_input_timer, TIMER_MS_2_TICKS(10));
+            timer_start(&g_input_timer, TIMER_MS_2_TICKS(20));
             input_background();
             check_inputs();
         }

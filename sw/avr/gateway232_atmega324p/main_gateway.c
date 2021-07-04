@@ -99,6 +99,9 @@ static void io_initialize(void)
 
     DDRD  |= ((0<<DDD7) | (0<<DDD6) | (1<<DDD5) | (1<<DDD4) | (0<<DDD3) | (0<<DDD2) | (0<<DDD1) | (0<<DDD0) );
     PORTD |= ((0<<PD7)   |  (0<<PD6)  |  (0<<PD5)  |  (0<<PD4)  |  (0<<PD3)  |  (0<<PD2)  |  (0<<PD1)  |  (0<<PD0)  );
+
+    // activate pin-change-interrupts for the inputs
+    PCMSK1 |= ((1<<PCINT12) | (1<<PCINT11) | (1<<PCINT10));
 }
 
 void activate_wakeup_interrupt(void)
@@ -184,6 +187,7 @@ static void send_input_state(uint8_t input, uint8_t value)
 	cmd[2] = value;
 
 	bus_send_message(&g_bus, BUS_BRDCSTADR, sizeof(cmd), cmd);
+	bgw_send_serial_msg(&g_serial_phy, g_bus.sCfg.uOwnAddress, BUS_BRDCSTADR, sizeof(cmd), cmd);
 }
 
 static void check_inputs(void)

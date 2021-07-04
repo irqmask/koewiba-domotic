@@ -49,6 +49,10 @@
 
 // --- Global functions --------------------------------------------------------
 
+bool bgw_send_serial_msg(scomm_phy_t *serial,
+                         uint16_t sender, uint16_t receiver,
+                         uint8_t len, uint8_t* msg);
+
 void bgw_forward_serial_msg (sBus_t* bus, scomm_phy_t* phy);
 
 bool bgw_forward_bus_msg (sBus_t *bus, scomm_phy_t *serial,

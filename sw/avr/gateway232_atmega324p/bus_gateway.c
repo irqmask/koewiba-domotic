@@ -275,6 +275,33 @@ void bgw_forward_serial_msg (sBus_t* bus, scomm_phy_t* rs232_phy)
 }
 
 /**
+ * Send a message on theserial line.
+ *
+ * @param[in]   serial  Handle to serial line.
+ * @param[in]   sender  Sender of the message.
+ * @param[in]   receiver Receiver of the message.
+ * @param[in]  len     Length of message.
+ * @param[in]  msg     Message payload.
+ *
+ * @returns true if a message was sent successfully, otherwise false.
+ */
+bool bgw_send_serial_msg(scomm_phy_t *serial, uint16_t sender, uint16_t receiver, uint8_t len, uint8_t* msg)
+{
+    convert_and_enqueue_byte(&serial->sendQ, (uint8_t)((sender & 0xFF00)>>8));
+    convert_and_enqueue_byte(&serial->sendQ, (uint8_t)( sender & 0x00FF));
+    convert_and_enqueue_byte(&serial->sendQ, (uint8_t)((receiver & 0xFF00)>>8));
+    convert_and_enqueue_byte(&serial->sendQ, (uint8_t)( receiver & 0x00FF));
+    convert_and_enqueue_byte(&serial->sendQ, len);
+    for (uint8_t i=0; i<len; i++) {
+        convert_and_enqueue_byte(&serial->sendQ, msg[i]);
+    }
+    q_put_byte(&serial->sendQ, '\n');
+    serial_phy_initiate_sending(serial);
+
+    return true;
+}
+
+/**
  * Forward a message from bus to serial line.
  *
  * @param[in]   bus     Handle to bus.

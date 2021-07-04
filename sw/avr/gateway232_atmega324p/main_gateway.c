@@ -36,6 +36,7 @@
 #include "cmddef_common.h"
 #include "moddef_common.h"
 #include "pcbconfig.h"
+#include "input.h"
 #include "register.h"
 #include "serialcomm.h"
 #include "sleepmode.h"
@@ -58,6 +59,7 @@
 // --- Local variables ---------------------------------------------------------
 
 static timer_data_t g_LED_timer;
+static timer_data_t g_input_timer;
 
 // --- Global variables --------------------------------------------------------
 
@@ -174,6 +176,30 @@ static inline void interpret_message (uint16_t sender, uint8_t msglen, uint8_t* 
     }
 }
 
+static void send_input_state(uint8_t input, uint8_t value)
+{
+	uint8_t cmd[3];
+	cmd[0] = eCMD_STATE_8BIT;
+	cmd[1] = APP_eReg_Input1 + input;
+	cmd[2] = value;
+
+	bus_send_message(&g_bus, BUS_BRDCSTADR, sizeof(cmd), cmd);
+}
+
+static void check_inputs(void)
+{
+	uint8_t opened = input_went_high();
+	uint8_t closed = input_went_low();
+	for (uint8_t i=0; i<INPUT_NUM_PINS; i++) {
+		if ((opened & (1<<i)) != 0) {
+			send_input_state(i, 255);
+		}
+		else if ((closed & (1<<i)) != 0) {
+			send_input_state(i, 0);
+		}
+	}
+}
+
 // --- Module global functions -------------------------------------------------
 
 // --- Global functions --------------------------------------------------------
@@ -186,6 +212,7 @@ int main(void)
     uint16_t module_id = 0;
 
     io_initialize();
+    input_initialize();
     timer_initialize();
     scomm_initialize_uart1(&g_serial_phy);
 
@@ -198,6 +225,7 @@ int main(void)
     LED_STATUS_OFF;
     LED_ERROR_OFF;
     timer_start(&g_LED_timer, TIMER_MS_2_TICKS(1000));
+    timer_start(&g_input_timer, TIMER_MS_2_TICKS(20));
 
     while (1) {
         // check for message and read it
@@ -207,6 +235,12 @@ int main(void)
             }
         }
         bgw_forward_serial_msg(&g_bus, &g_serial_phy);
+
+        if (timer_is_elapsed(&g_input_timer)) {
+            timer_start(&g_input_timer, TIMER_MS_2_TICKS(10));
+            input_background();
+            check_inputs();
+        }
 
         if (timer_is_elapsed(&g_LED_timer)) {
         	// cyclic reset of error LED

@@ -45,10 +45,10 @@
 //! Application specific layout of registers
 typedef enum appregisters {
     // registers saved in EEProm
-    APP_eReg_RemoteAddr00 = MOD_eReg_FirstAppSpecific, //!< Register mapping: remote address 0 (16bit)
-    APP_eReg_RemoteAddr01,
-    APP_eReg_RemoteAddr02,      //!< Register mapping: remote address 2 (16bit)
-    APP_eReg_RemoteAddr03,
+    APP_eReg_Input1 = MOD_eReg_FirstAppSpecific, //!< State of Input 1
+	APP_eReg_Input2,			//!< State of input 2
+	APP_eReg_Input3,			//!< State of input 3
+	APP_eReg_Input4,			//!< State of input 4
     APP_eReg_RemoteAddr04,      //!< Register mapping: remote address 4 (16bit)
     APP_eReg_RemoteAddr05,
     APP_eReg_RemoteAddr06,      //!< Register mapping: remote address 6 (16bit)

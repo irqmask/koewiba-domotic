@@ -67,7 +67,27 @@
 #define SCOMM_PORTIN        PIND
 #define SCOMM_CTS           PD5
 
-// Inputs (Buttons)
+// Inputs
+#define INPUT_PCBCONFIG     1
+
+#define INPUT_NUM_PINS      4
+#define INPUT_PORT_0        PORTA
+#define INPUT_PIN_0         PINA
+#define INPUT_DDR_0         DDRA
+#define INPUT_0             PA0
+#define INPUT_PORT_1        PORTA
+#define INPUT_PIN_1         PINA
+#define INPUT_DDR_1         DDRA
+#define INPUT_1             PA1
+#define INPUT_PORT_2        PORTA
+#define INPUT_PIN_2         PINA
+#define INPUT_DDR_2         DDRA
+#define INPUT_2             PA2
+#define INPUT_PORT_3        PORTA
+#define INPUT_PIN_3         PINA
+#define INPUT_DDR_3         DDRA
+#define INPUT_3             PA3
+
 
 // WakeUpPins
 #define SLEEP_WakeupPinsPortA   (0<<PCINT7)|(0<<PCINT6)|(0<<PCINT5)|(0<<PCINT4)|(1<<PCINT3)|(1<<PCINT2)|(1<<PCINT1)|(1<<PCINT0)

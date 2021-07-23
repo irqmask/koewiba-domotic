@@ -259,13 +259,17 @@ void app_background (void)
             case APP_LED_OFF:
                 g_state = APP_LED_ON;
             	app_register_get(APP_eReg_IntensityChn0Store, NULL, &g_led_setpoint[0]);
+            	send_intensity_setpoint(&g_bus, 0);
             	app_register_get(APP_eReg_IntensityChn1Store, NULL, &g_led_setpoint[1]);
+                send_intensity_setpoint(&g_bus, 1);
                 break;
 
             case APP_LED_ON:
                 g_state = APP_LED_OFF;
                 g_led_setpoint[0] = 0;
+                send_intensity_setpoint(&g_bus, 0);
                 g_led_setpoint[1] = 0;
+                send_intensity_setpoint(&g_bus, 1);
                 break;
 
             default:
@@ -315,7 +319,7 @@ void app_background (void)
             g_led_changing[1] = true;
         }
         else {
-            if (g_led_changing[0] == true) {
+            if (g_led_changing[1] == true) {
                 send_current_intensity(&g_bus, 1);
             }
             g_led_changing[1] = false;

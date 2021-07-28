@@ -2,8 +2,8 @@
  * @addtogroup KWBCONFIGURATION
  *
  * @{
- * @file    ActionRequest.h
- * @brief   Base-class of an action which sends a request / message to a bus-module.
+ * @file    Action.h
+ * @brief   Base-class of an action to be performed with a bus-module.
  *
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
@@ -29,10 +29,12 @@
 
 #include "prjconf.h"
 
+#include <chrono>
+
 // include
 #include "prjtypes.h"
-
-#include "Action.h"
+#include "msgbroker.h"
+#include "connection.h"
 
 // --- Definitions -------------------------------------------------------------
 
@@ -45,10 +47,11 @@
 // --- Class definition --------------------------------------------------------
 
 /**
- * Action to send a request / command to a bus module. A response is not
- * expected in this case.
+ * Base-class for "actions". An action in this context is a command / response
+ * sequence. The action is finished  when the command has been sent and a
+ * response has been received.
  */
-class ActionRequest : public Action
+class Action
 {
 public:
     /**
@@ -56,37 +59,39 @@ public:
      * @param[in]   conn        Reference to established connection to a
      *                          KWB bus os router
      * @param[in]   broker      Reference to message broker.
-     * @param[in]   moduleAddr  (optional, default=0) Module address to communicate with.
      */
-    ActionRequest(Connection &conn, MsgBroker &broker, uint16_t moduleAddr = 0);
-
-    bool start() override;
-    virtual void cancel() override;
-    virtual bool isFinished() override;
+    Action(Connection &conn, MsgBroker &broker);
 
     /**
-     * Set the address of the module to communicate with.
-     * @param[in]   address     Module address.
+     * Start the action.
+     * @returns true, it the action was started successfully, otherwise false.
      */
-    void setModuleAddress(uint16_t address);
+    virtual bool start() = 0;
 
     /**
-     * Get the currently set address of the recepient bus module.
-     * @return module address
+     * Cancel the running action.
      */
-    uint16_t getModuleAddress();
+    virtual void cancel() = 0;
+
+    /**
+     * @returns true if the action is finished, otherwise false.
+     */
+    virtual bool isFinished();
+
+    /**
+     * @returns true if the action has timed out, otherwise false.
+     */
+    virtual bool hasTimedOut();
 
 protected:
-    /**
-     * Form a message to be sent to the bus module.
-     * @returns true, if the messge was successfully formed, otherwise false.
-     */
-    virtual bool formMessage() = 0;
-
-    //! Address of module to perform action with.
-    uint16_t moduleAddr;
-    //! Message to be sent during this action.
-    msg_t    messageToSend;
+    //! Reference to message broker.
+    MsgBroker                   &msgBroker;
+    //! Reference to established connection.
+    Connection                  &connection;
+    //! Duration until action times out.
+    std::chrono::duration<int>  timeout;
+    //! Flag if timeout occurred.
+    bool                        timeoutOccurred;
 };
 
 /** @} */

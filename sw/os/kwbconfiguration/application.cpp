@@ -47,10 +47,10 @@
 #include "error_codes.h"
 #include "kwb_defines.h"
 
-#include "Application.h"
-#include "ActionQueryModules.h"
-#include "ActionReadRegister.h"
-#include "ActionWriteRegister.h"
+#include "application.h"
+#include "action_query_modules.h"
+#include "action_read_register.h"
+#include "action_write_register.h"
 
 // --- Definitions -------------------------------------------------------------
 

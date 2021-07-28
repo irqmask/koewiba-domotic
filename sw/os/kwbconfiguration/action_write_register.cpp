@@ -2,7 +2,7 @@
  * @addtogroup KWBCONFIGURATION
  *
  * @{
- * @file    ActionReadRegister.cpp
+ * @file    ActionWriteRegister.cpp
  * @brief   Action: Query a register of a bus module and wait for the answer.
  *
  * @author  Christian Verhalen
@@ -32,11 +32,7 @@
 #include "prjtypes.h"
 #include "cmddef_common.h"
 
-// os/include
-#include "error_codes.h"
-#include "kwb_defines.h"
-
-#include "ActionReadRegister.h"
+#include "action_write_register.h"
 
 // --- Definitions -------------------------------------------------------------
 
@@ -48,92 +44,85 @@
 
 // --- Class implementation  ---------------------------------------------------
 
-ActionReadRegister::ActionReadRegister(Connection   &msgep,
-                                       MsgBroker    &broker,
-                                       uint16_t     moduleAddr,
-                                       uint8_t      registerId)
-    : ActionWithResponse(msgep, broker, moduleAddr)
+ActionWriteRegister::ActionWriteRegister(Connection   &conn,
+                                         MsgBroker    &broker,
+                                         uint16_t     moduleAddr,
+                                         uint8_t      registerId)
+    : ActionRequest(conn, broker, moduleAddr)
     , registerId(registerId)
+    , registerFormat(eCMD_NAK)
+    , value(0)
 {
 }
 
 //----------------------------------------------------------------------------
-void ActionReadRegister::setRegisterId(uint8_t registerId)
+void ActionWriteRegister::setRegisterId(uint8_t registerId)
 {
     this->registerId = registerId;
 }
 
 //----------------------------------------------------------------------------
-uint8_t ActionReadRegister::getRegisterId()
+uint8_t ActionWriteRegister::getRegisterId()
 {
     return this->registerId;
 }
 
 //----------------------------------------------------------------------------
-bool ActionReadRegister::formMessage()
+bool ActionWriteRegister::formMessage()
 {
     if (moduleAddr == 0) {
         return false;
     }
     messageToSend.receiver = moduleAddr;
     messageToSend.sender = connection.getOwnNodeId();
-    messageToSend.length = 2;
-    messageToSend.data[0] = eCMD_REQUEST_REG;
+    messageToSend.data[0] = registerFormat;
     messageToSend.data[1] = registerId;
+
+    switch (registerFormat) {
+    case eCMD_SET_REG_8BIT:
+        messageToSend.length = 3;
+        messageToSend.data[2] = (uint8_t)(value & 0x000000FF);
+        break;
+    case eCMD_SET_REG_16BIT:
+        messageToSend.length = 4;
+        messageToSend.data[2] = (uint8_t)((value & 0x0000FF00) >> 8);
+        messageToSend.data[3] = (uint8_t)(value & 0x000000FF);
+        break;
+    case eCMD_SET_REG_32BIT:
+        messageToSend.length = 6;
+        messageToSend.data[2] = (uint8_t)((value & 0xFF000000) >> 24);
+        messageToSend.data[3] = (uint8_t)((value & 0x00FF0000) >> 16);
+        messageToSend.data[4] = (uint8_t)((value & 0x0000FF00) >> 8);
+        messageToSend.data[5] = (uint8_t)(value & 0x000000FF);
+        break;
+    default:
+        return false;
+    }
     return true;
 }
 
 //----------------------------------------------------------------------------
-bool ActionReadRegister::filterResponse(const msg_t &message)
+void ActionWriteRegister::setValue(int value)
 {
-    if (message.sender == moduleAddr &&
-        message.length >= 3 &&
-        (message.data[0] == eCMD_STATE_TYPELESS ||
-         message.data[0] == eCMD_STATE_BITFIELDS ||
-         message.data[0] == eCMD_STATE_8BIT ||
-         message.data[0] == eCMD_STATE_16BIT ||
-         message.data[0] == eCMD_STATE_32BIT ||
-         message.data[0] == eCMD_STATE_DATE_TIME) &&
-        message.data[1] == registerId) {
-        return true;
-    }
-    return false;
+    this->value = value;
 }
 
 //----------------------------------------------------------------------------
-void ActionReadRegister::handleResponse(const msg_t &message, void *reference)
+int ActionWriteRegister::getValue()
 {
-    receivedMessage = message;
-    messageReceived = true;
-}
-
-//----------------------------------------------------------------------------
-int ActionReadRegister::getValue()
-{
-    int value = 0;
-
-    switch (receivedMessage.data[0]) {
-    case eCMD_STATE_8BIT:
-        value = receivedMessage.data[2];
-        break;
-    case eCMD_STATE_16BIT:
-        value = receivedMessage.data[2];
-        value <<= 8;
-        value |= receivedMessage.data[3];
-        break;
-    case eCMD_STATE_32BIT:
-        value = receivedMessage.data[2];
-        value <<= 8;
-        value |= receivedMessage.data[3];
-        value <<= 8;
-        value |= receivedMessage.data[4];
-        value <<= 8;
-        value |= receivedMessage.data[5];
-        break;
-    default:
-        break;
-    }
     return value;
+}
+
+//----------------------------------------------------------------------------
+void ActionWriteRegister::setRegisterFormat(cmd_common_t format)
+{
+    registerFormat = format;
+}
+
+//----------------------------------------------------------------------------
+cmd_common_t ActionWriteRegister::getRegisterFormat()
+{
+    return registerFormat;
 }
 
 /** @} */

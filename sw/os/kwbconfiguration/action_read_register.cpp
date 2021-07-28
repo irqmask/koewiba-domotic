@@ -2,7 +2,7 @@
  * @addtogroup KWBCONFIGURATION
  *
  * @{
- * @file    ActionQueryModules.cpp
+ * @file    ActionReadRegister.cpp
  * @brief   Action: Query a register of a bus module and wait for the answer.
  *
  * @author  Christian Verhalen
@@ -36,7 +36,7 @@
 #include "error_codes.h"
 #include "kwb_defines.h"
 
-#include "ActionQueryModules.h"
+#include "action_read_register.h"
 
 // --- Definitions -------------------------------------------------------------
 
@@ -48,78 +48,92 @@
 
 // --- Class implementation  ---------------------------------------------------
 
-ActionQueryModules::ActionQueryModules(Connection   &conn,
+ActionReadRegister::ActionReadRegister(Connection   &msgep,
                                        MsgBroker    &broker,
-                                       uint16_t     nodeId)
-    : ActionWithResponse(conn, broker, nodeId)
+                                       uint16_t     moduleAddr,
+                                       uint8_t      registerId)
+    : ActionWithResponse(msgep, broker, moduleAddr)
+    , registerId(registerId)
 {
 }
 
 //----------------------------------------------------------------------------
-bool ActionQueryModules::waitForResponse()
+void ActionReadRegister::setRegisterId(uint8_t registerId)
 {
-    bool one_message_received = false, rc;
-
-
-    do {
-        this->messageReceived = false;
-        rc = ActionWithResponse::waitForResponse();
-        if (rc) {
-            one_message_received = true;
-        }
-    } while (rc);
-
-    return one_message_received;
+    this->registerId = registerId;
 }
 
 //----------------------------------------------------------------------------
-std::vector<ActionQueryModules::Module> ActionQueryModules::getModules()
+uint8_t ActionReadRegister::getRegisterId()
 {
-    return modules;
+    return this->registerId;
 }
 
 //----------------------------------------------------------------------------
-bool ActionQueryModules::formMessage()
+bool ActionReadRegister::formMessage()
 {
+    if (moduleAddr == 0) {
+        return false;
+    }
     messageToSend.receiver = moduleAddr;
     messageToSend.sender = connection.getOwnNodeId();
     messageToSend.length = 2;
-    messageToSend.data[0] = eCMD_REQUEST_INFO_OF_TYPE;
-    messageToSend.data[1] = eINFO_VERSION;
-    modules.clear();
+    messageToSend.data[0] = eCMD_REQUEST_REG;
+    messageToSend.data[1] = registerId;
     return true;
 }
 
 //----------------------------------------------------------------------------
-bool ActionQueryModules::filterResponse(const msg_t &message)
+bool ActionReadRegister::filterResponse(const msg_t &message)
 {
-    if (message.length >= (MOD_VERSIONINFO_LEN + 1) &&
-        message.data[0] == eCMD_STATE_VERSION) {
+    if (message.sender == moduleAddr &&
+        message.length >= 3 &&
+        (message.data[0] == eCMD_STATE_TYPELESS ||
+         message.data[0] == eCMD_STATE_BITFIELDS ||
+         message.data[0] == eCMD_STATE_8BIT ||
+         message.data[0] == eCMD_STATE_16BIT ||
+         message.data[0] == eCMD_STATE_32BIT ||
+         message.data[0] == eCMD_STATE_DATE_TIME) &&
+        message.data[1] == registerId) {
         return true;
     }
     return false;
 }
 
 //----------------------------------------------------------------------------
-void ActionQueryModules::handleResponse(const msg_t &message, void *reference)
+void ActionReadRegister::handleResponse(const msg_t &message, void *reference)
 {
-    Module new_module;
-
-    new_module.nodeId = message.sender;
-    new_module.version.controller_id[0] = message.data[1];
-    new_module.version.controller_id[1] = message.data[2];
-    new_module.version.controller_id[2] = message.data[3];
-    new_module.version.controller_id[3] = message.data[4];
-    new_module.version.board_id = (message.data[5] << 8) | message.data[6];
-    new_module.version.board_rev = message.data[7];
-    new_module.version.app_id = (message.data[8] << 8) | message.data[9];
-    new_module.version.version[0] = message.data[10];
-    new_module.version.version[1] = message.data[11];
-    new_module.version.version[2] = message.data[12];
-
-    modules.push_back(new_module);
-
+    receivedMessage = message;
     messageReceived = true;
+}
+
+//----------------------------------------------------------------------------
+int ActionReadRegister::getValue()
+{
+    int value = 0;
+
+    switch (receivedMessage.data[0]) {
+    case eCMD_STATE_8BIT:
+        value = receivedMessage.data[2];
+        break;
+    case eCMD_STATE_16BIT:
+        value = receivedMessage.data[2];
+        value <<= 8;
+        value |= receivedMessage.data[3];
+        break;
+    case eCMD_STATE_32BIT:
+        value = receivedMessage.data[2];
+        value <<= 8;
+        value |= receivedMessage.data[3];
+        value <<= 8;
+        value |= receivedMessage.data[4];
+        value <<= 8;
+        value |= receivedMessage.data[5];
+        break;
+    default:
+        break;
+    }
+    return value;
 }
 
 /** @} */

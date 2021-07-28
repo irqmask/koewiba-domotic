@@ -2,13 +2,13 @@
  * @addtogroup KWBCONFIGURATION
  *
  * @{
- * @file    ActionQueryModules.h
- * @brief   Action: Query version information of a bus module and wait for the answer.
+ * @file    ActionRequest.h
+ * @brief   Base-class of an action which sends a request / message to a bus-module.
  *
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
 /*
- * Copyright (C) 2019  christian <irqmask@web.de>
+ * Copyright (C) 2018  christian <irqmask@web.de>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,15 +27,12 @@
 
 // --- Include section ---------------------------------------------------------
 
-#include <vector>
-
 #include "prjconf.h"
 
 // include
 #include "prjtypes.h"
-#include "moddef_common.h"
 
-#include "ActionWithResponse.h"
+#include "action.h"
 
 // --- Definitions -------------------------------------------------------------
 
@@ -48,44 +45,48 @@
 // --- Class definition --------------------------------------------------------
 
 /**
- * Action to query one or multiple modules which are currently online.
+ * Action to send a request / command to a bus module. A response is not
+ * expected in this case.
  */
-class ActionQueryModules : public ActionWithResponse
+class ActionRequest : public Action
 {
 public:
-    //! Structure to store queried bus module information
-    struct Module {
-    public:
-        //! Module address
-        uint16_t nodeId;
-        //! Module type and version information of hard and software.
-        version_info_t version;
-    };
-
     /**
      * Constructor
      * @param[in]   conn        Reference to established connection to a
      *                          KWB bus os router
      * @param[in]   broker      Reference to message broker.
-     * @param[in]   moduleAddr  (optional, default = 0) Module address to communicate with.
+     * @param[in]   moduleAddr  (optional, default=0) Module address to communicate with.
      */
-    ActionQueryModules(Connection &conn, MsgBroker &broker, uint16_t moduleAddr = 0);
+    ActionRequest(Connection &conn, MsgBroker &broker, uint16_t moduleAddr = 0);
+
+    bool start() override;
+    virtual void cancel() override;
+    virtual bool isFinished() override;
 
     /**
-     * Get the result of the query.
-     * @return list of queried bus modules.
+     * Set the address of the module to communicate with.
+     * @param[in]   address     Module address.
      */
-    std::vector<Module> getModules();
+    void setModuleAddress(uint16_t address);
 
-    virtual bool waitForResponse() override;
+    /**
+     * Get the currently set address of the recepient bus module.
+     * @return module address
+     */
+    uint16_t getModuleAddress();
 
 protected:
-    virtual bool formMessage() override;
-    virtual bool filterResponse(const msg_t &message) override;
-    virtual void handleResponse(const msg_t &message, void *reference) override;
+    /**
+     * Form a message to be sent to the bus module.
+     * @returns true, if the messge was successfully formed, otherwise false.
+     */
+    virtual bool formMessage() = 0;
 
-    //! List of module information of modules which responed during this action.
-    std::vector<Module> modules;
+    //! Address of module to perform action with.
+    uint16_t moduleAddr;
+    //! Message to be sent during this action.
+    msg_t    messageToSend;
 };
 
 /** @} */

@@ -2,7 +2,7 @@
  * @addtogroup KWBCONFIGURATION
  *
  * @{
- * @file    ActionWriteRegister.cpp
+ * @file    ActionQueryModules.cpp
  * @brief   Action: Query a register of a bus module and wait for the answer.
  *
  * @author  Christian Verhalen
@@ -32,7 +32,11 @@
 #include "prjtypes.h"
 #include "cmddef_common.h"
 
-#include "ActionWriteRegister.h"
+// os/include
+#include "error_codes.h"
+#include "kwb_defines.h"
+
+#include "action_query_modules.h"
 
 // --- Definitions -------------------------------------------------------------
 
@@ -44,85 +48,78 @@
 
 // --- Class implementation  ---------------------------------------------------
 
-ActionWriteRegister::ActionWriteRegister(Connection   &conn,
-                                         MsgBroker    &broker,
-                                         uint16_t     moduleAddr,
-                                         uint8_t      registerId)
-    : ActionRequest(conn, broker, moduleAddr)
-    , registerId(registerId)
-    , registerFormat(eCMD_NAK)
-    , value(0)
+ActionQueryModules::ActionQueryModules(Connection   &conn,
+                                       MsgBroker    &broker,
+                                       uint16_t     nodeId)
+    : ActionWithResponse(conn, broker, nodeId)
 {
 }
 
 //----------------------------------------------------------------------------
-void ActionWriteRegister::setRegisterId(uint8_t registerId)
+bool ActionQueryModules::waitForResponse()
 {
-    this->registerId = registerId;
+    bool one_message_received = false, rc;
+
+
+    do {
+        this->messageReceived = false;
+        rc = ActionWithResponse::waitForResponse();
+        if (rc) {
+            one_message_received = true;
+        }
+    } while (rc);
+
+    return one_message_received;
 }
 
 //----------------------------------------------------------------------------
-uint8_t ActionWriteRegister::getRegisterId()
+std::vector<ActionQueryModules::Module> ActionQueryModules::getModules()
 {
-    return this->registerId;
+    return modules;
 }
 
 //----------------------------------------------------------------------------
-bool ActionWriteRegister::formMessage()
+bool ActionQueryModules::formMessage()
 {
-    if (moduleAddr == 0) {
-        return false;
-    }
     messageToSend.receiver = moduleAddr;
     messageToSend.sender = connection.getOwnNodeId();
-    messageToSend.data[0] = registerFormat;
-    messageToSend.data[1] = registerId;
-
-    switch (registerFormat) {
-    case eCMD_SET_REG_8BIT:
-        messageToSend.length = 3;
-        messageToSend.data[2] = (uint8_t)(value & 0x000000FF);
-        break;
-    case eCMD_SET_REG_16BIT:
-        messageToSend.length = 4;
-        messageToSend.data[2] = (uint8_t)((value & 0x0000FF00) >> 8);
-        messageToSend.data[3] = (uint8_t)(value & 0x000000FF);
-        break;
-    case eCMD_SET_REG_32BIT:
-        messageToSend.length = 6;
-        messageToSend.data[2] = (uint8_t)((value & 0xFF000000) >> 24);
-        messageToSend.data[3] = (uint8_t)((value & 0x00FF0000) >> 16);
-        messageToSend.data[4] = (uint8_t)((value & 0x0000FF00) >> 8);
-        messageToSend.data[5] = (uint8_t)(value & 0x000000FF);
-        break;
-    default:
-        return false;
-    }
+    messageToSend.length = 2;
+    messageToSend.data[0] = eCMD_REQUEST_INFO_OF_TYPE;
+    messageToSend.data[1] = eINFO_VERSION;
+    modules.clear();
     return true;
 }
 
 //----------------------------------------------------------------------------
-void ActionWriteRegister::setValue(int value)
+bool ActionQueryModules::filterResponse(const msg_t &message)
 {
-    this->value = value;
+    if (message.length >= (MOD_VERSIONINFO_LEN + 1) &&
+        message.data[0] == eCMD_STATE_VERSION) {
+        return true;
+    }
+    return false;
 }
 
 //----------------------------------------------------------------------------
-int ActionWriteRegister::getValue()
+void ActionQueryModules::handleResponse(const msg_t &message, void *reference)
 {
-    return value;
-}
+    Module new_module;
 
-//----------------------------------------------------------------------------
-void ActionWriteRegister::setRegisterFormat(cmd_common_t format)
-{
-    registerFormat = format;
-}
+    new_module.nodeId = message.sender;
+    new_module.version.controller_id[0] = message.data[1];
+    new_module.version.controller_id[1] = message.data[2];
+    new_module.version.controller_id[2] = message.data[3];
+    new_module.version.controller_id[3] = message.data[4];
+    new_module.version.board_id = (message.data[5] << 8) | message.data[6];
+    new_module.version.board_rev = message.data[7];
+    new_module.version.app_id = (message.data[8] << 8) | message.data[9];
+    new_module.version.version[0] = message.data[10];
+    new_module.version.version[1] = message.data[11];
+    new_module.version.version[2] = message.data[12];
 
-//----------------------------------------------------------------------------
-cmd_common_t ActionWriteRegister::getRegisterFormat()
-{
-    return registerFormat;
+    modules.push_back(new_module);
+
+    messageReceived = true;
 }
 
 /** @} */

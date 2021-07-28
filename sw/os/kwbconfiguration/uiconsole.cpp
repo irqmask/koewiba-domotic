@@ -26,7 +26,7 @@
 
 // --- Include section ---------------------------------------------------------
 
-#include "UIConsole.h"
+#include "uiconsole.h"
 
 #include <ctime>
 #include <iostream>
@@ -35,6 +35,8 @@
 // include
 #include "prjconf.h"
 #include "prjtypes.h"
+
+#include "kwbconfiguration_version.h"
 
 // --- Definitions -------------------------------------------------------------
 

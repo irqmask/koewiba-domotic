@@ -30,7 +30,7 @@
 
 #include "prjconf.h"
 
-#include "Action.h"
+#include "action.h"
 
 // --- Definitions -------------------------------------------------------------
 

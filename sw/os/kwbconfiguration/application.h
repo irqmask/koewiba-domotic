@@ -37,8 +37,8 @@
 
 // libkwb
 #include "connection.h"
-#include "ActionQueryModules.h"
-#include "MsgBroker.h"
+#include "action_query_modules.h"
+#include "msgbroker.h"
 
 // --- Definitions -------------------------------------------------------------
 

@@ -58,33 +58,33 @@ set (os_include_SRCS
 )
 
 set (kwbconfiguration_SRCS
-    Action.h
-    ActionRequest.h
-    ActionWithResponse.h
-    ActionQueryModules.h
-    ActionReadRegister.h
-    ActionWriteRegister.h
-    Application.h
+    action.h
+    action_request.h
+    action_with_response.h
+    action_query_modules.h
+    action_read_register.h
+    action_write_register.h
+    application.h
     kwbconfiguration_version.h
-    MsgBroker.h
-    UIConsole.h
-    UIMain.h
-    UIAllModules.h
-    UISingleModule.h
+    msgbroker.h
+    uiconsole.h
+    uimain.h
+    uiallmodules.h
+    uisinglemodule.h
 
-    Action.cpp
-    ActionRequest.cpp
-    ActionWithResponse.cpp
-    ActionQueryModules.cpp
-    ActionReadRegister.cpp
-    ActionWriteRegister.cpp
-    Application.cpp
+    action.cpp
+    action_request.cpp
+    action_with_response.cpp
+    action_query_modules.cpp
+    action_read_register.cpp
+    action_write_register.cpp
+    application.cpp
     kwbconfiguration_main.cpp
-    MsgBroker.cpp
-    UIConsole.cpp
-    UIMain.cpp
-    UIAllModules.cpp
-    UISingleModule.cpp
+    msgbroker.cpp
+    uiconsole.cpp
+    uimain.cpp
+    uiallmodules.cpp
+    uisinglemodule.cpp
 )
 
 # source groups

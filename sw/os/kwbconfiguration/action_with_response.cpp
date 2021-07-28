@@ -2,7 +2,7 @@
  * @addtogroup KWBCONFIGURATION
  *
  * @{
- * @file    ActionRequest.cpp
+ * @file    Action.cpp
  * @brief   Base-class of an action to be performed with a bus-module.
  *
  * @author  Christian Verhalen
@@ -32,7 +32,7 @@
 
 #include "prjconf.h"
 
-#include "ActionRequest.h"
+#include "action_with_response.h"
 
 // --- Definitions -------------------------------------------------------------
 
@@ -44,34 +44,48 @@
 
 // --- Class implementation  ---------------------------------------------------
 
-ActionRequest::ActionRequest(Connection   &conn,
-                             MsgBroker    &broker,
-                             uint16_t     moduleAddr)
-    : Action(conn, broker)
-    , moduleAddr(moduleAddr)
-    , messageToSend({0})
+ActionWithResponse::ActionWithResponse(Connection   &conn,
+                                       MsgBroker    &broker,
+                                       uint16_t     moduleAddr)
+    : ActionRequest(conn, broker, moduleAddr)
+    , receivedMessage({0})
+, messageReceived(false)
 {
+    using std::placeholders::_1;
+    using std::placeholders::_2;
+    msg_filter_t filterResponseFunc = std::bind(&ActionWithResponse::filterResponse, this, _1);
+    incom_func_t handleResponseFunc = std::bind(&ActionWithResponse::handleResponse, this, _1, _2);
+
+    msgBroker.registerForResponse(this, filterResponseFunc, handleResponseFunc);
 }
 
 //----------------------------------------------------------------------------
-bool ActionRequest::start()
+void ActionWithResponse::cancel()
 {
-    if (formMessage()) {
-        connection.send(messageToSend);
-        return true;
+    msgBroker.unregisterForResponse(this);
+}
+
+//----------------------------------------------------------------------------
+bool ActionWithResponse::isFinished()
+{
+    return timeoutOccurred || messageReceived;
+}
+
+//----------------------------------------------------------------------------
+bool ActionWithResponse::waitForResponse()
+{
+    auto start = std::chrono::high_resolution_clock::now();
+
+    while (!messageReceived) {
+        auto elapsed = std::chrono::high_resolution_clock::now() - start;
+        std::this_thread::yield(); // better wait for an event
+        if (elapsed > timeout) {
+            timeoutOccurred = true;
+            cancel();
+            break;
+        }
     }
-    return false;
-}
-
-//----------------------------------------------------------------------------
-void ActionRequest::cancel()
-{
-}
-
-//----------------------------------------------------------------------------
-bool ActionRequest::isFinished()
-{
-    return timeoutOccurred;
+    return messageReceived;
 }
 
 /** @} */

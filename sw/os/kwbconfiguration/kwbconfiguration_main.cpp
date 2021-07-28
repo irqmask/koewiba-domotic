@@ -69,10 +69,10 @@ extern "C" {
 #include "sysgetopt.h"
 #include "systime.h"
 
-#include "ActionReadRegister.h"
-#include "Application.h"
-#include "MsgBroker.h"
-#include "UIMain.h"
+#include "action_read_register.h"
+#include "application.h"
+#include "msgbroker.h"
+#include "uimain.h"
 
 // --- Definitions -------------------------------------------------------------
 

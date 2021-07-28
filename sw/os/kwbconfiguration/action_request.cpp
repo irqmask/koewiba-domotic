@@ -2,8 +2,8 @@
  * @addtogroup KWBCONFIGURATION
  *
  * @{
- * @file    MsgBroker.cpp
- * @brief   Broker which sorts incomming messages to running actions.
+ * @file    ActionRequest.cpp
+ * @brief   Base-class of an action to be performed with a bus-module.
  *
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
@@ -26,12 +26,13 @@
 
 // --- Include section ---------------------------------------------------------
 
+#include <chrono>
+#include <functional>
+#include <thread>
+
 #include "prjconf.h"
 
-// include
-#include "prjtypes.h"
-
-#include "MsgBroker.h"
+#include "action_request.h"
 
 // --- Definitions -------------------------------------------------------------
 
@@ -43,46 +44,34 @@
 
 // --- Class implementation  ---------------------------------------------------
 
-MsgBroker::MsgBroker()
+ActionRequest::ActionRequest(Connection   &conn,
+                             MsgBroker    &broker,
+                             uint16_t     moduleAddr)
+    : Action(conn, broker)
+    , moduleAddr(moduleAddr)
+    , messageToSend({0})
 {
-    this->response_handlers.clear();
 }
 
 //----------------------------------------------------------------------------
-void MsgBroker::registerForResponse(void *reference, msg_filter_t &filter_func, incom_func_t &handler_func)
+bool ActionRequest::start()
 {
-    msg_filter_data_t filter = { reference, filter_func, handler_func };
-    this->response_handlers.push_back(filter);
-}
-
-//----------------------------------------------------------------------------
-void MsgBroker::unregisterForResponse(void *reference)
-{
-    std::vector<msg_filter_data_t> &l = this->response_handlers;
-    std::vector<msg_filter_data_t>::iterator it = l.begin();
-    while (it != l.end()) {
-        if (it->reference == reference) {
-            it = l.erase(it);
-            if (it == l.end()) {
-                return;
-            }
-        }
-        else {
-            it++;
-        }
+    if (formMessage()) {
+        connection.send(messageToSend);
+        return true;
     }
+    return false;
 }
 
 //----------------------------------------------------------------------------
-void MsgBroker::handleIncomingMessage(const msg_t &message, void *reference)
+void ActionRequest::cancel()
 {
-    (reference);
-    for (auto receiver_data : this->response_handlers) {
-        if (receiver_data.msg_filter(message)) {
-            receiver_data.msg_handler(message, reference);
-            unregisterForResponse(receiver_data.reference);
-        }
-    }
+}
+
+//----------------------------------------------------------------------------
+bool ActionRequest::isFinished()
+{
+    return timeoutOccurred;
 }
 
 /** @} */

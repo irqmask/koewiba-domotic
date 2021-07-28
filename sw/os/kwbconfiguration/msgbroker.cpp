@@ -2,8 +2,8 @@
  * @addtogroup KWBCONFIGURATION
  *
  * @{
- * @file    Action.cpp
- * @brief   Base-class of an action to be performed with a bus-module.
+ * @file    MsgBroker.cpp
+ * @brief   Broker which sorts incomming messages to running actions.
  *
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
@@ -26,13 +26,12 @@
 
 // --- Include section ---------------------------------------------------------
 
-#include <chrono>
-#include <functional>
-#include <thread>
-
 #include "prjconf.h"
 
-#include "ActionWithResponse.h"
+// include
+#include "prjtypes.h"
+
+#include "msgbroker.h"
 
 // --- Definitions -------------------------------------------------------------
 
@@ -44,48 +43,46 @@
 
 // --- Class implementation  ---------------------------------------------------
 
-ActionWithResponse::ActionWithResponse(Connection   &conn,
-                                       MsgBroker    &broker,
-                                       uint16_t     moduleAddr)
-    : ActionRequest(conn, broker, moduleAddr)
-    , receivedMessage({0})
-, messageReceived(false)
+MsgBroker::MsgBroker()
 {
-    using std::placeholders::_1;
-    using std::placeholders::_2;
-    msg_filter_t filterResponseFunc = std::bind(&ActionWithResponse::filterResponse, this, _1);
-    incom_func_t handleResponseFunc = std::bind(&ActionWithResponse::handleResponse, this, _1, _2);
-
-    msgBroker.registerForResponse(this, filterResponseFunc, handleResponseFunc);
+    this->response_handlers.clear();
 }
 
 //----------------------------------------------------------------------------
-void ActionWithResponse::cancel()
+void MsgBroker::registerForResponse(void *reference, msg_filter_t &filter_func, incom_func_t &handler_func)
 {
-    msgBroker.unregisterForResponse(this);
+    msg_filter_data_t filter = { reference, filter_func, handler_func };
+    this->response_handlers.push_back(filter);
 }
 
 //----------------------------------------------------------------------------
-bool ActionWithResponse::isFinished()
+void MsgBroker::unregisterForResponse(void *reference)
 {
-    return timeoutOccurred || messageReceived;
-}
-
-//----------------------------------------------------------------------------
-bool ActionWithResponse::waitForResponse()
-{
-    auto start = std::chrono::high_resolution_clock::now();
-
-    while (!messageReceived) {
-        auto elapsed = std::chrono::high_resolution_clock::now() - start;
-        std::this_thread::yield(); // better wait for an event
-        if (elapsed > timeout) {
-            timeoutOccurred = true;
-            cancel();
-            break;
+    std::vector<msg_filter_data_t> &l = this->response_handlers;
+    std::vector<msg_filter_data_t>::iterator it = l.begin();
+    while (it != l.end()) {
+        if (it->reference == reference) {
+            it = l.erase(it);
+            if (it == l.end()) {
+                return;
+            }
+        }
+        else {
+            it++;
         }
     }
-    return messageReceived;
+}
+
+//----------------------------------------------------------------------------
+void MsgBroker::handleIncomingMessage(const msg_t &message, void *reference)
+{
+    (reference);
+    for (auto receiver_data : this->response_handlers) {
+        if (receiver_data.msg_filter(message)) {
+            receiver_data.msg_handler(message, reference);
+            unregisterForResponse(receiver_data.reference);
+        }
+    }
 }
 
 /** @} */

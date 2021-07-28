@@ -2,13 +2,13 @@
  * @addtogroup KWBCONFIGURATION
  *
  * @{
- * @file    ActionWriteRegister.h
- * @brief   Action: Write a register of a bus module.
+ * @file    ActionQueryModules.h
+ * @brief   Action: Query version information of a bus module and wait for the answer.
  *
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
 /*
- * Copyright (C) 2018  christian <irqmask@web.de>
+ * Copyright (C) 2019  christian <irqmask@web.de>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,13 +27,15 @@
 
 // --- Include section ---------------------------------------------------------
 
+#include <vector>
+
 #include "prjconf.h"
 
 // include
 #include "prjtypes.h"
-#include "cmddef_common.h"
+#include "moddef_common.h"
 
-#include "ActionRequest.h"
+#include "action_with_response.h"
 
 // --- Definitions -------------------------------------------------------------
 
@@ -46,66 +48,44 @@
 // --- Class definition --------------------------------------------------------
 
 /**
- * Action to write a regiter value to a bus module.
+ * Action to query one or multiple modules which are currently online.
  */
-class ActionWriteRegister : public ActionRequest
+class ActionQueryModules : public ActionWithResponse
 {
 public:
+    //! Structure to store queried bus module information
+    struct Module {
+    public:
+        //! Module address
+        uint16_t nodeId;
+        //! Module type and version information of hard and software.
+        version_info_t version;
+    };
+
     /**
      * Constructor
      * @param[in]   conn        Reference to established connection to a
      *                          KWB bus os router
      * @param[in]   broker      Reference to message broker.
      * @param[in]   moduleAddr  (optional, default = 0) Module address to communicate with.
-     * @param[in]   registerId  Id of register to write to.
      */
-    ActionWriteRegister(Connection &conn, MsgBroker &broker, uint16_t moduleAddr = 0, uint8_t registerId = 0);
+    ActionQueryModules(Connection &conn, MsgBroker &broker, uint16_t moduleAddr = 0);
 
     /**
-     * Set the id of the register to write to.
-     * @param[in]   registerId  Register id to write to.
+     * Get the result of the query.
+     * @return list of queried bus modules.
      */
-    void setRegisterId(uint8_t registerId);
+    std::vector<Module> getModules();
 
-    /**
-     * Get id of the reqister to write to.
-     * @return register id
-     */
-    uint8_t getRegisterId();
-
-    /**
-     * Set the value which shall be written to the register
-     * @param[in]   value       Value to be written.
-     */
-    void setValue(int value);
-
-    /**
-     * Get the value which shall be written to the register
-     * @return Value to be written.
-     */
-    int getValue();
-
-    /**
-     * Set the register format to select between 8, 16 and 32bit values.
-     * @param[in]   format      Register format being one of cmd_common_t.
-     */
-    void setRegisterFormat(cmd_common_t format);
-
-    /**
-     * Get the register format to write 8, 16 or 32bit values.
-     * @return register format beeing one of cmd_common_t.
-     */
-    cmd_common_t getRegisterFormat();
+    virtual bool waitForResponse() override;
 
 protected:
     virtual bool formMessage() override;
+    virtual bool filterResponse(const msg_t &message) override;
+    virtual void handleResponse(const msg_t &message, void *reference) override;
 
-    //! Id of register to write to.
-    uint8_t         registerId;
-    //! Format of the register to write.
-    cmd_common_t    registerFormat;
-    //! Value to write into the register.
-    int             value;
+    //! List of module information of modules which responed during this action.
+    std::vector<Module> modules;
 };
 
 /** @} */

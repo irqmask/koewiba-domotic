@@ -34,7 +34,7 @@
 // include
 #include "prjconf.h"
 #include "prjtypes.h"
-#include "Application.h"
+#include "application.h"
 
 // --- Definitions -------------------------------------------------------------
 

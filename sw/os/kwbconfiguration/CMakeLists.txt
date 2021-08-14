@@ -1,6 +1,8 @@
 # KWB Configuration
 cmake_minimum_required (VERSION 3.0)
 
+find_package(nlohmann_json REQUIRED)
+
 include_directories (
     ../../include
     ../../shared
@@ -113,6 +115,7 @@ set_property(TARGET kwbconfiguration PROPERTY CXX_STANDARD 14)
 # ---------------------------------------------------------
 target_link_libraries (kwbconfiguration libkwb)
 target_link_libraries (kwbconfiguration libsystem)
+target_link_libraries (kwbconfiguration nlohmann_json::nlohmann_json)
 if (WIN32)
 
 else (WIN32)

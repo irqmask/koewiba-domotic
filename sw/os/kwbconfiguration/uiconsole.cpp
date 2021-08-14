@@ -30,7 +30,10 @@
 
 #include <ctime>
 #include <iostream>
+#include <limits.h>
 #include <string>
+
+#include <nlohmann/json.hpp>
 
 // include
 #include "prjconf.h"

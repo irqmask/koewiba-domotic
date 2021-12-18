@@ -43,9 +43,9 @@
 // --- Definitions -------------------------------------------------------------
 
 #define APP_TEMP_INCR   50      //!< Temperature increment on keypress
-#define APP_INPUT_UP    0       //!< Input key "up"
+#define APP_INPUT_DOWN  0       //!< Input key "down"
 #define APP_INPUT_OK    1       //!< Input key "OK"
-#define APP_INPUT_DOWN  2       //!< Input key "down"
+#define APP_INPUT_UP    2       //!< Input key "up"
 
 // --- Type definitions --------------------------------------------------------
 

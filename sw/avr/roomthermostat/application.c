@@ -40,6 +40,8 @@
 #include "timer.h"
 #include "zagwire.h"
 
+#include "disp_sh1106.h"
+
 // --- Definitions -------------------------------------------------------------
 
 #define APP_TEMP_INCR   50      //!< Temperature increment on keypress
@@ -47,12 +49,16 @@
 #define APP_INPUT_OK    1       //!< Input key "OK"
 #define APP_INPUT_UP    2       //!< Input key "up"
 
+#define DISP_TIMEOUT_DIM 10     //!< timeout when display gets dimmed
+#define DISP_TIMEOUT_OFF 60     //!< timeout when display is switched off
+
 // --- Type definitions --------------------------------------------------------
 
 // --- Local variables ---------------------------------------------------------
 
 static timer_data_t g_seconds_timer;
 static uint16_t g_last_temperature;
+static uint8_t g_display_timeout;
 
 // --- Global variables --------------------------------------------------------
 
@@ -126,6 +132,25 @@ void draw_time(void)
     gdisp_put_char(c);
 }
 
+static void reset_display_timeout(void)
+{
+    if (g_display_timeout > DISP_TIMEOUT_DIM) {
+        sh1106_contrast(0xE0);
+        sh1106_display_on(1);
+    }
+    g_display_timeout = 0;
+}
+
+static void check_display_timeout(void)
+{
+    if (g_display_timeout < 255) g_display_timeout++;
+    if (g_display_timeout == DISP_TIMEOUT_DIM) {
+        sh1106_contrast(0);
+    }
+    else if (g_display_timeout == DISP_TIMEOUT_OFF) {
+        sh1106_display_on(0);
+    }
+}
 // --- Module global functions -------------------------------------------------
 
 // --- Global functions --------------------------------------------------------
@@ -151,6 +176,7 @@ void app_init (void)
 
     app_current_temp = 0;
     g_last_temperature = 0;
+    g_display_timeout = DISP_TIMEOUT_DIM - 1;
     app_desired_temp = 27315 + 2000;
     app_temp_offset = 0;
     timer_start(&g_seconds_timer, TIMER_MS_2_TICKS(1000));
@@ -185,6 +211,7 @@ void app_background (sBus_t* bus)
     input_background();
 
     if (input_on_activation(APP_INPUT_UP)) {
+        reset_display_timeout();
         if (app_desired_temp < 27315 + 4000 - APP_TEMP_INCR) {
             app_desired_temp += APP_TEMP_INCR;
             register_send_u16(bus, BUS_BRDCSTADR, APP_eReg_TempSetPoint, app_desired_temp);
@@ -193,6 +220,7 @@ void app_background (sBus_t* bus)
 
         }
     } else if (input_on_activation(APP_INPUT_DOWN)) {
+        reset_display_timeout();
         if (app_desired_temp > 27315 + APP_TEMP_INCR) {
             app_desired_temp -= APP_TEMP_INCR;
             register_send_u16(bus, BUS_BRDCSTADR, APP_eReg_TempSetPoint, app_desired_temp);
@@ -220,6 +248,8 @@ void app_background (sBus_t* bus)
         }
         gdisp_goto_col_line(30, 6);
         draw_time();
+
+        check_display_timeout();
     }
 }
 

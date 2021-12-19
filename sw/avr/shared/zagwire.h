@@ -96,10 +96,17 @@ void            zagw_initialize     (void);
 
 void            zagw_enable         (bool enable);
 
-bool            zagw_get_raw        (uint16_t* val);
+void            zagw_start_sampling (void);
+
+bool            zagw_sampling_done  (void);
+
+uint16_t        zagw_get_raw        (void);
 
 uint16_t        zagw_get_temperature(uint16_t raw);
 
+uint8_t         zagw_debug_get_bad_readings(void);
+
+void            zagw_debug_reset_bad_readings(void);
 
 #endif // _ZAGWIRE_H_
 /** @} */

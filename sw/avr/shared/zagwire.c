@@ -51,36 +51,45 @@
 // low-pulse width and fits it in tolerance windows to select if it is a
 // strobe-bit, a 0-bit or a 1-bit.
 
-#define PACKET_SIZE 2   ///< Number of bytes in a zagwire packet
-#define PW_1_MIN    19  ///< Minimum pulse width for a valid "one" pulse.
-#define PW_1_MAX    39  ///< Maximum pulse width for a valid "one" pulse.
-#define PW_STB_MIN  48  ///< Minimum pulse width for a valid "strobe" pulse.
-#define PW_STB_MAX  68  ///< Maximum pulse width for a valid "strobe" pulse.
-#define PW_0_MIN    76  ///< Minimum pulse width for a valid "zero" pulse.
-#define PW_0_MAX    96  ///< Maximum pulse width for a valid "zero" pulse.
+#define PW_1_MIN    18  ///< Minimum pulse width for a valid "one" pulse.
+#define PW_1_MAX    40  ///< Maximum pulse width for a valid "one" pulse.
+#define PW_STB_MIN  47  ///< Minimum pulse width for a valid "strobe" pulse.
+#define PW_STB_MAX  69  ///< Maximum pulse width for a valid "strobe" pulse.
+#define PW_0_MIN    75  ///< Minimum pulse width for a valid "zero" pulse.
+#define PW_0_MAX    97  ///< Maximum pulse width for a valid "zero" pulse.
+
+/// number of samples (two bytes, each having 1 strobe-bit + 8 data-bits + 1 parity-bit)
+#define ZAGWIRE_SAMPLE_LEN          ((1 + 8 + 1) * 2)
 
 // --- Type definitions --------------------------------------------------------
 
 // --- Local variables ---------------------------------------------------------
 
 static uint8_t g_irq_neg_edgeL;
-static uint8_t g_irq_neg_pulse;
-static uint8_t g_irq_pkt_idx; ///< packet index
-static uint8_t g_irq_bit;
-static uint8_t g_irq_byte[PACKET_SIZE];
-static uint8_t g_irq_parity;
-static uint8_t g_irq_parity_ok;
-
-static uint8_t g_data_read;
-static uint8_t g_datah;
-static uint8_t g_datal;
-static uint8_t g_parity_ok;
+static uint8_t g_samples_neg_pulsewidths[ZAGWIRE_SAMPLE_LEN];
+static uint8_t g_sample_idx;
+static uint8_t g_bad_readings;
 
 // --- Global variables --------------------------------------------------------
 
 // --- Module global variables -------------------------------------------------
 
 // --- Local functions ---------------------------------------------------------
+
+static bool isStrobe(uint8_t sample)
+{
+    return (sample >= PW_STB_MIN) && (sample <= PW_STB_MAX);
+}
+
+static bool isLow(uint8_t sample)
+{
+    return (sample >= PW_0_MIN) && (sample <= PW_0_MAX);
+}
+
+static bool isHigh(uint8_t sample)
+{
+    return (sample >= PW_1_MIN) && (sample <= PW_1_MAX);
+}
 
 // --- Interrupts --------------------------------------------------------------
 
@@ -89,14 +98,11 @@ static uint8_t g_parity_ok;
  */
 ISR(TIMER1_OVF_vect)
 {
-    if (g_irq_pkt_idx > PACKET_SIZE) {
-        // long time no see -> a new temperature transmission
-        g_irq_pkt_idx = 255;
-    }
+    TIMSK1 = 0;
 }
 
 /**
- * Pin capture interrupt occurrs either for falling or rising edges.
+ * Pin capture interrupt occurs either for falling or rising edges.
  */
 ISR(TIMER1_CAPT_vect)
 {
@@ -104,61 +110,16 @@ ISR(TIMER1_CAPT_vect)
         // falling edge detected
         g_irq_neg_edgeL = ICR1L;
         TCCR1B |= (1<<ICES1);
+        TIFR1 |= (1<<ICF1); // clear interrupt
     } else {
         // rising edge detected
-        g_irq_neg_pulse = ICR1L - g_irq_neg_edgeL;
+        g_samples_neg_pulsewidths[g_sample_idx++] = ICR1L - g_irq_neg_edgeL;
         TCCR1B &= ~(1<<ICES1);
-
-        if (g_irq_neg_pulse >= PW_STB_MIN && g_irq_neg_pulse <= PW_STB_MAX) {
-            // strobe-bit detected
-            g_irq_bit = 8;
-            g_irq_parity = 0;
-            if (g_irq_pkt_idx == 255) {
-                g_irq_pkt_idx++; // prepare to receive first byte
-                g_irq_parity_ok = 1;
-                g_irq_byte[0] = 0;
-                g_irq_byte[1] = 0;
-            }
-        }
-        if (g_irq_pkt_idx >= 0 && g_irq_pkt_idx < PACKET_SIZE) {
-            if (g_irq_neg_pulse >= PW_1_MIN && g_irq_neg_pulse <= PW_1_MAX) {
-                // 1-bit detected
-                if (g_irq_bit > 0) {
-                    g_irq_bit--;
-                    g_irq_byte[g_irq_pkt_idx] |= (1<<g_irq_bit);
-                    g_irq_parity++;
-                }
-                else {
-                    g_irq_pkt_idx++;
-                    // check if odd parity
-                    if ((g_irq_parity & 1) == 0) {
-                        g_irq_parity_ok = 0;
-                    }
-                }
-            }
-            else if (g_irq_neg_pulse >= PW_0_MIN && g_irq_neg_pulse <= PW_0_MAX) {
-                // 0-bit detected
-                if (g_irq_bit > 0) {
-                    g_irq_bit--;
-                }
-                else {
-                    g_irq_pkt_idx++;
-                    // check if even parity
-                    if ((g_irq_parity & 1) != 0) {
-                        g_irq_parity_ok = 0;
-                    }
-                }
-            }
-        }
-        else if (g_irq_pkt_idx == PACKET_SIZE) {
-            if (g_data_read != 0) {
-                g_datah = g_irq_byte[0];
-                g_datal = g_irq_byte[1];
-                g_parity_ok = g_irq_parity_ok;
-                g_data_read = 0;
-                g_irq_pkt_idx++; // only save bytes once
-            }
-        }
+        TIFR1 |= (1<<ICF1); // clear interrupt
+    }
+    if (g_sample_idx >= ZAGWIRE_SAMPLE_LEN) {
+        // disable overflow and capture interrupt
+        TIMSK1 = 0;
     }
 }
 
@@ -171,7 +132,7 @@ ISR(TIMER1_CAPT_vect)
  */
 void            zagw_initialize     (void)
 {
-    // set anable port pin as output and disable sensor
+    // set enable port pin as output and disable sensor
 #ifdef ZAGW_PORT_EN
     ZAGW_DDR_EN |= (1<<ZAGW_EN);
     ZAGW_PORT_EN &= ~(1<<ZAGW_EN);
@@ -181,16 +142,15 @@ void            zagw_initialize     (void)
     ZAGW_PORT_DATA &= ~(1<<ZAGW_DATA);
 
     // normal port operation: COM1A0 = COM1A1 = COM1B0 = COM1B2 = 0
-    // normal waveform generator operation: WGM13...WGM10 = 0
+    // no waveform generator operation: WGM13...WGM10 = 0
     TCCR1A = 0;
     // set clock prescaler to 8: CS12 = 0, CS11 = 1, CS10 = 0
     // Input noise canceler ICNC1 = 1, Start capturing the falling edge ICES1 = 0
     TCCR1B = (1<<ICNC1) | (1<<CS11);
-    // activate input capture interrupt
-    TIMSK1 = (1<<ICIE1) | (1<<TOV1);
 
-    g_data_read = 1;
-    g_parity_ok = 0;
+    TIMSK1 = 0;
+    g_sample_idx = 0;
+    g_bad_readings = 0;
 }
 
 /**
@@ -211,20 +171,133 @@ void zagw_enable(bool enable)
 }
 
 /**
- * Return last received raw bitvalue of temperature sensor.
- *
- * @param[out]  val     Raw temperature value.
- *
- * @returns A valid temperature was received, otherwise false.
+ * Start sampling of temperature. Sampling stops automatically when done.
  */
-bool zagw_get_raw(uint16_t *val)
+void zagw_start_sampling(void)
 {
-    if (g_data_read == 1) return false;
-    g_data_read = 1;
-    if (g_parity_ok == 0 || (g_datah & 0xF0) != 0) return false;
-    *val = g_datah << 8;
-    *val |= g_datal;
-    return true;
+    if (TIMSK1 == 0) {
+        // the sampling may start in between a running transmission
+        // from the sensor.
+        // since the error rate is high anyway, this is an additional, neglectable error.
+
+        // helper code to check that signal is idle (high). When used, an improvement
+        // is not really measurable.
+        /*
+        uint8_t to;
+
+        do {
+            to = 175;
+            while ((ZAGW_PIN_DATA & (1<<ZAGW_DATA)) && to > 0)
+            {
+                to--;
+                _delay_us(1);
+            }
+        } while (to > 0);*/
+        TCNT1H = 0;
+        TCNT1L = 1;
+        // capture falling edge first
+        TCCR1B &= ~(1<<ICES1);
+        // clear interrupt flags
+        TIFR1 |= ((1<<ICF1) | (1<<TOV1));
+        // activate input capture and overflow interrupt
+        TIMSK1 = (1<<ICIE1) | (1<<TOV1);
+        g_sample_idx = 0;
+    }
+}
+
+/**
+ * Check if it is still sampling temparature
+ */
+bool zagw_sampling_done(void)
+{
+    return (TIMSK1 == 0);
+}
+
+/**
+ * check if sampling is finished and return last received raw bitvalue
+ * of temperature sensor.
+ *
+ * @returns Raw temperature value if successful, otherwise 0.
+ */
+uint16_t zagw_get_raw(void)
+{
+    uint16_t retval = 0;
+    uint8_t idx, parity, highbyte, lowbyte;
+    do {
+        if (TIMSK1 != 0) break;
+
+        if (g_sample_idx != ZAGWIRE_SAMPLE_LEN) break;
+
+        // check both strobe bits
+        if (!isStrobe(g_samples_neg_pulsewidths[0])) break;
+        if (!isStrobe(g_samples_neg_pulsewidths[10])) break;
+
+        parity = 0;
+        highbyte = 0;
+        for (idx = 0; idx < 8; idx++) {
+            uint8_t sample = g_samples_neg_pulsewidths[1 + idx];
+            if (isLow(sample)) {
+                continue;
+            }
+            else if (isHigh(sample)) {
+                highbyte |= (1<<(7-idx));
+                parity++;
+            }
+            else {
+                idx = 0; // indicate error
+                break;
+            }
+        }
+        if (idx != 8) break;
+
+        // check parity
+        uint8_t psample = g_samples_neg_pulsewidths[9];
+        if (isLow(psample)) {
+            if ((parity & 1) != 0) break;
+        }
+        else if (isHigh(psample)) {
+            if ((parity & 1) == 0) break;
+        }
+        else break;
+
+        // low byte
+        parity = 0;
+        lowbyte = 0;
+        for (idx = 0; idx < 8; idx++) {
+            uint8_t sample = g_samples_neg_pulsewidths[11 + idx];
+            if (isLow(sample)) {
+                continue;
+            }
+            else if (isHigh(sample)) {
+                lowbyte |= (1<<(7-idx));
+                parity++;
+            }
+            else {
+                idx = 0; // indicate error
+                break;
+            }
+        }
+        if (idx != 8) break;
+
+        // check parity
+        psample = g_samples_neg_pulsewidths[19];
+        if (isLow(psample)) {
+            if ((parity & 1) != 0) break;
+        }
+        else if (isHigh(psample)) {
+            if ((parity & 1) == 0) break;
+        }
+        else break;
+
+        retval = highbyte;
+        retval = retval << 8;
+        retval = retval | lowbyte;
+
+    } while (false);
+
+    if (retval == 0 && g_bad_readings < 255) g_bad_readings++;
+
+    return retval;
 }
 
 /**
@@ -248,6 +321,22 @@ uint16_t zagw_get_temperature(uint16_t raw)
 
     temp += (27315 - 5000);
     return (uint16_t)temp;
+}
+
+/**
+ * return accumulated number of bad readings
+ */
+uint8_t zagw_debug_get_bad_readings(void)
+{
+    return g_bad_readings;
+}
+
+/**
+ * Reset number of bad readings
+ */
+void zagw_debug_reset_bad_readings(void)
+{
+    g_bad_readings = 0;
 }
 
 /** @} */

@@ -52,6 +52,8 @@
 #define DISP_TIMEOUT_DIM 10     //!< timeout when display gets dimmed
 #define DISP_TIMEOUT_OFF 60     //!< timeout when display is switched off
 
+#define TEMP_GLITCH_LIMIT 500   //!< absolute glitch limit +/- in Kelvin
+
 // --- Type definitions --------------------------------------------------------
 
 // --- Local variables ---------------------------------------------------------
@@ -59,6 +61,7 @@
 static timer_data_t g_seconds_timer;
 static uint16_t g_last_temperature;
 static uint8_t g_display_timeout;
+static uint8_t g_temperature_glitches;
 
 // --- Global variables --------------------------------------------------------
 
@@ -68,6 +71,20 @@ uint16_t app_current_temp, app_desired_temp;
 int16_t app_temp_offset;
 
 // --- Local functions ---------------------------------------------------------
+
+void draw_value8(uint8_t v)
+{
+    char c;
+    gdisp_choose_font(gdisp_font1_x16);
+    c = v / 100;
+    v = v % 100;
+    gdisp_put_char(c + '0');
+    c = v / 10;
+    v = v % 10;
+    gdisp_put_char(c + '0');
+    c = v;
+    gdisp_put_char(c + '0');
+}
 
 void draw_temp (uint16_t temperature)
 {
@@ -176,6 +193,7 @@ void app_init (void)
 
     app_current_temp = 0;
     g_last_temperature = 0;
+    g_temperature_glitches = 0;
     g_display_timeout = DISP_TIMEOUT_DIM - 1;
     app_desired_temp = 27315 + 2000;
     app_temp_offset = 0;
@@ -183,6 +201,9 @@ void app_init (void)
 
     gdisp_goto_col_line(15, 0);
     gdisp_put_text("ROOMTHERMOSTAT");
+    gdisp_goto_col_line(0, 4);
+    draw_value8(g_temperature_glitches);
+    zagw_start_sampling();
 }
 
 /**
@@ -235,17 +256,32 @@ void app_background (sBus_t* bus)
         dt_tick_second();
 
         // read and display temperature
-        if (zagw_get_raw(&raw_temp) == true) {
-            gdisp_goto_col_line(65, 2);
+        if (zagw_sampling_done()) {
+            raw_temp = zagw_get_raw();
+            zagw_start_sampling();
+            if (raw_temp != 0) {
+                app_current_temp = zagw_get_temperature(raw_temp);
+                if (app_current_temp != g_last_temperature) {
+                    gdisp_goto_col_line(65, 2);
+                    draw_temp(app_current_temp);
+                    register_send_u16(bus, BUS_BRDCSTADR, APP_eReg_TempCurrent, app_current_temp);
 
-            app_current_temp = zagw_get_temperature(raw_temp);
-            if (app_current_temp != g_last_temperature) {
-                draw_temp(app_current_temp);
-                register_send_u16(bus, BUS_BRDCSTADR, APP_eReg_TempCurrent, app_current_temp);
-                g_last_temperature = app_current_temp;
+                    uint16_t diff;
+                    if (app_current_temp > g_last_temperature)
+                        diff = app_current_temp - g_last_temperature;
+                    else
+                        diff = g_last_temperature - app_current_temp;
+
+                    if (diff > TEMP_GLITCH_LIMIT) {
+                        g_temperature_glitches++;
+                        gdisp_goto_col_line(0, 4);
+                        draw_value8(g_temperature_glitches);
+                    }
+                    g_last_temperature = app_current_temp;
+                }
             }
-
         }
+
         gdisp_goto_col_line(30, 6);
         draw_time();
 

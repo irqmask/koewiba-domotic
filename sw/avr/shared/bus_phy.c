@@ -64,19 +64,24 @@ ISR(INTERRUPT_USART_RXC0)
     uint8_t     data, fe;
     sBusRec_t   *buffer = &g_UART0Phy->sRecvBuf;
 
-    fe = (REGISTER_UCSRA0 & (1<<REGBIT_FE));
+    // read framing error before data!
+    fe = REGISTER_UCSRA0 & (1<<REGBIT_FE);
+
     // read data to clear interrupt flag
     data = REGISTER_UDR0;
 
     // framing error ?
-    if(0 != fe) {
+    if (fe) {
         g_UART0Phy->uFlags |= e_uartrxerrflag;
+        REGISTER_UCSRA0 &= ~(1<<REGBIT_FE); // Reset FrameError-Flag
         return;
     }
-    if (buffer->uWritePos == (buffer->uReadPos-1+sizeof(buffer->auBuf)) % (sizeof(buffer->auBuf))) return;
+
+    if (buffer->uWritePos == (buffer->uReadPos-1+sizeof(buffer->auBuf)) % (sizeof(buffer->auBuf))) {
+        return;
+    }
     buffer->auBuf[buffer->uWritePos] = data;
     buffer->uWritePos = (buffer->uWritePos+1) % sizeof(buffer->auBuf);
-    if (fe) REGISTER_UCSRA0 &= ~(1<<REGBIT_FE); // Reset FrameError-Flag
     g_UART0Phy->uFlags |= e_uartrxflag;
 }
 
@@ -104,7 +109,6 @@ ISR(INTERRUPT_UART_TRANS0)
     bus_phy_activate_receiver(g_UART0Phy, true);
 #endif
     g_UART0Phy->uFlags &= ~e_uarttxflag;
-
 }
 
 #if defined (__AVR_ATtiny1634__) && defined (BUS_HUBMODE)

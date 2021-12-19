@@ -42,6 +42,8 @@
 
 #include "disp_sh1106.h"
 
+#include "application.h"
+
 // --- Definitions -------------------------------------------------------------
 
 #define APP_TEMP_INCR   50      //!< Temperature increment on keypress
@@ -170,6 +172,18 @@ static void check_display_timeout(void)
 }
 // --- Module global functions -------------------------------------------------
 
+void app_draw_desired_temp(void)
+{
+    gdisp_goto_col_line(0, 2);
+    draw_temp(app_desired_temp);
+}
+
+void app_draw_current_temp(void)
+{
+    gdisp_goto_col_line(65, 2);
+    draw_temp(app_current_temp);
+}
+
 // --- Global functions --------------------------------------------------------
 
 /**
@@ -191,18 +205,19 @@ void app_init (void)
     //TODO insert application specific initializations here!
     //register_set_u16(MOD_eReg_ModuleID, 0x00F);
 
-    app_current_temp = 0;
+    app_current_temp = 27315 + 1000;
     g_last_temperature = 0;
     g_temperature_glitches = 0;
-    g_display_timeout = DISP_TIMEOUT_DIM - 1;
     app_desired_temp = 27315 + 2000;
     app_temp_offset = 0;
     timer_start(&g_seconds_timer, TIMER_MS_2_TICKS(1000));
 
+    g_display_timeout = DISP_TIMEOUT_DIM - 1;
+
     gdisp_goto_col_line(15, 0);
     gdisp_put_text("ROOMTHERMOSTAT");
-    gdisp_goto_col_line(0, 4);
-    draw_value8(g_temperature_glitches);
+    app_draw_desired_temp();
+    app_draw_current_temp();
     zagw_start_sampling();
 }
 
@@ -236,9 +251,7 @@ void app_background (sBus_t* bus)
         if (app_desired_temp < 27315 + 4000 - APP_TEMP_INCR) {
             app_desired_temp += APP_TEMP_INCR;
             register_send_u16(bus, BUS_BRDCSTADR, APP_eReg_TempSetPoint, app_desired_temp);
-            gdisp_goto_col_line(0, 2);
-            draw_temp(app_desired_temp);
-
+            app_draw_desired_temp();
         }
     } else if (input_on_activation(APP_INPUT_DOWN)) {
         reset_display_timeout();
@@ -262,8 +275,7 @@ void app_background (sBus_t* bus)
             if (raw_temp != 0) {
                 app_current_temp = zagw_get_temperature(raw_temp);
                 if (app_current_temp != g_last_temperature) {
-                    gdisp_goto_col_line(65, 2);
-                    draw_temp(app_current_temp);
+                    app_draw_current_temp();
                     register_send_u16(bus, BUS_BRDCSTADR, APP_eReg_TempCurrent, app_current_temp);
 
                     uint16_t diff;

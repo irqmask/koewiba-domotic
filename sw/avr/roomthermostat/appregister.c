@@ -40,6 +40,7 @@
 #include "register.h"
 
 #include "appconfig.h"
+#include "application.h"
 
 // --- Definitions -------------------------------------------------------------
 
@@ -144,8 +145,7 @@ void        app_register_set        (uint8_t                reg_no,
 
      case APP_eReg_TempSetPoint:
          app_desired_temp = tempval16;
-         gdisp_goto_col_line(0, 2);
-         draw_temp(app_desired_temp);
+         app_draw_desired_temp();
          break;
 
      case APP_eReg_TempOffset:

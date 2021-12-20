@@ -48,6 +48,10 @@ extern const unsigned char app_versioninfo[];
 
 // --- Module global functions -------------------------------------------------
 
+void app_set_temperature_offset(int16_t offset);
+
+int16_t app_get_temperature_offset(void);
+
 void app_set_windowcontact_moduleid(uint16_t moduleid);
 
 uint16_t app_get_windowcontact_moduleid(void);
@@ -56,9 +60,25 @@ void app_set_windowcontact_reg(uint8_t reg);
 
 uint8_t app_get_windowcontact_reg(void);
 
+void app_set_mode(uint8_t mode);
+
+uint8_t app_get_mode(void);
+
+void app_set_windowopen_temperature(uint16_t temp);
+
+uint16_t app_get_windowopen_temperature(void);
+
+void app_set_vacation_temperature(uint16_t temp);
+
+uint16_t app_get_vacation_temperature(void);
+
 void app_draw_desired_temp(void);
 
 void app_draw_current_temp(void);
+
+void app_draw_window(void);
+
+void app_register_load(void);
 
 // --- Global functions --------------------------------------------------------
 

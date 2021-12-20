@@ -32,6 +32,7 @@
 // --- Include section ---------------------------------------------------------
 
 #include "prjtypes.h"
+#include "cmddef_common.h"
 #include "alarmclock.h"
 #include "datetime.h"
 #include "gdisplay.h"
@@ -60,15 +61,26 @@
 
 // --- Local variables ---------------------------------------------------------
 
+// volatile data
 static timer_data_t g_seconds_timer;
 static uint16_t     g_last_temperature;
 static uint8_t      g_display_timeout;
 static uint8_t      g_temperature_glitches;
+static uint16_t     g_old_desired_temp;
+static uint8_t      g_window_open;
 
+// register data
+static int16_t      g_temperature_offset;
 static uint16_t     g_windowcontact_moduleid;
 static uint8_t      g_windowcontact_reg;
+static uint16_t     g_window_open_temperature;
+static uint16_t     g_vacation_temperature;
+static uint8_t      g_mode;
+
 
 // --- Global variables --------------------------------------------------------
+
+extern sBus_t  g_bus;
 
 // --- Module global variables -------------------------------------------------
 
@@ -154,6 +166,18 @@ void draw_time(void)
     gdisp_put_char(c);
 }
 
+static void draw_window(uint8_t open)
+{
+    gdisp_choose_font(gdisp_symbols_x24);
+    if (open != 0) {
+        gdisp_put_char(34);
+    }
+    else {
+        gdisp_put_char(33);
+
+    }
+}
+
 static void reset_display_timeout(void)
 {
     if (g_display_timeout > DISP_TIMEOUT_DIM) {
@@ -173,7 +197,56 @@ static void check_display_timeout(void)
         sh1106_display_on(0);
     }
 }
+
+static void set_desired_temp(uint16_t desired_temp)
+{
+    app_desired_temp = desired_temp;
+    app_draw_desired_temp();
+    register_send_u16(&g_bus, BUS_BRDCSTADR, APP_eReg_TempSetPoint, app_desired_temp);
+}
+
+static void set_remote_window_state(uint8_t open)
+{
+    g_window_open = open;
+    if (open != 0) {
+        if (g_old_desired_temp == 0) {
+            g_old_desired_temp = app_desired_temp;
+        }
+        set_desired_temp(g_window_open_temperature);
+    }
+    else {
+        if (g_mode == eMODE_VACATION) {
+            set_desired_temp(g_vacation_temperature);
+        }
+        else if (g_old_desired_temp != 0) {
+            set_desired_temp(g_old_desired_temp);
+            g_old_desired_temp = 0;
+        }
+    }
+    app_draw_desired_temp();
+    app_draw_window();
+    reset_display_timeout();
+}
+
+static void on_cmd_state_8bit_received(uint16_t sender, uint8_t reg, uint8_t value)
+{
+    if (sender == g_windowcontact_moduleid &&
+        reg == g_windowcontact_reg) {
+        set_remote_window_state(value);
+    }
+}
+
 // --- Module global functions -------------------------------------------------
+
+void app_set_temperature_offset(int16_t offset)
+{
+    g_temperature_offset = offset;
+}
+
+int16_t app_get_temperature_offset(void)
+{
+    return g_temperature_offset;
+}
 
 void app_set_windowcontact_moduleid(uint16_t moduleid)
 {
@@ -195,6 +268,59 @@ uint8_t app_get_windowcontact_reg(void)
     return g_windowcontact_reg;
 }
 
+void app_set_mode(uint8_t mode)
+{
+    if (g_mode == mode) return;
+
+    g_mode = mode;
+    switch (g_mode) {
+    case eMODE_NORMAL:
+        if (g_window_open) {
+            return;
+        }
+        else if (g_old_desired_temp != 0) {
+            set_desired_temp(g_old_desired_temp);
+            g_old_desired_temp = 0;
+        }
+        break;
+
+    case eMODE_VACATION:
+        if (g_old_desired_temp == 0 && g_window_open == 0) {
+            g_old_desired_temp = app_desired_temp;
+        }
+        set_desired_temp(g_vacation_temperature);
+        break;
+
+    default:
+        break;
+    }
+}
+
+uint8_t app_get_mode(void)
+{
+    return g_mode;
+}
+
+void app_set_windowopen_temperature(uint16_t temp)
+{
+    g_window_open_temperature = temp;
+}
+
+uint16_t app_get_windowopen_temperature(void)
+{
+    return g_window_open_temperature;
+}
+
+void app_set_vacation_temperature(uint16_t temp)
+{
+    g_vacation_temperature = temp;
+}
+
+uint16_t app_get_vacation_temperature(void)
+{
+    return g_vacation_temperature;
+}
+
 void app_draw_desired_temp(void)
 {
     gdisp_goto_col_line(0, 2);
@@ -205,6 +331,12 @@ void app_draw_current_temp(void)
 {
     gdisp_goto_col_line(65, 2);
     draw_temp(app_current_temp);
+}
+
+void app_draw_window()
+{
+    gdisp_goto_col_line(45, 2);
+    draw_window(g_window_open);
 }
 
 // --- Global functions --------------------------------------------------------
@@ -228,19 +360,29 @@ void app_init (void)
     //TODO insert application specific initializations here!
     //register_set_u16(MOD_eReg_ModuleID, 0x00F);
 
-    app_current_temp = 27315 + 1000;
-    g_last_temperature = 0;
     g_temperature_glitches = 0;
-    app_desired_temp = 27315 + 2000;
-    app_temp_offset = 0;
-    timer_start(&g_seconds_timer, TIMER_MS_2_TICKS(1000));
-
     g_display_timeout = DISP_TIMEOUT_DIM - 1;
 
+    app_temp_offset = 0;
+
+    // initialize volatile registers
+    app_current_temp = 27315 + 1000;
+    app_desired_temp = 27315 + 2000;
+    g_last_temperature = 0;
+    g_old_desired_temp = 0;
+    g_window_open = 0;
+
+    // load application parameters
+    app_register_load();
+
+    timer_start(&g_seconds_timer, TIMER_MS_2_TICKS(1000));
+
+    // display first screen
     gdisp_goto_col_line(15, 0);
     gdisp_put_text("ROOMTHERMOSTAT");
     app_draw_desired_temp();
     app_draw_current_temp();
+    app_draw_window();
     zagw_start_sampling();
 }
 
@@ -252,6 +394,11 @@ void app_init (void)
 void app_on_command (uint16_t sender, uint8_t msglen, uint8_t* msg)
 {
     switch (msg[0]) {
+    case eCMD_STATE_8BIT:
+        if (msglen >= 3)
+            on_cmd_state_8bit_received(sender, msg[1], msg[2]);
+        break;
+
     //TODO insert application specific command interpreter here!
     default:
         break;
@@ -272,17 +419,12 @@ void app_background (sBus_t* bus)
     if (input_on_activation(APP_INPUT_UP)) {
         reset_display_timeout();
         if (app_desired_temp < 27315 + 4000 - APP_TEMP_INCR) {
-            app_desired_temp += APP_TEMP_INCR;
-            register_send_u16(bus, BUS_BRDCSTADR, APP_eReg_TempSetPoint, app_desired_temp);
-            app_draw_desired_temp();
+            set_desired_temp(app_desired_temp + APP_TEMP_INCR);
         }
     } else if (input_on_activation(APP_INPUT_DOWN)) {
         reset_display_timeout();
         if (app_desired_temp > 27315 + APP_TEMP_INCR) {
-            app_desired_temp -= APP_TEMP_INCR;
-            register_send_u16(bus, BUS_BRDCSTADR, APP_eReg_TempSetPoint, app_desired_temp);
-            gdisp_goto_col_line(0, 2);
-            draw_temp(app_desired_temp);
+            set_desired_temp(app_desired_temp - APP_TEMP_INCR);
         }
     }
 
@@ -309,8 +451,8 @@ void app_background (sBus_t* bus)
 
                     if (diff > TEMP_GLITCH_LIMIT) {
                         g_temperature_glitches++;
-                        gdisp_goto_col_line(0, 4);
-                        draw_value8(g_temperature_glitches);
+                        //gdisp_goto_col_line(0, 4);
+                        //draw_value8(g_temperature_glitches);
                     }
                     g_last_temperature = app_current_temp;
                 }

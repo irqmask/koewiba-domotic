@@ -60,6 +60,24 @@ extern int16_t app_temp_offset;
 
 // --- Module global functions -------------------------------------------------
 
+void app_register_load(void)
+{
+    eeprom_write_word((uint16_t*)&register_eeprom_array[APP_eCfg_TempOffset], 0);
+    eeprom_write_word((uint16_t*)&register_eeprom_array[APP_eCfg_WindowSensorModuleID], 0x540);
+    eeprom_write_byte(&register_eeprom_array[APP_eCfg_WindowSensorReg], 0xC4);
+    eeprom_write_byte(&register_eeprom_array[APP_eCfg_Mode], eMODE_NORMAL);
+
+    eeprom_write_word((uint16_t*)&register_eeprom_array[APP_eCfg_TemperatureWindowOpen], 0x6DD3); // 8.0°C
+    eeprom_write_word((uint16_t*)&register_eeprom_array[APP_eCfg_TemperatureVacation], 0x71BB); // 18.0°C
+
+    app_set_temperature_offset(eeprom_read_word((uint16_t*)&register_eeprom_array[APP_eCfg_TempOffset]));
+    app_set_windowcontact_moduleid(eeprom_read_word((uint16_t*)&register_eeprom_array[APP_eCfg_WindowSensorModuleID]));
+    app_set_windowcontact_reg(eeprom_read_byte(&register_eeprom_array[APP_eCfg_WindowSensorReg]));
+    app_set_mode(eeprom_read_byte(&register_eeprom_array[APP_eCfg_Mode]));
+    app_set_windowopen_temperature(eeprom_read_word((uint16_t*)&register_eeprom_array[APP_eCfg_TemperatureWindowOpen]));
+    app_set_vacation_temperature(eeprom_read_word((uint16_t*)&register_eeprom_array[APP_eCfg_TemperatureVacation]));
+}
+
 bool        app_register_get        (uint8_t                reg_no,
                                      eRegType_t*            preg_type,
                                      void*                  pvalue)
@@ -161,16 +179,33 @@ void        app_register_set        (uint8_t                reg_no,
 
      case APP_eReg_TempOffset:
          app_temp_offset = tempval16;
+         eeprom_write_word((uint16_t*)&register_eeprom_array[APP_eCfg_TempOffset], tempval16);
          break;
 
      case APP_eReg_WindowSensorModuleID:
          app_set_windowcontact_moduleid(tempval16);
+         eeprom_write_word((uint16_t*)&register_eeprom_array[APP_eCfg_WindowSensorModuleID], tempval16);
          break;
 
      case APP_eReg_WindowSensorReg:
          app_set_windowcontact_reg(tempval8);
+         eeprom_write_byte((uint8_t*)&register_eeprom_array[APP_eCfg_WindowSensorReg], tempval8);
          break;
 
+     case APP_eReg_Mode:
+         app_set_mode(tempval8);
+         eeprom_write_byte((uint8_t*)&register_eeprom_array[APP_eCfg_Mode], tempval8);
+         break;
+
+     case APP_eReg_TemperatureWindowOpen:
+         app_set_windowopen_temperature(tempval16);
+         eeprom_write_word((uint16_t*)&register_eeprom_array[APP_eReg_TemperatureWindowOpen], tempval16);
+         break;
+
+     case APP_eReg_TemperatureVacation:
+         app_set_vacation_temperature(tempval16);
+         eeprom_write_word((uint16_t*)&register_eeprom_array[APP_eReg_TemperatureVacation], tempval16);
+         break;
 
      // registers in ROM/RAM
      case APP_eReg_Year:

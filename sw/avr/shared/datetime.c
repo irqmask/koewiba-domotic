@@ -87,7 +87,7 @@ static void dt_tick_day(void)
     if (g_dtdata.month > 0 && g_dtdata.month <= 12) {
         dpm = g_days_per_month[g_dtdata.month - 1];
     }
-    
+
     // leap year?
     if (g_dtdata.month == 2 && g_dtdata.year % 4 == 0) dpm++;
 
@@ -117,7 +117,7 @@ static void dt_tick_hour(void)
 #endif
 
 /**
- * Increase minute by one. 
+ * Increase minute by one.
  */
 static void dt_tick_minute(void)
 {
@@ -152,7 +152,7 @@ void dt_initialize(void)
 }
 
 /**
- * Set date and time and store it in clock data. If one parameter is out of 
+ * Set date and time and store it in clock data. If one parameter is out of
  * range, all clock data won't be updated.
  *
  * @param[in]   year    Year to set. All possible values are valid.
@@ -243,7 +243,7 @@ uint8_t dt_get_month()
 /**
  * Sets the current month.
  * @param[in]   month     Month to set.
- * 
+ *
  * @note Number of days per month is not checked here!
  */
 void dt_set_month(uint8_t month)
@@ -264,15 +264,14 @@ dt_day_of_week_t dt_get_day_of_week(void)
 /**
  * Sets the current day of week.
  * @param[in]   dow     Day of week.
- * 
- * @note Appropriate weekday at year/month/day is not checked here! E.g. you could 
+ *
+ * @note Appropriate weekday at year/month/day is not checked here! E.g. you could
  * set the 2002-04-30 to DT_FRIDAY, but is was indeed a DT_TUESDAY.
  */
 void dt_set_day_of_week(dt_day_of_week_t dow)
 {
-    if (dow >= DT_SUNDAY && dow <= DT_SATURDAY) {
-        g_dtdata.dow = dow;
-    }
+    while (dow > DT_SATURDAY) dow -= 7; // sunday is 0, saturday is 6
+    g_dtdata.dow = dow;
 }
 
 /**
@@ -353,7 +352,7 @@ void dt_set_second(uint8_t second)
 
 /**
  * Increase second by one. This function is mostly called by a timer.
- * @note If an alarm clock is implemented, the alarm functions will 
+ * @note If an alarm clock is implemented, the alarm functions will
  * be called in contexrt of this function!
  */
 void dt_tick_second(void)

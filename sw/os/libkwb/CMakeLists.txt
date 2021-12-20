@@ -44,8 +44,6 @@ set (libkwb_SRCS
     ioloop.h
     log.h
     message.h
-    message_serial.h
-    message_socket.h
     vos.h
 
     connection.cpp
@@ -55,8 +53,6 @@ set (libkwb_SRCS
     ioloop.c
     log.c
     message.c
-    message_serial.c
-    message_socket.c
     vos.c
 )
 

@@ -61,13 +61,20 @@ set (os_include_SRCS
     ../include/error_codes.h
 )
 
+set (shared_SRCS
+    ../../shared/crc16.h
+
+    ../../shared/crc16.c
+)
+
+
 set (kwbmqttgateway_SRCS
     kwbmqttgateway.h
 
-    kwbmqttgateway_main.c
-    msg2mqtt.c
-    mosquitto_ioloop_glue.c
-    mqtt2msg.c
+    kwbmqttgateway_main.cpp
+    msg2mqtt.cpp
+    mosquitto_ioloop_glue.cpp
+    mqtt2msg.cpp
 )
 
 # source groups

@@ -63,7 +63,6 @@ extern "C" {
 #include "exceptions.h"
 #include "ioloop.h"
 #include "log.h"
-#include "message_serial.h"
 
 // os/libsystem
 #include "sysgetopt.h"

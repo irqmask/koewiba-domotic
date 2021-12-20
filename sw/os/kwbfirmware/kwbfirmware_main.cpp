@@ -2,7 +2,7 @@
  * @addtogroup KWBFIRMWARE
  *
  * @{
- * @file    kwbfirmware_main.c
+ * @file    kwbfirmware_main.cpp
  * @brief   Update firmware of a module.
  *
  * @author  Christian Verhalen
@@ -28,6 +28,9 @@
 
 #include "prjconf.h"
 
+#include <memory>
+#include <sstream>
+
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -36,8 +39,10 @@
 #if defined (PRJCONF_UNIX) || \
     defined (PRJCONF_POSIX) || \
     defined (PRJCONF_LINUX)
-    #include <safe_lib.h>
-    #include <unistd.h>
+extern "C" {
+#include <safe_lib.h>
+}
+#include <unistd.h>
 #endif
 
 // include
@@ -47,10 +52,12 @@
 #include "error_codes.h"
 #include "kwb_defines.h"
 
-// os/shared
+// os/libkwb
+#include "connection_serial.h"
+#include "connection_socket.h"
+#include "exceptions.h"
 #include "ioloop.h"
 #include "log.h"
-#include "message_serial.h"
 
 // os/libsystem
 #include "sysgetopt.h"
@@ -190,18 +197,15 @@ static bool parse_commandline_options(int argc, char *argv[], options_t *options
  */
 static bool validate_options(options_t *options)
 {
-    bool    rc = false,
-            serial_device_set = false,
-            vbusd_address_set = false;
+    bool    rc = false;
 
     do {
-        // minimum address is "/a": unix socket with name "a" in the root directory
-        if (strnlen(options->router_address, sizeof(options->router_address)) < 2) {
-            log_error("Missing router address!\n");
+        if (!options->router_address_set && !options->serial_device_set) {
+            log_error("At least an address to router or serial device must be given!\n");
             break;
         }
-        if (!options->serial_device_set || strnlen(options->serial_device, sizeof(options->serial_device)) < 2) {
-            log_error("Invalid or missing serial connection device!\n");
+        if (options->router_address_set && options->serial_device_set) {
+            log_error("Not both settings of router and serial device are possible at the same time!\n");
             break;
         }
         if (strnlen(options->filename, sizeof(options->filename)) < 2) {
@@ -264,7 +268,6 @@ int main(int argc, char *argv[])
     options_t           options;
     bool                end_application = false;
     ioloop_t            mainloop;
-    firmwareupdate_t    firmware;
 
     do {
         log_set_mask(0xFFFFFFFF & ~LOG_VERBOSE2);
@@ -288,41 +291,60 @@ int main(int argc, char *argv[])
         ioloop_init(&mainloop);
         ioloop_set_default_timeout(&mainloop, 1);
 
-        rc = firmware_update_init(&firmware, &mainloop, options.serial_device, options.serial_baudrate);
-        if (rc != eERR_NONE) {
+        std::shared_ptr<Connection> conn;
+
+        // setup connections
+        try {
+            if (options.serial_device_set) {
+                auto conn_serial = std::make_shared<ConnectionSerial>(&mainloop, options.serial_device);
+                log_msg(LOG_STATUS, "Connected to serial interface %s with baudrate %d", conn_serial->getName().c_str(),
+                        conn_serial->getBaudrate());
+                conn = conn_serial;
+            }
+            else if (options.router_address_set) {
+                std::stringstream uriss;
+                uriss << options.router_address << ":" << options.router_port;
+                auto conn_socket = std::make_shared<ConnectionSocket>(&mainloop, uriss.str());
+                log_msg(LOG_STATUS, "Connected to router over socket interface %s", conn_socket->getName().c_str());
+                conn = conn_socket;
+            }
+        }
+        catch (Exception &e) {
+            log_error("Unable to connect! Exception %s\n", e.what());
             break;
         }
 
-        firmware_register_progress_func(&firmware, print_progress, NULL);
+        FirmwareUpdate fwu(conn);
 
-        rc = firmware_update_start(&firmware, options.filename, options.node_address);
+        fwu.registerProgressFunc(print_progress, NULL);
+
+        rc = fwu.start(options.filename, options.node_address);
         if (rc != eERR_NONE) {
             break;
         }
 
         while (!end_application) {
             ioloop_run_once(&mainloop);
-            rc = firmware_update_run(&firmware);
+            rc = fwu.run();
             if (rc != eRUNNING) {
                 if (rc == eMSG_ERR_BUSY) {
                     sys_sleep_ms(100);
                 }
                 else if (rc == eERR_NONE) {
-                    log_msg(LOG_STATUS, "FIRMWARE UPDATE SUCCESSFULL!");
-                    log_msg(LOG_STATUS, "Bootloader flags %02X", firmware.bldflags);
+                    log_msg(LOG_STATUS, "FIRMWARE UPDATE SUCCESSFUL!");
+                    log_msg(LOG_STATUS, "Bootloader flags %02X", fwu.getBldFlags());
                     end_application = true;
                 }
                 else {
                     log_msg(LOG_STATUS, "FIRMWARE UPDATE FAILED!");
                     log_msg(LOG_STATUS, "CRC expected %04X CRC calculated %04X",
-                            firmware.node_crc_calculated, firmware.node_crc_expected);
-                    log_msg(LOG_STATUS, "Bootloader flags %02X", firmware.bldflags);
+                            fwu.getNodeCrcCalculated(), fwu.getNodeCrcExpected());
+                    log_msg(LOG_STATUS, "Bootloader flags %02X", fwu.getBldFlags());
 
                     end_application = true;
                 }
             }
         }
-        firmware_update_close(&firmware);
     } while (0);
     return rc;
 }

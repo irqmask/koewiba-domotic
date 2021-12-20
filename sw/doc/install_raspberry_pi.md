@@ -166,10 +166,16 @@ See [build_os_software.md]
 ## Install the built kwbrouter + kwbmqttgateway deamons as services
 
 
-Copy the systemd init scripts (../sw/os/tools/)
-    - kwbrouter.service.server_template
+Rename the systemd init script (../sw/os/tools/) 
+    'kwbrouter.service.server_template' > 'kwbrouter.service'
+    or
+    'kwbrouter.service.client_template' > 'kwbrouter.service'
+and make approriate changes (e.g. server-address, serial device, node-id)
+then copy
+    - kwbrouter.service
     - kwbmqttgateway.service
 into `/etc/systemd/system`
+
 
 Then the services need to be activated:
 

@@ -21,7 +21,7 @@ SRC = ../shared/bus_transport.c \
       shared/gdisplay.c \
       shared/gdisplay_font_x8.c \
       shared/gdisplay_font_x16.c \
-      shared/gdisplay_font_x24.c \
+      shared/gdisplay_symbols_x24.c \
       shared/led_debug.c \
       shared/main_avr.c \
       shared/register.c \

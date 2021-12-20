@@ -285,10 +285,12 @@ void app_set_mode(uint8_t mode)
         break;
 
     case eMODE_VACATION:
-        if (g_old_desired_temp == 0 && g_window_open == 0) {
-            g_old_desired_temp = app_desired_temp;
+        if (g_window_open == 0) {
+            if (g_old_desired_temp == 0) {
+                g_old_desired_temp = app_desired_temp;
+                set_desired_temp(g_vacation_temperature);
+            }
         }
-        set_desired_temp(g_vacation_temperature);
         break;
 
     default:

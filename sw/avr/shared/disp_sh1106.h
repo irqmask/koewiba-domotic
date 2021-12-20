@@ -17,8 +17,6 @@
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
 /*
- * Copyright (C) 2019  christian <irqmask@web.de>
- *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -57,19 +55,26 @@
  */
 #ifndef DISP_SH1106_PCBCONFIG
  #define DISP_SH1106_PCBCONFIG  1
+ //! Defines the DDR of a port which contains the reset signal of the
+ //! display.
+ #define DISP_DDR_RES   DDRD
  //! Defines the DDR of a port which contains the slave select signal of the 
  //! display.
- #define DISP_DDR_SS    DDRB
+ #define DISP_DDR_SS    DDRD
  //! Defines the DDR which contains the A0 signal of the display.
- #define DISP_DDR_A0    DDRB
+ #define DISP_DDR_A0    DDRD
+ //! Defines the PORT which contains the reset signal of the display.
+ #define DISP_PORT_RES  PORTD
  //! Defines the PORT which contains the slave select signal of the display.
- #define DISP_PORT_SS   PORTB
+ #define DISP_PORT_SS   PORTD
  //! Defines the PORT which contains the A0 signal of the display.
- #define DISP_PORT_A0   PORTB
+ #define DISP_PORT_A0   PORTD
+ //! Defines the RES pin.
+ #define DISP_RES       PD3
  //! Defines the SS pin.
- #define DISP_SS           PB0
+ #define DISP_SS        PD4
  //! Defines the A0 pin.
- #define DISP_A0           PB1
+ #define DISP_A0        PD5
 #endif // DISP_SH1106_PCBCONFIG
 /** @} */
 

@@ -155,8 +155,9 @@ static bool receive (sBus_t* psBus)
                 psBus->sRecvMsg.uReceiver |= (((uint16_t)u & 0x000F) << 8);
                 // hello, is it me you are looking for (or broadcast-message or router)?
                 if (psBus->sCfg.router_mode ||
-                    psBus->sRecvMsg.uReceiver == BUS_BRDCSTADR ||
-                    psBus->sRecvMsg.uReceiver == psBus->sCfg.uOwnAddress) {
+                    (psBus->sRecvMsg.uReceiver == BUS_BRDCSTADR) ||
+                    (psBus->sRecvMsg.uReceiver == (psBus->sCfg.uOwnAddress & BUS_SEGBRDCSTMASK)) ||
+                    (psBus->sRecvMsg.uReceiver == psBus->sCfg.uOwnAddress)) {
                     // nothing more to do here.
                 } else {
                     // we are not interested in this message
@@ -435,8 +436,11 @@ bool bus_trp_send_sleepcmd (sBus_t* psBus)
     msg[0] = BUS_SYNCBYTE;                      // SY - Syncronization byte: '�' = 0b10011010
     msg[1] = psBus->sCfg.uOwnNodeAddress;       // AS - Address sender on bus 7bit
     msg[2] = sizeof(msg) - 3;                   // LE - Length of message from AR to CRCL
-    msg[3] = 0x00;                              // AR - Address receiver 7bit (Bus-Broadcast)
-    msg[4] = psBus->sCfg.uOwnExtAddress << 4;   // EA - Extended address 4bit sender in higher nibble, 4bit receiver in lower nibble.
+    // AR - Address receiver 7bit (Bus-Segment-Broadcast)
+    msg[3] = ((psBus->sCfg.uOwnAddress & 0x00FF) & BUS_SEGBRDCSTMASK);
+    // EA - Extended address 4bit sender in higher nibble, 4bit receiver in lower nibble.
+    msg[4] = (psBus->sCfg.uOwnExtAddress & (BUS_SEGBRDCSTMASK >> 8)) |
+             (psBus->sCfg.uOwnExtAddress << 4);
     msg[5] = eCMD_SLEEP;                        // MD - Sleep-Command
     crc = crc_calc16(&msg[0], 6);
     msg[6] = crc >> 8;
@@ -708,19 +712,6 @@ bool bus_send_ack_message (sBus_t* psBus, uint16_t uReceiver)
     } while ( false );
     return false;
 }
-
-/**
- * Send a message.
- *
- * @param[in]   psBus      Handle of the bus.
- * @param[in]   len        (Netto) Length of the message.
- * @param[in]   recH/L     Receiver address (High/Low-Byte) of the message.
- * @param[in]   *msg       message pointer.
- *
- * @returns true, if the message has successfully been queued.
- * @note Use bus_is_idle() to check if message is successfully transmitted.
- */
-
 
 /**
  * Check if bus is in IDLE state.

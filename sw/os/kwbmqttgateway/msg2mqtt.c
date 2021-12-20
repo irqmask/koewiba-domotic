@@ -56,94 +56,64 @@
 
 // --- Global functions --------------------------------------------------------
 
-void msg2mqtt_regstate_8bit(msg_t* message, char* topic, size_t max_topic_len, char* msgtext, size_t max_msgtext_len)
+/**
+ * Convert kwb message into MQTT message: State a 8bit register value of the bus module.
+ *
+ * @param[in]   message         Message to convert
+ * @param[out]  topic           Created MQTT topic.
+ * @param[in]   max_topic_len   Maximum length of MQTT topic including terminating zero.
+ * @param[out]  msgtext         Created MQTT message text
+ * @param[in]   max_msgtext_len Maximum length of MQTT message text including terminating zero.
+ */
+void msg2mqtt_regstate_8bit(msg_t *message, char *topic, size_t max_topic_len, char *msgtext, size_t max_msgtext_len)
 {
-    snprintf(topic, max_topic_len-1, "kwb/%04X/%04X/state8bit/%02X",
+    snprintf(topic, max_topic_len - 1, "kwb/%04X/%04X/state8bit/%02X",
              message->sender, message->receiver, message->data[1]);
-    topic[max_topic_len-1] = '\0';
-    snprintf(msgtext, max_msgtext_len-1, "%d",
+    topic[max_topic_len - 1] = '\0';
+    snprintf(msgtext, max_msgtext_len - 1, "%d",
              message->data[2]);
-    msgtext[max_msgtext_len-1] = '\0';
-}
-
-void msg2mqtt_regstate_16bit(msg_t* message, char* topic, size_t max_topic_len, char* msgtext, size_t max_msgtext_len)
-{
-    uint16_t value;
-
-    snprintf(topic, max_topic_len-1, "kwb/%04X/%04X/state16bit/%02X",
-             message->sender, message->receiver, message->data[1]);
-    topic[max_topic_len-1] = '\0';
-    value = message->data[2];
-    value <<= 8;
-    value |= message->data[3];
-    snprintf(msgtext, max_msgtext_len-1, "%d", value);
-    msgtext[max_msgtext_len-1] = '\0';
-}
-
-void msg2mqtt_regstate_32bit(msg_t* message, char* topic, size_t max_topic_len, char* msgtext, size_t max_msgtext_len)
-{
-    uint32_t value;
-
-    snprintf(topic, max_topic_len-1, "kwb/%04X/%04X/state32bit/%02X",
-             message->sender, message->receiver, message->data[1]);
-    topic[max_topic_len-1] = '\0';
-    value = message->data[2];
-    value <<= 8;
-    value |= message->data[3];
-    value <<= 8;
-    value |= message->data[4];
-    value <<= 8;
-    value |= message->data[5];
-    snprintf(msgtext, max_msgtext_len-1, "%d", value);
-    msgtext[max_msgtext_len-1] = '\0';
-}
-
-void msg2mqtt_request_reg(msg_t* message, char* topic, size_t max_topic_len, char* msgtext, size_t max_msgtext_len)
-{
-    snprintf(topic, max_topic_len-1, "kwb/%04X/%04X/requestreg",
-             message->sender, message->receiver);
-    topic[max_topic_len-1] = '\0';
-    snprintf(msgtext, max_msgtext_len-1, "%02X",
-             message->data[1]);
-    msgtext[max_msgtext_len-1] = '\0';
+    msgtext[max_msgtext_len - 1] = '\0';
 }
 
 /**
- * Encode MQTT message "set register 8bit"
+ * Convert kwb message into MQTT message: State a 16bit register value of the bus module.
  *
- * @param[in]   message KWB set register 8bit message which is transformed into MWTT message.
+ * @param[in]   message         Message to convert
+ * @param[out]  topic           Created MQTT topic.
+ * @param[in]   max_topic_len   Maximum length of MQTT topic including terminating zero.
+ * @param[out]  msgtext         Created MQTT message text
+ * @param[in]   max_msgtext_len Maximum length of MQTT message text including terminating zero.
  */
-void msg2mqtt_set_reg_8bit(msg_t* message, char* topic, size_t max_topic_len, char* msgtext, size_t max_msgtext_len)
-{
-    snprintf(topic, max_topic_len-1, "kwb/%04X/%04X/setreg8bit/%02X",
-             message->sender, message->receiver, message->data[1]);
-    topic[max_topic_len-1] = '\0';
-    snprintf(msgtext, max_msgtext_len-1, "%d",
-             message->data[2]);
-    msgtext[max_msgtext_len-1] = '\0';
-}
-
-void msg2mqtt_set_reg_16bit(msg_t* message, char* topic, size_t max_topic_len, char* msgtext, size_t max_msgtext_len)
+void msg2mqtt_regstate_16bit(msg_t *message, char *topic, size_t max_topic_len, char *msgtext, size_t max_msgtext_len)
 {
     uint16_t value;
 
-    snprintf(topic, max_topic_len-1, "kwb/%04X/%04X/setreg16bit/%02X",
+    snprintf(topic, max_topic_len - 1, "kwb/%04X/%04X/state16bit/%02X",
              message->sender, message->receiver, message->data[1]);
-    topic[max_topic_len-1] = '\0';
+    topic[max_topic_len - 1] = '\0';
     value = message->data[2];
     value <<= 8;
     value |= message->data[3];
-    snprintf(msgtext, max_msgtext_len-1, "%d", value);
-    msgtext[max_msgtext_len-1] = '\0';
+    snprintf(msgtext, max_msgtext_len - 1, "%d", value);
+    msgtext[max_msgtext_len - 1] = '\0';
 }
 
-void msg2mqtt_set_reg_32bit(msg_t* message, char* topic, size_t max_topic_len, char* msgtext, size_t max_msgtext_len)
+/**
+ * Convert kwb message into MQTT message: Request a register value from the bus module.
+ *
+ * @param[in]   message         Message to convert
+ * @param[out]  topic           Created MQTT topic.
+ * @param[in]   max_topic_len   Maximum length of MQTT topic including terminating zero.
+ * @param[out]  msgtext         Created MQTT message text
+ * @param[in]   max_msgtext_len Maximum length of MQTT message text including terminating zero.
+ */
+void msg2mqtt_regstate_32bit(msg_t *message, char *topic, size_t max_topic_len, char *msgtext, size_t max_msgtext_len)
 {
     uint32_t value;
 
-    snprintf(topic, max_topic_len-1, "kwb/%04X/%04X/setreg32bit/%02X",
+    snprintf(topic, max_topic_len - 1, "kwb/%04X/%04X/state32bit/%02X",
              message->sender, message->receiver, message->data[1]);
-    topic[max_topic_len-1] = '\0';
+    topic[max_topic_len - 1] = '\0';
     value = message->data[2];
     value <<= 8;
     value |= message->data[3];
@@ -151,29 +121,149 @@ void msg2mqtt_set_reg_32bit(msg_t* message, char* topic, size_t max_topic_len, c
     value |= message->data[4];
     value <<= 8;
     value |= message->data[5];
-    snprintf(msgtext, max_msgtext_len-1, "%d", value);
-    msgtext[max_msgtext_len-1] = '\0';
+    snprintf(msgtext, max_msgtext_len - 1, "%d", value);
+    msgtext[max_msgtext_len - 1] = '\0';
 }
 
-void msg2mqtt_sleep(msg_t* message, char* topic, size_t max_topic_len, char* msgtext, size_t max_msgtext_len)
+/**
+ * Convert kwb message into MQTT message: Set a 8bit register of the bus module.
+ *
+ * @param[in]   message         Message to convert
+ * @param[out]  topic           Created MQTT topic.
+ * @param[in]   max_topic_len   Maximum length of MQTT topic including terminating zero.
+ * @param[out]  msgtext         Created MQTT message text
+ * @param[in]   max_msgtext_len Maximum length of MQTT message text including terminating zero.
+ */
+void msg2mqtt_request_reg(msg_t *message, char *topic, size_t max_topic_len, char *msgtext, size_t max_msgtext_len)
 {
-    snprintf(topic, max_topic_len-1, "kwb/%04X/%04X",
+    snprintf(topic, max_topic_len - 1, "kwb/%04X/%04X/requestreg",
              message->sender, message->receiver);
-    topic[max_topic_len-1] = '\0';
-    snprintf(msgtext, max_msgtext_len-1, "SLEEP");
-    msgtext[max_msgtext_len-1] = '\0';
+    topic[max_topic_len - 1] = '\0';
+    snprintf(msgtext, max_msgtext_len - 1, "%02X",
+             message->data[1]);
+    msgtext[max_msgtext_len - 1] = '\0';
 }
 
-void msg2mqtt_reset(msg_t* message, char* topic, size_t max_topic_len, char* msgtext, size_t max_msgtext_len)
+/**
+ * Convert kwb message into MQTT message: Set a 8bit register of the bus module.
+ *
+ * @param[in]   message         Message to convert
+ * @param[out]  topic           Created MQTT topic.
+ * @param[in]   max_topic_len   Maximum length of MQTT topic including terminating zero.
+ * @param[out]  msgtext         Created MQTT message text
+ * @param[in]   max_msgtext_len Maximum length of MQTT message text including terminating zero.
+ */
+void msg2mqtt_set_reg_8bit(msg_t *message, char *topic, size_t max_topic_len, char *msgtext, size_t max_msgtext_len)
 {
-    snprintf(topic, max_topic_len-1, "kwb/%04X/%04X",
-             message->sender, message->receiver);
-    topic[max_topic_len-1] = '\0';
-    snprintf(msgtext, max_msgtext_len-1, "RESET");
-    msgtext[max_msgtext_len-1] = '\0';
+    snprintf(topic, max_topic_len - 1, "kwb/%04X/%04X/setreg8bit/%02X",
+             message->sender, message->receiver, message->data[1]);
+    topic[max_topic_len - 1] = '\0';
+    snprintf(msgtext, max_msgtext_len - 1, "%d",
+             message->data[2]);
+    msgtext[max_msgtext_len - 1] = '\0';
 }
 
-int msg2mqtt(msg_t* message, char* topic, size_t max_topic_len, char* msgtext, size_t max_msgtext_len)
+/**
+ * Convert kwb message into MQTT message: Set a 16bit register of the bus module.
+ *
+ * @param[in]   message         Message to convert
+ * @param[out]  topic           Created MQTT topic.
+ * @param[in]   max_topic_len   Maximum length of MQTT topic including terminating zero.
+ * @param[out]  msgtext         Created MQTT message text
+ * @param[in]   max_msgtext_len Maximum length of MQTT message text including terminating zero.
+ */
+void msg2mqtt_set_reg_16bit(msg_t *message, char *topic, size_t max_topic_len, char *msgtext, size_t max_msgtext_len)
+{
+    uint16_t value;
+
+    snprintf(topic, max_topic_len - 1, "kwb/%04X/%04X/setreg16bit/%02X",
+             message->sender, message->receiver, message->data[1]);
+    topic[max_topic_len - 1] = '\0';
+    value = message->data[2];
+    value <<= 8;
+    value |= message->data[3];
+    snprintf(msgtext, max_msgtext_len - 1, "%d", value);
+    msgtext[max_msgtext_len - 1] = '\0';
+}
+
+/**
+ * Convert kwb message into MQTT message: Set a 32bit register of the bus module.
+ *
+ * @param[in]   message         Message to convert
+ * @param[out]  topic           Created MQTT topic.
+ * @param[in]   max_topic_len   Maximum length of MQTT topic including terminating zero.
+ * @param[out]  msgtext         Created MQTT message text
+ * @param[in]   max_msgtext_len Maximum length of MQTT message text including terminating zero.
+ */
+void msg2mqtt_set_reg_32bit(msg_t *message, char *topic, size_t max_topic_len, char *msgtext, size_t max_msgtext_len)
+{
+    uint32_t value;
+
+    snprintf(topic, max_topic_len - 1, "kwb/%04X/%04X/setreg32bit/%02X",
+             message->sender, message->receiver, message->data[1]);
+    topic[max_topic_len - 1] = '\0';
+    value = message->data[2];
+    value <<= 8;
+    value |= message->data[3];
+    value <<= 8;
+    value |= message->data[4];
+    value <<= 8;
+    value |= message->data[5];
+    snprintf(msgtext, max_msgtext_len - 1, "%d", value);
+    msgtext[max_msgtext_len - 1] = '\0';
+}
+
+/**
+ * Convert kwb message into MQTT message: Activate sleep-mode of bus-module.
+ * It will wake up on internal events or new bus activity.
+ *
+ * @param[in]   message         Message to convert
+ * @param[out]  topic           Created MQTT topic.
+ * @param[in]   max_topic_len   Maximum length of MQTT topic including terminating zero.
+ * @param[out]  msgtext         Created MQTT message text
+ * @param[in]   max_msgtext_len Maximum length of MQTT message text including terminating zero.
+ */
+void msg2mqtt_sleep(msg_t *message, char *topic, size_t max_topic_len, char *msgtext, size_t max_msgtext_len)
+{
+    snprintf(topic, max_topic_len - 1, "kwb/%04X/%04X",
+             message->sender, message->receiver);
+    topic[max_topic_len - 1] = '\0';
+    snprintf(msgtext, max_msgtext_len - 1, "SLEEP");
+    msgtext[max_msgtext_len - 1] = '\0';
+}
+
+/**
+ * Convert kwb message into MQTT message: Reset the bus module.
+ *
+ * @param[in]   message         Message to convert
+ * @param[out]  topic           Created MQTT topic.
+ * @param[in]   max_topic_len   Maximum length of MQTT topic including terminating zero.
+ * @param[out]  msgtext         Created MQTT message text
+ * @param[in]   max_msgtext_len Maximum length of MQTT message text including terminating zero.
+ */
+void msg2mqtt_reset(msg_t *message, char *topic, size_t max_topic_len, char *msgtext, size_t max_msgtext_len)
+{
+    snprintf(topic, max_topic_len - 1, "kwb/%04X/%04X",
+             message->sender, message->receiver);
+    topic[max_topic_len - 1] = '\0';
+    snprintf(msgtext, max_msgtext_len - 1, "RESET");
+    msgtext[max_msgtext_len - 1] = '\0';
+}
+
+/**
+ * Convert a incoming kwb message into a mqtt message along with the topic.
+ *
+ * @param[in]   message         Message to convert
+ * @param[out]  topic           Created MQTT topic.
+ * @param[in]   max_topic_len   Maximum length of MQTT topic including
+ *                              terminating zero.
+ * @param[out]  msgtext         Created MQTT message text
+ * @param[in]   max_msgtext_len Maximum length of MQTT message text including
+ *                              terminating zero.
+ * @return eERR_NONE if the message was successfully converted to MQTT topic
+ *         and MQTT message, otherwise eERR_UNKNOWN.
+ */
+int msg2mqtt(msg_t *message, char *topic, size_t max_topic_len, char *msgtext, size_t max_msgtext_len)
 {
     int retval = eERR_NONE;
 
@@ -188,7 +278,7 @@ int msg2mqtt(msg_t* message, char* topic, size_t max_topic_len, char* msgtext, s
     case eCMD_BLOCK_RESET:
     case eCMD_ACK:
     case eCMD_NAK:
-        retval = eERR_UNSUPPORTED_MESSAGE;
+        retval = eERR_UNSUPPORTED;
         log_warning("msg2mqtt() Message %d not supported for MQTT", message->data[0]);
         break;
 
@@ -223,7 +313,7 @@ int msg2mqtt(msg_t* message, char* topic, size_t max_topic_len, char* msgtext, s
         break;
 
     default:
-        retval = eERR_UNKNOWN_MESSAGE;
+        retval = eERR_UNKNOWN;
         log_warning("msg2mqtt() Unkown message %d", message->data[0]);
         break;
     }

@@ -45,6 +45,16 @@
 #define MOD_LEN_APPVER          3
 #define MOD_VERSIONINFO_LEN     (MOD_LEN_CONTROLLERID + MOD_LEN_BOARDID + MOD_LEN_BOARDREV + MOD_LEN_APPID + MOD_LEN_APPVER)
 
+
+//! Type of a register
+typedef enum regtype {
+    eRegType_Unkown,        	//!< unknown register type
+    eRegType_U8,            	//!< 8bit register type
+    eRegType_U16,           	//!< 16bit register type
+    eRegType_U32,           	//!< 32bit register type
+    eRegType_Last
+} eRegType_t;
+
 //! Application's version items in #app_versioninfo
 //! @see BOARD_IDs, APP_IDs, APP_VERSIONING
 typedef enum {
@@ -75,7 +85,8 @@ typedef enum {
  * 0x0003 bus-module_attiny1634
  * 0x0004 gateway_usb
  * 0x0005 motor_switch_3pole
- * 0x000x (not available yet - room-thermostat)
+ * 0x0006 room-thermostat
+ * 0x0007 switch_3pole_5x
  * 0x000x (not available yet - heater-control)
  * 0x000x (not available yet - 8keys)
  * 0x000x (not available yet - io88)
@@ -98,6 +109,10 @@ typedef enum {
  * 0x0004 basic_app_atmega328(p)
  * 0x0005 basic_app_attiny1634
  * 0x0006 blind-control_atmega328(p)
+ * 0x0007 roomthermostat_atmega328(p)
+ * 0x0008 led2_atmega324(p)
+ * 0x0009 pushbutton8_atmega328(p)
+ * 0x000A switch5_atmega328(p)
  * ...
  * 0xEFFF (last common application)
  * 0xF000 (first user specific application)

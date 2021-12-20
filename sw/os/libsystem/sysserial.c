@@ -34,15 +34,15 @@
 #if defined (PRJCONF_UNIX) || \
     defined (PRJCONF_POSIX) || \
     defined (PRJCONF_LINUX)
-  #include <fcntl.h>
-  #include <safe_lib.h>
-  #include <sys/ioctl.h>
-  #include <sys/types.h>
-  #include <sys/stat.h>
-  #include <termios.h>
-  #include <unistd.h>
+    #include <fcntl.h>
+    #include <safe_lib.h>
+    #include <sys/ioctl.h>
+    #include <sys/types.h>
+    #include <sys/stat.h>
+    #include <termios.h>
+    #include <unistd.h>
 #elif defined (PRJCONF_WINDOWS)
-  #include <windows.h>
+    #include <windows.h>
 #endif
 
 #include "sysserial.h"
@@ -65,9 +65,9 @@ static const int c_baudrate[eSYS_SER_BR_LAST] = {
 #elif defined (PRJCONF_WINDOWS)
 static const int c_baudrate[eSYS_SER_BR_LAST] = {
     -1, -1, CBR_110, -1, -1, -1, CBR_300, CBR_600, CBR_1200, -1, CBR_2400, CBR_4800, CBR_9600,
-    CBR_14400, CBR_19200, -1, CBR_38400, -1, CBR_57600, CBR_115200, CBR_128000, -1, CBR_256000, -1, -1,
-    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1
-};
+        CBR_14400, CBR_19200, -1, CBR_38400, -1, CBR_57600, CBR_115200, CBR_128000, -1, CBR_256000, -1, -1,
+        -1, -1, -1, -1, -1, -1, -1, -1, -1, -1
+    };
 #endif
 
 static const int c_baudConsts2baudrate[eSYS_SER_BR_LAST] = {
@@ -139,9 +139,9 @@ static const int c_stopbits[eSYS_SER_SB_LAST] = {
 
 // --- Global functions --------------------------------------------------------
 
-sys_fd_t sys_serial_open (const char* device)
+sys_fd_t sys_serial_open(const char *device)
 {
-    sys_fd_t fd;
+    sys_fd_t fd = INVALID_FD;
 #if defined (PRJCONF_UNIX) || \
     defined (PRJCONF_POSIX) || \
     defined (PRJCONF_LINUX)
@@ -155,40 +155,26 @@ sys_fd_t sys_serial_open (const char* device)
         // without delay (check if other side is properly connected)
         fd = open(device, O_RDWR | O_NOCTTY | O_NDELAY);
         if (fd <= INVALID_FD) {
+            fd = INVALID_FD;
             perror("Unable to open serial device");
-            break;
-        }
-
-        if (tcgetattr(fd, &settings) < 0) {
-            perror("Unable to get device settings");
-            close(fd);
-            fd = INVALID_FD;
-            break;
-        }
-
-        settings.c_cc[VMIN]  = 1;     // block until n bytes are received
-        settings.c_cc[VTIME] = 0;     // no timeout
-        if (tcsetattr(fd, TCSANOW, &settings) < 0) {
-            perror("Unable to set device settings");
-            close(fd);
-            fd = INVALID_FD;
             break;
         }
     } while (0);
 #elif defined (PRJCONF_WINDOWS)
-        // exclusive access, default security attributes, non-overlapped IO
-        fd = CreateFile(device,
-                        GENERIC_READ | GENERIC_WRITE,
-                        0,
-                        0,
-                        OPEN_EXISTING,
-                        FILE_ATTRIBUTE_NORMAL,
-                        0);
+    // exclusive access, default security attributes, non-overlapped IO
+    fd = CreateFile(device,
+                    GENERIC_READ | GENERIC_WRITE,
+                    0,
+                    0,
+                    OPEN_EXISTING,
+                    FILE_ATTRIBUTE_NORMAL,
+                    0);
 #endif
     return fd;
 }
 
-void sys_serial_close (sys_fd_t fd)
+//----------------------------------------------------------------------------
+void sys_serial_close(sys_fd_t fd)
 {
 #if defined (PRJCONF_UNIX) || \
     defined (PRJCONF_POSIX) || \
@@ -199,12 +185,13 @@ void sys_serial_close (sys_fd_t fd)
 #endif
 }
 
-int sys_serial_set_params (sys_fd_t            fd,
-                           sys_ser_baudrate_t  baudrate,
-                           sys_ser_databits_t  databits,
-                           sys_ser_parity_t    parity,
-                           sys_ser_stopbits_t  stopbits,
-                           sys_ser_flowctrl_t  flowcontrol)
+//----------------------------------------------------------------------------
+int sys_serial_set_params(sys_fd_t            fd,
+                          sys_ser_baudrate_t  baudrate,
+                          sys_ser_databits_t  databits,
+                          sys_ser_parity_t    parity,
+                          sys_ser_stopbits_t  stopbits,
+                          sys_ser_flowctrl_t  flowcontrol)
 {
     int             rc = eSYS_ERR_NONE;
 #if defined (PRJCONF_UNIX) || \
@@ -223,9 +210,24 @@ int sys_serial_set_params (sys_fd_t            fd,
             parity >= eSYS_SER_P_LAST ||
             stopbits >= eSYS_SER_SB_LAST ||
             flowcontrol >= eSYS_SER_FC_LAST) {
-            eERR_BAD_PARAMETER;
+            rc = eERR_BAD_PARAMETER;
             break;
         }
+
+        if (tcgetattr(fd, &settings) < 0) {
+            perror("Unable to get device settings");
+            rc = eSYS_ERR_SER_CONFIGURE;
+            break;
+        }
+
+        settings.c_cc[VMIN]  = 1;     // block until n bytes are received
+        settings.c_cc[VTIME] = 0;     // no timeout
+        if (tcsetattr(fd, TCSANOW, &settings) < 0) {
+            perror("Unable to set device settings");
+            rc = eSYS_ERR_SER_CONFIGURE;
+            break;
+        }
+
         sys_baudrate = c_baudrate[baudrate];
         sys_databits = c_databits[databits];
         sys_parity = c_parity[parity];
@@ -241,8 +243,8 @@ int sys_serial_set_params (sys_fd_t            fd,
             break;
         }
 
-        if (sys_baudrate < 0 ||sys_databits < 0 || sys_parity < 0 || sys_stopbits < 0) {
-            eSYS_ERR_SER_UNSUPPORTED;
+        if (sys_baudrate < 0 || sys_databits < 0 || sys_parity < 0 || sys_stopbits < 0) {
+            rc = eSYS_ERR_SER_UNSUPPORTED;
             break;
         }
 
@@ -319,7 +321,8 @@ int sys_serial_set_params (sys_fd_t            fd,
     return rc;
 }
 
-size_t sys_serial_send (sys_fd_t fd, void* buf, size_t bufsize)
+//----------------------------------------------------------------------------
+ssize_t sys_serial_send(sys_fd_t fd, const void *buf, size_t bufsize)
 {
 #if defined (PRJCONF_UNIX) || \
     defined (PRJCONF_POSIX) || \
@@ -335,7 +338,8 @@ size_t sys_serial_send (sys_fd_t fd, void* buf, size_t bufsize)
 #endif
 }
 
-size_t sys_serial_recv (sys_fd_t fd, void* buf, size_t bufsize)
+//----------------------------------------------------------------------------
+ssize_t sys_serial_recv(sys_fd_t fd, void *buf, size_t bufsize)
 {
 #if defined (PRJCONF_UNIX) || \
     defined (PRJCONF_POSIX) || \
@@ -350,7 +354,8 @@ size_t sys_serial_recv (sys_fd_t fd, void* buf, size_t bufsize)
 #endif
 }
 
-void sys_serial_flush (sys_fd_t fd)
+//----------------------------------------------------------------------------
+void sys_serial_flush(sys_fd_t fd)
 {
 #if defined (PRJCONF_UNIX) || \
     defined (PRJCONF_POSIX) || \
@@ -361,7 +366,8 @@ void sys_serial_flush (sys_fd_t fd)
 #endif
 }
 
-size_t sys_serial_get_pending_sendq (sys_fd_t fd)
+//----------------------------------------------------------------------------
+size_t sys_serial_get_pending_sendq(sys_fd_t fd)
 {
     size_t pending_bytes = 0;
 
@@ -378,7 +384,8 @@ size_t sys_serial_get_pending_sendq (sys_fd_t fd)
     return pending_bytes;
 }
 
-size_t sys_serial_get_pending_recvq (sys_fd_t fd)
+//----------------------------------------------------------------------------
+size_t sys_serial_get_pending_recvq(sys_fd_t fd)
 {
     size_t pending_bytes = 0;
 
@@ -395,14 +402,16 @@ size_t sys_serial_get_pending_recvq (sys_fd_t fd)
     return pending_bytes;
 }
 
-void sys_serial_set_blocking (sys_fd_t fd, bool blocking)
+//----------------------------------------------------------------------------
+void sys_serial_set_blocking(sys_fd_t fd, bool blocking)
 {
 #if defined (PRJCONF_UNIX) || \
     defined (PRJCONF_POSIX) || \
     defined (PRJCONF_LINUX)
     if (blocking) {
         fcntl(fd, F_SETFL, 0);
-    } else {
+    }
+    else {
         fcntl(fd, F_SETFL, FNDELAY);
     }
 #elif defined (PRJCONF_WINDOWS)
@@ -410,12 +419,13 @@ void sys_serial_set_blocking (sys_fd_t fd, bool blocking)
 #endif
 }
 
-sys_ser_baudrate_t sys_serial_baudrate (int baudrate)
+//----------------------------------------------------------------------------
+sys_ser_baudrate_t sys_serial_baudrate(uint32_t baudrate)
 {
     sys_ser_baudrate_t br = -1;
     int ii;
 
-    for (ii=0; ii<eSYS_SER_BR_LAST; ii++) {
+    for (ii = 0; ii < eSYS_SER_BR_LAST; ii++) {
         if (baudrate == c_baudConsts2baudrate[ii]) {
             br = ii;
             break;

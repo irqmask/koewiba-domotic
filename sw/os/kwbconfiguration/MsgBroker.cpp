@@ -23,7 +23,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
- 
+
 // --- Include section ---------------------------------------------------------
 
 #include "prjconf.h"
@@ -48,34 +48,41 @@ MsgBroker::MsgBroker()
     this->response_handlers.clear();
 }
 
-void MsgBroker::registerForResponse(void* reference, msg_filter_t& filter_func, msg_handler_t& handler_func)
+//----------------------------------------------------------------------------
+void MsgBroker::registerForResponse(void *reference, msg_filter_t &filter_func, incom_func_t &handler_func)
 {
     msg_filter_data_t filter = { reference, filter_func, handler_func };
     this->response_handlers.push_back(filter);
 }
 
-void MsgBroker::unregisterForResponse(void* reference)
+//----------------------------------------------------------------------------
+void MsgBroker::unregisterForResponse(void *reference)
 {
-    std::vector<msg_filter_data_t>& l = this->response_handlers;
+    std::vector<msg_filter_data_t> &l = this->response_handlers;
     std::vector<msg_filter_data_t>::iterator it = l.begin();
     while (it != l.end()) {
         if (it->reference == reference) {
             it = l.erase(it);
-            if (it == l.end()) return;
-        } else {
+            if (it == l.end()) {
+                return;
+            }
+        }
+        else {
             it++;
         }
-    }   
+    }
 }
 
-void MsgBroker::handleIncommingMessage(msg_t& message)
+//----------------------------------------------------------------------------
+void MsgBroker::handleIncomingMessage(const msg_t &message, void *reference)
 {
-   for (auto receiver_data : this->response_handlers) {
-       if (receiver_data.msg_filter(message)) {
-           receiver_data.msg_handler(message);
-           unregisterForResponse(receiver_data.reference);
-       }
-   }
+    (reference);
+    for (auto receiver_data : this->response_handlers) {
+        if (receiver_data.msg_filter(message)) {
+            receiver_data.msg_handler(message, reference);
+            unregisterForResponse(receiver_data.reference);
+        }
+    }
 }
 
 /** @} */

@@ -3,7 +3,7 @@
  *
  * @{
  * @file    router.h
- * @brief   Router takes incomming message from a connection and routes it to 
+ * @brief   Router takes incomming message from a connection and routes it to
  *          all other connections.
  *
  * @author  Christian Verhalen
@@ -32,29 +32,72 @@
 #include <list>
 #include <stddef.h>
 
-#include "routeconnection.h"
+#include "connection.h"
 
 /**
- * The router takes incomming message from a connection and routes it to 
+ * The router takes incomming message from a connection and routes it to
  * all other connections.
- * The router is not thread-safe, it has to be used in a single threaded 
+ * The router is not thread-safe, it has to be used in a single threaded
  * loop.
- * The current design routes an incomming message from one connection to 
+ * The current design routes an incomming message from one connection to
  * all other connections.
  */
 class Router
 {
-private:
-    std::list<RouteConnection*> connections;
-
 public:
+    /**
+     * ctor
+     */
     Router();
+    /**
+     * Closes and deletes all remaining connections. (The closing happens
+     * in the connection's destructor.
+     */
     ~Router();
 
-    void AddConnection(RouteConnection* connection);
-    void RemoveConnection(RouteConnection* connection);
+    /**
+     * Adds a connection to/from which messages are routed.
+     *
+     * @param[in]   connection  Connection to be added.
+     */
+    void addConnection(Connection *connection);
 
-    void DistributeMessage(msg_t* message, RouteConnection* sender);
+    /**
+     * Removes a connection from the routing list and unregisteres the router's
+     * callback from the connection.
+     *
+     * @param[in]   connection  Connection to be removed.
+     */
+    void removeConnection(Connection *connection);
+
+    /**
+     * Distributes a received message from one connection to all other connection.
+     * The message is not echoed back to the sender.
+     *
+     * @param[in]   message     Incoming message which shall be distributed to
+     *                          the other connections.
+     * @param[in]   sender      Sender of the message.
+     */
+    void distributeMessage(const msg_t &message, Connection *sender);
+
+protected:
+    /**
+     * Callback to be called by incomming message handlers of all connections.
+     *
+     * @param[in]   message     Message to be distributed.
+     * @param[in]   reference   Reference to sender of the message.
+     * @todo replace typeless reference with connection type.
+     */
+    void onIncomingMessage(const msg_t &message, void *reference);
+
+    /**
+     * Log current list of connections.
+     * @param[in]   current     Mark current connection(optional)
+     */
+    void listConnections(Connection *current);
+
+    //! List of all established connections
+    std::list<Connection *> connections;
 };
 
 #endif // ROUTER_H

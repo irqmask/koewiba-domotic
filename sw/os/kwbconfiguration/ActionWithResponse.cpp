@@ -3,7 +3,7 @@
  *
  * @{
  * @file    Action.cpp
- * @brief   Base-class of an action to be performed with a bus-module. 
+ * @brief   Base-class of an action to be performed with a bus-module.
  *
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
@@ -23,7 +23,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
- 
+
 // --- Include section ---------------------------------------------------------
 
 #include <chrono>
@@ -44,39 +44,44 @@
 
 // --- Class implementation  ---------------------------------------------------
 
-ActionWithResponse::ActionWithResponse(MsgEndpoint  &msgep, 
-                                       MsgBroker    &broker, 
-                                       uint16_t     nodeId) : ActionRequest(msgep, broker, nodeId),
-                                                              receivedMessage({0}),
-                                                              messageReceived(false)
+ActionWithResponse::ActionWithResponse(Connection   &conn,
+                                       MsgBroker    &broker,
+                                       uint16_t     moduleAddr)
+    : ActionRequest(conn, broker, moduleAddr)
+    , receivedMessage({0})
+, messageReceived(false)
 {
     using std::placeholders::_1;
-    std::function<bool(msg_t&)> filterResponseFunc = std::bind(&ActionWithResponse::filterResponse, this, _1); 
-    std::function<void(msg_t&)> handleResponseFunc = std::bind(&ActionWithResponse::handleResponse, this, _1); 
- 
+    using std::placeholders::_2;
+    msg_filter_t filterResponseFunc = std::bind(&ActionWithResponse::filterResponse, this, _1);
+    incom_func_t handleResponseFunc = std::bind(&ActionWithResponse::handleResponse, this, _1, _2);
+
     msgBroker.registerForResponse(this, filterResponseFunc, handleResponseFunc);
 }
 
+//----------------------------------------------------------------------------
 void ActionWithResponse::cancel()
 {
     msgBroker.unregisterForResponse(this);
 }
 
+//----------------------------------------------------------------------------
 bool ActionWithResponse::isFinished()
 {
-    return timeout_elapsed || messageReceived;
+    return timeoutOccurred || messageReceived;
 }
 
+//----------------------------------------------------------------------------
 bool ActionWithResponse::waitForResponse()
 {
     auto start = std::chrono::high_resolution_clock::now();
-    
+
     while (!messageReceived) {
         auto elapsed = std::chrono::high_resolution_clock::now() - start;
         std::this_thread::yield(); // better wait for an event
         if (elapsed > timeout) {
-            timeout_elapsed = true;
-            cancel(); 
+            timeoutOccurred = true;
+            cancel();
             break;
         }
     }

@@ -1,0 +1,3 @@
+build-os* 
+*.user
+doxygen

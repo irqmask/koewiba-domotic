@@ -2,10 +2,10 @@
  * @addtogroup KWBCONFIGURATION
  *
  * @{
- * @file    kwbconfiguration_main.c
+ * @file    kwbconfiguration_main.cpp
  * @brief   Configure the modules, registers and applications of the KWB system.
- * This is the configuration software running in terminal to be usable in 
- * headless systems over SSH. 
+ * This is the configuration software running in terminal to be usable in
+ * headless systems over SSH.
  *
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
@@ -25,13 +25,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
- 
+
 // --- Include section ---------------------------------------------------------
 
 #include "prjconf.h"
 
 #include <functional>
 #include <iostream>
+#include <sstream>
 #include <thread>
 
 #include <assert.h>
@@ -42,10 +43,10 @@
 #if defined (PRJCONF_UNIX) || \
     defined (PRJCONF_POSIX) || \
     defined (PRJCONF_LINUX)
-  extern "C" {
-      #include <safe_lib.h>
-  }
-  #include <unistd.h>
+extern "C" {
+#include <safe_lib.h>
+}
+#include <unistd.h>
 #endif
 
 // include
@@ -56,7 +57,10 @@
 #include "error_codes.h"
 #include "kwb_defines.h"
 
-// os/shared
+// os/libkwb
+#include "connection_serial.h"
+#include "connection_socket.h"
+#include "exceptions.h"
 #include "ioloop.h"
 #include "log.h"
 #include "message_serial.h"
@@ -67,8 +71,6 @@
 
 #include "Application.h"
 #include "MsgBroker.h"
-#include "MsgEndpointSerial.h"
-
 #include "UIConsole.h"
 #include "ActionReadRegister.h"
 
@@ -88,8 +90,8 @@ typedef struct options {
                                     //!< configured in the command line options.
     bool        router_address_set; //!< Flag: is set, router address has been
                                     //!< configured in the command line options.
-    uint16_t    own_node_id;        //!< Node ID of node over which this software 
-                                    //!< communicates. 
+    uint16_t    own_node_id;        //!< Node ID of node over which this software
+    //!< communicates.
 } options_t;
 
 // --- Local variables ---------------------------------------------------------
@@ -111,12 +113,12 @@ typedef struct options {
  * @param[in]   router_port     Port number of kwbrouter server.
  * @param[in]   own_node_id     Address of node over which this software communicates.
  */
-static void set_options (options_t*     options,
-                         const char*    serial_device,
-                         int            serial_baudrate,
-                         const char*    router_address,
-                         uint16_t       router_port,
-                         uint16_t       own_node_id)
+static void set_options(options_t     *options,
+                        const char    *serial_device,
+                        int            serial_baudrate,
+                        const char    *router_address,
+                        uint16_t       router_port,
+                        uint16_t       own_node_id)
 {
     memset(options, 0, sizeof(options_t));
 
@@ -124,15 +126,17 @@ static void set_options (options_t*     options,
         strcpy_s(options->serial_device, sizeof(options->serial_device), serial_device);
     }
     options->serial_baudrate = serial_baudrate;
+
     if (router_address != NULL) {
         strcpy_s(options->router_address, sizeof(options->router_address), router_address);
     }
     options->router_port = router_port;
+
     options->own_node_id = own_node_id;
 }
 
 /**
- * Read command line options and save results in options.
+ * Parse the command line options and save results in options.
  *
  * @param[in]   argc    Count of command line options.
  * @param[in]   argv    Command line arguments.
@@ -142,37 +146,39 @@ static void set_options (options_t*     options,
  *          options have been read (in this case, default parameters will be
  *          used).
  */
-static bool parse_commandline_options (int argc, char* argv[], options_t* options)
+static bool parse_commandline_options(int argc, char *argv[], options_t *options)
 {
     bool                    rc = true;
     int                     c;
 
     while (1) {
         c = getopt(argc, argv, "d:b:a:p:o:v");
-        if (c == -1) break;
+        if (c == -1) {
+            break;
+        }
 
         switch (c) {
         case 'd':
-            log_msg(KWB_LOG_INFO, "device %s", optarg);
+            log_msg(LOG_INFO, "device %s", optarg);
             strcpy_s(options->serial_device, sizeof(options->serial_device), optarg);
             options->serial_device_set = true;
             break;
         case 'b':
-            log_msg(KWB_LOG_INFO, "baudrate %s", optarg);
+            log_msg(LOG_INFO, "baudrate %s", optarg);
             options->serial_baudrate = atoi(optarg);
             break;
         case 'a':
-            log_msg(KWB_LOG_INFO, "router address %s", optarg);
+            log_msg(LOG_INFO, "router address %s", optarg);
             strcpy_s(options->router_address, sizeof(options->router_address), optarg);
             options->router_address_set = true;
             break;
         case 'p':
-            log_msg(KWB_LOG_INFO, "router port %s", optarg);
+            log_msg(LOG_INFO, "router port %s", optarg);
             options->router_port = atoi(optarg);
             break;
         case 'o':
-            log_msg(KWB_LOG_INFO, "own node id %s", optarg);
-            options->own_node_id = atoi(optarg);
+            log_msg(LOG_INFO, "own node id %s", optarg);
+            options->own_node_id = strtol(optarg, NULL, 0);
             break;
         case 'v':
             log_add_mask(KWB_LOG_INTERCOMM | KWB_LOG_VERBOSE1 | KWB_LOG_VERBOSE2);
@@ -182,6 +188,7 @@ static bool parse_commandline_options (int argc, char* argv[], options_t* option
             break;
         }
     }
+
     return rc;
 }
 
@@ -191,11 +198,9 @@ static bool parse_commandline_options (int argc, char* argv[], options_t* option
  * @param[in,out]   options Structure where options are stored in.
  * @returns         true if options are constient and usable, otherwise false.
  */
- static bool validate_options(options_t* options)
+static bool validate_options(options_t *options)
 {
-    bool    rc = false,
-            serial_device_set = false,
-            vbusd_address_set = false;
+    bool    rc = false;
 
     do {
         // minimum address is "/a": unix socket with name "a" in the root directory
@@ -203,8 +208,9 @@ static bool parse_commandline_options (int argc, char* argv[], options_t* option
             log_error("Missing router address!\n");
             break;
         }
-        if (!options->serial_device_set || strnlen(options->serial_device, sizeof(options->serial_device)) < 2) {
-            log_error("Invalid or missing serial connection device!\n");
+        if (options->serial_device_set &&
+            strnlen(options->serial_device, sizeof(options->serial_device)) < 2) {
+            log_error("Invalid serial device path!");
             break;
         }
         rc = true;
@@ -215,7 +221,7 @@ static bool parse_commandline_options (int argc, char* argv[], options_t* option
 /**
  * Print usage notes to command prompt.
  */
-static void print_usage (void)
+static void print_usage(void)
 {
     fprintf(stderr, "\nUsage:\n");
     fprintf(stderr, "kwbconfiguration [-a <address>] [-p <port>] [-d <device>] [-b <baudrate>]\n\n");
@@ -227,11 +233,11 @@ static void print_usage (void)
     fprintf(stderr, " -o <own node id>    Node ID of node over which this software communicates.\n");
     fprintf(stderr, " -v                  Verbose logging.\n");
 
-    #ifdef PRJCONF_WINDOWS
+#ifdef PRJCONF_WINDOWS
     fprintf(stderr, "\n" \
-                    "NOTE: serial ports enumerated greater or equal to COM10\n" \
-                    "      should be stated as follows: \\\\.\\COM10\n");
-    #endif // PRJCONF_WINDOWS
+            "NOTE: serial ports enumerated greater or equal to COM10\n" \
+            "      should be stated as follows: \\\\.\\COM10\n");
+#endif // PRJCONF_WINDOWS
 }
 
 // --- Module global functions -------------------------------------------------
@@ -245,12 +251,15 @@ static void print_usage (void)
  * @param[in]   argv    List of command line arguments.
  * @returns     0 if firmware has been updated in target node successfully.
  */
-int main (int argc, char* argv[])
+int main(int argc, char *argv[])
 {
     int                 rc = eERR_NONE;
     bool                end_application = false;
     options_t           options;
     ioloop_t            mainloop;
+
+    log_set_mask(0xFFFFFFFF & ~LOG_VERBOSE2);
+    log_msg(LOG_INFO, "kwbconfiguration...");
 
     do {
         // set default options for kwbrouter
@@ -270,31 +279,56 @@ int main (int argc, char* argv[])
 
         ioloop_init(&mainloop);
         ioloop_set_default_timeout(&mainloop, 1);
-               
+
         MsgBroker broker;
-        MsgEndpoint* ep;
-        
+        std::shared_ptr<Connection> conn;
+
         // connect to the bus
         using std::placeholders::_1;
-        if (options.serial_device_set) {
-            log_msg(KWB_LOG_STATUS, "Own node Id is 0x%04X", options.own_node_id);
-            
-            MsgEndpointSerial* msgep_serial = new MsgEndpointSerial(mainloop, options.own_node_id, options.serial_device, options.serial_baudrate);            
-            if (msgep_serial->connect()) {
-                log_msg(KWB_LOG_STATUS, "Connected to serial interface %s with baudrate %d", options.serial_device, options.serial_baudrate);
+        using std::placeholders::_2;
+        incom_func_t handleIncomingMessageFunc = std::bind(&MsgBroker::handleIncomingMessage, &broker, _1, _2);
 
-                std::function<void(msg_t&)> handleIncommingSerialMessageFunc = std::bind(&MsgBroker::handleIncommingMessage, &broker, _1); 
-                msgep_serial->registerForIncommingMessages(handleIncommingSerialMessageFunc);
-                ep = msgep_serial;
+        log_msg(LOG_STATUS, "Own node Id is 0x%04X", options.own_node_id);
+
+        if (options.serial_device_set) {
+            try {
+                auto conn_serial = std::make_shared<ConnectionSerial>(&mainloop, options.serial_device);
+                log_msg(LOG_STATUS, "Connected to serial interface %s with baudrate %d", conn_serial->getName().c_str(),
+                        conn_serial->getBaudrate());
+                conn = conn_serial;
+            }
+            catch (Exception &e) {
+                log_error("Unable to connecto to serial device %s\n%s", options.serial_device, e.what());
             }
         }
-        
+        else if (options.router_address_set) {
+            try {
+                std::stringstream uriss;
+                uriss << options.router_address << ":" << options.router_port;
+                auto conn_socket = std::make_shared<ConnectionSocket>(&mainloop, uriss.str());
+                log_msg(LOG_STATUS, "Connected to router over socket interface %s", conn_socket->getName().c_str());
+                conn = conn_socket;
+            }
+            catch (Exception &e) {
+                log_error("Unable to connecto to socket %s:%d\n%s", options.router_address, options.router_port, e.what());
+            }
+        }
+
+        if (conn == nullptr) {
+            log_error("No connection to gateway or router over serial or TCP/IP was established!");
+            rc = eERR_RESOURCE;
+            break;
+        }
+
+        conn->setIncomingHandler(handleIncomingMessageFunc);
+        conn->setOwnNodeId(options.own_node_id);
+
         // instantiate application, ui and its thread
-        Application app(*ep, broker, end_application);
+        Application app(*conn, broker, end_application);
         UIMain uimain(app);
 
         std::thread ui_thread(&UIMain::run, &uimain);
-        
+
         std::cout << "entering mainloop" << std::endl;
         while (!end_application) {
             ioloop_run_once(&mainloop);

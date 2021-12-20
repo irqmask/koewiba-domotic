@@ -6,8 +6,8 @@ $Descr A4 11693 8268
 encoding utf-8
 Sheet 1 1
 Title "roomthermostat"
-Date "2018-09-22"
-Rev "A"
+Date "2019-03-05"
+Rev "B"
 Comp "koewiba"
 Comment1 ""
 Comment2 ""
@@ -107,9 +107,9 @@ Text Label 5700 4450 0    40   ~ 0
 DISP_MOSI
 Text Label 5700 4650 0    40   ~ 0
 DISP_SCK
-Text Label 5700 3800 0    40   ~ 0
-/DISP_CS
-Text Label 5700 3900 0    40   ~ 0
+Text Label 4200 4350 0    40   ~ 0
+DISP_CS
+Text Label 4200 4450 0    40   ~ 0
 DISP_A0
 Wire Wire Line
 	5650 4450 6050 4450
@@ -119,7 +119,7 @@ Wire Wire Line
 	5650 3900 6050 3900
 Wire Wire Line
 	5650 3800 6050 3800
-Text Label 4250 4000 0    40   ~ 0
+Text Label 4200 4000 0    40   ~ 0
 /RESET
 Wire Wire Line
 	6700 3850 6450 3850
@@ -127,8 +127,6 @@ Wire Wire Line
 	6600 3750 6600 4250
 Wire Wire Line
 	8100 3850 7900 3850
-Wire Wire Line
-	7900 2850 7900 3850
 Wire Wire Line
 	8300 3750 8300 4250
 $Comp
@@ -154,17 +152,6 @@ F 3 "" H 8300 4350 60  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L power:VCC #PWR05
-U 1 1 5B22104C
-P 7900 2850
-F 0 "#PWR05" H 7900 3025 50  0001 C CNN
-F 1 "VCC" H 7900 2975 50  0000 C CNN
-F 2 "" H 7900 2850 60  0001 C CNN
-F 3 "" H 7900 2850 60  0001 C CNN
-	1    7900 2850
-	1    0    0    -1  
-$EndComp
-$Comp
 L power:VCC #PWR06
 U 1 1 5B22106A
 P 6450 2850
@@ -180,11 +167,11 @@ DISP_SCK
 Text Label 6900 3800 3    40   ~ 0
 DISP_MOSI
 Text Label 7000 3800 3    40   ~ 0
-/RESET
+DISP_RESET
 Text Label 7100 3800 3    40   ~ 0
 DISP_A0
 Text Label 7200 3800 3    40   ~ 0
-/DISP_CS
+DISP_CS
 Wire Wire Line
 	6450 2850 6450 3850
 Connection ~ 6450 3850
@@ -197,7 +184,6 @@ Wire Wire Line
 Connection ~ 6600 4250
 Wire Wire Line
 	8100 3750 8100 3850
-Connection ~ 7900 3850
 Wire Wire Line
 	7900 4150 7900 4250
 Wire Wire Line
@@ -232,8 +218,6 @@ Wire Wire Line
 Wire Wire Line
 	8200 4000 8400 4000
 Wire Bus Line
-	8500 5500 8500 4100
-Wire Bus Line
 	7300 4300 7300 5500
 Entry Wire Line
 	6050 3800 6150 3900
@@ -260,7 +244,7 @@ U 1 1 5B221710
 P 3850 3100
 F 0 "S1" H 4000 3025 50  0000 C BNN
 F 1 "PushButton_SPST_NO" H 4000 3225 25  0000 C BNN
-F 2 "Switch_Miscelleaneus:PHAP3301" H 3850 3100 60  0001 C CNN
+F 2 "Switch_Miscelleaneus:PushButton_SPST_SMD_JTP-1138_BacksideMount" H 3850 3100 60  0001 C CNN
 F 3 "" H 3850 3100 60  0000 C CNN
 	1    3850 3100
 	1    0    0    -1  
@@ -271,7 +255,7 @@ U 1 1 5B22176B
 P 3850 3350
 F 0 "S2" H 4000 3275 50  0000 C BNN
 F 1 "PushButton_SPST_NO" H 4000 3475 25  0000 C BNN
-F 2 "Switch_Miscelleaneus:PHAP3301" H 3850 3350 60  0001 C CNN
+F 2 "Switch_Miscelleaneus:PushButton_SPST_SMD_JTP-1138_BacksideMount" H 3850 3350 60  0001 C CNN
 F 3 "" H 3850 3350 60  0000 C CNN
 	1    3850 3350
 	1    0    0    -1  
@@ -282,7 +266,7 @@ U 1 1 5B22178E
 P 3850 3600
 F 0 "S3" H 4000 3525 50  0000 C BNN
 F 1 "PushButton_SPST_NO" H 4000 3725 25  0000 C BNN
-F 2 "Switch_Miscelleaneus:PHAP3301" H 3850 3600 60  0001 C CNN
+F 2 "Switch_Miscelleaneus:PushButton_SPST_SMD_JTP-1138_BacksideMount" H 3850 3600 60  0001 C CNN
 F 3 "" H 3850 3600 60  0000 C CNN
 	1    3850 3600
 	1    0    0    -1  
@@ -328,7 +312,7 @@ F 3 "" H 3750 3700 60  0001 C CNN
 	1    3750 3700
 	1    0    0    -1  
 $EndComp
-Text Label 4250 4450 0    40   ~ 0
+Text Label 5700 3800 0    40   ~ 0
 TEMP
 Wire Wire Line
 	4550 4450 4200 4450
@@ -337,8 +321,6 @@ Entry Wire Line
 NoConn ~ 4550 3700
 NoConn ~ 4550 3800
 NoConn ~ 4550 3900
-NoConn ~ 4550 4250
-NoConn ~ 4550 4350
 NoConn ~ 4550 4550
 NoConn ~ 4550 4650
 $Comp
@@ -387,6 +369,44 @@ F 3 "" H 5100 3850 60  0000 C CNN
 $EndComp
 NoConn ~ 5000 3000
 NoConn ~ 4900 3000
+Text Label 4200 4250 0    40   ~ 0
+DISP_RESET
+Wire Wire Line
+	4550 4250 4200 4250
+Wire Wire Line
+	4550 4350 4200 4350
+Entry Wire Line
+	4100 4350 4200 4250
+Entry Wire Line
+	4100 4450 4200 4350
+Text Label 5700 3900 0    40   ~ 0
+TEMP_POW
+$Comp
+L standard:R R1
+U 1 1 5C7F083A
+P 7600 4050
+F 0 "R1" H 7600 3950 50  0000 C CNN
+F 1 "220" H 7600 4050 50  0000 C CNN
+F 2 "Resistor:R_0805" H 7600 4050 60  0001 C CNN
+F 3 "" H 7600 4050 60  0000 C CNN
+	1    7600 4050
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	7600 3850 7900 3850
+Connection ~ 7900 3850
+Wire Wire Line
+	7600 4250 7600 4600
+Wire Wire Line
+	7600 4600 8400 4600
+Text Label 7950 4600 0    40   ~ 0
+TEMP_POW
+Entry Wire Line
+	8400 4600 8500 4700
+Text Notes 4150 5250 0    40   ~ 0
+for debugging\nLED STATUS PD6\nLED ERROR PD7
+Wire Bus Line
+	8500 4100 8500 5500
 Wire Bus Line
 	4100 4100 4100 5500
 Wire Bus Line

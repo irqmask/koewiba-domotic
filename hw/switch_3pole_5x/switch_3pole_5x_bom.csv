@@ -1,0 +1,51 @@
+Id,Bezeichner,Gehäuse,Stückzahl,Bezeichnung
+19,"C3,C4,C9",C_0805,3,100nF
+20,"C5,C6",C_0805,2,18pF
+21,C7,C_0805,1,"4,7nF"
+22,C8,C_1206,1,100µF / 6V
+23,"D1,D2,D3,D4,D5",D_SOD323,5,1N4148
+11,"D11,D12,D13,D14,D15",SOT23-3,5,BAT54S
+24,D21,D_MINIMELF,1,ZD
+12,D22,D_SOT143,1,SEMTECH SR05
+3,"D6,D7,D8,D9,D10",LED_RM2.54mm_D3mm,5,"green, 2,2V/2mA"
+13,F2,R_1812,1,FUSE
+30,"J1,J2,J3,J4,J5",WAGO2081-1123,5,WAGO 2081-1123
+32,J10,Testpoint_1mm,1,tp_relay_1
+33,J11,Testpoint_1mm,1,tp_relay_2
+8,J12,HEADER_6,1,CONN-ISP-6
+5,J13,WAGO243,1,WAGO 243-723
+6,J14,WAGO243,1,WAGO 243-724
+7,J15,WAGO243,1,WAGO 243-721
+4,J16,WAGO243,1,WAGO 243-722
+34,J17,Testpoint_1mm,1,tp_relay_3
+35,J18,Testpoint_1mm,1,tp_relay_4
+36,J19,Testpoint_1mm,1,tp_button_0
+37,J20,Testpoint_1mm,1,tp_button_1
+38,J21,Testpoint_1mm,1,tp_button_2
+39,J22,Testpoint_1mm,1,tp_button_3
+40,J23,Testpoint_1mm,1,tp_button_4
+41,J24,Testpoint_1mm,1,tp_cseep
+42,J25,Testpoint_1mm,1,tp_miso
+43,J26,Testpoint_1mm,1,tp_mosi
+44,J27,Testpoint_1mm,1,tp_sck
+45,J28,Testpoint_1mm,1,tp_txden
+46,J29,Testpoint_1mm,1,tp_txd
+47,J30,Testpoint_1mm,1,tp_rxd
+48,J31,Testpoint_1mm,1,tp_vcc
+49,J32,Testpoint_1mm,1,tp_gnd
+31,J6,Testpoint_1mm,1,tp_relay_0
+14,"J7,J8",WAGO233-4,2,WAGO 233-504
+15,J9,WAGO233-4,1,WAGO 233-502
+16,"LOGO1,LOGO2",Symbol_OSHW-Logo_Copper,2,OPEN_HARDWARE_1
+17,LOGO4,Symbol_OSHW-Logo_SilkScreen,1,Open Hardware
+18,"Q1,Q2,Q3,Q4,Q5",SOT23-3,5,BSS138
+25,"R1,R2,R3,R4,R5,R31,R35,R36",R_0805,8,10k
+27,"R21,R22,R23,R24,R25",R_0805,5,4k7
+50,"R6,R12,R13,R14,R15",R_0805,5,1k5
+26,"R7,R8,R9,R10,R11,R32,R33,R34",R_0805,8,100
+2,"REL5,REL1,REL2,REL3,REL4",finder_34.51_1xUM,5,FINDER_34.51.7.024
+9,U3,SO8N,1,25LC256
+29,U4,TQFP-44_10x10mm_Pitch0.8mm,1,ATMEGA328-TQFP32
+28,U5,CRY_HC49_SMD,1,"7,3728MHz"
+10,U6,SO8N,1,MAX487ECSA
+1,U7,AM1S-XXXX_SIL4,1,AM1S-2405

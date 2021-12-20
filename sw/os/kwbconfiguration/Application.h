@@ -3,7 +3,7 @@
  *
  * @{
  * @file    Application.h
- * @brief   Application frontend. 
+ * @brief   Application frontend.
  *
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
@@ -23,7 +23,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#pragma once 
+#pragma once
 
 // --- Include section ---------------------------------------------------------
 
@@ -35,8 +35,9 @@
 // include
 #include "prjtypes.h"
 
+// libkwb
+#include "connection.h"
 #include "ActionQueryModules.h"
-#include "MsgEndpoint.h"
 #include "MsgBroker.h"
 
 // --- Definitions -------------------------------------------------------------
@@ -49,28 +50,89 @@
 
 // --- Class definition --------------------------------------------------------
 
-class Application {
+/**
+ * Application interface to UI of every action the application can perform.
+ */
+class Application
+{
 public:
-    Application(MsgEndpoint& msgep, MsgBroker& broker, bool& endApplication);
-    
+    /**
+     * @brief Application
+     * @param[in]   conn            Reference to connection to kwbrouter or serial gateway
+     * @param[in]   broker          Reference to message broker
+     * @param[out]  endApplication  Flag that application shall be terminated
+     */
+    Application(Connection &conn, MsgBroker &broker, bool &endApplication);
+
+    /**
+     * Detect all modules in the system.
+     * Each module reports with it's version information.
+     *
+     * @return true, if modules have been detected, otherwise false
+     */
     bool detectModules();
+
+    /**
+     * Get a list of detected modules and their version information.
+     *
+     * This method can be called after detectModules() has been called before.
+     * @return List of module information.
+     */
     std::vector<ActionQueryModules::Module> getDetectedModules();
-    void selectModule(uint16_t nodeid);
+
+    /**
+     * Select the module to work with.
+     *
+     * @param[in]   moduleAddr      The address of the module
+     */
+    void selectModule(uint16_t moduleAddr);
+
+    /**
+     * @return the address of the current selected module
+     */
     uint16_t getSelectedModule();
-    
-    bool readRegister(uint8_t registerId, int& value);
+
+    /**
+     * Read from a register of a module.
+     *
+     * @param[in]   registerId  Id of the register to read.
+     * @param[out]  value       The read value
+     *
+     * @return true, if the register has successfully been read, otherwise false.
+     */
+    bool readRegister(uint8_t registerId, int &value);
+
+    /**
+     * Write into a register of a module.
+     *
+     * @param[in]   registerId  Id of the register to write.
+     * @param[in]   value       Value to write into the register
+     *
+     * @return true, if the value has successfully been written into the register,
+     *         otherwise false.
+     */
     bool writeRegister(uint8_t registerId, int value);
-    bool verifyRegister(uint8_t registerId, int value, int& readValue);
-    int getLastRegisterValue();
-    
-    void endApplication();
-    
+
+    /**
+     * Verify a register value against a given value.
+     *
+     * @param[in]   registerId  Register Id to read the value from
+     * @param[in]   value       Expected value
+     * @param[out]  readValue   Value read from the register
+     *
+     * @return true, if the read value matches the expected value, otherwise false.
+     */
+    bool verifyRegister(uint8_t registerId, int value, int &readValue);
+
 protected:
+    //! List of detected modules. Filled by detectModules() command.
     std::vector<ActionQueryModules::Module> detected_modules;
-    uint16_t            selected_module;
-    MsgBroker&          msgBroker;
-    MsgEndpoint&        msgEndpoint;
-    bool&               end_application;
+    //! Currently selected module
+    uint16_t            selectedModule;
+    //! Referenc to message broker
+    MsgBroker           &msgBroker;
+    //! Reference to connection to the KWB sytsem
+    Connection          &msgEndpoint;
 };
 
 // -----------------------------------------------------------------------------

@@ -3,7 +3,7 @@
  *
  * @{
  * @file    ActionRequest.h
- * @brief   Base-class of an action which sends a request / message to a bus-module. 
+ * @brief   Base-class of an action which sends a request / message to a bus-module.
  *
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
@@ -23,7 +23,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#pragma once 
+#pragma once
 
 // --- Include section ---------------------------------------------------------
 
@@ -44,22 +44,49 @@
 
 // --- Class definition --------------------------------------------------------
 
-class ActionRequest : public Action {
+/**
+ * Action to send a request / command to a bus module. A response is not
+ * expected in this case.
+ */
+class ActionRequest : public Action
+{
 public:
-    ActionRequest(MsgEndpoint &msgep, MsgBroker &broker, uint16_t nodeId=0);
-    
-    bool start();
-    virtual void cancel();
-    virtual bool isFinished();
-        
-    void setNodeID(uint16_t id);
-    uint16_t getNodeID();
-    
+    /**
+     * Constructor
+     * @param[in]   conn        Reference to established connection to a
+     *                          KWB bus os router
+     * @param[in]   broker      Reference to message broker.
+     * @param[in]   moduleAddr  (optional, default=0) Module address to communicate with.
+     */
+    ActionRequest(Connection &conn, MsgBroker &broker, uint16_t moduleAddr = 0);
+
+    bool start() override;
+    virtual void cancel() override;
+    virtual bool isFinished() override;
+
+    /**
+     * Set the address of the module to communicate with.
+     * @param[in]   address     Module address.
+     */
+    void setModuleAddress(uint16_t address);
+
+    /**
+     * Get the currently set address of the recepient bus module.
+     * @return module address
+     */
+    uint16_t getModuleAddress();
+
 protected:
+    /**
+     * Form a message to be sent to the bus module.
+     * @returns true, if the messge was successfully formed, otherwise false.
+     */
     virtual bool formMessage() = 0;
-    
-    uint16_t nodeId; //! ID of node to perform action with.
-    msg_t    messageToSend; //!< Message to be sent during this action.
+
+    //! Address of module to perform action with.
+    uint16_t moduleAddr;
+    //! Message to be sent during this action.
+    msg_t    messageToSend;
 };
 
 /** @} */

@@ -1,5 +1,5 @@
 # unittests
-cmake_minimum_required (VERSION 2.8.1)
+cmake_minimum_required (VERSION 3.0)
 
 cmake_policy(SET CMP0015 NEW)
 
@@ -7,17 +7,16 @@ include_directories (
     ../../include
     ../../shared
     ../include
+    ../libkwb
     ../libsystem
     ../shared
+    ${googletest_INCLUDE_DIR}
     ${CMAKE_CURRENT_BINARY_DIR}
 )
 
 # system dependent include directories
 # ---------------------------------------------------------
 if (WIN32)
-    include_directories (
-        ../3rd_party/CUnit/include
-    )
 else (WIN32)
     include_directories (
         ../3rd_party/libsafec/include
@@ -25,15 +24,13 @@ else (WIN32)
 endif (WIN32)
 
 link_directories (
+    ${googletest_LIBRARY_DIR}
     ${CMAKE_CURRENT_BINARY_DIR}
 )
 
 # system dependant link directories
 # ---------------------------------------------------------
 if (WIN32)
-    link_directories (
-        ../3rd_party/CUnit/lib/Debug
-    )
 endif (WIN32)
 
 # system dependent definitions
@@ -64,20 +61,15 @@ set (os_include_SRCS
     ../include/error_codes.h
 )
 
-set (os_shared_SRCS
-    ../shared/log.h
-    ../shared/message.h
-
-    ../shared/ioloop.c
-    ../shared/log.c
-    ../shared/message_socket.c
-)
-
 set (unittests_SRCS
-    tests.c
-    test_libsystem_threads.c
-    test_libsystem_time.c
-    unittests_main.c
+    test_libsystem_threads.cpp
+    test_libsystem_time.cpp
+    
+    test_libkwb_connection.cpp
+    test_libkwb_connection_serial.cpp
+    test_libkwb_connection_socket.cpp
+    
+    unittests_main.cpp
 )
 
 # source groups
@@ -104,11 +96,12 @@ set_property(TARGET unittests PROPERTY CXX_STANDARD 11)
 
 # Link libraries
 # ---------------------------------------------------------
+target_link_libraries (unittests libkwb)
 target_link_libraries (unittests libsystem)
+target_link_libraries (unittests gtest)
+
 if (WIN32)
-    target_link_libraries (unittests libcunit)
 else (WIN32)
-    target_link_libraries (unittests cunit)
     target_link_libraries (unittests pthread)
     target_link_libraries (unittests safec-1.0)
 endif (WIN32)

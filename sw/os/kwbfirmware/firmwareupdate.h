@@ -36,6 +36,9 @@
 
 // --- Type definitions --------------------------------------------------------
 
+/**
+ * States of the firmware update
+ */
 typedef enum fwu_states {
     eFWU_IDLE,
     eFWU_START,
@@ -51,48 +54,65 @@ typedef enum fwu_states {
     eFWU_LAST
 } fwu_states_t;
 
-typedef void (*fwu_progress_func_t)(uint8_t progress, void* arg);
+/**
+ * Callback type to inform outer application about firmware update progress.
+ */
+typedef void (*fwu_progress_func_t)(uint8_t progress, void *arg);
 
-//! Firmware update process data structure.
+/**
+ * Firmware update process data structure.
+ */
 typedef struct firmwareupdate {
-    fwu_states_t    curr_state;         //!< Current state of firmware-update statemachine.
-    msg_serial_t    msg_serial;         //!< Handle of the serial connection.
-    char            filename[256];      //!< Path and filename to the IHEX file.
-    uint16_t        module_address;     //!< target module address.
+    //! Current state of firmware-update statemachine.
+    fwu_states_t    curr_state;
+    //! Handle of the serial connection.
+    msg_serial_t    msg_serial;
+    //! Path and filename to the IHEX file.
+    char            filename[256];
+    //! target module address.
+    uint16_t        module_address;
 
-    uint8_t*        fw_memory;          //!< Pointer to the memory block wich
-                                        //!< contains the target module's firmware.
-    uint32_t        fw_firstaddress;    //!< First (lowest) address of the target
-                                        //!< module's firmware.
-    uint32_t        fw_startaddress;    //!< Program entry point of the target's
-                                        //!< firmware.
-    uint32_t        fw_size;            //!< Size on bytes of the firmware.
+    //! Pointer to the memory block wich contains the target module's firmware.
+    uint8_t        *fw_memory;
+    //! First (lowest) address of the target module's firmware.
+    uint32_t        fw_firstaddress;
+    //! Program entry point of the target's firmware.
+    uint32_t        fw_startaddress;
+    //! Size on bytes of the firmware.
+    uint32_t        fw_size;
 
-    uint32_t        curr_offset;        //!< Current offset in fw_memory during
-                                        //!< transmission.
-    uint32_t        last_offset;        //!< Last offset in fw_memory during
-                                        //!< transmission.
-    uint32_t        last_node_offset;   //!< Last offset which has been
-                                        //!< acknowledged by node.
-    uint32_t        last_node_address;  //!< Last used address in node.
-    uint16_t        node_crc_expected;  //!< Checksum expected by node.
-    uint16_t        node_crc_calculated;//!< Checksum calculated by node.
-    uint8_t         block_info_received;//!< Flag if block_info message has been
-                                        //!< received. Reset by block_data and
-                                        //!< block_end message. Set by block_info
-                                        //!< message.
-    uint8_t         reset_target_node;  //!< Flag, if the target not shall be
-                                        //!< reset automatically after firmware
-                                        //!< upload.
-    sys_time_t      wait_start;         //!< timestamp of start of waiting for a response.
-    uint8_t         bldflags;           //!< Bootloader flags, which inform about
-                                        //!< the upload success.
-    uint8_t         bldflags_received;  //!< Flag, if the requested bootloader
-                                        //!< flags have been received yet.
-    uint8_t         last_progress;      //!< last progress;
-    uint8_t         progress_thd;       //!< threshold of progress update.
-    fwu_progress_func_t progress_func;  //!< progress update function.
-    void*           progress_arg;       //!< optional arguments for progress_func;
+    //! Current offset in fw_memory during transmission.
+    uint32_t        curr_offset;
+    //! Last offset in fw_memory during transmission.
+    uint32_t        last_offset;
+    //! Last offset which has been acknowledged by node.
+    uint32_t        last_node_offset;
+    //! Last used address in node.
+    uint32_t        last_node_address;
+    //! Checksum expected by node.
+    uint16_t        node_crc_expected;
+    //! Checksum calculated by node.
+    uint16_t        node_crc_calculated;
+    //! Flag if block_info message has been received. Reset by block_data and
+    //! block_end message. Set by block_info message.
+    uint8_t         block_info_received;
+    //! Flag, if the target not shall be reset automatically after firmware
+    //! upload.
+    uint8_t         reset_target_node;
+    //! timestamp of start of waiting for a response.
+    sys_time_t      wait_start;
+    //! Bootloader flags, which inform about the upload success.
+    uint8_t         bldflags;
+    //! Flag, if the requested bootloader flags have been received yet.
+    uint8_t         bldflags_received;
+    //! last progress
+    uint8_t         last_progress;
+    //! threshold of progress update.
+    uint8_t         progress_thd;
+    //! progress update function.
+    fwu_progress_func_t progress_func;
+    //! optional arguments for progress_func;
+    void           *progress_arg;
 } firmwareupdate_t;
 
 // --- Local variables ---------------------------------------------------------
@@ -107,25 +127,25 @@ typedef struct firmwareupdate {
 
 // --- Global functions --------------------------------------------------------
 
-int firmware_update_init    (firmwareupdate_t*  fwu,
-                             ioloop_t*          ioloop,
-                             const char*        device,
-                             int                baudrate);
+int firmware_update_init(firmwareupdate_t  *fwu,
+                         ioloop_t          *ioloop,
+                         const char        *device,
+                         int                baudrate);
 
-int firmware_update_start   (firmwareupdate_t*  fwu,
-                             const char*        filename,
-                             uint16_t           module_address);
+int firmware_update_start(firmwareupdate_t  *fwu,
+                          const char        *filename,
+                          uint16_t           module_address);
 
-int firmware_update_run     (firmwareupdate_t*  fwu);
+int firmware_update_run(firmwareupdate_t  *fwu);
 
-void firmware_update_close  (firmwareupdate_t*  fwu);
+void firmware_update_close(firmwareupdate_t  *fwu);
 
-void firmware_register_progress_func (firmwareupdate_t*     fwu,
-                                      fwu_progress_func_t   func,
-                                      void*                 arg);
+void firmware_register_progress_func(firmwareupdate_t     *fwu,
+                                     fwu_progress_func_t   func,
+                                     void                 *arg);
 
-void firmware_set_progress_thd (firmwareupdate_t*     fwu,
-                                uint8_t               thd);
+void firmware_set_progress_thd(firmwareupdate_t     *fwu,
+                               uint8_t               thd);
 
 #endif // _FIRMWAREUPDATE_H_
 /** @} */

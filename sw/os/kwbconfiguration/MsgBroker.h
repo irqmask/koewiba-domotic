@@ -3,7 +3,7 @@
  *
  * @{
  * @file    MsgBroker.h
- * @brief   Broker which sorts incomming messages to running actions. 
+ * @brief   Broker which sorts incomming messages to running actions.
  *
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
@@ -23,7 +23,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#pragma once 
+#pragma once
 
 // --- Include section ---------------------------------------------------------
 
@@ -35,19 +35,26 @@
 // include
 #include "prjtypes.h"
 
+// libkwb
+#include "connection.h"
 #include "message.h"
 
 // --- Definitions -------------------------------------------------------------
 
 // --- Type definitions --------------------------------------------------------
 
-typedef std::function<bool(msg_t&)> msg_filter_t;
-typedef std::function<void(msg_t&)> msg_handler_t;
+//! Callback type for filter functions.
+typedef std::function<bool(const msg_t &)> msg_filter_t;
 
+//! Hold callbacks and reference to filter incomin messages to convey it to
+//! interested entities.
 typedef struct {
-    void*           reference;      //! Reference to identify this entry
+    //! Reference to identify this entry
+    void           *reference;
+    //! Filter function
     msg_filter_t    msg_filter;
-    msg_handler_t   msg_handler;
+    //! Incoming message handler
+    incom_func_t    msg_handler;
 } msg_filter_data_t;
 
 // --- Local variables ---------------------------------------------------------
@@ -56,14 +63,46 @@ typedef struct {
 
 // --- Class definition --------------------------------------------------------
 
-class MsgBroker {
+/**
+ * Message broker class. Used to sort incoming messages to pending requests that
+ * have been made before.
+ */
+class MsgBroker
+{
 public:
+    /**
+     * Default constructor
+     */
     MsgBroker();
-    void handleIncommingMessage(msg_t& message);
-    void registerForResponse(void* reference, msg_filter_t& filter_func, msg_handler_t& handler_func);
-    void unregisterForResponse(void* reference);
-    
+
+    /**
+     * Handler for incoming message. Will distribute the messges to registered
+     * listeners.
+     *
+     * @param[in]   message     Incoming message
+     * @param[in]   reference   Reference to connection which received the
+     *                          message.
+     */
+    void handleIncomingMessage(const msg_t &message, void *reference);
+
+    /**
+     * @brief registerForResponse
+     * @param[in]   reference   Pointer to object which registered for response
+     * @param[in]   filter_func Filter function to select messages to be conveyed
+     * @param[in]   handler_func Message haandler function to which the filtered
+     *                           message is passed to.
+     */
+    void registerForResponse(void *reference, msg_filter_t &filter_func, incom_func_t &handler_func);
+
+    /**
+     * Un-register from listening to messages.
+     *
+     * @param[in]   reference   Pointer to object which registered for response
+     */
+    void unregisterForResponse(void *reference);
+
 protected:
+    //! List of registered response filter/handlers.
     std::vector<msg_filter_data_t> response_handlers;
 };
 

@@ -3,7 +3,7 @@
  *
  * @{
  * @file    Action.cpp
- * @brief   Base-class of an action to be performed with a bus-module. 
+ * @brief   Base-class of an action to be performed with a bus-module.
  *
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
@@ -23,7 +23,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
- 
+
 // --- Include section ---------------------------------------------------------
 
 #include <functional>
@@ -41,21 +41,25 @@
 // --- Global variables --------------------------------------------------------
 
 // --- Class implementation  ---------------------------------------------------
+
 using namespace std::chrono_literals;
-Action::Action(MsgEndpoint &msgep, MsgBroker &broker) : msgBroker(broker), 
-                                                        msgEndpoint(msgep),
-                                                        timeout(5s),
-                                                        timeout_elapsed(false)
+Action::Action(Connection &conn, MsgBroker &broker)
+    : msgBroker(broker)
+    , connection(conn)
+    , timeout(5s)
+    , timeoutOccurred(false)
 {
 }
 
+//----------------------------------------------------------------------------
 bool Action::isFinished()
 {
     return true;
 }
 
+//----------------------------------------------------------------------------
 bool Action::hasTimedOut()
 {
-    return timeout_elapsed;
+    return timeoutOccurred;
 }
 /** @} */

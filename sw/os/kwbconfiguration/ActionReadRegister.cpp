@@ -3,7 +3,7 @@
  *
  * @{
  * @file    ActionReadRegister.cpp
- * @brief   Action: Query a register of a bus module and wait for the answer. 
+ * @brief   Action: Query a register of a bus module and wait for the answer.
  *
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
@@ -23,7 +23,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
- 
+
 // --- Include section ---------------------------------------------------------
 
 #include "prjconf.h"
@@ -48,37 +48,45 @@
 
 // --- Class implementation  ---------------------------------------------------
 
-ActionReadRegister::ActionReadRegister(MsgEndpoint& msgep, 
-                                       MsgBroker&   broker, 
-                                       uint16_t     nodeId,
-                                       uint8_t      registerId) : ActionWithResponse(msgep, broker, nodeId),
-                                                                  registerId(registerId)
+ActionReadRegister::ActionReadRegister(Connection   &msgep,
+                                       MsgBroker    &broker,
+                                       uint16_t     moduleAddr,
+                                       uint8_t      registerId)
+    : ActionWithResponse(msgep, broker, moduleAddr)
+    , registerId(registerId)
 {
 }
 
+//----------------------------------------------------------------------------
 void ActionReadRegister::setRegisterId(uint8_t registerId)
 {
     this->registerId = registerId;
 }
 
+//----------------------------------------------------------------------------
 uint8_t ActionReadRegister::getRegisterId()
 {
     return this->registerId;
 }
-    
+
+//----------------------------------------------------------------------------
 bool ActionReadRegister::formMessage()
 {
-    if (nodeId == 0) return false;
-    messageToSend.receiver = nodeId;
-    messageToSend.sender = msgEndpoint.getOwnNodeId();
+    if (moduleAddr == 0) {
+        return false;
+    }
+    messageToSend.receiver = moduleAddr;
+    messageToSend.sender = connection.getOwnNodeId();
     messageToSend.length = 2;
     messageToSend.data[0] = eCMD_REQUEST_REG;
     messageToSend.data[1] = registerId;
+    return true;
 }
 
-bool ActionReadRegister::filterResponse(msg_t& message)
+//----------------------------------------------------------------------------
+bool ActionReadRegister::filterResponse(const msg_t &message)
 {
-    if (message.sender == nodeId &&
+    if (message.sender == moduleAddr &&
         message.length >= 3 &&
         (message.data[0] == eCMD_STATE_TYPELESS ||
          message.data[0] == eCMD_STATE_BITFIELDS ||
@@ -86,21 +94,24 @@ bool ActionReadRegister::filterResponse(msg_t& message)
          message.data[0] == eCMD_STATE_16BIT ||
          message.data[0] == eCMD_STATE_32BIT ||
          message.data[0] == eCMD_STATE_DATE_TIME) &&
-        message.data[1] == registerId) return true;
+        message.data[1] == registerId) {
+        return true;
+    }
     return false;
 }
 
-void ActionReadRegister::handleResponse(msg_t& message)
+//----------------------------------------------------------------------------
+void ActionReadRegister::handleResponse(const msg_t &message, void *reference)
 {
-    msg_log("MSG R", message);
     receivedMessage = message;
     messageReceived = true;
 }
 
+//----------------------------------------------------------------------------
 int ActionReadRegister::getValue()
 {
     int value = 0;
-    
+
     switch (receivedMessage.data[0]) {
     case eCMD_STATE_8BIT:
         value = receivedMessage.data[2];

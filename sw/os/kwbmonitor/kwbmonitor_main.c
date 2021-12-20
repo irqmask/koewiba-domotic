@@ -28,7 +28,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
- 
+
 // --- Include section ---------------------------------------------------------
 
 #include "prjconf.h"
@@ -40,8 +40,8 @@
 #if defined (PRJCONF_UNIX) || \
     defined (PRJCONF_POSIX) || \
     defined (PRJCONF_LINUX)
-  #include <safe_lib.h>
-  #include <unistd.h>
+    #include <safe_lib.h>
+    #include <unistd.h>
 #endif
 
 // include
@@ -61,13 +61,18 @@
 
 // --- Type definitions --------------------------------------------------------
 
+/**
+ * Structure of kwbconfiguration runtime options.
+ */
 typedef struct options {
-    char        serial_device[256];
-    int         serial_baudrate;
-    char        vbusd_address[256];
-    uint16_t    vbusd_port;
-    bool        serial_device_set;
-    bool        vbusd_address_set;
+    char        serial_device[256]; //!< Device of serial connection to RS232 gateway.
+    int         serial_baudrate;    //!< Baudrate of serial connection to RS232 gateway.
+    char        vbusd_address[256]; //!< IPv4 address of virtual bus
+    uint16_t    vbusd_port;         //!< IPv4 port of virtual bus
+    bool        serial_device_set;  //!< Flag: if set, serial device has been
+                                    //!< configured in the command line options.
+    bool        vbusd_address_set;  //!< Flag: if set, virtual bus has been
+                                    //!< configured in the command line options.
 } options_t;
 
 // --- Local variables ---------------------------------------------------------
@@ -81,7 +86,10 @@ static vos_t            g_vos;
 
 // --- Local functions ---------------------------------------------------------
 
-sys_thread_func (reader_thread)
+/**
+ * Monitor functionality runs in a thread.
+ */
+sys_thread_func(reader_thread)
 {
     uint8_t new_byte = 0;
     int     bytesread;
@@ -92,14 +100,16 @@ sys_thread_func (reader_thread)
         bytesread = vos_recv(&g_vos, &new_byte, 1);
         if (bytesread > 0) {
             monitor_parse_message(new_byte, &g_bus_history);
-        } else {
+        }
+        else {
             sys_sleep_ms(1);
         }
     }
     return 0;
 }
 
-static void print_usage (void)
+//----------------------------------------------------------------------------
+static void print_usage(void)
 {
     fprintf(stderr, "\nkwbmonitor - KoeWiBa bus monitor on a byte level\n");
     fprintf(stderr, "\nUsage:\n");
@@ -110,18 +120,19 @@ static void print_usage (void)
     fprintf(stderr, " -v <vbusd address>  Address of vbusd. Default: /tmp/vbusd.usk\n");
     fprintf(stderr, " -w <vbusd port>     Port number of vbusd. Default: 0\n");
 
-    #ifdef PRJCONF_WINDOWS
+#ifdef PRJCONF_WINDOWS
     fprintf(stderr, "\n" \
-                    "NOTE: serial ports enumerated greater or equal to COM10\n" \
-                    "      should be stated as follows: \\\\.\\COM10\n");
-    #endif // PRJCONF_WINDOWS
+            "NOTE: serial ports enumerated greater or equal to COM10\n" \
+            "      should be stated as follows: \\\\.\\COM10\n");
+#endif // PRJCONF_WINDOWS
 }
 
-static void set_options (options_t*     options,
-                         const char*    serial_device,
-                         int            serial_baudrate,
-                         const char*    vbusd_address,
-                         uint16_t       vbusd_port)
+//----------------------------------------------------------------------------
+static void set_options(options_t     *options,
+                        const char    *serial_device,
+                        int            serial_baudrate,
+                        const char    *vbusd_address,
+                        uint16_t       vbusd_port)
 {
     memset(options, 0, sizeof(options_t));
 
@@ -135,63 +146,65 @@ static void set_options (options_t*     options,
     options->vbusd_port = vbusd_port;
 }
 
-static bool parse_commandline_options (int          argc,
-                                       char*        argv[],
-                                       options_t*   options)
+//----------------------------------------------------------------------------
+static bool parse_commandline_options(int          argc,
+                                      char        *argv[],
+                                      options_t   *options)
 {
     bool                    rc = true;
     int                     c;
 
     while (1) {
         c = getopt(argc, argv, "d:b:v:w:");
-        if (c == -1) break;
+        if (c == -1) {
+            break;
+        }
 
         switch (c) {
-            case 'd':
-                fprintf(stderr, "device %s\n", optarg);
-                strcpy_s(options->serial_device, sizeof(options->serial_device), optarg);
-                options->serial_device_set = true;
-                break;
-            case 'b':
-                fprintf(stderr, "baudrate %s\n", optarg);
-                options->serial_baudrate = atoi(optarg);
-                break;
-            case 'v':
-                fprintf(stderr, "vbusd address %s\n", optarg);
-                strcpy_s(options->vbusd_address, sizeof(options->vbusd_address), optarg);
-                options->vbusd_address_set = true;
-                break;
-            case 'w':
-                fprintf(stderr, "vbusd port %s\n", optarg);
-                options->vbusd_port = atoi(optarg);
-                break;
-            default:
-                rc = false;
-                break;
+        case 'd':
+            fprintf(stderr, "device %s\n", optarg);
+            strcpy_s(options->serial_device, sizeof(options->serial_device), optarg);
+            options->serial_device_set = true;
+            break;
+        case 'b':
+            fprintf(stderr, "baudrate %s\n", optarg);
+            options->serial_baudrate = atoi(optarg);
+            break;
+        case 'v':
+            fprintf(stderr, "vbusd address %s\n", optarg);
+            strcpy_s(options->vbusd_address, sizeof(options->vbusd_address), optarg);
+            options->vbusd_address_set = true;
+            break;
+        case 'w':
+            fprintf(stderr, "vbusd port %s\n", optarg);
+            options->vbusd_port = atoi(optarg);
+            break;
+        default:
+            rc = false;
+            break;
         }
     }
     return rc;
 }
 
-static bool validate_options (options_t* options)
+//----------------------------------------------------------------------------
+static bool validate_options(options_t *options)
 {
-    bool    rc = false,
-    serial_device_set = false,
-    vbusd_address_set = false;
+    bool    rc = false;
 
     do {
         // minimum address is "/a": unix socket with name "a" in the root directory
         if (options->serial_device_set &&
             strnlen(options->serial_device, sizeof(options->serial_device)) < 2) {
             fprintf(stderr, "Invalid serial device path!\n");
-        break;
-            }
-            if (options->vbusd_address_set &&
-                strnlen(options->vbusd_address, sizeof(options->vbusd_address)) < 2) {
-                fprintf(stderr, "Invalid vbusd address!\n");
             break;
-                }
-                rc = true;
+        }
+        if (options->vbusd_address_set &&
+            strnlen(options->vbusd_address, sizeof(options->vbusd_address)) < 2) {
+            fprintf(stderr, "Invalid vbusd address!\n");
+            break;
+        }
+        rc = true;
     } while (0);
     return rc;
 }
@@ -200,7 +213,14 @@ static bool validate_options (options_t* options)
 
 // --- Global functions --------------------------------------------------------
 
-int main(int argc, char* argv[])
+/**
+ * main entry point of kwbmonitor.
+ *
+ * @param[in]   argc    Number of command line arguments.
+ * @param[in]   argv    List of command line arguments.
+ * @returns     0 if kwbmonitor run successfully.
+ */
+int main(int argc, char *argv[])
 {
     char cc;
     int rc = eERR_NONE;
@@ -221,13 +241,16 @@ int main(int argc, char* argv[])
 
         if (options.serial_device_set) {
             rc = vos_open_serial(&g_vos, options.serial_device, options.serial_baudrate);
-        } else {
+        }
+        else {
             rc = vos_open_vbusd(&g_vos, options.vbusd_address, options.vbusd_port);
         }
-        if (rc != eERR_NONE) break;
+        if (rc != eERR_NONE) {
+            break;
+        }
 
         sys_thread_start(&reader_thread);
-        while(running) {
+        while (running) {
             cc = sys_con_getch();
             switch (cc) {
             case 27: //ESC
@@ -256,3 +279,5 @@ int main(int argc, char* argv[])
 
     return rc;
 }
+
+/** @} */

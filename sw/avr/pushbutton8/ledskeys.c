@@ -208,6 +208,13 @@ void led_switch (uint8_t led_index, eLEDMode_t mode)
         led_off(led_index);
         break;
     }
+
+    /* As long as LED's should blink, the controller is not allowed to fall into sleep! */
+    if(0x00 != (g_led_fast_flash_mask | g_led_flash_mask))
+    {
+    	sleep_prevent(0x02, 1); // prevent process from sleeping as long as there are blinking LEDs.
+    }
+    else sleep_prevent(0x02, 0);
 }
 
 /**

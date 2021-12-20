@@ -36,7 +36,7 @@
 #if defined (PRJCONF_UNIX) || \
     defined (PRJCONF_POSIX) || \
     defined (PRJCONF_LINUX)
-#include <safe_lib.h>
+    #include <safe_lib.h>
 #endif
 
 // include
@@ -57,33 +57,40 @@
 
 // --- Type definitions --------------------------------------------------------
 
-typedef int (*mqtt_msg_converter_func)(char* topic, char* msgtext, msg_t* message);
+//! Type of conversion functions to convert from MQTT to kwb.
+typedef int (*mqtt_msg_converter_func)(char *topic, char *msgtext, msg_t *message);
 
+//! Structure holding message types and topic and a pointer to a function which
+//! knows how to convert to a kwb message.
 typedef struct _mqtt_message_types {
-    const char* msgtype;
-    const char* topic;
+    //! Message type e.g. "state8bit"
+    const char *msgtype;
+    //! Topic to listen for e.g. "kwb/+/+/state8bit/#"
+    const char *topic;
+    //! Pointer to converting function
     mqtt_msg_converter_func func;
 } mqtt_msg_types_t;
 
 // --- Local variables ---------------------------------------------------------
 
-int mqtt2msg_state_8bit(char* topic, char* msgtext, msg_t* message);
-int mqtt2msg_state_16bit(char* topic, char* msgtext, msg_t* message);
-int mqtt2msg_state_32bit(char* topic, char* msgtext, msg_t* message);
-int mqtt2msg_request_reg(char* topic, char* msgtext, msg_t* message);
-int mqtt2msg_setreg_8bit(char* topic, char* msgtext, msg_t* message);
-int mqtt2msg_setreg_16bit(char* topic, char* msgtext, msg_t* message);
-int mqtt2msg_setreg_32bit(char* topic, char* msgtext, msg_t* message);
+static int mqtt2msg_state_8bit(char *topic, char *msgtext, msg_t *message);
+static int mqtt2msg_state_16bit(char *topic, char *msgtext, msg_t *message);
+static int mqtt2msg_state_32bit(char *topic, char *msgtext, msg_t *message);
+static int mqtt2msg_request_reg(char *topic, char *msgtext, msg_t *message);
+static int mqtt2msg_setreg_8bit(char *topic, char *msgtext, msg_t *message);
+static int mqtt2msg_setreg_16bit(char *topic, char *msgtext, msg_t *message);
+static int mqtt2msg_setreg_32bit(char *topic, char *msgtext, msg_t *message);
 
+//! List of known message types and its converion functions into kwb messages.
 mqtt_msg_types_t g_mqtt_msg_types[] = {
-    "state8bit", "kwb/+/+/state8bit/#", mqtt2msg_state_8bit,
-    "state16bit", "kwb/+/+/state16bit/#", mqtt2msg_state_16bit,
-    "state32bit", "kwb/+/+/state32bit/#", mqtt2msg_state_32bit,
-    "requestreg", "kwb/+/+/requestreg", mqtt2msg_request_reg,
-    "setreg8bit", "kwb/+/+/setreg8bit/#", mqtt2msg_setreg_8bit,
-    "setreg16bit", "kwb/+/+/setreg16bit/#", mqtt2msg_setreg_16bit,
-    "setreg32bit", "kwb/+/+/setreg32bit/#", mqtt2msg_setreg_32bit,
-    NULL, NULL
+    { "state8bit", "kwb/+/+/state8bit/#", mqtt2msg_state_8bit },
+    { "state16bit", "kwb/+/+/state16bit/#", mqtt2msg_state_16bit },
+    { "state32bit", "kwb/+/+/state32bit/#", mqtt2msg_state_32bit },
+    { "requestreg", "kwb/+/+/requestreg", mqtt2msg_request_reg },
+    { "setreg8bit", "kwb/+/+/setreg8bit/#", mqtt2msg_setreg_8bit },
+    { "setreg16bit", "kwb/+/+/setreg16bit/#", mqtt2msg_setreg_16bit },
+    { "setreg32bit", "kwb/+/+/setreg32bit/#", mqtt2msg_setreg_32bit },
+    { NULL, NULL, NULL }
 };
 
 // --- Module global variables -------------------------------------------------
@@ -92,41 +99,61 @@ mqtt_msg_types_t g_mqtt_msg_types[] = {
 
 // --- Local functions ---------------------------------------------------------
 
-int mqtt_split_topic(char* topic,
-                     uint16_t* sender, uint16_t* receiver,
-                     char** msgtype,
-                     char** remaining_topic)
+static int mqtt_split_topic(char *topic,
+                            uint16_t *sender, uint16_t *receiver,
+                            char **msgtype,
+                            char **remaining_topic)
 {
-    int retval = eERR_UNKNOWN_MESSAGE;
+    int retval = eERR_UNKNOWN;
     char *slash_pos = topic;
     char *senderstr, *receiverstr;
 
     do {
         slash_pos = strstr(topic, "/");
-        if (slash_pos == NULL) break;
+        if (slash_pos == NULL) {
+            break;
+        }
         //! todo use safe string functions correctly! e.g. strlen(topic) = :-(
         //if (strstr_s(topic, strlen(topic), "/", 1, &slash_pos) != 0) break;
-        *slash_pos = '\0'; slash_pos++; if (*slash_pos == '\0') break;
+        *slash_pos = '\0';
+        slash_pos++;
+        if (*slash_pos == '\0') {
+            break;
+        }
         senderstr = slash_pos;
         topic = slash_pos;
         //if (strstr_s(topic, strlen(topic), "/", 1, &slash_pos) != 0) break;
         slash_pos = strstr(topic, "/");
-        if (slash_pos == NULL) break;
-        *slash_pos = '\0'; slash_pos++; if (*slash_pos == '\0') break;
+        if (slash_pos == NULL) {
+            break;
+        }
+        *slash_pos = '\0';
+        slash_pos++;
+        if (*slash_pos == '\0') {
+            break;
+        }
         receiverstr = slash_pos;
         topic = slash_pos;
         //if (strstr_s(topic, strlen(topic), "/", 1, &slash_pos) != 0) break;
         slash_pos = strstr(topic, "/");
-        if (slash_pos == NULL) break;
-        *slash_pos = '\0'; slash_pos++; if (*slash_pos == '\0') break;
+        if (slash_pos == NULL) {
+            break;
+        }
+        *slash_pos = '\0';
+        slash_pos++;
+        if (*slash_pos == '\0') {
+            break;
+        }
         *msgtype = slash_pos;
         topic = slash_pos;
         //if (strstr_s(topic, strlen(topic), "/", 1, &slash_pos) == 0) {
         slash_pos = strstr(topic, "/");
         if (slash_pos == NULL) {
             *remaining_topic = NULL;
-        } else {
-            *slash_pos = '\0'; slash_pos++;
+        }
+        else {
+            *slash_pos = '\0';
+            slash_pos++;
             *remaining_topic = slash_pos;
         }
 
@@ -138,7 +165,8 @@ int mqtt_split_topic(char* topic,
     return retval;
 }
 
-int mqtt2msg_state_8bit(char* topic, char* msgtext, msg_t* message)
+//----------------------------------------------------------------------------
+static int mqtt2msg_state_8bit(char *topic, char *msgtext, msg_t *message)
 {
     int retval = eERR_NONE;
     uint32_t value;
@@ -149,14 +177,14 @@ int mqtt2msg_state_8bit(char* topic, char* msgtext, msg_t* message)
 
         value = strtoul(topic, NULL, 16);
         if (value > UCHAR_MAX || errno != 0) {
-            retval = eERR_UNKNOWN_MESSAGE;
+            retval = eERR_UNKNOWN;
             break;
         }
         message->data[1] = value;
 
         value = strtoul(msgtext, NULL, 10);
         if (value > UCHAR_MAX || errno != 0) {
-            retval = eERR_UNKNOWN_MESSAGE;
+            retval = eERR_UNKNOWN;
             break;
         }
         message->data[2] = value;
@@ -164,7 +192,8 @@ int mqtt2msg_state_8bit(char* topic, char* msgtext, msg_t* message)
     return retval;
 }
 
-int mqtt2msg_state_16bit(char* topic, char* msgtext, msg_t* message)
+//----------------------------------------------------------------------------
+static int mqtt2msg_state_16bit(char *topic, char *msgtext, msg_t *message)
 {
     int retval = eERR_NONE;
     uint32_t value;
@@ -175,14 +204,14 @@ int mqtt2msg_state_16bit(char* topic, char* msgtext, msg_t* message)
 
         value = strtoul(topic, NULL, 16);
         if (value > UCHAR_MAX || errno != 0) {
-            retval = eERR_UNKNOWN_MESSAGE;
+            retval = eERR_UNKNOWN;
             break;
         }
         message->data[1] = value;
 
         value = strtoul(msgtext, NULL, 10);
         if (value > USHRT_MAX || errno != 0) {
-            retval = eERR_UNKNOWN_MESSAGE;
+            retval = eERR_UNKNOWN;
             break;
         }
         message->data[2] = (value >> 8) & 0x000000FF;
@@ -191,7 +220,8 @@ int mqtt2msg_state_16bit(char* topic, char* msgtext, msg_t* message)
     return retval;
 }
 
-int mqtt2msg_state_32bit(char* topic, char* msgtext, msg_t* message)
+//----------------------------------------------------------------------------
+static int mqtt2msg_state_32bit(char *topic, char *msgtext, msg_t *message)
 {
     int retval = eERR_NONE;
     uint32_t value;
@@ -202,14 +232,14 @@ int mqtt2msg_state_32bit(char* topic, char* msgtext, msg_t* message)
 
         value = strtoul(topic, NULL, 16);
         if (value > UCHAR_MAX || errno != 0) {
-            retval = eERR_UNKNOWN_MESSAGE;
+            retval = eERR_UNKNOWN;
             break;
         }
         message->data[1] = value;
 
         value = strtoul(msgtext, NULL, 10);
-        if (value > UINT_MAX || errno != 0) {
-            retval = eERR_UNKNOWN_MESSAGE;
+        if (value == UINT_MAX || errno != 0) {
+            retval = eERR_UNKNOWN;
             break;
         }
         message->data[2] = (value >> 24) & 0x000000FF;
@@ -220,8 +250,10 @@ int mqtt2msg_state_32bit(char* topic, char* msgtext, msg_t* message)
     return retval;
 }
 
-int mqtt2msg_request_reg(char* topic, char* msgtext, msg_t* message)
+//----------------------------------------------------------------------------
+static int mqtt2msg_request_reg(char *topic, char *msgtext, msg_t *message)
 {
+    (topic);
     int retval = eERR_NONE;
     uint32_t value;
 
@@ -231,7 +263,7 @@ int mqtt2msg_request_reg(char* topic, char* msgtext, msg_t* message)
 
         value = strtoul(msgtext, NULL, 16);
         if (value > UCHAR_MAX || errno != 0) {
-            retval = eERR_UNKNOWN_MESSAGE;
+            retval = eERR_UNKNOWN;
             break;
         }
         message->data[1] = value;
@@ -239,7 +271,8 @@ int mqtt2msg_request_reg(char* topic, char* msgtext, msg_t* message)
     return retval;
 }
 
-int mqtt2msg_setreg_8bit(char* topic, char* msgtext, msg_t* message)
+//----------------------------------------------------------------------------
+static int mqtt2msg_setreg_8bit(char *topic, char *msgtext, msg_t *message)
 {
     int retval = eERR_NONE;
     uint32_t value;
@@ -250,14 +283,14 @@ int mqtt2msg_setreg_8bit(char* topic, char* msgtext, msg_t* message)
 
         value = strtoul(topic, NULL, 16);
         if (value > UCHAR_MAX || errno != 0) {
-            retval = eERR_UNKNOWN_MESSAGE;
+            retval = eERR_UNKNOWN;
             break;
         }
         message->data[1] = value;
 
         value = strtoul(msgtext, NULL, 10);
         if (value > UCHAR_MAX || errno != 0) {
-            retval = eERR_UNKNOWN_MESSAGE;
+            retval = eERR_UNKNOWN;
             break;
         }
         message->data[2] = value;
@@ -265,7 +298,8 @@ int mqtt2msg_setreg_8bit(char* topic, char* msgtext, msg_t* message)
     return retval;
 }
 
-int mqtt2msg_setreg_16bit(char* topic, char* msgtext, msg_t* message)
+//----------------------------------------------------------------------------
+static int mqtt2msg_setreg_16bit(char *topic, char *msgtext, msg_t *message)
 {
     int retval = eERR_NONE;
     uint32_t value;
@@ -276,14 +310,14 @@ int mqtt2msg_setreg_16bit(char* topic, char* msgtext, msg_t* message)
 
         value = strtoul(topic, NULL, 16);
         if (value > UCHAR_MAX || errno != 0) {
-            retval = eERR_UNKNOWN_MESSAGE;
+            retval = eERR_UNKNOWN;
             break;
         }
         message->data[1] = value;
 
         value = strtoul(msgtext, NULL, 10);
         if (value > USHRT_MAX || errno != 0) {
-            retval = eERR_UNKNOWN_MESSAGE;
+            retval = eERR_UNKNOWN;
             break;
         }
         message->data[2] = (value >> 8) & 0x000000FF;
@@ -292,7 +326,8 @@ int mqtt2msg_setreg_16bit(char* topic, char* msgtext, msg_t* message)
     return retval;
 }
 
-int mqtt2msg_setreg_32bit(char* topic, char* msgtext, msg_t* message)
+//----------------------------------------------------------------------------
+static int mqtt2msg_setreg_32bit(char *topic, char *msgtext, msg_t *message)
 {
     int retval = eERR_NONE;
     uint32_t value;
@@ -303,14 +338,14 @@ int mqtt2msg_setreg_32bit(char* topic, char* msgtext, msg_t* message)
 
         value = strtoul(topic, NULL, 16);
         if (value > UCHAR_MAX || errno != 0) {
-            retval = eERR_UNKNOWN_MESSAGE;
+            retval = eERR_UNKNOWN;
             break;
         }
         message->data[1] = value;
 
         value = strtoul(msgtext, NULL, 10);
-        if (value > UINT_MAX || errno != 0) {
-            retval = eERR_UNKNOWN_MESSAGE;
+        if (value == UINT_MAX || errno != 0) {
+            retval = eERR_UNKNOWN;
             break;
         }
         message->data[2] = (value >> 24) & 0x000000FF;
@@ -325,11 +360,17 @@ int mqtt2msg_setreg_32bit(char* topic, char* msgtext, msg_t* message)
 
 // --- Global functions --------------------------------------------------------
 
-int mqtt2msg_subscribe(struct mosquitto* mosq)
+/**
+ * Subscribe to MQTT topics defined in g_mqtt_msg_types
+ *
+ * @param[in]   mosq    Handle to mosquitto connection-
+ * @return eERR_NONE if subscription was successful, otherwise
+ *                   eERR_3RD_PARTY_FUNC_FAILED.
+ */
+int mqtt2msg_subscribe(struct mosquitto *mosq)
 {
     int mrc;
-    uint16_t mid = 0;
-    mqtt_msg_types_t* msg_types = g_mqtt_msg_types;
+    mqtt_msg_types_t *msg_types = g_mqtt_msg_types;
     while (msg_types->func != NULL) {
         mrc = mosquitto_subscribe(mosq, NULL, msg_types->topic, 0);
         if (mrc != MOSQ_ERR_SUCCESS) {
@@ -346,13 +387,22 @@ int mqtt2msg_subscribe(struct mosquitto* mosq)
     return eERR_NONE;
 }
 
-int mqtt2msg(char* topic, char* msgtext, msg_t* message)
+/**
+ * Convert a MQTT message and MQTT topic into a kwb message.
+ *
+ * @param[in]   topic       Topic of MQTT message to convert
+ * @param[in]   msgtext     Content of MQTT message to convert
+ * @param[out]  message     Converted kwb message
+ * @return eERR_NONE if successful, otherwise error code.
+ */
+
+int mqtt2msg(char *topic, char *msgtext, msg_t *message)
 {
-    int retval = eERR_UNKNOWN_MESSAGE;
+    int retval = eERR_UNKNOWN;
 
     uint16_t sender = 0, receiver = 0;
     char *msgtype = NULL, *remaining_topic = NULL;
-    mqtt_msg_types_t* msg_types = g_mqtt_msg_types;
+    mqtt_msg_types_t *msg_types = g_mqtt_msg_types;
 
     do {
         retval = mqtt_split_topic(topic, &sender, &receiver, &msgtype, &remaining_topic);

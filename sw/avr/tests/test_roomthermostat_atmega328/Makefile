@@ -23,10 +23,10 @@ SRC = ../shared/bus_transport.c \
       shared/sleepmode.c \
       shared/timer.c \
       shared/zagwire.c \
+      tests/shared/test_eeprom.c \
       tests/test_roomthermostat_atmega328/appregister.c \
       tests/test_roomthermostat_atmega328/appversion.c \
-      tests/test_roomthermostat_atmega328/main_test_roomthermostat_atmega328.c \
-      tests/test_roomthermostat_atmega328/test_eeprom.c
+      tests/test_roomthermostat_atmega328/main_test_roomthermostat_atmega328.c
 
 # Place -I options here
 INCDIRS = -I. \

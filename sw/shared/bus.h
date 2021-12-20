@@ -85,6 +85,8 @@
 #define BUS_LASTNODE        0x7F
 
 #define BUS_BRDCSTADR       0x0000  //!< global broadcast address.
+#define BUS_SEGBRDCST         0x00  //!< segment broadcast
+#define BUS_SEGBRDCSTMASK   0x0F00  //!< segment broadcast mask
 #define BUS_UNKNOWNADR      0xFFFF  //!< unknown address.
 
 // --- Type definitions --------------------------------------------------------
@@ -137,9 +139,9 @@ typedef enum errorcodes {
 
 //! configuration data of the bus
 typedef struct busconfig {
-    uint16_t       uOwnAddress;
-    uint8_t        uOwnNodeAddress;    //!< address of node on bus.
-    uint8_t        uOwnExtAddress;     //!< extensionaddress of node on bus.
+    uint16_t       uOwnAddress;        //!< address of node on bus.
+    uint8_t        uOwnNodeAddress;    //!< lower 7bit of address of node on bus
+    uint8_t        uOwnExtAddress;     //!< extension (upper 4 bit) address of node on bus.
     bool           router_mode;
 } sBusCfg_t;
 

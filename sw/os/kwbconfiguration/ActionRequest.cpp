@@ -3,7 +3,7 @@
  *
  * @{
  * @file    ActionRequest.cpp
- * @brief   Base-class of an action to be performed with a bus-module. 
+ * @brief   Base-class of an action to be performed with a bus-module.
  *
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
@@ -23,7 +23,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
- 
+
 // --- Include section ---------------------------------------------------------
 
 #include <chrono>
@@ -44,30 +44,34 @@
 
 // --- Class implementation  ---------------------------------------------------
 
-ActionRequest::ActionRequest(MsgEndpoint  &msgep, 
-                             MsgBroker    &broker, 
-                             uint16_t     nodeId) : Action(msgep, broker),
-                                                    nodeId(nodeId),
-                                                    messageToSend({0})
+ActionRequest::ActionRequest(Connection   &conn,
+                             MsgBroker    &broker,
+                             uint16_t     moduleAddr)
+    : Action(conn, broker)
+    , moduleAddr(moduleAddr)
+    , messageToSend({0})
 {
 }
 
+//----------------------------------------------------------------------------
 bool ActionRequest::start()
 {
     if (formMessage()) {
-        msg_log("MSG S", messageToSend);
-        return msgEndpoint.sendMessage(messageToSend);
+        connection.send(messageToSend);
+        return true;
     }
     return false;
 }
 
+//----------------------------------------------------------------------------
 void ActionRequest::cancel()
 {
 }
 
+//----------------------------------------------------------------------------
 bool ActionRequest::isFinished()
 {
-    return timeout_elapsed;
+    return timeoutOccurred;
 }
 
 /** @} */

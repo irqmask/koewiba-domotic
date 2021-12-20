@@ -3,8 +3,8 @@
  *
  * @{
  * @file    RegisterInfo.h
- * @brief   Contains information (id, unit, description, ...) of an 
- *          application's register. 
+ * @brief   Contains information (id, unit, description, ...) of an
+ *          application's register.
  *
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
@@ -24,7 +24,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#pragma once 
+#pragma once
 
 // --- Include section ---------------------------------------------------------
 
@@ -45,10 +45,19 @@
 
 // --- Class definition --------------------------------------------------------
 
-class RegisterInfo {
+/**
+ * Contains information (id, unit, description, ...) of an application's
+ * register.
+ */
+class RegisterInfo
+{
 public:
+
+    /**
+     * Default constructor.
+     */
     RegisterInfo();
-    
+
 protected:
 
 };

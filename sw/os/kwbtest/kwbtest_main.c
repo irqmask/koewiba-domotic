@@ -23,7 +23,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
- 
+
 // --- Include section ---------------------------------------------------------
 
 #include "prjconf.h"
@@ -35,7 +35,7 @@
 #if defined (PRJCONF_UNIX) || \
     defined (PRJCONF_POSIX) || \
     defined (PRJCONF_LINUX)
-#include <safe_lib.h>
+    #include <safe_lib.h>
 #endif
 
 // include
@@ -62,7 +62,7 @@
 
 // --- Local variables ---------------------------------------------------------
 
-bool   g_end_application = false;
+static bool g_end_application = false;
 
 // --- Global variables --------------------------------------------------------
 
@@ -70,13 +70,33 @@ bool   g_end_application = false;
 
 // --- Local functions ---------------------------------------------------------
 
-static void handle_message(msg_t* message, void* reference, void* arg)
+static void handle_message(msg_t *message, void *reference, void *arg)
 {
-    msg_log("RECV", *message);
+    (reference);
+    (arg);
+    msg_log("RECV", message);
 }
 
-static void on_close_connection(const char* address, uint16_t port, void* reference, void* arg)
+static void send_message(msg_endpoint_t *ep, uint16_t sender, uint16_t receiver, uint32_t message_type)
 {
+    msg_t message;
+    message.sender = sender;
+    message.receiver = receiver;
+    switch (message_type) {
+    default:
+        message.length = 1;
+        message.data[0] = 0x24; // request version
+        break;
+    }
+    msg_s_send(ep, &message);
+}
+
+static void on_close_connection(const char *address, uint16_t port, void *reference, void *arg)
+{
+    (address);
+    (port);
+    (reference);
+    (arg);
     g_end_application = true;
 }
 
@@ -84,16 +104,25 @@ static void on_close_connection(const char* address, uint16_t port, void* refere
 
 // --- Global functions --------------------------------------------------------
 
-int main (int argc, char* argv[])
+/**
+ * Main entry point of kwbtest playground.
+ * @param[in]   argc    Number of arguments passed.
+ * @param[in]   argv    List of program arguments.
+ * @return 0, if successfully executed, otherwise a non-zero value.
+ */
+int main(int argc, char *argv[])
 {
+    (argc);
+    (argv);
     int             rc = eERR_NONE;
     ioloop_t        mainloop;
     msg_socket_t    msg_socket;
-    msg_endpoint_t* msg_ep;
+    msg_endpoint_t *msg_ep;
+    int state = 1;
 
     do {
-        log_msg(KWB_LOG_INFO, "kwbtest...");
         log_set_mask(0xFFFFFFFF);
+        log_msg(LOG_INFO, "kwbtest...");
         ioloop_init(&mainloop);
 
         msg_s_init(&msg_socket);
@@ -101,11 +130,15 @@ int main (int argc, char* argv[])
         if ((rc = msg_s_open_client(&msg_socket, &mainloop, "/tmp/kwbr.usk", 0)) != eERR_NONE) {
             break;
         }
-        msg_ep = msg_s_get_endpoint(&msg_socket, 0, 0);
+        msg_ep = msg_s_get_endpoint(&msg_socket, 0);
         msg_s_set_closeconnection_handler(msg_ep, on_close_connection, NULL);
-        log_msg(KWB_LOG_STATUS, "entering mainloop...");
+        log_msg(LOG_STATUS, "entering mainloop...");
         while (!g_end_application) {
             ioloop_run_once(&mainloop);
+            if (state == 1) {
+                send_message(msg_ep, 0x0501, 0x0110, 0);
+                state = 0;
+            }
         }
         //msg_s_close_connection(&msg_socket);
     } while (0);

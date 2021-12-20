@@ -3,7 +3,7 @@
  *
  * @{
  * @file    ActionWriteRegister.h
- * @brief   Action: Write a register of a bus module. 
+ * @brief   Action: Write a register of a bus module.
  *
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
@@ -23,7 +23,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#pragma once 
+#pragma once
 
 // --- Include section ---------------------------------------------------------
 
@@ -45,25 +45,67 @@
 
 // --- Class definition --------------------------------------------------------
 
-class ActionWriteRegister : public ActionRequest {
+/**
+ * Action to write a regiter value to a bus module.
+ */
+class ActionWriteRegister : public ActionRequest
+{
 public:
-    ActionWriteRegister(MsgEndpoint& msgep, MsgBroker& broker, uint16_t nodeId=0, uint8_t registerId=0);
-    
+    /**
+     * Constructor
+     * @param[in]   conn        Reference to established connection to a
+     *                          KWB bus os router
+     * @param[in]   broker      Reference to message broker.
+     * @param[in]   moduleAddr  (optional, default = 0) Module address to communicate with.
+     * @param[in]   registerId  Id of register to write to.
+     */
+    ActionWriteRegister(Connection &conn, MsgBroker &broker, uint16_t moduleAddr = 0, uint8_t registerId = 0);
+
+    /**
+     * Set the id of the register to write to.
+     * @param[in]   registerId  Register id to write to.
+     */
     void setRegisterId(uint8_t registerId);
+
+    /**
+     * Get id of the reqister to write to.
+     * @return register id
+     */
     uint8_t getRegisterId();
-    
+
+    /**
+     * Set the value which shall be written to the register
+     * @param[in]   value       Value to be written.
+     */
     void setValue(int value);
+
+    /**
+     * Get the value which shall be written to the register
+     * @return Value to be written.
+     */
     int getValue();
-    
+
+    /**
+     * Set the register format to select between 8, 16 and 32bit values.
+     * @param[in]   format      Register format being one of cmd_common_t.
+     */
     void setRegisterFormat(cmd_common_t format);
+
+    /**
+     * Get the register format to write 8, 16 or 32bit values.
+     * @return register format beeing one of cmd_common_t.
+     */
     cmd_common_t getRegisterFormat();
-    
+
 protected:
+    virtual bool formMessage() override;
+
+    //! Id of register to write to.
     uint8_t         registerId;
+    //! Format of the register to write.
     cmd_common_t    registerFormat;
+    //! Value to write into the register.
     int             value;
-    
-    virtual bool formMessage();
 };
 
 /** @} */

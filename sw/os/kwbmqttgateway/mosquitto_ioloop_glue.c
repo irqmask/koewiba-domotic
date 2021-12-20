@@ -52,28 +52,67 @@
 
 // --- Local functions ---------------------------------------------------------
 
-static int on_read_handler(void* arg)
+/**
+ * Callback whenever the registered socket for this callback is able to be read.
+ * @param[in]   arg         Pointer to structure carrying application handles.
+ * @returns always 0 meaning ioloop shall continue calling this callback.
+ */
+static int on_read_handler(void *arg)
 {
-    app_handles_t* h = (app_handles_t*)arg;
+    int rc = 0;
+    app_handles_t *h = (app_handles_t *)arg;
 
-    mosquitto_loop_read(h->mosq, 1);
+    rc = mosquitto_loop_read(h->mosq, 1);
+    if (rc != 0) {
+        log_error("mosquitto_loop_read returned error %d: %s", rc, mosquitto_strerror(rc));
+        if (rc == MOSQ_ERR_NO_CONN || rc == MOSQ_ERR_CONN_LOST) {
+            h->mqtt_disconnected = true;
+        }
+    }
+
     return 0;
 }
 
-static int on_write_handler(void* arg)
+/**
+ * Callback whenever the registered socket for this callback is able to be written.
+ * @param[in]   arg     Pointer to structure carrying application handles.
+ * @returns always 0 meaning ioloop shall continue calling this callback.
+ */
+static int on_write_handler(void *arg)
 {
-    app_handles_t* h = (app_handles_t*)arg;
+    int rc;
+    app_handles_t *h = (app_handles_t *)arg;
 
-    mosquitto_loop_write(h->mosq, 1);
+    rc = mosquitto_loop_write(h->mosq, 1);
+    if (rc != 0) {
+        log_error("mosquitto_loop_write returned error %d: %s", rc, mosquitto_strerror(rc));
+        if (rc == MOSQ_ERR_NO_CONN || rc == MOSQ_ERR_CONN_LOST) {
+            h->mqtt_disconnected = true;
+        }
+    }
+
     mosquitto_ioloop_suspend_write(h);
     return 0;
 }
 
-static int on_misc_handler(void* arg)
+/**
+ * Callback called in a cyclic interval for MQTT housekeeping.
+ * @param[in]   arg     Pointer to structure carrying application handles.
+ * @returns always 0 meaning ioloop shall continue calling this callback.
+ */
+static int on_misc_handler(void *arg)
 {
-    app_handles_t* h = (app_handles_t*)arg;
+    int rc = 0;
+    app_handles_t *h = (app_handles_t *)arg;
 
-    mosquitto_loop_misc(h->mosq);
+    rc = mosquitto_loop_misc(h->mosq);
+    if (rc != 0) {
+        log_error("mosquitto_loop_misc returned error %d: %s", rc, mosquitto_strerror(rc));
+        if (rc == MOSQ_ERR_NO_CONN || rc == MOSQ_ERR_CONN_LOST) {
+            h->mqtt_disconnected = true;
+        }
+    }
+
     return 0;
 }
 
@@ -81,7 +120,12 @@ static int on_misc_handler(void* arg)
 
 // --- Global functions --------------------------------------------------------
 
-int mosquitto_connect_to_ioloop(app_handles_t* h)
+/**
+ * Connect MQTT to ioloop.
+ * @param[in]   h       Structure carrying all network (kwb and mqtt) handles of the application.
+ * @returns 0 if successful otherwise error-code.
+ */
+int mosquitto_connect_to_ioloop(app_handles_t *h)
 {
     int retval = eERR_NONE;
     sys_fd_t fd = INVALID_FD;
@@ -89,7 +133,7 @@ int mosquitto_connect_to_ioloop(app_handles_t* h)
     do {
         fd = (sys_fd_t)mosquitto_socket(h->mosq);
         if (fd == INVALID_FD) {
-            retval = eERR_INVALID_FD;
+            retval = eERR_RESOURCE;
             break;
         }
         ioloop_register_fd(h->ioloop, fd, eIOLOOP_EV_READ, on_read_handler, h);
@@ -99,19 +143,23 @@ int mosquitto_connect_to_ioloop(app_handles_t* h)
     return retval;
 }
 
-/** 
+/**
  * Check if a MQTTmessage has to be written. If not suspend write callbacks.
+ * @param[in]   h       Structure carrying all network (kwb and mqtt) handles of the application.
  */
-void mosquitto_ioloop_suspend_write(app_handles_t* h)
+void mosquitto_ioloop_suspend_write(app_handles_t *h)
 {
     sys_fd_t fd;
 
     fd = (sys_fd_t)mosquitto_socket(h->mosq);
-    if (fd == INVALID_FD) return;
+    if (fd == INVALID_FD) {
+        return;
+    }
 
-    if (mosquitto_want_write(h->mosq)) {
+    if (mosquitto_want_write(h->mosq) == true) {
         ioloop_register_fd(h->ioloop, fd, eIOLOOP_EV_WRITE, on_write_handler, h->mosq);
-    } else {
+    }
+    else {
         ioloop_unregister_fd(h->ioloop, fd, eIOLOOP_EV_WRITE);
     }
 }

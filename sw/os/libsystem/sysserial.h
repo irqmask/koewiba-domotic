@@ -36,6 +36,10 @@
 
 #include "system.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // --- Definitions -------------------------------------------------------------
 
 // --- Type definitions --------------------------------------------------------
@@ -126,30 +130,115 @@ typedef enum sys_ser_flowctrl {
 
 // --- Global functions --------------------------------------------------------
 
-sys_fd_t sys_serial_open (const char* device);
+/**
+ * Open a connection to a derial device e.g. /dev/ttyS0
+ *
+ * @param[in]   device      Path and name of device.
+ *
+ * @return File descriptor if successful, otherwise INVALID_FD.
+ * @note call sys_err_get_as_string() to get error description.
+ */
+sys_fd_t sys_serial_open(const char *device);
 
-void sys_serial_close (sys_fd_t fd);
+/**
+ * Close a connection to a serial device.
+ *
+ * @param[in]   fd          File descriptor of device.
+ */
+void sys_serial_close(sys_fd_t fd);
 
-int sys_serial_set_params (sys_fd_t            fd,
-                           sys_ser_baudrate_t  baudrate,
-                           sys_ser_databits_t  databits,
-                           sys_ser_parity_t    parity,
-                           sys_ser_stopbits_t  stopbits,
-                           sys_ser_flowctrl_t  flowcontrol);
+/**
+ * Set parameters of a serial connection
+ *
+ * @param[in]   fd          File descriptor of device.
+ * @param[in]   baudrate    Baudrate to set. Can be one of sys_ser_baudrate_t.
+ * @param[in]   databits    Databits to use. Can be one of sys_ser_databits_t.
+ * @param[in]   parity      Usage of parity bit. Can be one of sys_ser_parity_t.
+ * @param[in]   stopbits    Usage of stop bits. Can be one of sys_ser_stopbits_t.
+ * @param[in]   flowcontrol Usage of hardware or software flow control. Can be
+ *                          one of sys_ser_flowctrl_t.
+ *
+ * @return 0 if successful, otherwise errorcode.
+ * @note call sys_err_get_as_string() to get error description.
+ */
+int sys_serial_set_params(sys_fd_t            fd,
+                          sys_ser_baudrate_t  baudrate,
+                          sys_ser_databits_t  databits,
+                          sys_ser_parity_t    parity,
+                          sys_ser_stopbits_t  stopbits,
+                          sys_ser_flowctrl_t  flowcontrol);
 
-size_t sys_serial_send (sys_fd_t fd, void* buf, size_t bufsize);
+/**
+ * Send data over the serial connection.
+ *
+ * @param[in]   fd          File descriptor of device.
+ * @param[in]   buf         Buffer containing data to send.
+ * @param[in]   bufsize     Number of bytes to be received.
+ *
+ * @return Number of sent bytes if successful, otherwise -1.
+ * @note call sys_err_get_as_string() to get error description.
+ */
+ssize_t sys_serial_send(sys_fd_t fd, const void *buf, size_t bufsize);
 
-size_t sys_serial_recv (sys_fd_t fd, void* buf, size_t bufsize);
+/**
+ * Receive data over the serial connection.
+ *
+ * @param[in]   fd          File descriptor of device.
+ * @param[in]   buf         Buffer to receive bytes to.
+ * @param[in]   bufsize     Desired number of bytes to receive.
+ *
+ * @return Number of received bytes if successful, 0 if connection is closed
+ *         remotely or -1 on error.
+ * @note call sys_err_get_as_string() to get error description.
+ */
+ssize_t sys_serial_recv(sys_fd_t fd, void *buf, size_t bufsize);
 
-void sys_serial_flush (sys_fd_t fd);
+/**
+ * Flush serial device's RX and TX buffers.
+ *
+ * @param[in]   fd          File descriptor of device.
+ */
+void sys_serial_flush(sys_fd_t fd);
 
-size_t sys_serial_get_pending_sendq (sys_fd_t fd);
+/**
+ * Get pending bytes in serial device's send queue.
+ *
+ * @param[in]   fd          File descriptor of device.
+ *
+ * @returns bytes to be sent in send-queue.
+ */
+size_t sys_serial_get_pending_sendq(sys_fd_t fd);
 
-size_t sys_serial_get_pending_recvq (sys_fd_t fd);
+/**
+ * Get pending bytes waiting in receive queue.
+ *
+ * @param[in]   fd          File descriptor of device.
+ *
+ * @returns pending bytes in receive queue
+ */
+size_t sys_serial_get_pending_recvq(sys_fd_t fd);
 
-void sys_serial_set_blocking (sys_fd_t fd, bool blocking);
+/**
+ * Set if calls to serial device e.g. send and receive shall be blocking or
+ * non-blocking.
+ *
+ * @param[in]   fd          File descriptor of device.
+ * @param[in]   blocking    true = calls shall be blocking.
+ */
+void sys_serial_set_blocking(sys_fd_t fd, bool blocking);
 
-sys_ser_baudrate_t sys_serial_baudrate (int baudrate);
+/**
+ * Convert baudrate as integer into baudrate enumeration.
+ *
+ * @param[in]   baudrate    Baudrate as integer (e.g. 38400)
+ *
+ * @return Converted baudrate (e.g. eSYS_SER_BR_38400), if not convertable -1.
+ */
+sys_ser_baudrate_t sys_serial_baudrate(uint32_t baudrate);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _SYSSERIAL_H_ */
 /** @} */

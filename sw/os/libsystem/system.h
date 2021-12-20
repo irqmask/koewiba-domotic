@@ -34,11 +34,11 @@
 #include "prjconf.h"
 
 #if defined (PRJCONF_UNIX) || \
-defined (PRJCONF_POSIX) || \
-defined (PRJCONF_LINUX)
-  #include <safe_lib.h>
+    defined (PRJCONF_POSIX) || \
+    defined (PRJCONF_LINUX)
+    #include <safe_lib.h>
 #elif defined (PRJCONF_WINDOWS)
-  #include <windows.h>
+    #include <windows.h>
 #endif
 
 #include "error_codes.h"
@@ -46,16 +46,18 @@ defined (PRJCONF_LINUX)
 
 // --- Definitions -------------------------------------------------------------
 
+//! Invalid handle value
 #if defined (PRJCONF_UNIX) || \
     defined (PRJCONF_POSIX) || \
     defined (PRJCONF_LINUX)
-  #define INVALID_FD (-1)
+    #define INVALID_FD (-1)
 #elif defined (PRJCONF_WINDOWS)
-  #define INVALID_FD INVALID_HANDLE_VALUE
+    #define INVALID_FD INVALID_HANDLE_VALUE
 #endif
 
 // --- Type definitions --------------------------------------------------------
 
+//! operating-system specific error codes
 typedef enum {
     eSYS_ERR_NONE = eERR_NONE,
 
@@ -63,12 +65,13 @@ typedef enum {
     eSYS_ERR_SER_CONFIGURE,
 } sys_errors_t;
 
+//! Operating system independent handle value.
 #if defined (PRJCONF_UNIX) || \
     defined (PRJCONF_POSIX) || \
     defined (PRJCONF_LINUX)
-typedef int sys_fd_t;
+    typedef int sys_fd_t;
 #elif defined (PRJCONF_WINDOWS)
-typedef HANDLE sys_fd_t;
+    typedef HANDLE sys_fd_t;
 #endif
 
 // --- Local variables ---------------------------------------------------------

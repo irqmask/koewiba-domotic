@@ -3,7 +3,7 @@
  *
  * @{
  * @file    ActionQueryModules.h
- * @brief   Action: Query version information of a bus module and wait for the answer. 
+ * @brief   Action: Query version information of a bus module and wait for the answer.
  *
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
@@ -23,7 +23,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#pragma once 
+#pragma once
 
 // --- Include section ---------------------------------------------------------
 
@@ -47,24 +47,44 @@
 
 // --- Class definition --------------------------------------------------------
 
-class ActionQueryModules : public ActionWithResponse {
+/**
+ * Action to query one or multiple modules which are currently online.
+ */
+class ActionQueryModules : public ActionWithResponse
+{
 public:
+    //! Structure to store queried bus module information
     struct Module {
-    public: 
+    public:
+        //! Module address
         uint16_t nodeId;
-        version_info_t version; 
+        //! Module type and version information of hard and software.
+        version_info_t version;
     };
-        
-    ActionQueryModules(MsgEndpoint& msgep, MsgBroker& broker, uint16_t nodeId=0);
-    
-    std::vector<Module> getModules();   
+
+    /**
+     * Constructor
+     * @param[in]   conn        Reference to established connection to a
+     *                          KWB bus os router
+     * @param[in]   broker      Reference to message broker.
+     * @param[in]   moduleAddr  (optional, default = 0) Module address to communicate with.
+     */
+    ActionQueryModules(Connection &conn, MsgBroker &broker, uint16_t moduleAddr = 0);
+
+    /**
+     * Get the result of the query.
+     * @return list of queried bus modules.
+     */
+    std::vector<Module> getModules();
+
     virtual bool waitForResponse() override;
-    
+
 protected:
-    virtual bool formMessage();
-    virtual bool filterResponse(msg_t& message) override;
-    virtual void handleResponse(msg_t& message) override;
-    
+    virtual bool formMessage() override;
+    virtual bool filterResponse(const msg_t &message) override;
+    virtual void handleResponse(const msg_t &message, void *reference) override;
+
+    //! List of module information of modules which responed during this action.
     std::vector<Module> modules;
 };
 

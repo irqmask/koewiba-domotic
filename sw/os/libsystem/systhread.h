@@ -34,26 +34,44 @@
 #include "prjconf.h"
 
 #ifdef PRJCONF_WINDOWS
-#  include <windows.h>
+    #include <windows.h>
 #else
-#  include <pthread.h>
-#  include <unistd.h>
+    #include <pthread.h>
+    #include <unistd.h>
+#endif
+
+#ifdef __cplusplus
+extern "C" {
 #endif
 
 // --- Definitions -------------------------------------------------------------
 
 #if defined (PRJCONF_WINDOWS)
+
+/**
+ * Declaration of a thread function.
+ */
 #  define sys_thread_func(name) DWORD WINAPI name( LPVOID p)
 
+/**
+ * Start a thread
+ */
 #  define sys_thread_start(func)    do{                 \
                                         CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)(func), NULL, 0, NULL);\
                                     }while(0);
 #else
+
+/**
+ * Declaration of a thread function.
+ */
 #  define sys_thread_func(name) void *name(void *p)
 
+/**
+ * Start a thread
+ */
 #  define sys_thread_start(func)    do{                 \
                                         pthread_t tid;   \
-                                        pthread_create(&tid, NULL, (func), NULL);\
+                                        pthread_create(&tid, NULL, func, NULL);\
                                     }while(0);
 #endif
 
@@ -70,6 +88,10 @@
 // --- Module global functions -------------------------------------------------
 
 // --- Global functions --------------------------------------------------------
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _SYSTHREAD_H_ */
 /** @} */

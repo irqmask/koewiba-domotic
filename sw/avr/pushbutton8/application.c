@@ -28,6 +28,8 @@
 
 // --- Definitions -------------------------------------------------------------
 
+#define OWN_NODE_ID 0x0a50
+
 // --- Type definitions --------------------------------------------------------
 
 // --- Local variables ---------------------------------------------------------
@@ -36,16 +38,29 @@
 
 // --- Module global variables -------------------------------------------------
 
+#if (OWN_NODE_ID == 0x0a50)
 app_on_key_set_register_t g_on_key_set_register[APP_NUM_KEYS] = {
-    { 0, 0x111, 17,   0 },
-    { 0, 0x111, 17, 100 },
-    { 0, 0x111, 25,   0 },
-    { 0, 0x111, 25, 100 },
-    { 0, 0x111, 33,   0 },
-    { 0, 0x111, 33, 100 },
-    { 0, 0x111, 41,   0 },
-    { 0, 0x111, 41, 100 },
+    { 0, 0x0a51, 17, 100 },
+    { 0, 0x0a51, 25, 100 },
+    { 0, 0x0a51, 33, 100 },
+    { 0, 0x0a51, 41, 100 },
+    { 0, 0x0a51, 17,   0 },
+    { 0, 0x0a51, 25,   0 },
+    { 0, 0x0a51, 33,   0 },
+    { 0, 0x0a51, 41,   0 },
 };
+#elif (OWN_NODE_ID == 0x0a51)
+app_on_key_set_register_t g_on_key_set_register[APP_NUM_KEYS] = {
+    { 0, 0x0a50, 17, 100 },
+    { 0, 0x0a50, 25, 100 },
+    { 0, 0x0a50, 33, 100 },
+    { 0, 0x0a50, 41, 100 },
+    { 0, 0x0a50, 17,   0 },
+    { 0, 0x0a50, 25,   0 },
+    { 0, 0x0a50, 33,   0 },
+    { 0, 0x0a50, 41,   0 },
+};
+#endif
 
 // --- Local functions ---------------------------------------------------------
 
@@ -83,14 +98,14 @@ extern void app_register_load (void);
 
 /**
  * Application specific initializations.
- * 
+ *
  * Executed if common code initialization passed.
  * @note Global interrupts are still switched off! Will be switched on in global
  * main after this initialization code.
  */
 void app_init (void)
 {
-    //register_set_u16(MOD_eReg_ModuleID, 0x110);
+    //register_set_u16(MOD_eReg_ModuleID, OWN_NODE_ID);
     //app_register_load();
     leds_keys_init();
 }
@@ -108,7 +123,7 @@ void app_on_pinchangeinterrupt(uint8_t pinchange_interruptflags)
 
 /**
  * Application specific command interpreter code.
- * 
+ *
  * Executed if a not-common command is received.
  */
 void app_on_command (uint16_t sender, uint8_t msglen, uint8_t* msg)
@@ -122,7 +137,7 @@ void app_on_command (uint16_t sender, uint8_t msglen, uint8_t* msg)
 
 /**
  * Application specific background code.
- * 
+ *
  * Executed once per main loop cycle.
  */
 void app_background (sBus_t* bus)

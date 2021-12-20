@@ -3,7 +3,7 @@
  *
  * @{
  * @file    ActionWriteRegister.cpp
- * @brief   Action: Query a register of a bus module and wait for the answer. 
+ * @brief   Action: Query a register of a bus module and wait for the answer.
  *
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
@@ -23,7 +23,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
- 
+
 // --- Include section ---------------------------------------------------------
 
 #include "prjconf.h"
@@ -44,30 +44,37 @@
 
 // --- Class implementation  ---------------------------------------------------
 
-ActionWriteRegister::ActionWriteRegister(MsgEndpoint& msgep, 
-                                         MsgBroker&   broker, 
-                                         uint16_t     nodeId,
-                                         uint8_t      registerId) : ActionRequest(msgep, broker, nodeId),
-                                                                    registerId(registerId),
-                                                                    value(0)
+ActionWriteRegister::ActionWriteRegister(Connection   &conn,
+                                         MsgBroker    &broker,
+                                         uint16_t     moduleAddr,
+                                         uint8_t      registerId)
+    : ActionRequest(conn, broker, moduleAddr)
+    , registerId(registerId)
+    , registerFormat(eCMD_NAK)
+    , value(0)
 {
 }
 
+//----------------------------------------------------------------------------
 void ActionWriteRegister::setRegisterId(uint8_t registerId)
 {
     this->registerId = registerId;
 }
 
+//----------------------------------------------------------------------------
 uint8_t ActionWriteRegister::getRegisterId()
 {
     return this->registerId;
 }
-    
+
+//----------------------------------------------------------------------------
 bool ActionWriteRegister::formMessage()
 {
-    if (nodeId == 0) return false;
-    messageToSend.receiver = nodeId;
-    messageToSend.sender = msgEndpoint.getOwnNodeId();
+    if (moduleAddr == 0) {
+        return false;
+    }
+    messageToSend.receiver = moduleAddr;
+    messageToSend.sender = connection.getOwnNodeId();
     messageToSend.data[0] = registerFormat;
     messageToSend.data[1] = registerId;
 
@@ -94,21 +101,25 @@ bool ActionWriteRegister::formMessage()
     return true;
 }
 
+//----------------------------------------------------------------------------
 void ActionWriteRegister::setValue(int value)
 {
     this->value = value;
 }
 
+//----------------------------------------------------------------------------
 int ActionWriteRegister::getValue()
 {
     return value;
 }
 
+//----------------------------------------------------------------------------
 void ActionWriteRegister::setRegisterFormat(cmd_common_t format)
 {
     registerFormat = format;
 }
 
+//----------------------------------------------------------------------------
 cmd_common_t ActionWriteRegister::getRegisterFormat()
 {
     return registerFormat;

@@ -27,7 +27,8 @@
 bool g_display_empty_msg = true;
 bool g_display_token_msg = true;
 
-static void current_time_difference (bus_history_t* history, uint32_t* diff_ms, uint32_t* remaining_us)
+//----------------------------------------------------------------------------
+static void current_time_difference(bus_history_t *history, uint32_t *diff_ms, uint32_t *remaining_us)
 {
     sys_time_t diff_us;
 
@@ -36,7 +37,8 @@ static void current_time_difference (bus_history_t* history, uint32_t* diff_ms, 
     *remaining_us = (uint32_t)(diff_us - (*diff_ms * 1000));
 }
 
-void monitor_init (bus_history_t* history)
+//----------------------------------------------------------------------------
+void monitor_init(bus_history_t *history)
 {
     history->time_start = sys_time_get_usecs();
     history->time_curr_byte = 0;
@@ -45,7 +47,8 @@ void monitor_init (bus_history_t* history)
     history->last_message_status = eMSG_NOTHING;
 }
 
-void monitor_parse_message (uint8_t new_byte, bus_history_t* history)
+//----------------------------------------------------------------------------
+void monitor_parse_message(uint8_t new_byte, bus_history_t *history)
 {
     char        buffer[1024], part[256];
     uint16_t    calcedcrc = 0;
@@ -58,10 +61,10 @@ void monitor_parse_message (uint8_t new_byte, bus_history_t* history)
     history->time_curr_byte = sys_time_get_usecs();
     if (history->current_msg_bytes == 0) {
         current_time_difference(history, &diff_ms, &remaining_us);
-        snprintf(buffer, sizeof(buffer)-1, "%9d.%03d | ", diff_ms, remaining_us);
+        snprintf(buffer, sizeof(buffer) - 1, "%9d.%03d | ", diff_ms, remaining_us);
     }
-    snprintf(part, sizeof(part-1), "%02X ", new_byte);
-    strcat_s(buffer, sizeof(buffer)-1, part);
+    snprintf(part, sizeof(part) - 1, "%02X ", new_byte);
+    strcat_s(buffer, sizeof(buffer) - 1, part);
 
     // compute status of message
     if (history->current_msg_bytes == 0) {
@@ -75,7 +78,8 @@ void monitor_parse_message (uint8_t new_byte, bus_history_t* history)
         }
         history->message[history->current_msg_bytes] = new_byte;
 
-    } else if (history->current_msg_bytes == 1) {
+    }
+    else if (history->current_msg_bytes == 1) {
         // check if token or message
         if (new_byte & 0x80) {
             msgstatus = eMSG_TOKEN;
@@ -83,37 +87,46 @@ void monitor_parse_message (uint8_t new_byte, bus_history_t* history)
         history->current_sender = new_byte & 0x7F;
         history->message[history->current_msg_bytes] = new_byte;
 
-    } else if (history->current_msg_bytes == 2) {
+    }
+    else if (history->current_msg_bytes == 2) {
         // check length
         if (new_byte == 0) {
             msgstatus = eMSG_EMPTY;
-        } else if (new_byte > BUS_MAXTOTALMSGLEN) {
+        }
+        else if (new_byte > BUS_MAXTOTALMSGLEN) {
             msgstatus = eMSG_ERROR;
-        } else {
+        }
+        else {
             history->expected_length = new_byte;
         }
         history->message[history->current_msg_bytes] = new_byte;
 
-    } else if (history->current_msg_bytes == 3) {
+    }
+    else if (history->current_msg_bytes == 3) {
         // check address receiver
         if (new_byte & 0x80) {
             msgstatus = eMSG_ERROR;
-        } else {
+        }
+        else {
             history->message[history->current_msg_bytes] = new_byte;
         }
-    } else if (history->current_msg_bytes == 4) {
+    }
+    else if (history->current_msg_bytes == 4) {
         // extended address
         history->message[history->current_msg_bytes] = new_byte;
 
-    } else if (history->current_msg_bytes < 3 + history->expected_length - 2) {
+    }
+    else if (history->current_msg_bytes < 3 + history->expected_length - 2) {
         // message data
         history->message[history->current_msg_bytes] = new_byte;
 
-    } else if (history->current_msg_bytes == 3 + history->expected_length - 2) {
+    }
+    else if (history->current_msg_bytes == 3 + history->expected_length - 2) {
         // CRC high byte
         history->expected_CRC = new_byte << 8;
 
-    } else if (history->current_msg_bytes == 3 + history->expected_length - 1) {
+    }
+    else if (history->current_msg_bytes == 3 + history->expected_length - 1) {
         // CRC high byte
         history->expected_CRC |= (new_byte & 0xFF);
         crclen = 3 + history->expected_length - 2;
@@ -121,71 +134,81 @@ void monitor_parse_message (uint8_t new_byte, bus_history_t* history)
         msgstatus = eMSG_COMPLETE;
     }
     history->current_msg_bytes++;
-    if (history->current_msg_bytes >= BUS_MAXTOTALMSGLEN+9) {
+    if (history->current_msg_bytes >= BUS_MAXTOTALMSGLEN + 9) {
         msgstatus = eMSG_ERROR;
     }
 
     // fill line
     if (msgstatus != eMSG_NOTHING) {
-        for (ii=0; ii<(MAX_DISPLAYLEN-history->current_msg_bytes); ii++)
-            strcat_s(buffer, sizeof(buffer)-1, "   ");
+        for (ii = 0; ii < (MAX_DISPLAYLEN - history->current_msg_bytes); ii++) {
+            strcat_s(buffer, sizeof(buffer) - 1, "   ");
+        }
         history->current_msg_bytes = 0;
         history->last_message_status = msgstatus;
     }
 
     // print status at end of line
     switch (msgstatus) {
-        case eMSG_NOTHING:
-            break;
-        case eMSG_ERROR:
-            strcat_s(buffer, sizeof(buffer)-1, "| ERR stray\r\n");
+    case eMSG_NOTHING:
+        break;
+    case eMSG_ERROR:
+        strcat_s(buffer, sizeof(buffer) - 1, "| ERR stray\r\n");
+        printf("%s", buffer);
+        break;
+
+    case eMSG_TOKEN:
+        strcat_s(buffer, sizeof(buffer) - 1, "| TOKEN\r\n");
+        if (g_display_token_msg) {
             printf("%s", buffer);
-            break;
+        }
+        break;
 
-        case eMSG_TOKEN:
-            strcat_s(buffer, sizeof(buffer)-1, "| TOKEN\r\n");
-            if (g_display_token_msg) printf("%s", buffer);
-            break;
-
-        case eMSG_EMPTY:
-            strcat_s(buffer, sizeof(buffer)-1, "| EMPTY MSG\r\n");
-            if (g_display_empty_msg) printf("%s", buffer);
-            break;
-
-        case eMSG_COMPLETE:
-            if (history->expected_CRC != calcedcrc) {
-                snprintf(part, sizeof(part)-1, "| MSG BADCRC %04x %04x\r\n", history->expected_CRC, calcedcrc);
-                strcat_s(buffer, sizeof(buffer)-1, part);
-            } else {
-                strcat_s(buffer, sizeof(buffer)-1, "| MESSAGE\r\n");
-            }
+    case eMSG_EMPTY:
+        strcat_s(buffer, sizeof(buffer) - 1, "| EMPTY MSG\r\n");
+        if (g_display_empty_msg) {
             printf("%s", buffer);
-            break;
+        }
+        break;
 
-        case eMSG_ACK:
-            strcat_s(buffer, sizeof(buffer)-1, "| ACK\r\n");
-            printf("%s", buffer);
-            break;
+    case eMSG_COMPLETE:
+        if (history->expected_CRC != calcedcrc) {
+            snprintf(part, sizeof(part) - 1, "| MSG BADCRC %04x %04x\r\n", history->expected_CRC, calcedcrc);
+            strcat_s(buffer, sizeof(buffer) - 1, part);
+        }
+        else {
+            strcat_s(buffer, sizeof(buffer) - 1, "| MESSAGE\r\n");
+        }
+        printf("%s", buffer);
+        break;
 
-        default:
-            break;
+    case eMSG_ACK:
+        strcat_s(buffer, sizeof(buffer) - 1, "| ACK\r\n");
+        printf("%s", buffer);
+        break;
+
+    default:
+        break;
     }
 }
 
-void monitor_toggle_display_empty_message (void)
+//----------------------------------------------------------------------------
+void monitor_toggle_display_empty_message(void)
 {
     if (g_display_empty_msg) {
         g_display_empty_msg = false;
-    } else {
+    }
+    else {
         g_display_empty_msg = true;
     }
 }
 
-void monitor_toggle_display_token_message (void)
+//----------------------------------------------------------------------------
+void monitor_toggle_display_token_message(void)
 {
     if (g_display_token_msg) {
         g_display_token_msg = false;
-    } else {
+    }
+    else {
         g_display_token_msg = true;
     }
 }

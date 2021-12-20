@@ -109,6 +109,28 @@ void        app_register_set        (uint8_t                reg_no,
         eeprom_write_word((uint16_t*)&register_eeprom_array[index], tempval16);
     }
 #endif
+
+    switch(reg_no)
+    {
+    case 17:
+    	if(value == 0)	led_switch(0, eLED_off);
+    	else 			led_switch(0, eLED_blink_slow);
+    	break;
+    case 25:
+    	if(value == 0)	led_switch(1, eLED_off);
+    	else 			led_switch(1, eLED_on);
+    	break;
+    case 33:
+    	if(value == 0)	led_switch(2, eLED_off);
+    	else 			led_switch(2, eLED_blink_fast);
+    	break;
+    case 41:
+    	if(value == 0)	led_switch(3, eLED_off);
+    	else 			led_switch(3, eLED_on);
+    	break;
+    default:
+    	break;
+    }
 }
 
 /** @} */

@@ -63,8 +63,39 @@
 typedef enum appregisters {
     // registers saved in EEProm
     APP_eReg_TempCurrent = MOD_eReg_FirstAppSpecific, //!< Current temperature in 1/100K.
-    APP_eReg_TempSetPoint,  //!< Wanted temperature in 1/100K.
-    APP_eReg_TempOffset,    //!< Temperature sensor offset in 1/100K (signed)
+    APP_eReg_TempSetPoint,          //!< Wanted temperature in 1/100K.
+    APP_eReg_TempOffset,            //!< Temperature sensor offset in 1/100K (signed)
+    APP_eReg_WindowSensorModuleID,  //!< Module ID of module which delivers the window state.
+    APP_eReg_WindowSensorReg,       //!< Register number of window state.
+
+    APP_eReg_Mode,                  //!< Mode: 0=normal, 1=vaccation
+    APP_eReg_TemperatureWindowOpen, //!< Temperature to set when a window is opened
+    APP_eReg_TemperatureVaccation,  //!< Temperature to set when in mode vaccation
+
+    APP_eReg_Temp1_Weekday,         //!< Timepoint 1: Weekday when to switch temperature
+    APP_eReg_Temp1_Hour,            //!< Timepoint 1: Hour when to switch temperature
+    APP_eReg_Temp1_Minute,          //!< Timepoint 1: Minute when to switch temperature
+    APP_eReg_Temp1_Temperature,     //!< Timepoint 1: Temperature to set when timepoint is reached
+
+    APP_eReg_Temp2_Weekday,         //!< Timepoint 2: Weekday when to switch temperature
+    APP_eReg_Temp2_Hour,            //!< Timepoint 2: Hour when to switch temperature
+    APP_eReg_Temp2_Minute,          //!< Timepoint 2: Minute when to switch temperature
+    APP_eReg_Temp2_Temperature,     //!< Timepoint 2: Temperature to set when timepoint is reached
+
+    APP_eReg_Temp3_Weekday,         //!< Timepoint 3: Weekday when to switch temperature
+    APP_eReg_Temp3_Hour,            //!< Timepoint 3: Hour when to switch temperature
+    APP_eReg_Temp3_Minute,          //!< Timepoint 3: Minute when to switch temperature
+    APP_eReg_Temp3_Temperature,     //!< Timepoint 3: Temperature to set when timepoint is reached
+
+    APP_eReg_Temp4_Weekday,         //!< Timepoint 4: Weekday when to switch temperature
+    APP_eReg_Temp4_Hour,            //!< Timepoint 4: Hour when to switch temperature
+    APP_eReg_Temp4_Minute,          //!< Timepoint 4: Minute when to switch temperature
+    APP_eReg_Temp4_Temperature,     //!< Timepoint 4: Temperature to set when timepoint is reached
+
+    APP_eReg_Temp5_Weekday,         //!< Timepoint 5: Weekday when to switch temperature
+    APP_eReg_Temp5_Hour,            //!< Timepoint 5: Hour when to switch temperature
+    APP_eReg_Temp5_Minute,          //!< Timepoint 5: Minute when to switch temperature
+    APP_eReg_Temp5_Temperature,     //!< Timepoint 5: Temperature to set when timepoint is reached
 
     // insert application specific registers here
 

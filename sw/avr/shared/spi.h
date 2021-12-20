@@ -148,13 +148,15 @@ typedef void (*spi_end_send_func_t)(uint8_t arg);
 /**
  * Initialize the SPI as master.
  */
-#if defined (__AVR_ATmega8__)    || \
-    defined (__AVR_ATmega88__)   || \
-    defined (__AVR_ATmega88A__)  || \
-    defined (__AVR_ATmega88P__)  || \
-    defined (__AVR_ATmega328__)  || \
-    defined (__AVR_ATmega328P__) || \
-    defined (__AVR_ATmega324P__) || \
+#if defined (__AVR_ATmega8__)     || \
+    defined (__AVR_ATmega88__)    || \
+    defined (__AVR_ATmega88A__)   || \
+    defined (__AVR_ATmega88P__)   || \
+    defined (__AVR_ATmega328__)   || \
+    defined (__AVR_ATmega328P__)  || \
+    defined (__AVR_ATmega328PB__) || \
+    defined (__AVR_ATmega324P__)  || \
+    defined (__AVR_ATmega324PA__) || \
     defined (__AVR_ATmega324A__)    
 
 inline void     spi_master_init_blk  (void)

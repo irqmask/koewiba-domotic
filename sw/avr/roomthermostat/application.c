@@ -61,9 +61,12 @@
 // --- Local variables ---------------------------------------------------------
 
 static timer_data_t g_seconds_timer;
-static uint16_t g_last_temperature;
-static uint8_t g_display_timeout;
-static uint8_t g_temperature_glitches;
+static uint16_t     g_last_temperature;
+static uint8_t      g_display_timeout;
+static uint8_t      g_temperature_glitches;
+
+static uint16_t     g_windowcontact_moduleid;
+static uint8_t      g_windowcontact_reg;
 
 // --- Global variables --------------------------------------------------------
 
@@ -172,6 +175,26 @@ static void check_display_timeout(void)
 }
 // --- Module global functions -------------------------------------------------
 
+void app_set_windowcontact_moduleid(uint16_t moduleid)
+{
+    g_windowcontact_moduleid = moduleid;
+}
+
+uint16_t app_get_windowcontact_moduleid(void)
+{
+    return g_windowcontact_moduleid;
+}
+
+void app_set_windowcontact_reg(uint8_t reg)
+{
+    g_windowcontact_reg = reg;
+}
+
+uint8_t app_get_windowcontact_reg(void)
+{
+    return g_windowcontact_reg;
+}
+
 void app_draw_desired_temp(void)
 {
     gdisp_goto_col_line(0, 2);
@@ -263,7 +286,7 @@ void app_background (sBus_t* bus)
         }
     }
 
-    //TODO insert application specific background routines here!
+    // do every 1s ...
     if (timer_is_elapsed(&g_seconds_timer)) {
         timer_start(&g_seconds_timer, TIMER_MS_2_TICKS(1000));
         dt_tick_second();

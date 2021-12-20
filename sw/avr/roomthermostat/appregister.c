@@ -86,7 +86,18 @@ bool        app_register_get        (uint8_t                reg_no,
         *(uint16_t*)pvalue = app_temp_offset;
         *preg_type = eRegType_U16;
         break;
-    // TODO add handler for with application specific registers here!
+
+    case APP_eReg_WindowSensorModuleID:
+        *(uint16_t*)pvalue = app_get_windowcontact_moduleid();
+        *preg_type = eRegType_U16;
+        break;
+
+    case APP_eReg_WindowSensorReg:
+        *(uint8_t*)pvalue = app_get_windowcontact_reg();
+        *preg_type = eRegType_U8;
+        break;
+
+        // TODO add handler for with application specific registers here!
 
     // registers in ROM/RAM
     case APP_eReg_Year:
@@ -151,6 +162,15 @@ void        app_register_set        (uint8_t                reg_no,
      case APP_eReg_TempOffset:
          app_temp_offset = tempval16;
          break;
+
+     case APP_eReg_WindowSensorModuleID:
+         app_set_windowcontact_moduleid(tempval16);
+         break;
+
+     case APP_eReg_WindowSensorReg:
+         app_set_windowcontact_reg(tempval8);
+         break;
+
 
      // registers in ROM/RAM
      case APP_eReg_Year:

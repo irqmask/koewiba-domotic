@@ -48,6 +48,14 @@ extern const unsigned char app_versioninfo[];
 
 // --- Module global functions -------------------------------------------------
 
+void app_set_windowcontact_moduleid(uint16_t moduleid);
+
+uint16_t app_get_windowcontact_moduleid(void);
+
+void app_set_windowcontact_reg(uint8_t reg);
+
+uint8_t app_get_windowcontact_reg(void);
+
 void app_draw_desired_temp(void);
 
 void app_draw_current_temp(void);

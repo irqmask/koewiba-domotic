@@ -61,30 +61,32 @@ extern sBus_t g_bus;
 // receivers per module.
 static uint16_t get_receiver (uint8_t selector)
 {
+    uint16_t address = g_bus.sCfg.uOwnExtAddress;
+    address <<= 8;
     if (selector == 1) {
-        if (g_bus.sCfg.uOwnNodeAddress == 10) return 11;
-        if (g_bus.sCfg.uOwnNodeAddress == 11) return 12;
-        if (g_bus.sCfg.uOwnNodeAddress == 12) return 10;
+        if (g_bus.sCfg.uOwnNodeAddress == 0x0A) address |= 0x0B;
+        if (g_bus.sCfg.uOwnNodeAddress == 0x0B) address |= 0x0C;
+        if (g_bus.sCfg.uOwnNodeAddress == 0x0C) address |= 0x0A;
         
-        if (g_bus.sCfg.uOwnNodeAddress == 3) return 5;
-        if (g_bus.sCfg.uOwnNodeAddress == 5) return 20;
-        if (g_bus.sCfg.uOwnNodeAddress == 20) return 3;
+        if (g_bus.sCfg.uOwnNodeAddress == 3) address |= 5;
+        if (g_bus.sCfg.uOwnNodeAddress == 5) address |= 20;
+        if (g_bus.sCfg.uOwnNodeAddress == 20) address |= 3;
         
-        if (g_bus.sCfg.uOwnNodeAddress == 21) return 22;
-        if (g_bus.sCfg.uOwnNodeAddress == 22) return 21;
+        if (g_bus.sCfg.uOwnNodeAddress == 21) address |= 22;
+        if (g_bus.sCfg.uOwnNodeAddress == 22) address |= 21;
     } else if (selector == 2) {
-        if (g_bus.sCfg.uOwnNodeAddress == 10) return 0x0E; //14
-        if (g_bus.sCfg.uOwnNodeAddress == 11) return 0x02;
-        if (g_bus.sCfg.uOwnNodeAddress == 12) return 20;
+        if (g_bus.sCfg.uOwnNodeAddress == 0x0A) address |= 0x11; //14
+        if (g_bus.sCfg.uOwnNodeAddress == 0x0B) address |= 0x20;
+        if (g_bus.sCfg.uOwnNodeAddress == 0x0C) address |= 0x21;
         
-        if (g_bus.sCfg.uOwnNodeAddress == 3) return 0x0E;
-        if (g_bus.sCfg.uOwnNodeAddress == 5) return 11;
-        if (g_bus.sCfg.uOwnNodeAddress == 20) return 12;
+        if (g_bus.sCfg.uOwnNodeAddress == 3) address |= 0x0E;
+        if (g_bus.sCfg.uOwnNodeAddress == 5) address |= 11;
+        if (g_bus.sCfg.uOwnNodeAddress == 20) address |= 12;
         
-        if (g_bus.sCfg.uOwnNodeAddress == 21) return 22;
-        if (g_bus.sCfg.uOwnNodeAddress == 22) return 21;
+        if (g_bus.sCfg.uOwnNodeAddress == 21) address |= 22;
+        if (g_bus.sCfg.uOwnNodeAddress == 22) address |= 21;
     }
-    return 0;
+    return address;
 }
 
 // check button state and send messages if a button is pressed.

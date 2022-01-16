@@ -3,8 +3,10 @@
  *
  * @{
  * @file    main_gateway.c
- * @brief   TODO describe briefly.
- * @todo    describe file purpose
+ * @brief   Main entry point of bus gateway. 
+ *          It translates bus messages to serial messages and vice-versa.
+ *          Additionally 4 inputs which a connected to pi2-base PCB are 
+ *          monitored.
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
 /*
@@ -168,28 +170,28 @@ static inline void interpret_message (uint16_t sender, uint8_t msglen, uint8_t* 
 
 static void send_input_state(uint8_t input, uint8_t value)
 {
-	uint8_t cmd[3];
-	cmd[0] = eCMD_STATE_8BIT;
-	cmd[1] = APP_eReg_Input1 + input;
-	cmd[2] = value;
+    uint8_t cmd[3];
+    cmd[0] = eCMD_STATE_8BIT;
+    cmd[1] = APP_eReg_Input1 + input;
+    cmd[2] = value;
 
-	bus_send_message(&g_bus, g_bus.sCfg.uOwnAddress & BUS_SEGBRDCSTMASK, sizeof(cmd), cmd);
-	bgw_send_serial_msg(&g_serial_phy, g_bus.sCfg.uOwnAddress, BUS_BRDCSTADR, sizeof(cmd), cmd);
+    bus_send_message(&g_bus, g_bus.sCfg.uOwnAddress & BUS_SEGBRDCSTMASK, sizeof(cmd), cmd);
+    bgw_send_serial_msg(&g_serial_phy, g_bus.sCfg.uOwnAddress, BUS_BRDCSTADR, sizeof(cmd), cmd);
 }
 
 static void check_inputs(void)
 {
     uint8_t opened = input_went_high();
-	uint8_t closed = input_went_low();
+    uint8_t closed = input_went_low();
 
-	for (uint8_t i=0; i<INPUT_NUM_PINS; i++) {
-		if ((closed & (1<<i)) != 0) {
-			send_input_state(i, 1);
-		}
-		else if ((opened & (1<<i)) != 0) {
+    for (uint8_t i=0; i<INPUT_NUM_PINS; i++) {
+        if ((closed & (1<<i)) != 0) {
             send_input_state(i, 0);
         }
-	}
+        else if ((opened & (1<<i)) != 0) {
+            send_input_state(i, 1);
+        }
+    }
 }
 
 // --- Module global functions -------------------------------------------------
@@ -242,7 +244,7 @@ int main(void)
         }
 
         if (timer_is_elapsed(&g_LED_timer)) {
-        	// cyclic reset of error LED
+            // cyclic reset of error LED
             LED_ERROR_OFF;
             LED_STATUS_TOGGLE;
             timer_start(&g_LED_timer, TIMER_MS_2_TICKS(1000));

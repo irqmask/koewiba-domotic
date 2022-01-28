@@ -1,0 +1,23 @@
+{
+  "modules": [
+    {
+      "nodeid": "0x104",
+      "register": [
+        {
+          "index": 1,
+          "name": "nodeId",
+          "value": "0x101",
+          "radix": 16,
+          "access": "rw"
+        },
+        {
+          "index": 2,
+          "name": "foo",
+          "value": "257",
+          "radix": 10,
+          "access": "rw"
+        }
+      ]
+    }
+  ]
+}

@@ -67,6 +67,7 @@ set (kwbconfiguration_SRCS
     action_read_register.h
     action_write_register.h
     application.h
+    backuprestore.h
     kwbconfiguration_version.h
     msgbroker.h
     uiconsole.h
@@ -81,6 +82,7 @@ set (kwbconfiguration_SRCS
     action_read_register.cpp
     action_write_register.cpp
     application.cpp
+    backuprestore.cpp
     kwbconfiguration_main.cpp
     msgbroker.cpp
     uiconsole.cpp

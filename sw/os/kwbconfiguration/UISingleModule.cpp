@@ -28,6 +28,8 @@
 
 #include "UISingleModule.h"
 
+#include "backuprestore.h"
+
 // --- Definitions -------------------------------------------------------------
 
 // --- Type definitions --------------------------------------------------------
@@ -58,8 +60,8 @@ void UISingleModule::display()
     //std::cout << " (3) udate firmware" << std::endl;
     std::cout << " (4) read register" << std::endl;
     std::cout << " (5) write register" << std::endl;
-    //std::cout << " (6) backup all registers" << std::endl;
-    //std::cout << " (7) restore all registers" << std::endl;
+    std::cout << " (6) backup all registers" << std::endl;
+    std::cout << " (7) restore all registers" << std::endl;
     std::cout << " (t) set time (according to system time)" << std::endl;
     std::cout << " (z) read time" << std::endl;
     std::cout << " (x) leave sub-menu" << std::endl;
@@ -77,6 +79,12 @@ void UISingleModule::onMenuChoice()
         break;
     case '5':
         writeRegister();
+        break;
+    case '6':
+        backupModule();
+        break;
+    case '7':
+        restoreModule();
         break;
     case 't':
         setTime();
@@ -172,6 +180,45 @@ void UISingleModule::writeRegister()
     }
     else {
         std::cout << "verification failed: written " << value << " read " << read_back_value << "!" << std::endl;
+    }
+}
+
+//----------------------------------------------------------------------------
+void UISingleModule::backupModule()
+{
+    uint16_t selected_module_id = app.getSelectedModule();
+    bool success = false;
+
+    do {
+        BackupRestore br;
+
+        std::stringstream filename;
+        filename << "backup" << std::hex << std::setw(4) << selected_module_id << ".json";
+        br.backup(selected_module_id, filename.str(), "layout0005.json");
+        // TODO implement
+        break;
+
+        fprintf(stdout, "Backup of module ID: 0x%04X registers SUCCESS\n", selected_module_id);
+    } while (false);
+    if (!success) {
+        fprintf(stdout, "Backup of module ID: 0x%04X registers FAILED\n", selected_module_id);
+    }
+}
+
+//----------------------------------------------------------------------------
+void UISingleModule::restoreModule()
+{
+    uint16_t selected_module_id = app.getSelectedModule();
+    bool success = false;
+
+    do {
+        // TODO implement
+        break;
+
+        fprintf(stdout, "Restore of module ID: 0x%04X registers SUCCESS\n", selected_module_id);
+    } while (false);
+    if (!success) {
+        fprintf(stdout, "Restore of module ID: 0x%04X registers FAILED\n", selected_module_id);
     }
 }
 

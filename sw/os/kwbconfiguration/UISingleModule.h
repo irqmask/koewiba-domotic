@@ -65,6 +65,8 @@ private:
     void readVersion();
     void readRegister();
     void writeRegister();
+    void backupModule();
+    void restoreModule();
     void setTime();
     void getTime();
 };

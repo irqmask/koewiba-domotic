@@ -1,0 +1,12 @@
+V1.0:
+* User shall be able to set target temperature.
+* Module shall send target temperature over the bus, if it changes.
+* User shall be able to read current temperature.
+* User sha
+* Module shall measure current temperatur constantly in an interval of 10s.
+* Module shall send current temperature over the bus in an interval not shorter than 10s.
+* Module shall send current temperature over the bus in an interval not longer than 5min.
+* Module shall send current temperature only if changed since last sent time.
+* Module shall filter temperature glitches, bad sensor readings.
+
+V1.1:

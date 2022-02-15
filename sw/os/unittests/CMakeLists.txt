@@ -62,6 +62,7 @@ set (os_include_SRCS
 )
 
 set (unittests_SRCS
+    test_json.cpp
     test_libsystem_threads.cpp
     test_libsystem_time.cpp
     

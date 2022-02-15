@@ -1,0 +1,178 @@
+{
+  "register": [
+    {
+      "index": 1,
+      "name": "ModuleID",
+      "type": "U16",
+      "access": "r"
+    },
+    {
+      "index": 2,
+      "name": "BldFlag",
+      "type": "U8",
+      "access": "r"
+    },
+    {
+      "index": 18,
+      "name": "ReactionDelay",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 19,
+      "name": "DurationOpen",
+      "type": "U16",
+      "access": "rw"
+    },
+    {
+      "index": 20,
+      "name": "DurationClose",
+      "type": "U16",
+      "access": "rw"
+    },
+    {
+      "index": 26,
+      "name": "TimeUp1_Weekday",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 27,
+      "name": "TimeUp1_Hour",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 28,
+      "name": "TimeUp1_Minute",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 31,
+      "name": "TimeDown1_Weekday",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 32,
+      "name": "TimeDown1_Hour",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 33,
+      "name": "TimeDown1_Minute",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 36,
+      "name": "TimeUp2_Weekday",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 37,
+      "name": "TimeUp2_Hour",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 38,
+      "name": "TimeUp2_Minute",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 41,
+      "name": "TimeDown2_Weekday",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 42,
+      "name": "TimeDown2_Hour",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 43,
+      "name": "TimeDown2_Minute",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 46,
+      "name": "TimeUp3_Weekday",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 47,
+      "name": "TimeUp3_Hour",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 48,
+      "name": "TimeUp3_Minute",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 51,
+      "name": "TimeDown3_Weekday",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 52,
+      "name": "TimeDown3_Hour",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 53,
+      "name": "TimeDown3_Minute",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 56,
+      "name": "TimeUp4_Weekday",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 57,
+      "name": "TimeUp4_Hour",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 58,
+      "name": "TimeUp4_Minute",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 61,
+      "name": "TimeDown4_Weekday",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 62,
+      "name": "TimeDown4_Hour",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 63,
+      "name": "TimeDown4_Minute",
+      "type": "U8",
+      "access": "rw"
+    }
+  ]
+}

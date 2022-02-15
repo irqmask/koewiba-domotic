@@ -9,11 +9,22 @@
 #define ACCESS_READ 0x01;
 #define ACCESS_WRITE 0x02;
 
-enum class REG_TYPE
+enum class RegType : uint8_t
 {
-    eREGU8,
-    eREGU16,
-    eREGU32
+    eREG_TYPE_INVALID = 0,
+    eREG_TYPE_U8 = 1,
+    eREG_TYPE_U16,
+    eREG_TYPE_U32,
+    eREG_TYPE_I8,
+    eREG_TYPE_I16,
+    eREG_TYPE_I32
+};
+
+
+enum RegAccess
+{
+    eREG_ACCESS_READ = 1,
+    eREG_ACCESS_WRITE = 2
 };
 
 
@@ -21,8 +32,9 @@ class BaseRegister
 {
 public:
     uint16_t index;
-    REG_TYPE type;
+    RegType type;
     uint8_t accessMask;
+    std::string name;
 };
 
 
@@ -45,7 +57,15 @@ public:
     bool restore(uint16_t moduleId, std::string regValueFile, std::string regLayoutFile);
 
 protected:
-    nlohmann::json loadLayoutFile(std::string filename);
+
+    uint16_t getRegIndexFromJson(const nlohmann::json &j);
+    RegType getRegTypeFromJson(const nlohmann::json &j);
+    uint8_t getRegAccessFromJson(const nlohmann::json &j);
+    std::string getRegNameFromJson(const nlohmann::json &j);
+
+    std::string regAccessToJson(uint8_t access);
+
+    std::vector<BaseRegister> loadLayoutFile(std::string filename);
 
     std::vector<BaseRegister> registers;
 };

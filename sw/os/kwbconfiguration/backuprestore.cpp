@@ -6,13 +6,19 @@
 
 #include <nlohmann/json.hpp>
 
+#include "action_query_modules.h"
+#include "application.h"
+#include "connection.h"
 #include "exceptions.h"
+#include "log.h"
+#include "msgbroker.h"
 
 using namespace nlohmann;
 
 
 //----------------------------------------------------------------------------
-BackupRestore::BackupRestore()
+BackupRestore::BackupRestore(Application &app)
+    : app(app)
 {
 }
 
@@ -29,13 +35,24 @@ bool BackupRestore::backup(uint16_t moduleId, std::string regValueFile, std::str
 
     auto jregs = json::array();
 
+
     // read register values from module
-    for (auto r : regs) {
+    for (auto &r : regs) {
+        if (!app.readRegister(r.index, r.value)) {
+            log_msg(LOG_ERROR, "Unable to read register %d", r.index);
+        }
+
+        log_msg(LOG_INFO, "Reg index %d value %d", r.index, r.value);
+    }
+
+    // save values to json
+    for (auto &r : regs) {
+        log_msg(LOG_INFO, "Reg index %d value %d", r.index, r.value);
         auto jr = json::object();
         jr["index"] = r.index;
         jr["type"] = r.type;
         jr["access"] = regAccessToJson(r.accessMask);
-        jr["value"] = 0;
+        jr["value"] = r.value;
         jr["name"] = r.name;
         jregs.emplace_back(jr);
     }
@@ -47,15 +64,18 @@ bool BackupRestore::backup(uint16_t moduleId, std::string regValueFile, std::str
 
     std::ofstream o(regValueFile);
     o << std::setw(4) << modules_array << std::endl;
-    return false;
+    return true;
 }
 
 //----------------------------------------------------------------------------
 bool BackupRestore::restore(uint16_t moduleId, std::string regValueFile, std::string regLayoutFile)
 {
     (void)moduleId;
-    (void)regValueFile;
     (void)regLayoutFile;
+
+    std::vector<BaseRegister> regs = loadValueFile(regValueFile);
+
+
     return false;
 }
 
@@ -173,5 +193,22 @@ std::vector<BaseRegister> BackupRestore::loadLayoutFile(std::string filename)
         registers.push_back(br);
     }
     return registers;
+}
+
+//----------------------------------------------------------------------------
+std::vector<BaseRegister> BackupRestore::loadValueFile(std::string filename)
+{
+    json values;
+    try {
+        std::ifstream ifs(filename, std::ios::in);
+        ifs >> values;
+    }
+    catch (std::exception & e) {
+        throw ResourceMissing(LOC, "Unable to read values file! %s\n%s", filename.c_str(), e.what());
+    }
+    std::vector<BaseRegister> regs;
+
+
+    return regs;
 }
 

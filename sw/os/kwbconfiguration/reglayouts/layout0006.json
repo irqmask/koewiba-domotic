@@ -13,19 +13,19 @@
       "access": "r"
     },
     {
-      "index": 18,
+      "index": 19,
       "name": "ReactionDelay",
       "type": "U8",
       "access": "rw"
     },
     {
-      "index": 19,
+      "index": 20,
       "name": "DurationOpen",
       "type": "U16",
       "access": "rw"
     },
     {
-      "index": 20,
+      "index": 21,
       "name": "DurationClose",
       "type": "U16",
       "access": "rw"
@@ -173,6 +173,108 @@
       "name": "TimeDown4_Minute",
       "type": "U8",
       "access": "rw"
+    },
+    {
+      "index": 223,
+      "name": "Year",
+      "type": "U16",
+      "access": "r"
+    },
+    {
+      "index": 224,
+      "name": "Month",
+      "type": "U8",
+      "access": "r"
+    },
+    {
+      "index": 225,
+      "name": "Day",
+      "type": "U8",
+      "access": "r"
+    },
+    {
+      "index": 226,
+      "name": "DOW",
+      "type": "U8",
+      "access": "r"
+    },
+    {
+      "index": 227,
+      "name": "Hour",
+      "type": "U8",
+      "access": "r"
+    },
+    {
+      "index": 228,
+      "name": "Minute",
+      "type": "U8",
+      "access": "r"
+    },
+    {
+      "index": 229,
+      "name": "Second",
+      "type": "U8",
+      "access": "r"
+    },
+    {
+      "index": 230,
+      "name": "DeviceSignature0",
+      "type": "U8",
+      "access": "r"
+    },
+    {
+      "index": 231,
+      "name": "DeviceSignature1",
+      "type": "U8",
+      "access": "r"
+    },
+    {
+      "index": 232,
+      "name": "DeviceSignature2",
+      "type": "U8",
+      "access": "r"
+    },
+    {
+      "index": 233,
+      "name": "DeviceSignature3",
+      "type": "U8",
+      "access": "r"
+    },
+    {
+      "index": 234,
+      "name": "BoardID",
+      "type": "U16",
+      "access": "r"
+    },
+    {
+      "index": 235,
+      "name": "BoardRev",
+      "type": "U8",
+      "access": "r"
+    },
+    {
+      "index": 236,
+      "name": "AppID",
+      "type": "U16",
+      "access": "r"
+    },
+    {
+      "index": 237,
+      "name": "AppVersionMajor",
+      "type": "U8",
+      "access": "r"
+    },
+    {
+      "index": 238,
+      "name": "AppVersionMinor",
+      "type": "U8",
+      "access": "r"
+    },
+    {
+      "index": 239,
+      "name": "AppVersionBugfix",
+      "type": "U8",
+      "access": "r"
     }
   ]
 }

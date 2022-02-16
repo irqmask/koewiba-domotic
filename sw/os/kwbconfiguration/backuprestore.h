@@ -35,6 +35,7 @@ public:
     RegType type;
     uint8_t accessMask;
     std::string name;
+    int32_t value;
 };
 
 
@@ -48,10 +49,12 @@ public:
 };
 
 
+class Application;
+
 class BackupRestore
 {
 public:
-    BackupRestore();
+    BackupRestore(Application &conn);
 
     bool backup(uint16_t moduleId, std::string regValueFile, std::string regLayoutFile);
     bool restore(uint16_t moduleId, std::string regValueFile, std::string regLayoutFile);
@@ -67,6 +70,11 @@ protected:
 
     std::vector<BaseRegister> loadLayoutFile(std::string filename);
 
+    std::vector<BaseRegister> loadValueFile(std::string filename);
+    void saveValueFile(std::string filename, const std::vector<BaseRegister>& regs);
+
     std::vector<BaseRegister> registers;
+
+    Application &app;
 };
 

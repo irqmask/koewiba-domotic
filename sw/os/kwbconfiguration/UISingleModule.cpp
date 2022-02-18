@@ -211,7 +211,7 @@ void UISingleModule::restoreModule()
         BackupRestore br(app);
 
         std::stringstream filename;
-        filename << "backup" << std::hex << std::setw(4) << selected_module_id << ".json";
+        filename << "backup" << std::hex << std::setfill('0') << std::setw(4) << selected_module_id << ".json";
 
         br.restore(selected_module_id, filename.str());
         fprintf(stdout, "Restore of module ID: 0x%04X registers SUCCESS\n", selected_module_id);

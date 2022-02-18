@@ -87,15 +87,26 @@ void BackupRestore::restore(uint16_t moduleId,
 
     // read register values from module
     for (auto &r : regs) {
+        log_msg(LOG_INFO, "Reg index %d value %d", r.index, r.value);
         if ((r.accessMask & eREG_ACCESS_WRITE) == 0) {
             continue;
         }
-        /*if (!app.writeRegister(r.index, r.value)) {
+        if (!app.writeRegister(r.index, r.value)) {
             log_msg(LOG_ERROR, "Unable to write register %d, value %d", r.index, r.value);
             write_success = false;
-        }*/
-
-        log_msg(LOG_INFO, "Reg index %d value %d", r.index, r.value);
+            continue;
+        }
+        int32_t read_value = 0;
+        if (!app.readRegister(r.index, read_value)) {
+            log_msg(LOG_ERROR, "Unable to verify register %d", r.index);
+            write_success = false;
+            continue;
+        }
+        if (read_value != r.value) {
+            log_msg(LOG_ERROR, "register %d value mismatch. written %d, read %d", r.index, r.value, read_value);
+            write_success = false;
+            continue;
+        }
     }
     if (!write_success) {
         throw OperationFailed(LOC, "Error occurred writing register values! Not all registers have been written correctly to the module!");

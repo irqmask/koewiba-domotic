@@ -192,7 +192,8 @@ void UISingleModule::backupModule()
         BackupRestore br(app);
 
         std::stringstream filename;
-        filename << "backup" << std::hex << std::setw(4) << selected_module_id << ".json";
+        filename << "backup" << std::hex << std::setfill('0') << std::setw(4) << selected_module_id << ".json";
+
         br.backup(selected_module_id, filename.str(), "layout0006.json");
         fprintf(stdout, "Backup of module ID: 0x%04X registers SUCCESS\n", selected_module_id);
     }
@@ -208,8 +209,11 @@ void UISingleModule::restoreModule()
 
     try {
         BackupRestore br(app);
-        // TODO implement
 
+        std::stringstream filename;
+        filename << "backup" << std::hex << std::setw(4) << selected_module_id << ".json";
+
+        br.restore(selected_module_id, filename.str());
         fprintf(stdout, "Restore of module ID: 0x%04X registers SUCCESS\n", selected_module_id);
     }
     catch (std::exception &e) {

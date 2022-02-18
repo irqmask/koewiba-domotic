@@ -11,13 +11,13 @@
 
 enum class RegType : uint8_t
 {
-    eREG_TYPE_INVALID = 0,
-    eREG_TYPE_U8 = 1,
-    eREG_TYPE_U16,
-    eREG_TYPE_U32,
-    eREG_TYPE_I8,
-    eREG_TYPE_I16,
-    eREG_TYPE_I32
+    eINVALID = 0,
+    eU8 = 1,
+    eU16,
+    eU32,
+    eI8,
+    eI16,
+    eI32
 };
 
 
@@ -56,8 +56,8 @@ class BackupRestore
 public:
     BackupRestore(Application &conn);
 
-    bool backup(uint16_t moduleId, std::string regValueFile, std::string regLayoutFile);
-    bool restore(uint16_t moduleId, std::string regValueFile, std::string regLayoutFile);
+    void backup(uint16_t moduleId, const std::string & regValueFile, const std::string & regLayoutFile);
+    void restore(uint16_t moduleId, const std::string & regValueFile);
 
 protected:
 
@@ -65,13 +65,15 @@ protected:
     RegType getRegTypeFromJson(const nlohmann::json &j);
     uint8_t getRegAccessFromJson(const nlohmann::json &j);
     std::string getRegNameFromJson(const nlohmann::json &j);
+    template <typename T>
+    T getRegValueFromJson(const nlohmann::json &j);
 
     std::string regAccessToJson(uint8_t access);
 
     std::vector<BaseRegister> loadLayoutFile(std::string filename);
 
-    std::vector<BaseRegister> loadValueFile(std::string filename);
-    void saveValueFile(std::string filename, const std::vector<BaseRegister>& regs);
+    std::vector<BaseRegister> loadValueFile(std::string filename, uint16_t &moduleIdFile);
+    void saveValueFile(std::string filename, uint16_t moduleId, const std::vector<BaseRegister>& regs);
 
     std::vector<BaseRegister> registers;
 

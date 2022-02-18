@@ -23,8 +23,9 @@ BackupRestore::BackupRestore(Application &app)
 }
 
 //----------------------------------------------------------------------------
-bool BackupRestore::backup(uint16_t moduleId, std::string regValueFile, std::string regLayoutFile)
+void BackupRestore::backup(uint16_t moduleId, const std::string & regValueFile, const std::string & regLayoutFile)
 {
+    bool read_success = true;
     // load register layout
     std::vector<BaseRegister> regs = loadLayoutFile(regLayoutFile);
 
@@ -35,11 +36,11 @@ bool BackupRestore::backup(uint16_t moduleId, std::string regValueFile, std::str
 
     auto jregs = json::array();
 
-
     // read register values from module
     for (auto &r : regs) {
         if (!app.readRegister(r.index, r.value)) {
             log_msg(LOG_ERROR, "Unable to read register %d", r.index);
+            read_success = false;
         }
 
         log_msg(LOG_INFO, "Reg index %d value %d", r.index, r.value);
@@ -64,19 +65,41 @@ bool BackupRestore::backup(uint16_t moduleId, std::string regValueFile, std::str
 
     std::ofstream o(regValueFile);
     o << std::setw(4) << modules_array << std::endl;
-    return true;
+
+    if (!read_success) {
+        throw OperationFailed(LOC, "Error occurred reading register values! Not all registers have been read correctly from the module!");
+    }
 }
 
 //----------------------------------------------------------------------------
-bool BackupRestore::restore(uint16_t moduleId, std::string regValueFile, std::string regLayoutFile)
+void BackupRestore::restore(uint16_t moduleId,
+                            const std::string & regValueFile)
 {
+    bool write_success = true;
+    uint16_t moduleIdFile = 0;
     (void)moduleId;
-    (void)regLayoutFile;
 
-    std::vector<BaseRegister> regs = loadValueFile(regValueFile);
+    std::vector<BaseRegister> regs = loadValueFile(regValueFile, moduleIdFile);
+    if (moduleId != moduleIdFile) {
+        log_msg(LOG_ERROR, "Mismatch of moduleId. Module id in file 0x%04X is not equal to selected module id 0x%04X");
+        throw OperationFailed(LOC, "Mismatch of moduleId. Module id in file 0x%04X is not equal to selected module id 0x%04X");
+    }
 
+    // read register values from module
+    for (auto &r : regs) {
+        if ((r.accessMask & eREG_ACCESS_WRITE) == 0) {
+            continue;
+        }
+        /*if (!app.writeRegister(r.index, r.value)) {
+            log_msg(LOG_ERROR, "Unable to write register %d, value %d", r.index, r.value);
+            write_success = false;
+        }*/
 
-    return false;
+        log_msg(LOG_INFO, "Reg index %d value %d", r.index, r.value);
+    }
+    if (!write_success) {
+        throw OperationFailed(LOC, "Error occurred writing register values! Not all registers have been written correctly to the module!");
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -97,19 +120,19 @@ uint16_t BackupRestore::getRegIndexFromJson(const json &j)
 }
 
 NLOHMANN_JSON_SERIALIZE_ENUM( RegType, {
-    {RegType::eREG_TYPE_INVALID, nullptr},
-    {RegType::eREG_TYPE_U8, "u8"},
-    {RegType::eREG_TYPE_U8, "U8"},
-    {RegType::eREG_TYPE_U16, "u16"},
-    {RegType::eREG_TYPE_U16, "U16"},
-    {RegType::eREG_TYPE_U32, "u32"},
-    {RegType::eREG_TYPE_U32, "U32"},
-    {RegType::eREG_TYPE_I8, "i8"},
-    {RegType::eREG_TYPE_I8, "I8"},
-    {RegType::eREG_TYPE_I16, "i16"},
-    {RegType::eREG_TYPE_I16, "I16"},
-    {RegType::eREG_TYPE_I32, "i32"},
-    {RegType::eREG_TYPE_I32, "I32"},
+    {RegType::eINVALID, nullptr},
+    {RegType::eU8, "u8"},
+    {RegType::eU8, "U8"},
+    {RegType::eU16, "u16"},
+    {RegType::eU16, "U16"},
+    {RegType::eU32, "u32"},
+    {RegType::eU32, "U32"},
+    {RegType::eI8, "i8"},
+    {RegType::eI8, "I8"},
+    {RegType::eI16, "i16"},
+    {RegType::eI16, "I16"},
+    {RegType::eI32, "i32"},
+    {RegType::eI32, "I32"},
 })
 
 //----------------------------------------------------------------------------
@@ -152,6 +175,21 @@ std::string BackupRestore::getRegNameFromJson(const nlohmann::json &j)
 }
 
 //----------------------------------------------------------------------------
+template <typename T>
+T BackupRestore::getRegValueFromJson(const nlohmann::json &j)
+{
+    if (!j.contains("value")) {
+        throw InvalidParameter(LOC, "Missing parameter 'value'!");
+    }
+    if (!j["value"].is_number()) {
+        throw InvalidParameter(LOC, "Expected parameter 'value' beeing value!");
+    }
+    T v = j.value<T>("value", 0);
+
+    return v;
+}
+
+//----------------------------------------------------------------------------
 std::string BackupRestore::regAccessToJson(uint8_t access)
 {
     switch (access) {
@@ -176,12 +214,12 @@ std::vector<BaseRegister> BackupRestore::loadLayoutFile(std::string filename)
         throw ResourceMissing(LOC, "Unable to read layout file! %s", e.what());
     }
 
-    json reg_array = layout["register"];
+    json reg_array = layout["regs"];
     if (!reg_array.is_array()) {
-        throw InvalidParameter(LOC, "layout file %s format wrong. expected entity 'register' beeing an array!", filename.c_str());
+        throw InvalidParameter(LOC, "layout file %s format wrong. expected entity 'regs' beeing an array!", filename.c_str());
     }
 
-    std::vector<BaseRegister> registers;
+    std::vector<BaseRegister> regs;
     for (json::iterator it = reg_array.begin(); it != reg_array.end(); ++it) {
         std::cout << *it << '\n';
 
@@ -190,24 +228,79 @@ std::vector<BaseRegister> BackupRestore::loadLayoutFile(std::string filename)
         br.type = getRegTypeFromJson(*it);
         br.accessMask = getRegAccessFromJson(*it);
         br.name = getRegNameFromJson(*it);
-        registers.push_back(br);
+        regs.push_back(br);
     }
-    return registers;
+    return regs;
 }
 
 //----------------------------------------------------------------------------
-std::vector<BaseRegister> BackupRestore::loadValueFile(std::string filename)
+std::vector<BaseRegister> BackupRestore::loadValueFile(std::string filename,
+                                                       uint16_t &moduleIdFile)
 {
-    json values;
+    json all_modules_all_regs;
     try {
         std::ifstream ifs(filename, std::ios::in);
-        ifs >> values;
+        ifs >> all_modules_all_regs;
     }
     catch (std::exception & e) {
         throw ResourceMissing(LOC, "Unable to read values file! %s\n%s", filename.c_str(), e.what());
     }
     std::vector<BaseRegister> regs;
 
+    if (!all_modules_all_regs.is_array()) {
+        throw InvalidParameter(LOC, "value file %s format wrong. expected outer entity beeing an array!", filename.c_str());
+    }
+    for (auto & jmod : all_modules_all_regs) {
+        if (!jmod.contains("nodeid")) {
+            throw InvalidParameter(LOC, "expected module to have parameter nodeid!");
+        }
+        if (!jmod["nodeid"].is_number_unsigned()) {
+            throw InvalidParameter(LOC, "expected nodeid beeing unsigned integer!");
+        }
+
+        moduleIdFile = jmod.value<uint16_t>("nodeid", 0);
+        if (!jmod.contains("regs")) {
+            throw InvalidParameter(LOC, "expected module to have array 'regs'!");
+        }
+        if (!jmod["regs"].is_array()) {
+            throw InvalidParameter(LOC, "expected module to have array 'regs'!");
+        }
+
+        auto &jregs = jmod["regs"];
+        for (json::iterator it = jregs.begin(); it != jregs.end(); ++it) {
+            std::cout << *it << '\n';
+
+            BaseRegister br;
+            br.index = getRegIndexFromJson(*it);
+            br.type = getRegTypeFromJson(*it);
+            br.accessMask = getRegAccessFromJson(*it);
+            br.name = getRegNameFromJson(*it);
+            switch (br.type) {
+            case RegType::eU8:
+                br.value = getRegValueFromJson<uint8_t>(*it);
+                break;
+            case RegType::eU16:
+                br.value = getRegValueFromJson<uint16_t>(*it);
+                break;
+            case RegType::eU32:
+                br.value = getRegValueFromJson<uint32_t>(*it);
+                break;
+            case RegType::eI8:
+                br.value = getRegValueFromJson<int8_t>(*it);
+                break;
+            case RegType::eI16:
+                br.value = getRegValueFromJson<int16_t>(*it);
+                break;
+            case RegType::eI32:
+                br.value = getRegValueFromJson<int32_t>(*it);
+                break;
+            default:
+                br.value = 0;
+            }
+
+            regs.push_back(br);
+        }
+    }
 
     return regs;
 }

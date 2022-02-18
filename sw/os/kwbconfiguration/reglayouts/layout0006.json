@@ -1,5 +1,5 @@
 {
-  "register": [
+  "regs": [
     {
       "index": 1,
       "name": "ModuleID",

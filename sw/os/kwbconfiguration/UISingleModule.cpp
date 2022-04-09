@@ -191,10 +191,10 @@ void UISingleModule::backupModule()
     try {
         BackupRestore br(app);
 
-        std::stringstream filename;
-        filename << "backup" << std::hex << std::setfill('0') << std::setw(4) << selected_module_id << ".json";
-
-        br.backup(selected_module_id, filename.str(), "layout0006.json");
+        uint16_t appid = 0x0006;
+        br.backup(selected_module_id,
+                  ModuleConfig::createValuesFilename(selected_module_id),
+                  ModuleConfig::createLayoutFilename(appid));
         fprintf(stdout, "Backup of module ID: 0x%04X registers SUCCESS\n", selected_module_id);
     }
     catch (std::exception &e) {
@@ -210,10 +210,7 @@ void UISingleModule::restoreModule()
     try {
         BackupRestore br(app);
 
-        std::stringstream filename;
-        filename << "backup" << std::hex << std::setfill('0') << std::setw(4) << selected_module_id << ".json";
-
-        br.restore(selected_module_id, filename.str());
+        br.restore(selected_module_id, ModuleConfig::createValuesFilename(selected_module_id));
         fprintf(stdout, "Restore of module ID: 0x%04X registers SUCCESS\n", selected_module_id);
     }
     catch (std::exception &e) {

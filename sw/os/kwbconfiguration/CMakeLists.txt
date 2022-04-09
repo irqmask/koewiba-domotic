@@ -69,6 +69,7 @@ set (kwbconfiguration_SRCS
     application.h
     backuprestore.h
     kwbconfiguration_version.h
+    module_config.h
     msgbroker.h
     uiconsole.h
     uimain.h
@@ -84,6 +85,7 @@ set (kwbconfiguration_SRCS
     application.cpp
     backuprestore.cpp
     kwbconfiguration_main.cpp
+    module_config.cpp
     msgbroker.cpp
     uiconsole.cpp
     uimain.cpp

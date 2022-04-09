@@ -1,4 +1,4 @@
-#include "backuprestore.h"
+#include "module_config.h"
 
 #include <fstream>
 #include <iomanip>
@@ -6,117 +6,35 @@
 
 #include <nlohmann/json.hpp>
 
-#include "action_query_modules.h"
-#include "application.h"
-#include "connection.h"
 #include "exceptions.h"
 #include "log.h"
-#include "module_config.h"
-#include "msgbroker.h"
 
 using namespace nlohmann;
 
 
 //----------------------------------------------------------------------------
-BackupRestore::BackupRestore(Application &app)
-    : app(app)
+ModuleConfig::ModuleConfig()
 {
 }
 
 //----------------------------------------------------------------------------
-void BackupRestore::backup(uint16_t moduleId, const std::string & regValueFile, const std::string & regLayoutFile)
+std::string ModuleConfig::createValuesFilename(uint16_t moduleId)
 {
-    bool read_success = true;
-    // load register layout
-    std::vector<BaseRegister> regs = loadLayoutFile(regLayoutFile);
-
-    // prepare values file
-    json modules_array = json::array();
-    json module = json::object();
-    module["nodeid"] = moduleId;
-
-    auto jregs = json::array();
-
-    // read register values from module
-    for (auto &r : regs) {
-        if (!app.readRegister(r.index, r.value)) {
-            log_msg(LOG_ERROR, "Unable to read register %d", r.index);
-            read_success = false;
-        }
-
-        log_msg(LOG_INFO, "Reg index %d value %d", r.index, r.value);
-    }
-
-    // save values to json
-    for (auto &r : regs) {
-        log_msg(LOG_INFO, "Reg index %d value %d", r.index, r.value);
-        auto jr = json::object();
-        jr["index"] = r.index;
-        jr["type"] = r.type;
-        jr["access"] = regAccessToJson(r.accessMask);
-        jr["value"] = r.value;
-        jr["name"] = r.name;
-        jregs.emplace_back(jr);
-    }
-
-    module["regs"] = jregs;
-
-    modules_array.emplace_back(module);
-    std::cout << modules_array << std::endl;
-
-    std::ofstream o(regValueFile);
-    o << std::setw(4) << modules_array << std::endl;
-    o.close();
-    if (!read_success) {
-        throw OperationFailed(LOC, "Error occurred reading register values! Not all registers have been read correctly from the module!");
-    }
-    log_msg(LOG_INFO, "Backup of registers of module 0x%04X successfully written to file %s", moduleId, regValueFile.c_str());
+    std::stringstream filename;
+    filename << "backup" << std::hex << std::setfill('0') << std::setw(4) << moduleId << ".json";
+    return filename.str();
 }
 
 //----------------------------------------------------------------------------
-void BackupRestore::restore(uint16_t moduleId,
-                            const std::string & regValueFile)
+std::string ModuleConfig::createLayoutFilename(uint16_t appId)
 {
-    bool write_success = true;
-    uint16_t moduleIdFile = 0;
-    (void)moduleId;
-
-    std::vector<BaseRegister> regs = loadValueFile(regValueFile, moduleIdFile);
-    if (moduleId != moduleIdFile) {
-        log_msg(LOG_ERROR, "Mismatch of moduleId. Module id in file 0x%04X is not equal to selected module id 0x%04X");
-        throw OperationFailed(LOC, "Mismatch of moduleId. Module id in file 0x%04X is not equal to selected module id 0x%04X");
-    }
-
-    // read register values from module
-    for (auto &r : regs) {
-        log_msg(LOG_INFO, "Reg index %d value %d", r.index, r.value);
-        if ((r.accessMask & eREG_ACCESS_WRITE) == 0) {
-            continue;
-        }
-        if (!app.writeRegister(r.index, r.value)) {
-            log_msg(LOG_ERROR, "Unable to write register %d, value %d", r.index, r.value);
-            write_success = false;
-            continue;
-        }
-        int32_t read_value = 0;
-        if (!app.readRegister(r.index, read_value)) {
-            log_msg(LOG_ERROR, "Unable to verify register %d", r.index);
-            write_success = false;
-            continue;
-        }
-        if (read_value != r.value) {
-            log_msg(LOG_ERROR, "register %d value mismatch. written %d, read %d", r.index, r.value, read_value);
-            write_success = false;
-            continue;
-        }
-    }
-    if (!write_success) {
-        throw OperationFailed(LOC, "Error occurred writing register values! Not all registers have been written correctly to the module!");
-    }
+    std::stringstream filename;
+    filename << "layout" << std::hex << std::setfill('0') << std::setw(4) << appId << ".json";
+    return filename.str();
 }
 
 //----------------------------------------------------------------------------
-uint16_t BackupRestore::getRegIndexFromJson(const json &j)
+uint16_t ModuleConfig::getRegIndexFromJson(const json &j)
 {
 
     if (!j.contains("index")) {
@@ -149,7 +67,7 @@ NLOHMANN_JSON_SERIALIZE_ENUM( RegType, {
 })
 
 //----------------------------------------------------------------------------
-RegType BackupRestore::getRegTypeFromJson(const json &j)
+RegType ModuleConfig::getRegTypeFromJson(const json &j)
 {
     if (!j.contains("type")) {
         throw InvalidParameter(LOC, "Missing parameter 'type'. expected entity 'type' beeing 'u8', 'u16', 'u32', 'i8', 'i16', 'i32' !");
@@ -159,7 +77,7 @@ RegType BackupRestore::getRegTypeFromJson(const json &j)
 }
 
 //----------------------------------------------------------------------------
-uint8_t BackupRestore::getRegAccessFromJson(const nlohmann::json &j)
+uint8_t ModuleConfig::getRegAccessFromJson(const nlohmann::json &j)
 {
     if (!j.contains("access")) {
         throw InvalidParameter(LOC, "Missing parameter 'access'. expected entity 'access' beeing '', 'r', 'rw' !");
@@ -177,7 +95,7 @@ uint8_t BackupRestore::getRegAccessFromJson(const nlohmann::json &j)
 }
 
 //----------------------------------------------------------------------------
-std::string BackupRestore::getRegNameFromJson(const nlohmann::json &j)
+std::string ModuleConfig::getRegNameFromJson(const nlohmann::json &j)
 {
     if (!j.contains("name")) {
         throw InvalidParameter(LOC, "Missing parameter 'name'!");
@@ -189,7 +107,7 @@ std::string BackupRestore::getRegNameFromJson(const nlohmann::json &j)
 
 //----------------------------------------------------------------------------
 template <typename T>
-T BackupRestore::getRegValueFromJson(const nlohmann::json &j)
+T ModuleConfig::getRegValueFromJson(const nlohmann::json &j)
 {
     if (!j.contains("value")) {
         throw InvalidParameter(LOC, "Missing parameter 'value'!");
@@ -203,7 +121,7 @@ T BackupRestore::getRegValueFromJson(const nlohmann::json &j)
 }
 
 //----------------------------------------------------------------------------
-std::string BackupRestore::regAccessToJson(uint8_t access)
+std::string ModuleConfig::regAccessToJson(uint8_t access)
 {
     switch (access) {
     case eREG_ACCESS_READ:
@@ -216,7 +134,7 @@ std::string BackupRestore::regAccessToJson(uint8_t access)
 }
 
 //----------------------------------------------------------------------------
-std::vector<BaseRegister> BackupRestore::loadLayoutFile(std::string filename)
+std::vector<BaseRegister> ModuleConfig::loadLayoutFile(const std::string &filename)
 {
     json layout;
     try {
@@ -224,7 +142,7 @@ std::vector<BaseRegister> BackupRestore::loadLayoutFile(std::string filename)
         ifs >> layout;
     }
     catch (std::exception & e) {
-        throw ResourceMissing(LOC, "Unable to read layout file %s! %s", filename.c_str(), e.what());
+        throw ResourceMissing(LOC, "Unable to read layout file! %s", e.what());
     }
 
     json reg_array = layout["regs"];
@@ -247,7 +165,7 @@ std::vector<BaseRegister> BackupRestore::loadLayoutFile(std::string filename)
 }
 
 //----------------------------------------------------------------------------
-std::vector<BaseRegister> BackupRestore::loadValueFile(std::string filename,
+std::vector<BaseRegister> ModuleConfig::loadValueFile(const std::string &filename,
                                                        uint16_t &moduleIdFile)
 {
     json all_modules_all_regs;
@@ -316,5 +234,36 @@ std::vector<BaseRegister> BackupRestore::loadValueFile(std::string filename,
     }
 
     return regs;
+}
+
+//----------------------------------------------------------------------------
+void ModuleConfig::saveValueFile(const std::string &filename, uint16_t moduleId, const std::vector<BaseRegister> &regs)
+{
+    // prepare values file
+    json modules_array = json::array();
+    json module = json::object();
+    module["nodeid"] = moduleId;
+
+    auto jregs = json::array();
+
+    // save values to json
+    for (auto &r : regs) {
+        log_msg(LOG_INFO, "Reg index %d value %d", r.index, r.value);
+        auto jr = json::object();
+        jr["index"] = r.index;
+        jr["type"] = r.type;
+        jr["access"] = regAccessToJson(r.accessMask);
+        jr["value"] = r.value;
+        jr["name"] = r.name;
+        jregs.emplace_back(jr);
+    }
+
+    module["regs"] = jregs;
+
+    modules_array.emplace_back(module);
+    std::cout << modules_array << std::endl;
+
+    std::ofstream o(filename);
+    o << std::setw(4) << modules_array << std::endl;
 }
 

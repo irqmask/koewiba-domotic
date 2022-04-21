@@ -26,13 +26,17 @@
 
 // --- Include section ---------------------------------------------------------
 
+#include "cmd.h"
+
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
 
-#include "cmd.h"
-#include "motor.h"
 #include "STM8L052C6.h"
+
+#include "motor.h"
+#include "remote_tempsense.h"
+
 
 #ifdef HAS_APPCONFIG_H
  #include "appconfig.h"
@@ -150,7 +154,7 @@ static void interpret_command(void)
             puts("POKE 0");
         }
     }
-    else if (starts_with("mh")) {
+    else if (starts_with("mh")) { // motor home
         if (motor_start_homing() != true) {
             puts("ebusy");
         }
@@ -158,25 +162,34 @@ static void interpret_command(void)
             puts("MH 0");
         }
     }
-    else if (starts_with("ms")) {
+    else if (starts_with("ms")) { // motor stop
         motor_set(false, false);
         puts("MS 0");
     }
-    else if (starts_with("mo")) {
+    else if (starts_with("mo")) { // motor move towards opening
         motor_set(true, false);
         puts("MO 0");
     }
-    else if (starts_with("mc")) {
+    else if (starts_with("mc")) { // motor move towards closing
         motor_set(true, true);
         puts("MC 0");
     }
-    else if (starts_with("mp")) {
+    else if (starts_with("mp")) { // motor position
         uint16_t pos = get_val_u16(&success);
         if (motor_start_move_pos(pos) != true) {
             puts("ebusy");
         }
         else {
             puts("MP 0");
+        }
+    }
+    else if (starts_with("srt")) { // set remote temperatures <current> <desired>s
+        uint16_t current_temp = get_val_u16(&success);
+        uint16_t desired_temp = get_val_u16(&success);
+        if (success) {
+            remts_set_current_temp(current_temp);
+            remts_set_desired_temp(desired_temp);
+            puts("SRT 0");
         }
     }
     else {

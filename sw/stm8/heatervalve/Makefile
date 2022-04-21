@@ -13,6 +13,7 @@ SOURCES       = adc.c \
                 lcd.c \
                 main.c \
                 motor.c \
+                remote_tempsense.c \
                 timer.c \
                 uart.c \
 

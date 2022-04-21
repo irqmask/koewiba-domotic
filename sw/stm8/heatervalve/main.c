@@ -6,6 +6,7 @@
 #include "adc.h"
 #include "cmd.h"
 #include "motor.h"
+#include "remote_tempsense.h"
 #include "timer.h"
 #include "uart.h"
 
@@ -28,16 +29,17 @@ void main(void)
     char buf[16];
 
     initClock();
+    uart_initialize();
+    uart_write("heatervalve\n");
     enableInterrupts();
 
     adc_initialize();
-    uart_initialize();
+
     timer_initialize();
     motor_initialize();
 
-    uart_write("woaaa\n");
-
     cmd_initialize();
+    remts_initialize();
     uart_write("init complete\n");
     while (1) {
         if (USART1_SR & USART_SR_RXNE) {

@@ -6,16 +6,22 @@ MAKEFILE      = Makefile
 
 ####### Files
 
-TARGET        = STM8First
+TARGET        = heatervalve
 
-SOURCES       = main.c \
+SOURCES       = adc.c \
+                cmd.c \
+                lcd.c \
+                main.c \
+                motor.c \
+                timer.c \
+                uart.c \
 
 INCPATH       = -I. -I/usr/local/share/sdcc/include
 
 ####### Output directories
 
 BUILDDIR      = ../build/$(TARGET)
-DESTDIR       = ../bin/
+DESTDIR       = ../bin
 
 OBJECTS       = $(SOURCES:.c=.rel)
 OBJECTS_W_PATH= $(addprefix $(BUILDDIR)/,$(OBJECTS))
@@ -79,6 +85,6 @@ clean:
 distclean: clean 
 
 program: $(TARGET)
-	
+	stm8flash -p stm8l052c6 -c stlinkv2 -w $(DESTDIR)/$(TARGET).ihx
 
  

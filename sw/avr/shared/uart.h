@@ -181,6 +181,8 @@ void            uart_hex_dump_blk1  (const uint8_t*         data,
                                      uint8_t                length);
 
 char            uart_get_char_blk1  (void);
+
+bool            uart_is_rx_pending1 (void);
 #endif
 
 #endif // _UART_H_

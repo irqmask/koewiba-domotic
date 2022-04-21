@@ -480,7 +480,7 @@ void uart_hex_dump_blk1 ( const uint8_t *data, uint8_t length)
 }
 
 /**
- * If there is a received char in the UART, whis function will return it. If no
+ * If there is a received char in the UART, this function will return it. If no
  * char has been received the null-character is received.
  *
  * @returns Received char, otherwise zero.
@@ -494,6 +494,14 @@ char uart_get_char_blk1 ( void )
     }
     // return received char
     return REGISTER_UDR1;
+}
+
+/**
+ * @returns true if a character is pending in uart buffer, otherwise false.
+ */
+bool uart_is_rx_pending1 ( void )
+{
+    return (REGISTER_UCSRA1 & (1 << RXC1));
 }
 
 #endif // HAS_UART1

@@ -159,20 +159,17 @@ bool motor_start_move_pos(uint16_t pos)
     if (pos > g_pos) {
         // move towards open position
         diff = pos - g_pos;
-        printf("to diff=%d\n",diff);
         time = (uint32_t)diff * MOTOR_DUR_FULL_OPEN / 1000;
         motor_set(true, false);
     }
     else if (g_pos > pos) {
         // move towards close position
         diff = g_pos - pos;
-        printf("tc diff=%d\n", diff);
         time = (uint32_t)diff * MOTOR_DUR_FULL_OPEN / 1000;
         motor_set(true, true);
     }
     g_start = timer_get_millis();
     g_timer = (uint16_t)time;
-    printf("g_timer=%d\n", g_timer);
     g_state = MOTOR_MOVING_TO_POS;
 
     return true;

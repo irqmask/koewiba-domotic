@@ -70,6 +70,7 @@ extern void        app_register_load       (void);
  */
 void app_init (void)
 {
+    //register_set_u16(MOD_eReg_ModuleID, 0xA05);
     motors_initialize();
     blinds_initialize();
     dt_initialize();

@@ -36,6 +36,7 @@
 
 #include "motor.h"
 #include "remote_tempsense.h"
+#include "uart.h"
 
 
 #ifdef HAS_APPCONFIG_H
@@ -97,6 +98,9 @@ static uint8_t get_nibble(bool *psuccess)
     }
     else if (g_cmdbuf[g_readidx] >= 'a' && g_cmdbuf[g_readidx] <= 'f') {
         nibble = 10 + g_cmdbuf[g_readidx++] - 'a';
+    }
+    else if (g_cmdbuf[g_readidx] >= 'A' && g_cmdbuf[g_readidx] <= 'F') {
+        nibble = 10 + g_cmdbuf[g_readidx++] - 'A';
     }
     else {
         *psuccess = false;
@@ -183,7 +187,7 @@ static void interpret_command(void)
             puts("MP 0");
         }
     }
-    else if (starts_with("srt")) { // set remote temperatures <current> <desired>s
+    else if (starts_with("srt")) { // set remote temperatures <current> <desired>
         uint16_t current_temp = get_val_u16(&success);
         uint16_t desired_temp = get_val_u16(&success);
         if (success) {
@@ -193,10 +197,13 @@ static void interpret_command(void)
         }
     }
     else {
-        printf("eunknown\n");
+        puts("eunknown");
     }
     if (!success) {
-        printf("eparam\n");
+        uart_write("eparam\n");
+        uart_write("# ");
+        uart_write(g_cmdbuf);
+        uart_write("\n");
     }
 }
 

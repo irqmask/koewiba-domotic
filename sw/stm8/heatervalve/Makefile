@@ -10,6 +10,7 @@ TARGET        = heatervalve
 
 SOURCES       = adc.c \
                 cmd.c \
+                control_temp.c \
                 lcd.c \
                 main.c \
                 motor.c \

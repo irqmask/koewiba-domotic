@@ -1,10 +1,12 @@
 /**
- * @addtogroup HEATERVALVE_MOTOR
- * @brief Interface for heateralve's motor.
+ * @addtogroup CONTROL_TEMP
+ * @brief Module to control the heatervalve depending on current and desired 
+ *        temperature.
  *
  * @{
- * @file    motor.h
- * @brief   Interface for heateralve's motors.
+ * @file    control_temp.h
+ * @brief   Module to control the heatervalve depending on current and desired 
+ *          temperature.
  *
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
@@ -25,12 +27,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _HEATERVALVE_MOTOR_H_
-#define _HEATERVALVE_MOTOR_H_
+#ifndef _CONTROL_TEMP_H_
+#define _CONTROL_TEMP_H_
 
 // --- Include section ---------------------------------------------------------
 
-#include <stdbool.h>
 #include <stdint.h>
 
 // --- Definitions -------------------------------------------------------------
@@ -41,17 +42,9 @@
 
 // --- Global functions --------------------------------------------------------
 
-void motor_initialize(void);
+void ctrl_temp_initialize(void);
 
-void motor_set(bool on, bool cw);
+void ctrl_temp_background(void);
 
-uint16_t motor_get_valve_pos(void);
-
-bool motor_start_homing(void);
-
-bool motor_start_move_pos(uint16_t pos);
-
-void motor_background(void);
-
-#endif // _HEATERVALVE_MOTOR_H_
+#endif // _CONTROL_TEMP_H_
 /** @} */

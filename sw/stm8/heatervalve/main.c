@@ -5,6 +5,7 @@
 
 #include "adc.h"
 #include "cmd.h"
+#include "control_temp.h"
 #include "motor.h"
 #include "remote_tempsense.h"
 #include "timer.h"
@@ -37,15 +38,17 @@ void main(void)
 
     timer_initialize();
     motor_initialize();
-
+    motor_start_homing();
     cmd_initialize();
     remts_initialize();
+    ctrl_temp_initialize();
     uart_write("init complete\n");
     while (1) {
         if (USART1_SR & USART_SR_RXNE) {
             c = USART1_DR;
             cmd_process_char(c);
         }
+        ctrl_temp_background();
         motor_background();
         adc = adc_read();
         diff = adc - oldadc;
@@ -55,6 +58,7 @@ void main(void)
         oldadc = adc;
     }
 }
+
 
 //#define UART_RECV_ISR 28
 #define TIM2_OVF_ISR 19

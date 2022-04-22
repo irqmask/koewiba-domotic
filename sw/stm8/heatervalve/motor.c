@@ -128,6 +128,12 @@ void motor_set(bool on, bool dir_close)
 }
 
 
+uint16_t motor_get_valve_pos(void)
+{
+    return g_pos;
+}
+
+
 bool motor_start_homing(void)
 {
     if (g_state != MOTOR_IDLE) {
@@ -216,6 +222,7 @@ void motor_background(void)
             g_pos = g_pos_desired;
             g_timer = 0;
             g_state = MOTOR_IDLE;
+            printf("# mp %d\n", g_pos);
         }
         break;
 

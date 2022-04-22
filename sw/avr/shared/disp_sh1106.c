@@ -81,7 +81,7 @@ void sh1106_start_line (uint8_t start_line)
     write_command(0b01000000 | start_line);
 }
 
-void sh1106_set_contrast (uint8_t contrast)
+void sh1106_contrast (uint8_t contrast)
 {
     write_command(0b10000001);
     write_command(contrast);
@@ -166,7 +166,7 @@ void sh1106_initialize (void)
     write_command(0xC8);
     write_command(0xDA);        // set comp ins
     write_command(0x12);
-    sh1106_set_contrast(0xCF);
+    sh1106_contrast(0xCF);
     write_command(0xD9);        // set precharge
     write_command(0xF1);
     write_command(0xDB);        // set VCOM detect

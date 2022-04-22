@@ -1,6 +1,6 @@
-MCU = atmega324p
+MCU = atmega328p
 FORMAT = ihex
-TARGET = roomthermostat_atmega324p
+TARGET = roomthermostat_atmega328p
 
 ROOTDIR = $(subst \,/,$(shell pwd))/..
 include ../buildscripts/lib/lib_outputdirs.mk
@@ -11,27 +11,33 @@ include ../buildscripts/lib/lib_outputdirs.mk
 SRC = ../shared/bus_transport.c \
       ../shared/crc16.c \
       ../shared/queue.c \
+      shared/alarmclock.c \
+      shared/block_message.c \
       shared/bus_phy.c \
-      shared/disp_st7565.c \
+      shared/datetime.c \
+      shared/disp_sh1106.c \
+      shared/eeprom_spi.c \
+      shared/inputs.c \
       shared/gdisplay.c \
       shared/gdisplay_font_x8.c \
       shared/gdisplay_font_x16.c \
-      shared/gdisplay_symbols_x16.c \
       shared/gdisplay_symbols_x24.c \
+      shared/led_debug.c \
+      shared/main_avr.c \
       shared/register.c \
       shared/sleepmode.c \
       shared/timer.c \
       shared/zagwire.c \
-      roomthermostat/appregister.c \
-      roomthermostat/appversion.c \
-      roomthermostat/main_roomthermostat.c
+      basic_app_atmega328p/application.c \
+      basic_app_atmega328p/appregister.c \
+      basic_app_atmega328p/appversion.c
 
 # Place -I options here
 INCDIRS = -I. \
-          -I../include \
           -I../shared \
           -I../../include \
           -I../../shared
+
 
 LOCAL_CFLAGS = -DF_CPU=7372800 -DHAS_PCBCONFIG_H -DHAS_APPCONFIG_H
 LOCAL_ASFLAGS =

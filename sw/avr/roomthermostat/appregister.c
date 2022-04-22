@@ -1,11 +1,11 @@
 /**
  * @addtogroup ROOMTHERMOSTAT
  * @addtogroup APPREGISTER
- * @brief Registers of the application roomthermostat.
+ * @brief Registers of the application "roomthermostat_atmega328p".
  *
  * @{
  * @file    appregister.h
- * @brief   Registers of the application roomthermostat.
+ * @brief   Registers of the application "roomthermostat_atmega328p".
  *
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
@@ -35,9 +35,12 @@
 #include "ucontroller.h"
 #include "moddef_common.h"
 
+#include "alarmclock.h"
+#include "datetime.h"
 #include "register.h"
 
 #include "appconfig.h"
+#include "application.h"
 
 // --- Definitions -------------------------------------------------------------
 
@@ -49,48 +52,102 @@
 
 // --- Module global variables -------------------------------------------------
 
+extern uint16_t app_current_temp;
+extern uint16_t app_desired_temp;
+extern int16_t app_temp_offset;
+
 // --- Local functions ---------------------------------------------------------
 
 // --- Module global functions -------------------------------------------------
 
-bool        app_register_get        (uint8_t                uRegNo,
-                                     eRegType_t*            peRegType,
-                                     void*                  pvValue)
+void app_register_load(void)
+{
+    /*eeprom_write_word((uint16_t*)&register_eeprom_array[APP_eCfg_TempOffset], 0);
+    eeprom_write_word((uint16_t*)&register_eeprom_array[APP_eCfg_WindowSensorModuleID], 0x540);
+    eeprom_write_byte(&register_eeprom_array[APP_eCfg_WindowSensorReg], 0xC4);
+    eeprom_write_byte(&register_eeprom_array[APP_eCfg_Mode], eMODE_NORMAL);
+
+    eeprom_write_word((uint16_t*)&register_eeprom_array[APP_eCfg_TemperatureWindowOpen], 0x6DD3); // 8.0°C
+    eeprom_write_word((uint16_t*)&register_eeprom_array[APP_eCfg_TemperatureVacation], 0x71BB); // 18.0°C
+    */
+
+    app_set_temperature_offset(eeprom_read_word((uint16_t*)&register_eeprom_array[APP_eCfg_TempOffset]));
+    app_set_windowcontact_moduleid(eeprom_read_word((uint16_t*)&register_eeprom_array[APP_eCfg_WindowSensorModuleID]));
+    app_set_windowcontact_reg(eeprom_read_byte(&register_eeprom_array[APP_eCfg_WindowSensorReg]));
+    app_set_mode(eeprom_read_byte(&register_eeprom_array[APP_eCfg_Mode]));
+    app_set_windowopen_temperature(eeprom_read_word((uint16_t*)&register_eeprom_array[APP_eCfg_TemperatureWindowOpen]));
+    app_set_vacation_temperature(eeprom_read_word((uint16_t*)&register_eeprom_array[APP_eCfg_TemperatureVacation]));
+}
+
+bool        app_register_get        (uint8_t                reg_no,
+                                     eRegType_t*            preg_type,
+                                     void*                  pvalue)
 {
     eRegType_t  regtype;
 
-    if (peRegType == NULL) peRegType = &regtype;
-    if (pvValue == NULL) return false;
-    *peRegType = eRegType_U8;
+    if (preg_type == NULL) preg_type = &regtype;
+    if (pvalue == NULL) return false;
+    *preg_type = eRegType_U8;
 
-    switch (uRegNo) {
+    switch (reg_no) {
     // registers saved in EEProm
-    case APP_eReg_DesiredTempDay1:
-        *(uint16_t*)pvValue = eeprom_read_word((uint16_t*)&register_eeprom_array[APP_eCfg_DesiredTempDay1]);
-        *peRegType = eRegType_U16;
+    case APP_eReg_TempCurrent:
+        *(uint16_t*)pvalue = app_current_temp;
+        *preg_type = eRegType_U16;
         break;
-    case APP_eReg_DesiredTempNight1:
-        *(uint16_t*)pvValue = eeprom_read_word((uint16_t*)&register_eeprom_array[APP_eCfg_DesiredTempNight1]);
-        *peRegType = eRegType_U16;
+
+    case APP_eReg_TempSetPoint:
+        *(uint16_t*)pvalue = app_desired_temp;
+        *preg_type = eRegType_U16;
         break;
-    case APP_eReg_DesiredTempDay2:
-        *(uint16_t*)pvValue = eeprom_read_word((uint16_t*)&register_eeprom_array[APP_eCfg_DesiredTempDay2]);
-        *peRegType = eRegType_U16;
+
+    case APP_eReg_TempOffset:
+        *(uint16_t*)pvalue = app_temp_offset;
+        *preg_type = eRegType_U16;
         break;
-    case APP_eReg_DesiredTempNight2:
-        *(uint16_t*)pvValue = eeprom_read_word((uint16_t*)&register_eeprom_array[APP_eCfg_DesiredTempNight2]);
-        *peRegType = eRegType_U16;
+
+    case APP_eReg_WindowSensorModuleID:
+        *(uint16_t*)pvalue = app_get_windowcontact_moduleid();
+        *preg_type = eRegType_U16;
         break;
-    case APP_eReg_DesiredTempAway:
-        *(uint16_t*)pvValue = eeprom_read_word((uint16_t*)&register_eeprom_array[APP_eCfg_DesiredTempAway]);
-        *peRegType = eRegType_U16;
+
+    case APP_eReg_WindowSensorReg:
+        *(uint8_t*)pvalue = app_get_windowcontact_reg();
+        *preg_type = eRegType_U8;
         break;
-    case APP_eReg_DesiredTempWindowOpened:
-        *(uint16_t*)pvValue = eeprom_read_word((uint16_t*)&register_eeprom_array[APP_eCfg_DesiredTempWindowOpened]);
-        *peRegType = eRegType_U16;
-        break;
+
+        // TODO add handler for with application specific registers here!
 
     // registers in ROM/RAM
+    case APP_eReg_Year:
+        *(uint16_t*)pvalue = dt_get_year();
+        *preg_type = eRegType_U16;
+        break;
+
+    case APP_eReg_Month:
+        *(uint8_t*)pvalue = dt_get_month();
+        break;
+
+    case APP_eReg_Day:
+        *(uint8_t*)pvalue = dt_get_day();
+        break;
+
+    case APP_eReg_DayOfWeek:
+        *(uint8_t*)pvalue = dt_get_day_of_week();
+        break;
+
+    case APP_eReg_Hour:
+        *(uint8_t*)pvalue = dt_get_hour();
+        break;
+
+    case APP_eReg_Minute:
+        *(uint8_t*)pvalue = dt_get_minute();
+        break;
+
+    case APP_eReg_Second:
+        *(uint8_t*)pvalue = dt_get_second();
+        break;
+
     default:
         return false;
         break;
@@ -98,36 +155,87 @@ bool        app_register_get        (uint8_t                uRegNo,
     return true;
 }
 
-void        app_register_set        (uint8_t                uRegNo,
-                                     uint32_t               uValue)
+void        app_register_set        (uint8_t                reg_no,
+                                     uint32_t               value)
 {
     uint16_t    tempval16;
-//    uint8_t     tempval;
+    uint8_t     tempval8;
 
-    tempval16 = (uint16_t)(uValue & 0x0000FFFF);
-//    tempval = (uint8_t)(uValue & 0x000000FF);
+    tempval16 = (uint16_t)(value & 0x0000FFFF);
+    tempval8 = (uint8_t)(value & 0x000000FF);
 
-    switch (uRegNo) {
+    switch (reg_no) {
     // registers saved in EEProm
-    case APP_eReg_DesiredTempDay1:
-        eeprom_write_word((uint16_t*)&register_eeprom_array[APP_eCfg_DesiredTempDay1], tempval16);
-        break;
-    case APP_eReg_DesiredTempNight1:
-        eeprom_write_word((uint16_t*)&register_eeprom_array[APP_eReg_DesiredTempNight1], tempval16);
-        break;
-    case APP_eReg_DesiredTempDay2:
-        eeprom_write_word((uint16_t*)&register_eeprom_array[APP_eCfg_DesiredTempDay2], tempval16);
-        break;
-    case APP_eReg_DesiredTempNight2:
-        eeprom_write_word((uint16_t*)&register_eeprom_array[APP_eReg_DesiredTempNight2], tempval16);
-        break;
-    case APP_eReg_DesiredTempAway:
-        eeprom_write_word((uint16_t*)&register_eeprom_array[APP_eReg_DesiredTempAway], tempval16);
-        break;
-    case APP_eReg_DesiredTempWindowOpened:
-        eeprom_write_word((uint16_t*)&register_eeprom_array[APP_eReg_DesiredTempWindowOpened], tempval16);
-        break;
+    // TODO add handler for with application specific registers here!
 
+    // registers in ROM/RAM
+     case APP_eReg_TempCurrent:
+         // read only
+         break;
+
+     case APP_eReg_TempSetPoint:
+         app_desired_temp = tempval16;
+         app_draw_desired_temp();
+         break;
+
+     case APP_eReg_TempOffset:
+         app_temp_offset = tempval16;
+         eeprom_write_word((uint16_t*)&register_eeprom_array[APP_eCfg_TempOffset], tempval16);
+         break;
+
+     case APP_eReg_WindowSensorModuleID:
+         app_set_windowcontact_moduleid(tempval16);
+         eeprom_write_word((uint16_t*)&register_eeprom_array[APP_eCfg_WindowSensorModuleID], tempval16);
+         break;
+
+     case APP_eReg_WindowSensorReg:
+         app_set_windowcontact_reg(tempval8);
+         eeprom_write_byte((uint8_t*)&register_eeprom_array[APP_eCfg_WindowSensorReg], tempval8);
+         break;
+
+     case APP_eReg_Mode:
+         app_set_mode(tempval8);
+         eeprom_write_byte((uint8_t*)&register_eeprom_array[APP_eCfg_Mode], tempval8);
+         break;
+
+     case APP_eReg_TemperatureWindowOpen:
+         app_set_windowopen_temperature(tempval16);
+         eeprom_write_word((uint16_t*)&register_eeprom_array[APP_eReg_TemperatureWindowOpen], tempval16);
+         break;
+
+     case APP_eReg_TemperatureVacation:
+         app_set_vacation_temperature(tempval16);
+         eeprom_write_word((uint16_t*)&register_eeprom_array[APP_eReg_TemperatureVacation], tempval16);
+         break;
+
+     // registers in ROM/RAM
+     case APP_eReg_Year:
+         dt_set_year(tempval16);
+         break;
+
+     case APP_eReg_Month:
+         dt_set_month(tempval8);
+         break;
+
+     case APP_eReg_Day:
+         dt_set_day(tempval8);
+         break;
+
+     case APP_eReg_DayOfWeek:
+         dt_set_day_of_week(tempval8);
+         break;
+
+     case APP_eReg_Hour:
+         dt_set_hour(tempval8);
+         break;
+
+     case APP_eReg_Minute:
+         dt_set_minute(tempval8);
+         break;
+
+     case APP_eReg_Second:
+         dt_set_second(tempval8);
+         break;
     // registers in ROM/RAM
 
     default:

@@ -1,30 +1,13 @@
 /**
- * @addtogroup ROOMTHERMOSTAT
- * @addtogroup PCBCONFIG
- * @brief PCB configuration of the "roomthermostat" application.
+ * @addtogroup ROOMTHERMOSTAT_ATMEGA328_PCBCONFIG
+ * @brief PCB configuration of the "roomthermostat_atmega328p" application.
  *
  * @{
  * @file    pcbconfig.h
- * @brief   PCB configuration of the "roomthermostat" application.
+ * @brief   PCB configuration of the "roomthermostat_atmega328p" application.
  *
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
-/*
- * Copyright (C) 2019  christian <irqmask@web.de>
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
 #ifndef _PCBCONFIG_H_
 #define _PCBCONFIG_H_
 
@@ -34,13 +17,13 @@
 
 // --- Definitions -------------------------------------------------------------
 
-// bus-module_atmega324 specific pin assignments
+// roomthermostat_atmega328p specific pin assignments
 // ----------------------------------------------------------------------------
 
-#define BUS_PCBCONFIG       1
+#define BUS_PCBCONFIG 1
 #define BUS_DDR_ENASND0     DDRD
 #define BUS_PORT_ENASND0    PORTD
-#define BUS_ENASND0         PD4
+#define BUS_ENASND0         PD2
 
 #define SPI_PCBCONFIG       1
 #define SPI_DDR_MOSI        DDRB
@@ -48,60 +31,60 @@
 #define SPI_DDR_SCK         DDRB
 #define SPI_DDR_SS          DDRB
 #define SPI_PORT_SS         PORTB
-#define SPI_MOSI            PB5
-#define SPI_MISO            PB6
-#define SPI_SCK             PB7
-#define SPI_SS              PB4 // same as EEPROM!
+#define SPI_MOSI            PB3
+#define SPI_MISO            PB4
+#define SPI_SCK             PB5
+#define SPI_SS              PB2 // same as EEPROM!
 
 #define EEPROM_PCB_CONFIG   1
 #define __25LC256__
 #define EEP_CS_PORT         PORTB
 #define EEP_CS_DDR          DDRB
-#define EEP_CS              PB4
+#define EEP_CS              PB2
 
 // Application specific pin assignments
 // ----------------------------------------------------------------------------
 
-// Pin assignments of board keys and LEDs
-#define LED_PCBCONFIG       1
-#define LED_STATUS          PC3  //left yellow LED
-#define LED_ERROR           PC4  //right yellow LED
-#define BTN_TEST            PC5
-#define BTN_EXP             PC6
-#define LED_STATUS_DDR      DDRC
-#define LED_ERROR_DDR       DDRC
-#define LED_STATUS_PORT     PORTC
-#define LED_ERROR_PORT      PORTC
+// debug LED outputs
+#define LED_PCBCONFIG        1
+#define LED_STATUS          PD6    //!< Yellow status LED
+#define LED_ERROR           PD7    //!< Red error LED
+#define LED_STATUS_DDR      DDRD
+#define LED_ERROR_DDR       DDRD
+#define LED_STATUS_PORT     PORTD
+#define LED_ERROR_PORT      PORTD
 
+#define INPUTS_PCBCONFIG    1
+#define INPUT_PORT          PORTC
+#define INPUT_DDR           DDRC
+#define INPUT_PIN           PINC
+#define INPUT_0_PIN         PC0
+#define INPUT_1_PIN         PC1
+#define INPUT_2_PIN         PC2
+#define INPUT_PCMSK         PCMSK1
+#define INPUT_PCMSK_VAL     ((1<<PCINT8) | (1<<PCINT9) | (1<<PCINT10))
+#define NBR_OF_INPUTS       3
 
-#define GDISPLAY_PCBCONFIG  1
-//! Defines the DDR of a port which contains the backlight LED signal.
-#define DISP_DDR_LED   DDRD
-//! Defines the PORT which contains the backlight LED signal.
-#define DISP_PORT_LED  PORTD
-//! Defines the LED pin.
-#define DISP_LED       PD7
+#define DISP_SH1106_PCBCONFIG  1
+#define DISP_DDR_RES        DDRD
+#define DISP_DDR_SS         DDRD
+#define DISP_DDR_A0         DDRD
+#define DISP_PORT_RES       PORTD
+#define DISP_PORT_SS        PORTD
+#define DISP_PORT_A0        PORTD
+#define DISP_RES            PD3
+#define DISP_SS             PD4
+#define DISP_A0             PD5
 
-#define DISP_ST7565_PCBCONFIG  1
-//! Defines the DDR of a port which contains the slave select signal of the
-//! display.
-#define DISP_DDR_SS    DDRB
-//! Defines the DDR which contains the A0 signal of the display.
-#define DISP_DDR_A0    DDRD
-//! Defines the DDR which contains the RES signal of the display.
-#define DISP_DDR_RES   DDRD
-//! Defines the PORT which contains the slave select signal of the display.
-#define DISP_PORT_SS   PORTB
-//! Defines the PORT which contains the A0 signal of the display.
-#define DISP_PORT_A0   PORTD
-//! Defines the PORT which contains the RES signal of the display.
-#define DISP_PORT_RES  PORTD
-//! Defines the SS pin.
-#define DISP_SS           PB3
-//! Defines the A0 pin.
-#define DISP_A0           PD6
-//! Defines the reset pin
-#define DISP_RES          PD5
+#define ZAGWIRE_PCBCONFIG   1
+#define ZAGW_DDR_DATA       DDRB
+#define ZAGW_PORT_DATA      PORTB
+#define ZAGW_PIN_DATA       PINB
+#define ZAGW_DATA           PB0
+
+#define ZAGW_DDR_EN         DDRB    //!< Defines the DDR of a port which contains the Zagwire enable signal.
+#define ZAGW_PORT_EN        PORTB   //!< Defines the PORT which contains the Zagwire enable signal.
+#define ZAGW_EN             PB1     //!< Defines the Zagwire enable pin (output).
 
 // --- Type definitions --------------------------------------------------------
 
@@ -118,5 +101,4 @@
 // --- Global functions --------------------------------------------------------
 
 #endif // _PCBCONFIG_H_
-/** @} */
 /** @} */

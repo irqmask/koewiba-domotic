@@ -16,6 +16,7 @@ SRC = ../shared/bus_transport.c \
       shared/bus_phy.c \
       shared/datetime.c \
       shared/eeprom_spi.c \
+      shared/inputs.c \
       shared/led_debug.c \
       shared/main_avr.c \
       shared/register.c \
@@ -26,7 +27,6 @@ SRC = ../shared/bus_transport.c \
       blind-control_atmega328p/application.c \
       blind-control_atmega328p/appregister.c \
       blind-control_atmega328p/appversion.c \
-      blind-control_atmega328p/inputs.c \
 
 # Place -I options here
 INCDIRS = -I. \

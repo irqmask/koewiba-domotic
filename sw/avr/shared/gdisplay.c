@@ -59,6 +59,7 @@
  #define GDISP_PAGE_ADDR     sh1106_page_addr
  #define GDISP_COLUMN_ADDR   sh1106_column_addr
  #define GDISP_START_LINE    sh1106_start_line
+ #define GDISP_DISPLAY_ONOFF sh1106_display_onoff
 #endif
 
 // --- Type definitions --------------------------------------------------------

@@ -72,6 +72,17 @@
 #define LED_STATUS_PORT      PORTD
 #define LED_ERROR_PORT       PORTD
 
+#define INPUTS_PCBCONFIG    1
+#define INPUT_PORT          PORTC
+#define INPUT_DDR           DDRC
+#define INPUT_PIN           PINC
+#define INPUT_0_PIN         PC4
+#define INPUT_1_PIN         PC3
+#define INPUT_2_PIN         PC2
+#define INPUT_PCMSK         PCMSK1
+#define INPUT_PCMSK_VAL     ((1<<PCINT12) | (1<<PCINT11) | (1<<PCINT10))
+#define NBR_OF_INPUTS       3
+
 // --- Type definitions --------------------------------------------------------
 
 // --- Local variables ---------------------------------------------------------

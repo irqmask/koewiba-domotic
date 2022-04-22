@@ -69,6 +69,24 @@ void send_window_state (sBus_t* bus)
     bus_send_message(bus, BUS_BRDCSTADR, 3, msg);
 }
 
+bool input_up               (void)
+{
+    //return ((PINC & (1<<INPUT_UP_PIN)) == 0);
+    return input_on_activation(2);
+}
+
+bool input_down             (void)
+{
+    //return ((PINC & (1<<INPUT_DOWN_PIN)) == 0);
+    return input_on_activation(1);
+}
+
+bool input_window_closed    (void)
+{
+    //return ((PINC & (1<<INPUT_WINDOW_PIN)) == 0);
+    return input_active(0);
+}
+
 // --- Module global functions -------------------------------------------------
 
 extern void        app_register_load       (void);
@@ -88,6 +106,7 @@ void app_init (void)
     motors_initialize();
     blinds_initialize();
     dt_initialize();
+    alarm_initialize();
 
     // load application parameters
     app_register_load();

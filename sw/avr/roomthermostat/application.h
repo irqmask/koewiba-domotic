@@ -1,16 +1,15 @@
+ 
 /**
- * @addtogroup TEST_ROOMTHERMOSTAT_ATMEGA328
- * @addtogroup APPVERSION
- * @brief Version information of "test_roomthermostat_atmega328" application.
+ * @addtogroup ROOMTHERMOSTAT
+ * @addtogroup APPLICATION
+ * @brief Declaration of application wide functions and variables
  *
  * @{
- * @file    appversion.c
- * @brief   Version information of "test_roomthermostat_atmega328" application.
- *
+ * @file    application.h
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
 /*
- * Copyright (C) 2019  christian <irqmask@web.de>
+ * Copyright (C) 2021  christian <irqmask@web.de>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,10 +25,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef _APPLICATION_H_
+#define _APPLICATION_H_
+
 // --- Include section ---------------------------------------------------------
 
-#include <avr/io.h>
-#include "moddef_common.h"
+#include "prjtypes.h"
 
 // --- Definitions -------------------------------------------------------------
 
@@ -39,16 +40,7 @@
 
 // --- Global variables --------------------------------------------------------
 
-//! Application's version information
-//! @note The linker sorts the variables upside down. app_controller_id begins at
-//!       the lowest address and app_version begins at the highest address.
-//! @see BOARD_IDs, APP_IDs, APP_VERSIONING
-const unsigned char app_versioninfo[MOD_LEN_CONTROLLERID + MOD_LEN_BOARDID + MOD_LEN_BOARDREV + MOD_LEN_APPID + MOD_LEN_APPVER] __attribute__((section(".versioninfo")))
-                        = {SIGNATURE_0,SIGNATURE_1,SIGNATURE_2,0x00,
-                           0x00,0x06,   // board ID            (high byte, low byte)
-                           2,           // board revision
-                           0x00,0x07,   // application ID      (high byte, low byte)
-                           0,2,1};      // application version (major, minor, bugfix)
+extern const unsigned char app_versioninfo[];
 
 // --- Module global variables -------------------------------------------------
 
@@ -56,6 +48,39 @@ const unsigned char app_versioninfo[MOD_LEN_CONTROLLERID + MOD_LEN_BOARDID + MOD
 
 // --- Module global functions -------------------------------------------------
 
+void app_set_temperature_offset(int16_t offset);
+
+int16_t app_get_temperature_offset(void);
+
+void app_set_windowcontact_moduleid(uint16_t moduleid);
+
+uint16_t app_get_windowcontact_moduleid(void);
+
+void app_set_windowcontact_reg(uint8_t reg);
+
+uint8_t app_get_windowcontact_reg(void);
+
+void app_set_mode(uint8_t mode);
+
+uint8_t app_get_mode(void);
+
+void app_set_windowopen_temperature(uint16_t temp);
+
+uint16_t app_get_windowopen_temperature(void);
+
+void app_set_vacation_temperature(uint16_t temp);
+
+uint16_t app_get_vacation_temperature(void);
+
+void app_draw_desired_temp(void);
+
+void app_draw_current_temp(void);
+
+void app_draw_window(void);
+
+void app_register_load(void);
+
 // --- Global functions --------------------------------------------------------
 
+#endif /* _APPLICATION_H_ */
 /** @} */

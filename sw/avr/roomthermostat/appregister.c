@@ -62,15 +62,6 @@ extern int16_t app_temp_offset;
 
 void app_register_load(void)
 {
-    /*eeprom_write_word((uint16_t*)&register_eeprom_array[APP_eCfg_TempOffset], 0);
-    eeprom_write_word((uint16_t*)&register_eeprom_array[APP_eCfg_WindowSensorModuleID], 0x540);
-    eeprom_write_byte(&register_eeprom_array[APP_eCfg_WindowSensorReg], 0xC4);
-    eeprom_write_byte(&register_eeprom_array[APP_eCfg_Mode], eMODE_NORMAL);
-
-    eeprom_write_word((uint16_t*)&register_eeprom_array[APP_eCfg_TemperatureWindowOpen], 0x6DD3); // 8.0°C
-    eeprom_write_word((uint16_t*)&register_eeprom_array[APP_eCfg_TemperatureVacation], 0x71BB); // 18.0°C
-    */
-
     app_set_temperature_offset(eeprom_read_word((uint16_t*)&register_eeprom_array[APP_eCfg_TempOffset]));
     app_set_windowcontact_moduleid(eeprom_read_word((uint16_t*)&register_eeprom_array[APP_eCfg_WindowSensorModuleID]));
     app_set_windowcontact_reg(eeprom_read_byte(&register_eeprom_array[APP_eCfg_WindowSensorReg]));
@@ -102,7 +93,7 @@ bool        app_register_get        (uint8_t                reg_no,
         break;
 
     case APP_eReg_TempOffset:
-        *(uint16_t*)pvalue = app_temp_offset;
+        *(uint16_t*)pvalue = app_get_temperature_offset();
         *preg_type = eRegType_U16;
         break;
 
@@ -179,7 +170,7 @@ void        app_register_set        (uint8_t                reg_no,
          break;
 
      case APP_eReg_TempOffset:
-         app_temp_offset = tempval16;
+         app_set_temperature_offset(tempval16);
          eeprom_write_word((uint16_t*)&register_eeprom_array[APP_eCfg_TempOffset], tempval16);
          break;
 

@@ -85,7 +85,6 @@ extern sBus_t  g_bus;
 // --- Module global variables -------------------------------------------------
 
 uint16_t app_current_temp, app_desired_temp;
-int16_t app_temp_offset;
 
 // --- Local functions ---------------------------------------------------------
 
@@ -365,8 +364,6 @@ void app_init (void)
     g_temperature_glitches = 0;
     g_display_timeout = DISP_TIMEOUT_DIM - 1;
 
-    app_temp_offset = 0;
-
     // initialize volatile registers
     app_current_temp = 27315 + 1000;
     app_desired_temp = 27315 + 2000;
@@ -441,6 +438,7 @@ void app_background (sBus_t* bus)
             zagw_start_sampling();
             if (raw_temp != 0) {
                 app_current_temp = zagw_get_temperature(raw_temp);
+                app_current_temp += g_temperature_offset;
                 if (app_current_temp != g_last_temperature) {
                     app_draw_current_temp();
                     register_send_u16(bus, BUS_BRDCSTADR, APP_eReg_TempCurrent, app_current_temp);

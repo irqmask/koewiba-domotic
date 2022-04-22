@@ -113,6 +113,8 @@ typedef enum {
  * 0x0008 led2_atmega324(p)
  * 0x0009 pushbutton8_atmega328(p)
  * 0x000A switch5_atmega328(p)
+ * 0x000B blind-control_5x_atmega328(p)
+ * 0x000C heatervalve_gateway_attiny1634
  * ...
  * 0xEFFF (last common application)
  * 0xF000 (first user specific application)

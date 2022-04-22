@@ -32,8 +32,12 @@
 
 #include <avr/io.h>
 #include "prjtypes.h"
+#include "cmddef_common.h"
+#include "register.h"
 #include "timer.h"
 #include "uart.h"
+
+#include "appconfig.h"
 
 // --- Definitions -------------------------------------------------------------
 
@@ -42,12 +46,31 @@
 // --- Local variables ---------------------------------------------------------
 
 static timer_data_t g_timer;
+static uint16_t g_remote_temp_curr;
+static uint16_t g_remote_temp_setpoint;
+static bool     g_send_remote_temp_update;
 
 // --- Global variables --------------------------------------------------------
 
 // --- Module global variables -------------------------------------------------
 
+uint16_t        app_rem_temp_curr_modid;    //!< module id of remote temperature sensor
+uint8_t         app_rem_temp_curr_regno;    //!< register number of remote temperature sensor
+uint16_t        app_rem_temp_setp_modid;    //!< module id of remote temperature setpoint
+uint8_t         app_rem_temp_setp_regno;    //!< register number of remote temperature setpoint
+
 // --- Local functions ---------------------------------------------------------
+
+static void send_temp_curr_and_setpoint(void)
+{
+    // send remote temperatures
+    // srt <current> <desired>
+    uart_put_string_blk1_p("srt ");
+    uart_put_hex16_blk1(g_remote_temp_curr);
+    uart_put_char_blk1(' ');
+    uart_put_hex16_blk1(g_remote_temp_setpoint);
+    uart_put_char_blk1('\n');
+}
 
 // --- Module global functions -------------------------------------------------
 
@@ -62,13 +85,17 @@ static timer_data_t g_timer;
  */
 void app_init (void)
 {
-    DDRB |= ((1<<PB1) | (1<<PB2));
-    PORTB &= ~((1<<PB1) | (1<<PB2));
-    PUEB &= ~((1<<PB1) | (1<<PB2));
-        //uart_init_blk1(9600);
-    //uart_put_string_blk1("Hello KWB world!\n");
-    //TODO insert application specific initializations here!
+    register_set_u16(MOD_eReg_ModuleID, 0x520);
+
+    uart_init_blk1(57600);
+
     timer_start(&g_timer, TIMER_MS_2_TICKS(1000));
+
+    // load application parameters
+    app_register_load();
+
+    g_remote_temp_setpoint = 15 * 100 + 27315;
+    g_remote_temp_curr = 15 * 100 + 27315;
 }
 
 /**
@@ -78,14 +105,29 @@ void app_init (void)
  */
 void app_on_command (uint16_t sender, uint8_t msglen, uint8_t* msg)
 {
+    uint8_t regno;
+    uint16_t value;
+
     switch (msg[0]) {
-    //TODO insert application specific command interpreter here!
+    case eCMD_STATE_16BIT:
+        regno = msg[1];
+        value = (uint16_t)msg[2] << 8;
+        value |= msg[3];
+        if (sender == app_rem_temp_curr_modid && regno == app_rem_temp_curr_regno) {
+            g_remote_temp_curr = value;
+            g_send_remote_temp_update = true;
+        }
+        else if (sender == app_rem_temp_setp_modid && regno == app_rem_temp_setp_regno) {
+            g_remote_temp_setpoint = value;
+            g_send_remote_temp_update = true;
+        }
+        break;
+
     default:
         break;
     }
 }
 
-bool toggle = false;
 /**
  * Application specific background code.
  *
@@ -94,22 +136,13 @@ bool toggle = false;
 void app_background (void)
 {
     if (timer_is_elapsed(&g_timer)) {
-        //uart_put_char_blk1('.');
 
-        if (toggle) {
-            toggle = false;
-            PORTB |= (1<<PB1);
-        } else {
-            toggle = true;
-            PORTB &= ~(1<<PB1);
-        }
-        timer_start(&g_timer, TIMER_MS_2_TICKS(100));
+        timer_start(&g_timer, TIMER_MS_2_TICKS(1000));
     }
 
-    /*if (uart_is_rx_pending1()) {
-        char c = uart_get_char_blk1();
-        uart_put_char_blk1(c);
-    }*/
-    //TODO insert application specific background routines here!
+    if (g_send_remote_temp_update) {
+        g_send_remote_temp_update = false;
+        send_temp_curr_and_setpoint();
+    }
 }
 /** @} */

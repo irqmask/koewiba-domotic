@@ -174,8 +174,10 @@ void            uart_init_blk1      (uint32_t               baudrate);
 void            uart_put_char_blk1  (char                   single_char);
 
 void            uart_put_hex8_blk1  (uint8_t                value);
+void            uart_put_hex16_blk1 (uint16_t               value);
 
 void            uart_put_string_blk1(const char*            string);
+void            uart_put_string_blk1_p(const char*          string);
 
 void            uart_hex_dump_blk1  (const uint8_t*         data,
                                      uint8_t                length);

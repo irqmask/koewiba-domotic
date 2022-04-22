@@ -52,37 +52,40 @@
 
 // --- Module global functions -------------------------------------------------
 
+void        app_register_load       (void)
+{
+    app_rem_temp_curr_modid = eeprom_read_word((uint16_t*)&register_eeprom_array[APP_eCfg_RemTempCurrentModuleID]);
+    app_rem_temp_curr_regno = eeprom_read_byte(&register_eeprom_array[APP_eCfg_RemTempCurrentRegNo]);
+    app_rem_temp_setp_modid = eeprom_read_word((uint16_t*)&register_eeprom_array[APP_eCfg_RemTempSetpointModuleID]);
+    app_rem_temp_setp_regno = eeprom_read_byte(&register_eeprom_array[APP_eCfg_RemTempSetpointModuleID]);
+}
+
 bool        app_register_get        (uint8_t                reg_no,
                                      eRegType_t*            preg_type,
                                      void*                  pvalue)
 {
     eRegType_t  regtype;
-    uint8_t index;
 
     if (preg_type == NULL) preg_type = &regtype;
     if (pvalue == NULL) return false;
     *preg_type = eRegType_U8;
 
+    switch (reg_no) {
     // registers saved in EEProm
-    if (reg_no >= APP_eReg_RemoteAddr00 && reg_no <= APP_eReg_RemoteAddr31) {
-        index = (reg_no - APP_eReg_RemoteAddr00) * 2;
-        index += APP_eCfg_RemoteAddr00;
-        *(uint16_t*)pvalue = eeprom_read_word((uint16_t*)&register_eeprom_array[index]);
+    case APP_eReg_RemTempCurrentModuleID:
+        *(uint16_t*)pvalue = app_rem_temp_curr_modid;
         *preg_type = eRegType_U16;
-    }
-    else if (reg_no >= APP_eReg_RemoteReg00 && reg_no <= APP_eReg_RemoteReg31) {
-        index = reg_no - APP_eReg_RemoteReg00;
-        index += APP_eCfg_RemoteReg00;
-        *(uint8_t*)pvalue = eeprom_read_byte(&register_eeprom_array[index]);
-    }
-    else if (reg_no >= APP_eReg_TargetReg00 && reg_no <= APP_eReg_TargetReg31) {
-        index = reg_no - APP_eReg_TargetReg00;
-        index += APP_eCfg_TargetReg00;
-        *(uint8_t*)pvalue = eeprom_read_byte(&register_eeprom_array[index]);
-    }
-    else switch (reg_no) {
-    // registers saved in EEProm
-    // TODO add handler for with application specific registers here!
+        break;
+    case APP_eReg_RemTempCurrentRegNo:
+        *(uint8_t*)pvalue = app_rem_temp_curr_regno;
+        break;
+    case APP_eReg_RemTempSetpointModuleID:
+        *(uint16_t*)pvalue = app_rem_temp_setp_modid;
+        *preg_type = eRegType_U16;
+        break;
+    case APP_eReg_RemTempSetpointRegNo:
+        *(uint8_t*)pvalue = app_rem_temp_setp_regno;
+        break;
 
     // registers in ROM/RAM
     default:
@@ -95,32 +98,30 @@ bool        app_register_get        (uint8_t                reg_no,
 void        app_register_set        (uint8_t                reg_no,
                                      uint32_t               value)
 {
-    uint16_t    tempval16;
-    uint8_t     tempval, index;
+    uint16_t    value16;
+    uint8_t     value8;
 
-    tempval16 = (uint16_t)(value & 0x0000FFFF);
-    tempval = (uint8_t)(value & 0x000000FF);
+    value16 = (uint16_t)(value & 0x0000FFFF);
+    value8 = (uint8_t)(value & 0x000000FF);
 
+    switch (reg_no) {
     // registers saved in EEProm
-    if (reg_no >= APP_eReg_RemoteAddr00 && reg_no <= APP_eReg_RemoteAddr31) {
-        index = (reg_no - APP_eReg_RemoteAddr00) * 2;
-        index += APP_eCfg_RemoteAddr00;
-        eeprom_write_word((uint16_t*)&register_eeprom_array[index], tempval16);
-    }
-    else if (reg_no >= APP_eReg_RemoteReg00 && reg_no <= APP_eReg_RemoteReg31) {
-        index = reg_no - APP_eReg_RemoteReg00;
-        index += APP_eCfg_RemoteReg00;
-        eeprom_write_byte(&register_eeprom_array[index], tempval);
-    }
-    else if (reg_no >= APP_eReg_TargetReg00 && reg_no <= APP_eReg_TargetReg31) {
-        index = reg_no - APP_eReg_TargetReg00;
-        index += APP_eCfg_TargetReg00;
-        eeprom_write_byte(&register_eeprom_array[index], tempval);
-    }
-    else switch (reg_no) {
-    // registers saved in EEProm
-    // TODO add handler for with application specific registers here!
-
+    case APP_eReg_RemTempCurrentModuleID:
+        app_rem_temp_curr_modid = value16;
+        eeprom_write_word((uint16_t*)&register_eeprom_array[APP_eCfg_RemTempCurrentModuleID], value16);
+        break;
+    case APP_eReg_RemTempCurrentRegNo:
+        app_rem_temp_curr_regno = value8;
+        eeprom_write_byte(&register_eeprom_array[APP_eCfg_RemTempCurrentRegNo], value8);
+        break;
+    case APP_eReg_RemTempSetpointModuleID:
+        app_rem_temp_setp_modid = value16;
+        eeprom_write_word((uint16_t*)&register_eeprom_array[APP_eCfg_RemTempSetpointModuleID], value16);
+        break;
+    case APP_eReg_RemTempSetpointRegNo:
+        app_rem_temp_setp_regno = value8;
+        eeprom_write_byte(&register_eeprom_array[APP_eCfg_RemTempSetpointRegNo], value8);
+        break;
 
     // registers in ROM/RAM
 

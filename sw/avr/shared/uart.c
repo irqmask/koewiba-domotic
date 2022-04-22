@@ -419,9 +419,6 @@ void uart_init_blk1 ( uint32_t baudrate )
  */
 void uart_put_char_blk1 ( char single_char )
 {
-    if ( single_char == '\n' )
-        uart_put_char_blk1('\r');
-
     loop_until_bit_is_set(REGISTER_UCSRA1, UDRE1);
     REGISTER_UDR1 = single_char;
 }
@@ -441,6 +438,20 @@ void uart_put_string_blk1 ( const char *string )
 }
 
 /**
+ * Sends a string from flash memory over the UART. Before sending a char, this function waits until
+ * the UART is ready to send the next char.
+ *
+ * @param[in] string
+ * String to send. String has to be terminated with a null character.
+ */
+void uart_put_string_blk1_p ( const char *string )
+{
+    while ( *string != '\0' ) {
+        uart_put_char_blk1(*string++);
+    }
+}
+
+/**
  * Sends a hexadecimal representation of a byte over the UART. Before each
  * character is sent, this function waits until the UART is ready to send
  * the next char.
@@ -452,6 +463,22 @@ void uart_put_hex8_blk1 (uint8_t value)
 {
     uart_put_char_blk1(val2hex(value >> 4));
     uart_put_char_blk1(val2hex(value & 0x0F));
+}
+
+/**
+ * Sends a hexadecimal representation of a 16bit word over the UART. Before each
+ * character is sent, this function waits until the UART is ready to send
+ * the next char.
+ *
+ * @param[in] value
+ * Byte-value to convert into hex and to be sent.
+ */
+void uart_put_hex16_blk1 (uint16_t value)
+{
+    uart_put_char_blk1(val2hex((value & 0xF000) >> 12));
+    uart_put_char_blk1(val2hex((value & 0x0F00) >> 8));
+    uart_put_char_blk1(val2hex((value & 0x00F0) >> 4));
+    uart_put_char_blk1(val2hex(value & 0x000F));
 }
 
 /**

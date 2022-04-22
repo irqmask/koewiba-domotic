@@ -2,7 +2,7 @@
  * @addtogroup KWBMQTTGATEWAY
  *
  * @{
- * @file    msg2mqtt.c
+ * @file    msg2mqtt.cpp
  * @brief   Convert koewiba message to mqtt and vice versa.
  *
  * @author  Christian Verhalen
@@ -65,13 +65,13 @@
  * @param[out]  msgtext         Created MQTT message text
  * @param[in]   max_msgtext_len Maximum length of MQTT message text including terminating zero.
  */
-void msg2mqtt_regstate_8bit(msg_t *message, char *topic, size_t max_topic_len, char *msgtext, size_t max_msgtext_len)
+void msg2mqtt_regstate_8bit(const msg_t &message, char *topic, size_t max_topic_len, char *msgtext, size_t max_msgtext_len)
 {
     snprintf(topic, max_topic_len - 1, "kwb/%04X/%04X/state8bit/%02X",
-             message->sender, message->receiver, message->data[1]);
+             message.sender, message.receiver, message.data[1]);
     topic[max_topic_len - 1] = '\0';
     snprintf(msgtext, max_msgtext_len - 1, "%d",
-             message->data[2]);
+             message.data[2]);
     msgtext[max_msgtext_len - 1] = '\0';
 }
 
@@ -84,16 +84,16 @@ void msg2mqtt_regstate_8bit(msg_t *message, char *topic, size_t max_topic_len, c
  * @param[out]  msgtext         Created MQTT message text
  * @param[in]   max_msgtext_len Maximum length of MQTT message text including terminating zero.
  */
-void msg2mqtt_regstate_16bit(msg_t *message, char *topic, size_t max_topic_len, char *msgtext, size_t max_msgtext_len)
+void msg2mqtt_regstate_16bit(const msg_t &message, char *topic, size_t max_topic_len, char *msgtext, size_t max_msgtext_len)
 {
     uint16_t value;
 
     snprintf(topic, max_topic_len - 1, "kwb/%04X/%04X/state16bit/%02X",
-             message->sender, message->receiver, message->data[1]);
+             message.sender, message.receiver, message.data[1]);
     topic[max_topic_len - 1] = '\0';
-    value = message->data[2];
+    value = message.data[2];
     value <<= 8;
-    value |= message->data[3];
+    value |= message.data[3];
     snprintf(msgtext, max_msgtext_len - 1, "%d", value);
     msgtext[max_msgtext_len - 1] = '\0';
 }
@@ -107,20 +107,20 @@ void msg2mqtt_regstate_16bit(msg_t *message, char *topic, size_t max_topic_len, 
  * @param[out]  msgtext         Created MQTT message text
  * @param[in]   max_msgtext_len Maximum length of MQTT message text including terminating zero.
  */
-void msg2mqtt_regstate_32bit(msg_t *message, char *topic, size_t max_topic_len, char *msgtext, size_t max_msgtext_len)
+void msg2mqtt_regstate_32bit(const msg_t &message, char *topic, size_t max_topic_len, char *msgtext, size_t max_msgtext_len)
 {
     uint32_t value;
 
     snprintf(topic, max_topic_len - 1, "kwb/%04X/%04X/state32bit/%02X",
-             message->sender, message->receiver, message->data[1]);
+             message.sender, message.receiver, message.data[1]);
     topic[max_topic_len - 1] = '\0';
-    value = message->data[2];
+    value = message.data[2];
     value <<= 8;
-    value |= message->data[3];
+    value |= message.data[3];
     value <<= 8;
-    value |= message->data[4];
+    value |= message.data[4];
     value <<= 8;
-    value |= message->data[5];
+    value |= message.data[5];
     snprintf(msgtext, max_msgtext_len - 1, "%d", value);
     msgtext[max_msgtext_len - 1] = '\0';
 }
@@ -134,13 +134,13 @@ void msg2mqtt_regstate_32bit(msg_t *message, char *topic, size_t max_topic_len, 
  * @param[out]  msgtext         Created MQTT message text
  * @param[in]   max_msgtext_len Maximum length of MQTT message text including terminating zero.
  */
-void msg2mqtt_request_reg(msg_t *message, char *topic, size_t max_topic_len, char *msgtext, size_t max_msgtext_len)
+void msg2mqtt_request_reg(const msg_t &message, char *topic, size_t max_topic_len, char *msgtext, size_t max_msgtext_len)
 {
     snprintf(topic, max_topic_len - 1, "kwb/%04X/%04X/requestreg",
-             message->sender, message->receiver);
+             message.sender, message.receiver);
     topic[max_topic_len - 1] = '\0';
     snprintf(msgtext, max_msgtext_len - 1, "%02X",
-             message->data[1]);
+             message.data[1]);
     msgtext[max_msgtext_len - 1] = '\0';
 }
 
@@ -153,13 +153,13 @@ void msg2mqtt_request_reg(msg_t *message, char *topic, size_t max_topic_len, cha
  * @param[out]  msgtext         Created MQTT message text
  * @param[in]   max_msgtext_len Maximum length of MQTT message text including terminating zero.
  */
-void msg2mqtt_set_reg_8bit(msg_t *message, char *topic, size_t max_topic_len, char *msgtext, size_t max_msgtext_len)
+void msg2mqtt_set_reg_8bit(const msg_t &message, char *topic, size_t max_topic_len, char *msgtext, size_t max_msgtext_len)
 {
     snprintf(topic, max_topic_len - 1, "kwb/%04X/%04X/setreg8bit/%02X",
-             message->sender, message->receiver, message->data[1]);
+             message.sender, message.receiver, message.data[1]);
     topic[max_topic_len - 1] = '\0';
     snprintf(msgtext, max_msgtext_len - 1, "%d",
-             message->data[2]);
+             message.data[2]);
     msgtext[max_msgtext_len - 1] = '\0';
 }
 
@@ -172,16 +172,16 @@ void msg2mqtt_set_reg_8bit(msg_t *message, char *topic, size_t max_topic_len, ch
  * @param[out]  msgtext         Created MQTT message text
  * @param[in]   max_msgtext_len Maximum length of MQTT message text including terminating zero.
  */
-void msg2mqtt_set_reg_16bit(msg_t *message, char *topic, size_t max_topic_len, char *msgtext, size_t max_msgtext_len)
+void msg2mqtt_set_reg_16bit(const msg_t &message, char *topic, size_t max_topic_len, char *msgtext, size_t max_msgtext_len)
 {
     uint16_t value;
 
     snprintf(topic, max_topic_len - 1, "kwb/%04X/%04X/setreg16bit/%02X",
-             message->sender, message->receiver, message->data[1]);
+             message.sender, message.receiver, message.data[1]);
     topic[max_topic_len - 1] = '\0';
-    value = message->data[2];
+    value = message.data[2];
     value <<= 8;
-    value |= message->data[3];
+    value |= message.data[3];
     snprintf(msgtext, max_msgtext_len - 1, "%d", value);
     msgtext[max_msgtext_len - 1] = '\0';
 }
@@ -195,20 +195,20 @@ void msg2mqtt_set_reg_16bit(msg_t *message, char *topic, size_t max_topic_len, c
  * @param[out]  msgtext         Created MQTT message text
  * @param[in]   max_msgtext_len Maximum length of MQTT message text including terminating zero.
  */
-void msg2mqtt_set_reg_32bit(msg_t *message, char *topic, size_t max_topic_len, char *msgtext, size_t max_msgtext_len)
+void msg2mqtt_set_reg_32bit(const msg_t &message, char *topic, size_t max_topic_len, char *msgtext, size_t max_msgtext_len)
 {
     uint32_t value;
 
     snprintf(topic, max_topic_len - 1, "kwb/%04X/%04X/setreg32bit/%02X",
-             message->sender, message->receiver, message->data[1]);
+             message.sender, message.receiver, message.data[1]);
     topic[max_topic_len - 1] = '\0';
-    value = message->data[2];
+    value = message.data[2];
     value <<= 8;
-    value |= message->data[3];
+    value |= message.data[3];
     value <<= 8;
-    value |= message->data[4];
+    value |= message.data[4];
     value <<= 8;
-    value |= message->data[5];
+    value |= message.data[5];
     snprintf(msgtext, max_msgtext_len - 1, "%d", value);
     msgtext[max_msgtext_len - 1] = '\0';
 }
@@ -223,10 +223,10 @@ void msg2mqtt_set_reg_32bit(msg_t *message, char *topic, size_t max_topic_len, c
  * @param[out]  msgtext         Created MQTT message text
  * @param[in]   max_msgtext_len Maximum length of MQTT message text including terminating zero.
  */
-void msg2mqtt_sleep(msg_t *message, char *topic, size_t max_topic_len, char *msgtext, size_t max_msgtext_len)
+void msg2mqtt_sleep(const msg_t &message, char *topic, size_t max_topic_len, char *msgtext, size_t max_msgtext_len)
 {
     snprintf(topic, max_topic_len - 1, "kwb/%04X/%04X",
-             message->sender, message->receiver);
+             message.sender, message.receiver);
     topic[max_topic_len - 1] = '\0';
     snprintf(msgtext, max_msgtext_len - 1, "SLEEP");
     msgtext[max_msgtext_len - 1] = '\0';
@@ -241,10 +241,10 @@ void msg2mqtt_sleep(msg_t *message, char *topic, size_t max_topic_len, char *msg
  * @param[out]  msgtext         Created MQTT message text
  * @param[in]   max_msgtext_len Maximum length of MQTT message text including terminating zero.
  */
-void msg2mqtt_reset(msg_t *message, char *topic, size_t max_topic_len, char *msgtext, size_t max_msgtext_len)
+void msg2mqtt_reset(const msg_t &message, char *topic, size_t max_topic_len, char *msgtext, size_t max_msgtext_len)
 {
     snprintf(topic, max_topic_len - 1, "kwb/%04X/%04X",
-             message->sender, message->receiver);
+             message.sender, message.receiver);
     topic[max_topic_len - 1] = '\0';
     snprintf(msgtext, max_msgtext_len - 1, "RESET");
     msgtext[max_msgtext_len - 1] = '\0';
@@ -263,11 +263,11 @@ void msg2mqtt_reset(msg_t *message, char *topic, size_t max_topic_len, char *msg
  * @return eERR_NONE if the message was successfully converted to MQTT topic
  *         and MQTT message, otherwise eERR_UNKNOWN.
  */
-int msg2mqtt(msg_t *message, char *topic, size_t max_topic_len, char *msgtext, size_t max_msgtext_len)
+int msg2mqtt(const msg_t &message, char *topic, size_t max_topic_len, char *msgtext, size_t max_msgtext_len)
 {
     int retval = eERR_NONE;
 
-    switch (message->data[0]) {
+    switch (message.data[0]) {
     case eCMD_STATE_TYPELESS:
     case eCMD_STATE_BITFIELDS:
     case eCMD_STATE_DATE_TIME:
@@ -279,7 +279,7 @@ int msg2mqtt(msg_t *message, char *topic, size_t max_topic_len, char *msgtext, s
     case eCMD_ACK:
     case eCMD_NAK:
         retval = eERR_UNSUPPORTED;
-        log_warning("msg2mqtt() Message %d not supported for MQTT", message->data[0]);
+        log_warning("msg2mqtt() Message %d not supported for MQTT", message.data[0]);
         break;
 
     case eCMD_STATE_8BIT:
@@ -314,7 +314,7 @@ int msg2mqtt(msg_t *message, char *topic, size_t max_topic_len, char *msgtext, s
 
     default:
         retval = eERR_UNKNOWN;
-        log_warning("msg2mqtt() Unkown message %d", message->data[0]);
+        log_warning("msg2mqtt() Unkown message %d", message.data[0]);
         break;
     }
     return retval;

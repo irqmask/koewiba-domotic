@@ -1,0 +1,18 @@
+[Unit]
+Description=kwbmqttgateway Daemon
+Wants=network.target kwbrouter.service
+After=kwbrouter.service
+
+[Service]
+User=pi
+Group=users
+WorkingDirectory=/tmp
+
+Type=idle
+ExecStart=/usr/local/bin/kwbmqttgateway
+StandardOutput=syslog
+StandardError=syslog
+
+[Install]
+WantedBy=multi-user.target
+

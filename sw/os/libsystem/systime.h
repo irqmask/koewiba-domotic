@@ -38,6 +38,7 @@
 #if defined (PRJCONF_UNIX) || \
     defined (PRJCONF_POSIX) || \
     defined (PRJCONF_LINUX)
+    #include <unistd.h>
     #include <sys/time.h>
 #elif defined (PRJCONF_WINDOWS)
     #include <windows.h>

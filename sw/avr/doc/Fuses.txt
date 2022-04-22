@@ -141,20 +141,20 @@ High Fuse:  0b11010010 = 0xD2
                     ^--------- BOOTSZ0  1 = BOOTSZ1:0 = 01 = 1024 words for bootloader. appflash 0000-77FF, bootflash 7800-7FFF
                      ^-------- BOOTRST  0 = Reset vector points to bootloader
 
-Ext. Fuse:  0b11111111 = 0xFF
+Ext. Fuse:  0b11111101 = 0xFD
               ^--------------- (unused)
                ^-------------- (unused)
                 ^------------- (unused)
                  ^------------ (unused)
                   ^----------- (unused)
                    ^---------- BODLEVEL2 1
-                    ^--------- BODLEVEL1 1
-                     ^-------- BODLEVEL0 1 = 111 = no brown out detection
+                    ^--------- BODLEVEL1 0
+                     ^-------- BODLEVEL0 1 = 101 = Brown-out level 2,7V
 
 Fuse Bytes programmieren mit AVR-Dude:
 avrdude -p atmega324p -P usb -c avrisp2 -B 32 -U lfuse:w:0xEC:m
 avrdude -p atmega324p -P usb -c avrisp2 -B 32 -U hfuse:w:0xD2:m
-avrdude -p atmega324p -P usb -c avrisp2 -B 32 -U efuse:w:0xFF:m
+avrdude -p atmega324p -P usb -c avrisp2 -B 32 -U efuse:w:0xFD:m
 
 EEProm Inhalt schreiben:
 avrdude -p atmega88 -P usb -c avrisp2 -B 32 -U eeprom:w:atmega88_address12.hex:i

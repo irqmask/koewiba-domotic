@@ -166,20 +166,35 @@ See [build_os_software.md]
 ## Install the built kwbrouter + kwbmqttgateway deamons as services
 
 
-Copy systemd init scripts kwbrouter and kwbmqttgateway into `/etc/init.d`
+Rename the systemd init script (../sw/os/tools/) 
+    'kwbrouter.service.server_template' > 'kwbrouter.service'
+    or
+    'kwbrouter.service.client_template' > 'kwbrouter.service'
+and make approriate changes (e.g. server-address, serial device, node-id)
+then copy
+    - kwbrouter.service
+    - kwbmqttgateway.service
+into `/etc/systemd/system`
+
+
 Then the services need to be activated:
 
 ```
 sudo systemctl daemon-reload
-sudo systemctl start kwbrouter
-sudo systemctl start kwbmqttgateway
+sudo systemctl enable kwbrouter
+sudo systemctl enable kwbmqttgateway
 ```
 
 ## Install openHab
 
 ### Install Zulu (open source Java alternative especially for ARM)
 
-Download Zulu install package from:
+Download Zulu install package from:   https://www.azul.com/downloads
+
+Choose the java version that is recommended by openHAB web site (e.g. Java 11 for openHAB 3)
+and download the 'tar.gz'-package for Linux OS and ARM 32-bit HF architecture.
+
+Transfer package to Pi and unpack it into the home directory.
 
 
 Extract the package and copy contents to `/opt/zulu`

@@ -48,14 +48,16 @@
 #elif __APPLE__
     // Mac OS, not sure if this is covered by __posix__ and/or __unix__ though...
     #define PRJCONF_APPLE   1
-#elif defined (__AVR_ATmega8__)    || \
-      defined (__AVR_ATmega88__)   || \
-      defined (__AVR_ATmega88A__)  || \
-      defined (__AVR_ATmega88P__)  || \
-      defined (__AVR_ATmega328__)  || \
-      defined (__AVR_ATmega328P__) || \
-      defined (__AVR_ATmega324P__) || \
-      defined (__AVR_ATmega324A__) || \
+#elif defined (__AVR_ATmega8__)     || \
+      defined (__AVR_ATmega88__)    || \
+      defined (__AVR_ATmega88A__)   || \
+      defined (__AVR_ATmega88P__)   || \
+      defined (__AVR_ATmega328__)   || \
+      defined (__AVR_ATmega328P__)  || \
+      defined (__AVR_ATmega328PB__) || \
+      defined (__AVR_ATmega324P__)  || \
+      defined (__AVR_ATmega324PA__) || \
+      defined (__AVR_ATmega324A__)  || \
       defined (__AVR_ATtiny1634__)
     #define PRJCONF_UC_AVR  1
 #else

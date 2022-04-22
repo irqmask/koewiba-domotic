@@ -128,10 +128,10 @@ void app_background (sBus_t* bus)
     input_background();
 
     if (input_up()) {
-        blind_move_to_position(0, 100);
+        blind_move_to_position(0, 0);
     }
     if (input_down()) {
-        blind_move_to_position(0, 0);
+        blind_move_to_position(0, 100);
     }
 
     // check window position

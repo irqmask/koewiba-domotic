@@ -1,0 +1,18 @@
+[Unit]
+Description=kwbrouter Daemon
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=pi
+Group=users
+WorkingDirectory=/tmp
+
+Type=idle
+ExecStart=/usr/local/bin/kwbrouter -d /dev/ttyAMA0 -a <ip address of foreign kwbrouter to connect to> -p <port to connect to> -o <node id of connected gateway>
+StandardOutput=syslog
+StandardError=syslog
+
+[Install]
+WantedBy=multi-user.target
+

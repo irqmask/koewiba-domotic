@@ -79,6 +79,7 @@ static timer_data_t g_timer;
 static app_states_t g_state = APP_IDLE;
 static uint8_t g_led_setpoint[APP_MAX_CHANNEL];
 static uint8_t g_led_current[APP_MAX_CHANNEL];
+static bool g_led_changing[APP_MAX_CHANNEL];
 static uint8_t g_new_intensity_timeout = 0;
 
 static int8_t g_channel_change_dir[APP_MAX_CHANNEL];
@@ -161,6 +162,18 @@ static void leds_cycle_intensity(void)
     }
 }
 
+static void send_current_intensity(sBus_t* bus, uint8_t channel)
+{
+    uint8_t msg[4];
+
+    if (channel > APP_MAX_CHANNEL) return;
+
+    msg[0] = eCMD_STATE_8BIT;
+    msg[1] = APP_eReg_IntensityChn0Current + channel;
+    msg[2] = g_led_current[channel];
+    bus_send_message(bus, BUS_BRDCSTADR, 3, msg);
+}
+
 static void send_intensity_setpoint (sBus_t* bus, uint8_t channel)
 {
     uint8_t msg[4];
@@ -198,6 +211,8 @@ void app_init (void)
     g_led_setpoint[1] = 0;
     g_channel_change_dir[0] = 1;
     g_channel_change_dir[1] = 0;
+    g_led_changing[0] = false;
+    g_led_changing[1] = false;
 
     // workaround, don't sleep
     sleep_prevent(1<<0, 1);
@@ -244,13 +259,17 @@ void app_background (void)
             case APP_LED_OFF:
                 g_state = APP_LED_ON;
             	app_register_get(APP_eReg_IntensityChn0Store, NULL, &g_led_setpoint[0]);
+            	send_intensity_setpoint(&g_bus, 0);
             	app_register_get(APP_eReg_IntensityChn1Store, NULL, &g_led_setpoint[1]);
+                send_intensity_setpoint(&g_bus, 1);
                 break;
 
             case APP_LED_ON:
                 g_state = APP_LED_OFF;
                 g_led_setpoint[0] = 0;
+                send_intensity_setpoint(&g_bus, 0);
                 g_led_setpoint[1] = 0;
+                send_intensity_setpoint(&g_bus, 1);
                 break;
 
             default:
@@ -275,18 +294,35 @@ void app_background (void)
         if (g_led_current[0] > g_led_setpoint[0]) {
             g_led_current[0]--;
             led2_set_intensity(0, g_led_current[0]);
+            g_led_changing[0] = true;
         }
         else if (g_led_current[0] < g_led_setpoint[0]) {
             g_led_current[0]++;
             led2_set_intensity(0, g_led_current[0]);
+            g_led_changing[0] = true;
         }
+        else {
+            if (g_led_changing[0] == true) {
+                send_current_intensity(&g_bus, 0);
+            }
+            g_led_changing[0] = false;
+        }
+
         if (g_led_current[1] > g_led_setpoint[1]) {
             g_led_current[1]--;
             led2_set_intensity(1, g_led_current[1]);
+            g_led_changing[1] = true;
         }
         else if (g_led_current[1] < g_led_setpoint[1]) {
             g_led_current[1]++;
             led2_set_intensity(1, g_led_current[1]);
+            g_led_changing[1] = true;
+        }
+        else {
+            if (g_led_changing[1] == true) {
+                send_current_intensity(&g_bus, 1);
+            }
+            g_led_changing[1] = false;
         }
         led2_background();
     }

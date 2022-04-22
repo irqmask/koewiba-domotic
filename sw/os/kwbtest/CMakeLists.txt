@@ -54,7 +54,7 @@ set (os_include_SRCS
 )
 
 set (kwbtest_SRCS
-    kwbtest_main.c
+    kwbtest_main.cpp
 )
 
 # source groups

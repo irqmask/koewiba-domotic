@@ -36,6 +36,10 @@
 #endif
 #include "prjtypes.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // --- Definitions -------------------------------------------------------------
 
 #define CRC_START_VALUE 0xFFFF
@@ -63,6 +67,10 @@ uint16_t crc_16_next_byte (uint16_t old_crc, uint8_t new_byte);
 #endif
 
 uint16_t crc_calc16 (const uint8_t* data, uint8_t len);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _CRC16_KWB_H_ */
 /** @} */

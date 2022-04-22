@@ -33,6 +33,7 @@
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #if defined (PRJCONF_UNIX) || \
     defined (PRJCONF_POSIX) || \
@@ -42,6 +43,7 @@
 
 // include
 #include "prjtypes.h"
+#include "cmddef_common.h"
 
 // os/include
 #include "error_codes.h"
@@ -77,6 +79,14 @@ static void handle_message(const msg_t &message, void *reference)
 {
     (reference);
     msg_log("RECV", &message);
+    if (message.data[0] == eCMD_STATE_STRING) {
+        char str[64];
+        uint8_t len = message.length - 1;
+        if (len > sizeof(str) - 1) len = sizeof(str) - 1;
+        memcpy(str, &message.data[1], len);
+        str[len] = '\0';
+        log_info("NODE %s", str);
+    }
 }
 
 static void send_message(Connection &co, uint16_t sender, uint16_t receiver, uint32_t message_type)
@@ -129,7 +139,7 @@ int main(int argc, char *argv[])
 
     try {
         std::stringstream uriss;
-        uriss << "/tmp/kwb.usk:0";
+        uriss << "/tmp/kwbr.usk:0";
         ConnectionSocket conn(&mainloop, uriss.str());
 
         using std::placeholders::_1;
@@ -141,12 +151,15 @@ int main(int argc, char *argv[])
         conn.setConnectionHandler(handle_connection_func);
 
         log_msg(LOG_STATUS, "entering mainloop...");
+        log_msg(LOG_INFO, "Call and filter messages: e.g.");
+        log_msg(LOG_INFO, ">./kwbtest 2>&1 >/dev/null | grep NODE");
         while (!g_end_application) {
             ioloop_run_once(&mainloop);
-            if (state == 1) {
+            /*if (state == 1) {
                 send_message(conn, 0x0501, 0x0110, 2);
                 state = 0;
-            }
+            }*/
+
         }
     }
     catch (Exception &e)

@@ -43,6 +43,7 @@ typedef enum {
     eCMD_STATE_32BIT            = 0x04, //!< Send 32bit state data.
     eCMD_STATE_DATE_TIME        = 0x05, //!< Send date/time data.
     eCMD_STATE_VERSION          = 0x06, //!< Send firmware version.
+    eCMD_STATE_STRING           = 0x0F, //!< Send arbitrary string.
     eCMD_REQUEST_REG            = 0x10, //!< Request register value.
     eCMD_REQUEST_INFO_OF_TYPE   = 0x11, //!< Request information (more complex
                                         //!< than register content, like
@@ -56,7 +57,7 @@ typedef enum {
     eCMD_BLOCK_END              = 0x22,
     eCMD_BLOCK_INFO             = 0x23,
     eCMD_BLOCK_RESET            = 0x24,
-    
+
     eCMD_FIRST_APP_SPECIFIC     = 0x40, //!< First application specific command.
 
     eCMD_ACK                    = 0xF0, //!< Acknowledge message.

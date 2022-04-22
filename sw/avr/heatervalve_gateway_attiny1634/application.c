@@ -49,8 +49,13 @@ static timer_data_t g_timer;
 static uint16_t g_remote_temp_curr;
 static uint16_t g_remote_temp_setpoint;
 static bool     g_send_remote_temp_update;
+static char     g_uart_rx_buffer[32];
+static uint8_t  g_uart_rx_idx;
+static uint16_t g_debug_receiver;
 
 // --- Global variables --------------------------------------------------------
+
+extern sBus_t   g_bus;
 
 // --- Module global variables -------------------------------------------------
 
@@ -70,6 +75,17 @@ static void send_temp_curr_and_setpoint(void)
     uart_put_char_blk1(' ');
     uart_put_hex16_blk1(g_remote_temp_setpoint);
     uart_put_char_blk1('\n');
+}
+
+static void forward_uart_buffer(void)
+{
+    uint8_t msg[40];
+    // send block data
+    msg[0] = eCMD_STATE_STRING;
+    for (uint8_t i = 0; i < g_uart_rx_idx; i++) {
+        msg[1 + i] = g_uart_rx_buffer[i];
+    }
+    bus_send_message(&g_bus, g_debug_receiver, 1 + g_uart_rx_idx, msg);
 }
 
 // --- Module global functions -------------------------------------------------
@@ -96,6 +112,8 @@ void app_init (void)
 
     g_remote_temp_setpoint = 15 * 100 + 27315;
     g_remote_temp_curr = 15 * 100 + 27315;
+    g_uart_rx_idx = 0;
+    g_debug_receiver = 0x503;
 }
 
 /**
@@ -143,6 +161,22 @@ void app_background (void)
     if (g_send_remote_temp_update) {
         g_send_remote_temp_update = false;
         send_temp_curr_and_setpoint();
+    }
+
+    if (uart_is_rx_pending1()) {
+        char c;
+        c = uart_get_char_blk1();
+        if (c == '\n') {
+            g_uart_rx_buffer[g_uart_rx_idx] = '\0';
+            if (g_uart_rx_idx > 0 && g_uart_rx_buffer[0] == '#') {
+                forward_uart_buffer();
+            }
+            g_uart_rx_idx = 0;
+        } else {
+            if (g_uart_rx_idx < (sizeof(g_uart_rx_buffer) - 1)) {
+                g_uart_rx_buffer[g_uart_rx_idx++] = c;
+            }
+        }
     }
 }
 /** @} */

@@ -51,7 +51,6 @@ static uint16_t g_remote_temp_setpoint;
 static bool     g_send_remote_temp_update;
 static char     g_uart_rx_buffer[32];
 static uint8_t  g_uart_rx_idx;
-static uint16_t g_debug_receiver;
 
 // --- Global variables --------------------------------------------------------
 
@@ -63,6 +62,8 @@ uint16_t        app_rem_temp_curr_modid;    //!< module id of remote temperature
 uint8_t         app_rem_temp_curr_regno;    //!< register number of remote temperature sensor
 uint16_t        app_rem_temp_setp_modid;    //!< module id of remote temperature setpoint
 uint8_t         app_rem_temp_setp_regno;    //!< register number of remote temperature setpoint
+uint16_t        app_debug_receiver;         //!< module id of receiver of debug messages
+                                            //!< if set to 0x0000 or 0xFFFF no debug messages will be sent.
 
 // --- Local functions ---------------------------------------------------------
 
@@ -80,12 +81,17 @@ static void send_temp_curr_and_setpoint(void)
 static void forward_uart_buffer(void)
 {
     uint8_t msg[40];
+
+    if (app_debug_receiver == 0x0000 || app_debug_receiver == 0xFFFF) {
+        return;
+    }
+
     // send block data
     msg[0] = eCMD_STATE_STRING;
     for (uint8_t i = 0; i < g_uart_rx_idx; i++) {
         msg[1 + i] = g_uart_rx_buffer[i];
     }
-    bus_send_message(&g_bus, g_debug_receiver, 1 + g_uart_rx_idx, msg);
+    bus_send_message(&g_bus, app_debug_receiver, 1 + g_uart_rx_idx, msg);
 }
 
 // --- Module global functions -------------------------------------------------
@@ -113,7 +119,6 @@ void app_init (void)
     g_remote_temp_setpoint = 15 * 100 + 27315;
     g_remote_temp_curr = 15 * 100 + 27315;
     g_uart_rx_idx = 0;
-    g_debug_receiver = 0x503;
 }
 
 /**

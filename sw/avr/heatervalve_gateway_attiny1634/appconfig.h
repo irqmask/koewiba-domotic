@@ -50,7 +50,7 @@ typedef enum appregisters {
     APP_eReg_RemTempCurrentRegNo,       //!< Sender's register number of current temperature
     APP_eReg_RemTempSetpointModuleID,   //!< ModuleID of sender of temperature setpoint
     APP_eReg_RemTempSetpointRegNo,      //!< Sender's register number of temperature setpoint
-
+    APP_eReg_DebugReceiverModuleID,     //!< Receiver module ID for debug messages
     // insert application specific registers here
     APP_eReg_Last
 } eRegisters_t;
@@ -65,6 +65,9 @@ typedef enum appconfig {
     APP_eCfg_RemTempSetpointModuleIDLow = APP_eCfg_RemTempSetpointModuleID,
     APP_eCfg_RemTempSetpointModuleIDHigh,
     APP_eCfg_RemTempSetpointRegNo,
+    APP_eCfg_DebugReceiverModuleID,
+    APP_eCfg_DebugReceiverModuleIDLow = APP_eCfg_DebugReceiverModuleID,
+    APP_eCfg_DebugReceiverModuleIDHigh,
 
     // insert application specific configuration here
     APP_eCfg_Last
@@ -82,6 +85,7 @@ extern uint16_t app_rem_temp_curr_modid;
 extern uint8_t app_rem_temp_curr_regno;
 extern uint16_t app_rem_temp_setp_modid;
 extern uint8_t app_rem_temp_setp_regno;
+extern uint16_t app_debug_receiver;
 
 // --- Local functions ---------------------------------------------------------
 

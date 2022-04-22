@@ -58,6 +58,7 @@ void        app_register_load       (void)
     app_rem_temp_curr_regno = eeprom_read_byte(&register_eeprom_array[APP_eCfg_RemTempCurrentRegNo]);
     app_rem_temp_setp_modid = eeprom_read_word((uint16_t*)&register_eeprom_array[APP_eCfg_RemTempSetpointModuleID]);
     app_rem_temp_setp_regno = eeprom_read_byte(&register_eeprom_array[APP_eCfg_RemTempSetpointModuleID]);
+    app_debug_receiver = eeprom_read_word((uint16_t*)&register_eeprom_array[APP_eCfg_DebugReceiverModuleID]);
 }
 
 bool        app_register_get        (uint8_t                reg_no,
@@ -85,6 +86,10 @@ bool        app_register_get        (uint8_t                reg_no,
         break;
     case APP_eReg_RemTempSetpointRegNo:
         *(uint8_t*)pvalue = app_rem_temp_setp_regno;
+        break;
+    case APP_eReg_DebugReceiverModuleID:
+        *(uint16_t*)pvalue = app_debug_receiver;
+        *preg_type = eRegType_U16;
         break;
 
     // registers in ROM/RAM
@@ -121,6 +126,10 @@ void        app_register_set        (uint8_t                reg_no,
     case APP_eReg_RemTempSetpointRegNo:
         app_rem_temp_setp_regno = value8;
         eeprom_write_byte(&register_eeprom_array[APP_eCfg_RemTempSetpointRegNo], value8);
+        break;
+    case APP_eReg_DebugReceiverModuleID:
+        app_debug_receiver = value16;
+        eeprom_write_word((uint16_t*)&register_eeprom_array[APP_eCfg_DebugReceiverModuleID], value16);
         break;
 
     // registers in ROM/RAM

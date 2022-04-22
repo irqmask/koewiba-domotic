@@ -31,7 +31,7 @@ void main(void)
 
     initClock();
     uart_initialize();
-    uart_write("heatervalve\n");
+    uart_write("# heatervalve\n");
     enableInterrupts();
 
     adc_initialize();
@@ -42,7 +42,7 @@ void main(void)
     cmd_initialize();
     remts_initialize();
     ctrl_temp_initialize();
-    uart_write("init complete\n");
+    uart_write("# init complete\n");
     while (1) {
         if (USART1_SR & USART_SR_RXNE) {
             c = USART1_DR;

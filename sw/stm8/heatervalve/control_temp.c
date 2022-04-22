@@ -68,7 +68,6 @@ static void background_10s(void)
     des_temp_c = remts_get_desired_temp();
     cur_temp_c = remts_get_current_temp();
     temp_diff = des_temp_c - cur_temp_c;
-    printf("# dt %4d ct %4d d %d\n", des_temp_c - 27315, cur_temp_c - 27315, temp_diff);
     if (temp_diff < 0) {
         valvepos = 0;
     }
@@ -82,7 +81,8 @@ static void background_10s(void)
             valvepos = 1000;
         }
     }
-    printf("# vp %d\n", (uint16_t)valvepos);
+    printf("# dt %4d ct %4d d %d vp %d\n", des_temp_c - 27315, cur_temp_c - 27315, temp_diff, (uint16_t)valvepos);
+
     // valvepos is between 0 and 1000
     diff_valvepos = valvepos - motor_get_valve_pos();
     if (diff_valvepos < -100 || diff_valvepos > 100 || g_second_count > 60) {

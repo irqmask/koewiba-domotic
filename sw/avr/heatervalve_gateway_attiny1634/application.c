@@ -51,6 +51,7 @@ static uint16_t g_remote_temp_setpoint;
 static bool     g_send_remote_temp_update;
 static char     g_uart_rx_buffer[32];
 static uint8_t  g_uart_rx_idx;
+static uint16_t g_kp;
 
 // --- Global variables --------------------------------------------------------
 
@@ -78,6 +79,13 @@ static void send_temp_curr_and_setpoint(void)
     uart_put_char_blk1('\n');
 }
 
+static void send_kp(void)
+{
+    uart_put_string_blk1_p("skp ");
+    uart_put_hex16_blk1(g_kp);
+    uart_put_char_blk1('\n');
+}
+
 static void forward_uart_buffer(void)
 {
     uint8_t msg[40];
@@ -95,6 +103,17 @@ static void forward_uart_buffer(void)
 }
 
 // --- Module global functions -------------------------------------------------
+
+void app_set_kp(uint16_t kp)
+{
+    g_kp = kp;
+    send_kp();
+}
+
+uint16_t app_get_kp(void)
+{
+    return g_kp;
+}
 
 // --- Global functions --------------------------------------------------------
 

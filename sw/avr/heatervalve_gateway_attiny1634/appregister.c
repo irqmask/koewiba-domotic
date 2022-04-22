@@ -52,6 +52,9 @@
 
 // --- Module global functions -------------------------------------------------
 
+extern void app_set_kp(uint16_t kp);
+extern uint16_t app_get_kp(void);
+
 void        app_register_load       (void)
 {
     app_rem_temp_curr_modid = eeprom_read_word((uint16_t*)&register_eeprom_array[APP_eCfg_RemTempCurrentModuleID]);
@@ -59,6 +62,7 @@ void        app_register_load       (void)
     app_rem_temp_setp_modid = eeprom_read_word((uint16_t*)&register_eeprom_array[APP_eCfg_RemTempSetpointModuleID]);
     app_rem_temp_setp_regno = eeprom_read_byte(&register_eeprom_array[APP_eCfg_RemTempSetpointModuleID]);
     app_debug_receiver = eeprom_read_word((uint16_t*)&register_eeprom_array[APP_eCfg_DebugReceiverModuleID]);
+    app_set_kp(eeprom_read_word((uint16_t*)&register_eeprom_array[APP_eCfg_Kp]));
 }
 
 bool        app_register_get        (uint8_t                reg_no,
@@ -89,6 +93,10 @@ bool        app_register_get        (uint8_t                reg_no,
         break;
     case APP_eReg_DebugReceiverModuleID:
         *(uint16_t*)pvalue = app_debug_receiver;
+        *preg_type = eRegType_U16;
+        break;
+    case APP_eReg_Kp:
+        *(uint16_t*)pvalue = app_get_kp();
         *preg_type = eRegType_U16;
         break;
 
@@ -130,6 +138,10 @@ void        app_register_set        (uint8_t                reg_no,
     case APP_eReg_DebugReceiverModuleID:
         app_debug_receiver = value16;
         eeprom_write_word((uint16_t*)&register_eeprom_array[APP_eCfg_DebugReceiverModuleID], value16);
+        break;
+    case APP_eReg_Kp:
+        app_set_kp(value16);
+        eeprom_write_word((uint16_t*)&register_eeprom_array[APP_eCfg_Kp], value16);
         break;
 
     // registers in ROM/RAM

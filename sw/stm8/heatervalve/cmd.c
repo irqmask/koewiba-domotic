@@ -34,6 +34,7 @@
 
 #include "STM8L052C6.h"
 
+#include "control_temp.h"
 #include "motor.h"
 #include "remote_tempsense.h"
 #include "uart.h"
@@ -196,6 +197,13 @@ static void interpret_command(void)
             puts("SRT 0");
         }
     }
+    else if (starts_with("skp")) { // set remote temperatures <current> <desired>
+            uint16_t tmp = get_val_u16(&success);
+            if (success) {
+                ctrl_set_kp(tmp);
+                puts("SKP 0");
+            }
+        }
     else {
         puts("eunknown");
     }

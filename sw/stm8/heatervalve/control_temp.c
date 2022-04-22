@@ -96,11 +96,15 @@ static void background_10s(void)
 
 // --- Global functions --------------------------------------------------------
 
+void ctrl_set_kp(uint16_t kp)
+{
+    g_kp = kp;
+}
+
 void ctrl_temp_initialize(void)
 {
     g_start = timer_get_millis();
 }
-
 
 void ctrl_temp_background(void)
 {

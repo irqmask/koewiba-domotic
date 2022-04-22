@@ -1,11 +1,11 @@
 /**
  * @addtogroup CONTROL_TEMP
- * @brief Module to control the heatervalve depending on current and desired 
+ * @brief Module to control the heatervalve depending on current and desired
  *        temperature.
  *
  * @{
  * @file    control_temp.h
- * @brief   Module to control the heatervalve depending on current and desired 
+ * @brief   Module to control the heatervalve depending on current and desired
  *          temperature.
  *
  * @author  Christian Verhalen
@@ -41,6 +41,8 @@
 // --- Global variables --------------------------------------------------------
 
 // --- Global functions --------------------------------------------------------
+
+void ctrl_set_kp(uint16_t kp);
 
 void ctrl_temp_initialize(void);
 

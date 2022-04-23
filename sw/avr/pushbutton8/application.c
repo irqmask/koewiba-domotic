@@ -21,6 +21,7 @@
 #include "sleepmode.h"
 
 #include "bus.h"
+#include "input.h"
 #include "ledskeys.h"
 #include "register.h"
 
@@ -81,7 +82,8 @@ static void app_check_keys (sBus_t* bus)
 {
     uint8_t pressed_keys, index;
 
-    pressed_keys = key_get_pressed_short(0xFF);
+    pressed_keys = input_went_low();
+    if (pressed_keys != 0x00) sleep_prevent(0x01, 0); // Reset sleep prevention bit as soon as pinchange-interrupt is processed.
     for (index=0; index<APP_NUM_KEYS; index++) {
         if (pressed_keys & (1<<index)) {
             on_keypress_send(bus, index);
@@ -108,6 +110,7 @@ void app_init (void)
     //register_set_u16(MOD_eReg_ModuleID, OWN_NODE_ID);
     //app_register_load();
     leds_keys_init();
+    input_initialize();
 }
 
 /**
@@ -142,6 +145,7 @@ void app_on_command (uint16_t sender, uint8_t msglen, uint8_t* msg)
  */
 void app_background (sBus_t* bus)
 {
+    input_background();
     leds_keys_background();
     app_check_keys(bus);
 }

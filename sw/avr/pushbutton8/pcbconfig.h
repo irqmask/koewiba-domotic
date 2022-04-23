@@ -42,6 +42,43 @@
 //! Defines the SS (slave select) pin.
 #define SPI_SS         PB2
 
+// switch inputs
+#define INPUT_PCBCONFIG     1
+#define INPUT_NUM_PINS      8
+#define INPUT_PORT_0        PORTD
+#define INPUT_PIN_0         PIND
+#define INPUT_DDR_0         DDRD
+#define INPUT_0             PD3
+#define INPUT_PORT_1        PORTC
+#define INPUT_PIN_1         PINC
+#define INPUT_DDR_1         DDRC
+#define INPUT_1             PC4
+#define INPUT_PORT_2        PORTC
+#define INPUT_PIN_2         PINC
+#define INPUT_DDR_2         DDRC
+#define INPUT_2             PC2
+#define INPUT_PORT_3        PORTC
+#define INPUT_PIN_3         PINC
+#define INPUT_DDR_3         DDRC
+#define INPUT_3             PC0
+#define INPUT_PORT_4        PORTD
+#define INPUT_PIN_4         PIND
+#define INPUT_DDR_4         DDRD
+#define INPUT_4             PD4
+#define INPUT_PORT_5        PORTC
+#define INPUT_PIN_5         PINC
+#define INPUT_DDR_5         DDRC
+#define INPUT_5             PC5
+#define INPUT_PORT_6        PORTC
+#define INPUT_PIN_6         PINC
+#define INPUT_DDR_6         DDRC
+#define INPUT_6             PC3
+#define INPUT_PORT_7        PORTC
+#define INPUT_PIN_7         PINC
+#define INPUT_DDR_7         DDRC
+#define INPUT_7             PC1
+
+
 // Pin assignments of board keys and LEDs
 #define LEDSKEYS_PCBCONFIG  1
 #define KEY0_DDR            DDRD

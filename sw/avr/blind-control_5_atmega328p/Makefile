@@ -1,6 +1,6 @@
 MCU = atmega328p
 FORMAT = ihex
-TARGET = blind-control_atmega328p
+TARGET = blind-control_5_atmega328p
 
 ROOTDIR = $(subst \,/,$(shell pwd))/..
 include ../buildscripts/lib/lib_outputdirs.mk
@@ -16,25 +16,27 @@ SRC = ../shared/bus_transport.c \
       shared/bus_phy.c \
       shared/datetime.c \
       shared/eeprom_spi.c \
-      shared/inputs.c \
       shared/led_debug.c \
       shared/main_avr.c \
       shared/register.c \
       shared/sleepmode.c \
+      shared/sn74595.c \
       shared/timer.c \
       blind-control/blindctrl.c \
       blind-control/motor.c \
-      blind-control/motor_relay_direct.c \
-      blind-control_atmega328p/application.c \
-      blind-control_atmega328p/appregister.c \
-      blind-control_atmega328p/appversion.c \
+      blind-control/motor_relay_serial.c \
+      blind-control_5_atmega328p/application.c \
+      blind-control_5_atmega328p/appregister.c \
+      blind-control_5_atmega328p/appversion.c \
+
 
 # Place -I options here
 INCDIRS = -I. \
           -I../blind-control \
           -I../shared \
           -I../../include \
-          -I../../shared
+          -I../../shared \
+
 
 
 LOCAL_CFLAGS = -DF_CPU=7372800 -DHAS_PCBCONFIG_H -DHAS_APPCONFIG_H

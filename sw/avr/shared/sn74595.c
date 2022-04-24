@@ -69,12 +69,15 @@
  */
 void sn74595_initialize    	(void)
 {
+#ifdef LATCH_OE_ENABLED
     LATCH_OE_DDR |= (1<<LATCH_OE_PIN);
-    LATCH_STB_DDR |= (1<<LATCH_STB_PIN);
     sn74595_OE_off();
+#endif
+    LATCH_STB_DDR |= (1<<LATCH_STB_PIN);
     LATCH_STB_PORT &= ~(1<<LATCH_STB_PIN);
 	spi_transmit_blk(0);
-	sn74595_latch();
+    spi_transmit_blk(0);
+    sn74595_latch();
 }
 
 /**
@@ -86,6 +89,7 @@ void sn74595_latch(void)
     LATCH_STB_PORT &= ~(1<<LATCH_STB_PIN);
 }
 
+#ifdef LATCH_OE_ENABLED
 /**
  * Output enable. If output enabled, data is valid at output lines.
  */
@@ -101,6 +105,7 @@ void sn74595_OE_off(void)
 {
     LATCH_OE_PORT |= (1<<LATCH_OE_PIN);
 }
+#endif
 
 /**
  * Send and latch one data byte.
@@ -110,6 +115,20 @@ void sn74595_OE_off(void)
 void sn74595_send(uint8_t data)
 {
     spi_transmit_blk(data);
+    sn74595_latch();
+}
+
+/**
+ * Send and latch multiple data bytes.
+ *
+ * @param[in] data  Databytes to send.
+ * @param[in] length Number of bytes to send.
+ */
+void sn74595_send_multiple(uint8_t *data, uint8_t length)
+{
+    for (uint8_t i=0; i<length; i++) {
+        spi_transmit_blk(data[i]);
+    }
     sn74595_latch();
 }
 

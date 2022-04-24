@@ -1,15 +1,16 @@
 /**
- * @addtogroup BLINDCONTROL
- * @addtogroup PCBCONFIG
- * @brief PCB configuration of the "blind-control_atmega328p" application.
+ * @addtogroup BOOTLOADER_ATMEGA328_PCBCONFIG
+ * @brief PCB configuration of the "bootloader_atmega328" application.
  *
  * @{
  * @file    pcbconfig.h
- * @brief   PCB configuration of the "blind-control_atmega328p" application.
+ * @brief   PCB configuration of the "bootloader_atmega328" application.
  *
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
 /*
+ * Copyright (C) 2021  christian <irqmask@web.de>
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -23,7 +24,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 #ifndef _PCBCONFIG_H_
 #define _PCBCONFIG_H_
 
@@ -35,11 +35,6 @@
 
 // bus-module_atmega328 specific pin assignments
 // ----------------------------------------------------------------------------
-
-#define BUS_PCBCONFIG 1
-#define BUS_DDR_ENASND0     DDRD
-#define BUS_PORT_ENASND0    PORTD
-#define BUS_ENASND0         PD2
 
 #define SPI_PCBCONFIG       1
 #define SPI_DDR_MOSI        DDRB
@@ -61,25 +56,17 @@
 // Application specific pin assignments
 // ----------------------------------------------------------------------------
 
-// debug LED outputs
-#define LED_PCBCONFIG        1
-#define LED_STATUS           PD6    //!< Yellow status LED
-#define LED_ERROR            PD7    //!< Red error LED
-#define LED_STATUS_DDR       DDRD
-#define LED_ERROR_DDR        DDRD
-#define LED_STATUS_PORT      PORTD
-#define LED_ERROR_PORT       PORTD
-
-#define INPUTS_PCBCONFIG    1
-#define INPUT_PORT          PORTC
-#define INPUT_DDR           DDRC
-#define INPUT_PIN           PINC
-#define INPUT_0_PIN         PC4
-#define INPUT_1_PIN         PC3
-#define INPUT_2_PIN         PC2
-#define INPUT_PCMSK         PCMSK1
-#define INPUT_PCMSK_VAL     ((1<<PCINT12) | (1<<PCINT11) | (1<<PCINT10))
-#define NBR_OF_INPUTS       3
+#ifdef DEBUG_LED_OUTPUT
+ #define DBG_0_PIN          PC0
+ #define DBG_1_PIN          PC1
+ #define DBG_2_PIN          PC2
+ #define DBG_3_PIN          PC3
+ #define DBG_4_PIN          PC4
+ #define DBG_5_PIN          PC5
+ #define DBG_PORT           PORTC
+ #define DBG_DDR            DDRC
+ #define DBG_ALL_MASK       (1<<DBG_0_PIN | 1<<DBG_1_PIN | 1<<DBG_2_PIN | 1<<DBG_3_PIN | 1<<DBG_4_PIN | 1<<DBG_5_PIN)
+#endif
 
 // --- Type definitions --------------------------------------------------------
 

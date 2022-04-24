@@ -192,7 +192,66 @@
  #define ADDR_SIGNATURE_BYTE1   2
  #define ADDR_SIGNATURE_BYTE2   4
  #define SIGRD 5 // workaround for missing define in avr-headers
+#elif defined (__AVR_ATmega328PB__)
+ // definition of processor depending global settings
+ // TODO CV: this part can be ported maybe to a makefile include
+ #define STARTADDR_APPVECTORS   0x0000
+ #define STARTADDR_VERSIONINFO  0x0068
+ #define STARTADDR_BOOTLOADER   0x1700
+ #define MAXSIZE_APPLICATION    (STARTADDR_BOOTLOADER - STARTADDR_APPVECTORS)
+ #define MAXSIZE_BOOTLOADER     0x0400
 
+// UART
+ #define REGISTER_UCSRA0         UCSR0A
+ #define REGISTER_UCSRB0         UCSR0B
+ #define REGISTER_UCSRC0         UCSR0C
+ #define REGISTER_UDR0           UDR0
+ #define REGISTER_UBRRH0         UBRR0H
+ #define REGISTER_UBRRL0         UBRR0L
+ #define REGBIT_RXCIE            RXCIE0
+ #define REGBIT_UDRIE            UDRIE0
+ #define REGBIT_TXCIE            TXCIE0
+ #define REGBIT_RXEN             RXEN0
+ #define REGBIT_TXEN             TXEN0
+ #define REGBIT_FE               FE0
+ #define INTERRUPT_USART_RXC0    USART0_RX_vect
+ #define INTERRUPT_USART_UDRE0   USART0_UDRE_vect
+ #define INTERRUPT_UART_TRANS0   USART0_TX_vect
+ #define INTERRUPT_PINCHANGE0    PCINT0_vect
+ #define INTERRUPT_PINCHANGE1    PCINT1_vect
+ #define INTERRUPT_PINCHANGE2    PCINT2_vect
+ #define INTERRUPT_SPI           SPI_STC_vect
+
+// SPI
+ #define REG_SPCR0              SPCR0
+ #define REG_SPDR0              SPDR0
+ #define REG_SPSR0              SPSR0
+ // SPCR
+ #define REGBIT_SPE0            SPE
+ #define REGBIT_MSTR0           MSTR
+ // SPSR
+ #define REGBIT_SPIF0           SPIF
+ #define REGBIT_SPI2X0          SPI2X
+
+ // Timer 0,1 and 2
+ #define REG_TIMER0_IRQMSK      TIMSK0
+ #define REG_TIMER1_IRQMSK      TIMSK1
+ #define REG_TIMER2_IRQMSK      TIMSK2
+ #define REGBIT_TIMER0_TOIE     TOIE0
+ #define REGBIT_TIMER0_OCIEA    OCIE0A
+ #define REGBIT_TIMER0_OCIEB    OCIE0B
+ #define REGBIT_TIMER1_TOIE     TOIE1
+ #define REGBIT_TIMER1_OCIEA    OCIE1A
+ #define REGBIT_TIMER1_OCIEB    OCIE1B
+ #define REGBIT_TIMER2_TOIE     TOIE2
+ #define REGBIT_TIMER2_OCIEA    OCIE2A
+ #define REGBIT_TIMER2_OCIEB    OCIE2B
+
+ // Signature byte addresses. TODO check for this processor!
+ #define ADDR_SIGNATURE_BYTE0   0
+ #define ADDR_SIGNATURE_BYTE1   2
+ #define ADDR_SIGNATURE_BYTE2   4
+ #define SIGRD 5 // workaround for missing define in avr-headers
 #elif defined (__AVR_ATmega324P__) || defined (__AVR_ATmega324A__) || defined (__AVR_ATmega324PA__)
  // definition of processor depending global settings
  // TODO CV: this part can be ported maybe to a makefile include
@@ -395,6 +454,7 @@
     defined (__AVR_ATmega88P__)  || \
     defined (__AVR_ATmega328__)  || \
     defined (__AVR_ATmega328P__)  || \
+	defined (__AVR_ATmega328PB__)  || \
     defined (__AVR_ATmega324P__) || \
     defined (__AVR_ATmega324A__) || \
     defined (__AVR_ATmega324PA__) || \

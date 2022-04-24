@@ -1,13 +1,11 @@
 /**
- * @addtogroup BLINDCTRL
- * @brief Public interface of blind control.
- *
- * This module contains functions to control the blind. It makes use of the
- * motor module and controls movement by timing.
+ * @addtogroup BLINDCONTROL_5_ATMEGA328
+ * @addtogroup APPVERSION
+ * @brief Version information of "blindcontrol_5_atmega328p" project.
  *
  * @{
- * @file    blindctrl.h
- * @brief   This module contains functions to control the blind.
+ * @file    appversion.c
+ * @brief   Version information of "blindcontrol_5_atmega328p" project.
  *
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
@@ -25,13 +23,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef _BLINDCTRL_H_
-#define _BLINDCTRL_H_
 
 // --- Include section ---------------------------------------------------------
 
-#include "prjtypes.h"
-#include "bus.h"
+#include <avr/io.h>
+#include "moddef_common.h"
 
 // --- Definitions -------------------------------------------------------------
 
@@ -41,6 +37,17 @@
 
 // --- Global variables --------------------------------------------------------
 
+//! Application's version information
+//! @note The linker sorts the variables upside down. app_controller_id begins at
+//!       the lowest address and app_version begins at the highest address.
+//! @see BOARD_IDs, APP_IDs, APP_VERSIONING
+const unsigned char app_versioninfo[MOD_VERSIONINFO_LEN] __attribute__((section(".versioninfo")))
+                        = {SIGNATURE_0,SIGNATURE_1,SIGNATURE_2,0x00,
+                           0x00,0x08,   // board ID            (high byte, low byte)
+                           2,           // board revision
+                           0x00,0x0B,   // application ID      (high byte, low byte)
+                           0,1,0};      // application version (major, minor, bugfix)
+
 // --- Module global variables -------------------------------------------------
 
 // --- Local functions ---------------------------------------------------------
@@ -49,36 +56,4 @@
 
 // --- Global functions --------------------------------------------------------
 
-
-void blind_move_to_position         (uint8_t index, uint8_t position);
-
-void blind_stop                     (uint8_t index);
-
-uint8_t blind_get_current_position  (uint8_t index);
-
-uint8_t blind_get_position_setpoint (uint8_t index);
-
-uint8_t blind_get_reaction_delay    (uint8_t index);
-
-void blind_set_reaction_delay       (uint8_t index, uint8_t reaction_delay);
-
-uint16_t blind_get_duration_open    (uint8_t index);
-
-void blind_set_duration_open        (uint8_t index, uint16_t duration);
-
-uint16_t blind_get_duration_close   (uint8_t index);
-
-void blind_set_duration_close       (uint8_t index, uint16_t duration);
-
-void blind_set_mode                 (uint8_t index, uint8_t mode);
-
-bool blind_is_moving                (uint8_t index);
-
-void blinds_initialize      (void);
-
-void blinds_background      (sBus_t* bus);
-
-bool blinds_are_moving      (void);
-
-#endif /* _BLINDCTRL_H_ */
 /** @} */

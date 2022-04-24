@@ -1,0 +1,9 @@
+Revision B
+ - Input connectors too close together
+ - DCDC converter is touching housing, needs to be moved, along with ISP6 connector more to the inner.
+ - Footprints of motor connectors shall be rotatd 180°. Release buttons shall not be covered by cable when installed.
+ - LED holes are too tight.
+ 
+Revision A
+ - wrong ATMEGA328 footprint!
+ - WAGO243 hole too tight

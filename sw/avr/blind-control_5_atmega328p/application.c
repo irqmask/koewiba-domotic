@@ -1,14 +1,14 @@
 /**
- * @addtogroup BLINDCONTROL
+ * @addtogroup BLINDCONTROL_5_ATMEGA328
  * @addtogroup APPLICATION
- * @brief Application specific code of "blind-control_atmega328p" project.
+ * @brief Application specific code of "blind-control_5_atmega328p" project.
  *
  * Contains application specific initialization, command-interpreter,
  * register code and background loop.
  *
  * @{
  * @file    application.c
- * @brief   Application specific code of "blind-control_atmega328p" project.
+ * @brief   Application specific code of "blind-control_5+4_atmega328p" project.
  *
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
@@ -29,14 +29,14 @@
 
 // --- Include section ---------------------------------------------------------
 
+#include <avr/io.h>
+
 #include "prjtypes.h"
 
-#include "alarmclock.h"
 #include "blindctrl.h"
 #include "bus.h"
 #include "cmddef_common.h"
 #include "datetime.h"
-#include "inputs.h"
 #include "motor.h"
 #include "register.h"
 #include "timer.h"
@@ -47,8 +47,6 @@
 
 // --- Local variables ---------------------------------------------------------
 
-static bool g_window_state = false;
-static bool g_last_window_state = true;
 static timer_data_t g_seconds_timer;
 
 // --- Global variables --------------------------------------------------------
@@ -56,34 +54,6 @@ static timer_data_t g_seconds_timer;
 // --- Module global variables -------------------------------------------------
 
 // --- Local functions ---------------------------------------------------------
-
-void send_window_state (sBus_t* bus)
-{
-    uint8_t msg[4];
-
-    msg[0] = eCMD_STATE_8BIT;
-    msg[1] = APP_eReg_WindowState;      // number of bitfiels bytes
-    msg[2] = (g_window_state==true) ? (1<<0) : 0;
-    bus_send_message(bus, BUS_BRDCSTADR, 3, msg);
-}
-
-bool input_up               (void)
-{
-    //return ((PINC & (1<<INPUT_UP_PIN)) == 0);
-    return input_on_activation(2);
-}
-
-bool input_down             (void)
-{
-    //return ((PINC & (1<<INPUT_DOWN_PIN)) == 0);
-    return input_on_activation(1);
-}
-
-bool input_window_closed    (void)
-{
-    //return ((PINC & (1<<INPUT_WINDOW_PIN)) == 0);
-    return input_active(0);
-}
 
 // --- Module global functions -------------------------------------------------
 
@@ -100,17 +70,13 @@ extern void        app_register_load       (void);
  */
 void app_init (void)
 {
-    input_initialize();
+    //register_set_u16(MOD_eReg_ModuleID, 0xA05);
     motors_initialize();
     blinds_initialize();
     dt_initialize();
-    alarm_initialize();
 
     // load application parameters
     app_register_load();
-    // initialize window statemachine
-    g_window_state = false;
-    g_last_window_state = !g_window_state;
 
     timer_start(&g_seconds_timer, TIMER_MS_2_TICKS(1000));
 }
@@ -142,48 +108,12 @@ void app_on_command (uint16_t sender, uint8_t msglen, uint8_t* msg)
  */
 void app_background (sBus_t* bus)
 {
-    input_background();
-
-    if (input_up()) {
-        blind_move_to_position(0, 0);
-    }
-    if (input_down()) {
-        blind_move_to_position(0, 100);
-    }
-
-    // check window position
-    g_window_state = input_window_closed();
-    if (g_last_window_state != g_window_state) {
-        g_last_window_state = g_window_state;
-        send_window_state(bus);
-    }
-
     motors_background();
     blinds_background(bus);
 
     if (timer_is_elapsed(&g_seconds_timer)) {
         timer_start(&g_seconds_timer, TIMER_MS_2_TICKS(1000));
         dt_tick_second();
-    }
-}
-
-/**
- *  Check every minute if one of the up/down alarms triggers.
- */
-void app_on_minute(void)
-{
-    int8_t alarm_idx = -1;
-    bool move_up = false;
-
-    if (alarm_check(&alarm_idx)) {
-        if (blind_is_moving(0) == false) {
-            move_up = ((alarm_idx % 2) == 0);
-            if (move_up) {
-                blind_move_to_position(0, 0);
-            } else {
-                blind_move_to_position(0, 100);
-            }
-        }
     }
 }
 

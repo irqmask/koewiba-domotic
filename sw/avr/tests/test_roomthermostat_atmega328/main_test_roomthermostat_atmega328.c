@@ -266,7 +266,9 @@ int main(void)
         oldpinc = pinc;
 
         // read and display temperature
-        if (zagw_get_raw(&raw_temp) == true) {
+        if (zagw_sampling_done()) {
+            raw_temp = zagw_get_raw();
+            zagw_start_sampling();
             gdisp_goto_col_line(76, 4);
             temperature = zagw_get_temperature(raw_temp);
             draw_temp(temperature);

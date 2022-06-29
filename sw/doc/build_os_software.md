@@ -27,9 +27,8 @@ Create thridparty folder, build and install thirdparty libraries
     cd sw/os/3rd_party
 
 Build libsafec:
-
     
-    scp libsafec-10052013.tar.gz pi@192.168.X.Y:/home/pi/koewiba-domotic/sw/os/3rd_party
+    scp libsafec-10052013.tar.gz pi@192.168.X.Y:/home/<user>/koewiba-domotic/sw/os/3rd_party
     tar -xvvf libsafec-10052013.tar.gz
     mv libsafec-10052013 libsafec  
     cd libsafec
@@ -45,7 +44,8 @@ Build libsafec:
     make clean
     make
     cd ../../..
-Compiled firmware in Inter-HEX format is safed in 'sw/avr/bin/[Debug|Release]'
+
+Compiled firmware in Intel-HEX format is safed in 'sw/avr/bin/[Debug|Release]'
 Detailled build logs are saved in the 'build/[applicationname]/[Debug/Release]
     
 ### Build Linux applications
@@ -56,4 +56,5 @@ Detailled build logs are saved in the 'build/[applicationname]/[Debug/Release]
     cmake ..
     make -j4
     sudo make install
+
 The built binaries are stored in 'sw/os/bin'. Build intermediates are stored in the 'sw/os/build' folder.

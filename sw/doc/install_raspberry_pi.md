@@ -1,6 +1,23 @@
 # Installing operating system images on Linux
 
-sudo dd bs=4M if=2018-11-13-raspbian-stretch-lite.img of=/dev/sdc
+sudo dd bs=4M if=20XX-XX-XX-raspbian-XXXX-lite.img of=/dev/sdX
+
+## set username and password
+
+Before booting the raspberry pi a default username and password needs to be set.
+Therefore create a userconf.txt file in the root folder of the boot partition consisting of a single line:
+`username:encrypted- password`
+
+Run this command to create the encrypted password:
+```
+echo '<the password>' | openssl passwd -6 -stdin
+```
+
+The file could look like this now:
+```
+ernie:$6$7W8KvS4grfekyIH8$hlWh1TxO1wcxl0eGtdtgDfjPdGAdmZnOc/WF1EBlOWE39NrZZBMQ3Y6dW.qgZT4jxh8wJpCZrcwUzF2seVz671
+```
+
 
 ## Activate ssh
 
@@ -80,7 +97,10 @@ Reboot for the changes to take effect:
 sudo reboot
 ```
 
-## Change password
+## Change password (only before raspbian bullseye)
+
+(Changing password is not necessary if it was confirued during or immediately after imaging the SD card)
+
 It is highly recommended to change the standard password of the Raspberry Pi!
 Login to the Raspbarry Pi using the new address:
 `ssh pi@<new_address>`
@@ -100,13 +120,19 @@ Log-out and the log-in again using your new password.
 
 ```
 sudo raspi-config
-->Set locale and timezone
-->Interfacing Options->P6 Serial
+-> 5 Localisation Options
+  -> L1 Locale
+    Set according to your country and language
+  -> L2 Timezone
+    Set according to your residence
+-> 3 Interface Options
+  -> I6 Serial Port
     Disable serial login shell
     ENABLE the serial interface
-->Interfacing Options->P5 I2C
+  -> I5 I2C
     ENABLE I2C
-->Advanced->A1 Expand Filesystem
+-> 6 Advanced Options
+  -> A1 Expand Filesystem
 exit with Finish. Let it reboot
 ```
 

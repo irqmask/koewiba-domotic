@@ -55,7 +55,7 @@ public:
      * Closes active connection.
      * @note Does not call onConnectionClosed()!
      */
-    ~ConnectionSerial();
+    virtual ~ConnectionSerial();
 
     /**
      * @returns baudrate of established connection.
@@ -80,6 +80,8 @@ protected:
      * Close the connection to the serial device.
      */
     void close();
+
+    virtual void reconnect() override;
 
     /**
      * Receive pending data. Call onIncomingMessage() for each completely

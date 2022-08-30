@@ -109,6 +109,7 @@ void ConnectionSerial::open(bool configure)
     if (ioloop != nullptr) {
         ioloop_register_fd(ioloop, fd, eIOLOOP_EV_READ, ConnectionSerial::receiveCallback, this);
     }
+    this->connected = true;
 }
 
 //----------------------------------------------------------------------------
@@ -121,8 +122,16 @@ void ConnectionSerial::close()
 
         sys_serial_close(fd);
         fd = INVALID_FD;
+        connected = false;
         log_msg(LOG_STATUS, "SERIAL close connection to %s", this->getName().c_str());
     }
+}
+
+//----------------------------------------------------------------------------
+void ConnectionSerial::reconnect()
+{
+    this->close();
+    this->open(true);
 }
 
 //----------------------------------------------------------------------------

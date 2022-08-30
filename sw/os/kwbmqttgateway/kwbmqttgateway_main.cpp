@@ -32,8 +32,10 @@
 #include "prjconf.h"
 
 #include <algorithm>
+#include <chrono>
 #include <memory>
 #include <sstream>
+#include <thread>
 #include <vector>
 
 #include <mosquitto.h>
@@ -147,7 +149,7 @@ static bool parse_commandline_options(int argc, char *argv[], options_t *options
     int                     c;
 
     while (1) {
-        c = getopt(argc, argv, "a:p");
+        c = getopt(argc, argv, "a:p:");
         if (c == -1) {
             break;
         }
@@ -268,6 +270,8 @@ bool check_for_echoes(uint16_t message_crc)
  */
 void on_mqtt_message(struct mosquitto *mosq, void *userdata, const struct mosquitto_message *message)
 {
+    (void)mosq;
+    (void)userdata;
     msg_t kwbmsg;
 
     if (message->payloadlen) {
@@ -296,6 +300,7 @@ void on_mqtt_message(struct mosquitto *mosq, void *userdata, const struct mosqui
  */
 void on_mqtt_connect(struct mosquitto *mosq, void *userdata, int result)
 {
+    (void)userdata;
     if (!result) {
         log_msg(LOG_STATUS, "MQTT connected. Result %d", result);
         /* Subscribe to broker information topics on successful connect. */
@@ -338,6 +343,8 @@ void on_mqtt_disconnect(struct mosquitto *mosq, void *userdata, int result)
  */
 void on_mqtt_topic_subscribed(struct mosquitto *mosq, void *userdata, int mid, int qos_count, const int *granted_qos)
 {
+    (void)mosq;
+    (void)userdata;
     int i;
 
     log_msg(LOG_STATUS, "MQTT subscribed (mid: %d): %d", mid, granted_qos[0]);
@@ -390,6 +397,7 @@ int mosquitto_setup()
  */
 void on_kwb_incoming_message(const msg_t &message, void *reference)
 {
+    (void)reference;
     char topic[256], msgtext[256];
     int mid = 0;
     int mrc;
@@ -420,8 +428,8 @@ void on_kwb_incoming_message(const msg_t &message, void *reference)
  */
 void on_kwb_close_connection(const std::string &uri, void *reference)
 {
-    log_msg(LOG_STATUS, "MQTT connection closed. address=%s", uri.c_str());
-    g_end_application = true;
+    (void)reference;
+    log_msg(LOG_STATUS, "KWB connection closed. address=%s", uri.c_str());
 }
 
 /**
@@ -442,25 +450,41 @@ int kwb_socket_setup(ioloop_t *ioloop, options_t *options)
             if (options->router_address_set) {
                 std::stringstream uriss;
                 uriss << options->router_address << ":" << options->router_port;
+                g_handles.kwb_conn_retries++;
                 auto conn_socket = std::make_shared<ConnectionSocket>(ioloop, uriss.str());
                 log_msg(LOG_STATUS, "Connected to router over socket interface %s", conn_socket->getName().c_str());
                 g_conn = conn_socket;
+                g_handles.kwb_conn_retries = 0;
 
                 using std::placeholders::_1;
                 using std::placeholders::_2;
                 incom_func_t handle_incoming_message_func = std::bind(&on_kwb_incoming_message, _1, _2);
                 g_conn->setIncomingHandler(handle_incoming_message_func);
 
+
                 conn_func_t handle_connection_func = std::bind(&on_kwb_close_connection, _1, _2);
                 g_conn->setConnectionHandler(handle_connection_func);
             }
+            break;
         }
         catch (Exception &e) {
             log_error("Unable to connect! Exception %s\n", e.what());
-            retval = eERR_UNSUPPORTED;
-            break;
+            if (g_handles.kwb_conn_retries < 5) {
+                std::this_thread::sleep_for(std::chrono::seconds(1));
+            }
+            else if (g_handles.kwb_conn_retries < 10) {
+                std::this_thread::sleep_for(std::chrono::seconds(10));
+            }
+            else {
+                std::this_thread::sleep_for(std::chrono::seconds(30));
+            }
         }
-    } while (0);
+        catch (...) {
+            log_error("unknown error occurred during reconnect!");
+            std::this_thread::sleep_for(std::chrono::seconds(30));
+        }
+
+    } while (1);
 
     return retval;
 }
@@ -521,8 +545,49 @@ int main(int argc, char *argv[])
             ioloop_run_once(g_handles.ioloop);
             // issue a re-connect to mqtt server
             if (g_handles.mosq != NULL && g_handles.mqtt_disconnected) {
+                if (g_handles.mqtt_conn_retries < 5) {
+                    std::this_thread::sleep_for(std::chrono::seconds(1));
+                }
+                else if (g_handles.mqtt_conn_retries < 10) {
+                    std::this_thread::sleep_for(std::chrono::seconds(10));
+                }
+                else {
+                    std::this_thread::sleep_for(std::chrono::seconds(30));
+                }
+                g_handles.mqtt_conn_retries++;
                 g_handles.mqtt_disconnected = false;
                 mosquitto_reconnect(g_handles.mosq);
+            }
+            else {
+                g_handles.mqtt_conn_retries = 0;
+            }
+
+            // issue a re-connect to kwbrouter
+            if (g_conn != NULL && !g_conn->isConnected())
+            {
+                g_handles.kwb_conn_retries++;
+                log_error("Connection to kwbrouter lost!");
+                try {
+                    g_conn->reconnect();
+                }
+                catch (Exception &e) {
+                    if (g_handles.kwb_conn_retries < 5) {
+                        std::this_thread::sleep_for(std::chrono::seconds(1));
+                    }
+                    else if (g_handles.kwb_conn_retries < 10) {
+                        std::this_thread::sleep_for(std::chrono::seconds(10));
+                    }
+                    else {
+                        std::this_thread::sleep_for(std::chrono::seconds(30));
+                    }
+                }
+                catch (...) {
+                    log_error("unknown error occurred during reconnect!");
+                    std::this_thread::sleep_for(std::chrono::seconds(30));
+                }
+            }
+            else {
+                g_handles.kwb_conn_retries = 0;
             }
         }
         mosquitto_destroy(g_handles.mosq);

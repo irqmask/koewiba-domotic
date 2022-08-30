@@ -90,6 +90,7 @@ void Connection::clearConnectionHandler()
 //----------------------------------------------------------------------------
 void Connection::onConnectionClosed()
 {
+    this->connected = false;
     if (this->extOnConnectionClosed != nullptr) {
         this->extOnConnectionClosed(uri, this);
     }
@@ -126,9 +127,22 @@ bool Connection::addressIsInConnectionsSegment(uint16_t nodeAddress)
     return false;
 }
 
+//----------------------------------------------------------------------------
+void Connection::reconnect()
+{
+    // nothing todo here
+}
+
+//----------------------------------------------------------------------------
+bool Connection::isConnected()
+{
+    return connected;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 void Connection::send(const msg_t &message)
 {
+    (void)message;
 }
 
 /** @} */

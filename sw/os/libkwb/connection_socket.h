@@ -52,7 +52,7 @@ public:
      * Closes active connection.
      * @note Does not call onConnectionClosed()!
      */
-    ~ConnectionSocket();
+    virtual ~ConnectionSocket();
 
     /**
      * Extract address and port from URI
@@ -67,6 +67,8 @@ public:
      *       in RFC 3986
      */
     static void getAddressAndPort(std::string uri, std::string &address, uint16_t &port);
+
+    virtual void reconnect() override;
 
     /**
      * Send a KWB messgae over the socket connection.

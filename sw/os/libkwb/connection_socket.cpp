@@ -129,6 +129,7 @@ void ConnectionSocket::open()
             ioloop_register_fd(ioloop, fd, eIOLOOP_EV_READ, ConnectionSocket::receiveCallback, this);
         }
 
+        connected = true;
         log_msg(LOG_STATUS, "SOCKET open connection to %s", this->getName().c_str());
     } while (0);
 }
@@ -143,8 +144,16 @@ void ConnectionSocket::close()
 
         sys_socket_close(fd);
         fd = INVALID_FD;
+        connected = false;
         log_msg(LOG_STATUS, "SOCKET close connection to %s", this->getName().c_str());
     }
+}
+
+//----------------------------------------------------------------------------
+void ConnectionSocket::reconnect()
+{
+    this->close();
+    this->open();
 }
 
 //----------------------------------------------------------------------------
@@ -167,7 +176,6 @@ void ConnectionSocket::receive()
         received_bytes = sys_socket_recv(fd, &message, sizeof(message));
         if (received_bytes == 0) {
             onConnectionClosed();
-            close();
             break;
         }
 

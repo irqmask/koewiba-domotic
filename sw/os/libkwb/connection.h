@@ -61,7 +61,7 @@ public:
     /**
      * No need for cleanup in base-class
      */
-    ~Connection();
+    virtual ~Connection();
 
     /**
      * @returns The name of the connection.
@@ -136,6 +136,16 @@ public:
     virtual bool addressIsInConnectionsSegment(uint16_t nodeAddress);
 
     /**
+     * Close connection and re-open it.
+     */
+    virtual void reconnect();
+
+    /**
+     * @returns true if connection is established, otherwise false;
+     */
+    virtual bool isConnected();
+
+    /**
      * Send the message over the established route-connection.
      *
      * @param[in]   message     Message to be sent.
@@ -145,6 +155,8 @@ public:
     virtual void send(const msg_t &message);
 
 protected:
+    //! Flag if connection is established and working
+    bool                connected;
     //! Callback which will be called for each incoming message.
     incom_func_t        extOnIncomingMsg;
     //! Optional callback argument when messages arrive.

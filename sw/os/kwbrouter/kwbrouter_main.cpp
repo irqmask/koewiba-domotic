@@ -36,7 +36,10 @@
 
 #include "prjconf.h"
 
+#include <algorithm>
+#include <chrono>
 #include <sstream>
+#include <thread>
 
 #include <stdlib.h>
 #include <string.h>
@@ -87,6 +90,8 @@ typedef struct options {
 } options_t;
 
 // --- Local variables ---------------------------------------------------------
+
+static int32_t g_kwb_conn_retries = 0;
 
 // --- Global variables --------------------------------------------------------
 
@@ -269,6 +274,50 @@ static void create_unix_socket_file(options_t *options)
     }
 }
 
+/**
+ * This function is called when the connection to the kwbrouter is closed.
+ *
+ * @param[in]   uri         URI of connetion which was closed.
+ * @param[in]   reference   Optional reference, registered with this callback.
+ */
+void on_kwb_close_connection(const std::string &uri, void *reference)
+{
+    (void)reference;
+    log_msg(LOG_STATUS, "KWB connection closed. address=%s", uri.c_str());
+}
+
+ConnectionSocket * tryConnectToServer(ioloop_t *ioloop, const std::string &uri)
+{
+    ConnectionSocket *sockconn = nullptr;
+
+    do {
+        try {
+            g_kwb_conn_retries++;
+            sockconn = new ConnectionSocket(ioloop, uri);
+            g_kwb_conn_retries = 0;
+
+            using std::placeholders::_1;
+            using std::placeholders::_2;
+            conn_func_t handle_connection_func = std::bind(&on_kwb_close_connection, _1, _2);
+            sockconn->setConnectionHandler(handle_connection_func);
+            break;
+        }
+        catch (Exception &e) {
+            log_error("Opening socket connection to %s: failed with exception %s!", uri.c_str(), e.what());
+            if (g_kwb_conn_retries < 5) {
+                std::this_thread::sleep_for(std::chrono::seconds(1));
+            }
+            else if (g_kwb_conn_retries < 10) {
+                std::this_thread::sleep_for(std::chrono::seconds(10));
+            }
+            else {
+                std::this_thread::sleep_for(std::chrono::seconds(30));
+            }
+        }
+    } while (1);
+    return sockconn;
+}
+
 // --- Module global functions -------------------------------------------------
 
 // --- Global functions --------------------------------------------------------
@@ -345,16 +394,12 @@ int main(int argc, char *argv[])
 
         ConnectionSocket *sockconn = nullptr;
         std::stringstream uriss;
-        try {
-            if (options.router_client_configured) {
-                uriss << options.remote_router_address << ":" << options.router_server_port;
-                sockconn = new ConnectionSocket(&mainloop, uriss.str());
+        if (options.router_client_configured) {
+            uriss << options.remote_router_address << ":" << options.router_server_port;
+            sockconn = tryConnectToServer(&mainloop, uriss.str());
+            if (sockconn != nullptr) {
                 router->addConnection(sockconn);
             }
-        }
-        catch (Exception &e) {
-            log_error("Opening socket connection to %s: failed with exception %s!", uriss.str().c_str(), e.what());
-            sockconn = nullptr;
         }
 
         SocketServer *unix_socket_server = nullptr;
@@ -390,6 +435,29 @@ int main(int argc, char *argv[])
         log_msg(LOG_STATUS, "entering mainloop...\n");
         while (!end_application) {
             ioloop_run_once(&mainloop);
+            if (sockconn != nullptr && sockconn->isConnected() == false) {
+                log_error("Connection to kwbrouter lost!");
+                g_kwb_conn_retries++;
+                try {
+                    sockconn->reconnect();
+                    g_kwb_conn_retries = 0;
+                }
+                catch (Exception &e) {
+                    if (g_kwb_conn_retries < 5) {
+                        std::this_thread::sleep_for(std::chrono::seconds(1));
+                    }
+                    else if (g_kwb_conn_retries < 10) {
+                        std::this_thread::sleep_for(std::chrono::seconds(10));
+                    }
+                    else {
+                        std::this_thread::sleep_for(std::chrono::seconds(30));
+                    }
+                }
+                catch (...) {
+                    log_error("unknown error occurred during reconnect!");
+                    std::this_thread::sleep_for(std::chrono::seconds(30));
+                }
+            }
         }
 
         if (unix_socket_server != nullptr) {

@@ -70,7 +70,7 @@ void send_window_state (sBus_t* bus)
 bool input_up               (void)
 {
     //return ((PINC & (1<<INPUT_UP_PIN)) == 0);
-    return input_on_activation(2);
+    return input_on_activation(0);
 }
 
 bool input_down             (void)
@@ -82,7 +82,7 @@ bool input_down             (void)
 bool input_window_closed    (void)
 {
     //return ((PINC & (1<<INPUT_WINDOW_PIN)) == 0);
-    return input_active(0);
+    return input_active(2);
 }
 
 // --- Module global functions -------------------------------------------------

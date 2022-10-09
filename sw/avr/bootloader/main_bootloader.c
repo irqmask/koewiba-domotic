@@ -240,9 +240,10 @@ int main ( void )
 
     // check internal EEProm if a new application has to be flashed
     bld_status = eeprom_read_byte(&g_reg_internal_eep[MOD_eCfg_BldFlag]);
-    bld_status &= ~((1<<eBldFlagCRCMismatch) |
+    bld_status &= ~((1 << eBldFlagCRCMismatch) |
     		        (1 << eBldFlagControllerTypeMismatch) |
-    		        (1 << eBldFlagBoardTypeMismatch));
+                    (1 << eBldFlagBoardTypeMismatch) |
+                    (1 << eBldFlagUnused));
 
 
     if (bld_status & (1<<eBldFlagAppProgram)) {

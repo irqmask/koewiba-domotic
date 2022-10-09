@@ -216,8 +216,8 @@ void FirmwareUpdate::handleIncomingMessage(const msg_t &message, void *reference
     (reference);
     log_hexdump16(LOG_VERBOSE1, "BUS I ", (const uint8_t *)&message.data, message.length);
 
-    if (message.length > 0) {
-        // incomming command handler
+    if (message.sender == this->module_address &&  message.length > 0) {
+        // incoming command handler
         switch (message.data[0]) {
         case eCMD_STATE_8BIT:
             parseSetReg8bitMsg(message);
@@ -428,6 +428,9 @@ int FirmwareUpdate::sendRequestBldflagsMessage()
     msg.data[1] = MOD_eReg_BldFlag;
     msg.length = 2;
 
+    this->bldflags_received = 0;
+    this->bldflags = 0;
+
     try {
         this->connection->send(msg);
     }
@@ -451,7 +454,7 @@ int FirmwareUpdate::receiveAndCheckBldflags()
 
     if (this->bldflags_received) {
         rc = eERR_NONE;
-        log_msg(LOG_INFO, "BLDFlags: %d", this->bldflags);
+        log_msg(LOG_INFO, "BLDFlags: 0x%02X", this->bldflags);
         if ((this->bldflags & (1 << eBldFlagNewSWProgrammed)) == 0) {
             log_error("BLDFlags: Controller has NOT been flashed!");
             rc = eERR_PROCESS_FAILED;

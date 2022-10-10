@@ -50,3 +50,5 @@
 # Other
 *.ps
 3rd_party
+version.h
+

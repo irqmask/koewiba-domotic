@@ -7,7 +7,7 @@ set (CMAKE_BINARY_DIR ../../bin)
 set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 
 include(ExternalProject)
-include(../cmake/GitVersion)
+include(cmake/GitVersion)
 
 ## thirdparty projects ########################################################
 

@@ -133,10 +133,16 @@ release_done: $(ELFFILE_RELEASE)
 
 all: build_debug
 
+# Create version file
+# =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+version.h: 
+	@$(ROOTDIR)/buildscripts/gitversion.sh $(SRCDIR)/include
+
 # Compile: create object files from C source files.
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-$(BUILDDIR_DEBUG)%.o $(BUILDDIR_RELEASE)%.o: %.c
+$(BUILDDIR_DEBUG)%.o $(BUILDDIR_RELEASE)%.o: %.c version.h
 ifneq ($(BUILD_NIGHTLY),True)
 	@echo "    $(IDENT) [CC]         ===> $<"
 endif

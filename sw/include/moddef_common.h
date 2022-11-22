@@ -43,7 +43,8 @@
 #define MOD_LEN_BOARDREV        1
 #define MOD_LEN_APPID           2
 #define MOD_LEN_APPVER          3
-#define MOD_VERSIONINFO_LEN     (MOD_LEN_CONTROLLERID + MOD_LEN_BOARDID + MOD_LEN_BOARDREV + MOD_LEN_APPID + MOD_LEN_APPVER)
+#define MOD_LEN_APPHASH         4
+#define MOD_VERSIONINFO_LEN     (MOD_LEN_CONTROLLERID + MOD_LEN_BOARDID + MOD_LEN_BOARDREV + MOD_LEN_APPID + MOD_LEN_APPVER + MOD_LEN_APPHASH)
 
 
 //! Type of a register
@@ -69,7 +70,11 @@ typedef enum {
     MOD_eVerAppIdLow,           //!< Low byte of 16bit application id.
     MOD_eVerAppMajor,           //!< Major application's version number.
     MOD_eVerAppMinor,           //!< Minor application's version number.
-    MOD_eVerAppBugfix           //!< Bugfix application's version number.
+    MOD_eVerAppBugfix,          //!< Bugfix application's version number.
+    MOD_eVerHash0Low,           //!< Hash low 1st byte
+    MOD_eVerHash1,              //!< Hash 2nd byte
+    MOD_eVerHash2,              //!< Hash 3rd byte
+    MOD_eVerHash3High           //!< Hash high 4th byte
 } MOD_eVersionItems;
 
 /**
@@ -169,7 +174,8 @@ typedef enum {
     MOD_eReg_AppID              = 236,  //!< Application ID.
     MOD_eReg_AppVersionMajor    = 237,  //!< Application version major.
     MOD_eReg_AppVersionMinor    = 238,  //!< Application version minor.
-    MOD_eReg_AppVersionBugfix   = 239   //!< Application version bug-fix.
+    MOD_eReg_AppVersionBugfix   = 239,  //!< Application version bug-fix.
+    MOD_eReg_AppVersionHash     = 240   //!< Application version hash.
 } MOD_eRegCommon_t;
 
 //! Common configuration storage layout which is used by all applications.
@@ -213,6 +219,7 @@ typedef struct {
     uint8_t board_rev;      //!< Hardware revision of board/pcb
     uint16_t app_id;        //!< Software ID of application.
     uint8_t version[MOD_LEN_APPVER]; //!< Major, Minor, Bugfix version.
+    uint32_t versionhash;
 } version_info_t;
 
 // --- Local variables ---------------------------------------------------------

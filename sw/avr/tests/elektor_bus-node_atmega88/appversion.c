@@ -29,6 +29,7 @@
 
 #include <avr/io.h>
 #include "moddef_common.h"
+#include "version.h"
 
 // --- Definitions -------------------------------------------------------------
 
@@ -42,12 +43,17 @@
 //! @note The linker sorts the variables upside down. app_controller_id begins at
 //!       the lowest address and app_version begins at the highest address.
 //! @see BOARD_IDs, APP_IDs, APP_VERSIONING
-const unsigned char app_versioninfo[MOD_LEN_CONTROLLERID + MOD_LEN_BOARDID + MOD_LEN_BOARDREV + MOD_LEN_APPID + MOD_LEN_APPVER] // not for atmega88 // __attribute__((section(".versioninfo")))
+const unsigned char app_versioninfo[MOD_VERSIONINFO_LEN] // not for atmega88 // __attribute__((section(".versioninfo")))
                         = {SIGNATURE_0,SIGNATURE_1,SIGNATURE_2,0x00,
                            0xFF,0xFE,   // board ID
                            1,           // board revision
                            0xFF,0xFE,   // application ID
-                           0,1,3};      // application version
+                           VERSION_MAJOR, VERSION_MINOR, VERSION_BUGFIX, // application version (major, minor, bugfix)
+                            (VERSION_HASH & 0x000000FF),        // version hash
+                           ((VERSION_HASH & 0x0000FF00) >> 8),
+                           ((VERSION_HASH & 0x00FF0000) >> 16),
+                           ((VERSION_HASH & 0xFF000000) >> 24)
+};
 
 // --- Module global variables -------------------------------------------------
 

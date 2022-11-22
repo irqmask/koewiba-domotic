@@ -26,6 +26,7 @@ SRC = ../shared/bus_transport.c \
 # Place -I options here
 INCDIRS = -I. \
           -I../shared \
+          -I../include \
           -I../../include \
           -I../../shared
 

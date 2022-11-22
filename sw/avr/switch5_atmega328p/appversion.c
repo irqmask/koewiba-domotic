@@ -27,6 +27,7 @@
 
 #include <avr/io.h>
 #include "moddef_common.h"
+#include "version.h"
 
 // --- Definitions -------------------------------------------------------------
 
@@ -45,7 +46,12 @@ const unsigned char app_versioninfo[MOD_VERSIONINFO_LEN] __attribute__((section(
                            0x00,0x07,   // board ID            (high byte, low byte)
                            1,           // board revision
                            0x00,0x0A,   // application ID      (high byte, low byte)
-                           0,1,0};      // application version (major, minor, bugfix)
+                           VERSION_MAJOR, VERSION_MINOR, VERSION_BUGFIX, // application version (major, minor, bugfix)
+                            (VERSION_HASH & 0x000000FF),        // version hash
+                           ((VERSION_HASH & 0x0000FF00) >> 8),
+                           ((VERSION_HASH & 0x00FF0000) >> 16),
+                           ((VERSION_HASH & 0xFF000000) >> 24)
+};
 
 // --- Module global variables -------------------------------------------------
 

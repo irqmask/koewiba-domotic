@@ -33,6 +33,7 @@ SRC = ../shared/bus_transport.c \
 # Place -I options here
 INCDIRS = -I. \
           -I../blind-control \
+          -I../include \
           -I../shared \
           -I../../include \
           -I../../shared \

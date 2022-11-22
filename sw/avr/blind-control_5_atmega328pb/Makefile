@@ -34,6 +34,7 @@ SRC = ../shared/bus_transport.c \
 INCDIRS = -I. \
           -I../blind-control \
           -I../blind-control_5_atmega328p \
+          -I../include \
           -I../shared \
           -I../../include \
           -I../../shared \

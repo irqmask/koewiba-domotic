@@ -168,19 +168,21 @@ bool        register_get            (uint8_t                reg_no,
     case MOD_eReg_AppVersionMajor:
         *reg_type = eRegType_U8;
         *(uint8_t*)value = pgm_read_byte(&app_versioninfo[MOD_eVerAppMajor]);
-        //*(uint8_t*)value = app_versioninfo[MOD_eVerAppMajor];
         break;
 
     case MOD_eReg_AppVersionMinor:
         *reg_type = eRegType_U8;
         *(uint8_t*)value = pgm_read_byte(&app_versioninfo[MOD_eVerAppMinor]);
-        //*(uint8_t*)value = app_versioninfo[MOD_eVerAppMinor];
         break;
 
     case MOD_eReg_AppVersionBugfix:
         *reg_type = eRegType_U8;
         *(uint8_t*)value = pgm_read_byte(&app_versioninfo[MOD_eVerAppBugfix]);
-        //*(uint8_t*)value = app_versioninfo[MOD_eVerAppBugfix];
+        break;
+
+    case MOD_eReg_AppVersionHash:
+        *reg_type = eRegType_U32;
+        *(uint32_t*)value = pgm_read_dword(&app_versioninfo[MOD_eVerHash0Low]);
         break;
 
     // application specific registers

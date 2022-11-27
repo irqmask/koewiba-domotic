@@ -213,7 +213,7 @@ void FirmwareUpdate::parseBlockNakMsg(const msg_t &message)
  */
 void FirmwareUpdate::handleIncomingMessage(const msg_t &message, void *reference)
 {
-    (reference);
+    (void)(reference);
     log_hexdump16(LOG_VERBOSE1, "BUS I ", (const uint8_t *)&message.data, message.length);
 
     if (message.sender == this->module_address &&  message.length > 0) {
@@ -591,7 +591,7 @@ int FirmwareUpdate::start(const char          *filename,
                                 this->fw_memory, this->fw_size);
         if (rc != eERR_NONE) {
             log_error("Failed to open %s, error %d", this->filename, rc);
-            free(&this->fw_memory);
+            free(this->fw_memory);
             this->fw_memory = NULL;
             break;
         }

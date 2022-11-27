@@ -27,11 +27,12 @@
 
 // --- Include section ---------------------------------------------------------
 
-#include "prjconf.h"
-
+#include <climits>
+#include <cstdint>
 #include <iostream>
 
 // include
+#include "prjconf.h"
 #include "prjtypes.h"
 #include "Application.h"
 
@@ -96,7 +97,7 @@ protected:
      *
      * @return User input as unsigned 32bit integer.
      */
-    virtual uint32_t queryU32(std::string query_text, uint32_t lowest_allowed, uint32_t highest_allowed);
+    virtual uint32_t queryU32(std::string query_text, uint32_t lowest_allowed = 0, uint32_t highest_allowed = 0xFFFFFFFF);
 
     /**
      * Query an unsigned 16bit integer as user input.
@@ -107,7 +108,7 @@ protected:
      *
      * @return User input as unsigned 16bit integer.
      */
-    virtual uint16_t queryU16(std::string query_text, uint16_t lowest_allowed, uint16_t highest_allowed);
+    virtual uint16_t queryU16(std::string query_text, uint16_t lowest_allowed = 0, uint16_t highest_allowed = 0xFFFF);
 
     /**
      * Query an unsigned 8bit integer as user input.
@@ -118,7 +119,7 @@ protected:
      *
      * @return User input as unsigned 8bit integer.
      */
-    virtual uint8_t queryU8(std::string query_text, uint8_t lowest_allowed, uint8_t highest_allowed);
+    virtual uint8_t queryU8(std::string query_text, uint8_t lowest_allowed = 0, uint8_t highest_allowed = 0xFF);
 
     /**
      * Query a signed 32bit integer as user input.
@@ -129,7 +130,7 @@ protected:
      *
      * @return User input as signed 32bit integer.
      */
-    virtual int32_t queryI32(std::string query_text, int32_t lowest_allowed, int32_t highest_allowed);
+    virtual int32_t queryI32(std::string query_text, int32_t lowest_allowed = INT_MIN, int32_t highest_allowed = INT_MAX);
 
     /**
      * Query a signed 16bit integer as user input.
@@ -140,7 +141,7 @@ protected:
      *
      * @return User input as signed 16bit integer.
      */
-    virtual int16_t queryI16(std::string query_text, int16_t lowest_allowed, int16_t highest_allowed);
+    virtual int16_t queryI16(std::string query_text, int16_t lowest_allowed = SHRT_MIN, int16_t highest_allowed = SHRT_MAX);
 
     /**
      * Query a signed 8bit integer as user input.
@@ -151,7 +152,7 @@ protected:
      *
      * @return User input as signed 8bit integer.
      */
-    virtual int8_t queryI8(std::string query_text, int8_t lowest_allowed, int8_t highest_allowed);
+    virtual int8_t queryI8(std::string query_text, int8_t lowest_allowed = CHAR_MIN, int8_t highest_allowed = CHAR_MAX);
 
     //! Selected menu item by the user.
     char        last_choice;
@@ -159,33 +160,6 @@ protected:
     bool        leave_menu;
     //! Reference to belonging application
     Application &app;
-};
-
-// -----------------------------------------------------------------------------
-
-/**
- * User interface: Main menu
- */
-class UIMain: public UIConsole
-{
-public:
-    /**
-     * Constructor
-     * @param[in]   app         Reference to belonging application
-     */
-    UIMain(Application &app);
-
-protected:
-    virtual void display() override;
-    virtual void onMenuChoice() override;
-
-private:
-    void detectModules();
-    void selectModule();
-    void readRegister();
-    void writeRegister();
-    void setTime();
-    void getTime();
 };
 
 /** @} */

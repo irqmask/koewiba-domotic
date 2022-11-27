@@ -68,6 +68,9 @@ set (kwbconfiguration_SRCS
     kwbconfiguration_version.h
     MsgBroker.h
     UIConsole.h
+    UIMain.h
+    UIAllModules.h
+    UISingleModule.h
 
     Action.cpp
     ActionRequest.cpp
@@ -79,6 +82,9 @@ set (kwbconfiguration_SRCS
     kwbconfiguration_main.cpp
     MsgBroker.cpp
     UIConsole.cpp
+    UIMain.cpp
+    UIAllModules.cpp
+    UISingleModule.cpp
 )
 
 # source groups

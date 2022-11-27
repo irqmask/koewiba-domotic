@@ -30,15 +30,8 @@
 
 #include "prjconf.h"
 
-#include <functional>
-#include <iostream>
-#include <sstream>
-#include <thread>
-
-#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 
 #if defined (PRJCONF_UNIX) || \
     defined (PRJCONF_POSIX) || \
@@ -48,6 +41,14 @@ extern "C" {
 }
 #include <unistd.h>
 #endif
+
+#include <cassert>
+#include <cstring>
+#include <functional>
+#include <iostream>
+#include <memory>
+#include <sstream>
+#include <thread>
 
 // include
 #include "prjtypes.h"
@@ -90,12 +91,14 @@ typedef struct options {
     bool        router_address_set; //!< Flag: is set, router address has been
                                     //!< configured in the command line options.
     uint16_t    own_node_id;        //!< Node ID of node over which this software
-    //!< communicates.
+                                    //!< communicates.
 } options_t;
 
 // --- Local variables ---------------------------------------------------------
 
 // --- Global variables --------------------------------------------------------
+
+bool g_end_application = false;
 
 // --- Module global variables -------------------------------------------------
 
@@ -253,7 +256,6 @@ static void print_usage(void)
 int main(int argc, char *argv[])
 {
     int                 rc = eERR_NONE;
-    bool                end_application = false;
     options_t           options;
     ioloop_t            mainloop;
 
@@ -323,13 +325,13 @@ int main(int argc, char *argv[])
         conn->setOwnNodeId(options.own_node_id);
 
         // instantiate application, ui and its thread
-        Application app(*conn, broker, end_application);
+        Application app(*conn, broker);
         UIMain uimain(app);
 
         std::thread ui_thread(&UIMain::run, &uimain);
 
         std::cout << "entering mainloop" << std::endl;
-        while (!end_application) {
+        while (!g_end_application) {
             ioloop_run_once(&mainloop);
         }
         ui_thread.join();

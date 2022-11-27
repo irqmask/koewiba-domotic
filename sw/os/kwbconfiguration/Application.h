@@ -60,9 +60,8 @@ public:
      * @brief Application
      * @param[in]   conn            Reference to connection to kwbrouter or serial gateway
      * @param[in]   broker          Reference to message broker
-     * @param[out]  endApplication  Flag that application shall be terminated
      */
-    Application(Connection &conn, MsgBroker &broker, bool &endApplication);
+    Application(Connection &conn, MsgBroker &broker);
 
     /**
      * Detect all modules in the system.

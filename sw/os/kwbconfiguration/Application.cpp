@@ -69,8 +69,7 @@
 // --- Global functions --------------------------------------------------------
 
 Application::Application(Connection     &conn,
-                         MsgBroker      &broker,
-                         bool           &end)
+                         MsgBroker      &broker)
     : msgEndpoint(conn)
     , msgBroker(broker)
     , selectedModule(0)

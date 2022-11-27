@@ -165,8 +165,7 @@ void        app_register_set        (uint8_t                reg_no,
          break;
 
      case APP_eReg_TempSetPoint:
-         app_desired_temp = tempval16;
-         app_draw_desired_temp();
+         app_set_desired_temp(tempval16, false);
          break;
 
      case APP_eReg_TempOffset:

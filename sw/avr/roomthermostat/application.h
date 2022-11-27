@@ -48,6 +48,8 @@ extern const unsigned char app_versioninfo[];
 
 // --- Module global functions -------------------------------------------------
 
+void app_set_desired_temp(uint16_t desired_temp, bool publish);
+
 void app_set_temperature_offset(int16_t offset);
 
 int16_t app_get_temperature_offset(void);

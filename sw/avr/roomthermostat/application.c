@@ -197,12 +197,6 @@ static void check_display_timeout(void)
     }
 }
 
-static void set_desired_temp(uint16_t desired_temp)
-{
-    app_desired_temp = desired_temp;
-    app_draw_desired_temp();
-    register_send_u16(&g_bus, BUS_BRDCSTADR, APP_eReg_TempSetPoint, app_desired_temp);
-}
 
 static void set_remote_window_state(uint8_t open)
 {
@@ -211,14 +205,14 @@ static void set_remote_window_state(uint8_t open)
         if (g_old_desired_temp == 0) {
             g_old_desired_temp = app_desired_temp;
         }
-        set_desired_temp(g_window_open_temperature);
+        app_set_desired_temp(g_window_open_temperature, true);
     }
     else {
         if (g_mode == eMODE_VACATION) {
-            set_desired_temp(g_vacation_temperature);
+            app_set_desired_temp(g_vacation_temperature, true);
         }
         else if (g_old_desired_temp != 0) {
-            set_desired_temp(g_old_desired_temp);
+            app_set_desired_temp(g_old_desired_temp, true);
             g_old_desired_temp = 0;
         }
     }
@@ -236,6 +230,18 @@ static void on_cmd_state_8bit_received(uint16_t sender, uint8_t reg, uint8_t val
 }
 
 // --- Module global functions -------------------------------------------------
+
+void app_set_desired_temp(uint16_t desired_temp, bool publish)
+{
+	if (desired_temp < 27315 || desired_temp > 27315 + 4000)
+		return;
+
+    app_desired_temp = desired_temp;
+    app_draw_desired_temp();
+    if (publish) {
+    	register_send_u16(&g_bus, BUS_BRDCSTADR, APP_eReg_TempSetPoint, app_desired_temp);
+    }
+}
 
 void app_set_temperature_offset(int16_t offset)
 {
@@ -278,7 +284,7 @@ void app_set_mode(uint8_t mode)
             return;
         }
         else if (g_old_desired_temp != 0) {
-            set_desired_temp(g_old_desired_temp);
+            app_set_desired_temp(g_old_desired_temp, true);
             g_old_desired_temp = 0;
         }
         break;
@@ -287,7 +293,7 @@ void app_set_mode(uint8_t mode)
         if (g_window_open == 0) {
             if (g_old_desired_temp == 0) {
                 g_old_desired_temp = app_desired_temp;
-                set_desired_temp(g_vacation_temperature);
+                app_set_desired_temp(g_vacation_temperature, true);
             }
         }
         break;
@@ -417,14 +423,10 @@ void app_background (sBus_t* bus)
 
     if (input_on_activation(APP_INPUT_UP)) {
         reset_display_timeout();
-        if (app_desired_temp < 27315 + 4000 - APP_TEMP_INCR) {
-            set_desired_temp(app_desired_temp + APP_TEMP_INCR);
-        }
+        app_set_desired_temp(app_desired_temp + APP_TEMP_INCR, true);
     } else if (input_on_activation(APP_INPUT_DOWN)) {
         reset_display_timeout();
-        if (app_desired_temp > 27315 + APP_TEMP_INCR) {
-            set_desired_temp(app_desired_temp - APP_TEMP_INCR);
-        }
+        app_set_desired_temp(app_desired_temp - APP_TEMP_INCR, true);
     }
 
     // do every 1s ...

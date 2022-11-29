@@ -59,6 +59,8 @@ typedef enum {
     eERR_PROCESS_FAILED,
     eERR_3RD_PARTY_FUNC_FAILED,
     eERR_UNSUPPORTED,
+    /// Unable to establish connection
+    eERR_CONNECTION,
     eERR_UNKNOWN
 } gen_errors_t;
 

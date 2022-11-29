@@ -311,6 +311,7 @@ int main(int argc, char *argv[])
         }
         catch (Exception &e) {
             log_error("Unable to connect! Exception %s\n", e.what());
+            rc = eERR_CONNECTION;
             break;
         }
 
@@ -346,6 +347,7 @@ int main(int argc, char *argv[])
             }
         }
     } while (0);
+
     return rc;
 }
 

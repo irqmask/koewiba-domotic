@@ -128,3 +128,5 @@ else (WIN32)
 endif (WIN32)
 
 add_dependencies (kwbconfiguration libsystem)
+
+add_custom_command(TARGET kwbconfiguration POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/reglayouts $<TARGET_FILE_DIR:kwbconfiguration>)

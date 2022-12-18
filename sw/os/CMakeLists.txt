@@ -3,7 +3,7 @@ project (KoeWiBa)
 
 ## folder settings ############################################################
 
-set (CMAKE_BINARY_DIR ../../bin)
+set (CMAKE_BINARY_DIR ${CMAKE_SOURCE_DIR}/bin)
 set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 
 include(ExternalProject)

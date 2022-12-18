@@ -29,6 +29,7 @@
 #include "uisinglemodule.h"
 
 #include "backuprestore.h"
+#include "exceptions.h"
 
 // --- Definitions -------------------------------------------------------------
 
@@ -191,7 +192,12 @@ void UISingleModule::backupModule()
     try {
         BackupRestore br(app);
 
-        uint16_t appid = 0x0006;
+        int32_t temp = 0;
+        uint16_t appid = 0;
+        if (!app.readRegister(MOD_eReg_AppID, temp)) {
+            throw OperationFailed(LOC, "Unable to read application ID");
+        }
+        appid = static_cast<uint16_t>(temp);
         br.backup(selected_module_id,
                   ModuleConfig::createValuesFilename(selected_module_id),
                   ModuleConfig::createLayoutFilename(appid));

@@ -38,8 +38,6 @@
 #include "prjconf.h"
 #include "prjtypes.h"
 
-#include "kwbconfiguration_version.h"
-
 // --- Definitions -------------------------------------------------------------
 
 // --- Type definitions --------------------------------------------------------

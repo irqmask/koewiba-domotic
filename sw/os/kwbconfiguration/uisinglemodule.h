@@ -32,8 +32,8 @@
 // include
 #include "prjconf.h"
 #include "prjtypes.h"
-#include "Application.h"
-#include "UIConsole.h"
+#include "application.h"
+#include "uiconsole.h"
 
 // --- Definitions -------------------------------------------------------------
 

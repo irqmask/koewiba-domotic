@@ -26,7 +26,7 @@
 
 // --- Include section ---------------------------------------------------------
 
-#include "UISingleModule.h"
+#include "uisinglemodule.h"
 
 #include "backuprestore.h"
 

@@ -25,7 +25,7 @@
  */
 #pragma once
 
-#include "UIConsole.h"
+#include "uiconsole.h"
 
 class UIAllModules : public UIConsole
 {

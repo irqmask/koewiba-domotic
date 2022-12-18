@@ -26,15 +26,15 @@
 
 // --- Include section ---------------------------------------------------------
 
-#include "UIMain.h"
+#include "uimain.h"
 
 #include <ctime>
 #include <iostream>
 #include <string>
 
 #include "kwbconfiguration_version.h"
-#include "UISingleModule.h"
-#include "UIAllModules.h"
+#include "uisinglemodule.h"
+#include "uiallmodules.h"
 
 // --- Definitions -------------------------------------------------------------
 

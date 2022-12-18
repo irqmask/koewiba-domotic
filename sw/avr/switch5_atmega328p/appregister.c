@@ -59,27 +59,29 @@ void        app_register_load       (void)
 {
     uint8_t v;
     for (uint8_t chn=0; chn<APP_NUM_CHANNEL; chn++) {
-        //eeprom_write_byte(&register_eeprom_array[APP_eCfg_Chn0_Mode + chn * APP_CFG_BYTES_PER_CHN], 0);
+        eeprom_write_byte(&register_eeprom_array[APP_eCfg_Chn0_Mode + chn * APP_CFG_BYTES_PER_CHN], 0);
         v = eeprom_read_byte(&register_eeprom_array[APP_eCfg_Chn0_Mode + chn * APP_CFG_BYTES_PER_CHN]);
         app_chn_mode[chn] = v;
     }
     for (uint8_t chn=0; chn<OUTPUT_NUM_PINS; chn++) {
         uint8_t chn_offset = chn * APP_CFG_BYTES_PER_CHN;
-        //eeprom_write_byte(&register_eeprom_array[APP_eCfg_Chn0_ThresholdOff + chn_offset], 64);
-        //eeprom_write_byte(&register_eeprom_array[APP_eCfg_Chn0_ThresholdOn + chn_offset], 128);
+        eeprom_write_byte(&register_eeprom_array[APP_eCfg_Chn0_ThresholdOff + chn_offset], 64);
+        eeprom_write_byte(&register_eeprom_array[APP_eCfg_Chn0_ThresholdOn + chn_offset], 128);
         v = eeprom_read_byte(&register_eeprom_array[APP_eCfg_Chn0_ThresholdOff + chn_offset]);
         output_set_threshold_off(chn, v);
         v = eeprom_read_byte(&register_eeprom_array[APP_eCfg_Chn0_ThresholdOn + chn_offset]);
         output_set_threshold_on(chn, v);
 
-        for (uint8_t a=0; a<APP_ONOFFTIMER_COUNT * 2; a++) {
+        for (uint8_t a=0; a<APP_SWITCHTIMER_COUNT; a++) {
             // same for off and on
-            v = eeprom_read_byte(&register_eeprom_array[APP_eCfg_Chn0_TimeOn0_Weekday + a * APP_REGS_PER_ALARM + chn_offset]);
-            alarm_set_days_of_week_mask(a + chn * APP_ONOFFTIMER_COUNT * 2, v);
-            v = eeprom_read_byte(&register_eeprom_array[APP_eCfg_Chn0_TimeOn0_Hour + a * APP_REGS_PER_ALARM + chn_offset]);
-            alarm_set_hour(a + chn * APP_ONOFFTIMER_COUNT * 2, v);
-            v = eeprom_read_byte(&register_eeprom_array[APP_eCfg_Chn0_TimeOn0_Minute + a * APP_REGS_PER_ALARM + chn_offset]);
-            alarm_set_minute(a + chn * APP_ONOFFTIMER_COUNT * 2, v);
+            v = eeprom_read_byte(&register_eeprom_array[APP_eCfg_Chn0_Timer0_Weekday + a * APP_REGS_PER_ALARM + chn_offset]);
+            alarm_set_days_of_week_mask(a + chn * APP_SWITCHTIMER_COUNT, v);
+            v = eeprom_read_byte(&register_eeprom_array[APP_eCfg_Chn0_Timer0_Hour + a * APP_REGS_PER_ALARM + chn_offset]);
+            alarm_set_hour(a + chn * APP_SWITCHTIMER_COUNT, v);
+            v = eeprom_read_byte(&register_eeprom_array[APP_eCfg_Chn0_Timer0_Minute + a * APP_REGS_PER_ALARM + chn_offset]);
+            alarm_set_minute(a + chn * APP_SWITCHTIMER_COUNT, v);
+            v = eeprom_read_byte(&register_eeprom_array[APP_eCfg_Chn0_Timer0_SetPoint + a * APP_REGS_PER_ALARM + chn_offset]);
+            alarm_set_minute(a + chn * APP_SWITCHTIMER_COUNT, v);
         }
     }
 
@@ -123,22 +125,25 @@ bool        app_register_get        (uint8_t                reg_no,
             break;
         }
 
-        if (index >= APP_eReg_Chn0_TimeOn0_Weekday && index <= APP_eReg_Chn0_TimeOff3_Minute) {
+        if (index >= APP_eReg_Chn0_Timer0_Weekday && index <= APP_eReg_Chn0_Timer7_SetPoint) {
             // calculate alarmidx per channel
-            uint8_t alarmidx = (index - APP_eReg_Chn0_TimeOn0_Weekday) / APP_REGS_PER_ALARM;
+            uint8_t alarm_idx = (index - APP_eReg_Chn0_Timer0_Weekday) / APP_REGS_PER_ALARM;
             // calculate offset to alarm block in register space
-            uint8_t offset = alarmidx * APP_REGS_PER_ALARM;
+            uint8_t offset = alarm_idx * APP_REGS_PER_ALARM;
             index -= offset;
             switch (index) {
             // same for on and off
-            case APP_eReg_Chn0_TimeOn0_Weekday:
-                *(uint8_t*)pvalue = eeprom_read_byte(&register_eeprom_array[APP_eCfg_Chn0_TimeOn0_Weekday + (chn * APP_CFG_BYTES_PER_CHN) + offset]);
+            case APP_eReg_Chn0_Timer0_Weekday:
+                *(uint8_t*)pvalue = eeprom_read_byte(&register_eeprom_array[APP_eCfg_Chn0_Timer0_Weekday + (chn * APP_CFG_BYTES_PER_CHN) + offset]);
                 break;
-            case APP_eReg_Chn0_TimeOn0_Hour:
-                *(uint8_t*)pvalue = eeprom_read_byte(&register_eeprom_array[APP_eCfg_Chn0_TimeOn0_Hour + (chn * APP_CFG_BYTES_PER_CHN) + offset]);
+            case APP_eReg_Chn0_Timer0_Hour:
+                *(uint8_t*)pvalue = eeprom_read_byte(&register_eeprom_array[APP_eCfg_Chn0_Timer0_Hour + (chn * APP_CFG_BYTES_PER_CHN) + offset]);
                 break;
-            case APP_eReg_Chn0_TimeOn0_Minute:
-                *(uint8_t*)pvalue = eeprom_read_byte(&register_eeprom_array[APP_eCfg_Chn0_TimeOn0_Minute + (chn * APP_CFG_BYTES_PER_CHN) + offset]);
+            case APP_eReg_Chn0_Timer0_Minute:
+                *(uint8_t*)pvalue = eeprom_read_byte(&register_eeprom_array[APP_eCfg_Chn0_Timer0_Minute + (chn * APP_CFG_BYTES_PER_CHN) + offset]);
+                break;
+            case APP_eReg_Chn0_Timer0_SetPoint:
+                *(uint8_t*)pvalue = app_get_alarm_setpoint(chn, alarm_idx);
                 break;
             default:
                 break;
@@ -225,27 +230,31 @@ void        app_register_set        (uint8_t                reg_no,
             break;
         }
 
-        if (index >= APP_eReg_Chn0_TimeOn0_Weekday && index <= APP_eReg_Chn0_TimeOff3_Minute) {
-            // calculate alarmidx per channel
-            uint8_t alarmidx = (index - APP_eReg_Chn0_TimeOn0_Weekday) / APP_REGS_PER_ALARM;
+        if (index >= APP_eReg_Chn0_Timer0_Weekday && index <= APP_eReg_Chn0_Timer7_SetPoint) {
+            // calculate alarmindex per channel
+            uint8_t alarmidx = (index - APP_eReg_Chn0_Timer0_Weekday) / APP_REGS_PER_ALARM;
             // calculate offset to alarm block in register space
             uint8_t offset = alarmidx * APP_REGS_PER_ALARM;
             index -= offset;
             switch (index) {
             // same for on and off
-            case APP_eReg_Chn0_TimeOn0_Weekday:
-                eeprom_write_byte(&register_eeprom_array[APP_eCfg_Chn0_TimeOn0_Weekday + chn * APP_CFG_BYTES_PER_CHN + offset], value8);
-                alarm_set_days_of_week_mask(alarmidx + chn * APP_ONOFFTIMER_COUNT * 2, value8);
+            case APP_eReg_Chn0_Timer0_Weekday:
+                eeprom_write_byte(&register_eeprom_array[APP_eCfg_Chn0_Timer0_Weekday + chn * APP_CFG_BYTES_PER_CHN + offset], value8);
+                alarm_set_days_of_week_mask(alarmidx + chn * APP_SWITCHTIMER_COUNT, value8);
                 break;
 
-            case APP_eReg_Chn0_TimeOn0_Hour:
-                eeprom_write_byte(&register_eeprom_array[APP_eCfg_Chn0_TimeOn0_Hour + chn * APP_CFG_BYTES_PER_CHN + offset], value8);
-                alarm_set_hour(alarmidx + chn * APP_ONOFFTIMER_COUNT * 2, value8);
+            case APP_eReg_Chn0_Timer0_Hour:
+                eeprom_write_byte(&register_eeprom_array[APP_eCfg_Chn0_Timer0_Hour + chn * APP_CFG_BYTES_PER_CHN + offset], value8);
+                alarm_set_hour(alarmidx + chn * APP_SWITCHTIMER_COUNT, value8);
                 break;
 
-            case APP_eReg_Chn0_TimeOn0_Minute:
-                eeprom_write_byte(&register_eeprom_array[APP_eCfg_Chn0_TimeOn0_Minute + chn * APP_CFG_BYTES_PER_CHN + offset], value8);
-                alarm_set_minute(alarmidx + chn * APP_ONOFFTIMER_COUNT * 2, value8);
+            case APP_eReg_Chn0_Timer0_Minute:
+                eeprom_write_byte(&register_eeprom_array[APP_eCfg_Chn0_Timer0_Minute + chn * APP_CFG_BYTES_PER_CHN + offset], value8);
+                alarm_set_minute(alarmidx + chn * APP_SWITCHTIMER_COUNT, value8);
+                break;
+
+            case APP_eReg_Chn0_Timer0_SetPoint:
+                eeprom_write_byte(&register_eeprom_array[APP_eCfg_Chn0_Timer0_SetPoint + chn * APP_CFG_BYTES_PER_CHN + offset], value8);
                 break;
 
             default:
@@ -288,6 +297,12 @@ void        app_register_set        (uint8_t                reg_no,
             break;
         }
     }
+}
+
+
+uint8_t app_get_alarm_setpoint(uint8_t chn, uint8_t alarm_idx)
+{
+    return eeprom_read_byte(&register_eeprom_array[APP_eCfg_Chn0_Timer0_SetPoint + (chn * APP_CFG_BYTES_PER_CHN) + alarm_idx * APP_REGS_PER_ALARM]);
 }
 
 // --- Global functions --------------------------------------------------------

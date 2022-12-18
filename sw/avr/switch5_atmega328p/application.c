@@ -185,17 +185,13 @@ void app_background (void)
 void app_on_minute(void)
 {
     int8_t alarm_idx = -1;
-    bool switch_on = false;
     uint8_t chn = 0;
 
     if (alarm_check(&alarm_idx)) {
-        chn = alarm_idx / (2 * APP_ONOFFTIMER_COUNT);
-        switch_on = ((alarm_idx % 2) == 0);
-        if (switch_on) {
-            app_set_output(chn, 255);
-        } else {
-            app_set_output(chn, 0);
-        }
+        chn = alarm_idx / APP_SWITCHTIMER_COUNT;
+        alarm_idx = alarm_idx % APP_SWITCHTIMER_COUNT;
+        uint8_t setpoint = app_get_alarm_setpoint(chn, alarm_idx);
+        app_set_output(chn, setpoint);
     }
 }
 /** @} */

@@ -47,6 +47,8 @@ extern uint8_t app_chn_mode[APP_NUM_CHANNEL];
 
 // --- Module global functions -------------------------------------------------
 
+uint8_t app_get_alarm_setpoint(uint8_t chn, uint8_t alarmidx);
+
 void app_set_mode(uint8_t chn, uint8_t mode);
 
 void app_send_state(uint8_t chn, uint8_t state);

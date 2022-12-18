@@ -259,7 +259,7 @@ int main(int argc, char *argv[])
     options_t           options;
     ioloop_t            mainloop;
 
-    log_set_mask(0xFFFFFFFF & ~LOG_VERBOSE2);
+    log_set_mask(0xFFFFFFFF & ~(KWB_LOG_INTERCOMM | KWB_LOG_VERBOSE1 | LOG_VERBOSE2));
     log_msg(LOG_INFO, "kwbconfiguration...");
 
     do {

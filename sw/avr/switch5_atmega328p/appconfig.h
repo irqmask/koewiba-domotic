@@ -485,6 +485,8 @@ typedef enum appconfig {
 
 //! Number of bytes in non-volatile memory per channel
 #define APP_CFG_BYTES_PER_CHN (APP_eCfg_Chn0_Unused0 - APP_eCfg_Chn0_ThresholdOff + 1)
+//! Number of bytes in non-volatile memory per alarm
+#define APP_CFG_BYTES_PER_ALARM (APP_eCfg_Chn0_Timer1_Weekday - APP_eCfg_Chn0_Timer0_Weekday)
 
 // --- Local variables ---------------------------------------------------------
 

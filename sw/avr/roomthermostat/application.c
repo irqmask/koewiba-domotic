@@ -47,15 +47,16 @@
 
 // --- Definitions -------------------------------------------------------------
 
-#define APP_TEMP_INCR   50      //!< Temperature increment on keypress
-#define APP_INPUT_DOWN  0       //!< Input key "down"
-#define APP_INPUT_OK    1       //!< Input key "OK"
-#define APP_INPUT_UP    2       //!< Input key "up"
+#define APP_TEMP_INCR       50  //!< Temperature increment on keypress
+#define APP_INPUT_DOWN      0   //!< Input key "down"
+#define APP_INPUT_OK        1   //!< Input key "OK"
+#define APP_INPUT_UP        2   //!< Input key "up"
+#define APP_MAX_CONTACTS    2   //!< Maximum number of window contacts
 
-#define DISP_TIMEOUT_DIM 10     //!< timeout when display gets dimmed
-#define DISP_TIMEOUT_OFF 60     //!< timeout when display is switched off
+#define DISP_TIMEOUT_DIM    10  //!< timeout when display gets dimmed
+#define DISP_TIMEOUT_OFF    60  //!< timeout when display is switched off
 
-#define TEMP_GLITCH_LIMIT 500   //!< absolute glitch limit +/- in Kelvin
+#define TEMP_GLITCH_LIMIT   500 //!< absolute glitch limit +/- in Kelvin
 
 // --- Type definitions --------------------------------------------------------
 
@@ -72,7 +73,7 @@ static uint8_t      g_window_open;
 // register data
 static int16_t      g_temperature_offset;
 static uint16_t     g_windowcontact_moduleid;
-static uint8_t      g_windowcontact_reg;
+static uint8_t      g_windowcontact_reg[APP_MAX_CONTACTS];
 static uint16_t     g_window_open_temperature;
 static uint16_t     g_vacation_temperature;
 static uint8_t      g_mode;
@@ -224,7 +225,7 @@ static void set_remote_window_state(uint8_t open)
 static void on_cmd_state_8bit_received(uint16_t sender, uint8_t reg, uint8_t value)
 {
     if (sender == g_windowcontact_moduleid &&
-        reg == g_windowcontact_reg) {
+        ((reg == g_windowcontact_reg[0]) || (reg == g_windowcontact_reg[1]))) {
         set_remote_window_state(value);
     }
 }
@@ -263,14 +264,22 @@ uint16_t app_get_windowcontact_moduleid(void)
     return g_windowcontact_moduleid;
 }
 
-void app_set_windowcontact_reg(uint8_t reg)
+void app_set_windowcontact_reg(uint8_t contact_idx, uint8_t reg)
 {
-    g_windowcontact_reg = reg;
+    if (contact_idx >= APP_MAX_CONTACTS)
+    {
+        return;
+    }
+    g_windowcontact_reg[contact_idx] = reg;
 }
 
-uint8_t app_get_windowcontact_reg(void)
+uint8_t app_get_windowcontact_reg(uint8_t contact_idx)
 {
-    return g_windowcontact_reg;
+    if (contact_idx >= APP_MAX_CONTACTS)
+    {
+        return 0;
+    }
+    return g_windowcontact_reg[contact_idx];
 }
 
 void app_set_mode(uint8_t mode)
@@ -476,7 +485,8 @@ void app_on_minute(void)
     int8_t alarm_idx = -1;
 
     if (alarm_check(&alarm_idx)) {
-        /// @todo implement timed heater settings
+        uint16_t setpoint = app_get_alarm_setpoint(alarm_idx);
+        app_set_desired_temp(setpoint, true);
     }
 }
 

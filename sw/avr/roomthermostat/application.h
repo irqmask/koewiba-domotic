@@ -58,9 +58,9 @@ void app_set_windowcontact_moduleid(uint16_t moduleid);
 
 uint16_t app_get_windowcontact_moduleid(void);
 
-void app_set_windowcontact_reg(uint8_t reg);
+void app_set_windowcontact_reg(uint8_t contact_idx, uint8_t reg);
 
-uint8_t app_get_windowcontact_reg(void);
+uint8_t app_get_windowcontact_reg(uint8_t contact_idx);
 
 void app_set_mode(uint8_t mode);
 
@@ -73,6 +73,8 @@ uint16_t app_get_windowopen_temperature(void);
 void app_set_vacation_temperature(uint16_t temp);
 
 uint16_t app_get_vacation_temperature(void);
+
+uint16_t app_get_alarm_setpoint(uint8_t alarm_idx);
 
 void app_draw_desired_temp(void);
 

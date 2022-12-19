@@ -34,19 +34,19 @@
     },
     {
       "index": 19,
-      "name": "WindowSensorModuleID1",
+      "name": "WindowSensorModuleID",
       "type": "U16",
       "access": "rw"
     },
     {
       "index": 20,
-      "name": "WindowSensor1Reg",
+      "name": "WindowSensor0Reg",
       "type": "U8",
       "access": "rw"
     },
     {
       "index": 21,
-      "name": "WindowSensor2Reg",
+      "name": "WindowSensor1Reg",
       "type": "U8",
       "access": "rw"
     },
@@ -68,124 +68,124 @@
       "type": "U16",
       "access": "rw"
     },
-    
-    
+
+
     {
       "index": 26,
-      "name": "Temp1_Weekday",
+      "name": "Temp0_Weekday",
       "type": "U8",
       "access": "rw"
     },
     {
       "index": 27,
-      "name": "Temp1_Hour",
+      "name": "Temp0_Hour",
       "type": "U8",
       "access": "rw"
     },
     {
       "index": 28,
-      "name": "Temp1_Minute",
+      "name": "Temp0_Minute",
       "type": "U8",
       "access": "rw"
     },
     {
       "index": 29,
-      "name": "Temp1_Temperature",
+      "name": "Temp0_Temperature",
       "type": "U16",
       "access": "rw"
     },
     {
       "index": 31,
-      "name": "Temp2_Weekday",
+      "name": "Temp1_Weekday",
       "type": "U8",
       "access": "rw"
     },
     {
       "index": 32,
-      "name": "Temp2_Hour",
+      "name": "Temp1_Hour",
       "type": "U8",
       "access": "rw"
     },
     {
       "index": 33,
-      "name": "Temp2_Minute",
+      "name": "Temp1_Minute",
       "type": "U8",
       "access": "rw"
     },
     {
       "index": 34,
-      "name": "Temp2_Temperature",
+      "name": "Temp1_Temperature",
       "type": "U16",
       "access": "rw"
     },
     {
       "index": 36,
-      "name": "Temp3_Weekday",
+      "name": "Temp2_Weekday",
       "type": "U8",
       "access": "rw"
     },
     {
       "index": 37,
-      "name": "Temp3_Hour",
+      "name": "Temp2_Hour",
       "type": "U8",
       "access": "rw"
     },
     {
       "index": 38,
-      "name": "Temp3_Minute",
+      "name": "Temp2_Minute",
       "type": "U8",
       "access": "rw"
     },
     {
       "index": 39,
-      "name": "Temp3_Temperature",
+      "name": "Temp2_Temperature",
       "type": "U16",
       "access": "rw"
-    },    
+    },
     {
       "index": 41,
-      "name": "Temp4_Weekday",
+      "name": "Temp3_Weekday",
       "type": "U8",
       "access": "rw"
     },
     {
       "index": 42,
-      "name": "Temp4_Hour",
+      "name": "Temp3_Hour",
       "type": "U8",
       "access": "rw"
     },
     {
       "index": 43,
-      "name": "Temp4_Minute",
+      "name": "Temp3_Minute",
       "type": "U8",
       "access": "rw"
     },
     {
       "index": 44,
-      "name": "Temp4_Temperature",
+      "name": "Temp3_Temperature",
       "type": "U16",
       "access": "rw"
     },    {
       "index": 46,
-      "name": "Temp5_Weekday",
+      "name": "Temp4_Weekday",
       "type": "U8",
       "access": "rw"
     },
     {
       "index": 47,
-      "name": "Temp5_Hour",
+      "name": "Temp4_Hour",
       "type": "U8",
       "access": "rw"
     },
     {
       "index": 48,
-      "name": "Temp5_Minute",
+      "name": "Temp4_Minute",
       "type": "U8",
       "access": "rw"
     },
     {
       "index": 49,
-      "name": "Temp5_Temperature",
+      "name": "Temp4_Temperature",
       "type": "U16",
       "access": "rw"
     },

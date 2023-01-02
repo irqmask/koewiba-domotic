@@ -21,14 +21,18 @@ public:
 
 protected:
 
-    uint16_t getRegIndexFromJson(const nlohmann::json &j);
-    RegType getRegTypeFromJson(const nlohmann::json &j);
-    uint8_t getRegAccessFromJson(const nlohmann::json &j);
-    std::string getRegNameFromJson(const nlohmann::json &j);
+    uint16_t getRegIndexFromJson(const nlohmann::json &j) const;
+    RegType getRegTypeFromJson(const nlohmann::json &j) const;
+    uint8_t getRegAccessFromJson(const nlohmann::json &j) const;
+    std::string getRegNameFromJson(const nlohmann::json &j) const;
+    ValueFormat getValueFormatFromJson(const nlohmann::json &j) const;
     template <typename T>
-    T getRegValueFromJson(const nlohmann::json &j);
-
-    std::string regAccessToJson(uint8_t access);
+    T getRegValueFromJson(const nlohmann::json &j, ValueFormat format) const;
+    template <typename T>
+    std::string valueToBinaryString(T value) const;
+    template <typename T>
+    std::string valueToString(T value, ValueFormat format) const;
+    std::string regAccessToString(uint8_t access) const;
 
     std::vector<BaseRegister> loadLayoutFile(std::string filename);
 

@@ -6,12 +6,14 @@
       "index": 1,
       "name": "ModuleID",
       "type": "U16",
+      "format": "hex",
       "access": "r"
     },
     {
       "index": 2,
       "name": "BldFlag",
       "type": "U8",
+      "format": "hex",
       "access": "r"
     },
     {
@@ -48,6 +50,7 @@
       "index": 21,
       "name": "Chn0Timer0_Weekday",
       "type": "U8",
+      "format": "bin",
       "access": "rw"
     },
     {
@@ -72,6 +75,7 @@
       "index": 25,
       "name": "Chn0Timer1_Weekday",
       "type": "U8",
+      "format": "bin",
       "access": "rw"
     },
     {
@@ -96,6 +100,7 @@
       "index": 29,
       "name": "Chn0Timer2_Weekday",
       "type": "U8",
+      "format": "bin",
       "access": "rw"
     },
     {
@@ -120,6 +125,7 @@
       "index": 33,
       "name": "Chn0Timer3_Weekday",
       "type": "U8",
+      "format": "bin",
       "access": "rw"
     },
     {
@@ -144,6 +150,7 @@
       "index": 37,
       "name": "Chn0Timer4_Weekday",
       "type": "U8",
+      "format": "bin",
       "access": "rw"
     },
     {
@@ -168,6 +175,7 @@
       "index": 41,
       "name": "Chn0Timer5_Weekday",
       "type": "U8",
+      "format": "bin",
       "access": "rw"
     },
     {
@@ -192,6 +200,7 @@
       "index": 45,
       "name": "Chn0Timer6_Weekday",
       "type": "U8",
+      "format": "bin",
       "access": "rw"
     },
     {
@@ -216,6 +225,7 @@
       "index": 49,
       "name": "Chn0Timer7_Weekday",
       "type": "U8",
+      "format": "bin",
       "access": "rw"
     },
     {
@@ -271,6 +281,7 @@
       "index": 61,
       "name": "Chn1Timer0_Weekday",
       "type": "U8",
+      "format": "bin",
       "access": "rw"
     },
     {
@@ -295,6 +306,7 @@
       "index": 65,
       "name": "Chn1Timer1_Weekday",
       "type": "U8",
+      "format": "bin",
       "access": "rw"
     },
     {
@@ -319,6 +331,7 @@
       "index": 69,
       "name": "Chn1Timer2_Weekday",
       "type": "U8",
+      "format": "bin",
       "access": "rw"
     },
     {
@@ -343,6 +356,7 @@
       "index": 73,
       "name": "Chn1Timer3_Weekday",
       "type": "U8",
+      "format": "bin",
       "access": "rw"
     },
     {
@@ -367,6 +381,7 @@
       "index": 77,
       "name": "Chn1Timer4_Weekday",
       "type": "U8",
+      "format": "bin",
       "access": "rw"
     },
     {
@@ -391,6 +406,7 @@
       "index": 81,
       "name": "Chn1Timer5_Weekday",
       "type": "U8",
+      "format": "bin",
       "access": "rw"
     },
     {
@@ -415,6 +431,7 @@
       "index": 85,
       "name": "Chn1Timer6_Weekday",
       "type": "U8",
+      "format": "bin",
       "access": "rw"
     },
     {
@@ -439,6 +456,7 @@
       "index": 89,
       "name": "Chn1Timer7_Weekday",
       "type": "U8",
+      "format": "bin",
       "access": "rw"
     },
     {
@@ -494,6 +512,7 @@
       "index": 101,
       "name": "Chn2Timer0_Weekday",
       "type": "U8",
+      "format": "bin",
       "access": "rw"
     },
     {
@@ -518,6 +537,7 @@
       "index": 105,
       "name": "Chn2Timer1_Weekday",
       "type": "U8",
+      "format": "bin",
       "access": "rw"
     },
     {
@@ -542,6 +562,7 @@
       "index": 109,
       "name": "Chn2Timer2_Weekday",
       "type": "U8",
+      "format": "bin",
       "access": "rw"
     },
     {
@@ -566,6 +587,7 @@
       "index": 113,
       "name": "Chn2Timer3_Weekday",
       "type": "U8",
+      "format": "bin",
       "access": "rw"
     },
     {
@@ -590,6 +612,7 @@
       "index": 117,
       "name": "Chn2Timer4_Weekday",
       "type": "U8",
+      "format": "bin",
       "access": "rw"
     },
     {
@@ -614,6 +637,7 @@
       "index": 121,
       "name": "Chn2Timer5_Weekday",
       "type": "U8",
+      "format": "bin",
       "access": "rw"
     },
     {
@@ -638,6 +662,7 @@
       "index": 125,
       "name": "Chn2Timer6_Weekday",
       "type": "U8",
+      "format": "bin",
       "access": "rw"
     },
     {
@@ -662,6 +687,7 @@
       "index": 129,
       "name": "Chn2Timer7_Weekday",
       "type": "U8",
+      "format": "bin",
       "access": "rw"
     },
     {
@@ -717,6 +743,7 @@
       "index": 141,
       "name": "Chn3Timer0_Weekday",
       "type": "U8",
+      "format": "bin",
       "access": "rw"
     },
     {
@@ -741,6 +768,7 @@
       "index": 145,
       "name": "Chn3Timer1_Weekday",
       "type": "U8",
+      "format": "bin",
       "access": "rw"
     },
     {
@@ -765,6 +793,7 @@
       "index": 149,
       "name": "Chn3Timer2_Weekday",
       "type": "U8",
+      "format": "bin",
       "access": "rw"
     },
     {
@@ -789,6 +818,7 @@
       "index": 153,
       "name": "Chn3Timer3_Weekday",
       "type": "U8",
+      "format": "bin",
       "access": "rw"
     },
     {
@@ -813,6 +843,7 @@
       "index": 157,
       "name": "Chn3Timer4_Weekday",
       "type": "U8",
+      "format": "bin",
       "access": "rw"
     },
     {
@@ -837,6 +868,7 @@
       "index": 161,
       "name": "Chn3Timer5_Weekday",
       "type": "U8",
+      "format": "bin",
       "access": "rw"
     },
     {
@@ -861,6 +893,7 @@
       "index": 165,
       "name": "Chn3Timer6_Weekday",
       "type": "U8",
+      "format": "bin",
       "access": "rw"
     },
     {
@@ -885,6 +918,7 @@
       "index": 169,
       "name": "Chn3Timer7_Weekday",
       "type": "U8",
+      "format": "bin",
       "access": "rw"
     },
     {
@@ -940,6 +974,7 @@
       "index": 181,
       "name": "Chn4Timer0_Weekday",
       "type": "U8",
+      "format": "bin",
       "access": "rw"
     },
     {
@@ -964,6 +999,7 @@
       "index": 185,
       "name": "Chn4Timer1_Weekday",
       "type": "U8",
+      "format": "bin",
       "access": "rw"
     },
     {
@@ -988,6 +1024,7 @@
       "index": 189,
       "name": "Chn4Timer2_Weekday",
       "type": "U8",
+      "format": "bin",
       "access": "rw"
     },
     {
@@ -1012,6 +1049,7 @@
       "index": 193,
       "name": "Chn4Timer3_Weekday",
       "type": "U8",
+      "format": "bin",
       "access": "rw"
     },
     {
@@ -1036,6 +1074,7 @@
       "index": 197,
       "name": "Chn4Timer4_Weekday",
       "type": "U8",
+      "format": "bin",
       "access": "rw"
     },
     {
@@ -1060,6 +1099,7 @@
       "index": 201,
       "name": "Chn4Timer5_Weekday",
       "type": "U8",
+      "format": "bin",
       "access": "rw"
     },
     {
@@ -1084,6 +1124,7 @@
       "index": 205,
       "name": "Chn4Timer6_Weekday",
       "type": "U8",
+      "format": "bin",
       "access": "rw"
     },
     {
@@ -1108,6 +1149,7 @@
       "index": 209,
       "name": "Chn4Timer7_Weekday",
       "type": "U8",
+      "format": "bin",
       "access": "rw"
     },
     {
@@ -1175,30 +1217,35 @@
       "index": 230,
       "name": "DeviceSignature0",
       "type": "U8",
+      "format": "hex",
       "access": "r"
     },
     {
       "index": 231,
       "name": "DeviceSignature1",
       "type": "U8",
+      "format": "hex",
       "access": "r"
     },
     {
       "index": 232,
       "name": "DeviceSignature2",
       "type": "U8",
+      "format": "hex",
       "access": "r"
     },
     {
       "index": 233,
       "name": "DeviceSignature3",
       "type": "U8",
+      "format": "hex",
       "access": "r"
     },
     {
       "index": 234,
       "name": "BoardID",
       "type": "U16",
+      "format": "hex",
       "access": "r"
     },
     {
@@ -1211,6 +1258,7 @@
       "index": 236,
       "name": "AppID",
       "type": "U16",
+      "format": "hex",
       "access": "r"
     },
     {
@@ -1235,6 +1283,7 @@
       "index": 240,
       "name": "AppVersionHash",
       "type": "U32",
+      "format": "hex",
       "access": "r"
     }
     ]

@@ -16,6 +16,29 @@
 
 using namespace nlohmann;
 
+NLOHMANN_JSON_SERIALIZE_ENUM( RegType, {
+    {RegType::eINVALID, nullptr},
+    {RegType::eU8, "u8"},
+    {RegType::eU8, "U8"},
+    {RegType::eU16, "u16"},
+    {RegType::eU16, "U16"},
+    {RegType::eU32, "u32"},
+    {RegType::eU32, "U32"},
+    {RegType::eI8, "i8"},
+    {RegType::eI8, "I8"},
+    {RegType::eI16, "i16"},
+    {RegType::eI16, "I16"},
+    {RegType::eI32, "i32"},
+    {RegType::eI32, "I32"},
+})
+
+// map TaskState values to JSON as strings
+NLOHMANN_JSON_SERIALIZE_ENUM( ValueFormat, {
+    {ValueFormat::eBINARY, "bin"},
+    {ValueFormat::eOCTAL, "oct"},
+    {ValueFormat::eDECIMAL, "dec"},
+    {ValueFormat::eHEXADECIMAL, "hex"},
+})
 
 //----------------------------------------------------------------------------
 BackupRestore::BackupRestore(Application &app)
@@ -53,8 +76,9 @@ void BackupRestore::backup(uint16_t moduleId, const std::string & regValueFile, 
         auto jr = json::object();
         jr["index"] = r.index;
         jr["type"] = r.type;
-        jr["access"] = regAccessToJson(r.accessMask);
-        jr["value"] = r.value;
+        jr["access"] = regAccessToString(r.accessMask);
+        jr["format"] = r.format;
+        jr["value"] = valueToString(r.value, r.format);
         jr["name"] = r.name;
         jregs.emplace_back(jr);
     }
@@ -116,7 +140,7 @@ void BackupRestore::restore(uint16_t moduleId,
 }
 
 //----------------------------------------------------------------------------
-uint16_t BackupRestore::getRegIndexFromJson(const json &j)
+uint16_t BackupRestore::getRegIndexFromJson(const json &j) const
 {
 
     if (!j.contains("index")) {
@@ -132,24 +156,8 @@ uint16_t BackupRestore::getRegIndexFromJson(const json &j)
     return val;
 }
 
-NLOHMANN_JSON_SERIALIZE_ENUM( RegType, {
-    {RegType::eINVALID, nullptr},
-    {RegType::eU8, "u8"},
-    {RegType::eU8, "U8"},
-    {RegType::eU16, "u16"},
-    {RegType::eU16, "U16"},
-    {RegType::eU32, "u32"},
-    {RegType::eU32, "U32"},
-    {RegType::eI8, "i8"},
-    {RegType::eI8, "I8"},
-    {RegType::eI16, "i16"},
-    {RegType::eI16, "I16"},
-    {RegType::eI32, "i32"},
-    {RegType::eI32, "I32"},
-})
-
 //----------------------------------------------------------------------------
-RegType BackupRestore::getRegTypeFromJson(const json &j)
+RegType BackupRestore::getRegTypeFromJson(const json &j) const
 {
     if (!j.contains("type")) {
         throw InvalidParameter(LOC, "Missing parameter 'type'. expected entity 'type' beeing 'u8', 'u16', 'u32', 'i8', 'i16', 'i32' !");
@@ -159,7 +167,7 @@ RegType BackupRestore::getRegTypeFromJson(const json &j)
 }
 
 //----------------------------------------------------------------------------
-uint8_t BackupRestore::getRegAccessFromJson(const nlohmann::json &j)
+uint8_t BackupRestore::getRegAccessFromJson(const nlohmann::json &j) const
 {
     if (!j.contains("access")) {
         throw InvalidParameter(LOC, "Missing parameter 'access'. expected entity 'access' beeing '', 'r', 'rw' !");
@@ -177,7 +185,7 @@ uint8_t BackupRestore::getRegAccessFromJson(const nlohmann::json &j)
 }
 
 //----------------------------------------------------------------------------
-std::string BackupRestore::getRegNameFromJson(const nlohmann::json &j)
+std::string BackupRestore::getRegNameFromJson(const nlohmann::json &j) const
 {
     if (!j.contains("name")) {
         throw InvalidParameter(LOC, "Missing parameter 'name'!");
@@ -188,22 +196,89 @@ std::string BackupRestore::getRegNameFromJson(const nlohmann::json &j)
 }
 
 //----------------------------------------------------------------------------
+ValueFormat BackupRestore::getValueFormatFromJson(const nlohmann::json &j) const
+{
+    ValueFormat format = ValueFormat::eDECIMAL;
+    if (j.contains("format")) {
+        format = j["format"];
+    }
+    return format;
+}
+
+//----------------------------------------------------------------------------
 template <typename T>
-T BackupRestore::getRegValueFromJson(const nlohmann::json &j)
+T BackupRestore::getRegValueFromJson(const nlohmann::json &j, ValueFormat format) const
 {
     if (!j.contains("value")) {
         throw InvalidParameter(LOC, "Missing parameter 'value'!");
     }
-    if (!j["value"].is_number()) {
-        throw InvalidParameter(LOC, "Expected parameter 'value' beeing value!");
+    if (!j["value"].is_string()) {
+        throw InvalidParameter(LOC, "Expected parameter 'value' beeing string!");
     }
-    T v = j.value<T>("value", 0);
+    std::string valuestr = j["value"];
+    T v;
+    switch (format)
+    {
+    case ValueFormat::eBINARY:
+        v = strtol(valuestr.c_str(), nullptr, 2);
+        break;
+    case ValueFormat::eOCTAL:
+        v = strtol(valuestr.c_str(), nullptr, 8);
+        break;
+    case ValueFormat::eDECIMAL:
+        v = strtol(valuestr.c_str(), nullptr, 10);
+        break;
+    case ValueFormat::eHEXADECIMAL:
+        v = strtol(valuestr.c_str(), nullptr, 16);
+        break;
+    default:
+        throw InvalidParameter(LOC, "unknown format");
+    }
 
     return v;
 }
 
 //----------------------------------------------------------------------------
-std::string BackupRestore::regAccessToJson(uint8_t access)
+template<typename T>
+std::string BackupRestore::valueToBinaryString(T value) const
+{
+    std::stringstream ss;
+    while (value > 0) {
+        ss << (value % 2);
+        value /= 2;
+    }
+    std::string binary = ss.str();
+    std::reverse(binary.begin(), binary.end());
+    return binary;
+}
+
+//----------------------------------------------------------------------------
+template<typename T>
+std::string BackupRestore::valueToString(T value, ValueFormat format) const
+{
+    std::stringstream ss;
+    switch (format)
+    {
+    case ValueFormat::eBINARY:
+        ss << valueToBinaryString(value);
+        break;
+    case ValueFormat::eOCTAL:
+        ss << std::oct << value;
+        break;
+    case ValueFormat::eDECIMAL:
+        ss << value;
+        break;
+    case ValueFormat::eHEXADECIMAL:
+        ss << std::hex << value;
+        break;
+    default:
+        throw InvalidParameter(LOC, "unknown format");
+    }
+    return ss.str();
+}
+
+//----------------------------------------------------------------------------
+std::string BackupRestore::regAccessToString(uint8_t access) const
 {
     switch (access) {
     case eREG_ACCESS_READ:
@@ -241,6 +316,7 @@ std::vector<BaseRegister> BackupRestore::loadLayoutFile(std::string filename)
         br.type = getRegTypeFromJson(*it);
         br.accessMask = getRegAccessFromJson(*it);
         br.name = getRegNameFromJson(*it);
+        br.format = getValueFormatFromJson(*it);
         regs.push_back(br);
     }
     return regs;
@@ -288,24 +364,25 @@ std::vector<BaseRegister> BackupRestore::loadValueFile(std::string filename,
             br.type = getRegTypeFromJson(*it);
             br.accessMask = getRegAccessFromJson(*it);
             br.name = getRegNameFromJson(*it);
+            br.format = getValueFormatFromJson(*it);
             switch (br.type) {
             case RegType::eU8:
-                br.value = getRegValueFromJson<uint8_t>(*it);
+                br.value = getRegValueFromJson<uint8_t>(*it, br.format);
                 break;
             case RegType::eU16:
-                br.value = getRegValueFromJson<uint16_t>(*it);
+                br.value = getRegValueFromJson<uint16_t>(*it, br.format);
                 break;
             case RegType::eU32:
-                br.value = getRegValueFromJson<uint32_t>(*it);
+                br.value = getRegValueFromJson<uint32_t>(*it, br.format);
                 break;
             case RegType::eI8:
-                br.value = getRegValueFromJson<int8_t>(*it);
+                br.value = getRegValueFromJson<int8_t>(*it, br.format);
                 break;
             case RegType::eI16:
-                br.value = getRegValueFromJson<int16_t>(*it);
+                br.value = getRegValueFromJson<int16_t>(*it, br.format);
                 break;
             case RegType::eI32:
-                br.value = getRegValueFromJson<int32_t>(*it);
+                br.value = getRegValueFromJson<int32_t>(*it, br.format);
                 break;
             default:
                 br.value = 0;
@@ -317,4 +394,3 @@ std::vector<BaseRegister> BackupRestore::loadValueFile(std::string filename,
 
     return regs;
 }
-

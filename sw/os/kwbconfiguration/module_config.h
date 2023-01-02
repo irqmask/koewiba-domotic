@@ -27,6 +27,13 @@ enum RegAccess
     eREG_ACCESS_WRITE = 2
 };
 
+enum class ValueFormat
+{
+    eBINARY,
+    eDECIMAL,
+    eOCTAL,
+    eHEXADECIMAL
+};
 
 class BaseRegister
 {
@@ -36,6 +43,7 @@ public:
     uint8_t accessMask;
     std::string name;
     int32_t value;
+    ValueFormat format = ValueFormat::eDECIMAL;
 };
 
 

@@ -6,12 +6,14 @@
       "index": 1,
       "name": "ModuleID",
       "type": "U16",
+      "format": "hex",
       "access": "r"
     },
     {
       "index": 2,
       "name": "BldFlag",
       "type": "U8",
+      "format": "hex",
       "access": "r"
     },
     {
@@ -74,6 +76,7 @@
       "index": 26,
       "name": "Temp0_Weekday",
       "type": "U8",
+      "format": "bin",
       "access": "rw"
     },
     {
@@ -98,6 +101,7 @@
       "index": 31,
       "name": "Temp1_Weekday",
       "type": "U8",
+      "format": "bin",
       "access": "rw"
     },
     {
@@ -122,6 +126,7 @@
       "index": 36,
       "name": "Temp2_Weekday",
       "type": "U8",
+      "format": "bin",
       "access": "rw"
     },
     {
@@ -146,6 +151,7 @@
       "index": 41,
       "name": "Temp3_Weekday",
       "type": "U8",
+      "format": "bin",
       "access": "rw"
     },
     {
@@ -169,6 +175,7 @@
       "index": 46,
       "name": "Temp4_Weekday",
       "type": "U8",
+      "format": "bin",
       "access": "rw"
     },
     {
@@ -235,30 +242,35 @@
       "index": 230,
       "name": "DeviceSignature0",
       "type": "U8",
+      "format": "hex",
       "access": "r"
     },
     {
       "index": 231,
       "name": "DeviceSignature1",
       "type": "U8",
+      "format": "hex",
       "access": "r"
     },
     {
       "index": 232,
       "name": "DeviceSignature2",
       "type": "U8",
+      "format": "hex",
       "access": "r"
     },
     {
       "index": 233,
       "name": "DeviceSignature3",
       "type": "U8",
+      "format": "hex",
       "access": "r"
     },
     {
       "index": 234,
       "name": "BoardID",
       "type": "U16",
+      "format": "hex",
       "access": "r"
     },
     {
@@ -271,6 +283,7 @@
       "index": 236,
       "name": "AppID",
       "type": "U16",
+      "format": "hex",
       "access": "r"
     },
     {
@@ -295,6 +308,7 @@
       "index": 240,
       "name": "AppVersionHash",
       "type": "U32",
+      "format": "hex",
       "access": "r"
     }
     ]

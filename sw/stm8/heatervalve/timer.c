@@ -28,7 +28,7 @@
 
 #include "timer.h"
 
-#include "STM8L052C6.h"
+#include <stm8l15x_tim1.h>
 
 #ifdef HAS_APPCONFIG_H
  #include "appconfig.h"
@@ -36,21 +36,21 @@
 
 // --- Definitions -------------------------------------------------------------
 
-#define TIM2_OVF_ISR 19
+#define TIMER_TICK_PRESCALER            10
+#define TIMER_TICK_PERIOD               199
+#define TIMER_TICK_REPTETION_COUNTER    0
 
 // --- Type definitions --------------------------------------------------------
 
 // --- Local variables ---------------------------------------------------------
 
-volatile uint32_t g_tim2_millis = 0;
+volatile uint32_t g_millisec_ticks = 0;
 
 // --- Global variables --------------------------------------------------------
 
 // --- Module global variables -------------------------------------------------
 
 // --- Local functions ---------------------------------------------------------
-
-
 
 // --- Module global functions -------------------------------------------------
 
@@ -61,29 +61,49 @@ volatile uint32_t g_tim2_millis = 0;
  */
 void timer_initialize(void)
 {
-    g_tim2_millis = 0;
+ //   g_tim2_millis = 0;
     // 16000 ticks
-    TIM2_ARRH = 0x3E;
-    TIM2_ARRL = 0x80;
+ //   TIM2_ARRH = 0x3E;
+ //   TIM2_ARRL = 0x80;
     //TIM2_PSCR = 0b010;
 
-    TIM2_IER |= 0x1; // Update interrupt
-    TIM2_CR1 = 0x1; // enable timer
-
+   // TIM2_IER |= 0x1; // Update interrupt
+   // TIM2_CR1 = 0x1; // enable timer
+    g_millisec_ticks = 0;
+    CLK_PeripheralClockConfig(CLK_Peripheral_TIM1, ENABLE);
+    TIM1_TimeBaseInit(TIMER_TICK_PRESCALER,
+                      TIM1_CounterMode_Up,
+                      TIMER_TICK_PERIOD,
+                      TIMER_TICK_REPTETION_COUNTER);
+    TIM1_ITConfig(TIM1_IT_Update, ENABLE);
+    TIM1_Cmd(ENABLE);
 }
 
 
-uint32_t timer_get_millis()
+void timer_irq_handler(void)
 {
-    return g_tim2_millis;
+    g_millisec_ticks++;
+}
+
+
+uint32_t timer_get_millis(void)
+{
+    return g_millisec_ticks;
 }
 
 
 void delay_ms(uint16_t ms)
 {
     uint32_t start = timer_get_millis();
-    while ((timer_get_millis() - start) < ms)
-        ;
+    while ((timer_get_millis() - start) < ms);
 }
+
+/*
+void TIM1_UPD_OVF_TRG_COM_IRQHandler() __interrupt(IPT_TIM1_UPD_OVF_TRG_COM)
+{
+    timer_irq_handler();
+    TIM1_ClearITPendingBit(TIM1_IT_Update);
+}*/
+
 
 /** @} */

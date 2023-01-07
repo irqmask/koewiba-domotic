@@ -42,6 +42,8 @@
 
 void timer_initialize(void);
 
+void timer_irq_handler(void);
+
 uint32_t timer_get_millis(void);
 
 void delay_ms(uint16_t ms);

@@ -30,6 +30,7 @@
 
 // --- Include section ---------------------------------------------------------
 
+#include <stdbool.h>
 #include <stdint.h>
 
 // --- Definitions -------------------------------------------------------------
@@ -40,7 +41,28 @@
 
 // --- Global functions --------------------------------------------------------
 
+/**
+ * Initialize LCD preipheral
+ */
 void lcd_initialize(void);
+
+/**
+ * Switch blinking display on or off
+ * @param[in]   on      true = blinking, otherwise false
+ */
+void lcd_blink(bool on);
+
+void lcd_test(void);
+
+void lcd_digit0(char value);
+
+void lcd_digit1(char value);
+
+void lcd_digit2(char value);
+
+void lcd_digit3(char value);
+
+void lcd_digit(uint8_t index, char value);
 
 #endif // _STM8_LCD_H_
 /** @} */

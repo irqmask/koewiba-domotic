@@ -28,7 +28,8 @@
 
 #include "uart.h"
 
-#include "STM8L052C6.h"
+//#include "STM8L052C6.h"
+#include <stm8l15x.h>
 
 #ifdef HAS_APPCONFIG_H
  #include "appconfig.h"
@@ -70,6 +71,7 @@ static void disable_uart_tx(void)
  */
 void uart_initialize(void)
 {
+    /*
     // TX: PA2, RX: PA3
     SYSCFG_RMPCR1 |= 0x10;
     PA_CR1 |= MP1;
@@ -82,7 +84,23 @@ void uart_initialize(void)
     USART1_CR3 &= ~(USART_CR3_STOP1 | USART_CR3_STOP2);
     // 57600 baud
     USART1_BRR1 = 0x11;
-    USART1_BRR2 = 0x6;
+    USART1_BRR2 = 0x6;*/
+    CLK_PeripheralClockConfig(CLK_Peripheral_USART1, ENABLE);
+    GPIO_Init(GPIOE, GPIO_Pin_7, GPIO_Mode_In_FL_No_IT);
+    SYSCFG_REMAPPinConfig(REMAP_Pin_USART1TxRxPortA, ENABLE);
+
+    GPIO_ExternalPullUpConfig(GPIOA, GPIO_Pin_2, ENABLE);
+    GPIO_ExternalPullUpConfig(GPIOA, GPIO_Pin_3, ENABLE);
+
+    USART_ITConfig(USART1, USART_IT_RXNE, DISABLE);
+    USART_Init(USART1,
+               9600, // 57600
+               USART_WordLength_8b,
+               USART_StopBits_1,
+               USART_Parity_No,
+               (USART_Mode_TypeDef)(USART_Mode_Tx | USART_Mode_Rx));
+
+    USART_Cmd(USART1, ENABLE);
 }
 
 
@@ -91,15 +109,27 @@ uint8_t uart_write(const char *str)
     uint8_t i = 0;
     enable_uart_tx();
     while (str[i] != '\0') {
-        while (!(USART1_SR & USART_SR_TXE))
-            ;
-        USART1_DR = str[i];
+        while (USART_GetFlagStatus(USART1, USART_FLAG_TC) == RESET);
+        USART_SendData8(USART1, str[i]);
+        //while (!(USART1_SR & USART_SR_TXE));
+        //USART1_DR = str[i];
         i++;
     }
     disable_uart_tx();
     return (i); // Bytes sent
 }
 
+bool uart_rx_pending(void)
+{
+    //return USART1_SR & USART_SR_RXNE;
+    return USART_GetFlagStatus(USART1, USART_FLAG_RXNE) == SET;
+}
+
+uint8_t uart_rx_data(void)
+{
+    //return USART1_DR;
+    return USART_ReceiveData8(USART1);
+}
 
 void putchar(unsigned char data)
 {
@@ -109,7 +139,6 @@ void putchar(unsigned char data)
         ;
     disable_uart_tx();
 }
-
 
 void dec2bcd(uint16_t val, char* bcdbuf)
 {
@@ -135,7 +164,6 @@ void dec2bcd(uint16_t val, char* bcdbuf)
     bcdbuf[4] = temp + '0';
 
     bcdbuf[5] = '\0';
-
 }
 
 /** @} */

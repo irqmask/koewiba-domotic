@@ -1,8 +1,8 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include <stm8l15x.h>
-#include <stm8l15x_ipt.h>
+// include
+#include "stm8l052c6.h"
 
 #include "adc.h"
 #include "cmd.h"
@@ -17,17 +17,15 @@
 
 static void initClock()
 {
-    CLK_SYSCLKSourceSwitchCmd(ENABLE);
-    CLK_SYSCLKSourceConfig(CLK_SYSCLKSource_HSI);
-    CLK_SYSCLKDivConfig(CLK_SYSCLKDiv_8);
-    while (CLK_GetSYSCLKSource() != CLK_SYSCLKSource_HSI);
+    // enable system clock
+    CLK_SWCR |= CLK_SWCR_SWEN;
+    CLK_SWR = CLK_SWR_SRC_HSI;
+    CLK_CKDIVR = CLK_CKDIV_8;
+    while (CLK_SCSR != CLK_SWR_SRC_HSI);
 
-    /* Enable external low speed crystal for RTC */
-    CLK_PeripheralClockConfig(CLK_Peripheral_RTC, ENABLE);
-    CLK_RTCClockConfig(CLK_RTCCLKSource_LSE, CLK_RTCCLKDiv_1);
-
-    //RTC_WakeUpClockConfig(RTC_WakeUpClock_RTCCLK_Div4);
-    //RTC_ITConfig(RTC_IT_WUT, ENABLE);
+    // Enable external low speed crystal for RTC
+    CLK_PCKENR2 |= CLK_PCKENR2_RTC;
+    CLK_CRTCR = CLK_RTCCLK_SRC_LSE | CLK_RTCCLK_DIV_1;
 }
 
 
@@ -36,7 +34,7 @@ void main(void)
     char c;
     //uint16_t adc, oldadc;
     int16_t diff = 0;
-    char buf[16];
+    //char buf[16];
     char ticks_written = 0;
     char lcd_test_value = 0;
     initClock();
@@ -52,8 +50,11 @@ void main(void)
     cmd_initialize();
     remts_initialize();
     ctrl_temp_initialize();
+
     LOG_DEBUG("# init complete\n");
-    lcd_test();
+
+    //lcd_test();
+
     while (1) {
         if (uart_rx_pending()) {
             c = uart_rx_data();

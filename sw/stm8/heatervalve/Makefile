@@ -8,52 +8,21 @@ MAKEFILE      = Makefile
 
 TARGET        = heatervalve
 
-#../STM8L15x_StdPeriph_Driver/src/stm8l15x_aes.c
-#../STM8L15x_StdPeriph_Driver/src/stm8l15x_beep.c
-#                ../STM8L15x_StdPeriph_Driver/src/stm8l15x_dac.c \
-#                ../STM8L15x_StdPeriph_Driver/src/stm8l15x_dma.c \
-                ../STM8L15x_StdPeriph_Driver/src/stm8l15x_i2c.c \
-                ../STM8L15x_StdPeriph_Driver/src/stm8l15x_irtim.c \
-                ../STM8L15x_StdPeriph_Driver/src/stm8l15x_itc.c \
-                ../STM8L15x_StdPeriph_Driver/src/stm8l15x_iwdg.c \
-                ../STM8L15x_StdPeriph_Driver/src/stm8l15x_wfe.c \
-                ../STM8L15x_StdPeriph_Driver/src/stm8l15x_wwdg.c \
-                ../STM8L15x_StdPeriph_Driver/src/stm8l15x_tim3.c \
-                ../STM8L15x_StdPeriph_Driver/src/stm8l15x_tim4.c \
-                ../STM8L15x_StdPeriph_Driver/src/stm8l15x_tim5.c \
-                ../STM8L15x_StdPeriph_Driver/src/stm8l15x_comp.c \
-                ../STM8L15x_StdPeriph_Driver/src/stm8l15x_flash.c \
-                ../STM8L15x_StdPeriph_Driver/src/stm8l15x_adc.c \
-                ../STM8L15x_StdPeriph_Driver/src/stm8l15x_rtc.c \
-                ../STM8L15x_StdPeriph_Driver/src/stm8l15x_exti.c \
-                ../STM8L15x_StdPeriph_Driver/src/stm8l15x_tim2.c \
-                
-SOURCES       = ../STM8L15x_StdPeriph_Driver/src/stm8l15x_clk.c \
-                ../STM8L15x_StdPeriph_Driver/src/stm8l15x_gpio.c \
-                ../STM8L15x_StdPeriph_Driver/src/stm8l15x_lcd.c \
-                ../STM8L15x_StdPeriph_Driver/src/stm8l15x_pwr.c \
-                ../STM8L15x_StdPeriph_Driver/src/stm8l15x_rst.c \
-                ../STM8L15x_StdPeriph_Driver/src/stm8l15x_spi.c \
-                ../STM8L15x_StdPeriph_Driver/src/stm8l15x_syscfg.c \
-                ../STM8L15x_StdPeriph_Driver/src/stm8l15x_tim1.c \
-                ../STM8L15x_StdPeriph_Driver/src/stm8l15x_usart.c \
-                adc.c \
+SOURCES       = adc.c \
                 cmd.c \
                 control_temp.c \
                 lcd.c \
                 main.c \
                 motor.c \
                 remote_tempsense.c \
-                stm8l15x_ipt.c \
                 timer.c \
                 uart.c \
 
-INCPATH       = -I. -I/usr/local/share/sdcc/include -I../STM8L15x_StdPeriph_Driver/inc
+INCPATH       = -I. -I ../include -I/usr/local/share/sdcc/include
 
 ####### Output directories
 
 BUILDDIR      = ../build/$(TARGET)
-BUILDDIRSPL   = ../build/STM8L15x_StdPeriph_Driver/src
 DESTDIR       = ../bin
 
 OBJECTS       = $(SOURCES:.c=.rel)
@@ -105,7 +74,6 @@ release: $(TARGET)
 
 dirs:
 	@test -d $(BUILDDIR)/ || mkdir -p $(BUILDDIR)/
-	@test -d $(BUILDDIRSPL) || mkdir -p $(BUILDDIRSPL) 
 	@test -d $(DESTDIR)/ || mkdir -p $(DESTDIR)/
 
 $(TARGET): dirs $(OBJECTS)

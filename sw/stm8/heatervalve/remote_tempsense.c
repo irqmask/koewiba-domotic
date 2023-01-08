@@ -30,7 +30,6 @@
 #include "remote_tempsense.h"
 
 #include <stdint.h>
-#include "STM8L052C6.h"
 
 #ifdef HAS_APPCONFIG_H
  #include "appconfig.h"

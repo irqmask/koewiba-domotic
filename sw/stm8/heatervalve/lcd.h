@@ -42,7 +42,7 @@
 // --- Global functions --------------------------------------------------------
 
 /**
- * Initialize LCD preipheral
+ * Initialize LCD peripheral
  */
 void lcd_initialize(void);
 
@@ -52,15 +52,6 @@ void lcd_initialize(void);
  */
 void lcd_blink(bool on);
 
-void lcd_test(void);
-
-void lcd_digit0(char value);
-
-void lcd_digit1(char value);
-
-void lcd_digit2(char value);
-
-void lcd_digit3(char value);
 
 void lcd_digit(uint8_t index, char value);
 

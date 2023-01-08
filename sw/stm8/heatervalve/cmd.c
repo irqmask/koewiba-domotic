@@ -32,7 +32,8 @@
 #include <stdint.h>
 #include <stdio.h>
 
-#include "STM8L052C6.h"
+// include
+#include "stm8l052c6.h"
 
 #include "control_temp.h"
 #include "motor.h"
@@ -148,7 +149,7 @@ static void interpret_command(void)
         offset = get_val_u16(&success);
         if (success) {
             value = peek(offset);
-            printf("PEEK 0 %04x\n", value);
+            printf("PEEK 0 %02x\n", value);
         }
     }
     else if (starts_with("poke")) {

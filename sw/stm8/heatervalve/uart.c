@@ -28,16 +28,14 @@
 
 #include "uart.h"
 
-//#include "STM8L052C6.h"
-#include <stm8l15x.h>
+// include
+#include "stm8l052c6.h"
 
 #ifdef HAS_APPCONFIG_H
  #include "appconfig.h"
 #endif
 
 // --- Definitions -------------------------------------------------------------
-
-#define MP1 (1 << 2)
 
 // --- Type definitions --------------------------------------------------------
 
@@ -51,7 +49,7 @@
 
 static void enable_uart_tx(void)
 {
-    PA_DDR |= MP1;
+    PA_DDR |= PIN_2;
     USART1_CR2 |= USART_CR2_TEN;    // enable UART
 }
 
@@ -59,7 +57,7 @@ static void enable_uart_tx(void)
 static void disable_uart_tx(void)
 {
     USART1_CR2 &= ~USART_CR2_TEN;   // disable UART to not disturb ATtiny's SPI
-    PA_DDR &= ~MP1;
+    PA_DDR &= ~PIN_2;
 }
 
 // --- Module global functions -------------------------------------------------
@@ -71,36 +69,46 @@ static void disable_uart_tx(void)
  */
 void uart_initialize(void)
 {
-    /*
-    // TX: PA2, RX: PA3
-    SYSCFG_RMPCR1 |= 0x10;
-    PA_CR1 |= MP1;
+    // enable peripheral clock
+    CLK_PCKENR1 |= CLK_PCKENR1_USART1;
+
+    PE_CR2 &= ~PIN_7; //
+    PE_DDR &= ~PIN_7; // configure as input
+    PE_CR1 &= ~PIN_7; // floating input,  no pull-up
+
+    // remap UART1 PINs TX: PA2, RX: PA3
+    SYSCFG_RMPCR1 &= ~SYSCFG_RMPCR1_USART1TXRXMASK;
+    SYSCFG_RMPCR1 |= SYSCFG_RMPCR1_USART1TXRXPORTA;
+
+    PA_DDR &= ~PIN_2;
+    PA_DDR &= ~PIN_3;
+
+    // enable receive, no interrupts
+    USART1_CR2 = USART_CR2_REN; // not USART_CR2_TEN
+    USART1_CR3 &= ~(USART_CR3_STOP1 | USART_CR3_STOP2);
+
     disable_uart_tx();
 
-    // enable transmit and receive, no interrrupts
-    USART1_CR2 = USART_CR2_REN; // not USART_CR2_TEN
+    // calculate baudrate
+    // fHSI = 16MHz, ckdiv = 8 -> fClk = 2MHz
+    // M = fClk / fBaud
 
-    // 1 stop bit
-    USART1_CR3 &= ~(USART_CR3_STOP1 | USART_CR3_STOP2);
+    //         msb              lsb
+    // BRR1 = M(15..12) | M(03..00)
+    // BRR2 = M(11..08) | M(07..04)
+
+    // 9600 baud
+    // M = fClk / fBaud = 2000000 / 9600 = 208,33 = 0xD0
+    USART1_BRR1 = 0x0D;
+    USART1_BRR2 = 0x00;
+
     // 57600 baud
-    USART1_BRR1 = 0x11;
-    USART1_BRR2 = 0x6;*/
-    CLK_PeripheralClockConfig(CLK_Peripheral_USART1, ENABLE);
-    GPIO_Init(GPIOE, GPIO_Pin_7, GPIO_Mode_In_FL_No_IT);
-    SYSCFG_REMAPPinConfig(REMAP_Pin_USART1TxRxPortA, ENABLE);
+    // M = fClk / fBaud = 2000000 / 57600 = 34,72 = 35 = 0x23
+    //USART1_BRR1 = 0x02;
+    //USART1_BRR2 = 0x03;
 
-    GPIO_ExternalPullUpConfig(GPIOA, GPIO_Pin_2, ENABLE);
-    GPIO_ExternalPullUpConfig(GPIOA, GPIO_Pin_3, ENABLE);
-
-    USART_ITConfig(USART1, USART_IT_RXNE, DISABLE);
-    USART_Init(USART1,
-               9600, // 57600
-               USART_WordLength_8b,
-               USART_StopBits_1,
-               USART_Parity_No,
-               (USART_Mode_TypeDef)(USART_Mode_Tx | USART_Mode_Rx));
-
-    USART_Cmd(USART1, ENABLE);
+    // enable USART1 (resetting disable bit)
+    USART1_CR1 &= ~USART_CR1_UARTD;
 }
 
 
@@ -109,10 +117,8 @@ uint8_t uart_write(const char *str)
     uint8_t i = 0;
     enable_uart_tx();
     while (str[i] != '\0') {
-        while (USART_GetFlagStatus(USART1, USART_FLAG_TC) == RESET);
-        USART_SendData8(USART1, str[i]);
-        //while (!(USART1_SR & USART_SR_TXE));
-        //USART1_DR = str[i];
+        while (!(USART1_SR & USART_SR_TXE));
+        USART1_DR = str[i];
         i++;
     }
     disable_uart_tx();
@@ -121,22 +127,19 @@ uint8_t uart_write(const char *str)
 
 bool uart_rx_pending(void)
 {
-    //return USART1_SR & USART_SR_RXNE;
-    return USART_GetFlagStatus(USART1, USART_FLAG_RXNE) == SET;
+    return USART1_SR & USART_SR_RXNE;
 }
 
 uint8_t uart_rx_data(void)
 {
-    //return USART1_DR;
-    return USART_ReceiveData8(USART1);
+    return USART1_DR;
 }
 
-void putchar(unsigned char data)
+void putchar (unsigned char data)
 {
     enable_uart_tx();
     USART1_DR = data;
-    while (!(USART1_SR & USART_SR_TC))
-        ;
+    while (!(USART1_SR & USART_SR_TC));
     disable_uart_tx();
 }
 

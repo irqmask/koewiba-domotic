@@ -6,8 +6,7 @@ tested on Ubuntu 18.04
 
 Install required packages
 
-    sudo apt install build-essential git cmake libmosquitto-dev 
-    
+    sudo apt install build-essential git cmake libmosquitto-dev nlohmann-json-dev
 Install required packages to build AVR firmware:
 
     sudo apt install avr-libc avrdude gcc-avr

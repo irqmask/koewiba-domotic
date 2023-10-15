@@ -29,7 +29,8 @@
 
 // --- Definitions -------------------------------------------------------------
 
-#define OWN_NODE_ID 0x0a51
+#define OWN_NODE_ID 0x0a53
+#define REC_NODE_ID 0x0a52
 
 // --- Type definitions --------------------------------------------------------
 
@@ -39,29 +40,17 @@
 
 // --- Module global variables -------------------------------------------------
 
-#if (OWN_NODE_ID == 0x0a50)
+
 app_on_key_set_register_t g_on_key_set_register[APP_NUM_KEYS] = {
-    { 0, 0x0a05, 17, 100 },
-    { 0, 0x0a05, 27, 100 },
-    { 0, 0x0a05, 37, 100 },
-    { 0, 0x0a05, 47, 100 },
-    { 0, 0x0a05, 17,   0 },
-    { 0, 0x0a05, 27,   0 },
-    { 0, 0x0a05, 37,   0 },
-    { 0, 0x0a05, 47,   0 },
+    { 0, REC_NODE_ID, 17, 100 },
+    { 0, REC_NODE_ID, 27, 100 },
+    { 0, REC_NODE_ID, 37, 100 },
+    { 0, REC_NODE_ID, 47, 100 },
+    { 0, REC_NODE_ID, 17,   0 },
+    { 0, REC_NODE_ID, 27,   0 },
+    { 0, REC_NODE_ID, 37,   0 },
+    { 0, REC_NODE_ID, 47,   0 },
 };
-#elif (OWN_NODE_ID == 0x0a51)
-app_on_key_set_register_t g_on_key_set_register[APP_NUM_KEYS] = {
-    { 0, 0x0a50, 17, 100 },
-    { 0, 0x0a50, 27, 100 },
-    { 0, 0x0a50, 37, 100 },
-    { 0, 0x0a50, 47, 100 },
-    { 0, 0x0a50, 17,   0 },
-    { 0, 0x0a50, 27,   0 },
-    { 0, 0x0a50, 37,   0 },
-    { 0, 0x0a50, 47,   0 },
-};
-#endif
 
 // --- Local functions ---------------------------------------------------------
 
@@ -107,7 +96,7 @@ extern void app_register_load (void);
  */
 void app_init (void)
 {
-    //register_set_u16(MOD_eReg_ModuleID, OWN_NODE_ID);
+    register_set_u16(MOD_eReg_ModuleID, OWN_NODE_ID);
     //app_register_load();
     leds_keys_init();
     input_initialize();

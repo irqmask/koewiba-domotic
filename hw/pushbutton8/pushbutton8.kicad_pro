@@ -345,7 +345,7 @@
     "pinned_symbol_libs": []
   },
   "meta": {
-    "filename": "pushbutton8_rev3.kicad_pro",
+    "filename": "pushbutton8.kicad_pro",
     "version": 1
   },
   "net_settings": {
@@ -398,7 +398,7 @@
     "last_paths": {
       "gencad": "",
       "idf": "",
-      "netlist": "",
+      "netlist": "pushbutton8.net",
       "specctra_dsn": "",
       "step": "",
       "vrml": ""

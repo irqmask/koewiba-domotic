@@ -39,7 +39,7 @@
 
 // --- Local variables ---------------------------------------------------------
 
-// Currently we don't need to save, if seeping was requested.
+// Currently we don't need to save, if sleeping was requested.
 // There is no mechanism to detect, when sleeping is no longer wanted
 uint8_t g_sleep_required = 0;
 uint8_t g_sleep_prevent_mask = 0;

@@ -66,23 +66,29 @@ sBus_t  g_bus;
 
 extern void app_init (void);
 
+extern void app_on_pinchangeinterrupt(uint8_t pinchange_interruptflags);
+
 extern void app_on_command (uint16_t sender, uint8_t msglen, uint8_t* msg);
 
 extern void app_background (sBus_t* bus);
 
 ISR(INTERRUPT_PINCHANGE0)
 {
-    // nothing to do here, but ISR is needed for sleep-mode
+    // ISR is needed for wake-up from sleep-mode. Inform application about the interrupt.
+	app_on_pinchangeinterrupt(PCIFR);
 }
 
 ISR(INTERRUPT_PINCHANGE1)
 {
-    // nothing to do here, but ISR is needed for sleep-mode
+    // ISR is needed for wake-up from sleep-mode. Inform application about the interrupt.
+	app_on_pinchangeinterrupt(PCIFR);
+
 }
 
 ISR(INTERRUPT_PINCHANGE2)
 {
-    // nothing to do here, but ISR is needed for sleep-mode
+    // ISR is needed for wake-up from sleep-mode. Inform application about the interrupt.
+	app_on_pinchangeinterrupt(PCIFR);
 }
 
 /**

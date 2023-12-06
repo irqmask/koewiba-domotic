@@ -74,13 +74,13 @@
  //! Defines the PORT which contains the standard slave select signal.
  #define SPI_PORT_SS    PORTB
  //! Defines the MOSI pin.
- #define SPI_MOSI       PB5
+ #define SPI_MOSI       PB3
  //! Defines the MISO pin.
- #define SPI_MISO       PB6
+ #define SPI_MISO       PB4
  //! Defines the SCK pin.
- #define SPI_SCK        PB7
+ #define SPI_SCK        PB5
  //! Defines the SS (slave select) pin.
- #define SPI_SS         PB4
+ #define SPI_SS         PB2
 #endif // SPI_PCBCONFIG
 
 /** @} */

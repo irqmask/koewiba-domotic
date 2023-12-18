@@ -75,20 +75,31 @@ extern void app_background (sBus_t* bus);
 ISR(INTERRUPT_PINCHANGE0)
 {
     // ISR is needed for wake-up from sleep-mode. Inform application about the interrupt.
-	app_on_pinchangeinterrupt(PCIFR);
+#ifdef __AVR_ATtiny1634__
+    app_on_pinchangeinterrupt(GIFR);
+#else
+    app_on_pinchangeinterrupt(PCIFR);
+#endif
 }
 
 ISR(INTERRUPT_PINCHANGE1)
 {
     // ISR is needed for wake-up from sleep-mode. Inform application about the interrupt.
-	app_on_pinchangeinterrupt(PCIFR);
-
+#ifdef __AVR_ATtiny1634__
+    app_on_pinchangeinterrupt(GIFR);
+#else
+    app_on_pinchangeinterrupt(PCIFR);
+#endif
 }
 
 ISR(INTERRUPT_PINCHANGE2)
 {
     // ISR is needed for wake-up from sleep-mode. Inform application about the interrupt.
-	app_on_pinchangeinterrupt(PCIFR);
+#ifdef __AVR_ATtiny1634__
+    app_on_pinchangeinterrupt(GIFR);
+#else   
+    app_on_pinchangeinterrupt(PCIFR);
+#endif
 }
 
 /**

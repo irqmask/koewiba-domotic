@@ -61,6 +61,20 @@ void app_init (void)
 }
 
 /**
+ * Application specific ISR for pin change interrupt.
+ *
+ * @param[in] pinchange_interruptflags  The value of PCIFR is for determining, 
+ *                                      which register has to be checked for the
+ *                                      source of interrupt.
+ */
+void app_on_pinchangeinterrupt(uint8_t pinchange_interruptflags)
+{
+    (void)pinchange_interruptflags;
+    //TODO insert application specific code here!
+    //sleep_prevent(0x01, 1); // prevent process from sleeping till pinchange event has been processed.
+}
+
+/**
  * Application specific command interpreter code.
  * 
  * Executed if a not-common command is received.

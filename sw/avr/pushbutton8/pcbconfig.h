@@ -22,6 +22,8 @@
 #define BUS_PORT_ENASND0    PORTD
 #define BUS_ENASND0         PD2
 
+#define LATCH_OE_ENABLED    1
+
 #define SPI_PCBCONFIG  1
 //! Defines the DDR of a port which contains the MOSI signal.
 #define SPI_DDR_MOSI   DDRB

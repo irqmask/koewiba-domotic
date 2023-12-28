@@ -4,10 +4,10 @@
  * @brief Business logic of the application pushbutton8.
  *
  * @{
- * @file    application.h
+ * @file   application.h
  * @brief   Business logic of the application pushbutton8.
  *
- * @author  Christian Verhalen
+ * @author  Christian Verhalen, Robert Mueller
  *///---------------------------------------------------------------------------
 
 // --- Include section ---------------------------------------------------------
@@ -41,16 +41,13 @@
 // --- Module global variables -------------------------------------------------
 
 
-app_on_key_set_register_t g_on_key_set_register[APP_NUM_KEYS] = {
-    { 0, REC_NODE_ID, 17, 100 },
-    { 0, REC_NODE_ID, 27, 100 },
-    { 0, REC_NODE_ID, 37, 100 },
-    { 0, REC_NODE_ID, 47, 100 },
-    { 0, REC_NODE_ID, 17,   0 },
-    { 0, REC_NODE_ID, 27,   0 },
-    { 0, REC_NODE_ID, 37,   0 },
-    { 0, REC_NODE_ID, 47,   0 },
-};
+app_on_key_set_register_t  g_on_key_set_register[APP_NUM_KEYS];
+app_on_msg_received_t      g_on_msg_received[APP_NUM_MSG_STUBS];
+
+// --- Module global functions -------------------------------------------------
+
+extern void app_register_load (void);
+extern void app_register_set  (uint8_t reg_no, uint32_t value);
 
 // --- Local functions ---------------------------------------------------------
 
@@ -76,14 +73,58 @@ static void app_check_keys (sBus_t* bus)
     for (index=0; index<APP_NUM_KEYS; index++) {
         if (pressed_keys & (1<<index)) {
             on_keypress_send(bus, index);
-
         }
     }
 }
 
-// --- Module global functions -------------------------------------------------
 
-extern void app_register_load (void);
+
+static void app_execute_message_dependend_function(app_msg_dep_func_t function_id, uint8_t add_info, void* pvalue)
+{
+    uint8_t value       = 0;
+    uint8_t led_idx     = 0;
+    uint8_t bit_set_idx = 0;
+    uint8_t led_reg_val = 0;
+
+    switch (function_id) {
+    case eMsgDepFunc_Led_on_bitset: // LED active when bit is set
+        value       = *(uint8_t*)pvalue;
+        bit_set_idx = (add_info & 0x0F);
+        led_idx     = (add_info & 0xF0)>>4;
+
+        if(value & (1<<bit_set_idx))   led_reg_val = 0x0F;
+        else                           led_reg_val = 0x0;
+        break;
+    case eMsgDepFunc_Led_blindcontrol: // LED active when bit is set
+        value      = *(uint8_t*)pvalue;
+        led_idx    = add_info;
+
+        if(value == 100)    led_reg_val = 0x00;
+        else if(value == 0) led_reg_val = 0x00;
+        else                led_reg_val = 0x0F;
+        break;
+    default:
+        return;
+    }
+    app_register_set(led_idx + APP_eReg_0_LEDState, led_reg_val);
+}
+
+static void process_state_message(uint16_t sender, uint8_t msglen, uint8_t* msg)
+{
+    uint8_t index;
+
+    // Iterate over all stubs
+    for (index=0; index<APP_NUM_MSG_STUBS; index++) {
+        // check every entry if all criteria are met
+        if((g_on_msg_received[index].command       == msg[0]) &&
+           (g_on_msg_received[index].register_id   == msg[1]) &&
+           (g_on_msg_received[index].receiver      == sender))
+        {
+            app_execute_message_dependend_function(g_on_msg_received[index].func_id, g_on_msg_received[index].add_info, &msg[2]);
+        }
+    }
+}
+
 
 // --- Global functions --------------------------------------------------------
 
@@ -96,8 +137,8 @@ extern void app_register_load (void);
  */
 void app_init (void)
 {
-    register_set_u16(MOD_eReg_ModuleID, OWN_NODE_ID);
-    //app_register_load();
+    //register_set_u16(MOD_eReg_ModuleID, OWN_NODE_ID);
+    app_register_load();
     leds_keys_init();
     input_initialize();
 }
@@ -122,6 +163,9 @@ void app_on_command (uint16_t sender, uint8_t msglen, uint8_t* msg)
 {
     switch (msg[0]) {
     //TODO insert application specific command interpreter here!
+    case eCMD_STATE_8BIT:
+        process_state_message(sender, msglen, msg);
+        break;
     default:
         break;
     }

@@ -44,7 +44,7 @@ void uart_initialize(void);
 
 uint8_t uart_write(const char *str);
 
-void putchar(unsigned char data);
+// already defined in stdio.h: void putchar(unsigned char data);
 
 void dec2bcd(uint16_t val, char* bcdbuf);
 

@@ -1,13 +1,14 @@
-## Build software
+# Build software
 
-tested on Ubuntu 18.04
+(tested on Ubuntu 18.04)
 
-### Common required packages
+## Common required packages
 
 Install required packages
 
     sudo apt install build-essential git cmake libmosquitto-dev nlohmann-json3-dev
-Install required packages to build AVR firmware:
+
+Install required packages to build AVR firmware
 
     sudo apt install avr-libc avrdude gcc-avr
     
@@ -20,7 +21,7 @@ Clone repository:
     git clone https://github.com/irqmask/koewiba-domotic.git
     cd koewiba-domotic
     
-Create thridparty folder, build and install thirdparty libraries
+Create thirdparty folder, build and install thirdparty libraries
 
     mkdir -p sw/os/3rd_party
     cd sw/os/3rd_party
@@ -37,7 +38,7 @@ Build libsafec:
     sudo ldconfig           # recreate library index
     cd ../../../..
 
-### Build AVR firmware
+## Build AVR firmware
 
     cd sw/avr/buildscripts
     make clean
@@ -47,7 +48,7 @@ Build libsafec:
 Compiled firmware in Intel-HEX format is safed in 'sw/avr/bin/[Debug|Release]'
 Detailled build logs are saved in the 'build/[applicationname]/[Debug/Release]
     
-### Build Linux applications
+## Build Linux applications
 
     cd sw/os/
     mkdir build

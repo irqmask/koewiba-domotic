@@ -126,7 +126,7 @@ void leds_keys_init (void)
     sn74595_OE_on();
 
     // set inputs for keys and enable pull-ups
-    KEY0_DDR &= ~(1<<KEY0_PIN);
+ /*   KEY0_DDR &= ~(1<<KEY0_PIN);
     KEY0_PORT |= (1<<KEY0_PIN);
     KEY1_DDR &= ~(1<<KEY1_PIN);
     KEY1_PORT |= (1<<KEY1_PIN);
@@ -141,7 +141,7 @@ void leds_keys_init (void)
     KEY6_DDR &= ~(1<<KEY6_PIN);
     KEY6_PORT |= (1<<KEY6_PIN);
     KEY7_DDR &= ~(1<<KEY7_PIN);
-    KEY7_PORT |= (1<<KEY7_PIN);
+    KEY7_PORT |= (1<<KEY7_PIN);*/
 
     KEY0_WAKEUP_REG |= (1<<KEY0_WAKEUP);
     KEY1_WAKEUP_REG |= (1<<KEY1_WAKEUP);
@@ -172,7 +172,7 @@ void leds_keys_background (void)
         sn74595_send(g_led_data | flashed_leds);
         timer_start(&g_timer, TIMER_MS_2_TICKS(150));
 
-        if(key_pressed != 0xFF) sleep_prevent(0x01, 0); // Reset sleep prevention bit as soon as pinchange-interrupt is processed.
+        if (key_pressed != 0xFF) sleep_prevent(0x01, 0); // Reset sleep prevention bit as soon as pinchange-interrupt is processed.
     }
 }
 
@@ -210,7 +210,7 @@ void led_switch (uint8_t led_index, eLEDMode_t mode)
     }
 
     /* As long as LED's should blink, the controller is not allowed to fall into sleep! */
-    if(0x00 != (g_led_fast_flash_mask | g_led_flash_mask))
+    if (0x00 != (g_led_fast_flash_mask | g_led_flash_mask))
     {
     	sleep_prevent(0x02, 1); // prevent process from sleeping as long as there are blinking LEDs.
     }
@@ -226,13 +226,13 @@ void led_switch (uint8_t led_index, eLEDMode_t mode)
  * @returns
  * Mask of keys which are pressed.
  */
-uint8_t key_get_pressed (uint8_t mask)
+/*uint8_t key_get_pressed (uint8_t mask)
 {
     // read and clear atomic !
     mask &= key_pressed; // read key(s)
     key_pressed ^= mask; // clear key(s)
     return mask;
-}
+}*/
 
 /**
  * Check if a key has been pressed long enough such that the key repeat
@@ -246,6 +246,7 @@ uint8_t key_get_pressed (uint8_t mask)
  * @returns
  * Mask of keys which are pressed repetitive.
  */
+/*
 uint8_t key_get_pressed_repeat (uint8_t mask)
 {
     // read and clear atomic !
@@ -263,6 +264,6 @@ uint8_t key_get_pressed_short (uint8_t mask)
 uint8_t key_get_pressed_long (uint8_t mask)
 {
     return key_get_pressed(key_get_pressed_repeat(mask));
-}
+}*/
 
 /** @} */

@@ -116,15 +116,15 @@ void        app_register_set        (uint8_t                reg_no,
     	if(value == 0)	led_switch(0, eLED_off);
     	else 			led_switch(0, eLED_blink_slow);
     	break;
-    case 25:
+    case 27:
     	if(value == 0)	led_switch(1, eLED_off);
     	else 			led_switch(1, eLED_on);
     	break;
-    case 33:
+    case 37:
     	if(value == 0)	led_switch(2, eLED_off);
     	else 			led_switch(2, eLED_blink_fast);
     	break;
-    case 41:
+    case 47:
     	if(value == 0)	led_switch(3, eLED_off);
     	else 			led_switch(3, eLED_on);
     	break;

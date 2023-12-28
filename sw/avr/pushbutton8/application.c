@@ -21,6 +21,7 @@
 #include "sleepmode.h"
 
 #include "bus.h"
+#include "input.h"
 #include "ledskeys.h"
 #include "register.h"
 
@@ -28,7 +29,8 @@
 
 // --- Definitions -------------------------------------------------------------
 
-#define OWN_NODE_ID 0x0a50
+#define OWN_NODE_ID 0x0a53
+#define REC_NODE_ID 0x0a52
 
 // --- Type definitions --------------------------------------------------------
 
@@ -38,29 +40,17 @@
 
 // --- Module global variables -------------------------------------------------
 
-#if (OWN_NODE_ID == 0x0a50)
+
 app_on_key_set_register_t g_on_key_set_register[APP_NUM_KEYS] = {
-    { 0, 0x0a51, 17, 100 },
-    { 0, 0x0a51, 25, 100 },
-    { 0, 0x0a51, 33, 100 },
-    { 0, 0x0a51, 41, 100 },
-    { 0, 0x0a51, 17,   0 },
-    { 0, 0x0a51, 25,   0 },
-    { 0, 0x0a51, 33,   0 },
-    { 0, 0x0a51, 41,   0 },
+    { 0, REC_NODE_ID, 17, 100 },
+    { 0, REC_NODE_ID, 27, 100 },
+    { 0, REC_NODE_ID, 37, 100 },
+    { 0, REC_NODE_ID, 47, 100 },
+    { 0, REC_NODE_ID, 17,   0 },
+    { 0, REC_NODE_ID, 27,   0 },
+    { 0, REC_NODE_ID, 37,   0 },
+    { 0, REC_NODE_ID, 47,   0 },
 };
-#elif (OWN_NODE_ID == 0x0a51)
-app_on_key_set_register_t g_on_key_set_register[APP_NUM_KEYS] = {
-    { 0, 0x0a50, 17, 100 },
-    { 0, 0x0a50, 25, 100 },
-    { 0, 0x0a50, 33, 100 },
-    { 0, 0x0a50, 41, 100 },
-    { 0, 0x0a50, 17,   0 },
-    { 0, 0x0a50, 25,   0 },
-    { 0, 0x0a50, 33,   0 },
-    { 0, 0x0a50, 41,   0 },
-};
-#endif
 
 // --- Local functions ---------------------------------------------------------
 
@@ -81,7 +71,8 @@ static void app_check_keys (sBus_t* bus)
 {
     uint8_t pressed_keys, index;
 
-    pressed_keys = key_get_pressed_short(0xFF);
+    pressed_keys = input_went_low();
+    if (pressed_keys != 0x00) sleep_prevent(0x01, 0); // Reset sleep prevention bit as soon as pinchange-interrupt is processed.
     for (index=0; index<APP_NUM_KEYS; index++) {
         if (pressed_keys & (1<<index)) {
             on_keypress_send(bus, index);
@@ -105,9 +96,10 @@ extern void app_register_load (void);
  */
 void app_init (void)
 {
-    //register_set_u16(MOD_eReg_ModuleID, OWN_NODE_ID);
+    register_set_u16(MOD_eReg_ModuleID, OWN_NODE_ID);
     //app_register_load();
     leds_keys_init();
+    input_initialize();
 }
 
 /**
@@ -142,6 +134,7 @@ void app_on_command (uint16_t sender, uint8_t msglen, uint8_t* msg)
  */
 void app_background (sBus_t* bus)
 {
+    input_background();
     leds_keys_background();
     app_check_keys(bus);
 }

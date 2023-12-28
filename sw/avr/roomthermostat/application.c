@@ -393,8 +393,8 @@ void app_init (void)
     timer_start(&g_seconds_timer, TIMER_MS_2_TICKS(1000));
 
     // display first screen
-    gdisp_goto_col_line(15, 0);
-    gdisp_put_text("ROOMTHERMOSTAT");
+    gdisp_goto_col_line(0, 0);
+    gdisp_put_text("SOLL       IST");
     app_draw_desired_temp();
     app_draw_current_temp();
     app_draw_window();

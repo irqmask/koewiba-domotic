@@ -47,7 +47,7 @@
 const unsigned char app_versioninfo[MOD_VERSIONINFO_LEN] __attribute__((section(".versioninfo")))
                         = {SIGNATURE_0,SIGNATURE_1,SIGNATURE_2,0x00,
                            0x00,0x06,   // board ID            (high byte, low byte)
-                           1,           // board revision
+                           2,           // board revision
                            0x00,0x07,   // application ID      (high byte, low byte)
                            VERSION_MAJOR, VERSION_MINOR, VERSION_BUGFIX, // application version (major, minor, bugfix)
                             (VERSION_HASH & 0x000000FF),        // version hash

@@ -48,6 +48,19 @@
 
 // --- Local functions ---------------------------------------------------------
 
+static void enable_uart_tx(void)
+{
+    PA_DDR |= MP1;
+    USART1_CR2 |= USART_CR2_TEN;    // enable UART
+}
+
+
+static void disable_uart_tx(void)
+{
+    USART1_CR2 &= ~USART_CR2_TEN;   // disable UART to not disturb ATtiny's SPI
+    PA_DDR &= ~MP1;
+}
+
 // --- Module global functions -------------------------------------------------
 
 // --- Global functions --------------------------------------------------------
@@ -59,11 +72,11 @@ void uart_initialize(void)
 {
     // TX: PA2, RX: PA3
     SYSCFG_RMPCR1 |= 0x10;
-    PA_DDR |= MP1;
     PA_CR1 |= MP1;
+    disable_uart_tx();
 
     // enable transmit and receive, no interrrupts
-    USART1_CR2 = USART_CR2_TEN | USART_CR2_REN;
+    USART1_CR2 = USART_CR2_REN; // not USART_CR2_TEN
 
     // 1 stop bit
     USART1_CR3 &= ~(USART_CR3_STOP1 | USART_CR3_STOP2);
@@ -76,21 +89,25 @@ void uart_initialize(void)
 uint8_t uart_write(const char *str)
 {
     uint8_t i = 0;
+    enable_uart_tx();
     while (str[i] != '\0') {
         while (!(USART1_SR & USART_SR_TXE))
             ;
         USART1_DR = str[i];
         i++;
     }
+    disable_uart_tx();
     return (i); // Bytes sent
 }
 
 
 void putchar(unsigned char data)
 {
+    enable_uart_tx();
     USART1_DR = data;
     while (!(USART1_SR & USART_SR_TC))
         ;
+    disable_uart_tx();
 }
 
 

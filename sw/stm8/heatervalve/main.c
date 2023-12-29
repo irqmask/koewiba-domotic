@@ -6,6 +6,7 @@
 #include "adc.h"
 #include "cmd.h"
 #include "control_temp.h"
+#include "debug.h"
 #include "motor.h"
 #include "remote_tempsense.h"
 #include "timer.h"
@@ -31,7 +32,7 @@ void main(void)
 
     initClock();
     uart_initialize();
-    uart_write("# heatervalve\n");
+    LOG_DEBUG("# heatervalve\n");
     enableInterrupts();
 
     adc_initialize();
@@ -42,7 +43,7 @@ void main(void)
     cmd_initialize();
     remts_initialize();
     ctrl_temp_initialize();
-    uart_write("# init complete\n");
+    LOG_DEBUG("# init complete\n");
     while (1) {
         if (USART1_SR & USART_SR_RXNE) {
             c = USART1_DR;

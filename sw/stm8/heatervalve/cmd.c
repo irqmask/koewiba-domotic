@@ -198,14 +198,11 @@ static void interpret_command(void)
         }
     }
     else if (starts_with("skp")) { // set remote temperatures <current> <desired>
-            uint16_t tmp = get_val_u16(&success);
-            if (success) {
-                ctrl_set_kp(tmp);
-                puts("SKP 0");
-            }
+        uint16_t tmp = get_val_u16(&success);
+        if (success) {
+            ctrl_set_kp(tmp);
+            puts("SKP 0");
         }
-    else {
-        puts("eunknown");
     }
     if (!success) {
         uart_write("eparam\n");

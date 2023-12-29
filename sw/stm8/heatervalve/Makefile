@@ -32,7 +32,7 @@ OBJECTS_W_PATH= $(addprefix $(BUILDDIR)/,$(OBJECTS))
 
 CC            = sdcc
 CXX           = sdcc
-DEFINES       = 
+DEFINES       = -DHAS_APPCONFIG_H
 CFLAGS        = -mstm8 --verbose --no-xinit-opt $(DEFINES)
 CXXFLAGS      = -mstm8 --verbose $(DEFINES)
 CHK_DIR_EXISTS= test -d

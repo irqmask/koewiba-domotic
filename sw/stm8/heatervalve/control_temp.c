@@ -33,6 +33,7 @@
 #include <stdio.h>
 #include "STM8L052C6.h"
 
+#include "debug.h"
 #include "motor.h"
 #include "remote_tempsense.h"
 #include "timer.h"
@@ -81,7 +82,7 @@ static void background_10s(void)
             valvepos = 1000;
         }
     }
-    printf("# dt %4d ct %4d d %d vp %d\n", des_temp_c - 27315, cur_temp_c - 27315, temp_diff, (uint16_t)valvepos);
+    LOG_DEBUG("# dt %4d ct %4d d %d vp %d\n", des_temp_c - 27315, cur_temp_c - 27315, temp_diff, (uint16_t)valvepos);
 
     // valvepos is between 0 and 1000
     diff_valvepos = valvepos - motor_get_valve_pos();

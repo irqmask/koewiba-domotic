@@ -99,9 +99,10 @@ uint8_t eep_check_statusregister (uint8_t flag_mask)
 
     EEP_SPI_CS_ACTIVATE;
     spi_transmit_blk(eEEP_RDSR);
-    spi_transmit_blk(0);
-    if (flag_mask) retval = (flag_mask & SPI_DATA_REG);
-    else retval = SPI_DATA_REG;
+    retval = spi_transmit_blk(0);
+    if (flag_mask) {
+        retval &= flag_mask;
+    }
     EEP_SPI_CS_DEACTIVATE;
     return retval;
 }
@@ -118,8 +119,8 @@ uint8_t eep_check_statusregister (uint8_t flag_mask)
 uint16_t eep_read (uint16_t eep_address, uint16_t count, uint8_t* buffer)
 {
     uint16_t read = 0;
-    uint8_t addressH = (0xFF00 & eep_address) >> 8;
-    uint8_t addressL = (0x00FF & eep_address);
+    uint8_t addressH = (eep_address >> 8);
+    uint8_t addressL = (eep_address & 0x00FF);
 
     if (eep_address + count > EEPROM_SIZE) return 0;
 
@@ -132,8 +133,7 @@ uint16_t eep_read (uint16_t eep_address, uint16_t count, uint8_t* buffer)
     spi_transmit_blk(addressH);
     spi_transmit_blk(addressL);
     for (read = 0; read < count; read++) {
-        spi_transmit_blk(0);
-        buffer[read] = SPI_DATA_REG;
+        buffer[read] = spi_transmit_blk(0);
     }
     EEP_SPI_CS_DEACTIVATE;
     return read;

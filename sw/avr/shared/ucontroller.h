@@ -355,7 +355,7 @@
  #define ADDR_SIGNATURE_BYTE1   2
  #define ADDR_SIGNATURE_BYTE2   4
  #define SIGRD 5 // workaround for missing define in avr-headers
- // definition of prozessor depending global settings
+ // definition of processor depending global settings
  // TODO CV: this part can be ported maybe to a makefile include
  #define STARTADDR_APPVECTORS   0x0000
  #define STARTADDR_VERSIONINFO  0x0070
@@ -435,10 +435,8 @@
  #define REGBIT_TIMER2_OCIEB    OCIE2B
 
 // SPI
- //#define REG_SPCR0              SPCR
  #define REG_SPDR0              UDR0
  #define REG_SPDR1              UDR1
- //#define REG_SPSR0              SPSR
  // SPCR
  #define REGBIT_SPE0            SPE
  #define REGBIT_MSTR0           MSTR

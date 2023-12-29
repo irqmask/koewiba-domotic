@@ -102,7 +102,7 @@
 /** @} */
 
 #if defined (__AVR_ATtiny1634__)
-#define SPI_DATA_REG                REG_SPDR1
+#define SPI_DATA_REG                UDR1
 #define SPI_TRANSMITION_COMPLETE    (UCSR1A & (1<<UDRE1))
 #define SPI_RECEPTION_COMPLETE      (UCSR1A & (1<<RXC1 ))
 #else // defined (__AVR_ATtiny1634__)
@@ -171,28 +171,25 @@ inline void     spi_master_init_blk  (void)
     // Enable SPI, Master, set clock rate fck/2
     REG_SPCR0     =  (1 << REGBIT_SPE0) | (1 << REGBIT_MSTR0);
 }
-#endif
-
-#if defined (__AVR_ATtiny1634__)
+#elif defined (__AVR_ATtiny1634__)
 
 inline void     spi_master_init_blk  (void)
 {
     UBRR1 = 0;
 	SPI_DDR_MISO &= ~(1 << SPI_MISO);
     SPI_DDR_MOSI |=  (1 << SPI_MOSI);
-    /* Setting the XCKn port pin as output, enables master mode. */
+    // Setting the XCKn port pin as output, enables master mode.
     SPI_DDR_SCK  |=  (1 << SPI_SCK);
     SPI_DDR_SS   |=  (1 << SPI_SS);    // set DDR for slave select as output to guarantee SPI master mode
     SPI_PORT_SS  |=  (1 << SPI_SS);    // set slave select to 1 (slave disabled)
 
-    /* Set MSPI mode of operation and SPI data mode 0. */
-    UCSR1C = (1<<UMSEL11)|(1<<UMSEL10)|(0<<UCPHA1)|(0<<UCPOL1);
-    /* Enable receiver and transmitter. */
-    UCSR1B = (1<<RXEN1)|(1<<TXEN1);
-    /* Set baud rate. */
-    /* IMPORTANT: The Baud Rate must be set after the transmitter is enabled
-    */
-    UBRR1 = 0;
+    // Set MSPI mode of operation and SPI data mode 0.
+    UCSR1C = (1<<UMSEL11) | (1<<UMSEL10) | (0<<UCPHA1) | (0<<UCPOL1);
+    // Enable receiver and transmitter.
+    UCSR1B = (1<<RXEN1) | (1<<TXEN1);
+    // Set baud rate.
+    // IMPORTANT: The Baud Rate must be set after the transmitter is enabled
+    UBRR1 = 1;
 }
 
 #endif // defined (__AVR_ATtiny1634__)
@@ -205,15 +202,41 @@ inline void     spi_master_init_blk  (void)
  * Byte to be sent over SPI0.
  * @returns Byte received through MISO line during transmission.
  */
+#if defined (__AVR_ATmega8__)     || \
+    defined (__AVR_ATmega88__)    || \
+    defined (__AVR_ATmega88A__)   || \
+    defined (__AVR_ATmega88P__)   || \
+    defined (__AVR_ATmega328__)   || \
+    defined (__AVR_ATmega328P__)  || \
+    defined (__AVR_ATmega328PB__) || \
+    defined (__AVR_ATmega324P__)  || \
+    defined (__AVR_ATmega324PA__) || \
+    defined (__AVR_ATmega324A__)
+
 inline uint8_t  spi_transmit_blk    (uint8_t                data )
 {
     // Start transmission
     SPI_DATA_REG = data;
     // Wait for transmission complete
     while ( !(SPI_TRANSMITION_COMPLETE) );
-    return SPI_DATA_REG; // SPDR contains received byte during transmission.
+    // SPDR contains received byte during transmission.
+    return SPI_DATA_REG;
 }
 
+#elif defined (__AVR_ATtiny1634__)
+
+inline uint8_t  spi_transmit_blk    (uint8_t                data )
+{
+    // Wait for empty transmission buffer
+    while ( !(SPI_TRANSMITION_COMPLETE) );
+    // Start transmission
+    SPI_DATA_REG = data;
+    // Wait for transmission complete
+    while ( !(SPI_RECEPTION_COMPLETE) );
+    // SPDR contains received byte during transmission.
+    return SPI_DATA_REG;
+}
+#endif // defined (__AVR_ATtiny1634__)
 #endif // SPI_WITH_BLOCKING
 
 

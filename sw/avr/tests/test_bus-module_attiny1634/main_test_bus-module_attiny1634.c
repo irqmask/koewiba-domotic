@@ -51,7 +51,6 @@ static bool test_eeprom (void)
 {
     uint16_t 	ii, wanted_crc16, read_crc16;
     uint8_t		databyte;
-    bool        test_is_ok = true;
 
     // fill EEProm
     wanted_crc16 = CRC_START_VALUE;
@@ -70,11 +69,7 @@ static bool test_eeprom (void)
     	read_crc16 = crc_16_next_byte(read_crc16, databyte);
     }
     
-    if (read_crc16 != wanted_crc16) {
-    	test_is_ok = false;
-    }
-
-    return test_is_ok;
+    return (read_crc16 == wanted_crc16);
 }
 
 static void interpret_message (uint16_t sender, uint8_t msglen, uint8_t* msg)

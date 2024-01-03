@@ -156,6 +156,7 @@ void app_init (void)
     LED_ERROR_OFF;
     LED_STATUS_DDR |= (1<<LED_STATUS);
     LED_STATUS_OFF;
+
     uart_init_blk1(UART_BAUDRATE);
 
     timer_start(&g_timer, TIMER_MS_2_TICKS(1000));

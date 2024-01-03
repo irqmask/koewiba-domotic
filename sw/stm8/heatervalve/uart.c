@@ -53,7 +53,6 @@ static void enable_uart_tx(void)
     USART1_CR2 |= USART_CR2_TEN;    // enable UART
 }
 
-
 static void disable_uart_tx(void)
 {
     USART1_CR2 &= ~USART_CR2_TEN;   // disable UART to not disturb ATtiny's SPI
@@ -69,20 +68,21 @@ static void disable_uart_tx(void)
  */
 void uart_initialize(void)
 {
-    // enable peripheral clock
-    CLK_PCKENR1 |= CLK_PCKENR1_USART1;
-
-    PE_CR2 &= ~PIN_7; //
-    PE_DDR &= ~PIN_7; // configure as input
-    PE_CR1 &= ~PIN_7; // floating input,  no pull-up
-
     // remap UART1 PINs TX: PA2, RX: PA3
     SYSCFG_RMPCR1 &= ~SYSCFG_RMPCR1_USART1TXRXMASK;
     SYSCFG_RMPCR1 |= SYSCFG_RMPCR1_USART1TXRXPORTA;
 
+    // enable peripheral clock
+    CLK_PCKENR1 |= CLK_PCKENR1_USART1;
+
+    // PA2: TX
+    PA_CR1 |= PIN_2;
     PA_DDR &= ~PIN_2;
+    // PA3: RX
     PA_DDR &= ~PIN_3;
 
+    // enable USART1 (resetting disable bit)
+    USART1_CR1 &= ~USART_CR1_UARTD;
     // enable receive, no interrupts
     USART1_CR2 = USART_CR2_REN; // not USART_CR2_TEN
     USART1_CR3 &= ~(USART_CR3_STOP1 | USART_CR3_STOP2);
@@ -106,11 +106,7 @@ void uart_initialize(void)
     // M = fClk / fBaud = 2000000 / 57600 = 34,72 = 35 = 0x23
     //USART1_BRR1 = 0x02;
     //USART1_BRR2 = 0x03;
-
-    // enable USART1 (resetting disable bit)
-    USART1_CR1 &= ~USART_CR1_UARTD;
 }
-
 
 uint8_t uart_write(const char *str)
 {

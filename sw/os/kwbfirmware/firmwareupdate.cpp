@@ -501,9 +501,29 @@ int FirmwareUpdate::receiveAndCheckBldflags()
  * standard ctor
  */
 FirmwareUpdate::FirmwareUpdate()
-    : reset_target_node(1)
+    : curr_state(eFWU_IDLE)
+    , module_address(0)
+    , fw_memory(nullptr)
+    , fw_firstaddress(0)
+    , fw_startaddress(0)
+    , fw_size(0)
+    , curr_offset(0)
+    , last_offset(0)
+    , last_node_offset(0)
+    , last_node_address(0)
+    , node_crc_expected(0)
+    , node_crc_calculated(0)
+    , block_info_received(0)
+    , reset_target_node(1)
+    , bldflags(0)
+    , bldflags_received(0)
+    , last_progress(0)
     , progress_thd(5)
+    , progress_func(nullptr)
+    , progress_arg(nullptr)
 {
+    memset(filename, 0, sizeof(filename));
+    memset(&wait_start, 0, sizeof(wait_start));
 }
 
 /**
@@ -530,7 +550,7 @@ FirmwareUpdate::FirmwareUpdate(std::shared_ptr<Connection> connection)
  */
 FirmwareUpdate::~FirmwareUpdate()
 {
-    if (this->fw_memory != NULL) {
+    if (this->fw_memory != nullptr) {
         free(this->fw_memory);
     }
 }

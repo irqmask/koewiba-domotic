@@ -175,21 +175,12 @@ inline void     spi_master_init_blk  (void)
 
 inline void     spi_master_init_blk  (void)
 {
-    UBRR1 = 0;
 	SPI_DDR_MISO &= ~(1 << SPI_MISO);
     SPI_DDR_MOSI |=  (1 << SPI_MOSI);
     // Setting the XCKn port pin as output, enables master mode.
     SPI_DDR_SCK  |=  (1 << SPI_SCK);
     SPI_DDR_SS   |=  (1 << SPI_SS);    // set DDR for slave select as output to guarantee SPI master mode
     SPI_PORT_SS  |=  (1 << SPI_SS);    // set slave select to 1 (slave disabled)
-
-    // Set MSPI mode of operation and SPI data mode 0.
-    UCSR1C = (1<<UMSEL11) | (1<<UMSEL10) | (0<<UCPHA1) | (0<<UCPOL1);
-    // Enable receiver and transmitter.
-    UCSR1B = (1<<RXEN1) | (1<<TXEN1);
-    // Set baud rate.
-    // IMPORTANT: The Baud Rate must be set after the transmitter is enabled
-    UBRR1 = 1;
 }
 
 #endif // defined (__AVR_ATtiny1634__)
@@ -227,14 +218,28 @@ inline uint8_t  spi_transmit_blk    (uint8_t                data )
 
 inline uint8_t  spi_transmit_blk    (uint8_t                data )
 {
-    // Wait for empty transmission buffer
-    while ( !(SPI_TRANSMITION_COMPLETE) );
-    // Start transmission
-    SPI_DATA_REG = data;
-    // Wait for transmission complete
-    while ( !(SPI_RECEPTION_COMPLETE) );
-    // SPDR contains received byte during transmission.
-    return SPI_DATA_REG;
+    register uint8_t clk = 0x11;
+    register uint8_t clk_and_shift = 0x13;
+
+    USIDR = data;
+    USICR = clk;
+    USICR = clk_and_shift;
+    USICR = clk;
+    USICR = clk_and_shift;
+    USICR = clk;
+    USICR = clk_and_shift;
+    USICR = clk;
+    USICR = clk_and_shift;
+    USICR = clk;
+    USICR = clk_and_shift;
+    USICR = clk;
+    USICR = clk_and_shift;
+    USICR = clk;
+    USICR = clk_and_shift;
+    USICR = clk;
+    USICR = clk_and_shift;
+
+    return USIBR;
 }
 #endif // defined (__AVR_ATtiny1634__)
 #endif // SPI_WITH_BLOCKING

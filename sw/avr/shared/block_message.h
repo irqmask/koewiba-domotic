@@ -5,7 +5,7 @@
  *      Author: mue
  */
 /*
- * Copyright (C) 2015
+ * Copyright (C) 2023
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,6 +29,10 @@
 
 #include "bus.h"
 
+#ifdef HAS_APPCONFIG_H
+ #include "appconfig.h"
+#endif
+
 typedef struct block_data {
     uint8_t  blocktype;
     uint32_t startaddress;
@@ -42,10 +46,16 @@ typedef struct block_data {
     uint8_t  additional_info2;
 } block_data_t;
 
+#if APP_HAS_BLOCK_HANDLER
+extern bool app_block_start(uint16_t sender, uint8_t blocktype);
+extern bool app_block_end(uint16_t sender, uint8_t blocktype);
+#endif
+
 
 bool block_message_start(sBus_t* bus, uint16_t sender, uint8_t msglen, uint8_t* msg);
 bool block_message_data (sBus_t* bus, uint16_t sender, uint8_t msglen, uint8_t* msg);
 bool block_message_end  (sBus_t* bus, uint16_t sender, uint8_t msglen, uint8_t* msg);
 void block_data_reset   (void);
 bool block_timer_elapsed(void);
+
 #endif /* _BLOCK_MESSAGE_H_ */

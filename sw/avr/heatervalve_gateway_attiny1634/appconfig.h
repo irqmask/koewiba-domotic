@@ -35,11 +35,14 @@
 
 // --- Definitions -------------------------------------------------------------
 
-#define BUS_APPCONFIG   1
-#undef BUS_SCHEDULER                //!< This program has no scheduling capabilities.
-#define BUS_TX_QUEUE_SIZE  100      //!< Size in bytes of the message transmit queue.
-#define BUS_MAXSENDMSGLEN   32      //!< Maximum length of a message to be sent.
-#define BUS_MAXRECVMSGLEN   64 + 2  //!< Maximum length of a message to be received.
+#define BUS_APPCONFIG           1
+#undef BUS_SCHEDULER                    //!< This program has no scheduling capabilities.
+#define BUS_TX_QUEUE_SIZE       100     //!< Size in bytes of the message transmit queue.
+#define BUS_MAXSENDMSGLEN       32      //!< Maximum length of a message to be sent.
+#define BUS_MAXRECVMSGLEN       64 + 2  //!< Maximum length of a message to be received.
+
+#define UART_BAUDRATE           57600   //!< Baudrate for second UART interfacing heatervalve module.
+#define APP_HAS_BLOCK_HANDLER   1       //!< Application has block start and block end handler.
 
 // --- Type definitions --------------------------------------------------------
 
@@ -83,6 +86,9 @@ typedef enum appconfig {
 extern const unsigned char app_versioninfo[];
 
 // --- Module global variables -------------------------------------------------
+
+extern bool app_block_start(uint16_t sender, uint8_t blocktype);
+extern bool app_block_end(uint16_t sender, uint8_t blocktype);
 
 extern uint16_t app_rem_temp_curr_modid;
 extern uint8_t app_rem_temp_curr_regno;

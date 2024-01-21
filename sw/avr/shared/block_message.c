@@ -9,7 +9,7 @@
  * @author  Christian Verhalen
  */
 /*
- * Copyright (C) 2015
+ * Copyright (C) 2023
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,8 +24,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "bus.h"
 #include "block_message.h"
+
+#include "bus.h"
 #include "cmddef_common.h"
 #include "crc16.h"
 #include "eeprom_spi.h"
@@ -180,21 +181,24 @@ static bool process_eeprom_block_end (uint8_t msglen, uint8_t* msg)
 
 bool block_message_start (sBus_t* bus, uint16_t sender, uint8_t msglen, uint8_t* msg)
 {
-    bool ret = true;
+    bool ret = false;
 
     do {
         g_bd.blocktype = msg[1];
         g_bd.sender = sender;
         g_bd.received = 0;
         switch (g_bd.blocktype) {
-        case eSTORAGE_EEPROM_INT:
-            break;
         case eSTORAGE_EEPROM_EXT:
             ret = process_eeprom_block_start(msglen, msg);
             break;
         default:
             break;
         }
+        if (ret != true) break;
+
+#if APP_HAS_BLOCK_HANDLER
+        ret = app_block_start(g_bd.sender, g_bd.blocktype);
+#endif
     } while (false);
     if (ret == true) {
         timer_start(&g_timer, TIMER_MS_2_TICKS(10000));
@@ -207,18 +211,15 @@ bool block_message_start (sBus_t* bus, uint16_t sender, uint8_t msglen, uint8_t*
 
 bool block_message_data (sBus_t* bus, uint16_t sender, uint8_t msglen, uint8_t* msg)
 {
-    bool ret = true;
+    bool ret = false;
 
     do {
         if (sender != g_bd.sender) {
             g_bd.additional_info1 = 1;
             g_bd.additional_info2 = 0;
-            ret = false;
             break;
         }
         switch (g_bd.blocktype) {
-        case eSTORAGE_EEPROM_INT:
-            break;
         case eSTORAGE_EEPROM_EXT:
             ret = process_eeprom_block_data(msglen, msg);
             break;
@@ -255,6 +256,10 @@ bool block_message_end (sBus_t* bus, uint16_t sender, uint8_t msglen, uint8_t* m
         default:
             break;
         }
+        if (ret != true) break;
+#if APP_HAS_BLOCK_HANDLER
+        ret = app_block_end(g_bd.sender, g_bd.blocktype);
+#endif
     } while (false);
     send_block_info_message(bus, sender,
             g_bd.crc_host,

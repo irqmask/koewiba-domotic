@@ -239,7 +239,7 @@ inline uint8_t  spi_transmit_blk    (uint8_t                data )
     USICR = clk;
     USICR = clk_and_shift;
 
-    return USIBR;
+    return USIDR;
 }
 #endif // defined (__AVR_ATtiny1634__)
 #endif // SPI_WITH_BLOCKING

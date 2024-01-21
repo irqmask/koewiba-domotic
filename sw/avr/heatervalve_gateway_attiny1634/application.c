@@ -34,10 +34,12 @@
 #include "prjtypes.h"
 #include "cmddef_common.h"
 #include "register.h"
+#include "spi.h"
 #include "timer.h"
 #include "uart.h"
 
 #include "appconfig.h"
+#include "led_debug.h"
 
 // --- Definitions -------------------------------------------------------------
 
@@ -46,6 +48,7 @@
 // --- Local variables ---------------------------------------------------------
 
 static timer_data_t g_timer;
+static bool     g_blocktransfer_active;
 static uint16_t g_remote_temp_curr;
 static uint16_t g_remote_temp_setpoint;
 static bool     g_send_remote_temp_update;
@@ -70,6 +73,8 @@ uint16_t        app_debug_receiver;         //!< module id of receiver of debug 
 
 static void send_temp_curr_and_setpoint(void)
 {
+    if (g_blocktransfer_active) return;
+
     // send remote temperatures
     // srt <current> <desired>
     uart_put_string_blk1_p("srt ");
@@ -81,6 +86,8 @@ static void send_temp_curr_and_setpoint(void)
 
 static void send_kp(void)
 {
+    if (g_blocktransfer_active) return;
+
     uart_put_string_blk1_p("skp ");
     uart_put_hex16_blk1(g_kp);
     uart_put_char_blk1('\n');
@@ -103,6 +110,24 @@ static void forward_uart_buffer(void)
 }
 
 // --- Module global functions -------------------------------------------------
+
+bool app_block_start(uint16_t sender, uint8_t blocktype)
+{
+    (void)sender;
+    (void)blocktype;
+    spi_master_init_blk();
+    g_blocktransfer_active = true;
+    return true;
+}
+
+bool app_block_end(uint16_t sender, uint8_t blocktype)
+{
+    (void)sender;
+    (void)blocktype;
+    uart_init_blk1(UART_BAUDRATE);
+    g_blocktransfer_active = false;
+    return true;
+}
 
 void app_set_kp(uint16_t kp)
 {
@@ -128,13 +153,17 @@ void app_init (void)
 {
     register_set_u16(MOD_eReg_ModuleID, 0x520);
 
-    uart_init_blk1(57600);
+    LED_ERROR_DDR |=  (1<<LED_ERROR);
+    LED_ERROR_OFF;
+    LED_STATUS_DDR |= (1<<LED_STATUS);
+    LED_STATUS_OFF;
+    uart_init_blk1(UART_BAUDRATE);
 
     timer_start(&g_timer, TIMER_MS_2_TICKS(1000));
 
     // load application parameters
     app_register_load();
-
+    g_blocktransfer_active = false;
     g_remote_temp_setpoint = 15 * 100 + 27315;
     g_remote_temp_curr = 15 * 100 + 27315;
     g_uart_rx_idx = 0;
@@ -195,6 +224,9 @@ void app_background (void)
         timer_start(&g_timer, TIMER_MS_2_TICKS(1000));
     }
 
+    // anything beyond this line will only be executed when no block transfer is active
+    if (g_blocktransfer_active) return;
+    // ------------------------------------------------------------------------
     if (g_send_remote_temp_update) {
         g_send_remote_temp_update = false;
         send_temp_curr_and_setpoint();

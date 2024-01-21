@@ -32,6 +32,8 @@
 
 #include "prjtypes.h"
 
+#include "led_debug.h"
+
 // --- Definitions -------------------------------------------------------------
 
 // --- Type definitions --------------------------------------------------------
@@ -57,7 +59,12 @@
  */
 void app_init (void) 
 {
+    register_set_u16(MOD_eReg_ModuleID, 0x520);
     //TODO insert application specific initializations here!
+    LED_ERROR_DDR |=  (1<<LED_ERROR);
+    LED_ERROR_OFF;
+    LED_STATUS_DDR |= (1<<LED_STATUS);
+    LED_STATUS_OFF;
 }
 
 /**

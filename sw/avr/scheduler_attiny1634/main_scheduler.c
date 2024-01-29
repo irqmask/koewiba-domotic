@@ -33,7 +33,9 @@
 #include <util/delay.h>
 
 #include "pcbconfig.h"
+
 #include "block_message.h"
+#include "bootloader.h"
 #include "bus.h"
 #include "bus_scheduler.h"
 #include "cmddef_common.h"
@@ -141,12 +143,8 @@ static inline void interpret_message (uint16_t sender, uint8_t msglen, uint8_t* 
 
     case eCMD_RESET:
         cli();
-#ifdef __AVR_ATtiny1634__
-        //TODO implement reset for attiny1634
-#else
         wdt_enable(WDTO_15MS);
         while (1); // wait until watchdog resets the controller.
-#endif
         break;
 
     default:
@@ -182,6 +180,15 @@ void        app_register_set        (uint8_t                reg_no,
 
 int main(void)
 {
+    MCUSR = 0;
+    wdt_disable();
+#ifdef __AVR_ATtiny1634__
+    void (*bld_entrypoint)( void ) = (void*)BLD_ENTRYPOINT;
+
+    // call bootloader of ATtiny1634, since it has no dedicated bootloader section
+    bld_entrypoint();
+#endif
+
     uint16_t    module_id = 0;
     uint8_t     msglen = 0;
     uint16_t    sender = 0;
@@ -190,9 +197,11 @@ int main(void)
     io_initialize();
     timer_initialize();
     register_get(MOD_eReg_ModuleID, 0, &module_id);
-    if (module_id != 1) {
-        register_set_u16(MOD_eReg_ModuleID, 0x001);
+#if 0
+    if (module_id != 0x01) {
+        register_set_u16(MOD_eReg_ModuleID, 0x01);
     }
+#endif
     bus_configure(&g_bus, module_id); // configure a bus node with address 1
     bus_scheduler_initialize(&g_bus, &g_sched, 0);// initialize bus on UART 0
 

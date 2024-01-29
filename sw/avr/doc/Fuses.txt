@@ -162,7 +162,36 @@ avrdude -p atmega88 -P usb -c avrisp2 -B 32 -U eeprom:w:atmega88_address12.hex:i
 
 ATTINY1634 (signature 1E 94 12)
 ====================================================================
-avrdude -p attiny1634 -P usb -c avrisp2 -B 32 -U lfuse:w:0xAD:m
+Low Fuse:   0b11101101 = 0xED
+              ^--------------- CKDIV8    1 = disabled Divide clock by 8
+               ^-------------- CKOUT     1 = disabled Clock output
+                ^------------- -         1 (unprogrammed)
+                 ^------------ SUT0      0 = Startup time -> Fast rising power
+                  ^----------- CKSEL3    1
+                   ^---------- CKSEL2    1
+                    ^--------- CKSEL1    0
+                     ^-------- CKSEL0    1 CKSEL3:0 = 1111External crystal/resonator high frequency; Start-up time: 16K CK + 64ms
+
+High Fuse:  0b11010101 = 0xD5
+              ^--------------- RSTDISBL  1 = disabled: reset is enabled
+               ^-------------- DWEN      1 = disabled: debug wire
+                ^------------- SPIEN     0 = enabled: SPI programming
+                 ^------------ WDTON     1 = disabled: Watchdogtimer always on
+                  ^----------- EESAVE    0 = enabled: EEProm memory preserve through chip erase
+                   ^---------- BODLEVEL2 1
+                    ^--------- BODLEVEL1 0
+                     ^-------- BODLEVEL0 1 = 101 Brown-out level 2,7V
+
+Ext. Fuse:  0b11101100 = 0xEC
+              ^--------------- -         x
+               ^-------------- -         x
+                ^------------- -         x
+                 ^------------ BODPD1    0
+                  ^----------- BODPD0    1 = BOD mode (01=sampled) when device in sleep mode
+                   ^---------- BODACT1   1
+                    ^--------- BODACT0   0 = BOD mode (10=enabled) when device active or idle
+                     ^-------- SELFPRGEN 0 = enabled: Enables SPM instruction
+avrdude -p attiny1634 -P usb -c avrisp2 -B 32 -U lfuse:w:0xED:m
 avrdude -p attiny1634 -P usb -c avrisp2 -B 32 -U hfuse:w:0xD5:m
-avrdude -p attiny1634 -P usb -c avrisp2 -B 32 -U efuse:w:0x1F:m
+avrdude -p attiny1634 -P usb -c avrisp2 -B 32 -U efuse:w:0xEC:m
 

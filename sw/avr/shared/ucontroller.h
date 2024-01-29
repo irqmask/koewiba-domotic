@@ -133,14 +133,6 @@
  #define SIGRD 5 // workaround for missing define in avr-headers
 
 #elif defined (__AVR_ATmega328__) || defined (__AVR_ATmega328P__)
- // definition of processor depending global settings
- // TODO CV: this part can be ported maybe to a makefile include
- #define STARTADDR_APPVECTORS   0x0000
- #define STARTADDR_VERSIONINFO  0x0068
- #define STARTADDR_BOOTLOADER   0x1700
- #define MAXSIZE_APPLICATION    (STARTADDR_BOOTLOADER - STARTADDR_APPVECTORS)
- #define MAXSIZE_BOOTLOADER     0x0400
-
 // UART
  #define REGISTER_UCSRA0         UCSR0A
  #define REGISTER_UCSRB0         UCSR0B
@@ -193,14 +185,6 @@
  #define ADDR_SIGNATURE_BYTE2   4
  #define SIGRD 5 // workaround for missing define in avr-headers
 #elif defined (__AVR_ATmega328PB__)
- // definition of processor depending global settings
- // TODO CV: this part can be ported maybe to a makefile include
- #define STARTADDR_APPVECTORS   0x0000
- #define STARTADDR_VERSIONINFO  0x0068
- #define STARTADDR_BOOTLOADER   0x1700
- #define MAXSIZE_APPLICATION    (STARTADDR_BOOTLOADER - STARTADDR_APPVECTORS)
- #define MAXSIZE_BOOTLOADER     0x0400
-
 // UART
  #define REGISTER_UCSRA0         UCSR0A
  #define REGISTER_UCSRB0         UCSR0B
@@ -253,14 +237,6 @@
  #define ADDR_SIGNATURE_BYTE2   4
  #define SIGRD 5 // workaround for missing define in avr-headers
 #elif defined (__AVR_ATmega324P__) || defined (__AVR_ATmega324A__) || defined (__AVR_ATmega324PA__)
- // definition of processor depending global settings
- // TODO CV: this part can be ported maybe to a makefile include
- #define STARTADDR_APPVECTORS   0x0000
- #define STARTADDR_VERSIONINFO  0x007C
- #define STARTADDR_BOOTLOADER   0x1700
- #define MAXSIZE_APPLICATION    (STARTADDR_BOOTLOADER - STARTADDR_APPVECTORS)
- #define MAXSIZE_BOOTLOADER     0x0400
-
  // definition of processor specific registers
  // UART0
  #define REGISTER_UCSRA0        UCSR0A
@@ -355,13 +331,6 @@
  #define ADDR_SIGNATURE_BYTE1   2
  #define ADDR_SIGNATURE_BYTE2   4
  #define SIGRD 5 // workaround for missing define in avr-headers
- // definition of processor depending global settings
- // TODO CV: this part can be ported maybe to a makefile include
- #define STARTADDR_APPVECTORS   0x0000
- #define STARTADDR_VERSIONINFO  0x0070
- #define STARTADDR_BOOTLOADER   0x1700
- #define MAXSIZE_APPLICATION    (STARTADDR_BOOTLOADER - STARTADDR_APPVECTORS)
- #define MAXSIZE_BOOTLOADER     0x0400
 
  // definition of processor specific registers
  // UART0

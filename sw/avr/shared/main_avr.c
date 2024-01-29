@@ -13,7 +13,7 @@
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
 /*
- * Copyright (C) 2019  christian <irqmask@web.de>
+ * Copyright (C) 2024  christian <irqmask@web.de>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,6 +35,9 @@
 #include <avr/pgmspace.h>
 #include <avr/wdt.h>
 
+#ifdef __AVR_ATtiny1634__
+ #include "bootloader.h"
+#endif
 #include "bus.h"
 #include "cmddef_common.h"
 #include "moddef_common.h"
@@ -171,12 +174,8 @@ static inline void interpret_message (uint16_t sender, uint8_t msglen, uint8_t* 
 
     case eCMD_RESET:
         cli();
-#ifdef __AVR_ATtiny1634__
-        //TODO implement reset for attiny1634
-#else
         wdt_enable(WDTO_15MS);
         while (1); // wait until watchdog resets the controller.
-#endif
         break;
 
     default:
@@ -191,6 +190,15 @@ static inline void interpret_message (uint16_t sender, uint8_t msglen, uint8_t* 
 
 int main(void)
 {
+    MCUSR = 0;
+    wdt_disable();
+#ifdef __AVR_ATtiny1634__
+    void (*bld_entrypoint)( void ) = (void*)BLD_ENTRYPOINT;
+
+    // call bootloader of ATtiny1634, since it has no dedicated bootloader section
+    bld_entrypoint();
+#endif
+
     uint8_t msglen = 0;
     uint8_t msg[BUS_MAXRECVMSGLEN];
     uint16_t sender = 0, module_id = 0x7F;

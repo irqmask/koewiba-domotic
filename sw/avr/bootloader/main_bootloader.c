@@ -7,7 +7,7 @@
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
 /*
- * Copyright (C) 2021  christian <irqmask@web.de>
+ * Copyright (C) 2024  christian <irqmask@web.de>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,6 +35,7 @@
 #include "ucontroller.h"
 
 // shared
+#include "bootloader.h"
 #include "crc16.h"
 #include "eeprom_spi.h"
 #include "spi.h"
@@ -82,14 +83,6 @@
 #endif
 
 // --- Type definitions --------------------------------------------------------
-
-typedef enum {
-	BLD_eExtEEPAddr_CtrlID      = MOD_eExtEEPAddr_AppStart + STARTADDR_VERSIONINFO,
-    BLD_eExtEEPAddr_BoardID     = BLD_eExtEEPAddr_CtrlID + MOD_LEN_CONTROLLERID,
-    BLD_eExtEEPAddr_BoardRev    = BLD_eExtEEPAddr_BoardID + MOD_LEN_BOARDID,
-    BLD_eExtEEPAddr_AppID       = BLD_eExtEEPAddr_BoardRev + MOD_LEN_BOARDREV,
-    BLD_eExtEEPAddr_AppVer      = BLD_eExtEEPAddr_AppID + MOD_LEN_APPID,
-} bld_ext_eep_addr_t;
 
 // --- Local variables ---------------------------------------------------------
 
@@ -217,7 +210,7 @@ int main ( void )
 {
 	uint8_t     bld_status;
     uint16_t    length = 0;
-    register uint8_t temp, tempSREG;
+
     void (*start) ( void ) = (void*) 0x0000; // function pointer to application code
 
     DBG_INIT();
@@ -225,12 +218,15 @@ int main ( void )
     // disable all interrupts
     cli();
 
+#ifndef __AVR_ATtiny1634__
+    register uint8_t temp, tempSREG;
     // move interrupt vector table to bootloader section
     tempSREG = SREG;
     temp = MCUCR;
     MCUCR = temp | (1 << IVCE);     // needed to unlock IVSEL
     MCUCR = temp | (1 << IVSEL);    // set IVSEL (within 4 cycles)
     SREG = tempSREG;
+#endif
 
     bld_status = 0;
 
@@ -288,9 +284,11 @@ int main ( void )
             DBG_SET_PIN3();
 
             bld_status |= (1 << eBldFlagNewSWProgrammed);
+#ifndef __AVR_ATtiny1634__
             // re-enable RWW-section again. We need this if we want to jump back
             // to the application after bootloading.
             boot_rww_enable ();
+#endif
         } while ( false );
         eeprom_write_byte(&g_reg_internal_eep[MOD_eCfg_BldFlag], bld_status);
     }
@@ -306,10 +304,11 @@ int main ( void )
 
     // restore interrupt vector table
     cli();
+#ifndef __AVR_ATtiny1634__
     temp = MCUCR;
     MCUCR = temp | (1<<IVCE);
     MCUCR = temp & ~(1<<IVSEL);
-
+#endif
     // start application
     start();
     return 0;

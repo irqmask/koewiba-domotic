@@ -64,7 +64,32 @@
 #endif
 #define EEPROM_MAXADDRESS EEPROM_SIZE-1
 
+#define EEP_SPI_CS_ACTIVATE   EEP_CS_PORT &= ~(1<<EEP_CS)
+#define EEP_SPI_CS_DEACTIVATE EEP_CS_PORT |=  (1<<EEP_CS)
+
 // --- Type definitions --------------------------------------------------------
+
+//! Flags of the EEProm's status register
+enum eep_flags {
+    eEEP_WIP    = 0x01, //!< Write-In-Process
+    eEEP_WEL    = 0x02, //!< Write-Enable-Latch
+    eEEP_BP0    = 0x04, //!< Block-Protection 0
+    eEEP_BP1    = 0x08, //!< Block-Protection 1
+    eEEP_WPEN   = 0x80  //!< Write-Protection-Enabled
+} eep_flags_t;
+
+//! Commands of the EEPRom
+enum eep_commands {
+    eEEP_WRSR   = 0x01, //!< Write STATUS register
+    eEEP_WRITE  = 0x02, //!< Write data to memory array beginning at selected
+                        //!< address.
+    eEEP_READ   = 0x03, //!< Read data from memory array beginning at selected
+                        //!< address.
+    eEEP_WRDI   = 0x04, //!< Reset the write enable latch (disable write
+                        //!< operations).
+    eEEP_RDSR   = 0x05, //!< Read STATUS register
+    eEEP_WREN   = 0x06  //!< Set the write enable latch (enable write operations)
+} eep_commands_t;
 
 // --- Local variables ---------------------------------------------------------
 

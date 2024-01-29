@@ -3,10 +3,8 @@ TARGETS = basic_app_atmega324p \
           basic_app_attiny1634 \
           blind-control_atmega328p \
           blind-control_5_atmega328p \
-          blind-control_5_atmega328pb \
           bootloader_atmega324p \
           bootloader_atmega328p \
-          bootloader_atmega328pb \
           gateway232_atmega324p \
           led2_atmega324p \
           roomthermostat \

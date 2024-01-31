@@ -49,18 +49,51 @@
 //! Application specific layout of registers
 typedef enum appregisters {
     // registers saved in EEProm
-    APP_eReg_RemTempCurrentModuleID = MOD_eReg_FirstAppSpecific,    //!< ModuleID of sender of current temperature
+    APP_eReg_IntTempCurrent = MOD_eReg_FirstAppSpecific, //!< Internal temperature sensor measurement in 1/100 Kelvin
+    APP_eReg_ResTempCurrent,			//!< Resulting temperature in 1/100 Kelvin. Depends on TemperatureMode
+    APP_eReg_IntTempOffset,				//!< Offset to calibrate internal temperature sensor in 1/100 Kelvin
+    APP_eReg_TempMode,           		//!< Temperature measurement mode (0=internal, 1=external, 2=average int+ext)
+    APP_eReg_reserved020,
+    APP_eReg_reserved021,
+    APP_eReg_reserved022,
+    APP_eReg_reserved023,
+    APP_eReg_reserved024,
+    APP_eReg_reserved025,
+    APP_eReg_reserved026,
+    APP_eReg_reserved027,
+    APP_eReg_reserved028,
+    APP_eReg_reserved029,
+    APP_eReg_reserved030,
+    APP_eReg_reserved031,
+    APP_eReg_RemTempCurrentModuleID, 	//!< ModuleID of sender of current temperature
     APP_eReg_RemTempCurrentRegNo,       //!< Sender's register number of current temperature
     APP_eReg_RemTempSetpointModuleID,   //!< ModuleID of sender of temperature setpoint
     APP_eReg_RemTempSetpointRegNo,      //!< Sender's register number of temperature setpoint
-    APP_eReg_DebugReceiverModuleID,     //!< Receiver module ID for debug messages
+    APP_eReg_DbgRecvModuleID,           //!< Receiver module ID for debug messages
+    APP_eReg_reserved037,
     APP_eReg_Kp,                        //!< Kp regulation parameter as 8bit fix-point number. 256 = 1.0
+    APP_eReg_reserved038,
+    APP_eReg_reserved039,
+    APP_eReg_reserved040,
+    APP_eReg_reserved041,
+    APP_eReg_reserved042,
+    APP_eReg_reserved043,
+    APP_eReg_reserved044,
+    APP_eReg_reserved045,
+    APP_eReg_reserved046,
+    APP_eReg_reserved047,
+    APP_eReg_Contact0State,
+    APP_eReg_Contact1State,
     APP_eReg_Last
 } eRegisters_t;
 
 //! Application specific layout of non volatile parameters (internal EEProm)
 typedef enum appconfig {
-    APP_eCfg_RemTempCurrentModuleID = MOD_eCfg_FirstAppSpecific,
+    APP_eCfg_IntTempOffset = MOD_eCfg_FirstAppSpecific,
+    APP_eCfg_IntTempOffsetLow = APP_eCfg_IntTempOffset,
+    APP_eCfg_IntTempOffsetHigh,
+    APP_eCfg_TempMode,
+    APP_eCfg_RemTempCurrentModuleID,
     APP_eCfg_RemTempCurrentModuleIDLow = APP_eCfg_RemTempCurrentModuleID,
     APP_eCfg_RemTempCurrentModuleIDHigh,
     APP_eCfg_RemTempCurrentRegNo,

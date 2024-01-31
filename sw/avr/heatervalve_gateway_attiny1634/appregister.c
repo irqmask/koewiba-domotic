@@ -91,7 +91,7 @@ bool        app_register_get        (uint8_t                reg_no,
     case APP_eReg_RemTempSetpointRegNo:
         *(uint8_t*)pvalue = app_rem_temp_setp_regno;
         break;
-    case APP_eReg_DebugReceiverModuleID:
+    case APP_eReg_DbgRecvModuleID:
         *(uint16_t*)pvalue = app_debug_receiver;
         *preg_type = eRegType_U16;
         break;
@@ -135,7 +135,7 @@ void        app_register_set        (uint8_t                reg_no,
         app_rem_temp_setp_regno = value8;
         eeprom_write_byte(&register_eeprom_array[APP_eCfg_RemTempSetpointRegNo], value8);
         break;
-    case APP_eReg_DebugReceiverModuleID:
+    case APP_eReg_DbgRecvModuleID:
         app_debug_receiver = value16;
         eeprom_write_word((uint16_t*)&register_eeprom_array[APP_eCfg_DebugReceiverModuleID], value16);
         break;

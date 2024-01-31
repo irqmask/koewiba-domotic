@@ -36,7 +36,7 @@
 #include "alarmclock.h"
 #include "datetime.h"
 #include "gdisplay.h"
-#include "inputs.h"
+#include "input.h"
 #include "register.h"
 #include "timer.h"
 #include "zagwire.h"
@@ -44,6 +44,7 @@
 #include "disp_sh1106.h"
 
 #include "application.h"
+#include "pcbconfig.h"
 
 // --- Definitions -------------------------------------------------------------
 
@@ -367,6 +368,8 @@ void app_draw_window()
 void app_init (void)
 {
     input_initialize();
+    INPUT_PCMSK |= INPUT_PCMSK_VAL; // activate pin-change-interrupts for the inputs
+
     gdisp_initialize();
     zagw_initialize();
     zagw_enable(true);
@@ -443,10 +446,11 @@ void app_background (sBus_t* bus)
 
     input_background();
 
-    if (input_on_activation(APP_INPUT_UP)) {
+    uint8_t in = input_went_low();
+    if (in & (1<<APP_INPUT_UP)) {
         reset_display_timeout();
         app_set_desired_temp(app_desired_temp + APP_TEMP_INCR, true);
-    } else if (input_on_activation(APP_INPUT_DOWN)) {
+    } else if (in & (1<<APP_INPUT_DOWN)) {
         reset_display_timeout();
         app_set_desired_temp(app_desired_temp - APP_TEMP_INCR, true);
     }

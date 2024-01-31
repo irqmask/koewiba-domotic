@@ -17,7 +17,7 @@ SRC = ../shared/bus_transport.c \
       shared/datetime.c \
       shared/disp_sh1106.c \
       shared/eeprom_spi.c \
-      shared/inputs.c \
+      shared/input.c \
       shared/gdisplay.c \
       shared/gdisplay_font_x8.c \
       shared/gdisplay_font_x16.c \

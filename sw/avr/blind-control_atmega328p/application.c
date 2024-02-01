@@ -31,17 +31,23 @@
 
 #include "prjtypes.h"
 
+#include <avr/io.h>
+
 #include "alarmclock.h"
 #include "blindctrl.h"
 #include "bus.h"
 #include "cmddef_common.h"
 #include "datetime.h"
-#include "inputs.h"
+#include "input.h"
 #include "motor.h"
 #include "register.h"
 #include "timer.h"
 
 // --- Definitions -------------------------------------------------------------
+
+#define APP_INPUT_UP        0   //!< Input key "up"
+#define APP_INPUT_DOWN      1   //!< Input key "down"
+#define APP_INPUT_WINDOW    2   //!< Input key "window"
 
 // --- Type definitions --------------------------------------------------------
 
@@ -65,24 +71,6 @@ void send_window_state (sBus_t* bus)
     msg[1] = APP_eReg_WindowState;      // number of bitfiels bytes
     msg[2] = (g_window_state==true) ? (1<<0) : 0;
     bus_send_message(bus, BUS_BRDCSTADR, 3, msg);
-}
-
-bool input_up               (void)
-{
-    //return ((PINC & (1<<INPUT_UP_PIN)) == 0);
-    return input_on_activation(0);
-}
-
-bool input_down             (void)
-{
-    //return ((PINC & (1<<INPUT_DOWN_PIN)) == 0);
-    return input_on_activation(1);
-}
-
-bool input_window_closed    (void)
-{
-    //return ((PINC & (1<<INPUT_WINDOW_PIN)) == 0);
-    return input_active(2);
 }
 
 // --- Module global functions -------------------------------------------------
@@ -156,16 +144,20 @@ void app_on_command (uint16_t sender, uint8_t msglen, uint8_t* msg)
 void app_background (sBus_t* bus)
 {
     input_background();
+    INPUT_PCMSK |= INPUT_PCMSK_VAL; // activate pin-change-interrupts for the inputs
 
-    if (input_up()) {
+    // check keys
+    uint8_t keys = input_went_low();
+
+    if (keys & (1<<APP_INPUT_UP)) {
         blind_move_to_position(0, 0);
     }
-    if (input_down()) {
+    if (keys & (1<<APP_INPUT_DOWN)) {
         blind_move_to_position(0, 100);
     }
 
     // check window position
-    g_window_state = input_window_closed();
+    g_window_state = (input_state() & (1<<APP_INPUT_WINDOW)) != 0;
     if (g_last_window_state != g_window_state) {
         g_last_window_state = g_window_state;
         send_window_state(bus);

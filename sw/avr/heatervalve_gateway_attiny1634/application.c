@@ -39,6 +39,7 @@
 #include "uart.h"
 
 #include "appconfig.h"
+#include "contacts.h"
 #include "led_debug.h"
 
 // --- Definitions -------------------------------------------------------------
@@ -167,6 +168,8 @@ void app_init (void)
     g_remote_temp_setpoint = 15 * 100 + 27315;
     g_remote_temp_curr = 15 * 100 + 27315;
     g_uart_rx_idx = 0;
+
+    contacts_initialize();
 }
 
 /**
@@ -223,6 +226,8 @@ void app_background (void)
 
         timer_start(&g_timer, TIMER_MS_2_TICKS(1000));
     }
+
+    contacts_background();
 
     // anything beyond this line will only be executed when no block transfer is active
     if (g_blocktransfer_active) return;

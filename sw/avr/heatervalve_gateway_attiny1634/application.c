@@ -31,6 +31,7 @@
 // --- Include section ---------------------------------------------------------
 
 #include <avr/io.h>
+
 #include "prjtypes.h"
 #include "cmddef_common.h"
 #include "register.h"
@@ -169,6 +170,7 @@ void app_init (void)
     g_uart_rx_idx = 0;
 
     contacts_initialize();
+    PCMSK0 |= ((1<<PCINT1) | (1<<PCINT2)); // wake-up by pin change on contact inputs
 }
 
 /**

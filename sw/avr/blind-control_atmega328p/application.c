@@ -89,6 +89,8 @@ extern void        app_register_load       (void);
 void app_init (void)
 {
     input_initialize();
+    INPUT_PCMSK |= INPUT_PCMSK_VAL; // activate pin-change-interrupts for the inputs
+
     motors_initialize();
     blinds_initialize();
     dt_initialize();
@@ -144,7 +146,6 @@ void app_on_command (uint16_t sender, uint8_t msglen, uint8_t* msg)
 void app_background (sBus_t* bus)
 {
     input_background();
-    INPUT_PCMSK |= INPUT_PCMSK_VAL; // activate pin-change-interrupts for the inputs
 
     // check keys
     uint8_t keys = input_went_low();

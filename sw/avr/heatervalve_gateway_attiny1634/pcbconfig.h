@@ -74,11 +74,11 @@
 #define INPUT_PCBCONFIG     1
 
 #define INPUT_NUM_PINS      2
-#define INPUT_PORT_0        PORTA
+#define INPUT_PORT_0        PUEA
 #define INPUT_PIN_0         PINA
 #define INPUT_DDR_0         DDRA
 #define INPUT_0             PA1
-#define INPUT_PORT_1        PORTA
+#define INPUT_PORT_1        PUEA
 #define INPUT_PIN_1         PINA
 #define INPUT_DDR_1         DDRA
 #define INPUT_1             PA2

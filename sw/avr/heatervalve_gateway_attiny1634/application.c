@@ -152,8 +152,6 @@ uint16_t app_get_kp(void)
  */
 void app_init (void)
 {
-    register_set_u16(MOD_eReg_ModuleID, 0x520);
-
     LED_ERROR_DDR |=  (1<<LED_ERROR);
     LED_ERROR_OFF;
     LED_STATUS_DDR |= (1<<LED_STATUS);

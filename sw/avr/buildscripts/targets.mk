@@ -6,6 +6,7 @@ TARGETS = basic_app_atmega324p \
           bootloader_atmega324p \
           bootloader_atmega328p \
           gateway232_atmega324p \
+          heatervalve_gateway_attiny1634 \
           led2_atmega324p \
           roomthermostat \
           scheduler_attiny1634 \

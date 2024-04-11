@@ -71,6 +71,9 @@
 #define LED_STATUS_PORT     PORTA
 #define LED_ERROR_PORT      PORTA
 
+#define LED_STATUS_INVERTED 1
+#define LED_ERROR_INVERTED  1
+
 #define INPUT_PCBCONFIG     1
 
 #define INPUT_NUM_PINS      2

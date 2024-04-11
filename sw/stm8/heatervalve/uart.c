@@ -80,9 +80,11 @@ void uart_initialize(void)
 
     // 1 stop bit
     USART1_CR3 &= ~(USART_CR3_STOP1 | USART_CR3_STOP2);
+    // BRR = F_CPU / Baudrate
     // 57600 baud
-    USART1_BRR1 = 0x11;
-    USART1_BRR2 = 0x6;
+    // BRR = 16000000 / 57600 = 278 = 0x0116
+    USART1_BRR1 = 0x11; // bit 11..4
+    USART1_BRR2 = 0x06; // bit 15..12 | 3..0
 }
 
 

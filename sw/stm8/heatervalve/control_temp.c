@@ -31,7 +31,6 @@
 
 #include <stdint.h>
 #include <stdio.h>
-#include "STM8L052C6.h"
 
 #include "debug.h"
 #include "motor.h"

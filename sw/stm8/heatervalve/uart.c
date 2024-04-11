@@ -73,7 +73,6 @@ void uart_initialize(void)
     // TX: PA2, RX: PA3
     SYSCFG_RMPCR1 |= 0x10;
     PA_CR1 |= MP1;
-    disable_uart_tx();
 
     // enable transmit and receive, no interrrupts
     USART1_CR2 = USART_CR2_REN; // not USART_CR2_TEN
@@ -85,31 +84,33 @@ void uart_initialize(void)
     // BRR = 16000000 / 57600 = 278 = 0x0116
     USART1_BRR1 = 0x11; // bit 11..4
     USART1_BRR2 = 0x06; // bit 15..12 | 3..0
+
+    enable_uart_tx();
 }
 
 
 uint8_t uart_write(const char *str)
 {
     uint8_t i = 0;
-    enable_uart_tx();
+    //enable_uart_tx();
     while (str[i] != '\0') {
         while (!(USART1_SR & USART_SR_TXE))
             ;
         USART1_DR = str[i];
         i++;
     }
-    disable_uart_tx();
+    //disable_uart_tx();
     return (i); // Bytes sent
 }
 
 
 int putchar(int data)
 {
-    enable_uart_tx();
+    //enable_uart_tx();
     USART1_DR = data;
     while (!(USART1_SR & USART_SR_TC))
         ;
-    disable_uart_tx();
+    //disable_uart_tx();
     return 1;
 }
 

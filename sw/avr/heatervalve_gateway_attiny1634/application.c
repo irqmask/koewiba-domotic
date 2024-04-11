@@ -176,7 +176,7 @@ void app_init (void)
 /**
  * Application specific ISR for pin change interrupt.
  *
- * @param[in] pinchange_interruptflags  The value of PCIFR is for determining, 
+ * @param[in] pinchange_interruptflags  The value of PCIFR is for determining,
  *                                      which register has to be checked for the
  *                                      source of interrupt.
  */
@@ -226,6 +226,7 @@ void app_background (void)
     if (timer_is_elapsed(&g_timer)) {
 
         timer_start(&g_timer, TIMER_MS_2_TICKS(1000));
+        LED_ERROR_TOGGLE;
     }
 
     contacts_background();
@@ -241,6 +242,7 @@ void app_background (void)
     if (uart_is_rx_pending1()) {
         char c;
         c = uart_get_char_blk1();
+        LED_STATUS_TOGGLE;
         if (c == '\n') {
             g_uart_rx_buffer[g_uart_rx_idx] = '\0';
             if (g_uart_rx_idx > 0 && g_uart_rx_buffer[0] == '#') {

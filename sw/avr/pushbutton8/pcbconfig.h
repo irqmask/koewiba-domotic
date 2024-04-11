@@ -133,6 +133,7 @@
 #define KEY7_WAKEUP         PCINT9  // PC1
 #define KEY7_WAKEUP_REG     PCMSK1
 
+#define LATCH_OE_ENABLED
 
 #define LED_OE_DDR          DDRD
 #define LED_OE_PORT         PORTD

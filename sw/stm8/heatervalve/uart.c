@@ -101,13 +101,14 @@ uint8_t uart_write(const char *str)
 }
 
 
-void putchar(unsigned char data)
+int putchar(int data)
 {
     enable_uart_tx();
     USART1_DR = data;
     while (!(USART1_SR & USART_SR_TC))
         ;
     disable_uart_tx();
+    return 1;
 }
 
 

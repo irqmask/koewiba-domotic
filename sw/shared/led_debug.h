@@ -41,23 +41,36 @@
 #endif
 
 #ifdef PRJCONF_UC_AVR
- #define LED_ERROR_ON        LED_ERROR_PORT &= ~(1<<LED_ERROR)
- #define LED_ERROR_OFF       LED_ERROR_PORT |=  (1<<LED_ERROR)
- #define LED_ERROR_TOGGLE    LED_ERROR_PORT ^=  (1<<LED_ERROR)
 
- #define LED_STATUS_ON       LED_STATUS_PORT &= ~(1<<LED_STATUS)
- #define LED_STATUS_OFF      LED_STATUS_PORT |=  (1<<LED_STATUS)
- #define LED_STATUS_TOGGLE   LED_STATUS_PORT ^=  (1<<LED_STATUS)
- 
+ #ifdef LED_ERROR_INVERTED
+  #define LED_ERROR_OFF       LED_ERROR_PORT &= ~(1<<LED_ERROR)
+  #define LED_ERROR_ON        LED_ERROR_PORT |=  (1<<LED_ERROR)
+  #define LED_ERROR_TOGGLE    LED_ERROR_PORT ^=  (1<<LED_ERROR)
+ #else // LED_ERROR_INVERTED
+  #define LED_ERROR_ON        LED_ERROR_PORT &= ~(1<<LED_ERROR)
+  #define LED_ERROR_OFF       LED_ERROR_PORT |=  (1<<LED_ERROR)
+  #define LED_ERROR_TOGGLE    LED_ERROR_PORT ^=  (1<<LED_ERROR)
+ #endif // LED_ERROR_INVERTED
+
+ #ifdef LED_STATUS_INVERTED
+  #define LED_STATUS_OFF      LED_STATUS_PORT &= ~(1<<LED_STATUS)
+  #define LED_STATUS_ON       LED_STATUS_PORT |=  (1<<LED_STATUS)
+  #define LED_STATUS_TOGGLE   LED_STATUS_PORT ^=  (1<<LED_STATUS)
+ #else // LED_STATUS_INVERTED
+  #define LED_STATUS_ON       LED_STATUS_PORT &= ~(1<<LED_STATUS)
+  #define LED_STATUS_OFF      LED_STATUS_PORT |=  (1<<LED_STATUS)
+  #define LED_STATUS_TOGGLE   LED_STATUS_PORT ^=  (1<<LED_STATUS)
+ #endif // LED_STATUS_INVERTED
+
 #else
- #define LED_ERROR_ON
- #define LED_ERROR_OFF
- #define LED_ERROR_TOGGLE
-
- #define LED_STATUS_ON
- #define LED_STATUS_OFF
- #define LED_STATUS_TOGGLE
+  #define LED_ERROR_OFF
+  #define LED_ERROR_ON
+  #define LED_ERROR_TOGGLE
+  #define LED_STATUS_ON
+  #define LED_STATUS_OFF
+  #define LED_STATUS_TOGGLE
 #endif
+
 // --- Type definitions --------------------------------------------------------
 
 // --- Local variables ---------------------------------------------------------

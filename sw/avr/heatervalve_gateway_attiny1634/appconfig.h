@@ -41,7 +41,7 @@
 #define BUS_MAXSENDMSGLEN       32      //!< Maximum length of a message to be sent.
 #define BUS_MAXRECVMSGLEN       64 + 2  //!< Maximum length of a message to be received.
 
-#define UART_BAUDRATE           57600   //!< Baudrate for second UART interfacing heatervalve module.
+#define UART_BAUDRATE           9600    //!< Baudrate for second UART interfacing heatervalve module.
 #define APP_HAS_BLOCK_HANDLER   1       //!< Application has block start and block end handler.
 
 // --- Type definitions --------------------------------------------------------

@@ -18,7 +18,7 @@ SOURCES       = adc.c \
                 timer.c \
                 uart.c \
 
-INCPATH       = -I. -I/usr/local/share/sdcc/include
+INCPATH       = -I. -I ../include -I/usr/local/share/sdcc/include
 
 ####### Output directories
 

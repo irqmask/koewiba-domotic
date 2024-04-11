@@ -28,15 +28,14 @@
 
 #include "uart.h"
 
-#include "STM8L052C6.h"
+// include
+#include "stm8l052c6.h"
 
 #ifdef HAS_APPCONFIG_H
  #include "appconfig.h"
 #endif
 
 // --- Definitions -------------------------------------------------------------
-
-#define MP1 (1 << 2)
 
 // --- Type definitions --------------------------------------------------------
 
@@ -50,15 +49,14 @@
 
 static void enable_uart_tx(void)
 {
-    PA_DDR |= MP1;
+    PA_DDR |= PIN_2;
     USART1_CR2 |= USART_CR2_TEN;    // enable UART
 }
-
 
 static void disable_uart_tx(void)
 {
     USART1_CR2 &= ~USART_CR2_TEN;   // disable UART to not disturb ATtiny's SPI
-    PA_DDR &= ~MP1;
+    PA_DDR &= ~PIN_2;
 }
 
 // --- Module global functions -------------------------------------------------
@@ -70,32 +68,54 @@ static void disable_uart_tx(void)
  */
 void uart_initialize(void)
 {
-    // TX: PA2, RX: PA3
-    SYSCFG_RMPCR1 |= 0x10;
-    PA_CR1 |= MP1;
+    // remap UART1 PINs TX: PA2, RX: PA3
+    SYSCFG_RMPCR1 &= ~SYSCFG_RMPCR1_USART1TXRXMASK;
+    SYSCFG_RMPCR1 |= SYSCFG_RMPCR1_USART1TXRXPORTA;
 
-    // enable transmit and receive, no interrrupts
+    // enable peripheral clock
+    CLK_PCKENR1 |= CLK_PCKENR1_USART1;
+
+    // PA2: TX
+    PA_CR1 |= PIN_2;
+    PA_DDR &= ~PIN_2;
+    // PA3: RX
+    PA_DDR &= ~PIN_3;
+
+    // enable USART1 (resetting disable bit)
+    USART1_CR1 &= ~USART_CR1_UARTD;
+    // enable receive, no interrupts
     USART1_CR2 = USART_CR2_REN; // not USART_CR2_TEN
-
-    // 1 stop bit
     USART1_CR3 &= ~(USART_CR3_STOP1 | USART_CR3_STOP2);
-    // BRR = F_CPU / Baudrate
+
+    //disable_uart_tx();
+
+    // calculate baudrate
+    // fHSI = 16MHz, ckdiv = 8 -> fClk = 2MHz
+    // M = fClk / fBaud
+
+    //         msb              lsb
+    // BRR1 = M(15..12) | M(03..00)
+    // BRR2 = M(11..08) | M(07..04)
+
+    // 9600 baud
+    // M = fClk / fBaud = 2000000 / 9600 = 208,33 = 0xD0
+    USART1_BRR1 = 0x0D;
+    USART1_BRR2 = 0x00;
+
     // 57600 baud
-    // BRR = 16000000 / 57600 = 278 = 0x0116
-    USART1_BRR1 = 0x11; // bit 11..4
-    USART1_BRR2 = 0x06; // bit 15..12 | 3..0
+    // M = fClk / fBaud = 2000000 / 57600 = 34,72 = 35 = 0x23
+    //USART1_BRR1 = 0x02;
+    //USART1_BRR2 = 0x03;
 
     enable_uart_tx();
 }
-
 
 uint8_t uart_write(const char *str)
 {
     uint8_t i = 0;
     //enable_uart_tx();
     while (str[i] != '\0') {
-        while (!(USART1_SR & USART_SR_TXE))
-            ;
+        while (!(USART1_SR & USART_SR_TXE));
         USART1_DR = str[i];
         i++;
     }
@@ -103,17 +123,24 @@ uint8_t uart_write(const char *str)
     return (i); // Bytes sent
 }
 
+bool uart_rx_pending(void)
+{
+    return USART1_SR & USART_SR_RXNE;
+}
 
-int putchar(int data)
+uint8_t uart_rx_data(void)
+{
+    return USART1_DR;
+}
+
+int putchar (int data)
 {
     //enable_uart_tx();
     USART1_DR = data;
-    while (!(USART1_SR & USART_SR_TC))
-        ;
+    while (!(USART1_SR & USART_SR_TC));
     //disable_uart_tx();
     return 1;
 }
-
 
 void dec2bcd(uint16_t val, char* bcdbuf)
 {
@@ -139,7 +166,6 @@ void dec2bcd(uint16_t val, char* bcdbuf)
     bcdbuf[4] = temp + '0';
 
     bcdbuf[5] = '\0';
-
 }
 
 /** @} */

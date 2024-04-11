@@ -8,7 +8,7 @@
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
 /*
- * Copyright (C) 2022  christian <irqmask@web.de>
+ * Copyright (C) 2024  christian <irqmask@web.de>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,8 +31,6 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
-
-#include "STM8L052C6.h"
 
 #include "control_temp.h"
 #include "motor.h"

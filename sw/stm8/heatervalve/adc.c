@@ -26,10 +26,10 @@
 
 // --- Include section ---------------------------------------------------------
 
-#include "STM8L052C6.h"
-
 #include "adc.h"
 
+// include
+#include "stm8l052c6.h"
 
 #ifdef HAS_APPCONFIG_H
  #include "appconfig.h"

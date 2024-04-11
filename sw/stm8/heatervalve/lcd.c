@@ -27,7 +27,8 @@
 // --- Include section ---------------------------------------------------------
 
 #include "lcd.h"
-#include "STM8L052C6.h"
+
+#include "stm8l052c6.h"
 
 #ifdef HAS_APPCONFIG_H
  #include "appconfig.h"
@@ -54,14 +55,6 @@
  */
 void lcd_initialize(void)
 {
-    //LCD_CR1 = 0x00;
-    //LCD_CR2 = 0x00;
-    //LCD_CR3 = 0x00;
-    //LCD_FRQ = 0x11;
-    //LCD_PM0 = ;
-    //LCD_PM1 = ;
-    //LCD_PM2 = ;
-
 }
 
 /** @} */

@@ -28,7 +28,8 @@
 
 #include "timer.h"
 
-#include "STM8L052C6.h"
+// include
+#include "stm8l052c6.h"
 
 #ifdef HAS_APPCONFIG_H
  #include "appconfig.h"
@@ -36,21 +37,21 @@
 
 // --- Definitions -------------------------------------------------------------
 
-#define TIM2_OVF_ISR 19
+#define TIMER_TICK_PRESCALER            10
+#define TIMER_TICK_PERIOD               199
+#define TIMER_TICK_REPTETION_COUNTER    0
 
 // --- Type definitions --------------------------------------------------------
 
 // --- Local variables ---------------------------------------------------------
 
-volatile uint32_t g_tim2_millis = 0;
+volatile uint32_t g_millisec_ticks = 0;
 
 // --- Global variables --------------------------------------------------------
 
 // --- Module global variables -------------------------------------------------
 
 // --- Local functions ---------------------------------------------------------
-
-
 
 // --- Module global functions -------------------------------------------------
 
@@ -61,29 +62,52 @@ volatile uint32_t g_tim2_millis = 0;
  */
 void timer_initialize(void)
 {
-    g_tim2_millis = 0;
-    // 16000 ticks
-    TIM2_ARRH = 0x3E;
-    TIM2_ARRL = 0x80;
-    //TIM2_PSCR = 0b010;
+    g_millisec_ticks = 0;
+    CLK_PCKENR2 |= CLK_PCKENR2_TIM1;
 
-    TIM2_IER |= 0x1; // Update interrupt
-    TIM2_CR1 = 0x1; // enable timer
+    // set auto-reload register value
+    TIM1_ARRH = (uint8_t)(TIMER_TICK_PERIOD >> 8);
+    TIM1_ARRL = (uint8_t)(TIMER_TICK_PERIOD & 0xFF);
 
+    // set prescaler value
+    TIM1_PSCRH = (uint8_t)(TIMER_TICK_PRESCALER >> 8);
+    TIM1_PSCRL = (uint8_t)(TIMER_TICK_PRESCALER & 0xFF);
+
+    // Select the Counter Mode: count up (=0)
+    TIM1_CR1 &= ~(TIM_CR1_CMSH | TIM_CR1_CMSL | TIM_CR1_DIR);
+
+    TIM1_RCR = TIMER_TICK_REPTETION_COUNTER;
+
+    TIM1_IER |= TIM_IER_UIE; // update interrupt enable
+
+    // enable timer 1
+    TIM1_CR1 |= TIM_CR1_CEN;
 }
 
 
-uint32_t timer_get_millis()
+void timer_irq_handler(void)
 {
-    return g_tim2_millis;
+    g_millisec_ticks++;
+}
+
+
+uint32_t timer_get_millis(void)
+{
+    return g_millisec_ticks;
 }
 
 
 void delay_ms(uint16_t ms)
 {
     uint32_t start = timer_get_millis();
-    while ((timer_get_millis() - start) < ms)
-        ;
+    while ((timer_get_millis() - start) < ms);
+}
+
+
+void TIM1_UPD_OVF_TRG_COM_IRQHandler() __interrupt(IPT_TIM1_UPD_OVF_TRG_COM)
+{
+    timer_irq_handler();
+    TIM1_SR1 = ~(uint8_t)TIM_SR1_UIF;
 }
 
 /** @} */

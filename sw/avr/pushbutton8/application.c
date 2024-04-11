@@ -96,8 +96,8 @@ extern void app_register_load (void);
  */
 void app_init (void)
 {
-    register_set_u16(MOD_eReg_ModuleID, OWN_NODE_ID);
-    //app_register_load();
+    //register_set_u16(MOD_eReg_ModuleID, OWN_NODE_ID);
+    app_register_load();
     leds_keys_init();
     input_initialize();
 }

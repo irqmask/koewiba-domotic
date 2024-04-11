@@ -282,7 +282,7 @@ void blind_stop             (uint8_t index)
 {
     if (index >= BLIND_COUNT) return;
     motor_stop(index);
-    if (g_blind_control[index].blind_state != idle && g_blind_control[index].blind_state != stopping) {
+    if (g_blind_control[index].blind_state != stopping) {
         g_blind_control[index].blind_state = stopping;
 
         update_current_position(index);
@@ -469,7 +469,10 @@ void blinds_background      (sBus_t* bus)
         case stopping:
             if (!motor_is_running(index)) {
                 g_blind_control[index].blind_state = idle;
-                send_current_position(index, bus);
+
+                if(g_blind_control[index].current_position != g_blind_control[index].position_setpoint) {
+                	send_current_position(index, bus);
+                }
                 send_position_setpoint(index, bus);
                 g_blinds_active &= ~(1<<index);
             }

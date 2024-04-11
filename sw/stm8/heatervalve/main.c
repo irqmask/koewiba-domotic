@@ -8,6 +8,7 @@
 #include "cmd.h"
 #include "control_temp.h"
 #include "debug.h"
+#include "lcd.h"
 #include "motor.h"
 #include "remote_tempsense.h"
 #include "timer.h"
@@ -36,21 +37,26 @@ void main(void)
     //char buf[16];
 
     char ticks_written = 0;
+    char lcd_test_value = 0;
     initClock();
     uart_initialize();
 
     LOG_DEBUG("# heatervalve\n");
+    lcd_initialize();
 
     adc_initialize();
 
     timer_initialize();
     enableInterrupts();
+
     motor_initialize();
     motor_start_homing();
     cmd_initialize();
     remts_initialize();
     ctrl_temp_initialize();
+
     LOG_DEBUG("# init complete\n");
+
     while (1) {
         if (uart_rx_pending()) {
             c = uart_rx_data();
@@ -68,10 +74,17 @@ void main(void)
         oldadc = adc;
         if ((timer_get_millis() % 500) == 0 && ticks_written == 0) {
             LOG_DEBUG("#tick\n");
+            //dec2bcd(timer_get_millis(), buf); buf[15] = 0;
             ticks_written = 1;
+            lcd_digit(0, lcd_test_value);
+            lcd_digit(1, lcd_test_value);
+            lcd_digit(2, lcd_test_value);
+            lcd_digit(3, lcd_test_value++);
+            if (lcd_test_value > 9)
+                lcd_test_value = 0;
         } else {
             ticks_written = 0;
-        }*/
+        }
     }
 }
 

@@ -58,7 +58,7 @@ static uint8_t g_segmentB[4][2] = {
 static uint8_t g_segmentC[4][2] = {
         { LCD_RAM_IDX0A, 0x80 },
         { LCD_RAM_IDX0B, 0x04 },
-        { LCD_RAM_IDX0B, 0x01 },
+        { LCD_RAM_IDX0C, 0x01 },
         { LCD_RAM_IDX0C, 0x08 }
 };
 
@@ -154,7 +154,7 @@ void lcd_initialize(void)
     // - configure LCD port pins
     LCD_PM0 = 0xFF;
     LCD_PM1 = 0xFF;
-    LCD_PM2 = 0x7F;// 0x03
+    LCD_PM2 = 0x03; //0x7F;// 0x03
     LCD_PM3 = 0x00;
 
     // - set contrast

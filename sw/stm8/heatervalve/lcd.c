@@ -8,7 +8,7 @@
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
 /*
- * Copyright (C) 2022  christian <irqmask@web.de>
+ * Copyright (C) 2024  christian <irqmask@web.de>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -154,16 +154,16 @@ void lcd_initialize(void)
     // - configure LCD port pins
     LCD_PM0 = 0xFF;
     LCD_PM1 = 0xFF;
-    LCD_PM2 = 0x03; //0x7F;// 0x03
+    LCD_PM2 = 0x00; //0x7F;// 0x03
     LCD_PM3 = 0x00;
 
     // - set contrast
     LCD_CR2 &= ~LCD_CR2_CTRST_MASK;
-    LCD_CR2 |= LCD_CR2_CTRST_LVL_6;
+    LCD_CR2 |= LCD_CR2_CTRST_LVL_3;
 
     // - set dead time
     LCD_CR3 &= ~LCD_CR3_DEAD_MASK;
-    LCD_CR3 |= LCD_CR3_DEAD_0;
+    LCD_CR3 |= LCD_CR3_DEAD_3;
 
     // - set pulse-on duration
     LCD_CR2 &= ~LCD_CR2_PON_MASK;

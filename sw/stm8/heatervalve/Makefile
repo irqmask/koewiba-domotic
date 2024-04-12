@@ -11,6 +11,7 @@ TARGET        = heatervalve
 SOURCES       = adc.c \
                 cmd.c \
                 control_temp.c \
+                encoder.c \
                 lcd.c \
                 main.c \
                 motor.c \
@@ -77,8 +78,8 @@ dirs:
 	@test -d $(DESTDIR)/ || mkdir -p $(DESTDIR)/
 
 $(TARGET): dirs $(OBJECTS)
-	$(LINK) $(LFLAGS) -o $(DESTDIR)/$(TARGET).ihx $(OBJECTS_W_PATH) $(LIBS)
-	objcopy -Iihex -Obinary $(DESTDIR)/$(TARGET).ihx $(DESTDIR)/$(TARGET).bin
+	$(LINK) $(LFLAGS) -o $(DESTDIR)/$(TARGET).hex $(OBJECTS_W_PATH) $(LIBS)
+	objcopy -Iihex -Obinary $(DESTDIR)/$(TARGET).hex $(DESTDIR)/$(TARGET).bin
 
 clean: 
 	-$(DEL_FILE) $(BUILDDIR)/*
@@ -87,6 +88,6 @@ clean:
 distclean: clean 
 
 program: $(TARGET)
-	stm8flash -p stm8l052c6 -c stlinkv2 -w $(DESTDIR)/$(TARGET).ihx
+	stm8flash -p stm8l052c6 -c stlinkv2 -w $(DESTDIR)/$(TARGET).hex
 
  

@@ -57,6 +57,7 @@ volatile uint32_t g_millisec_ticks = 0;
 
 // --- Global functions --------------------------------------------------------
 
+extern void app_irq_every_millisec(void);
 /**
  * Initialize timer.
  */
@@ -107,6 +108,7 @@ void delay_ms(uint16_t ms)
 void TIM1_UPD_OVF_TRG_COM_IRQHandler() __interrupt(IPT_TIM1_UPD_OVF_TRG_COM)
 {
     timer_irq_handler();
+    app_irq_every_millisec();
     TIM1_SR1 = ~(uint8_t)TIM_SR1_UIF;
 }
 

@@ -8,6 +8,7 @@
 #include "cmd.h"
 #include "control_temp.h"
 #include "debug.h"
+#include "encoder.h"
 #include "lcd.h"
 #include "motor.h"
 #include "remote_tempsense.h"
@@ -28,6 +29,10 @@ static void initClock()
     CLK_CRTCR = CLK_RTCCLK_SRC_LSE | CLK_RTCCLK_DIV_1;
 }
 
+void app_irq_every_millisec(void)
+{
+    enc_on_irq();
+}
 
 void main(void)
 {
@@ -45,6 +50,7 @@ void main(void)
     lcd_initialize();
 
     adc_initialize();
+    enc_initialize(5, 100);
 
     timer_initialize();
     enableInterrupts();
@@ -72,9 +78,8 @@ void main(void)
             dec2bcd(adc, buf);
         }
         oldadc = adc;
+        */
         if ((timer_get_millis() % 500) == 0 && ticks_written == 0) {
-            LOG_DEBUG("#tick\n");
-            //dec2bcd(timer_get_millis(), buf); buf[15] = 0;
             ticks_written = 1;
             lcd_digit(0, lcd_test_value);
             lcd_digit(1, lcd_test_value);
@@ -82,6 +87,8 @@ void main(void)
             lcd_digit(3, lcd_test_value++);
             if (lcd_test_value > 9)
                 lcd_test_value = 0;
+            LOG_DEBUG("# ENC %d\n", enc_read());
+           // LOG_DEBUG("# tick\n");
         } else {
             ticks_written = 0;
         }

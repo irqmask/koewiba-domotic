@@ -24,7 +24,8 @@ SRC = ../shared/bus_transport.c \
       heatervalve_gateway_attiny1634/application.c \
       heatervalve_gateway_attiny1634/appregister.c \
       heatervalve_gateway_attiny1634/appversion.c \
-      heatervalve_gateway_attiny1634/contacts.c
+      heatervalve_gateway_attiny1634/contacts.c \
+      heatervalve_gateway_attiny1634/heatervalve.c
 
 # Place -I options here
 INCDIRS = -I. \

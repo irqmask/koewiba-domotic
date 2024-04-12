@@ -133,6 +133,7 @@
 #define KEY7_WAKEUP         PCINT9  // PC1
 #define KEY7_WAKEUP_REG     PCMSK1
 
+#define SN74595_REG_BYTES	1		// Number of bytes to send in full spi message
 #define LATCH_OE_ENABLED
 
 #define LED_OE_DDR          DDRD

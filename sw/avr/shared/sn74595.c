@@ -56,6 +56,7 @@
 // --- Global variables --------------------------------------------------------
 
 // --- Module global variables -------------------------------------------------
+static uint8_t sn74595_schadow_reg[SN74595_REG_BYTES];
 
 // --- Local functions ---------------------------------------------------------
 
@@ -69,14 +70,18 @@
  */
 void sn74595_initialize    	(void)
 {
+    uint8_t i;
 #ifdef LATCH_OE_ENABLED
     LATCH_OE_DDR |= (1<<LATCH_OE_PIN);
     sn74595_OE_off();
 #endif
     LATCH_STB_DDR |= (1<<LATCH_STB_PIN);
     LATCH_STB_PORT &= ~(1<<LATCH_STB_PIN);
-	spi_transmit_blk(0);
-    spi_transmit_blk(0);
+    for(i=0; i<SN74595_REG_BYTES; i++)
+    {
+        sn74595_schadow_reg[i] = 0;
+        spi_transmit_blk(sn74595_schadow_reg[i]);
+    }
     sn74595_latch();
 }
 
@@ -85,7 +90,7 @@ void sn74595_initialize    	(void)
  */
 void sn74595_latch(void)
 {
-    LATCH_STB_PORT |= (1<<LATCH_STB_PIN);
+    LATCH_STB_PORT |=  (1<<LATCH_STB_PIN);
     LATCH_STB_PORT &= ~(1<<LATCH_STB_PIN);
 }
 
@@ -108,26 +113,31 @@ void sn74595_OE_off(void)
 #endif
 
 /**
- * Send and latch one data byte.
+ * Set bits in the spi message.
  *
- * @param[in] data  Databyte to send.
+ * @param[in] byte_idx	Index of byte in message.
+ * @param[in] data  	Databyte to send.
+ * @param[in] mask  	Bit mask (which bits should be updated).
  */
-void sn74595_send(uint8_t data)
+void sn74595_set_byte(uint8_t byte_idx, uint8_t data, uint8_t mask)
 {
-    spi_transmit_blk(data);
-    sn74595_latch();
+    uint8_t byte = sn74595_schadow_reg[byte_idx] & ~mask;
+
+    byte |= data & mask;
+    sn74595_schadow_reg[byte_idx] = byte;
 }
 
 /**
- * Send and latch multiple data bytes.
+ * Send and latch all data bytes.
  *
- * @param[in] data  Databytes to send.
- * @param[in] length Number of bytes to send.
  */
-void sn74595_send_multiple(uint8_t *data, uint8_t length)
+void sn74595_send(void)
 {
-    for (uint8_t i=0; i<length; i++) {
-        spi_transmit_blk(data[i]);
+    uint8_t	i;
+
+    for(i=0; i<SN74595_REG_BYTES; i++)
+    {
+        spi_transmit_blk(sn74595_schadow_reg[i]);
     }
     sn74595_latch();
 }

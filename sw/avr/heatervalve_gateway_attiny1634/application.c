@@ -41,6 +41,7 @@
 
 #include "appconfig.h"
 #include "contacts.h"
+#include "heatervalve.h"
 #include "led_debug.h"
 #include "messaging.h"
 
@@ -119,6 +120,7 @@ bool app_block_start(uint16_t sender, uint8_t blocktype)
     (void)sender;
     (void)blocktype;
     spi_master_init_blk();
+    hv_reset(true);
     g_blocktransfer_active = true;
     return true;
 }
@@ -128,6 +130,7 @@ bool app_block_end(uint16_t sender, uint8_t blocktype)
     (void)sender;
     (void)blocktype;
     uart_init_blk1(UART_BAUDRATE);
+    hv_initialize();
     g_blocktransfer_active = false;
     return true;
 }
@@ -158,7 +161,7 @@ void app_init (void)
     LED_ERROR_OFF;
     LED_STATUS_DDR |= (1<<LED_STATUS);
     LED_STATUS_OFF;
-    uart_init_blk1(UART_BAUDRATE);
+    hv_initialize();
 
     timer_start(&g_timer, TIMER_MS_2_TICKS(1000));
 

@@ -58,7 +58,9 @@ void sn74595_OE_on          (void);
 
 void sn74595_OE_off         (void);
 
-void sn74595_send           (uint8_t data);
+void sn74595_set_byte       (uint8_t byte_idx, uint8_t data, uint8_t mask);
+
+void sn74595_send           (void);
 
 void sn74595_send_multiple  (uint8_t *data, uint8_t length);
 

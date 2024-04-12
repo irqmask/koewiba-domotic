@@ -169,7 +169,8 @@ void leds_keys_background (void)
         g_led_flash_index++;
         g_led_flash_index &= 0x07;
 
-        sn74595_send(g_led_data | flashed_leds);
+        sn74595_set_byte(0, g_led_data | flashed_leds, 0xff);
+        sn74595_send();
         timer_start(&g_timer, TIMER_MS_2_TICKS(150));
 
         if (key_pressed != 0xFF) sleep_prevent(0x01, 0); // Reset sleep prevention bit as soon as pinchange-interrupt is processed.

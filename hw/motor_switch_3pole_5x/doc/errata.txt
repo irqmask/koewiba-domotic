@@ -1,3 +1,8 @@
+Revision C
+ - OutputEnable-Pin (OE) pulled directly to GND. Must be controlled by µC and pulled up with 10K to VCC.
+ - Input connectors still too close together
+ - DCDC converter too close to ISP6 connector.
+
 Revision B
  - Input connectors too close together
  - DCDC converter is touching housing, needs to be moved, along with ISP6 connector more to the inner.

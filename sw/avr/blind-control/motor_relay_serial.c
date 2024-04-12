@@ -139,10 +139,21 @@ static uint8_t g_motor_relay_shadow[2];
  */
 void motors_relay_initialize       (void)
 {
+    uint8_t i;
+    uint8_t mask[MOTOR_COUNT] = {0,0};
+
     g_motor_relay_shadow[0] = 0;
     g_motor_relay_shadow[1] = 0;
     sn74595_initialize();
-    sn74595_send_multiple(g_motor_relay_shadow, sizeof(g_motor_relay_shadow));
+    for(i=0; i<MOTOR_COUNT; i++)
+    {
+        mask[0] |= g_motor_relay_onoff_mask[i][0] | g_motor_relay_updown_mask[i][0];
+        mask[1] |= g_motor_relay_onoff_mask[i][1] | g_motor_relay_updown_mask[i][1];
+    }
+    sn74595_set_byte(0, g_motor_relay_shadow[0], mask[0]);
+    sn74595_set_byte(1, g_motor_relay_shadow[1], mask[1]);
+    sn74595_send();
+    sn74595_OE_on();
 }
 
 void motor_relay_onoff(uint8_t index, bool onoff)
@@ -157,7 +168,9 @@ void motor_relay_onoff(uint8_t index, bool onoff)
         g_motor_relay_shadow[0] &= ~g_motor_relay_onoff_mask[index][0];
         g_motor_relay_shadow[1] &= ~g_motor_relay_onoff_mask[index][1];
     }
-    sn74595_send_multiple(g_motor_relay_shadow, sizeof(g_motor_relay_shadow));
+    sn74595_set_byte(0, g_motor_relay_shadow[0], g_motor_relay_onoff_mask[index][0]);
+    sn74595_set_byte(1, g_motor_relay_shadow[1], g_motor_relay_onoff_mask[index][1]);
+    sn74595_send();
 }
 
 void motor_relay_updown(uint8_t index, bool updown)
@@ -172,7 +185,9 @@ void motor_relay_updown(uint8_t index, bool updown)
         g_motor_relay_shadow[0] &= ~g_motor_relay_updown_mask[index][0];
         g_motor_relay_shadow[1] &= ~g_motor_relay_updown_mask[index][1];
     }
-    sn74595_send_multiple(g_motor_relay_shadow, sizeof(g_motor_relay_shadow));
+    sn74595_set_byte(0, g_motor_relay_shadow[0], g_motor_relay_updown_mask[index][0]);
+    sn74595_set_byte(1, g_motor_relay_shadow[1], g_motor_relay_updown_mask[index][1]);
+    sn74595_send();
 }
 
 

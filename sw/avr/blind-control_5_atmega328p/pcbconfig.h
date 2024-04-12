@@ -62,7 +62,8 @@
 // ----------------------------------------------------------------------------
 
 #define SN74595_PCBCONFIG   1
-#undef LATCH_OE_ENABLED
+#define SN74595_REG_BYTES	2		// Number of bytes to send in full spi message
+#define LATCH_OE_ENABLED	1
 #define LATCH_OE_DDR        DDRD
 #define LATCH_OE_PORT       PORTD
 #define LATCH_OE_PIN        PD7

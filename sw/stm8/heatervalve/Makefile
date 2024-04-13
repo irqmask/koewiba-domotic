@@ -18,8 +18,9 @@ SOURCES       = adc.c \
                 remote_tempsense.c \
                 timer.c \
                 uart.c \
+                queue.c
 
-INCPATH       = -I. -I ../include -I/usr/local/share/sdcc/include
+INCPATH       = -I. -I../include -I../../include -I../../shared -I/usr/local/share/sdcc/include
 
 ####### Output directories
 

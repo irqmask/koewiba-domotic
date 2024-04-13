@@ -119,6 +119,6 @@ void TIM1_UPD_OVF_TRG_COM_IRQHandler(void) __interrupt(IPT_TIM1_UPD_OVF_TRG_COM)
 //void TIM4_UPD_OVF_TRG_IRQHandler(void) __interrupt(IPT_TIM4_UPD_OVF);
 //void SPI1_IRQHandler(void) __interrupt(IPT_SPI1);
 //void USART1_TX_TIM5_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(IPT_USART1_TX_TIM5_UPD_OVF_TRG_BRK);
-//void USART1_RX_TIM5_CC_IRQHandler(void) __interrupt(IPT_USART1_RX_TIM5_CC);
+void USART1_RX_TIM5_CC_IRQHandler(void) __interrupt(IPT_USART1_RX_TIM5_CC);
 //void I2C1_SPI2_IRQHandler(void) __interrupt(IPT_I2C1_SPI2);
 

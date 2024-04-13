@@ -8,7 +8,7 @@
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
 /*
- * Copyright (C) 2022  christian <irqmask@web.de>
+ * Copyright (C) 2024  christian <irqmask@web.de>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,6 +31,9 @@
 // include
 #include "stm8l052c6.h"
 
+// shared
+#include "queue.h"
+
 #ifdef HAS_APPCONFIG_H
  #include "appconfig.h"
 #endif
@@ -40,6 +43,9 @@
 // --- Type definitions --------------------------------------------------------
 
 // --- Local variables ---------------------------------------------------------
+
+uint8_t g_rx_queue_data[64];
+queue_t g_rx_queue;
 
 // --- Global variables --------------------------------------------------------
 
@@ -68,6 +74,8 @@ static void disable_uart_tx(void)
  */
 void uart_initialize(void)
 {
+    q_initialize(&g_rx_queue, g_rx_queue_data, sizeof(g_rx_queue_data));
+
     // remap UART1 PINs TX: PA2, RX: PA3
     SYSCFG_RMPCR1 &= ~SYSCFG_RMPCR1_USART1TXRXMASK;
     SYSCFG_RMPCR1 |= SYSCFG_RMPCR1_USART1TXRXPORTA;
@@ -83,8 +91,8 @@ void uart_initialize(void)
 
     // enable USART1 (resetting disable bit)
     USART1_CR1 &= ~USART_CR1_UARTD;
-    // enable receive, no interrupts
-    USART1_CR2 = USART_CR2_REN; // not USART_CR2_TEN
+    // enable receiver and receive-interrupts
+    USART1_CR2 = USART_CR2_REN | USART_CR2_RIEN; // not USART_CR2_TEN
     USART1_CR3 &= ~(USART_CR3_STOP1 | USART_CR3_STOP2);
 
     //disable_uart_tx();
@@ -125,12 +133,12 @@ uint8_t uart_write(const char *str)
 
 bool uart_rx_pending(void)
 {
-    return USART1_SR & USART_SR_RXNE;
+    return q_is_pending(&g_rx_queue);
 }
 
 uint8_t uart_rx_data(void)
 {
-    return USART1_DR;
+    return q_get_byte(&g_rx_queue);
 }
 
 int putchar (int data)
@@ -166,6 +174,13 @@ void dec2bcd(uint16_t val, char* bcdbuf)
     bcdbuf[4] = temp + '0';
 
     bcdbuf[5] = '\0';
+}
+
+void USART1_RX_TIM5_CC_IRQHandler(void) __interrupt(IPT_USART1_RX_TIM5_CC)
+{
+    if ((USART1_SR & USART_SR_RXNE) != 0) {
+        q_put_byte(&g_rx_queue, USART1_DR);
+    }
 }
 
 /** @} */

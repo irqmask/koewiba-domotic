@@ -141,8 +141,8 @@ bool        app_register_get        (uint8_t                reg_no,
         switch (reg_no - index * NUM_REGS_PER_STUB)
         {
         case APP_eReg_RecMsg0_RemoteAddr:
-         *(uint16_t*)pvalue = eeprom_read_word((uint16_t*)&register_eeprom_array[APP_eCfg_RecMsg0_RemoteAddr + index * NUM_EEBYTES_PER_STUB]);
-         *preg_type = eRegType_U16;
+            *(uint16_t*)pvalue = eeprom_read_word((uint16_t*)&register_eeprom_array[APP_eCfg_RecMsg0_RemoteAddr + index * NUM_EEBYTES_PER_STUB]);
+            *preg_type = eRegType_U16;
          break;
 
         case APP_eReg_RecMsg0_Command:
@@ -264,45 +264,17 @@ void        app_register_set        (uint8_t                reg_no,
             break;
         }
     }
-    else
+    else if (reg_no >= APP_eReg_0_LEDState &&
+             reg_no < (APP_eReg_0_LEDState + APP_NUM_LEDS))
     {
-        switch(reg_no)
-        {
-        case APP_eReg_0_LEDState:
-            if(tempval8 == 0) led_switch(0, eLED_off);
-            else              led_switch(0, eLED_on);
-            break;
-        case APP_eReg_1_LEDState:
-            if(tempval8 == 0) led_switch(1, eLED_off);
-            else              led_switch(1, eLED_on);
-            break;
-        case APP_eReg_2_LEDState:
-            if(tempval8 == 0) led_switch(2, eLED_off);
-            else              led_switch(2, eLED_on);
-            break;
-        case APP_eReg_3_LEDState:
-            if(tempval8 == 0) led_switch(3, eLED_off);
-            else              led_switch(3, eLED_on);
-            break;
-        case APP_eReg_4_LEDState:
-            if(tempval8 == 0) led_switch(4, eLED_off);
-            else              led_switch(4, eLED_on);
-            break;
-        case APP_eReg_5_LEDState:
-            if(tempval8 == 0) led_switch(5, eLED_off);
-            else              led_switch(5, eLED_on);
-            break;
-        case APP_eReg_6_LEDState:
-            if(tempval8 == 0) led_switch(6, eLED_off);
-            else              led_switch(6, eLED_on);
-            break;
-        case APP_eReg_7_LEDState:
-            if(tempval8 == 0) led_switch(7, eLED_off);
-            else              led_switch(7, eLED_on);
-            break;
-        default:
-            break;
-        }
+        uint8_t led_mode = eLED_off;
+        uint8_t led_idx  = reg_no - APP_eReg_0_LEDState;
+
+        if(0x0 < tempval8) led_mode = eLED_blink_slow;
+        if(0x7 < tempval8) led_mode = eLED_blink_fast;
+        if(0xE < tempval8) led_mode = eLED_on;
+
+        led_switch(led_idx, led_mode);
     }
 }
 

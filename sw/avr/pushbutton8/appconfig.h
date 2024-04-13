@@ -26,6 +26,7 @@
 #define BUS_MAXRECVMSGLEN   64 + 2  //!< Maximum length of a message to be received.
 
 #define APP_NUM_KEYS        8       //!< The keys application supports eight keys.
+#define APP_NUM_LEDS        8       //!< The leds application supports eight leds.
 #define APP_NUM_KEY_STUBS   8       //!< The keys application supports eight keys.
 #define APP_NUM_MSG_STUBS  16       //!< Number of message receiver stubs
 

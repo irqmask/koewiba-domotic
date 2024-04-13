@@ -83,30 +83,41 @@ static void app_execute_message_dependend_function(app_msg_dep_func_t function_i
 {
     uint8_t value       = 0;
     uint8_t led_idx     = 0;
+    uint8_t led_mask    = 0;
+    uint8_t led_mode    = 0;
     uint8_t bit_set_idx = 0;
     uint8_t led_reg_val = 0;
+    uint8_t i;
 
     switch (function_id) {
     case eMsgDepFunc_Led_on_bitset: // LED active when bit is set
         value       = *(uint8_t*)pvalue;
-        bit_set_idx = (add_info & 0x0F);
-        led_idx     = (add_info & 0xF0)>>4;
+        // [bit_idx=0..15 | led_idx=0..15]
+        led_idx     = (add_info & 0x0F);
+        bit_set_idx = (add_info & 0xF0)>>4;
 
-        if(value & (1<<bit_set_idx))   led_reg_val = 0x0F;
+        if(value & (1<<bit_set_idx))   led_reg_val = 0x0F; // constant full intensity
         else                           led_reg_val = 0x0;
+        led_mask = 0x01<<led_idx;
         break;
     case eMsgDepFunc_Led_blindcontrol: // LED active when bit is set
-        value      = *(uint8_t*)pvalue;
-        led_idx    = add_info;
+        value       = *(uint8_t*)pvalue;
 
-        if(value == 100)    led_reg_val = 0x00;
-        else if(value == 0) led_reg_val = 0x00;
-        else                led_reg_val = 0x0F;
+        // [led_mode=0..15 | led_idx=0..15]
+        led_mode    = (add_info & 0xF0)>>4; // [0=off|15=on|2..14=slow..fast blinking]
+        led_idx     = (add_info & 0x0F);    // [0=LED0 ... 7=LED7]
+
+        if     (0xF==led_mode)  led_reg_val = 0x0F;
+        else if(0x0==led_mode)  led_reg_val = 0x00;
+        else                    led_reg_val = led_mode;
+        led_mask = 0x11<<led_idx; // switch opposite LED in addition
         break;
     default:
         return;
     }
-    app_register_set(led_idx + APP_eReg_0_LEDState, led_reg_val);
+    for(i=0;i<APP_NUM_KEYS;i++) {
+        if(led_mask & (1<<i)) app_register_set(i + APP_eReg_0_LEDState, led_reg_val);
+    }
 }
 
 static void process_state_message(uint16_t sender, uint8_t msglen, uint8_t* msg)

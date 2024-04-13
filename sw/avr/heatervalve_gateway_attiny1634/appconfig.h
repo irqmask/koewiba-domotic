@@ -72,7 +72,6 @@ typedef enum appregisters {
     APP_eReg_DbgRecvModuleID,           //!< Receiver module ID for debug messages
     APP_eReg_reserved037,
     APP_eReg_Kp,                        //!< Kp regulation parameter as 8bit fix-point number. 256 = 1.0
-    APP_eReg_reserved038,
     APP_eReg_reserved039,
     APP_eReg_reserved040,
     APP_eReg_reserved041,
@@ -120,6 +119,7 @@ extern const unsigned char app_versioninfo[];
 
 // --- Module global variables -------------------------------------------------
 
+extern void app_send_debug_string(const char* str);
 extern bool app_block_start(uint16_t sender, uint8_t blocktype);
 extern bool app_block_end(uint16_t sender, uint8_t blocktype);
 

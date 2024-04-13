@@ -31,6 +31,7 @@
 // --- Include section ---------------------------------------------------------
 
 #include <stdbool.h>
+#include <stdint.h>
 
 // --- Definitions -------------------------------------------------------------
 
@@ -43,6 +44,16 @@
 void hv_initialize(void);
 
 void hv_reset(bool on);
+
+void hv_send_currtemp_and_setpoint(uint16_t currtemp, uint16_t setpoint);
+
+void hv_send_kp(uint16_t kp);
+
+void hv_forward_uart_buffer(void);
+
+void hv_lcd_disp_val(uint16_t value, uint8_t decpoints);
+
+void hv_lcd_disp_sym(char symbol, bool on);
 
 void hv_background(void);
 

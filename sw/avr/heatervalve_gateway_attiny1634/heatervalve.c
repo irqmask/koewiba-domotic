@@ -38,20 +38,80 @@
  #include "pcbconfig.h"
 #endif
 
+// include
+#include "cmddef_common.h"
 #include "prjtypes.h"
+
+// shared
+#include "bus.h"
+#include "led_debug.h"
+#include "util.h"
+
+// avr shared
 #include "uart.h"
 
 // --- Definitions -------------------------------------------------------------
+
+#define UART_RX_BUFLEN 32
 
 // --- Type definitions --------------------------------------------------------
 
 // --- Local variables ---------------------------------------------------------
 
+static char     g_uart_rx_buffer[32];
+static uint8_t  g_uart_rx_idx;
+static uint8_t  g_readidx;
+
+static uint8_t  g_enc_lastval;
+
 // --- Global variables --------------------------------------------------------
+
+extern sBus_t   g_bus;
+extern void app_on_encoder_value(int8_t diff);
 
 // --- Module global variables -------------------------------------------------
 
 // --- Local functions ---------------------------------------------------------
+
+static void eat_whitespace(void)
+{
+    while (g_readidx < UART_RX_BUFLEN && g_uart_rx_buffer[g_readidx] == ' ') {
+        g_readidx++;
+    }
+}
+
+static bool starts_with(const char* cmd)
+{
+    uint8_t idx = 0;
+
+    while (g_uart_rx_buffer[idx] != '\0' && cmd[idx] != '\0' && idx < UART_RX_BUFLEN) {
+
+        if (g_uart_rx_buffer[idx] != cmd[idx]) {
+            return false;
+        }
+        idx++;
+    }
+    if (cmd[idx] == '\0') {
+        g_readidx = idx;
+        eat_whitespace();
+        return true;
+    }
+    return false;
+}
+
+static void interpret_message(void)
+{
+    uint8_t val8;
+    if (g_uart_rx_idx > 0 && g_uart_rx_buffer[0] == '#') {
+        app_send_debug_string(g_uart_rx_buffer);
+    }
+    else if (starts_with("enc")) {
+        if (decode_hex8(&g_uart_rx_buffer[g_readidx], &val8)) {;
+            app_on_encoder_value(val8 - g_enc_lastval);
+            g_enc_lastval = val8;
+        }
+    }
+}
 
 // --- Module global functions -------------------------------------------------
 
@@ -68,6 +128,8 @@ void hv_initialize(void)
     hv_reset(true);
     uart_init_blk1(UART_BAUDRATE);
     hv_reset(false);
+
+    g_uart_rx_idx = 0;
 }
 
 /**
@@ -84,12 +146,68 @@ void hv_reset(bool on)
     }
 }
 
+void hv_send_currtemp_and_setpoint(uint16_t currtemp, uint16_t setpoint)
+{
+    // send remote temperatures
+    // srt <current> <desired>
+    uart_put_string_blk1_p("srt ");
+    uart_put_hex16_blk1(currtemp);
+    uart_put_char_blk1(' ');
+    uart_put_hex16_blk1(setpoint);
+    uart_put_char_blk1('\n');
+}
+
+void hv_send_kp(uint16_t kp)
+{
+    uart_put_string_blk1_p("skp ");
+    uart_put_hex16_blk1(kp);
+    uart_put_char_blk1('\n');
+}
+
+/**
+ * Display decimal value on LCD display with decimal points.
+ * @param[in] value     Value to be displayed.
+ * @param[in] decpoints Decimalpoint beeing displayed.
+ */
+void hv_lcd_disp_val(uint16_t value, uint8_t decpoints)
+{
+    uart_put_string_blk1_p("dv ");
+    uart_put_hex16_blk1(value);
+    uart_put_char_blk1(' ');
+    uart_put_hex8_blk1(decpoints);
+    uart_put_char_blk1('\n');
+}
+
+/**
+ * Display or hide a symbol
+ */
+void hv_lcd_disp_sym(char symbol, bool on)
+{
+    uart_put_string_blk1_p("ds ");
+    uart_put_char_blk1(symbol);
+    uart_put_char_blk1(on + '0');
+    uart_put_char_blk1('\n');
+}
+
 /**
  * Heatervalve background processing, e.g. listening for incoming messages from sub-module
  */
 void hv_background(void)
 {
-
+    if (uart_is_rx_pending1()) {
+        char c;
+        c = uart_get_char_blk1();
+        LED_STATUS_TOGGLE;
+        if (c == '\n') {
+            g_uart_rx_buffer[g_uart_rx_idx] = '\0';
+            interpret_message();
+            g_uart_rx_idx = 0;
+        } else {
+            if (g_uart_rx_idx < (sizeof(g_uart_rx_buffer) - 1)) {
+                g_uart_rx_buffer[g_uart_rx_idx++] = c;
+            }
+        }
+    }
 }
 
 /** @} */

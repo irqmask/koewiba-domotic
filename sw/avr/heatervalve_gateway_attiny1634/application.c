@@ -56,8 +56,7 @@ static bool     g_blocktransfer_active;
 static uint16_t g_remote_temp_curr;
 static uint16_t g_remote_temp_setpoint;
 static bool     g_send_remote_temp_update;
-static char     g_uart_rx_buffer[32];
-static uint8_t  g_uart_rx_idx;
+
 static uint16_t g_kp;
 
 // --- Global variables --------------------------------------------------------
@@ -75,29 +74,28 @@ uint16_t        app_debug_receiver;         //!< module id of receiver of debug 
 
 // --- Local functions ---------------------------------------------------------
 
-static void send_temp_curr_and_setpoint(void)
+void display_temp_setpoint(void)
 {
-    if (g_blocktransfer_active) return;
-
-    // send remote temperatures
-    // srt <current> <desired>
-    uart_put_string_blk1_p("srt ");
-    uart_put_hex16_blk1(g_remote_temp_curr);
-    uart_put_char_blk1(' ');
-    uart_put_hex16_blk1(g_remote_temp_setpoint);
-    uart_put_char_blk1('\n');
+    uint16_t tempdec = (g_remote_temp_setpoint - 27315) / 10;
+    hv_lcd_disp_val(tempdec, 1); // temperature in 1/10 °C -> one decimal place
+    //hv_lcd_disp_sym('d', true);
 }
 
-static void send_kp(void)
+void forward_temp_setpoint(void)
 {
-    if (g_blocktransfer_active) return;
+    uint8_t msg[4];
 
-    uart_put_string_blk1_p("skp ");
-    uart_put_hex16_blk1(g_kp);
-    uart_put_char_blk1('\n');
+    // send block data
+    msg[0] = eCMD_SET_REG_16BIT;
+    msg[1] = app_rem_temp_setp_regno;
+    msg[2] = g_remote_temp_setpoint >> 8;
+    msg[3] = g_remote_temp_setpoint & 0x00FF;
+    bus_send_message(&g_bus, app_rem_temp_setp_modid, sizeof(msg), msg);
 }
 
-static void forward_uart_buffer(void)
+// --- Module global functions -------------------------------------------------
+
+void app_send_debug_string(const char* str)
 {
     uint8_t msg[40];
 
@@ -107,13 +105,13 @@ static void forward_uart_buffer(void)
 
     // send block data
     msg[0] = eCMD_STATE_STRING;
-    for (uint8_t i = 0; i < g_uart_rx_idx; i++) {
-        msg[1 + i] = g_uart_rx_buffer[i];
+    uint8_t i = 1;
+    while (i < sizeof(msg) && *str != '\0') {
+        msg[i] = *str++;
+        i++;
     }
-    message_send(app_debug_receiver, 1 + g_uart_rx_idx, msg);
+    message_send(app_debug_receiver, i, msg);
 }
-
-// --- Module global functions -------------------------------------------------
 
 bool app_block_start(uint16_t sender, uint8_t blocktype)
 {
@@ -138,12 +136,21 @@ bool app_block_end(uint16_t sender, uint8_t blocktype)
 void app_set_kp(uint16_t kp)
 {
     g_kp = kp;
-    send_kp();
+    hv_send_kp(g_kp);
 }
 
 uint16_t app_get_kp(void)
 {
     return g_kp;
+}
+
+void app_on_encoder_value(int8_t diff)
+{
+    int16_t diff16 = diff;
+    diff16 *= 50;
+    g_remote_temp_setpoint += diff16;
+    display_temp_setpoint();
+    forward_temp_setpoint();
 }
 
 // --- Global functions --------------------------------------------------------
@@ -157,6 +164,7 @@ uint16_t app_get_kp(void)
  */
 void app_init (void)
 {
+    register_set_u16(MOD_eReg_ModuleID, 0x520);
     LED_ERROR_DDR |=  (1<<LED_ERROR);
     LED_ERROR_OFF;
     LED_STATUS_DDR |= (1<<LED_STATUS);
@@ -170,7 +178,6 @@ void app_init (void)
     g_blocktransfer_active = false;
     g_remote_temp_setpoint = 15 * 100 + 27315;
     g_remote_temp_curr = 15 * 100 + 27315;
-    g_uart_rx_idx = 0;
 
     contacts_initialize();
     PCMSK0 |= ((1<<PCINT1) | (1<<PCINT2)); // wake-up by pin change on contact inputs
@@ -210,6 +217,7 @@ void app_on_command (uint16_t sender, uint8_t msglen, uint8_t* msg)
         }
         else if (sender == app_rem_temp_setp_modid && regno == app_rem_temp_setp_regno) {
             g_remote_temp_setpoint = value;
+            display_temp_setpoint();
             g_send_remote_temp_update = true;
         }
         break;
@@ -237,26 +245,12 @@ void app_background (void)
     // anything beyond this line will only be executed when no block transfer is active
     if (g_blocktransfer_active) return;
     // ------------------------------------------------------------------------
-    if (g_send_remote_temp_update) {
+    if (g_send_remote_temp_update && !g_blocktransfer_active) {
         g_send_remote_temp_update = false;
-        send_temp_curr_and_setpoint();
+        hv_send_currtemp_and_setpoint(g_remote_temp_curr, g_remote_temp_setpoint);
     }
 
-    if (uart_is_rx_pending1()) {
-        char c;
-        c = uart_get_char_blk1();
-        LED_STATUS_TOGGLE;
-        if (c == '\n') {
-            g_uart_rx_buffer[g_uart_rx_idx] = '\0';
-            if (g_uart_rx_idx > 0 && g_uart_rx_buffer[0] == '#') {
-                forward_uart_buffer();
-            }
-            g_uart_rx_idx = 0;
-        } else {
-            if (g_uart_rx_idx < (sizeof(g_uart_rx_buffer) - 1)) {
-                g_uart_rx_buffer[g_uart_rx_idx++] = c;
-            }
-        }
-    }
+    hv_background();
+
 }
 /** @} */

@@ -28,6 +28,9 @@
 #ifndef _QUEUE_H_
 #define _QUEUE_H_
 
+#include <stdbool.h>
+#include <stdint.h>
+
 typedef struct queue {
     uint16_t readpos;
     uint16_t writepos;

@@ -30,6 +30,7 @@
 
 // --- Include section ---------------------------------------------------------
 
+#include <stdbool.h>
 #include <stdint.h>
 
 // --- Definitions -------------------------------------------------------------
@@ -40,13 +41,13 @@
 
 // --- Global functions --------------------------------------------------------
 
-void enc_initialize(uint16_t minval, uint16_t maxval);
-
-void enc_set_minmax(uint16_t minval, uint16_t maxval);
+void enc_initialize(void);
 
 void enc_on_irq(void);
 
-uint16_t enc_read(void);
+bool enc_val_changed(void);
+
+uint8_t enc_read(void);
 
 #endif // _ENCODER_H_
 /** @} */

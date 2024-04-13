@@ -9,7 +9,7 @@
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
 /*
- * Copyright (C) 2022  christian <irqmask@web.de>
+ * Copyright (C) 2024  christian <irqmask@web.de>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -50,10 +50,13 @@ void lcd_initialize(void);
  * Switch blinking display on or off
  * @param[in]   on      true = blinking, otherwise false
  */
-void lcd_blink(bool on);
-
+void lcd_blink(bool o);
 
 void lcd_digit(uint8_t index, char value);
+
+void lcd_disp_value(uint16_t value, uint8_t decpoint);
+
+void lcd_disp_symbol(char symbol, bool on);
 
 #endif // _STM8_LCD_H_
 /** @} */

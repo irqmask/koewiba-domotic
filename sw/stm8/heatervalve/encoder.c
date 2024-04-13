@@ -53,11 +53,12 @@
 
 // --- Local variables ---------------------------------------------------------
 
-static uint16_t g_encval;
-static uint16_t g_minval;
-static uint16_t g_maxval;
+static uint8_t g_encval;
+static bool g_encval_changed;
+
 static uint8_t g_old_input_state;
 static uint8_t g_input_state;
+
 
 // --- Global variables --------------------------------------------------------
 
@@ -67,14 +68,14 @@ static uint8_t g_input_state;
 
 static void increase(void)
 {
-    if (g_encval < g_maxval)
-        g_encval++;
+    g_encval++;
+    g_encval_changed = true;
 }
 
 static void decrease(void)
 {
-    if (g_encval > g_minval)
-        g_encval--;
+    g_encval--;
+    g_encval_changed = true;
 }
 
 // --- Module global functions -------------------------------------------------
@@ -83,36 +84,16 @@ static void decrease(void)
 
 /**
  * Initialize Encoder hardware and data.
- * @param[in]   minval      Lowest allowed value
- * @param[in]   maxval      Highest allowed value
  */
-void enc_initialize(uint16_t minval, uint16_t maxval)
+void enc_initialize(void)
 {
     ENC_DDR &= ~ENC_MASK;   // configure as input
     ENC_CR1 |= ENC_MASK;    // activate internal pull-up resistor
-    g_encval = minval;
-
-    enc_set_minmax(minval, maxval);
+    g_encval = 0;
+    g_encval_changed = false;
 
     g_old_input_state = ENC_INPUT & ENC_MASK;
     g_input_state = g_old_input_state;
-}
-
-/**
- * Set minimum and maximum value.
- * @param[in]   minval      Lowest allowed value
- * @param[in]   maxval      Highest allowed value
- */
-void enc_set_minmax(uint16_t minval, uint16_t maxval)
-{
-    if (minval < maxval) {
-        g_minval = minval;
-        g_maxval = maxval;
-    }
-    else {
-        g_maxval = minval;
-        g_minval = maxval;
-    }
 }
 
 /**
@@ -156,10 +137,19 @@ void enc_on_irq(void)
 }
 
 /**
+ * @returns true if encoder value changed since last read
+ */
+bool enc_val_changed(void)
+{
+    return g_encval_changed;
+}
+
+/**
  * Read current encoder value
  */
-uint16_t enc_read()
+uint8_t enc_read()
 {
+    g_encval_changed = false;
     return g_encval;
 }
 

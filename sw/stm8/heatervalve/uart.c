@@ -38,12 +38,15 @@
  #include "appconfig.h"
 #endif
 
+
 // --- Definitions -------------------------------------------------------------
 
 // --- Type definitions --------------------------------------------------------
 
 // --- Local variables ---------------------------------------------------------
 
+//uint8_t g_tx_queue_data[64];
+//queue_t g_tx_queue;
 uint8_t g_rx_queue_data[64];
 queue_t g_rx_queue;
 
@@ -59,12 +62,6 @@ static void enable_uart_tx(void)
     USART1_CR2 |= USART_CR2_TEN;    // enable UART
 }
 
-static void disable_uart_tx(void)
-{
-    USART1_CR2 &= ~USART_CR2_TEN;   // disable UART to not disturb ATtiny's SPI
-    PA_DDR &= ~PIN_2;
-}
-
 // --- Module global functions -------------------------------------------------
 
 // --- Global functions --------------------------------------------------------
@@ -74,6 +71,7 @@ static void disable_uart_tx(void)
  */
 void uart_initialize(void)
 {
+    // q_initialize(&g_tx_queue, g_tx_queue_data, sizeof(g_tx_queue_data));
     q_initialize(&g_rx_queue, g_rx_queue_data, sizeof(g_rx_queue_data));
 
     // remap UART1 PINs TX: PA2, RX: PA3
@@ -95,8 +93,6 @@ void uart_initialize(void)
     USART1_CR2 = USART_CR2_REN | USART_CR2_RIEN; // not USART_CR2_TEN
     USART1_CR3 &= ~(USART_CR3_STOP1 | USART_CR3_STOP2);
 
-    //disable_uart_tx();
-
     // calculate baudrate
     // fHSI = 16MHz, ckdiv = 8 -> fClk = 2MHz
     // M = fClk / fBaud
@@ -110,24 +106,22 @@ void uart_initialize(void)
     USART1_BRR1 = 0x0D;
     USART1_BRR2 = 0x00;
 
-    // 57600 baud
-    // M = fClk / fBaud = 2000000 / 57600 = 34,72 = 35 = 0x23
-    //USART1_BRR1 = 0x02;
-    //USART1_BRR2 = 0x03;
-
     enable_uart_tx();
 }
 
 uint8_t uart_write(const char *str)
 {
     uint8_t i = 0;
-    //enable_uart_tx();
+
     while (str[i] != '\0') {
+        //while (q_get_free(&g_tx_queue) == 0);
+        //q_put_byte(&g_tx_queue, str[i]);
+        //USART1_CR2 |= USART_CR2_TIEN;
         while (!(USART1_SR & USART_SR_TXE));
         USART1_DR = str[i];
         i++;
     }
-    //disable_uart_tx();
+
     return (i); // Bytes sent
 }
 
@@ -143,10 +137,13 @@ uint8_t uart_rx_data(void)
 
 int putchar (int data)
 {
-    //enable_uart_tx();
-    USART1_DR = data;
-    while (!(USART1_SR & USART_SR_TC));
-    //disable_uart_tx();
+    //while (q_get_free(&g_tx_queue) == 0);
+    //q_put_byte(&g_tx_queue, (uint8_t)data & 0x00FF);
+    //USART1_CR2 |= USART_CR2_TIEN;
+
+    while (!(USART1_SR & USART_SR_TXE));
+    USART1_DR = (uint8_t)data & 0x00FF;
+
     return 1;
 }
 
@@ -175,6 +172,13 @@ void dec2bcd(uint16_t val, char* bcdbuf)
 
     bcdbuf[5] = '\0';
 }
+
+/*void USART1_TX_TIM5_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(IPT_USART1_TX_TIM5_UPD_OVF_TRG_BRK)
+{
+    if (q_is_pending(&g_tx_queue)) {
+        USART1_DR = q_get_byte(&g_tx_queue);
+    }
+}*/
 
 void USART1_RX_TIM5_CC_IRQHandler(void) __interrupt(IPT_USART1_RX_TIM5_CC)
 {

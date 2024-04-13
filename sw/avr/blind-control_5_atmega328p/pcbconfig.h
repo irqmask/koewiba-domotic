@@ -86,6 +86,14 @@
 #define MOTOR_4_UPDOWN      {0x80, 0x00}
 #define MOTOR_SWITCH_DELAY  80
 
+//! digital outputs port on 74595
+#define OUTPUT_0             2
+#define OUTPUT_1             5
+#define OUTPUT_2             1
+#define OUTPUT_3             4
+#define OUTPUT_4             0
+#define OUTPUT_5             3
+
 // debug LED outputs
 #define LED_PCBCONFIG       1
 #define LED_STATUS          PB1

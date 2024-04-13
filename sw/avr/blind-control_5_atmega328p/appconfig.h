@@ -43,6 +43,7 @@
 
 #define BLIND_APPCONFIG     1
 #define BLIND_COUNT         5       //!< Number of blind which this software is capable to control.
+#define OUTPUT_COUNT        6       //!< Number of output channels which this software is capable to control.
 
 #define APP_eSLEEPMASK_MOTOR    (1<<0)  //!< Mask used for sleep_prevent() function.
                                         //!< Prevent the controller to fall asleep if motor is moving.
@@ -116,6 +117,147 @@ typedef enum appregisters {
     APP_eReg_B4_Unused1,           //!< unused
     APP_eReg_B4_Last = APP_eReg_B4_Unused1,
 
+    APP_eReg_B0_TimeUp1_Weekday,     //!< Flags on which weekday this timer applies. Index flags with day-of-week
+    APP_eReg_B0_TimeUp1_Hour,        //!< Hour when blind wents up.
+    APP_eReg_B0_TimeUp1_Minute,      //!< Minute when blind wents up.
+    APP_eReg_B0_TimeUp1_unused_1,
+    APP_eReg_B0_TimeUp1_unused_0,
+    APP_eReg_B0_TimeDown1_Weekday,   //!< Flags on which weekday this timer applies. Index flags with day-of-week
+    APP_eReg_B0_TimeDown1_Hour,      //!< Hour when blind wents down.
+    APP_eReg_B0_TimeDown1_Minute,    //!< Minute when blind wents down.
+    APP_eReg_B0_TimeDown1_unused_1,
+    APP_eReg_B0_TimeDown1_unused_0,
+    APP_eReg_B0_TimeUp2_Weekday,     //!< Flags on which weekday this timer applies. Index flags with day-of-week
+    APP_eReg_B0_TimeUp2_Hour,        //!< Hour when blind wents up.
+    APP_eReg_B0_TimeUp2_Minute,      //!< Minute when blind wents up.
+    APP_eReg_B0_TimeUp2_unused_1,
+    APP_eReg_B0_TimeUp2_unused_0,
+    APP_eReg_B0_TimeDown2_Weekday,   //!< Flags on which weekday this timer applies. Index flags with day-of-week
+    APP_eReg_B0_TimeDown2_Hour,      //!< Hour when blind wents down.
+    APP_eReg_B0_TimeDown2_Minute,    //!< Minute when blind wents down.
+    APP_eReg_B0_TimeDown2_unused_1,
+    APP_eReg_B0_TimeDown2_unused_0,
+
+    APP_eReg_B1_TimeUp1_Weekday,     //!< Flags on which weekday this timer applies. Index flags with day-of-week
+    APP_eReg_B1_TimeUp1_Hour,        //!< Hour when blind wents up.
+    APP_eReg_B1_TimeUp1_Minute,      //!< Minute when blind wents up.
+    APP_eReg_B1_TimeUp1_unused_1,
+    APP_eReg_B1_TimeUp1_unused_0,
+    APP_eReg_B1_TimeDown1_Weekday,   //!< Flags on which weekday this timer applies. Index flags with day-of-week
+    APP_eReg_B1_TimeDown1_Hour,      //!< Hour when blind wents down.
+    APP_eReg_B1_TimeDown1_Minute,    //!< Minute when blind wents down.
+    APP_eReg_B1_TimeDown1_unused_1,
+    APP_eReg_B1_TimeDown1_unused_0,
+    APP_eReg_B1_TimeUp2_Weekday,     //!< Flags on which weekday this timer applies. Index flags with day-of-week
+    APP_eReg_B1_TimeUp2_Hour,        //!< Hour when blind wents up.
+    APP_eReg_B1_TimeUp2_Minute,      //!< Minute when blind wents up.
+    APP_eReg_B1_TimeUp2_unused_1,
+    APP_eReg_B1_TimeUp2_unused_0,
+    APP_eReg_B1_TimeDown2_Weekday,   //!< Flags on which weekday this timer applies. Index flags with day-of-week
+    APP_eReg_B1_TimeDown2_Hour,      //!< Hour when blind wents down.
+    APP_eReg_B1_TimeDown2_Minute,    //!< Minute when blind wents down.
+    APP_eReg_B1_TimeDown2_unused_1,
+    APP_eReg_B1_TimeDown2_unused_0,
+
+    APP_eReg_B2_TimeUp1_Weekday,     //!< Flags on which weekday this timer applies. Index flags with day-of-week
+    APP_eReg_B2_TimeUp1_Hour,        //!< Hour when blind wents up.
+    APP_eReg_B2_TimeUp1_Minute,      //!< Minute when blind wents up.
+    APP_eReg_B2_TimeUp1_unused_1,
+    APP_eReg_B2_TimeUp1_unused_0,
+    APP_eReg_B2_TimeDown1_Weekday,   //!< Flags on which weekday this timer applies. Index flags with day-of-week
+    APP_eReg_B2_TimeDown1_Hour,      //!< Hour when blind wents down.
+    APP_eReg_B2_TimeDown1_Minute,    //!< Minute when blind wents down.
+    APP_eReg_B2_TimeDown1_unused_1,
+    APP_eReg_B2_TimeDown1_unused_0,
+    APP_eReg_B2_TimeUp2_Weekday,     //!< Flags on which weekday this timer applies. Index flags with day-of-week
+    APP_eReg_B2_TimeUp2_Hour,        //!< Hour when blind wents up.
+    APP_eReg_B2_TimeUp2_Minute,      //!< Minute when blind wents up.
+    APP_eReg_B2_TimeUp2_unused_1,
+    APP_eReg_B2_TimeUp2_unused_0,
+    APP_eReg_B2_TimeDown2_Weekday,   //!< Flags on which weekday this timer applies. Index flags with day-of-week
+    APP_eReg_B2_TimeDown2_Hour,      //!< Hour when blind wents down.
+    APP_eReg_B2_TimeDown2_Minute,    //!< Minute when blind wents down.
+    APP_eReg_B2_TimeDown2_unused_1,
+    APP_eReg_B2_TimeDown2_unused_0,
+
+    APP_eReg_B3_TimeUp1_Weekday,     //!< Flags on which weekday this timer applies. Index flags with day-of-week
+    APP_eReg_B3_TimeUp1_Hour,        //!< Hour when blind wents up.
+    APP_eReg_B3_TimeUp1_Minute,      //!< Minute when blind wents up.
+    APP_eReg_B3_TimeUp1_unused_1,
+    APP_eReg_B3_TimeUp1_unused_0,
+    APP_eReg_B3_TimeDown1_Weekday,   //!< Flags on which weekday this timer applies. Index flags with day-of-week
+    APP_eReg_B3_TimeDown1_Hour,      //!< Hour when blind wents down.
+    APP_eReg_B3_TimeDown1_Minute,    //!< Minute when blind wents down.
+    APP_eReg_B3_TimeDown1_unused_1,
+    APP_eReg_B3_TimeDown1_unused_0,
+    APP_eReg_B3_TimeUp2_Weekday,     //!< Flags on which weekday this timer applies. Index flags with day-of-week
+    APP_eReg_B3_TimeUp2_Hour,        //!< Hour when blind wents up.
+    APP_eReg_B3_TimeUp2_Minute,      //!< Minute when blind wents up.
+    APP_eReg_B3_TimeUp2_unuMOD_eReg_FirstAppSpecificsed_1,
+    APP_eReg_B3_TimeUp2_unused_0,
+    APP_eReg_B3_TimeDown2_Weekday,   //!< Flags on which weekday this timer applies. Index flags with day-of-week
+    APP_eReg_B3_TimeDown2_Hour,      //!< Hour when blind wents down.
+    APP_eReg_B3_TimeDown2_Minute,    //!< Minute when blind wents down.
+    APP_eReg_B3_TimeDown2_unused_1,
+    APP_eReg_B3_TimeDown2_unused_0,
+
+    APP_eReg_B4_TimeUp1_Weekday,     //!< Flags on which weekday this timer applies. Index flags with day-of-week
+    APP_eReg_B4_TimeUp1_Hour,        //!< Hour when blind wents up.
+    APP_eReg_B4_TimeUp1_Minute,      //!< Minute when blind wents up.
+    APP_eReg_B4_TimeUp1_unused_1,
+    APP_eReg_B4_TimeUp1_unused_0,
+    APP_eReg_B4_TimeDown1_Weekday,   //!< Flags on which weekday this timer applies. Index flags with day-of-week
+    APP_eReg_B4_TimeDown1_Hour,      //!< Hour when blind wents down.
+    APP_eReg_B4_TimeDown1_Minute,    //!< Minute when blind wents down.
+    APP_eReg_B4_TimeDown1_unused_1,
+    APP_eReg_B4_TimeDown1_unused_0,
+    APP_eReg_B4_TimeUp2_Weekday,     //!< Flags on which weekday this timer applies. Index flags with day-of-week
+    APP_eReg_B4_TimeUp2_Hour,        //!< Hour when blind wents up.
+    APP_eReg_B4_TimeUp2_Minute,      //!< Minute when blind wents up.
+    APP_eReg_B4_TimeUp2_unused_1,
+    APP_eReg_B4_TimeUp2_unused_0,
+    APP_eReg_B4_TimeDown2_Weekday,   //!< Flags on which weekday this timer applies. Index flags with day-of-week
+    APP_eReg_B4_TimeDown2_Hour,      //!< Hour when blind wents down.
+    APP_eReg_B4_TimeDown2_Minute,    //!< Minute when blind wents down.
+    APP_eReg_B4_TimeDown2_unused_1,
+    APP_eReg_B4_TimeDown2_unused_0,
+
+    APP_eReg_Chn0_SwitchCurrent,     //!< Current switch state (0...255)
+    APP_eReg_Chn0_SwitchSetPoint,    //!< Target switch state (0...255)
+    APP_eReg_Chn0_ThresholdOff,      //!< If value goes below, channel switches off
+    APP_eReg_Chn0_ThresholdOn,       //!< If value goes above, channel switches on
+    APP_eReg_Chn0_Mode,              //!< not used yet
+
+    APP_eReg_Chn1_SwitchCurrent,     //!< Current switch state (0...255)
+    APP_eReg_Chn1_SwitchSetPoint,    //!< Target switch state (0...255)
+    APP_eReg_Chn1_ThresholdOff,      //!< If value goes below, channel switches off
+    APP_eReg_Chn1_ThresholdOn,       //!< If value goes above, channel switches on
+    APP_eReg_Chn1_Mode,              //!< not used yet
+
+    APP_eReg_Chn2_SwitchCurrent,     //!< Current switch state (0...255)
+    APP_eReg_Chn2_SwitchSetPoint,    //!< Target switch state (0...255)
+    APP_eReg_Chn2_ThresholdOff,      //!< If value goes below, channel switches off
+    APP_eReg_Chn2_ThresholdOn,       //!< If value goes above, channel switches on
+    APP_eReg_Chn2_Mode,              //!< not used yet
+
+    APP_eReg_Chn3_SwitchCurrent,     //!< Current switch state (0...255)
+    APP_eReg_Chn3_SwitchSetPoint,    //!< Target switch state (0...255)
+    APP_eReg_Chn3_ThresholdOff,      //!< If value goes below, channel switches off
+    APP_eReg_Chn3_ThresholdOn,       //!< If value goes above, channel switches on
+    APP_eReg_Chn3_Mode,              //!< not used yet
+
+    APP_eReg_Chn4_SwitchCurrent,     //!< Current switch state (0...255)
+    APP_eReg_Chn4_SwitchSetPoint,    //!< Target switch state (0...255)
+    APP_eReg_Chn4_ThresholdOff,      //!< If value goes below, channel switches off
+    APP_eReg_Chn4_ThresholdOn,       //!< If value goes above, channel switches on
+    APP_eReg_Chn4_Mode,              //!< not used yet
+
+    APP_eReg_Chn5_SwitchCurrent,     //!< Current switch state (0...255)
+    APP_eReg_Chn5_SwitchSetPoint,    //!< Target switch state (0...255)
+    APP_eReg_Chn5_ThresholdOff,      //!< If value goes below, channel switches off
+    APP_eReg_Chn5_ThresholdOn,       //!< If value goes above, channel switches on
+    APP_eReg_Chn5_Mode,              //!< not used yet
+
     APP_eReg_Year = 223,        //!< Current year.
     APP_eReg_Month,             //!< Current month.
     APP_eReg_Day,               //!< Current day.
@@ -129,6 +271,9 @@ typedef enum appregisters {
 
 //! Number of registers per blind
 #define APP_NUM_REGS_PER_BLIND (APP_eReg_B0_Last - APP_eReg_B0_PositionCurrent + 1)
+//! Number of registers per channel
+#define APP_NUM_REGS_PER_CHN (APP_eReg_Chn0_Mode - APP_eReg_Chn0_SwitchCurrent + 1)
+
 
 //! Application specific layout of non volatile parameters (internal EEProm)
 typedef enum appconfig {
@@ -177,12 +322,33 @@ typedef enum appconfig {
     APP_eCfg_B4_DurationCloseHigh,
     APP_eCfg_B4_Mode,
 
+    APP_eCfg_Chn0_ThresholdOff,
+    APP_eCfg_Chn0_ThresholdOn,
+    APP_eCfg_Chn0_Mode,
+    APP_eCfg_Chn1_ThresholdOff,
+    APP_eCfg_Chn1_ThresholdOn,
+    APP_eCfg_Chn1_Mode,
+    APP_eCfg_Chn2_ThresholdOff,
+    APP_eCfg_Chn2_ThresholdOn,
+    APP_eCfg_Chn2_Mode,
+    APP_eCfg_Chn3_ThresholdOff,
+    APP_eCfg_Chn3_ThresholdOn,
+    APP_eCfg_Chn3_Mode,
+    APP_eCfg_Chn4_ThresholdOff,
+    APP_eCfg_Chn4_ThresholdOn,
+    APP_eCfg_Chn4_Mode,
+    APP_eCfg_Chn5_ThresholdOff,
+    APP_eCfg_Chn5_ThresholdOn,
+    APP_eCfg_Chn5_Mode,
+
     // insert application specific configuration here
     APP_eCfg_Last
 } eConfiguration_t;
 
 //! Number of eeprom bytes per blind
 #define NUM_EEBYTES_PER_BLIND (APP_eCfg_B1_ReactionDelay - APP_eCfg_B0_ReactionDelay)
+//! Number of configuration registers per channel
+#define NUM_EEBYTES_PER_CHN (APP_eCfg_Chn0_Mode - APP_eCfg_Chn0_ThresholdOff + 1)
 
 // --- Local variables ---------------------------------------------------------
 

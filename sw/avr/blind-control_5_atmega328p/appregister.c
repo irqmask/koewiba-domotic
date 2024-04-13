@@ -29,6 +29,7 @@
 #include <avr/boot.h>
 #include <avr/eeprom.h>
 
+#include "digital_output.h"
 #include "appconfig.h"
 #include "blindctrl.h"
 #include "datetime.h"
@@ -64,6 +65,15 @@ void        app_register_load       (void)
         blind_set_duration_close(index, eeprom_read_word((uint16_t*)&register_eeprom_array[eepindex]));
         eepindex = APP_eCfg_B0_Mode + index * NUM_EEBYTES_PER_BLIND;
         blind_set_mode(index, eeprom_read_byte(&register_eeprom_array[eepindex]));
+    }
+    for (uint8_t chn=0; chn<OUTPUT_COUNT; chn++) {
+        uint8_t v;
+        uint8_t chn_offset = chn * NUM_EEBYTES_PER_CHN;
+
+        v = eeprom_read_byte(&register_eeprom_array[APP_eCfg_Chn0_ThresholdOff + chn_offset]);
+        digital_output_set_threshold_off(chn, v);
+        v = eeprom_read_byte(&register_eeprom_array[APP_eCfg_Chn0_ThresholdOn + chn_offset]);
+        digital_output_set_threshold_on(chn, v);
     }
 }
 
@@ -115,6 +125,42 @@ bool        app_register_get        (uint8_t                reg_no,
         case APP_eReg_B0_Mode:
             eepindex = APP_eCfg_B0_Mode + index * NUM_EEBYTES_PER_BLIND;
             *(uint8_t*)pvalue = eeprom_read_byte((uint8_t*)&register_eeprom_array[eepindex]);
+            break;
+
+        default:
+            return false;
+            break;
+        }
+        return true;
+    } else if (reg_no >= APP_eReg_Chn0_SwitchCurrent &&
+        reg_no < (APP_eReg_Chn0_SwitchCurrent + OUTPUT_COUNT*APP_NUM_REGS_PER_CHN)) {
+
+        // calculate index of blind and normalize register number
+        index = (reg_no - APP_eReg_Chn0_SwitchCurrent) / APP_NUM_REGS_PER_CHN;
+        reg_no -= (index * APP_NUM_REGS_PER_CHN);
+
+        switch (reg_no) {
+        // registers in ROM/RAM
+        case APP_eReg_Chn0_SwitchCurrent:
+            // fallthrough
+        case APP_eReg_Chn0_SwitchSetPoint:
+            *(uint8_t*)pvalue = digital_output_get_current_state(index);
+            break;
+
+        // registers saved in EEProm
+        case APP_eReg_Chn0_ThresholdOff:
+            eepindex = APP_eCfg_Chn0_ThresholdOff + index * NUM_EEBYTES_PER_CHN;
+            *(uint8_t*)pvalue = eeprom_read_byte(&register_eeprom_array[eepindex]);
+            break;
+        case APP_eReg_Chn0_ThresholdOn:
+            eepindex = APP_eCfg_Chn0_ThresholdOn + index * NUM_EEBYTES_PER_CHN;
+            *(uint8_t*)pvalue = eeprom_read_byte((uint8_t*)&register_eeprom_array[eepindex]);
+            *preg_type = eRegType_U16;
+            break;
+        case APP_eReg_Chn0_Mode:
+            eepindex = APP_eCfg_Chn0_Mode + index * NUM_EEBYTES_PER_CHN;
+            *(uint8_t*)pvalue = eeprom_read_byte((uint8_t*)&register_eeprom_array[eepindex]);
+            *preg_type = eRegType_U16;
             break;
 
         default:
@@ -204,6 +250,44 @@ void        app_register_set        (uint8_t                reg_no,
             value8 = value & 0x000000FF;
             blind_set_mode(index, value8);
             eepindex = APP_eCfg_B0_Mode + index * NUM_EEBYTES_PER_BLIND;
+            eeprom_write_byte(&register_eeprom_array[eepindex], value8);
+            break;
+        default:
+            break;
+        }
+    } else if (reg_no >= APP_eReg_Chn0_SwitchCurrent &&
+        reg_no < (APP_eReg_Chn0_SwitchCurrent + OUTPUT_COUNT*APP_NUM_REGS_PER_CHN)) {
+
+        // calculate index of blind and normalize register number
+        index = (reg_no - APP_eReg_Chn0_SwitchCurrent) / APP_NUM_REGS_PER_CHN;
+        reg_no -= (index * APP_NUM_REGS_PER_CHN);
+
+        // registers in ROM/RAM
+        switch (reg_no) {
+        case APP_eReg_Chn0_SwitchCurrent:
+            // read only
+            break;
+        case APP_eReg_Chn0_SwitchSetPoint:
+            digital_output_set(index, value & 0x000000FF);
+            break;
+
+        // registers saved in EEProm
+        case APP_eReg_Chn0_ThresholdOff:
+            value8 = value & 0x000000FF;
+            digital_output_set_threshold_off(index, value8);
+            eepindex = APP_eCfg_Chn0_ThresholdOff + index * NUM_EEBYTES_PER_CHN;
+            eeprom_write_byte(&register_eeprom_array[eepindex], value8);
+            break;
+        case APP_eReg_Chn0_ThresholdOn:
+            value8 = value & 0x000000FF;
+            digital_output_set_threshold_on(index, value8);
+            eepindex = APP_eCfg_Chn0_ThresholdOn + index * NUM_EEBYTES_PER_CHN;
+            eeprom_write_byte(&register_eeprom_array[eepindex], value8);
+            break;
+        case APP_eReg_Chn0_Mode:
+            value8 = value & 0x000000FF;
+            //digital_output_set_mode(index, value8);
+            eepindex = APP_eCfg_Chn0_Mode + index * NUM_EEBYTES_PER_CHN;
             eeprom_write_byte(&register_eeprom_array[eepindex], value8);
             break;
         default:

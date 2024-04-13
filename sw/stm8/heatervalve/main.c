@@ -50,7 +50,7 @@ void main(void)
     lcd_initialize();
 
     adc_initialize();
-    enc_initialize(5, 100);
+    enc_initialize();
 
     timer_initialize();
     enableInterrupts();
@@ -79,16 +79,10 @@ void main(void)
         }
         oldadc = adc;
         */
-        if ((timer_get_millis() % 500) == 0 && ticks_written == 0) {
-            ticks_written = 1;
-            lcd_digit(0, lcd_test_value);
-            lcd_digit(1, lcd_test_value);
-            lcd_digit(2, lcd_test_value);
-            lcd_digit(3, lcd_test_value++);
-            if (lcd_test_value > 9)
-                lcd_test_value = 0;
-            LOG_DEBUG("# ENC %d\n", enc_read());
-           // LOG_DEBUG("# tick\n");
+        if ((timer_get_millis() % 500) == 0) {
+            if (enc_val_changed()) {
+                printf("enc %02x\n", enc_read());
+            }
         } else {
             ticks_written = 0;
         }

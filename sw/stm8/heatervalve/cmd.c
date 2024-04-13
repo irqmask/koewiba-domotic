@@ -33,10 +33,11 @@
 #include <stdio.h>
 
 #include "control_temp.h"
+#include "debug.h"
 #include "motor.h"
+#include "lcd.h"
 #include "remote_tempsense.h"
 #include "uart.h"
-
 
 #ifdef HAS_APPCONFIG_H
  #include "appconfig.h"
@@ -119,7 +120,6 @@ static uint8_t get_val_u8(bool *psuccess)
     return value;
 }
 
-
 static uint16_t get_val_u16(bool *psuccess)
 {
     uint16_t value = 0;
@@ -136,25 +136,31 @@ static uint16_t get_val_u16(bool *psuccess)
     return value;
 }
 
-
 static void interpret_command(void)
 {
     bool success = true;
-    uint16_t offset;
-    uint8_t value;
+
     if (starts_with("peek")) {
-        offset = get_val_u16(&success);
+        uint16_t offset = get_val_u16(&success);
+        uint8_t val8;
         if (success) {
-            value = peek(offset);
-            printf("PEEK 0 %04x\n", value);
+            val8 = peek(offset);
+            printf("PEEK 0 %04x\n", val8);
         }
     }
     else if (starts_with("poke")) {
-        offset = get_val_u16(&success);
-        value = get_val_u8(&success);
+        uint16_t offset = get_val_u16(&success);
+        uint8_t val8 = get_val_u8(&success);
         if (success) {
-            poke(offset, value);
+            poke(offset, val8);
             puts("POKE 0");
+        }
+    }
+    else if (starts_with("dv")) { // display value
+        uint16_t val16 = get_val_u16(&success);
+        uint8_t dp = get_val_u8(&success);
+        if (success) {
+            lcd_disp_value(val16, dp);
         }
     }
     else if (starts_with("mh")) { // motor home

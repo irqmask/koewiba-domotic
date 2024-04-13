@@ -29,7 +29,7 @@
 #include "lcd.h"
 
 // include
-#include "stm8l052c6.h"
+#include <stm8l052c6.h>
 
 #ifdef HAS_APPCONFIG_H
  #include "appconfig.h"
@@ -338,6 +338,84 @@ void lcd_digit(uint8_t index, char value)
         LCD_RAM[g_segmentX[index][0]] &= ~g_segmentX[index][1];
         break;
 
+    case ' ':
+        LCD_RAM[g_segmentA[index][0]] &= ~g_segmentA[index][1];
+        LCD_RAM[g_segmentB[index][0]] &= ~g_segmentB[index][1];
+        LCD_RAM[g_segmentC[index][0]] &= ~g_segmentC[index][1];
+        LCD_RAM[g_segmentD[index][0]] &= ~g_segmentD[index][1];
+        LCD_RAM[g_segmentE[index][0]] &= ~g_segmentE[index][1];
+        LCD_RAM[g_segmentF[index][0]] &= ~g_segmentF[index][1];
+        LCD_RAM[g_segmentG1[index][0]] &= ~g_segmentG1[index][1];
+        LCD_RAM[g_segmentG2[index][0]] &= ~g_segmentG2[index][1];
+        LCD_RAM[g_segmentT[index][0]] &= ~g_segmentT[index][1];
+        LCD_RAM[g_segmentX[index][0]] &= ~g_segmentX[index][1];
+        break;
+
+    case '°':
+        LCD_RAM[g_segmentA[index][0]] |= g_segmentA[index][1];
+        LCD_RAM[g_segmentB[index][0]] |= g_segmentB[index][1];
+        LCD_RAM[g_segmentC[index][0]] &= ~g_segmentC[index][1];
+        LCD_RAM[g_segmentD[index][0]] &= ~g_segmentD[index][1];
+        LCD_RAM[g_segmentE[index][0]] &= ~g_segmentE[index][1];
+        LCD_RAM[g_segmentF[index][0]] |= g_segmentF[index][1];
+        LCD_RAM[g_segmentG1[index][0]] |= g_segmentG1[index][1];
+        LCD_RAM[g_segmentG2[index][0]] |= g_segmentG2[index][1];
+        LCD_RAM[g_segmentT[index][0]] &= ~g_segmentT[index][1];
+        LCD_RAM[g_segmentX[index][0]] &= ~g_segmentX[index][1];
+        break;
+
+    case 'C':
+        LCD_RAM[g_segmentA[index][0]] |= g_segmentA[index][1];
+        LCD_RAM[g_segmentB[index][0]] &= ~g_segmentB[index][1];
+        LCD_RAM[g_segmentC[index][0]] &= ~g_segmentC[index][1];
+        LCD_RAM[g_segmentD[index][0]] |= g_segmentD[index][1];
+        LCD_RAM[g_segmentE[index][0]] |= g_segmentE[index][1];
+        LCD_RAM[g_segmentF[index][0]] |= g_segmentF[index][1];
+        LCD_RAM[g_segmentG1[index][0]] &= ~g_segmentG1[index][1];
+        LCD_RAM[g_segmentG2[index][0]] &= ~g_segmentG2[index][1];
+        LCD_RAM[g_segmentT[index][0]] &= ~g_segmentT[index][1];
+        LCD_RAM[g_segmentX[index][0]] &= ~g_segmentX[index][1];
+        break;
+
+    default:
+        break;
+    }
+}
+
+void lcd_disp_value(uint16_t value, uint8_t decpoint)
+{
+    uint8_t digit, dv;
+    for (digit=4; digit>0; digit--) {
+        if (value == 0) {
+            if (digit == 4) {
+                lcd_digit(digit - 1, 0);
+            }
+            else {
+                lcd_digit(digit - 1, ' ');
+            }
+        } else {
+            uint8_t dv = value % 10;
+            value = value / 10;
+            lcd_digit(digit - 1, dv);
+        }
+    }
+    // FIXME insert decimal point
+    (void)decpoint;
+}
+
+void lcd_disp_symbol(char symbol, bool on)
+{
+    // FIXME implement displaying various symbols
+    (void)on;
+    switch (symbol) {
+    case 'D':
+        if (on) {
+
+        }
+        else {
+
+        }
+        break;
     default:
         break;
     }

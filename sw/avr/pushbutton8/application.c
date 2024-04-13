@@ -97,7 +97,15 @@ static void app_execute_message_dependend_function(app_msg_dep_func_t function_i
         bit_set_idx = (add_info & 0xF0)>>4;
 
         if(value & (1<<bit_set_idx))   led_reg_val = 0x0F; // constant full intensity
-        else                           led_reg_val = 0x0;
+        led_mask = 0x01<<led_idx;
+        break;
+    case eMsgDepFunc_Led_switch_register: // LED active when value=255
+        value       = *(uint8_t*)pvalue;
+        // [led_mode=0..15 | led_idx=0..15]
+        led_mode    = (add_info & 0xF0)>>4; // [0=off|15=on|2..14=slow..fast blinking]
+        led_idx     = (add_info & 0x0F);    // [0=LED0 ... 15=LED15]
+
+        if(0xFF == value) led_reg_val = led_mode; // constant full intensity
         led_mask = 0x01<<led_idx;
         break;
     case eMsgDepFunc_Led_blindcontrol: // LED active when bit is set
@@ -105,7 +113,7 @@ static void app_execute_message_dependend_function(app_msg_dep_func_t function_i
 
         // [led_mode=0..15 | led_idx=0..15]
         led_mode    = (add_info & 0xF0)>>4; // [0=off|15=on|2..14=slow..fast blinking]
-        led_idx     = (add_info & 0x0F);    // [0=LED0 ... 7=LED7]
+        led_idx     = (add_info & 0x0F);    // [0=LED0 ... 15=LED15]
 
         if     (0xF==led_mode)  led_reg_val = 0x0F;
         else if(0x0==led_mode)  led_reg_val = 0x00;

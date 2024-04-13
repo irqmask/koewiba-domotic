@@ -394,7 +394,7 @@ typedef enum msg_dependend_functions {
     eMsgDepFunc_NoFunction = 0,
     eMsgDepFunc_Led_setting_command,
     eMsgDepFunc_Led_on_bitset,
-    eMsgDepFunc_Led_off_bitset,
+    eMsgDepFunc_Led_switch_register,
     eMsgDepFunc_Led_blink0_bitset,
     eMsgDepFunc_Led_blink1_bitset,
     eMsgDepFunc_Led_blink2_bitset,

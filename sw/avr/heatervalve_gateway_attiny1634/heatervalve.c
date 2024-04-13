@@ -62,8 +62,8 @@
  */
 void hv_initialize(void)
 {
-    PORTB |= (1<<PB3);
-    DDRB |= (1<<PB3);
+    DDRB &= ~(1<<PB3);
+    PORTB &= ~(1<<PB3);
 
     hv_reset(true);
     uart_init_blk1(UART_BAUDRATE);
@@ -77,10 +77,10 @@ void hv_initialize(void)
 void hv_reset(bool on)
 {
     if (on) {
-        PORTB &= ~(1<<PB3);
+        DDRB |= (1<<PB3);
     }
     else {
-        PORTB |= (1<<PB3);
+        DDRB &= ~(1<<PB3);
     }
 }
 

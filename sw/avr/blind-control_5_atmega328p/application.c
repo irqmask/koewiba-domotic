@@ -34,6 +34,7 @@
 #include "prjtypes.h"
 
 #include "blindctrl.h"
+#include "digital_output.h"
 #include "bus.h"
 #include "cmddef_common.h"
 #include "datetime.h"
@@ -70,9 +71,10 @@ extern void        app_register_load       (void);
  */
 void app_init (void)
 {
-    //register_set_u16(MOD_eReg_ModuleID, 0xA05);
+    //register_set_u16(MOD_eReg_ModuleID, 0xA2d);
     motors_initialize();
     blinds_initialize();
+    digital_output_initialize();
     dt_initialize();
 
     // load application parameters
@@ -106,7 +108,7 @@ void app_on_command (uint16_t sender, uint8_t msglen, uint8_t* msg)
     switch (msg[0]) {
     case APP_eCmd_Stop:
         blind_index = msg[1];
-        if (blind_index < BLIND_COUNT) blind_stop(blind_index);
+        blind_stop(blind_index);
         break;
 
     default:
@@ -122,7 +124,8 @@ void app_on_command (uint16_t sender, uint8_t msglen, uint8_t* msg)
 void app_background (sBus_t* bus)
 {
     motors_background();
-    blinds_background();
+    blinds_background(bus);
+    digital_output_background(bus);
 
     if (timer_is_elapsed(&g_seconds_timer)) {
         timer_start(&g_seconds_timer, TIMER_MS_2_TICKS(1000));

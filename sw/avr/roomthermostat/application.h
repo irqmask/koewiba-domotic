@@ -1,4 +1,4 @@
- 
+
 /**
  * @addtogroup ROOMTHERMOSTAT
  * @addtogroup APPLICATION
@@ -47,6 +47,8 @@ extern const unsigned char app_versioninfo[];
 // --- Local functions ---------------------------------------------------------
 
 // --- Module global functions -------------------------------------------------
+
+void app_reset_display_timeout(void);
 
 void app_set_desired_temp(uint16_t desired_temp, bool publish);
 

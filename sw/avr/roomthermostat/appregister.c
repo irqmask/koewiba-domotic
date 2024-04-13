@@ -234,6 +234,7 @@ void        app_register_set        (uint8_t                reg_no,
 
         case APP_eReg_TempSetPoint:
             app_set_desired_temp(tempval16, false);
+            app_reset_display_timeout();
             break;
 
         case APP_eReg_TempOffset:

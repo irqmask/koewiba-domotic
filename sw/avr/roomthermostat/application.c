@@ -181,15 +181,6 @@ static void draw_window(uint8_t open)
     }
 }
 
-static void reset_display_timeout(void)
-{
-    if (g_display_timeout > DISP_TIMEOUT_DIM) {
-        sh1106_contrast(0xE0);
-        sh1106_display_on(1);
-    }
-    g_display_timeout = 0;
-}
-
 static void check_display_timeout(void)
 {
     if (g_display_timeout < 255) g_display_timeout++;
@@ -222,7 +213,7 @@ static void set_remote_window_state(uint8_t open)
     }
     app_draw_desired_temp();
     app_draw_window();
-    reset_display_timeout();
+    app_reset_display_timeout();
 }
 
 static void on_cmd_state_8bit_received(uint16_t sender, uint8_t reg, uint8_t value)
@@ -234,6 +225,15 @@ static void on_cmd_state_8bit_received(uint16_t sender, uint8_t reg, uint8_t val
 }
 
 // --- Module global functions -------------------------------------------------
+
+void app_reset_display_timeout(void)
+{
+    if (g_display_timeout > DISP_TIMEOUT_DIM) {
+        sh1106_contrast(0xE0);
+        sh1106_display_on(1);
+    }
+    g_display_timeout = 0;
+}
 
 void app_set_desired_temp(uint16_t desired_temp, bool publish)
 {
@@ -428,7 +428,7 @@ void app_init (void)
 /**
  * Application specific ISR for pin change interrupt.
  *
- * @param[in] pinchange_interruptflags  The value of PCIFR is for determining, 
+ * @param[in] pinchange_interruptflags  The value of PCIFR is for determining,
  *                                      which register has to be checked for the
  *                                      source of interrupt.
  */
@@ -504,10 +504,10 @@ void app_background (sBus_t* bus)
 
     uint8_t in = input_went_low();
     if (in & (1<<APP_INPUT_UP)) {
-        reset_display_timeout();
+        app_reset_display_timeout();
         app_set_desired_temp(app_desired_temp + APP_TEMP_INCR, true);
     } else if (in & (1<<APP_INPUT_DOWN)) {
-        reset_display_timeout();
+        app_reset_display_timeout();
         app_set_desired_temp(app_desired_temp - APP_TEMP_INCR, true);
     }
 

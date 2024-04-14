@@ -37,6 +37,7 @@
 #include "register.h"
 
 #include "appconfig.h"
+#include "control_temp.h"
 
 // --- Definitions -------------------------------------------------------------
 
@@ -62,7 +63,7 @@ void        app_register_load       (void)
     app_rem_temp_setp_modid = eeprom_read_word((uint16_t*)&register_eeprom_array[APP_eCfg_RemTempSetpointModuleID]);
     app_rem_temp_setp_regno = eeprom_read_byte(&register_eeprom_array[APP_eCfg_RemTempSetpointModuleID]);
     app_debug_receiver = eeprom_read_word((uint16_t*)&register_eeprom_array[APP_eCfg_DebugReceiverModuleID]);
-    app_set_kp(eeprom_read_word((uint16_t*)&register_eeprom_array[APP_eCfg_Kp]));
+    ctrl_set_kp(eeprom_read_word((uint16_t*)&register_eeprom_array[APP_eCfg_Kp]));
 }
 
 bool        app_register_get        (uint8_t                reg_no,
@@ -96,7 +97,7 @@ bool        app_register_get        (uint8_t                reg_no,
         *preg_type = eRegType_U16;
         break;
     case APP_eReg_Kp:
-        *(uint16_t*)pvalue = app_get_kp();
+        *(uint16_t*)pvalue = ctrl_get_kp();
         *preg_type = eRegType_U16;
         break;
 
@@ -140,7 +141,7 @@ void        app_register_set        (uint8_t                reg_no,
         eeprom_write_word((uint16_t*)&register_eeprom_array[APP_eCfg_DebugReceiverModuleID], value16);
         break;
     case APP_eReg_Kp:
-        app_set_kp(value16);
+        ctrl_set_kp(value16);
         eeprom_write_word((uint16_t*)&register_eeprom_array[APP_eCfg_Kp], value16);
         break;
 

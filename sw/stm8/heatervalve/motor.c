@@ -214,6 +214,7 @@ void motor_background(void)
             g_state = MOTOR_IDLE;
             g_pos = 1000; // valve is fully open now
             g_pos_desired = 1000;
+            printf("mp %04x\n", g_pos);
         }
         break;
 
@@ -224,7 +225,7 @@ void motor_background(void)
             g_pos = g_pos_desired;
             g_timer = 0;
             g_state = MOTOR_IDLE;
-            printf("# mp %d\n", g_pos);
+            printf("mp %04x\n", g_pos);
         }
         break;
 

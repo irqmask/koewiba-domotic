@@ -32,11 +32,9 @@
 #include <stdint.h>
 #include <stdio.h>
 
-#include "control_temp.h"
 #include "debug.h"
 #include "motor.h"
 #include "lcd.h"
-#include "remote_tempsense.h"
 #include "uart.h"
 
 #ifdef HAS_APPCONFIG_H
@@ -190,22 +188,6 @@ static void interpret_command(void)
         }
         else {
             puts("MP 0");
-        }
-    }
-    else if (starts_with("srt")) { // set remote temperatures <current> <desired>
-        uint16_t current_temp = get_val_u16(&success);
-        uint16_t desired_temp = get_val_u16(&success);
-        if (success) {
-            remts_set_current_temp(current_temp);
-            remts_set_desired_temp(desired_temp);
-            puts("SRT 0");
-        }
-    }
-    else if (starts_with("skp")) { // set remote temperatures <current> <desired>
-        uint16_t tmp = get_val_u16(&success);
-        if (success) {
-            ctrl_set_kp(tmp);
-            puts("SKP 0");
         }
     }
     if (!success) {

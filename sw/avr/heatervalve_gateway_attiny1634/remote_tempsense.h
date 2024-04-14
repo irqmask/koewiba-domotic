@@ -44,9 +44,9 @@
 
 void remts_initialize(void);
 
-uint16_t remts_get_desired_temp();
+uint16_t remts_get_desired_temp(void);
 
-uint16_t remts_get_current_temp();
+uint16_t remts_get_current_temp(void);
 
 void remts_set_desired_temp(uint16_t temp);
 

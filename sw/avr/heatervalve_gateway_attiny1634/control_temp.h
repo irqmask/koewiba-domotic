@@ -44,9 +44,11 @@
 
 void ctrl_set_kp(uint16_t kp);
 
+uint16_t ctrl_get_kp(void);
+
 void ctrl_temp_initialize(void);
 
-void ctrl_temp_background(void);
+void ctrl_temp_background_10s(void);
 
 #endif // _CONTROL_TEMP_H_
 /** @} */

@@ -32,8 +32,7 @@
 #include <stdint.h>
 #include <stdio.h>
 
-#include "debug.h"
-#include "motor.h"
+#include "heatervalve.h"
 #include "remote_tempsense.h"
 #include "timer.h"
 
@@ -47,7 +46,6 @@
 
 // --- Local variables ---------------------------------------------------------
 
-static uint32_t g_start;
 static uint8_t g_second_count;
 
 static uint16_t g_kp = 256;
@@ -58,7 +56,25 @@ static uint16_t g_kp = 256;
 
 // --- Local functions ---------------------------------------------------------
 
-static void background_10s(void)
+// --- Module global functions -------------------------------------------------
+
+// --- Global functions --------------------------------------------------------
+
+void ctrl_set_kp(uint16_t kp)
+{
+    g_kp = kp;
+}
+
+uint16_t ctrl_get_kp(void)
+{
+    return g_kp;
+}
+
+void ctrl_temp_initialize(void)
+{
+}
+
+void ctrl_temp_background_10s(void)
 {
     uint16_t des_temp_c, cur_temp_c;
     int16_t temp_diff;
@@ -81,37 +97,13 @@ static void background_10s(void)
             valvepos = 1000;
         }
     }
-    LOG_DEBUG("# dt %4d ct %4d d %d vp %d\n", des_temp_c - 27315, cur_temp_c - 27315, temp_diff, (uint16_t)valvepos);
+    //LOG_DEBUG("# dt %4d ct %4d d %d vp %d\n", des_temp_c - 27315, cur_temp_c - 27315, temp_diff, (uint16_t)valvepos);
 
     // valvepos is between 0 and 1000
-    diff_valvepos = valvepos - motor_get_valve_pos();
+    diff_valvepos = valvepos - hv_motor_get_cached_pos();
     if (diff_valvepos < -100 || diff_valvepos > 100 || g_second_count > 60) {
-        if (motor_start_move_pos(valvepos)) {
-            g_second_count = 0;
-        }
-    }
-}
-
-// --- Module global functions -------------------------------------------------
-
-// --- Global functions --------------------------------------------------------
-
-void ctrl_set_kp(uint16_t kp)
-{
-    g_kp = kp;
-}
-
-void ctrl_temp_initialize(void)
-{
-    g_start = timer_get_millis();
-}
-
-void ctrl_temp_background(void)
-{
-    uint32_t elapsed = timer_get_millis() - g_start;
-    if (elapsed > 10000) {
-        g_start += 10000;
-        background_10s();
+        hv_motor_move_pos(valvepos);
+        g_second_count = 0;
     }
 }
 

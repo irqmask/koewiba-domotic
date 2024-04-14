@@ -63,6 +63,7 @@ static uint8_t  g_uart_rx_idx;
 static uint8_t  g_readidx;
 
 static uint8_t  g_enc_lastval;
+static uint16_t g_motor_pos;
 
 // --- Global variables --------------------------------------------------------
 
@@ -102,6 +103,7 @@ static bool starts_with(const char* cmd)
 static void interpret_message(void)
 {
     uint8_t val8;
+
     if (g_uart_rx_idx > 0 && g_uart_rx_buffer[0] == '#') {
         app_send_debug_string(g_uart_rx_buffer);
     }
@@ -110,6 +112,9 @@ static void interpret_message(void)
             app_on_encoder_value(val8 - g_enc_lastval);
             g_enc_lastval = val8;
         }
+    }
+    else if (starts_with("mp")) {
+        decode_hex16(&g_uart_rx_buffer[g_readidx], &g_motor_pos);
     }
 }
 
@@ -130,6 +135,7 @@ void hv_initialize(void)
     hv_reset(false);
 
     g_uart_rx_idx = 0;
+    g_motor_pos = 0;
 }
 
 /**
@@ -144,24 +150,6 @@ void hv_reset(bool on)
     else {
         DDRB &= ~(1<<PB3);
     }
-}
-
-void hv_send_currtemp_and_setpoint(uint16_t currtemp, uint16_t setpoint)
-{
-    // send remote temperatures
-    // srt <current> <desired>
-    uart_put_string_blk1_p("srt ");
-    uart_put_hex16_blk1(currtemp);
-    uart_put_char_blk1(' ');
-    uart_put_hex16_blk1(setpoint);
-    uart_put_char_blk1('\n');
-}
-
-void hv_send_kp(uint16_t kp)
-{
-    uart_put_string_blk1_p("skp ");
-    uart_put_hex16_blk1(kp);
-    uart_put_char_blk1('\n');
 }
 
 /**
@@ -187,6 +175,33 @@ void hv_lcd_disp_sym(char symbol, bool on)
     uart_put_char_blk1(symbol);
     uart_put_char_blk1(on + '0');
     uart_put_char_blk1('\n');
+}
+
+/**
+ * Start motor homing sequence
+ */
+void hv_motor_homing(void)
+{
+    uart_put_string_blk1_p("mh\n");
+}
+
+/**
+ * Start a motor movement to specific position
+ * @param[in]   pos     Desired motor position
+ */
+void hv_motor_move_pos(uint16_t pos)
+{
+    uart_put_string_blk1_p("mp ");
+    uart_put_hex16_blk1(pos);
+    uart_put_char_blk1('\n');
+}
+
+/**
+ * @returns last received motor position
+ */
+uint16_t hv_motor_get_cached_pos(void)
+{
+    return g_motor_pos;
 }
 
 /**

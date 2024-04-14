@@ -6,12 +6,10 @@
 
 #include "adc.h"
 #include "cmd.h"
-#include "control_temp.h"
 #include "debug.h"
 #include "encoder.h"
 #include "lcd.h"
 #include "motor.h"
-#include "remote_tempsense.h"
 #include "timer.h"
 #include "uart.h"
 
@@ -58,8 +56,6 @@ void main(void)
     motor_initialize();
     motor_start_homing();
     cmd_initialize();
-    remts_initialize();
-    ctrl_temp_initialize();
 
     LOG_DEBUG("# init complete\n");
 
@@ -69,7 +65,6 @@ void main(void)
             cmd_process_char(c);
         }
 
-        ctrl_temp_background();
         motor_background();
         /*
         adc = adc_read();

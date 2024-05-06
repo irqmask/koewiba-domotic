@@ -111,11 +111,11 @@ Fuse Bytes programmieren mit AVR-Dude:
 Without bootloader:
 avrdude -p atmega328p -P usb -c avrisp2 -B 32 -U lfuse:w:0xDF:m
 avrdude -p atmega328p -P usb -c avrisp2 -B 32 -U hfuse:w:0xD3:m
-avrdude -p atmega328p -P usb -c avrisp2 -B 32 -U efuse:w:0x05:m
+avrdude -p atmega328p -P usb -c avrisp2 -B 32 -U efuse:w:0xFD:m
 With bootloader:
 avrdude -p atmega328p -P usb -c avrisp2 -B 32 -U lfuse:w:0xDF:m
 avrdude -p atmega328p -P usb -c avrisp2 -B 32 -U hfuse:w:0xD2:m
-avrdude -p atmega328p -P usb -c avrisp2 -B 32 -U efuse:w:0x05:m
+avrdude -p atmega328p -P usb -c avrisp2 -B 32 -U efuse:w:0xFD:m
 
 
 

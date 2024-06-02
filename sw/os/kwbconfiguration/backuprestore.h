@@ -6,8 +6,9 @@
 
 #include <nlohmann/json.hpp>
 
-#include "module_config.h"
-
+#include "cfg_module.hpp"
+#include "cfg_module_register.hpp"
+#include "cfg_module_register_json.h"
 
 class Application;
 
@@ -19,28 +20,16 @@ public:
     void backup(uint16_t moduleId, const std::string & regValueFile, const std::string & regLayoutFile);
     void restore(uint16_t moduleId, const std::string & regValueFile);
 
+    static std::string createValuesFilename(uint16_t moduleId);
+    static std::string createLayoutFilename(uint16_t appId);
+
 protected:
+    std::vector<ModuleRegisterJson> loadLayoutFile(std::string filename);
 
-    uint16_t getRegIndexFromJson(const nlohmann::json &j) const;
-    RegType getRegTypeFromJson(const nlohmann::json &j) const;
-    uint8_t getRegAccessFromJson(const nlohmann::json &j) const;
-    std::string getRegNameFromJson(const nlohmann::json &j) const;
-    ValueFormat getValueFormatFromJson(const nlohmann::json &j) const;
-    template <typename T>
-    T getRegValueFromJson(const nlohmann::json &j, ValueFormat format) const;
-    template <typename T>
-    std::string valueToBinaryString(T value) const;
-    template <typename T>
-    std::string valueToString(T value, ValueFormat format) const;
-    std::string regAccessToString(uint8_t access) const;
+    std::vector<ModuleRegisterJson> loadValueFile(std::string filename, uint16_t &moduleIdFile);
+    void saveValueFile(std::string filename, uint16_t moduleId, const std::vector<ModuleRegisterJson>& regs);
 
-    std::vector<BaseRegister> loadLayoutFile(std::string filename);
-
-    std::vector<BaseRegister> loadValueFile(std::string filename, uint16_t &moduleIdFile);
-    void saveValueFile(std::string filename, uint16_t moduleId, const std::vector<BaseRegister>& regs);
-
-    std::vector<BaseRegister> registers;
+    std::vector<ModuleRegisterJson> registers;
 
     Application &app;
 };
-

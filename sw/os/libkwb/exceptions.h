@@ -90,7 +90,7 @@ void Exception::compileErrorMessage(const char *format, ...)
 }
 
 /**
- * An invalid parameter has been passed to a dunction.
+ * An invalid parameter has been passed to a function.
  */
 class InvalidParameter : public Exception
 {
@@ -104,6 +104,28 @@ public:
      * @param[in] args      Optional arguments used in the format string
      */
     template <class... Args> InvalidParameter(const char *file, uint32_t line, const char *function, const char *fmt,
+                                              Args... args)
+        : Exception(file, line, function)
+    {
+        compileErrorMessage(fmt, args...);
+    };
+};
+
+/**
+ * A logic error was detected e.g. mismatching values.
+ */
+class LogicError : public Exception
+{
+public:
+    /**
+     * ctor
+     * @param[in] file      Name of source file where the exception occurred
+     * @param[in] line      Line in source file where the exception occurred
+     * @param[in] function  Name of function where the exception occurred
+     * @param[in] fmt       Format string of the message
+     * @param[in] args      Optional arguments used in the format string
+     */
+    template <class... Args> LogicError(const char *file, uint32_t line, const char *function, const char *fmt,
                                               Args... args)
         : Exception(file, line, function)
     {

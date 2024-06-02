@@ -79,7 +79,7 @@ TEST_F(JsonRegsTest, GetType)
 }
 
 // example enum type declaration
-enum class RegType
+enum class TestType
 {
     eREGInvalid = -1,
     eREGU8 = 0,
@@ -88,34 +88,33 @@ enum class RegType
 };
 
 // map RegType values to JSON as strings
-NLOHMANN_JSON_SERIALIZE_ENUM( RegType, {
-    {RegType::eREGInvalid, nullptr},
-    {RegType::eREGU8, "regu8"},
-    {RegType::eREGU8, "REGU8"},
-    {RegType::eREGU16, "regu16"},
-    {RegType::eREGU16, "REGU16"},
-    {RegType::eREGU32, "regu32"},
-    {RegType::eREGU32, "REGU32"},
+NLOHMANN_JSON_SERIALIZE_ENUM( TestType, {
+    {TestType::eREGInvalid, nullptr},
+    {TestType::eREGU8, "regu8"},
+    {TestType::eREGU8, "REGU8"},
+    {TestType::eREGU16, "regu16"},
+    {TestType::eREGU16, "REGU16"},
+    {TestType::eREGU32, "regu32"},
+    {TestType::eREGU32, "REGU32"},
 })
 
 /// Test to decode enums
 TEST_F(JsonRegsTest, GetEnum)
 {
     json j = json::parse("{\"type\":\"U8\"}");
-    RegType rt = j["type"].get<RegType>();
-    ASSERT_EQ(RegType::eREGInvalid, rt);
+    TestType rt = j["type"].get<TestType>();
+    ASSERT_EQ(TestType::eREGInvalid, rt);
 
     j = json::parse("{\"bogus\":\"U8\"}");
-    rt = j["type"].get<RegType>();
-    ASSERT_EQ(RegType::eREGInvalid, rt);
+    rt = j["type"].get<TestType>();
+    ASSERT_EQ(TestType::eREGInvalid, rt);
 
 
     j = json::parse("{\"type\":\"REGU8\"}");
-    rt = j["type"].get<RegType>();
-    ASSERT_EQ(RegType::eREGU8, rt);
+    rt = j["type"].get<TestType>();
+    ASSERT_EQ(TestType::eREGU8, rt);
 
     j = json::parse("{\"type\":\"regu8\"}");
-    rt = j["type"].get<RegType>();
-    ASSERT_EQ(RegType::eREGU8, rt);
-
+    rt = j["type"].get<TestType>();
+    ASSERT_EQ(TestType::eREGU8, rt);
 }

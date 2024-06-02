@@ -69,6 +69,9 @@ set (unittests_SRCS
     test_libkwb_connection.cpp
     test_libkwb_connection_serial.cpp
     test_libkwb_connection_socket.cpp
+
+    test_configuration_register.cpp
+    test_configuration_module.cpp
     
     unittests_main.cpp
 )

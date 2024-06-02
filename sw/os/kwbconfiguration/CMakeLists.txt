@@ -68,8 +68,11 @@ set (kwbconfiguration_SRCS
     action_write_register.h
     application.h
     backuprestore.h
+    cfg_module.hpp
+    cfg_module_json.h
+    cfg_module_register.hpp
+    cfg_module_register_json.h
     kwbconfiguration_version.h
-    module_config.h
     msgbroker.h
     uiconsole.h
     uimain.h
@@ -84,8 +87,9 @@ set (kwbconfiguration_SRCS
     action_write_register.cpp
     application.cpp
     backuprestore.cpp
+    cfg_module_json.cpp
+    cfg_module_register_json.cpp
     kwbconfiguration_main.cpp
-    module_config.cpp
     msgbroker.cpp
     uiconsole.cpp
     uimain.cpp

@@ -58,7 +58,7 @@ void UISingleModule::display()
     std::cout << "Single module Menu" << std::endl;
     std::cout << "--------------------------------------------------" << std::endl;
     std::cout << " (2) read version" << std::endl;
-    //std::cout << " (3) udate firmware" << std::endl;
+    //std::cout << " (3) update firmware" << std::endl;
     std::cout << " (4) read register" << std::endl;
     std::cout << " (5) write register" << std::endl;
     std::cout << " (6) backup all registers" << std::endl;
@@ -199,8 +199,8 @@ void UISingleModule::backupModule()
         }
         appid = static_cast<uint16_t>(temp);
         br.backup(selected_module_id,
-                  ModuleConfig::createValuesFilename(selected_module_id),
-                  ModuleConfig::createLayoutFilename(appid));
+                  BackupRestore::createValuesFilename(selected_module_id),
+                  BackupRestore::createLayoutFilename(appid));
         fprintf(stdout, "Backup of module ID: 0x%04X registers SUCCESS\n", selected_module_id);
     }
     catch (std::exception &e) {
@@ -216,7 +216,7 @@ void UISingleModule::restoreModule()
     try {
         BackupRestore br(app);
 
-        br.restore(selected_module_id, ModuleConfig::createValuesFilename(selected_module_id));
+        br.restore(selected_module_id, BackupRestore::createValuesFilename(selected_module_id));
         fprintf(stdout, "Restore of module ID: 0x%04X registers SUCCESS\n", selected_module_id);
     }
     catch (std::exception &e) {

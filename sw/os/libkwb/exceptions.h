@@ -27,6 +27,7 @@
 
 #include <stdexcept>
 #include <cstdarg>
+#include <cstdint>
 
 //! Helper macro if noexcept is not defined on certain operating systems.
 #define NOEXCEPT noexcept

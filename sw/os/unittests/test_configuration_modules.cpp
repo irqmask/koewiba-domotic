@@ -2,13 +2,11 @@
  * @addtogroup UNITTESTS
  *
  * @{
- * @file    test_configuration_module_config.cpp
- * @brief   This module contains the unittests for: ModuleConfig class..
- *
- * @author  Christian Verhalen
+ * @file    test_configuration_modules.cpp
+ * @brief   This module contains the unittests for: ModuleFile class.
  *///---------------------------------------------------------------------------
 /*
- * Copyright (C) 2024  christian <irqmask@gmx.de>
+ * Copyright (C) 2025  christian <irqmask@gmx.de>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,11 +33,9 @@
 
 // include
 #include "prjtypes.h"
-// libsystem
-#include "systime.h"
 // kwbconfiguration
-#include "../kwbconfiguration/cfg_module_json.h"
-#include "../kwbconfiguration/cfg_module_json.cpp"
+#include "../kwbconfiguration/cfg_module_file.h"
+#include "../kwbconfiguration/cfg_module_file.cpp"
 
 using namespace nlohmann;
 
@@ -60,36 +56,65 @@ using namespace nlohmann;
 // --- Global functions --------------------------------------------------------
 
 /// @test Test function to parse the register layout file
-TEST(kwbconfiguration_Module, fromString)
+TEST(kwbconfiguration_Modules, OneFromString)
 {
     std::string modcfg =
-        //"{\"modules\":["
+        "{\"modules\":["
         "  {"
         "    \"nodeid\": \"0x104\","
         "    \"appid\": \"0x815\","
-        "    \"name\": \"GustavGans\","
+        "    \"name\": \"GiesbertGockel\","
         "    \"description\": \"Das ist die Beschreibung zu Giesbert Gockel\""
-        "  }";
-        //"]}";
+        "  }"
+        "]}";
 
-    ModuleJson m;
-    ASSERT_NO_THROW(m.fromJson(modcfg));
+    ModuleFile m;
+    ASSERT_NO_THROW(m.fromString(modcfg));
+    auto modules = m.getModules();
 
-    ASSERT_EQ(m.nodeId, 0x104);
-    ASSERT_EQ(m.appId, 0x815);
-    ASSERT_STREQ(m.name.c_str(), "GustavGans");
-    ASSERT_STREQ(m.description.c_str(), "Das ist die Beschreibung zu Giesbert Gockel");
+    ASSERT_EQ(modules.size(), 1);
 
-
+    ASSERT_STREQ(modules[0].name.c_str(), "GiesbertGockel");
 }
 
-// test node id in dec
-// test node id in hex
-// test app id in dec
-// test app id in hex
-// test missing description (no error)
-// test missing node id (error expected)
-// test missing app id (error expected)
-// test missing name (error expected)
+
+/// @test Test function to parse the register layout file
+TEST(kwbconfiguration_Modules, ThreeFromString)
+{
+    std::string modcfg =
+        "{\"modules\":["
+        "  {"
+        "    \"nodeid\": \"0x301\","
+        "    \"appid\": 111,"
+        "    \"name\": \"one\","
+        "    \"description\": \"description one\""
+        "  },"
+        "  {"
+        "    \"nodeid\": \"0x302\","
+        "    \"appid\": 222,"
+        "    \"name\": \"two\","
+        "    \"description\": \"description two\""
+        "  },"
+        "  {"
+        "    \"nodeid\": \"0x303\","
+        "    \"appid\": 333,"
+        "    \"name\": \"three\","
+        "    \"description\": \"description three\""
+        "  }"
+        "]}";
+
+    ModuleFile m;
+    ASSERT_NO_THROW(m.fromString(modcfg));
+    auto modules = m.getModules();
+
+    ASSERT_EQ(modules.size(), 3);
+
+    ASSERT_EQ(modules[0].appId, 111);
+    ASSERT_STREQ(modules[0].name.c_str(), "one");
+    ASSERT_EQ(modules[1].appId, 222);
+    ASSERT_STREQ(modules[1].name.c_str(), "two");
+    ASSERT_EQ(modules[2].appId, 333);
+    ASSERT_STREQ(modules[2].name.c_str(), "three");
+}
 
 /** @} */

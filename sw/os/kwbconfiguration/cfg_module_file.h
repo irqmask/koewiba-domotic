@@ -2,7 +2,7 @@
  * @addtogroup KWBCONFIGURATION
  *
  * @{
- * @file    cfg_module_json.h
+ * @file    cfg_module_file.h
  * @brief   Configuration: Module with JSON serializer/deserializer.
  *///---------------------------------------------------------------------------
 /*
@@ -27,13 +27,14 @@
 
 #include "prjconf.h"
 
+#include <string>
 #include <nlohmann/json.hpp>
 
 // include
 #include "prjtypes.h"
 #include "moddef_common.h"
 
-#include "cfg_module.hpp"
+#include "cfg_module_json.h"
 
 // --- Definitions -------------------------------------------------------------
 
@@ -45,23 +46,24 @@
 
 // --- Class definition --------------------------------------------------------
 
-class ModuleJson : public Module
+class ModuleJson;
+
+class ModuleFile
 {
 public:
-    ModuleJson();
+    ModuleFile();
+    ModuleFile(const std::string &filename);
 
-    virtual void fromJson(nlohmann::json &jm);
-    virtual void fromJson(const char *jsonString);
-    virtual void fromJson(const std::string &jsonString);
+    void fromFile(const std::string & filename);
+    void fromString(const std::string &jsonString);
+    void fromJson(const nlohmann::json &json);
 
-    nlohmann::json toJson() const;
-    std::string toJsonStr() const;
+    std::vector<ModuleJson> getModules() { return modules; };
 
 protected:
-    uint16_t getNodeIdFromJson(const nlohmann::json &jm);
-    uint16_t getAppIdFromJson(const nlohmann::json &jm);
-    std::string getNameFromJson(const nlohmann::json &jm);
-    std::string getDescriptionFromJson(const nlohmann::json &jm);
+    std::vector<ModuleJson> modules;
+
+    std::vector<ModuleJson> loadFromFile(const std::string &filename);
 };
 
 /** @} */

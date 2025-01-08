@@ -78,6 +78,12 @@ Application::Application(Connection     &conn,
 }
 
 //----------------------------------------------------------------------------
+bool Application::listAllModules()
+{
+    return true;
+}
+
+//----------------------------------------------------------------------------
 bool Application::detectModules()
 {
     bool rc = false;

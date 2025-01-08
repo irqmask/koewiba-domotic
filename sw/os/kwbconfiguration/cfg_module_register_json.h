@@ -4,11 +4,9 @@
  * @{
  * @file    cfg_module_register_json.h
  * @brief   Configuration: Register with JSON serializer/deserializer.
- *
- * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
 /*
- * Copyright (C) 2024  christian <irqmask@web.de>
+ * Copyright (C) 2025  christian <irqmask@web.de>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -64,7 +62,7 @@ NLOHMANN_JSON_SERIALIZE_ENUM( RegType, {
 
 // map TaskState values to JSON as strings
 NLOHMANN_JSON_SERIALIZE_ENUM( ValueFormat, {
-    {ValueFormat::eINVALID, nullptr},
+    {ValueFormat::eUNSPECIFIED, nullptr},
     {ValueFormat::eBINARY, "bin"},
     {ValueFormat::eOCTAL, "oct"},
     {ValueFormat::eDECIMAL, "dec"},

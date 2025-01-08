@@ -64,6 +64,12 @@ public:
     Application(Connection &conn, MsgBroker &broker);
 
     /**
+     * List all modules which are declared in the modules configuration file.
+     * @return true, if module configuration file was found and could be parsed successfully.
+     */
+    bool listAllModules();
+
+    /**
      * Detect all modules in the system.
      * Each module reports with it's version information.
      *

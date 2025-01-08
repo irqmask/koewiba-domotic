@@ -4,11 +4,9 @@
  * @{
  * @file    cfg_module_register.hpp
  * @brief   Configuration: Holds properties of the registers of a module.
- *
- * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
 /*
- * Copyright (C) 2024  christian <irqmask@web.de>
+ * Copyright (C) 2025  christian <irqmask@web.de>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,10 +27,8 @@
 
 #include "prjconf.h"
 
-#include <algorithm>
 #include <iostream>
 #include <string>
-#include <sstream>
 
 // include
 #include "prjtypes.h"
@@ -41,6 +37,7 @@
 // libkwb
 #include "exceptions.h"
 #include "log.h"
+#include "numberformat.hpp"
 
 // --- Definitions -------------------------------------------------------------
 
@@ -71,15 +68,6 @@ enum RegAccess
 {
     eREG_ACCESS_READ = 1,
     eREG_ACCESS_WRITE = 2
-};
-
-enum class ValueFormat : uint8_t
-{
-    eINVALID,
-    eBINARY,
-    eDECIMAL,
-    eOCTAL,
-    eHEXADECIMAL
 };
 
 /// Definition of a module's register
@@ -144,61 +132,23 @@ public:
     int64_t value;
 
 protected:
-    //----------------------------------------------------------------------------
-    template<typename T>
-    std::string valueToBinaryString(T value) const
-    {
-        std::stringstream ss;
-        while (value > 0) {
-            ss << (value % 2);
-            value /= 2;
-        }
-        std::string binary = ss.str();
-        std::reverse(binary.begin(), binary.end());
-        return binary;
-    }
-
-    //----------------------------------------------------------------------------
-    template<typename T>
-    std::string tvalueToString(T value, ValueFormat format) const
-    {
-        std::stringstream ss;
-        switch (format)
-        {
-        case ValueFormat::eBINARY:
-            ss << valueToBinaryString(value);
-            break;
-        case ValueFormat::eOCTAL:
-            ss << std::oct << static_cast<int64_t>(value); // ugly hack to proper convert uint_8 to octal
-            break;
-        case ValueFormat::eDECIMAL:
-            ss << std::to_string(value);
-            break;
-        case ValueFormat::eHEXADECIMAL:
-            ss << std::hex << static_cast<int64_t>(value); // ugly hack to proper convert uint_8 to hexadecimal
-            break;
-        default:
-            throw InvalidParameter(LOC, "unknown format");
-        }
-        return ss.str();
-    }
 
     //----------------------------------------------------------------------------
     std::string valueToString() const
     {
         switch (type) {
         case RegType::eU8:
-            return tvalueToString<uint8_t>(static_cast<uint8_t>(value), format);
+            return number2str<uint8_t>(static_cast<uint8_t>(value), format);
         case RegType::eU16:
-            return tvalueToString<uint16_t>(static_cast<uint16_t>(value), format);
+            return number2str<uint16_t>(static_cast<uint16_t>(value), format);
         case RegType::eU32:
-            return tvalueToString<uint32_t>(static_cast<uint32_t>(value), format);
+            return number2str<uint32_t>(static_cast<uint32_t>(value), format);
         case RegType::eI8:
-            return tvalueToString<int8_t>(static_cast<int8_t>(value), format);
+            return number2str<int8_t>(static_cast<int8_t>(value), format);
         case RegType::eI16:
-            return tvalueToString<int16_t>(static_cast<int16_t>(value), format);
+            return number2str<int16_t>(static_cast<int16_t>(value), format);
         case RegType::eI32:
-            return tvalueToString<int32_t>(static_cast<int32_t>(value), format);
+            return number2str<int32_t>(static_cast<int32_t>(value), format);
         default:
             return std::string("NaN");
         }

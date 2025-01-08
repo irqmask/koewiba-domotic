@@ -4,8 +4,6 @@
  * @{
  * @file    cfg_module.hpp
  * @brief   Configuration: Holds properties of the configuration of a module.
- *
- * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
 /*
  * Copyright (C) 2024  christian <irqmask@web.de>

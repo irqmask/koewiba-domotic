@@ -2,13 +2,11 @@
  * @addtogroup KWBCONFIGURATION
  *
  * @{
- * @file    UIAllModules.cpp
+ * @file    uiallmodules.cpp
  * @brief   UI sub-menu for actions on all modules.
- *
- * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
 /*
- * Copyright (C) 2022  christian <irqmask@web.de>
+ * Copyright (C) 2025  christian <irqmask@web.de>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,6 +26,14 @@
 
 #include "uiallmodules.h"
 
+// os/libkwb
+#include "exceptions.h"
+#include "log.h"
+
+#include "action_read_module_info.h"
+#include "cfg_module_file.h"
+#include "cfg_module_json.h"
+
 // --- Definitions -------------------------------------------------------------
 
 // --- Type definitions --------------------------------------------------------
@@ -44,6 +50,8 @@
 
 // --- Global functions --------------------------------------------------------
 
+constexpr char UIAllModules::DEF_MODULE_FILENAME[];
+
 UIAllModules::UIAllModules(Application &app) : UIConsole(app)
 {
 }
@@ -54,22 +62,52 @@ void UIAllModules::display()
     std::cout << std::endl;
     std::cout << "All modules Menu" << std::endl;
     std::cout << "--------------------------------------------------" << std::endl;
-    //std::cout << " (1) ping all" << std::endl;
+    std::cout << " (1) list all (from file)" << std::endl;
     std::cout << " (2) read all versions" << std::endl;
-    std::cout << " (4) backup all registers" << std::endl;
-    std::cout << " (5) restore all registers" << std::endl;
+    //std::cout << " (4) backup all registers" << std::endl;
+    //std::cout << " (5) restore all registers" << std::endl;
     std::cout << " (x) leave sub-menu" << std::endl;
 }
 
 //----------------------------------------------------------------------------
 void UIAllModules::onMenuChoice()
 {
-    switch (this->last_choice) {
-    case 'x':
-        leave_menu = true;
-        break;
-    default:
-        UIConsole::onMenuChoice();
-        break;
+    try {
+        switch (this->last_choice) {
+        case '1':
+            listAllFromFile();
+            break;
+        case 'x':
+            leave_menu = true;
+            break;
+        default:
+            UIConsole::onMenuChoice();
+            break;
+        }
+    }
+    catch (Exception &e) {
+        std::cerr << "Error occured during executing " << this->last_choice << "!" << std::endl;
+        std::cerr << e.what() << std::endl;
+    }
+}
+
+//----------------------------------------------------------------------------
+void UIAllModules::listAllFromFile()
+{
+    std::string filename = "modules.json";
+    try {
+        ModuleFile mf(filename);
+        std::vector<ModuleJson> modules = mf.getModules();
+
+        std::cout << "Modules from file " << filename << std::endl;
+        std::cout << "  ModId  AppId  Name              Description" << std::endl;
+        for (auto &module : modules) {
+            fprintf(stdout, "  0x%04x 0x%04x %16s %s\n", module.nodeId, module.appId, module.name.c_str(), module.description.c_str());
+        }
+    }
+    catch (Exception &e) {
+        throw OperationFailed(LOC, "Cannot load modules file! %s", e.what());
+    }
+}
     }
 }

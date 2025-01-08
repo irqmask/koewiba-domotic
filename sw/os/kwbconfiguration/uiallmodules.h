@@ -2,13 +2,11 @@
  * @addtogroup KWBCONFIGURATION
  *
  * @{
- * @file    UIAllModules.h
+ * @file    uiallmodules.h
  * @brief   UI sub-menu for actions on all modules.
- *
- * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
 /*
- * Copyright (C) 2022  christian <irqmask@web.de>
+ * Copyright (C) 2025  christian <irqmask@web.de>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -38,7 +36,10 @@ public:
     UIAllModules(Application &app);
 
 protected:
+    static constexpr char DEF_MODULE_FILENAME[] = "modules.json";
     virtual void display() override;
     virtual void onMenuChoice() override;
+
+    virtual void listAllFromFile();
 };
 

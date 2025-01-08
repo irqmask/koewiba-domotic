@@ -4,11 +4,9 @@
  * @{
  * @file    cfg_module_register_json.cpp
  * @brief   Configuration: Implementation of Register with JSON serializer/deserializer.
- *
- * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
 /*
- * Copyright (C) 2024  christian <irqmask@web.de>
+ * Copyright (C) 2025  christian <irqmask@web.de>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -40,8 +38,10 @@
 #include "error_codes.h"
 #include "kwb_defines.h"
 
+// os/libkwb
 #include "exceptions.h"
 #include "log.h"
+#include "numberformat.hpp"
 
 #include "cfg_module_register.hpp"
 
@@ -143,11 +143,11 @@ json ModuleRegisterJson::toJson() const
 {
     if (type == RegType::eINVALID)
     {
-        throw LogicError(LOC, "Cannot convert type RegType::eINVALID to JSON");
+        throw LogicError(LOC, "Cannot convert type RegType::eUNSPECIFIED to JSON");
     }
-    if (format == ValueFormat::eINVALID)
+    if (format == ValueFormat::eUNSPECIFIED)
     {
-        throw LogicError(LOC, "Cannot convert format ValueFormat::eINVALID to JSON");
+        throw LogicError(LOC, "Cannot convert format ValueFormat::eUNSPECIFIED to JSON");
     }
     auto jr = json::object();
     jr["index"] = this->index;
@@ -244,7 +244,7 @@ ValueFormat ModuleRegisterJson::getValueFormatFromJson(const nlohmann::json &j)
     }
     ValueFormat vf = j["format"].get<ValueFormat>();
 
-    if (vf == ValueFormat::eINVALID) {
+    if (vf == ValueFormat::eUNSPECIFIED) {
         std::string kv = j["format"];
         throw InvalidParameter(LOC, "Invalid value '%s' for parameter 'type'. expected entity 'type' beeing 'u8', 'u16', 'u32', 'i8', 'i16', 'i32' !", kv.c_str());
     }
@@ -267,38 +267,7 @@ T ModuleRegisterJson::getRegValueFromJson(const nlohmann::json &j)
     }
     else if (j["value"].is_string()) {
         std::string s = j["value"];
-        try {
-            int base = 10;
-            switch (format)
-            {
-            case ValueFormat::eBINARY:
-                base = 2;
-                break;
-            case ValueFormat::eOCTAL:
-                base = 8;
-                break;
-            case ValueFormat::eDECIMAL:
-                base = 10;
-                break;
-            case ValueFormat::eHEXADECIMAL:
-                base = 16;
-                break;
-            default:
-                base = 0;
-                break;
-            }
-
-            if ((type == RegType::eU8) || (type == RegType::eU16) || (type == RegType::eU32))
-                v = stoul(s, nullptr, base); // unsigned type conversion
-            else
-                v = stol(s, nullptr, base); // signed type conversion
-        }
-        catch (std::invalid_argument &e) {
-            throw InvalidParameter(LOC, "Value %s cannot be converted to number! %s", s.c_str(), e.what());
-        }
-        catch (std::out_of_range &e) {
-            throw InvalidParameter(LOC, "Value %s cannot be converted to number! Out of range!", s.c_str(), e.what());
-        }
+        v = str2number<T>(s, format, (type == RegType::eI8) || (type == RegType::eI16) || (type == RegType::eI32));
     }
     else {
         std::string s = j["value"];

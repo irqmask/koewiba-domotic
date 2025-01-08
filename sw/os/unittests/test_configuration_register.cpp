@@ -388,7 +388,6 @@ TEST(kwbconfiguration_ModuleRegister, ModuleRegister_toJsonU32OK)
 }
 
 
-
 TEST(kwbconfiguration_ModuleRegister, ModuleRegister_toJsonNOK)
 {
     std::string s;
@@ -399,7 +398,7 @@ TEST(kwbconfiguration_ModuleRegister, ModuleRegister_toJsonNOK)
     }
 
     {
-        ModuleRegisterJson r(1, RegType::eU16, eREG_ACCESS_READ | eREG_ACCESS_WRITE, "def", ValueFormat::eINVALID, 547);
+        ModuleRegisterJson r(1, RegType::eU16, eREG_ACCESS_READ | eREG_ACCESS_WRITE, "def", ValueFormat::eUNSPECIFIED, 547);
         EXPECT_THROW(s = r.toJsonStr(), LogicError);
     }
 }

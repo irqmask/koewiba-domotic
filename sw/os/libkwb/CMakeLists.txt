@@ -42,8 +42,10 @@ set (libkwb_SRCS
     connection_socket.h
     exceptions.h
     ioloop.h
+    jsonhelper.hpp
     log.h
     message.h
+    numberformat.hpp
     vos.h
 
     connection.cpp

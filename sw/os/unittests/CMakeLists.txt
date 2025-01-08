@@ -72,7 +72,8 @@ set (unittests_SRCS
 
     test_configuration_register.cpp
     test_configuration_module.cpp
-    
+    test_configuration_modules.cpp
+
     unittests_main.cpp
 )
 

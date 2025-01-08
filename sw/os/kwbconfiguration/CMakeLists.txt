@@ -69,6 +69,7 @@ set (kwbconfiguration_SRCS
     application.h
     backuprestore.h
     cfg_module.hpp
+    cfg_module_file.h
     cfg_module_json.h
     cfg_module_register.hpp
     cfg_module_register_json.h
@@ -87,6 +88,7 @@ set (kwbconfiguration_SRCS
     action_write_register.cpp
     application.cpp
     backuprestore.cpp
+    cfg_module_file.cpp
     cfg_module_json.cpp
     cfg_module_register_json.cpp
     kwbconfiguration_main.cpp

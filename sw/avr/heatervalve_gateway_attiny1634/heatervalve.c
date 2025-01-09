@@ -127,6 +127,7 @@ static void interpret_message(void)
  */
 void hv_initialize(void)
 {
+    // setup reset line
     DDRB &= ~(1<<PB3);
     PORTB &= ~(1<<PB3);
 

@@ -159,7 +159,7 @@ typedef void (*spi_end_send_func_t)(uint8_t arg);
     defined (__AVR_ATmega324PA__) || \
     defined (__AVR_ATmega324A__)    
 
-inline void     spi_master_init_blk  (void)
+static inline void     spi_master_init_blk  (void)
 {
     // Set MOSI and SCK output, all others input
     SPI_DDR_MISO &= ~(1 << SPI_MISO);
@@ -173,7 +173,7 @@ inline void     spi_master_init_blk  (void)
 }
 #elif defined (__AVR_ATtiny1634__)
 
-inline void     spi_master_init_blk  (void)
+static inline void     spi_master_init_blk  (void)
 {
 	SPI_DDR_MISO &= ~(1 << SPI_MISO);
     SPI_DDR_MOSI |=  (1 << SPI_MOSI);
@@ -204,7 +204,7 @@ inline void     spi_master_init_blk  (void)
     defined (__AVR_ATmega324PA__) || \
     defined (__AVR_ATmega324A__)
 
-inline uint8_t  spi_transmit_blk    (uint8_t                data )
+static inline uint8_t  spi_transmit_blk    (uint8_t                data )
 {
     // Start transmission
     SPI_DATA_REG = data;
@@ -216,7 +216,7 @@ inline uint8_t  spi_transmit_blk    (uint8_t                data )
 
 #elif defined (__AVR_ATtiny1634__)
 
-inline uint8_t  spi_transmit_blk    (uint8_t                data )
+static inline uint8_t  spi_transmit_blk    (uint8_t                data )
 {
     register uint8_t clk = 0x11;
     register uint8_t clk_and_shift = 0x13;

@@ -54,19 +54,18 @@ extern void app_register_set  (uint8_t reg_no, uint32_t value);
 
 static void on_keypress_send (uint8_t key_index)
 {
-    uint16_t receiver;
     uint8_t msg[4];
-    receiver = g_on_key_set_register[key_index].receiver;
-    if (receiver != 0) {
-        msg[2] = g_on_key_set_register[key_index].value;
-        if(eKeyMode_PushbuttonToggle == g_on_key_set_register[key_index].key_mode) {
-            if (app_remote_states & (1<<key_index)) msg[2] = 0;
-        }
-        msg[0] = eCMD_SET_REG_8BIT;
-        msg[1] = g_on_key_set_register[key_index].register_id;
-        msg[2] = g_on_key_set_register[key_index].value;
-        message_send(receiver, 3, msg);
+
+    if(eKeyMode_NoFunction == g_on_key_set_register[key_index].key_mode) {
+        return;
     }
+    msg[0] = eCMD_SET_REG_8BIT;
+    msg[1] = g_on_key_set_register[key_index].register_id;
+    msg[2] = g_on_key_set_register[key_index].value;
+    if(eKeyMode_PushbuttonToggle == g_on_key_set_register[key_index].key_mode) {
+        if (app_remote_states & (1<<key_index)) msg[2] = 0;
+    }
+    bus_send_message(bus, g_on_key_set_register[key_index].receiver, 3, msg);
 }
 
 static void app_check_keys (void)

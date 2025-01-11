@@ -28,6 +28,8 @@
 // --- Include section ---------------------------------------------------------
 
 #include <avr/io.h>
+#include <avr/pgmspace.h>
+
 #include "moddef_common.h"
 #include "version.h"
 
@@ -43,7 +45,7 @@
 //! @note The linker sorts the variables upside down. app_controller_id begins at
 //!       the lowest address and app_version begins at the highest address.
 //! @see BOARD_IDs, APP_IDs, APP_VERSIONING
-const unsigned char app_versioninfo[MOD_VERSIONINFO_LEN] // not for atmega88 // __attribute__((section(".versioninfo")))
+const unsigned char app_versioninfo[MOD_VERSIONINFO_LEN] PROGMEM // not for atmega88 // __attribute__((section(".versioninfo")))
                         = {SIGNATURE_0,SIGNATURE_1,SIGNATURE_2,0x00,
                            0xFF,0xFE,   // board ID
                            1,           // board revision

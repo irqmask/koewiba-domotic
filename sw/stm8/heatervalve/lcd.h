@@ -54,6 +54,11 @@ void lcd_blink(bool o);
 
 void lcd_digit(uint8_t index, char value);
 
+/**
+ * Display value from 0000-9999. Insert decimal point
+ * @param[in] value Decimal value to display
+ * @param[in] decpoint  Resolution 0=1, 1=1/10, 2=1/100 3=colon,
+ */
 void lcd_disp_value(uint16_t value, uint8_t decpoint);
 
 void lcd_disp_symbol(char symbol, bool on);

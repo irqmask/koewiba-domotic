@@ -111,6 +111,13 @@ static uint8_t g_segmentX[4][2] = {
         { LCD_RAM_IDX08, 0x80 }
 };
 
+static uint8_t g_segment_dp[4][2] = {
+        { LCD_RAM_IDX00, 0x10 },
+        { LCD_RAM_IDX01, 0x01 },
+        { LCD_RAM_IDX01, 0x08 },
+        { LCD_RAM_IDX01, 0x40 }
+};
+
 // --- Global variables --------------------------------------------------------
 
 // --- Module global variables -------------------------------------------------
@@ -399,8 +406,15 @@ void lcd_disp_value(uint16_t value, uint8_t decpoint)
             lcd_digit(digit - 1, dv);
         }
     }
-    // FIXME insert decimal point
-    (void)decpoint;
+    // insert decimal point
+    if (decpoint < 4) {
+        decpoint = 3 - decpoint;
+        LCD_RAM[g_segment_dp[0][0]] &= ~g_segment_dp[0][1];
+        LCD_RAM[g_segment_dp[1][0]] &= ~g_segment_dp[1][1];
+        LCD_RAM[g_segment_dp[2][0]] &= ~g_segment_dp[2][1];
+        LCD_RAM[g_segment_dp[3][0]] &= ~g_segment_dp[3][1];
+        LCD_RAM[g_segment_dp[decpoint][0]] |= g_segment_dp[decpoint][1];
+    }
 }
 
 void lcd_disp_symbol(char symbol, bool on)

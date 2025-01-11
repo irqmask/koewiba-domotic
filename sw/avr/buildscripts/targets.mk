@@ -8,6 +8,7 @@ TARGETS = basic_app_atmega324p \
           gateway232_atmega324p \
           heatervalve_gateway_attiny1634 \
           led2_atmega324p \
+	  pushbutton8 \
           roomthermostat \
           scheduler_attiny1634 \
           switch5_atmega328p \

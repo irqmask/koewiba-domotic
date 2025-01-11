@@ -153,7 +153,7 @@ void app_on_encoder_value(int8_t diff)
  */
 void app_init (void)
 {
-    register_set_u16(MOD_eReg_ModuleID, 0x520);
+    //register_set_u16(MOD_eReg_ModuleID, 0xa60);
     LED_ERROR_DDR |=  (1<<LED_ERROR);
     LED_ERROR_OFF;
     LED_STATUS_DDR |= (1<<LED_STATUS);

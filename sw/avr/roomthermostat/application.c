@@ -32,6 +32,8 @@
 // --- Include section ---------------------------------------------------------
 
 #include "prjtypes.h"
+#include "heatercontrol_common.h"
+
 #include "cmddef_common.h"
 #include "alarmclock.h"
 #include "datetime.h"
@@ -237,7 +239,7 @@ void app_reset_display_timeout(void)
 
 void app_set_desired_temp(uint16_t desired_temp, bool publish)
 {
-	if (desired_temp < 27315 || desired_temp > 27315 + 4000)
+	if (desired_temp < HEATERCTRL_MIN_TEMP || desired_temp > HEATERCTRL_MAX_TEMP)
 		return;
 
     app_desired_temp = desired_temp;

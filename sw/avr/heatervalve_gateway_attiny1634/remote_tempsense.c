@@ -35,6 +35,8 @@
  #include "appconfig.h"
 #endif
 
+#include "heatercontrol_common.h"
+
 // --- Definitions -------------------------------------------------------------
 
 // --- Type definitions --------------------------------------------------------
@@ -88,6 +90,9 @@ uint16_t remts_get_current_temp()
  */
 void remts_set_desired_temp(uint16_t temp)
 {
+    if (temp < HEATERCTRL_MIN_TEMP || temp > HEATERCTRL_MAX_TEMP) {
+        return;
+    }
     g_desired_temp = temp;
 }
 
@@ -98,6 +103,9 @@ void remts_set_desired_temp(uint16_t temp)
  */
 void remts_set_current_temp(uint16_t temp)
 {
+    if (temp < HEATERCTRL_MIN_TEMP || temp > HEATERCTRL_MAX_TEMP) {
+        return;
+    }
     g_current_temp = temp;
 }
 

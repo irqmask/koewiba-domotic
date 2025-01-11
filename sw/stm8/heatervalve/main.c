@@ -46,6 +46,10 @@ void main(void)
 
     LOG_DEBUG("# heatervalve\n");
     lcd_initialize();
+    lcd_digit(0, '-');
+    lcd_digit(1, '-');
+    lcd_digit(2, '-');
+    lcd_digit(3, '-');
 
     adc_initialize();
     enc_initialize();

@@ -345,6 +345,19 @@ void lcd_digit(uint8_t index, char value)
         LCD_RAM[g_segmentX[index][0]] &= ~g_segmentX[index][1];
         break;
 
+    case '-':
+        LCD_RAM[g_segmentA[index][0]] &= ~g_segmentA[index][1];
+        LCD_RAM[g_segmentB[index][0]] &= ~g_segmentB[index][1];
+        LCD_RAM[g_segmentC[index][0]] &= ~g_segmentC[index][1];
+        LCD_RAM[g_segmentD[index][0]] &= ~g_segmentD[index][1];
+        LCD_RAM[g_segmentE[index][0]] &= ~g_segmentE[index][1];
+        LCD_RAM[g_segmentF[index][0]] &= ~g_segmentF[index][1];
+        LCD_RAM[g_segmentG1[index][0]] |= g_segmentG1[index][1];
+        LCD_RAM[g_segmentG2[index][0]] |= g_segmentG2[index][1];
+        LCD_RAM[g_segmentT[index][0]] &= ~g_segmentT[index][1];
+        LCD_RAM[g_segmentX[index][0]] &= ~g_segmentX[index][1];
+        break;
+
     case ' ':
         LCD_RAM[g_segmentA[index][0]] &= ~g_segmentA[index][1];
         LCD_RAM[g_segmentB[index][0]] &= ~g_segmentB[index][1];

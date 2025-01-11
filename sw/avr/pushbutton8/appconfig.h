@@ -402,6 +402,13 @@ typedef enum msg_dependend_functions {
     eMsgDepFunc_Led_blindcontrol
 } app_msg_dep_func_t;
 
+typedef enum key_modes {
+    eKeyMode_NoFunction = 0,
+    eKeyMode_PushbuttonOnOff,
+    eKeyMode_PushbuttonToggle,
+} app_key_modes_t;
+
+
 #define NUM_EEBYTES_PER_KEY  (APP_eCfg_K1_Mode - APP_eCfg_K0_Mode)
 #define NUM_EEBYTES_PER_STUB (APP_eCfg_RecMsg1_RemoteAddr - APP_eCfg_RecMsg0_RemoteAddr)
 

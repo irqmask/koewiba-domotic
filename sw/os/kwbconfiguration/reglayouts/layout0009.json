@@ -1,0 +1,997 @@
+{
+  "name": "pushbutton8",
+  "description": "Register layout of a pushbutton8 module",
+  "regs": [
+    {
+      "index": 1,
+      "name": "ModuleID",
+      "type": "U16",
+      "format": "hex",
+      "access": "r"
+    },
+    {
+      "index": 2,
+      "name": "BldFlag",
+      "type": "U8",
+      "format": "hex",
+      "access": "r"
+    },
+    {
+      "index": 16,
+      "name": "Key0_Mode",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 17,
+      "name": "Key0_RemoteAddress",
+      "type": "U16",
+      "format": "hex",
+      "access": "rw"
+    },
+    {
+      "index": 18,
+      "name": "Key0_RemoteRegister",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 19,
+      "name": "Key_RemoteValue",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 20,
+      "name": "Key0_Reserve3",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 21,
+      "name": "Key0_Reserve2",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 22,
+      "name": "Key0_Reserve1",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 23,
+      "name": "Key0_Reserve0",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 24,
+      "name": "Key1_Mode",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 25,
+      "name": "Key1_RemoteAddress",
+      "type": "U16",
+      "format": "hex",
+      "access": "rw"
+    },
+    {
+      "index": 26,
+      "name": "Key1_RemoteRegister",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 27,
+      "name": "Key_RemoteValue",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 28,
+      "name": "Key1_Reserve3",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 29,
+      "name": "Key1_Reserve2",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 30,
+      "name": "Key1_Reserve1",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 31,
+      "name": "Key1_Reserve0",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 32,
+      "name": "Key2_Mode",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 33,
+      "name": "Key2_RemoteAddress",
+      "type": "U16",
+      "format": "hex",
+      "access": "rw"
+    },
+    {
+      "index": 34,
+      "name": "Key2_RemoteRegister",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 35,
+      "name": "Key_RemoteValue",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 36,
+      "name": "Key2_Reserve3",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 37,
+      "name": "Key2_Reserve2",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 38,
+      "name": "Key2_Reserve1",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 39,
+      "name": "Key2_Reserve0",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 40,
+      "name": "Key3_Mode",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 41,
+      "name": "Key3_RemoteAddress",
+      "type": "U16",
+      "format": "hex",
+      "access": "rw"
+    },
+    {
+      "index": 42,
+      "name": "Key3_RemoteRegister",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 43,
+      "name": "Key_RemoteValue",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 44,
+      "name": "Key3_Reserve3",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 45,
+      "name": "Key3_Reserve2",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 46,
+      "name": "Key3_Reserve1",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 47,
+      "name": "Key3_Reserve0",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 48,
+      "name": "Key4_Mode",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 49,
+      "name": "Key4_RemoteAddress",
+      "type": "U16",
+      "format": "hex",
+      "access": "rw"
+    },
+    {
+      "index": 50,
+      "name": "Key4_RemoteRegister",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 51,
+      "name": "Key_RemoteValue",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 52,
+      "name": "Key4_Reserve3",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 53,
+      "name": "Key4_Reserve2",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 54,
+      "name": "Key4_Reserve1",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 55,
+      "name": "Key4_Reserve0",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 56,
+      "name": "Key5_Mode",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 57,
+      "name": "Key5_RemoteAddress",
+      "type": "U16",
+      "format": "hex",
+      "access": "rw"
+    },
+    {
+      "index": 58,
+      "name": "Key5_RemoteRegister",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 59,
+      "name": "Key_RemoteValue",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 60,
+      "name": "Key5_Reserve3",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 61,
+      "name": "Key5_Reserve2",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 62,
+      "name": "Key5_Reserve1",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 63,
+      "name": "Key5_Reserve0",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 64,
+      "name": "Key6_Mode",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 65,
+      "name": "Key6_RemoteAddress",
+      "type": "U16",
+      "format": "hex",
+      "access": "rw"
+    },
+    {
+      "index": 66,
+      "name": "Key6_RemoteRegister",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 67,
+      "name": "Key_RemoteValue",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 68,
+      "name": "Key6_Reserve3",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 69,
+      "name": "Key6_Reserve2",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 70,
+      "name": "Key6_Reserve1",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 71,
+      "name": "Key6_Reserve0",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 72,
+      "name": "Key7_Mode",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 73,
+      "name": "Key7_RemoteAddress",
+      "type": "U16",
+      "format": "hex",
+      "access": "rw"
+    },
+    {
+      "index": 74,
+      "name": "Key7_RemoteRegister",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 75,
+      "name": "Key_RemoteValue",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 76,
+      "name": "Key7_Reserve3",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 77,
+      "name": "Key7_Reserve2",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 78,
+      "name": "Key7_Reserve1",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 79,
+      "name": "Key7_Reserve0",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 80,
+      "name": "RecMessage0_RemoteAddr",
+      "type": "U16",
+      "format": "hex",
+      "access": "rw"
+    },
+    {
+      "index": 81,
+      "name": "RecMessage0_Command",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 82,
+      "name": "RecMessage0_Register",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 83,
+      "name": "RecMessage0_LEDFunction",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 84,
+      "name": "RecMessage0_AdditionalData",
+      "type": "U8",
+      "format": "hex",
+      "access": "rw"
+    },
+    {
+      "index": 85,
+      "name": "RecMessage1_RemoteAddr",
+      "type": "U16",
+      "format": "hex",
+      "access": "rw"
+    },
+    {
+      "index": 86,
+      "name": "RecMessage1_Command",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 87,
+      "name": "RecMessage1_Register",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 88,
+      "name": "RecMessage1_LEDFunction",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 89,
+      "name": "RecMessage1_AdditionalData",
+      "type": "U8",
+      "format": "hex",
+      "access": "rw"
+    },
+    {
+      "index": 90,
+      "name": "RecMessage2_RemoteAddr",
+      "type": "U16",
+      "format": "hex",
+      "access": "rw"
+    },
+    {
+      "index": 91,
+      "name": "RecMessage2_Command",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 92,
+      "name": "RecMessage2_Register",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 93,
+      "name": "RecMessage2_LEDFunction",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 94,
+      "name": "RecMessage2_AdditionalData",
+      "type": "U8",
+      "format": "hex",
+      "access": "rw"
+    },
+    {
+      "index": 95,
+      "name": "RecMessage3_RemoteAddr",
+      "type": "U16",
+      "format": "hex",
+      "access": "rw"
+    },
+    {
+      "index": 96,
+      "name": "RecMessage3_Command",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 97,
+      "name": "RecMessage3_Register",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 98,
+      "name": "RecMessage3_LEDFunction",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 99,
+      "name": "RecMessage3_AdditionalData",
+      "type": "U8",
+      "format": "hex",
+      "access": "rw"
+    },
+{
+      "index": 100,
+      "name": "RecMessage4_RemoteAddr",
+      "type": "U16",
+      "format": "hex",
+      "access": "rw"
+    },
+    {
+      "index": 101,
+      "name": "RecMessage4_Command",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 102,
+      "name": "RecMessage4_Register",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 103,
+      "name": "RecMessage4_LEDFunction",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 104,
+      "name": "RecMessage4_AdditionalData",
+      "type": "U8",
+      "format": "hex",
+      "access": "rw"
+    },
+    {
+      "index": 105,
+      "name": "RecMessage5_RemoteAddr",
+      "type": "U16",
+      "format": "hex",
+      "access": "rw"
+    },
+    {
+      "index": 106,
+      "name": "RecMessage5_Command",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 107,
+      "name": "RecMessage5_Register",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 108,
+      "name": "RecMessage5_LEDFunction",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 109,
+      "name": "RecMessage5_AdditionalData",
+      "type": "U8",
+      "format": "hex",
+      "access": "rw"
+    },
+    {
+      "index": 110,
+      "name": "RecMessage6_RemoteAddr",
+      "type": "U16",
+      "format": "hex",
+      "access": "rw"
+    },
+    {
+      "index": 111,
+      "name": "RecMessage6_Command",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 112,
+      "name": "RecMessage6_Register",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 113,
+      "name": "RecMessage6_LEDFunction",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 114,
+      "name": "RecMessage6_AdditionalData",
+      "type": "U8",
+      "format": "hex",
+      "access": "rw"
+    },
+    {
+      "index": 115,
+      "name": "RecMessage7_RemoteAddr",
+      "type": "U16",
+      "format": "hex",
+      "access": "rw"
+    },
+    {
+      "index": 116,
+      "name": "RecMessage7_Command",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 117,
+      "name": "RecMessage7_Register",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 118,
+      "name": "RecMessage7_LEDFunction",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 119,
+      "name": "RecMessage7_AdditionalData",
+      "type": "U8",
+      "format": "hex",
+      "access": "rw"
+    },
+    {
+      "index": 120,
+      "name": "RecMessage8_RemoteAddr",
+      "type": "U16",
+      "format": "hex",
+      "access": "rw"
+    },
+    {
+      "index": 121,
+      "name": "RecMessage8_Command",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 122,
+      "name": "RecMessage8_Register",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 123,
+      "name": "RecMessage8_LEDFunction",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 124,
+      "name": "RecMessage8_AdditionalData",
+      "type": "U8",
+      "format": "hex",
+      "access": "rw"
+    },
+    {
+      "index": 125,
+      "name": "RecMessage9_RemoteAddr",
+      "type": "U16",
+      "format": "hex",
+      "access": "rw"
+    },
+    {
+      "index": 126,
+      "name": "RecMessage9_Command",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 127,
+      "name": "RecMessage9_Register",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 128,
+      "name": "RecMessage9_LEDFunction",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 129,
+      "name": "RecMessage9_AdditionalData",
+      "type": "U8",
+      "format": "hex",
+      "access": "rw"
+    },
+    {
+      "index": 130,
+      "name": "RecMessage10_RemoteAddr",
+      "type": "U16",
+      "format": "hex",
+      "access": "rw"
+    },
+    {
+      "index": 121,
+      "name": "RecMessage10_Command",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 132,
+      "name": "RecMessage10_Register",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 133,
+      "name": "RecMessage10_LEDFunction",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 134,
+      "name": "RecMessage10_AdditionalData",
+      "type": "U8",
+      "format": "hex",
+      "access": "rw"
+    },
+    {
+      "index": 135,
+      "name": "RecMessage11_RemoteAddr",
+      "type": "U16",
+      "format": "hex",
+      "access": "rw"
+    },
+    {
+      "index": 136,
+      "name": "RecMessag11_Command",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 137,
+      "name": "RecMessage11_Register",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 138,
+      "name": "RecMessage11_LEDFunction",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 139,
+      "name": "RecMessage11_AdditionalData",
+      "type": "U8",
+      "format": "hex",
+      "access": "rw"
+    },
+{
+      "index": 140,
+      "name": "RecMessage12_RemoteAddr",
+      "type": "U16",
+      "format": "hex",
+      "access": "rw"
+    },
+    {
+      "index": 141,
+      "name": "RecMessage12_Command",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 142,
+      "name": "RecMessage12_Register",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 143,
+      "name": "RecMessage12_LEDFunction",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 144,
+      "name": "RecMessage12_AdditionalData",
+      "type": "U8",
+      "format": "hex",
+      "access": "rw"
+    },
+    {
+      "index": 145,
+      "name": "RecMessage13_RemoteAddr",
+      "type": "U16",
+      "format": "hex",
+      "access": "rw"
+    },
+    {
+      "index": 146,
+      "name": "RecMessage13_Command",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 147,
+      "name": "RecMessage13_Register",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 148,
+      "name": "RecMessage13_LEDFunction",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 149,
+      "name": "RecMessage13_AdditionalData",
+      "type": "U8",
+      "format": "hex",
+      "access": "rw"
+    },
+    {
+      "index": 150,
+      "name": "RecMessage14_RemoteAddr",
+      "type": "U16",
+      "format": "hex",
+      "access": "rw"
+    },
+    {
+      "index": 151,
+      "name": "RecMessage14_Command",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 152,
+      "name": "RecMessage14_Register",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 153,
+      "name": "RecMessage14_LEDFunction",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 154,
+      "name": "RecMessage14_AdditionalData",
+      "type": "U8",
+      "format": "hex",
+      "access": "rw"
+    },
+    {
+      "index": 155,
+      "name": "RecMessage15_RemoteAddr",
+      "type": "U16",
+      "format": "hex",
+      "access": "rw"
+    },
+    {
+      "index": 156,
+      "name": "RecMessage15_Command",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 157,
+      "name": "RecMessage15_Register",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 158,
+      "name": "RecMessage15_LEDFunction",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 159,
+      "name": "RecMessage15_AdditionalData",
+      "type": "U8",
+      "format": "hex",
+      "access": "rw"
+    },
+    {
+      "index": 230,
+      "name": "DeviceSignature0",
+      "type": "U8",
+      "format": "hex",
+      "access": "r"
+    },
+    {
+      "index": 231,
+      "name": "DeviceSignature1",
+      "type": "U8",
+      "format": "hex",
+      "access": "r"
+    },
+    {
+      "index": 232,
+      "name": "DeviceSignature2",
+      "type": "U8",
+      "format": "hex",
+      "access": "r"
+    },
+    {
+      "index": 233,
+      "name": "DeviceSignature3",
+      "type": "U8",
+      "format": "hex",
+      "access": "r"
+    },
+    {
+      "index": 234,
+      "name": "BoardID",
+      "type": "U16",
+      "format": "hex",
+      "access": "r"
+    },
+    {
+      "index": 235,
+      "name": "BoardRev",
+      "type": "U8",
+      "access": "r"
+    },
+    {
+      "index": 236,
+      "name": "AppID",
+      "type": "U16",
+      "format": "hex",
+      "access": "r"
+    },
+    {
+      "index": 237,
+      "name": "AppVersionMajor",
+      "type": "U8",
+      "access": "r"
+    },
+    {
+      "index": 238,
+      "name": "AppVersionMinor",
+      "type": "U8",
+      "access": "r"
+    },
+    {
+      "index": 239,
+      "name": "AppVersionBugfix",
+      "type": "U8",
+      "access": "r"
+    },
+    {
+      "index": 240,
+      "name": "AppVersionHash",
+      "type": "U32",
+      "format": "hex",
+      "access": "r"
+    }
+    ]
+}

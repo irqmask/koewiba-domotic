@@ -39,7 +39,7 @@
 // --- Global variables --------------------------------------------------------
 
 // --- Module global variables -------------------------------------------------
-
+static uint8_t  app_remote_states;
 
 app_on_key_set_register_t  g_on_key_set_register[APP_NUM_KEYS];
 app_on_msg_received_t      g_on_msg_received[APP_NUM_MSG_STUBS];
@@ -57,9 +57,12 @@ static void on_keypress_send (sBus_t* bus, uint8_t key_index)
     uint8_t msg[4];
     receiver = g_on_key_set_register[key_index].receiver;
     if (receiver != 0) {
+        msg[2] = g_on_key_set_register[key_index].value;
+        if(eKeyMode_PushbuttonToggle == g_on_key_set_register[key_index].key_mode) {
+            if (app_remote_states & (1<<key_index)) msg[2] = 0;
+        }
         msg[0] = eCMD_SET_REG_8BIT;
         msg[1] = g_on_key_set_register[key_index].register_id;
-        msg[2] = g_on_key_set_register[key_index].value;
         bus_send_message(bus, receiver, 3, msg);
     }
 }
@@ -89,6 +92,7 @@ static void app_execute_message_dependend_function(app_msg_dep_func_t function_i
     uint8_t led_reg_val = 0;
     uint8_t i;
 
+
     switch (function_id) {
     case eMsgDepFunc_Led_on_bitset: // LED active when bit is set
         value       = *(uint8_t*)pvalue;
@@ -105,7 +109,7 @@ static void app_execute_message_dependend_function(app_msg_dep_func_t function_i
         led_mode    = (add_info & 0xF0)>>4; // [0=off|15=on|2..14=slow..fast blinking]
         led_idx     = (add_info & 0x0F);    // [0=LED0 ... 15=LED15]
 
-        if(0xFF == value) led_reg_val = led_mode; // constant full intensity
+        if(0 < value) led_reg_val = led_mode; // constant full intensity
         led_mask = 0x01<<led_idx;
         break;
     case eMsgDepFunc_Led_blindcontrol: // LED active when bit is set
@@ -141,6 +145,22 @@ static void process_state_message(uint16_t sender, uint8_t msglen, uint8_t* msg)
         {
             app_execute_message_dependend_function(g_on_msg_received[index].func_id, g_on_msg_received[index].add_info, &msg[2]);
         }
+    }
+    // Iterate over all buttons and check if a state message from remote actuator is received
+    for (index=0; index<APP_NUM_KEYS; index++) {
+        // check every entry if all criteria are met
+        if( (eCMD_STATE_8BIT                             == msg[0]) &&
+            (g_on_key_set_register[index].register_id    == msg[1]) &&
+            (g_on_key_set_register[index].receiver       == sender))
+            {
+                if(0 != msg[2]) {
+                    app_remote_states |= (1<<index);
+                }
+                else {
+                    app_remote_states &= ~(1<<index);
+
+                }
+            }
     }
 }
 

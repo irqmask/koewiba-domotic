@@ -50,42 +50,42 @@
 /**
  * Action to query one or multiple modules which are currently online.
  */
-class ActionQueryModules : public ActionWithResponse
+class ActionReadModuleInfo : public Action
 {
 public:
-    //! Structure to store queried bus module information
-    struct Module {
-    public:
-        //! Module address
-        uint16_t nodeId;
-        //! Module type and version information of hard and software.
-        version_info_t version;
-    };
-
     /**
      * Constructor
      * @param[in]   conn        Reference to established connection to a
      *                          KWB bus os router
      * @param[in]   broker      Reference to message broker.
-     * @param[in]   moduleAddr  (optional, default = 0) Module address to communicate with.
+     * @param[in]   nodeId      Module address aka node id to communicate with.
      */
-    ActionQueryModules(Connection &conn, MsgBroker &broker, uint16_t moduleAddr = 0);
+    ActionReadModuleInfo(Connection &conn, MsgBroker &broker, uint16_t nodeId = 0);
 
-    /**
-     * Get the result of the query.
-     * @return list of queried bus modules.
-     */
-    std::vector<Module> getModules();
+    virtual void start() override;
+    virtual void waitFinished() override;
+    virtual void cancel() override;
 
-    virtual bool waitForResponse() override;
+    std::array<uint8_t , 4> getControllerId() { return controllerId; };
+    uint16_t getBoardId() { return boardId; };
+    uint8_t getBoardRev() { return boardRev; };
+    uint16_t getAppId() { return appId; };
+    uint8_t getMajorVersion() { return majorVersion; };
+    uint8_t getMinorVersion() { return minorVersion; };
+    uint8_t getBugfixVersion() { return bugfixVersion; };
+    uint32_t getVersionHash() { return versionHash; };
 
 protected:
-    virtual bool formMessage() override;
-    virtual bool filterResponse(const msg_t &message) override;
-    virtual void handleResponse(const msg_t &message, void *reference) override;
+    uint16_t nodeId;
 
-    //! List of module information of modules which responed during this action.
-    std::vector<Module> modules;
+    std::array<uint8_t, 4> controllerId;
+    uint16_t boardId;
+    uint8_t boardRev;
+    uint16_t appId;
+    uint8_t majorVersion;
+    uint8_t minorVersion;
+    uint8_t bugfixVersion;
+    uint32_t versionHash;
 };
 
 /** @} */

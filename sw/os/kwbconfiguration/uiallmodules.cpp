@@ -77,6 +77,9 @@ void UIAllModules::onMenuChoice()
         case '1':
             listAllFromFile();
             break;
+        case '2':
+            readAllVersions();
+            break;
         case 'x':
             leave_menu = true;
             break;
@@ -109,5 +112,32 @@ void UIAllModules::listAllFromFile()
         throw OperationFailed(LOC, "Cannot load modules file! %s", e.what());
     }
 }
+
+//----------------------------------------------------------------------------
+void UIAllModules::readAllVersions()
+{
+    std::string filename = DEF_MODULE_FILENAME;
+
+    std::cout << "Read versions of modules from file " << filename << std::endl;
+    ModuleFile mf(filename);
+    std::vector<ModuleJson> modules = mf.getModules();
+
+    std::cout << "Modules from file " << filename << std::endl;
+    std::cout << "  ModId  AppId  Name              AppId  BoardId.BoardRev Version   ControllerId" << std::endl;
+    for (auto &module : modules) {
+        try {
+            ActionReadModuleInfo armi(app.getMsgEndpoint(), app.getMsgBroker(), module.nodeId);
+            armi.start();
+            armi.waitFinished();
+            auto ctrlId = armi.getControllerId();
+            fprintf(stdout, "  0x%04x 0x%04x %16s 0x%04x %2d.%02d.%03d-g%08x  0x%04x.%d %02x:%02x:%02x:%02x\n",
+                    module.nodeId, module.appId, module.name.c_str(),
+                    armi.getAppId(), armi.getMajorVersion(), armi.getMinorVersion(), armi.getBugfixVersion(), armi.getVersionHash(), armi.getBoardId(), armi.getBoardRev(),
+                    ctrlId[0], ctrlId[1], ctrlId[2], ctrlId[3]);
+
+        }
+        catch (Exception &e) {
+            log_error("%s", e.what());
+        }
     }
 }

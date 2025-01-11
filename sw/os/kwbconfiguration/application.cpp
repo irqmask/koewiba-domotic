@@ -2,13 +2,11 @@
  * @addtogroup KWBCONFIGURATION
  *
  * @{
- * @file    Application.cpp
+ * @file    application.cpp
  * @brief   Application frontend.
- *
- * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
 /*
- * Copyright (C) 2017  christian <irqmask@web.de>
+ * Copyright (C) 2025  christian <irqmask@web.de>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,6 +24,7 @@
 
 // --- Include section ---------------------------------------------------------
 
+#include "application.h"
 #include "prjconf.h"
 
 #include <assert.h>
@@ -47,8 +46,11 @@
 #include "error_codes.h"
 #include "kwb_defines.h"
 
-#include "application.h"
-#include "action_query_modules.h"
+// os/libkwb
+#include "exceptions.h"
+#include "log.h"
+
+#include "action_helper.hpp"
 #include "action_read_register.h"
 #include "action_write_register.h"
 
@@ -74,32 +76,6 @@ Application::Application(Connection     &conn,
     , msgBroker(broker)
     , selectedModule(0)
 {
-    this->detected_modules.clear();
-}
-
-//----------------------------------------------------------------------------
-bool Application::listAllModules()
-{
-    return true;
-}
-
-//----------------------------------------------------------------------------
-bool Application::detectModules()
-{
-    bool rc = false;
-    this->detected_modules.clear();
-    ActionQueryModules action_query_modules(msgEndpoint, msgBroker, BUS_BRDCSTADR);
-    if ((rc = action_query_modules.start()) == true) {
-        rc = action_query_modules.waitForResponse();
-    }
-    this->detected_modules = action_query_modules.getModules();
-    return rc;
-}
-
-//----------------------------------------------------------------------------
-std::vector<ActionQueryModules::Module> Application::getDetectedModules()
-{
-    return this->detected_modules;
 }
 
 //----------------------------------------------------------------------------
@@ -114,46 +90,83 @@ uint16_t Application::getSelectedModule()
     return this->selectedModule;
 }
 
+// obsolete repeating every action in application -> better move into dedicated actions
+
 //----------------------------------------------------------------------------
 bool Application::readRegister(uint8_t registerId, int &value)
 {
-    bool rc = false;
-    ActionReadRegister action_read_reg(msgEndpoint, msgBroker, selectedModule, registerId);
-    if ((rc = action_read_reg.start()) == true) {
-        rc = action_read_reg.waitForResponse();
+    try {
+        ActionReadRegister action_read_reg(msgEndpoint, msgBroker, selectedModule, registerId);
+        action_read_reg.start();
+        action_read_reg.waitFinished();
+        value = action_read_reg.getValue();
     }
-    value = action_read_reg.getValue();
-    return rc;
+    catch (Exception &e) {
+        log_error("read register %d of node 0x%04x failed!\n%s\n", registerId, selectedModule, e.what());
+        return false;
+    }
+    return true;
 }
 
 //----------------------------------------------------------------------------
 bool Application::writeRegister(uint8_t registerId, int value)
 {
-    bool rc = false;
-    ActionWriteRegister action_write_reg(msgEndpoint, msgBroker, selectedModule, registerId);
-    action_write_reg.setValue(value);
+    try {
+        ActionWriteRegister action_write_reg(msgEndpoint, msgBroker, selectedModule, registerId);
+        action_write_reg.setValue(value);
 
-    // hack, remove when register layout is known to the program
-    if (value > 65535) {
-        action_write_reg.setRegisterFormat(eCMD_SET_REG_32BIT);
+        // hack, remove when register layout is known to the program
+        if (value > 65535) {
+            action_write_reg.setRegisterFormat(eCMD_SET_REG_32BIT);
+        }
+        else if (value > 255) {
+            action_write_reg.setRegisterFormat(eCMD_SET_REG_16BIT);
+        }
+        else {
+            action_write_reg.setRegisterFormat(eCMD_SET_REG_8BIT);
+        }
+
+        action_write_reg.start();
+        action_write_reg.waitFinished();
     }
-    else if (value > 255) {
-        action_write_reg.setRegisterFormat(eCMD_SET_REG_16BIT);
-    }
-    else {
-        action_write_reg.setRegisterFormat(eCMD_SET_REG_8BIT);
+    catch (Exception &e) {
+        log_error("write register %d of node 0x%04x failed!\n%s\n", registerId, selectedModule, e.what());
+        return false;
     }
 
-    return action_write_reg.start();
+    return true;
 }
 
 //----------------------------------------------------------------------------
 bool Application::verifyRegister(uint8_t registerId, int value, int &readValue)
 {
-    if (!readRegister(registerId, readValue) || (value != readValue)) {
+    try {
+        readRegister(registerId, readValue);
+        if (value != readValue) {
+            throw OperationFailed(LOC, "read value %d does not match previous written value %d!", readValue, value);
+        }
+    }
+    catch (Exception &e) {
+        log_error("verify of register %d of node 0x%04x failed!\n%s\n", registerId, selectedModule, e.what());
+        return false;
+    }
+
+    return true;
+}
+
+//----------------------------------------------------------------------------
+template<typename ActionType, typename T, typename... Args>
+bool Application::runAction(uint16_t nodeId, T &result, Args... args)
+{
+    try {
+        runActionBlocking(this->msgEndpoint, this->msgBroker, nodeId, args...);
+    }
+    catch (Exception & e) {
+        log_error("%s", e.what());
         return false;
     }
     return true;
 }
+
 
 /** @} */

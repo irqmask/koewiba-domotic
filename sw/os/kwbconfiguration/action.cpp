@@ -26,11 +26,17 @@
 
 // --- Include section ---------------------------------------------------------
 
+#include "action.h"
+
+#include <chrono>
 #include <functional>
 
+// include
 #include "prjconf.h"
 
-#include "action.h"
+// libkwb
+#include "exceptions.h"
+
 
 // --- Definitions -------------------------------------------------------------
 
@@ -52,9 +58,16 @@ Action::Action(Connection &conn, MsgBroker &broker)
 }
 
 //----------------------------------------------------------------------------
+void Action::start()
+{
+    timeoutOccurred = false;
+    startTime = std::chrono::high_resolution_clock::now();
+}
+
+//----------------------------------------------------------------------------
 bool Action::isFinished()
 {
-    return true;
+    return timeoutOccurred;
 }
 
 //----------------------------------------------------------------------------
@@ -62,4 +75,17 @@ bool Action::hasTimedOut()
 {
     return timeoutOccurred;
 }
+
+
+//----------------------------------------------------------------------------
+void Action::checkTimeout()
+{
+    auto elapsed = std::chrono::high_resolution_clock::now() - startTime;
+    if (elapsed > timeout) {
+        timeoutOccurred = true;
+        cancel();
+        throw Timeout(LOC, "Action timed out after %ds!", timeout.count());
+    }
+}
+
 /** @} */

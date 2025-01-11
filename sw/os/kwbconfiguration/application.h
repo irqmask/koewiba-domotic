@@ -2,13 +2,11 @@
  * @addtogroup KWBCONFIGURATION
  *
  * @{
- * @file    Application.h
+ * @file    application.h
  * @brief   Application frontend.
- *
- * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
 /*
- * Copyright (C) 2017  christian <irqmask@web.de>
+ * Copyright (C) 2025  christian <irqmask@web.de>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,9 +33,8 @@
 // include
 #include "prjtypes.h"
 
-// libkwb
+// os/libkwb
 #include "connection.h"
-#include "action_query_modules.h"
 #include "msgbroker.h"
 
 // --- Definitions -------------------------------------------------------------
@@ -63,27 +60,12 @@ public:
      */
     Application(Connection &conn, MsgBroker &broker);
 
-    /**
-     * List all modules which are declared in the modules configuration file.
-     * @return true, if module configuration file was found and could be parsed successfully.
-     */
-    bool listAllModules();
+    MsgBroker &getMsgBroker() { return msgBroker; };
 
-    /**
-     * Detect all modules in the system.
-     * Each module reports with it's version information.
-     *
-     * @return true, if modules have been detected, otherwise false
-     */
-    bool detectModules();
+    Connection &getMsgEndpoint() { return msgEndpoint; };
 
-    /**
-     * Get a list of detected modules and their version information.
-     *
-     * This method can be called after detectModules() has been called before.
-     * @return List of module information.
-     */
-    std::vector<ActionQueryModules::Module> getDetectedModules();
+    template <typename ActionType, typename T, typename...  Args>
+    bool runAction(uint16_t nodeId, T &result, Args... args);
 
     /**
      * Select the module to work with.
@@ -130,8 +112,6 @@ public:
     bool verifyRegister(uint8_t registerId, int value, int &readValue);
 
 protected:
-    //! List of detected modules. Filled by detectModules() command.
-    std::vector<ActionQueryModules::Module> detected_modules;
     //! Currently selected module
     uint16_t            selectedModule;
     //! Referenc to message broker

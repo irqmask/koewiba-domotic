@@ -64,14 +64,9 @@ public:
 
     /**
      * Start the action.
-     * @returns true, it the action was started successfully, otherwise false.
+     * @throws OperationFailed if action cannot be started.
      */
-    virtual bool start() = 0;
-
-    /**
-     * Cancel the running action.
-     */
-    virtual void cancel() = 0;
+    virtual void start();
 
     /**
      * @returns true if the action is finished, otherwise false.
@@ -79,19 +74,41 @@ public:
     virtual bool isFinished();
 
     /**
+     * Advance the action until it is finished.
+     * Call advance() until it returns false. Then the action is finished.
+     * If the action throws an Exception it is automatically finished, too.
+     *
+     * @throws OperationFailed when a action failed during execution
+     * @throws Timeout whe the action timed out.
+     */
+    virtual void waitFinished() = 0;
+
+    /**
+     * Cancel the running action.
+     */
+    virtual void cancel() = 0;
+
+    /**
      * @returns true if the action has timed out, otherwise false.
      */
     virtual bool hasTimedOut();
 
 protected:
-    //! Reference to message broker.
-    MsgBroker                   &msgBroker;
+    //! Measure time since action start and throw Timeout exception once the timeout duration exceeds.
+    void checkTimeout();
+
     //! Reference to established connection.
     Connection                  &connection;
+    //! Reference to message broker.
+    MsgBroker                   &msgBroker;
     //! Duration until action times out.
     std::chrono::duration<int>  timeout;
+    //! Start timepoint
+    std::chrono::system_clock::time_point startTime;
     //! Flag if timeout occurred.
     bool                        timeoutOccurred;
+    //! Flag if action is still running
+    bool                        isRunning;
 };
 
 /** @} */

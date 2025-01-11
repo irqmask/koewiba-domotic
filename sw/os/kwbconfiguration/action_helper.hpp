@@ -2,8 +2,8 @@
  * @addtogroup KWBCONFIGURATION
  *
  * @{
- * @file    action_request.cpp
- * @brief   Base-class of an action to be performed with a bus-module.
+ * @file    action_helper.hpp
+ * @brief   Actions: Manage and run actions of a module.
  *///---------------------------------------------------------------------------
 /*
  * Copyright (C) 2025  christian <irqmask@web.de>
@@ -21,19 +21,24 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+#pragma once
 
 // --- Include section ---------------------------------------------------------
 
-#include "action_request.h"
+#include "prjconf.h"
 
-#include <chrono>
-#include <functional>
-#include <thread>
+#include <string>
 
 // include
-#include "prjconf.h"
-// libkwb
+#include "prjtypes.h"
+#include "moddef_common.h"
+
+// os/libkwb
+#include "connection.h"
 #include "exceptions.h"
+#include "log.h"
+
+#include "msgbroker.h"
 
 // --- Definitions -------------------------------------------------------------
 
@@ -43,46 +48,20 @@
 
 // --- Global variables --------------------------------------------------------
 
-// --- Class implementation  ---------------------------------------------------
+// --- Global methods ----------------------------------------------------------
 
-ActionRequest::ActionRequest(Connection   &conn,
-                             MsgBroker    &broker,
-                             uint16_t     moduleAddr)
-    : Action(conn, broker)
-    , moduleAddr(moduleAddr)
-    , messageToSend({0})
-{
-}
-
-//----------------------------------------------------------------------------
-void ActionRequest::start()
+template <typename ActionType, typename T, typename...  Args>
+void runActionBlocking(Connection &connection, MsgBroker &msgBroker, uint16_t nodeId, T &result, Args... args)
 {
     try {
-        Action::start();
-        formMessage();
-        connection.send(messageToSend);
+        ActionType a(connection, msgBroker, nodeId, args...);
+        a.start();
+        a.waitFinished();
+        result = a.getValue();
     }
     catch (Exception &e) {
-        throw OperationFailed(LOC, "Cannot start action! Error occured:\n%s", e.what());
+        throw OperationFailed(LOC, "Action %s for node 0x%04x failed\n%s", typeid(ActionType).name(), nodeId, e.what());
     }
-}
-
-//----------------------------------------------------------------------------
-bool ActionRequest::isFinished()
-{
-    return timeoutOccurred;
-}
-
-//----------------------------------------------------------------------------
-void ActionRequest::waitFinished()
-{
-    checkTimeout();
-}
-
-//----------------------------------------------------------------------------
-void ActionRequest::cancel()
-{
-    // nothing to cancel here
 }
 
 /** @} */

@@ -156,6 +156,25 @@ public:
     };
 };
 
+class Timeout : public Exception
+{
+public:
+    /**
+     * ctor
+     * @param[in] file      Name of source file where the exception occurred
+     * @param[in] line      Line in source file where the exception occurred
+     * @param[in] function  Name of function where the exception occurred
+     * @param[in] fmt       Format string of the message
+     * @param[in] args      Optional arguments used in the format string
+     */
+    template <class... Args> Timeout(const char *file, uint32_t line, const char *function, const char *fmt,
+                                              Args... args)
+        : Exception(file, line, function)
+    {
+        compileErrorMessage(fmt, args...);
+    };
+};
+
 /**
  * A resource (e.g. a file) was not found-
  */

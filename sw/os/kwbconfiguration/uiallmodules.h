@@ -41,5 +41,6 @@ protected:
     virtual void onMenuChoice() override;
 
     virtual void listAllFromFile();
+    virtual void readAllVersions();
 };
 

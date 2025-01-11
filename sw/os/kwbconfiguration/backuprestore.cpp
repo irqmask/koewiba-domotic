@@ -6,7 +6,6 @@
 
 #include <nlohmann/json.hpp>
 
-#include "action_query_modules.h"
 #include "application.h"
 #include "connection.h"
 #include "exceptions.h"

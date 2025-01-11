@@ -61,11 +61,16 @@ set (os_include_SRCS
 
 set (kwbconfiguration_SRCS
     action.h
+    action_helper.hpp
+
     action_request.h
     action_with_response.h
-    action_query_modules.h
+
     action_read_register.h
     action_write_register.h
+
+    action_read_module_info.h
+
     application.h
     backuprestore.h
     cfg_module.hpp
@@ -81,11 +86,15 @@ set (kwbconfiguration_SRCS
     uisinglemodule.h
 
     action.cpp
+
     action_request.cpp
     action_with_response.cpp
-    action_query_modules.cpp
+
     action_read_register.cpp
     action_write_register.cpp
+
+    action_read_module_info.cpp
+
     application.cpp
     backuprestore.cpp
     cfg_module_file.cpp

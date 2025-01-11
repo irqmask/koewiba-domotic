@@ -2,13 +2,11 @@
  * @addtogroup KWBCONFIGURATION
  *
  * @{
- * @file    ActionRequest.h
+ * @file    action_request.h
  * @brief   Base-class of an action which sends a request / message to a bus-module.
- *
- * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
 /*
- * Copyright (C) 2018  christian <irqmask@web.de>
+ * Copyright (C) 2025  christian <irqmask@web.de>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -60,9 +58,10 @@ public:
      */
     ActionRequest(Connection &conn, MsgBroker &broker, uint16_t moduleAddr = 0);
 
-    bool start() override;
-    virtual void cancel() override;
+    virtual void start() override;
     virtual bool isFinished() override;
+    virtual void waitFinished() override;
+    virtual void cancel() override;
 
     /**
      * Set the address of the module to communicate with.

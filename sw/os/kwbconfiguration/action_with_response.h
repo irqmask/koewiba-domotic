@@ -2,13 +2,11 @@
  * @addtogroup KWBCONFIGURATION
  *
  * @{
- * @file    ActionWithResponse.h
+ * @file    action_with_response.h
  * @brief   Base-class of an action which waits for a response to be performed with a bus-module.
- *
- * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
 /*
- * Copyright (C) 2018  christian <irqmask@web.de>
+ * Copyright (C) 2025  christian <irqmask@web.de>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -62,15 +60,15 @@ public:
 
     virtual void cancel() override;
     virtual bool isFinished() override;
-
     /**
-     * Wait until the response has been received or timeour occurred.
+     * Wait until the response has been received or timeout occurred.
      * @returns true if response has been received, otherwise false.
      */
-    virtual bool waitForResponse();
+    virtual void waitFinished() override;
+
 
 protected:
-    virtual bool formMessage() = 0;
+    virtual bool formMessage() override = 0;
 
     /**
      * @brief filterResponse

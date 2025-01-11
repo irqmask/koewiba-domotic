@@ -2,13 +2,11 @@
  * @addtogroup KWBCONFIGURATION
  *
  * @{
- * @file    UIMain.h
+ * @file    uimain.h
  * @brief   UI main menu.
- *
- * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
 /*
- * Copyright (C) 2022  christian <irqmask@web.de>
+ * Copyright (C) 2025  christian <irqmask@web.de>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -62,7 +60,6 @@ protected:
     virtual void onMenuChoice() override;
 
 private:
-    void detectModules();
     void selectModule();
 
 };

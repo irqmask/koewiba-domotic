@@ -2,13 +2,11 @@
  * @addtogroup KWBCONFIGURATION
  *
  * @{
- * @file    UIMain.cpp
+ * @file    uimain.cpp
  * @brief   UI main menu.
- *
- * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
 /*
- * Copyright (C) 2022  christian <irqmask@web.de>
+ * Copyright (C) 2025  christian <irqmask@web.de>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -98,31 +96,6 @@ void UIMain::onMenuChoice()
         UIConsole::onMenuChoice();
         break;
     }
-}
-
-//----------------------------------------------------------------------------
-void UIMain::detectModules()
-{
-    app.detectModules();
-    auto modules = app.getDetectedModules();
-    if (modules.size() == 0) {
-        std::cout << "No modules detected!" << std::endl;
-        return;
-    }
-
-    std::cout << "Node ID | Ctrl ID             | Board  |     | App ID | App Version " << std::endl;
-    std::cout << "        |                     | ID     | Rev |        |             " << std::endl;
-    std::cout << "--------+---------------------+--------+-----+--------+-------------" << std::endl;
-    for (ActionQueryModules::Module m : modules) {
-        printf("0x%04X  | 0x%02X 0x%02X 0x%02X 0x%02X | 0x%04X | %3d | 0x%04X | %d.%d.%d",
-               m.nodeId,
-               m.version.controller_id[0], m.version.controller_id[1],
-               m.version.controller_id[2], m.version.controller_id[3],
-               m.version.board_id, m.version.board_rev,
-               m.version.app_id,
-               m.version.version[0], m.version.version[1], m.version.version[2]);
-    }
-    std::cout << std::endl;
 }
 
 //----------------------------------------------------------------------------

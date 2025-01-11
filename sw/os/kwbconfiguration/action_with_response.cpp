@@ -2,13 +2,11 @@
  * @addtogroup KWBCONFIGURATION
  *
  * @{
- * @file    Action.cpp
+ * @file    action_with_response.cpp
  * @brief   Base-class of an action to be performed with a bus-module.
- *
- * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
 /*
- * Copyright (C) 2018  christian <irqmask@web.de>
+ * Copyright (C) 2025  christian <irqmask@web.de>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -49,7 +47,7 @@ ActionWithResponse::ActionWithResponse(Connection   &conn,
                                        uint16_t     moduleAddr)
     : ActionRequest(conn, broker, moduleAddr)
     , receivedMessage({0})
-, messageReceived(false)
+    , messageReceived(false)
 {
     using std::placeholders::_1;
     using std::placeholders::_2;
@@ -72,20 +70,12 @@ bool ActionWithResponse::isFinished()
 }
 
 //----------------------------------------------------------------------------
-bool ActionWithResponse::waitForResponse()
+void ActionWithResponse::waitFinished()
 {
-    auto start = std::chrono::high_resolution_clock::now();
-
     while (!messageReceived) {
-        auto elapsed = std::chrono::high_resolution_clock::now() - start;
+        checkTimeout();
         std::this_thread::yield(); // better wait for an event
-        if (elapsed > timeout) {
-            timeoutOccurred = true;
-            cancel();
-            break;
-        }
     }
-    return messageReceived;
 }
 
 /** @} */

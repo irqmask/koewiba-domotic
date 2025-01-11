@@ -339,7 +339,7 @@ int main(int argc, char *argv[])
                 else {
                     log_msg(LOG_STATUS, "FIRMWARE UPDATE FAILED!");
                     log_msg(LOG_STATUS, "CRC expected 0x%04X CRC calculated 0x%04X",
-                            fwu.getNodeCrcCalculated(), fwu.getNodeCrcExpected());
+                            fwu.getNodeCrcExpected(), fwu.getNodeCrcCalculated());
                     log_msg(LOG_STATUS, "Bootloader flags 0x%02X", fwu.getBldFlags());
 
                     end_application = true;

@@ -27,6 +27,7 @@
 
 // --- Include section ---------------------------------------------------------
 
+#include <array>
 #include <vector>
 
 #include "prjconf.h"

@@ -2,10 +2,8 @@
  * @addtogroup KWBCONFIGURATION
  *
  * @{
- * @file    UIConsole.h
+ * @file    uiconsole.h
  * @brief   UI for console.
- *
- * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
 /*
  * Copyright (C) 2017  christian <irqmask@web.de>

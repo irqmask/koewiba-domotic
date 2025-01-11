@@ -2,13 +2,11 @@
  * @addtogroup KWBCONFIGURATION
  *
  * @{
- * @file    ActionWriteRegister.cpp
+ * @file    action_write_register.cpp
  * @brief   Action: Query a register of a bus module and wait for the answer.
- *
- * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
 /*
- * Copyright (C) 2018  christian <irqmask@web.de>
+ * Copyright (C) 2025  christian <irqmask@web.de>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -43,6 +41,7 @@
 // --- Global variables --------------------------------------------------------
 
 // --- Class implementation  ---------------------------------------------------
+
 
 ActionWriteRegister::ActionWriteRegister(Connection   &conn,
                                          MsgBroker    &broker,

@@ -2,10 +2,8 @@
  * @addtogroup KWBCONFIGURATION
  *
  * @{
- * @file    ActionReadRegister.cpp
+ * @file    action_read_register.cpp
  * @brief   Action: Query a register of a bus module and wait for the answer.
- *
- * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
 /*
  * Copyright (C) 2018  christian <irqmask@web.de>

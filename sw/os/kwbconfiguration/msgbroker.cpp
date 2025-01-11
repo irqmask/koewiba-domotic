@@ -2,13 +2,11 @@
  * @addtogroup KWBCONFIGURATION
  *
  * @{
- * @file    MsgBroker.cpp
+ * @file    msgbroker.cpp
  * @brief   Broker which sorts incomming messages to running actions.
- *
- * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
 /*
- * Copyright (C) 2018  christian <irqmask@web.de>
+ * Copyright (C) 2025  christian <irqmask@web.de>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

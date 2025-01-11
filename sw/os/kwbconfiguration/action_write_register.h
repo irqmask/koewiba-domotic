@@ -2,13 +2,11 @@
  * @addtogroup KWBCONFIGURATION
  *
  * @{
- * @file    ActionWriteRegister.h
+ * @file    action_write_register.h
  * @brief   Action: Write a register of a bus module.
- *
- * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
 /*
- * Copyright (C) 2018  christian <irqmask@web.de>
+ * Copyright (C) 2025  christian <irqmask@web.de>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

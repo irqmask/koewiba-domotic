@@ -99,6 +99,7 @@ typedef enum {
  * ...
  * 0xEFFF (last common board)
  * 0xF000 (first user specific board)
+ * 0xF001 di2rw2_attiny1634 (handcrafted PCB with 2 inputs and 2 relays).
  * 0xFFFE elektor_bus-node_atmega88 (only for testing, since this software is
  *                                   not productively usable)(last user specific board)
  * 0xFFFF (empty flash: board ID not defined)
@@ -124,6 +125,7 @@ typedef enum {
  * ...
  * 0xEFFF (last common application)
  * 0xF000 (first user specific application)
+ * 0xF001 di2rw2_attiny1634 (IO control firmware).
  * 0xFFFE elektor_bus-node_atmega88 (only for testing, since this software is
  *                                   not productively usable)
  * 0xFFFF (empty flash: application ID not defined)

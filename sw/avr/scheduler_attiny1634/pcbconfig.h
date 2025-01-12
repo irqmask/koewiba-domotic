@@ -1,12 +1,10 @@
 /**
- * @addtogroup TESTSCHEDULER_PCBCONFIG
- * @brief PCB configuration of the "testscheduler" application.
+ * @addtogroup SCHEDULER_PCBCONFIG
+ * @brief PCB configuration of the "scheduler" application.
  *
  * @{
  * @file    pcbconfig.h
- * @brief   PCB configuration of the "testscheduler" application.
- *
- * @author  Christian Verhalen
+ * @brief   PCB configuration of the "scheduler" application.
  *///---------------------------------------------------------------------------
 /*
  * Copyright (C) 2021  christian <irqmask@web.de>
@@ -75,6 +73,9 @@
 #define LED_ERROR           PA0  //!< Red error LED
 #define LED_ERROR_DDR       DDRA
 #define LED_ERROR_PORT      PORTA
+#define LED_STATUS          PA1  //!< Yellow status
+#define LED_STATUS_DDR      DDRA
+#define LED_STATUS_PORT     PORTA
 
 // --- Type definitions --------------------------------------------------------
 

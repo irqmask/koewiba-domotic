@@ -1,14 +1,13 @@
 /**
- * @addtogroup TEST_SCHEDULER
+ * @addtogroup SCHEDULER
  *
  * @{
- * @file    main_testscheduler.c
- * @brief   TODO describe briefly.
- * @todo    describe file purpose
- * @author  Christian Verhalen
+ * @file    main_scheduler.c
+ * Scheduler to address all modules on a bus using a token message to
+ * permit a send slot for payload messages.
  *///---------------------------------------------------------------------------
 /*
- * Copyright (C) 2021  christian <irqmask@web.de>
+ * Copyright (C) 2025  christian <irqmask@web.de>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -77,7 +76,7 @@ void io_initialize (void)
     PORTD |= ((1<<PORTD7) | (0<<PORTD6) | (1<<PORTD5) | (0<<PORTD4) | (0<<PORTD3) | (0<<PORTD2) | (0<<PORTD1) | (1<<PORTD0));
 #elif defined (__AVR_ATtiny1634__)
     DDRA  |= ((0<<DDRA7)  | (1<<DDRA6)  | (0<<DDRA5)  | (1<<DDRA4)  | (1<<DDRA3)  | (1<<DDRA2)  | (1<<DDRA1)  | (1<<DDRA0) );
-    PORTA |= ((0<<PORTA7) | (0<<PORTA6) | (0<<PORTA5) | (1<<PORTA4) | (1<<PORTA3) | (0<<PORTA2) | (0<<PORTA1) | (1<<PORTA0));
+    PORTA |= ((0<<PORTA7) | (0<<PORTA6) | (0<<PORTA5) | (1<<PORTA4) | (1<<PORTA3) | (0<<PORTA2) | (1<<PORTA1) | (1<<PORTA0));
 
     DDRB  |= (                                                        (1<<DDRB3)  | (0<<DDRB2)  | (1<<DDRB1)  | (1<<DDRB0) );
     PORTB |= (                                                        (1<<PORTB3) | (0<<PORTB2) | (0<<PORTB1) | (0<<PORTB0));
@@ -197,11 +196,7 @@ int main(void)
     io_initialize();
     timer_initialize();
     register_get(MOD_eReg_ModuleID, 0, &module_id);
-#if 0
-    if (module_id != 0x01) {
-        register_set_u16(MOD_eReg_ModuleID, 0x01);
-    }
-#endif
+
     bus_configure(&g_bus, module_id); // configure a bus node with address 1
     bus_scheduler_initialize(&g_bus, &g_sched, 0);// initialize bus on UART 0
 
@@ -220,7 +215,7 @@ int main(void)
         if (timer_is_elapsed(&g_led_timer)) {
         	// TODO remove after debug
             timer_start(&g_led_timer, TIMER_MS_2_TICKS(1000));
-            LED_ERROR_TOGGLE;
+            LED_STATUS_TOGGLE;
         }
     }
     return 0;

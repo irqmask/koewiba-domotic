@@ -312,7 +312,10 @@ bool bus_schedule_and_get_message (sBus_t* psBus, sSched_t* psSched )
                 psBus->msg_receive_state = eBUS_RECV_NOTHING;
             }
             psSched->bSchedWaitingForAnswer = false;
-            if (eBus_AckWaitReceiving != psBus->eState) {
+            // if we are not waiting passively for message and ack and
+            // if we have not received a broadcast, segment broadcas or own message
+            // then discard the message
+            if ((eBus_AckWaitReceiving != psBus->eState) && !msg_received) {
                 // return to IDLE state
                 bus_trp_reset(psBus);
             }

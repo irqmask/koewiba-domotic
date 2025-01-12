@@ -9,7 +9,7 @@
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
 /*
- * Copyright (C) 2021  christian <irqmask@web.de>
+ * Copyright (C) 2025  christian <irqmask@web.de>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -136,7 +136,7 @@ bool        register_get            (uint8_t                reg_no,
 
     case MOD_eReg_DeviceSignature3:
         *reg_type = eRegType_U8;
-        *(uint8_t*)value = 0;// not used yet // boot_signature_byte_get(ADDR_SIGNATURE_BYTE2);
+        *(uint8_t*)value = 0;// not used yet // boot_signature_byte_get(ADDR_SIGNATURE_BYTE3);
         break;
 
     case MOD_eReg_BoardID:
@@ -144,15 +144,11 @@ bool        register_get            (uint8_t                reg_no,
         *(uint16_t*)value = pgm_read_byte(&app_versioninfo[MOD_eVerBoardIdHigh]);
         *(uint16_t*)value <<= 8;
         *(uint16_t*)value |= pgm_read_byte(&app_versioninfo[MOD_eVerBoardIdLow]);
-        //*(uint16_t*)value = app_versioninfo[MOD_eVerBoardIdHigh];
-        //*(uint16_t*)value <<= 8;
-        //*(uint16_t*)value |= app_versioninfo[MOD_eVerBoardIdLow];
         break;
 
     case MOD_eReg_BoardRev:
         *reg_type = eRegType_U8;
         *(uint8_t*)value = pgm_read_byte(&app_versioninfo[MOD_eVerBoardRev]);
-        //*(uint8_t*)value = app_versioninfo[MOD_eVerBoardRev];
         break;
 
     case MOD_eReg_AppID:
@@ -160,9 +156,6 @@ bool        register_get            (uint8_t                reg_no,
         *(uint16_t*)value = pgm_read_byte(&app_versioninfo[MOD_eVerAppIdHigh]);
         *(uint16_t*)value <<= 8;
         *(uint16_t*)value |= pgm_read_byte(&app_versioninfo[MOD_eVerAppIdLow]);
-        //*(uint16_t*)value = app_versioninfo[MOD_eVerAppIdHigh];
-        //*(uint16_t*)value <<= 8;
-        //*(uint16_t*)value |= app_versioninfo[MOD_eVerAppIdLow];
         break;
 
     case MOD_eReg_AppVersionMajor:
@@ -371,37 +364,5 @@ void        register_send_u32       (sBus_t*                bus,
     msg[5] = value & 0x000000FF;
     bus_send_message(bus, receiver, sizeof(msg), msg);
 }
-
-/**
- * Map incoming stated values to local registers.
- *
- * @param[in] uRemoteModuleAddr Module address of incoming state message.
- * @param[in] uRemoteRegister   Module register of incoming state message.
- * @param[in] uValue            Value to set.
- *
- * @returns true, if a register mapping for the received address and value
- *          was found.
- */
-/*bool        register_do_mapping     (uint16_t               uRemoteModuleAddr,
-                                     uint8_t                uRemoteRegister,
-                                     uint32_t               uValue)
-{
-    uint16_t    addr;
-    uint8_t     ii, reg, target_reg;
-    bool        retval = false;
-
-    for (ii=0; ii<REG_MAX_MAPPINGS; ii++) {
-        if (!register_get(APP_eReg_RemoteAddr00 + ii, 0, &addr)) continue;
-        if (addr == uRemoteModuleAddr) {
-            if (!register_get(APP_eReg_RemoteReg00 + ii, 0, &reg)) continue;
-            if (reg == uRemoteRegister) {
-                if (!register_get(APP_eReg_TargetReg00 + ii, 0, &target_reg)) continue;
-                register_set(target_reg, uValue);
-                retval = true;
-            }
-        }
-    }
-    return retval;
-}*/
 
 /** @} */

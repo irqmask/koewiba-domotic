@@ -6,13 +6,9 @@
  * @{
  * @file    bus_transport.c
  * @brief   Transport protocol for sending and receiving messages on the bus.
- * @todo    1. Describe file purpose
- * @todo    2. Implement a queue of received messages instead of only one
-            message. Many nodes can send one node a message.
- * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
 /*
- * Copyright (C) 2019  christian <irqmask@web.de>
+ * Copyright (C) 2025  christian <irqmask@web.de>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

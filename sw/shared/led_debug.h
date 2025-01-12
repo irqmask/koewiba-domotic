@@ -33,7 +33,9 @@
 // Pin assignments of board keys and LEDs
 // Port D pin assignments
  #define LED_STATUS      PD6  //!< Yellow status LED
+ #define LED_STATUS_PORT PORTD
  #define LED_ERROR       PD4  //!< Red error LED
+ #define LED_ERROR_PORT  PORTD
  #define BTN_TEST        PD5
  #define BTN_EXP         PD7
 #endif
@@ -70,17 +72,4 @@
 
 // --- Global functions --------------------------------------------------------
 
-/*
-void dbg_toggle_status_LED (void);
-
-void dbg_status_LED_on (void);
-
-void dbg_status_LED_off (void);
-
-void dbg_toggle_error_LED (void);
-
-void dbg_error_LED_on (void);
-
-void dbg_error_LED_off (void);
-*/
 #endif /* LED_DEBUG_H_ */

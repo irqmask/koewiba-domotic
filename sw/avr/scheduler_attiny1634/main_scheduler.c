@@ -42,6 +42,7 @@
 #include "led_debug.h"
 #include "register.h"
 #include "timer.h"
+#include "spi.h"
 
 // --- Definitions -------------------------------------------------------------
 
@@ -194,6 +195,7 @@ int main(void)
     uint8_t     msg[BUS_MAXRECVMSGLEN];
 
     io_initialize();
+    spi_master_init_blk();
     timer_initialize();
     register_get(MOD_eReg_ModuleID, 0, &module_id);
 

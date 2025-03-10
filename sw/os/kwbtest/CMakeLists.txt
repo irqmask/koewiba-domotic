@@ -69,12 +69,10 @@ source_group(os\\shared FILES ${os_shared_SRCS})
 # ---------------------------------------------------------
 if (WIN32)
     add_executable ( kwbtest ${include_SRCS} ${shared_SRCS} ${os_include_SRCS} ${kwbtest_SRCS} )
-    install ( TARGETS kwbtest
-              RUNTIME DESTINATION . )
+    # install ( TARGETS kwbtest RUNTIME DESTINATION . )
 else (WIN32)
     add_executable ( kwbtest ${include_SRCS} ${shared_SRCS} ${os_include_SRCS} ${kwbtest_SRCS} )
-    install ( TARGETS kwbtest
-              RUNTIME DESTINATION bin )
+    # install ( TARGETS kwbtest RUNTIME DESTINATION bin )
 endif (WIN32)
 
 set_property(TARGET kwbtest PROPERTY CXX_STANDARD 11)

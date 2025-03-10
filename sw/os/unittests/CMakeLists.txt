@@ -89,12 +89,10 @@ source_group(os\\shared FILES ${os_shared_SRCS})
 # ---------------------------------------------------------
 if (WIN32)
     add_executable ( unittests ${include_SRCS} ${shared_SRCS} ${os_include_SRCS} ${os_shared_SRCS} ${unittests_SRCS} )
-    install ( TARGETS unittests
-              RUNTIME DESTINATION . )
+    # install ( TARGETS unittests RUNTIME DESTINATION . )
 else (WIN32)
     add_executable ( unittests ${include_SRCS} ${shared_SRCS} ${os_include_SRCS} ${os_shared_SRCS} ${unittests_SRCS} )
-    install ( TARGETS unittests
-              RUNTIME DESTINATION bin )
+    # install ( TARGETS unittests RUNTIME DESTINATION bin )
 endif (WIN32)
 
 set_property(TARGET unittests PROPERTY CXX_STANDARD 11)

@@ -271,7 +271,8 @@ bool bus_schedule_and_get_message (sBus_t* psBus, sSched_t* psSched )
 
     // scheduler send ACK bytes for broadcast messages
     if (msg_received == true &&
-        psBus->sRecvMsg.uReceiver == BUS_BRDCSTADR) {
+        (psBus->sRecvMsg.uReceiver == BUS_BRDCSTADR || // bus broadcast
+         psBus->sRecvMsg.uReceiver == (psBus->sCfg.uOwnAddress & BUS_SEGBRDCSTMASK))) { // segment broadcast
         if (psSched->broadcast_acknowledged == false) {
             psSched->broadcast_acknowledged = true;
             bus_trp_send_ackbyte(psBus);

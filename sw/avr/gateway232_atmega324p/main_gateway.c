@@ -224,10 +224,6 @@ int main(void)
     // activate pin-change-interrupts for the inputs
     PCMSK0 |= ((1<<PCINT3) | (1<<PCINT2) | (1<<PCINT1) | (1<<PCINT0));
 
-    // WORKAROUND: since atmega324 has issues with going to sleep and waking up again.
-    //             root-cause still to be found.
-    sleep_prevent(APP_eSLEEPMASK_GATEWAY, 1);
-
     while (1) {
         // check for message and read it
         if (bus_get_message(&g_bus)) {

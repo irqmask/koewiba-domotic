@@ -125,7 +125,7 @@ int main(void)
     LED_ERROR_DDR |= (1<<LED_ERROR);
     timer_initialize();
 
-    //register_set_u16(MOD_eReg_ModuleID, 0x6D);
+    register_set_u16(MOD_eReg_ModuleID, 0x56D);
     register_get(MOD_eReg_ModuleID, 0, &module_id);
     bus_configure(&g_bus, module_id);
     bus_initialize(&g_bus, 0);// initialize bus on UART 0

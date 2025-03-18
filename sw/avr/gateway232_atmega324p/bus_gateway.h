@@ -9,7 +9,7 @@
  * @author  Robert Mueller, Christian Verhalen
  *///---------------------------------------------------------------------------
 /*
- * Copyright (C) 2019  christian <irqmask@web.de>
+ * Copyright (C) 2025  christian <irqmask@web.de>
  *                     robert <djrfm@gmx.net>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -37,6 +37,26 @@
 
 // --- Type definitions --------------------------------------------------------
 
+typedef enum bgw_state {
+    eBGW_IDLE = 0,
+    eBGW_WAIT_COMPLETE,
+    eBGW_RECV,
+    eBGW_ERROR
+} bgw_state_t;
+
+/**
+ * Structure carrying serial message runtime data
+ */
+typedef struct serial_msg {
+    bgw_state_t curr_state;
+    uint8_t     curr_recv_h;
+    uint8_t     curr_recv_l;
+    uint8_t     curr_send_h;
+    uint8_t     curr_send_l;
+    uint8_t     curr_len;
+    scomm_phy_t serphy;
+} serial_msg_t;
+
 // --- Local variables ---------------------------------------------------------
 
 // --- Global variables --------------------------------------------------------
@@ -49,9 +69,14 @@
 
 // --- Global functions --------------------------------------------------------
 
-void bgw_forward_serial_msg (sBus_t* bus, scomm_phy_t* phy);
+void bgw_initialize(serial_msg_t *serial);
 
-bool bgw_forward_bus_msg (sBus_t *bus, scomm_phy_t *serial,
-                          uint16_t* sender, uint8_t* len, uint8_t* msg);
+bool bgw_get_serial_msg(serial_msg_t *serial);
+
+bool bgw_forward_serial_msg(sBus_t *bus, serial_msg_t *serial,
+                            uint16_t *sender, uint8_t *length, uint8_t *msg);
+
+bool bgw_forward_bus_msg(sBus_t *bus, serial_msg_t *serial,
+                         uint16_t *sender, uint8_t *length, uint8_t *msg);
 
 #endif /* BUS_GATEWAY_H_ */

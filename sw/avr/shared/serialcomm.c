@@ -37,12 +37,11 @@
 #include <stddef.h>
 
 #include "pcbconfig.h"
+
+#include "led_debug.h"
 #include "serialcomm.h"
 #include "ucontroller.h"
 #include "queue.h"
-
-// TODO remove after debug
-#include "led_debug.h"
 
 // --- Definitions -------------------------------------------------------------
 
@@ -222,14 +221,14 @@ void serial_phy_check_q_level (scomm_phy_t* serial)
  *
  * @returns true if a message was sent successfully, otherwise false.
  */
-bool serial_send_message (scomm_phy_t *serial, uint16_t sender, uint16_t receiver, uint8_t msglen, uint8_t *msg)
+bool serial_send_message (scomm_phy_t *serial, uint16_t sender, uint16_t receiver, uint8_t length, const uint8_t *msg)
 {
     serial_convert_and_enqueue_byte(&serial->sendQ, (uint8_t)((sender & 0xFF00)>>8));
     serial_convert_and_enqueue_byte(&serial->sendQ, (uint8_t)( sender & 0x00FF));
     serial_convert_and_enqueue_byte(&serial->sendQ, (uint8_t)((receiver & 0xFF00)>>8));
     serial_convert_and_enqueue_byte(&serial->sendQ, (uint8_t)( receiver & 0x00FF));
-    serial_convert_and_enqueue_byte(&serial->sendQ, msglen);
-    for (uint8_t i=0; i<msglen; i++) {
+    serial_convert_and_enqueue_byte(&serial->sendQ, length);
+    for (uint8_t i=0; i<length; i++) {
         serial_convert_and_enqueue_byte(&serial->sendQ, msg[i]);
     }
     q_put_byte(&serial->sendQ, '\n');

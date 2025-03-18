@@ -41,8 +41,8 @@
 #define BUS_MAXRECVMSGLEN   64 + 3  //!< Maximum length of a message to be received.
 
 #define MESSAGING_APPCONFIG 1
-#define MESAGING_BUS        1
-#define MESAGING_SERIAL     1
+#define MESSAGING_BUS       1
+#define MESSAGING_SERIAL    1
 
 // --- Type definitions --------------------------------------------------------
 

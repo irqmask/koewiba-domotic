@@ -68,7 +68,8 @@ static timer_data_t g_input_timer;
 extern const unsigned char app_versioninfo[];
 
 sBus_t              g_bus;
-scomm_phy_t         g_serial;
+serial_msg_t        g_serial;
+scomm_phy_t         *g_serphy = &g_serial.serphy;
 
 // --- Module global variables -------------------------------------------------
 
@@ -179,7 +180,7 @@ static void send_input_state(uint8_t input, uint8_t value)
     cmd[2] = value;
 
     bus_send_message(&g_bus, g_bus.sCfg.uOwnAddress & BUS_SEGBRDCSTMASK, sizeof(cmd), cmd);
-    serial_send_message(&g_serial, g_bus.sCfg.uOwnAddress, BUS_BRDCSTADR, sizeof(cmd), cmd);
+    serial_send_message(&g_serial.serphy, g_bus.sCfg.uOwnAddress, BUS_BRDCSTADR, sizeof(cmd), cmd);
 }
 
 static void check_inputs(void)
@@ -211,7 +212,7 @@ int main(void)
     io_initialize();
     input_initialize();
     timer_initialize();
-    scomm_initialize_uart1(&g_serial);
+    bgw_initialize(&g_serial);
 
     //register_set_u16(MOD_eReg_ModuleID, 0x0003);
     register_get(MOD_eReg_ModuleID, 0, &module_id);
@@ -232,7 +233,11 @@ int main(void)
                 interpret_message(sender, msglen, msg);
             }
         }
-        bgw_forward_serial_msg(&g_bus, &g_serial);
+        if (bgw_get_serial_msg(&g_serial)) {
+            if (bgw_forward_serial_msg(&g_bus, &g_serial, &sender, &msglen, msg)) {
+                interpret_message(sender, msglen, msg);
+            }
+        }
 
         if (timer_is_elapsed(&g_input_timer)) {
             timer_start(&g_input_timer, TIMER_MS_2_TICKS(20));

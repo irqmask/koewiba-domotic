@@ -38,51 +38,19 @@
 #include "serialcomm.h"
 #include "sleepmode.h"
 
+#include "bus_gateway.h"
+
 // --- Definitions -------------------------------------------------------------
 
 // --- Type definitions --------------------------------------------------------
 
-typedef enum bgw_state {
-    eBGW_IDLE = 0,
-    eBGW_WAIT_COMPLETE,
-    eBGW_RECV,
-    eBGW_ERROR
-} bgw_state_t;
-
 // --- Local variables ---------------------------------------------------------
-
-static bgw_state_t  g_curr_state;
-static uint8_t      g_curr_recv_h;
-static uint8_t      g_curr_recv_l;
-static uint8_t      g_curr_send_h;
-static uint8_t      g_curr_send_l;
-static uint8_t      g_curr_len;
 
 // --- Global variables --------------------------------------------------------
 
 // --- Module global variables -------------------------------------------------
 
 // --- Local functions ---------------------------------------------------------
-
-/*static void debug_sendval8 (scomm_phy_t* phy, uint8_t val)
-{
-    uint8_t nibble;
-
-    nibble = (val & 0xF0) >> 4;
-    if (nibble > 9) {
-        q_put_byte(&phy->sendQ, nibble + 'A' - 10);
-    } else {
-        q_put_byte(&phy->sendQ, nibble + '0');
-    }
-    nibble = (val & 0x0F);
-    if (nibble > 9) {
-        q_put_byte(&phy->sendQ, nibble + 'A' - 10);
-    } else {
-        q_put_byte(&phy->sendQ, nibble + '0');
-    }
-    q_put_byte(&phy->sendQ, '\n');
-    serial_phy_initiate_sending(phy);
-}*/
 
 static bool convert_nibbles_to_byte (uint8_t nibble_h, uint8_t nibble_l, uint8_t* byte)
 {
@@ -112,8 +80,141 @@ static bool convert_nibbles_to_byte (uint8_t nibble_h, uint8_t nibble_l, uint8_t
     return true;
 }
 
-static bgw_state_t bgw_send_message_to_bus (sBus_t* bus, scomm_phy_t* rs232_phy)
+// --- Module global functions -------------------------------------------------
+
+// --- Global functions --------------------------------------------------------
+
+extern void serial_convert_and_enqueue_byte (queue_t *q, uint8_t byte);
+
+/**
+ * Initialize module to send and receiver messages over UART.
+ */
+void bgw_initialize(serial_msg_t *serial)
 {
+    scomm_initialize_uart1(&serial->serphy);
+}
+
+/**
+ * Receive a message on a serial line and forward it to the bus.
+ * This is implemented as a state-macine and this function has to be called
+ * periodically.
+ *
+ * @param[in] rs232_phy Handle of serial line.
+ */
+bool bgw_get_serial_msg (serial_msg_t* serial)
+{
+    bool message_received = false;
+    uint16_t receiver;
+    uint8_t nibble_h, nibble_l, num_bytes;
+
+    switch (serial->curr_state) {
+    case eBGW_IDLE:
+        // check if message header is already in the queue
+        if (q_get_pending(&serial->serphy.recvQ) >= 10) {
+            // get sender's address
+            nibble_h = q_read_byte(&serial->serphy.recvQ, 0);
+            nibble_l = q_read_byte(&serial->serphy.recvQ, 1);
+            if (!convert_nibbles_to_byte(nibble_h, nibble_l, &serial->curr_send_h)) {
+                serial->curr_state = eBGW_ERROR;
+                break;
+            }
+            nibble_h = q_read_byte(&serial->serphy.recvQ, 2);
+            nibble_l = q_read_byte(&serial->serphy.recvQ, 3);
+            if (!convert_nibbles_to_byte(nibble_h, nibble_l, &serial->curr_send_l)) {
+                serial->curr_state = eBGW_ERROR;
+                break;
+            }
+            // get receiver address
+            nibble_h = q_read_byte(&serial->serphy.recvQ, 4);
+            nibble_l = q_read_byte(&serial->serphy.recvQ, 5);
+            if (!convert_nibbles_to_byte(nibble_h, nibble_l, &serial->curr_recv_h)) {
+                serial->curr_state = eBGW_ERROR;
+                break;
+            }
+            nibble_h = q_read_byte(&serial->serphy.recvQ, 6);
+            nibble_l = q_read_byte(&serial->serphy.recvQ, 7);
+            if (!convert_nibbles_to_byte(nibble_h, nibble_l, &serial->curr_recv_l)) {
+                serial->curr_state = eBGW_ERROR;
+                break;
+            }
+            // get and check message size
+            nibble_h = q_read_byte(&serial->serphy.recvQ, 8);
+            nibble_l = q_read_byte(&serial->serphy.recvQ, 9);
+            if (!convert_nibbles_to_byte(nibble_h, nibble_l, &serial->curr_len)) {
+                serial->curr_state = eBGW_ERROR;
+                break;
+            }
+            if (serial->curr_len == 0 || serial->curr_len > BUS_MAXSENDMSGLEN) {
+                serial->curr_state = eBGW_ERROR;
+                break;
+            }
+            q_flush_bytes(&serial->serphy.recvQ, 10);
+            sleep_request(false);
+            serial->curr_state = eBGW_WAIT_COMPLETE;
+        }
+        break;
+
+    case eBGW_WAIT_COMPLETE:
+        // wait until complete message including newline is in the queue
+        if (q_get_pending(&serial->serphy.recvQ) >= ((serial->curr_len << 1) + 1)) {
+            serial->curr_state = eBGW_RECV;
+        }
+        break;
+
+    case eBGW_RECV:
+        receiver = serial->curr_recv_h & 0x0F;
+        receiver <<= 8;
+        receiver |= serial->curr_recv_l & 0x7F;
+        message_received = true;
+        break;
+
+    //case eBGW_ERROR:
+    default:
+        // error state: read until next newline character
+        num_bytes = q_get_pending(&serial->serphy.recvQ);
+        while (num_bytes--) {
+            if (q_get_byte(&serial->serphy.recvQ) == '\n') {
+                break;
+            }
+        }
+        serial->curr_state = eBGW_IDLE;
+        break;
+    }
+    serial_phy_check_q_level(&serial->serphy);
+    return message_received;
+}
+
+/**
+ * Forward a message from serial line to bus and/or to local interpreter.
+ *
+ * @param[in]   bus     Handle to bus.
+ * @param[in]   serial  Handle to serial line.
+ * @param[out]  sender  Sender of received message.
+ * @param[out]  len     Length of received message.
+ * @param[out]  msg     Message payload.
+ *
+ * @returns true if a message for the gateway module was received.
+ */
+bool bgw_forward_serial_msg(sBus_t *bus, serial_msg_t *serial,
+                            uint16_t *sender, uint8_t *length, uint8_t *msg)
+{
+    bool msg_for_me = false,
+         msg_for_others = true;
+
+    uint16_t r = ((uint16_t)serial->curr_recv_h << 8) | serial->curr_recv_l;
+
+    if (r == bus->sCfg.uOwnAddress) {
+        msg_for_me = true;
+        msg_for_others = true; // forward answers of e.g. kwbfirmware
+    }
+    else if (r == (bus->sCfg.uOwnAddress & BUS_SEGBRDCSTMASK)) {
+        msg_for_me = true;
+        msg_for_others = false;
+    }
+    else if (r == BUS_BRDCSTADR) {
+        msg_for_me = true;
+    }
+
     uint16_t saved_writepos;
     uint8_t nibble_h, nibble_l, byte = 0, num_read = 0;
 
@@ -125,141 +226,73 @@ static bgw_state_t bgw_send_message_to_bus (sBus_t* bus, scomm_phy_t* rs232_phy)
         bus_flush_bus(bus);
     }
 
+    // message shall be forwarded, then
     // check if there is enough free space in the send queue
     // OVERALLLENGTH + SYNC + ADDR + LEN + RECV + EA + uLen
-    if (q_get_free(&bus->tx_queue) < g_curr_len + 6) {
-        return eBGW_RECV;
+    if (msg_for_others && q_get_free(&bus->tx_queue) < serial->curr_len + 6) {
+        serial->curr_state = eBGW_RECV; // defer message handling to next mainloop iteration
+        return false;
     }
+
     // save old bus queue write pointer
     saved_writepos = bus->tx_queue.writepos;
-    // save length of message in queue
-    q_put_byte(&bus->tx_queue, g_curr_len + 5); //SYNC + ADDR + LEN + RECV + EA (without CRC)
 
-    // prepare message header
-    q_put_byte(&bus->tx_queue, BUS_SYNCBYTE);
-    q_put_byte(&bus->tx_queue, bus->sCfg.uOwnNodeAddress & 0x007F);
-    q_put_byte(&bus->tx_queue, g_curr_len + 4); // RECV + EA + 2byte CRC
-    q_put_byte(&bus->tx_queue, g_curr_recv_l);
-    // EA - Extended address 4bit sender in higher nibble, 4bit receiver
-    // in lower nibble.
-    q_put_byte(&bus->tx_queue, (g_curr_recv_h & 0x0F) | (bus->sCfg.uOwnExtAddress << 4));
+    if (msg_for_others) {
+        // save length of message in queue
+        q_put_byte(&bus->tx_queue, serial->curr_len + 5); //SYNC + ADDR + LEN + RECV + EA (without CRC)
+
+        // prepare message header
+        q_put_byte(&bus->tx_queue, BUS_SYNCBYTE);
+        q_put_byte(&bus->tx_queue, bus->sCfg.uOwnNodeAddress & 0x007F);
+        q_put_byte(&bus->tx_queue, serial->curr_len + 4); // RECV + EA + 2byte CRC
+        q_put_byte(&bus->tx_queue, serial->curr_recv_l);
+        // EA - Extended address 4bit sender in higher nibble, 4bit receiver
+        // in lower nibble.
+        q_put_byte(&bus->tx_queue, (serial->curr_recv_h & 0x0F) | (bus->sCfg.uOwnExtAddress << 4));
+    }
+    // check if message shall be copied for local use
+    if (msg_for_me && sender) {
+        *sender = serial->curr_send_h;
+        *sender <<= 8;
+        *sender |= serial->curr_send_l;
+    }
+
+    if (msg_for_me && length) {
+        *length = serial->curr_len;
+    }
 
     // copy data
-    while (g_curr_len--) {
-        nibble_h = q_read_byte(&rs232_phy->recvQ, num_read++);
-        nibble_l = q_read_byte(&rs232_phy->recvQ, num_read++);
+    while (serial->curr_len--) {
+        nibble_h = q_read_byte(&serial->serphy.recvQ, num_read++);
+        nibble_l = q_read_byte(&serial->serphy.recvQ, num_read++);
         if (!convert_nibbles_to_byte(nibble_h, nibble_l, &byte)) {
             bus->tx_queue.writepos = saved_writepos;
-            return eBGW_ERROR;
+            serial->curr_state = eBGW_ERROR;
+            return false;
         }
-        q_put_byte(&bus->tx_queue, byte);
+        if (msg_for_others) {
+           q_put_byte(&bus->tx_queue, byte);
+        }
+        if (msg_for_me) {
+            *msg++ = byte;
+        }
     }
-    q_flush_bytes(&rs232_phy->recvQ, num_read);
+    q_flush_bytes(&serial->serphy.recvQ, num_read);
 
     // check for final newline
-    byte = q_get_byte(&rs232_phy->recvQ);
+    byte = q_get_byte(&serial->serphy.recvQ);
     if (byte != '\n') {
         bus->tx_queue.writepos = saved_writepos;
-        return eBGW_ERROR;
+        serial->curr_state = eBGW_ERROR;
+        return false;
     }
 
-    return eBGW_IDLE;
-}
-
-// --- Module global functions -------------------------------------------------
-
-// --- Global functions --------------------------------------------------------
-
-extern void serial_convert_and_enqueue_byte (queue_t *q, uint8_t byte);
-
-/**
- * Receive a message on a serial line and forward it to the bus.
- * This is implemented as a state-macine and this function has to be called
- * periodically.
- *
- * @param[in] bus       Handle of bus.
- * @param[in] rs232_phy Handle of serial line.
- */
-void bgw_forward_serial_msg (sBus_t* bus, scomm_phy_t* rs232_phy)
-{
-    uint8_t nibble_h, nibble_l, num_bytes;
-
-    switch (g_curr_state) {
-    case eBGW_IDLE:
-        // check if message header is already in the queue
-        if (q_get_pending(&rs232_phy->recvQ) >= 10) {
-            // get sender's address
-            nibble_h = q_read_byte(&rs232_phy->recvQ, 0);
-            nibble_l = q_read_byte(&rs232_phy->recvQ, 1);
-            if (!convert_nibbles_to_byte(nibble_h, nibble_l, &g_curr_send_h)) {
-                g_curr_state = eBGW_ERROR;
-                break;
-            }
-            nibble_h = q_read_byte(&rs232_phy->recvQ, 2);
-            nibble_l = q_read_byte(&rs232_phy->recvQ, 3);
-            if (!convert_nibbles_to_byte(nibble_h, nibble_l, &g_curr_send_l)) {
-                g_curr_state = eBGW_ERROR;
-                break;
-            }
-            // get receiver address
-            nibble_h = q_read_byte(&rs232_phy->recvQ, 4);
-            nibble_l = q_read_byte(&rs232_phy->recvQ, 5);
-            if (!convert_nibbles_to_byte(nibble_h, nibble_l, &g_curr_recv_h)) {
-                g_curr_state = eBGW_ERROR;
-                break;
-            }
-            nibble_h = q_read_byte(&rs232_phy->recvQ, 6);
-            nibble_l = q_read_byte(&rs232_phy->recvQ, 7);
-            if (!convert_nibbles_to_byte(nibble_h, nibble_l, &g_curr_recv_l)) {
-                g_curr_state = eBGW_ERROR;
-                break;
-            }
-            // get and check message size
-            nibble_h = q_read_byte(&rs232_phy->recvQ, 8);
-            nibble_l = q_read_byte(&rs232_phy->recvQ, 9);
-            if (!convert_nibbles_to_byte(nibble_h, nibble_l, &g_curr_len)) {
-                g_curr_state = eBGW_ERROR;
-                break;
-            }
-            if (g_curr_len == 0 || g_curr_len > BUS_MAXSENDMSGLEN) {
-                g_curr_state = eBGW_ERROR;
-                break;
-            }
-            q_flush_bytes(&rs232_phy->recvQ, 10);
-            sleep_request(false);
-            g_curr_state = eBGW_WAIT_COMPLETE;
-        }
-        break;
-
-    case eBGW_WAIT_COMPLETE:
-        // wait until complete message including newline is in the queue
-        if (q_get_pending(&rs232_phy->recvQ) >= ((g_curr_len<<1) + 1)) {
-            g_curr_state = eBGW_RECV;
-        }
-        break;
-
-    case eBGW_RECV:
-        g_curr_state = bgw_send_message_to_bus(bus, rs232_phy);
-        break;
-
-    //case eBGW_ERROR:
-    default:
-
-        // error state: read until next newline character
-        num_bytes = q_get_pending(&rs232_phy->recvQ);
-        while (num_bytes--) {
-            if (q_get_byte(&rs232_phy->recvQ) == '\n') {
-                break;
-            }
-        }
-        g_curr_state = eBGW_IDLE;
-        break;
-    }
-    serial_phy_check_q_level(rs232_phy);
+    serial->curr_state = eBGW_IDLE;
+    return msg_for_me;
 }
 
 /**
- * Forward a message from bus to serial line.
+ * Forward a message from bus to serial line and/or to local interpreter.
  *
  * @param[in]   bus     Handle to bus.
  * @param[in]   serial  Handle to serial line.
@@ -269,8 +302,8 @@ void bgw_forward_serial_msg (sBus_t* bus, scomm_phy_t* rs232_phy)
  *
  * @returns true if a message for the gateway module was received.
  */
-bool bgw_forward_bus_msg (sBus_t *bus, scomm_phy_t *serial,
-                          uint16_t* sender, uint8_t* len, uint8_t* msg)
+bool bgw_forward_bus_msg (sBus_t *bus, serial_msg_t *serial,
+                          uint16_t* sender, uint8_t* length, uint8_t* msg)
 {
     bool     msg_for_me, msg_for_others;
     uint8_t  l_curr;
@@ -303,26 +336,26 @@ bool bgw_forward_bus_msg (sBus_t *bus, scomm_phy_t *serial,
         l_curr = 0;
         if (msg_for_others) {
             // create message header on serial send queue
-            serial_convert_and_enqueue_byte(&serial->sendQ, (uint8_t)((s & 0xFF00)>>8));
-            serial_convert_and_enqueue_byte(&serial->sendQ, (uint8_t)( s & 0x00FF));
-            serial_convert_and_enqueue_byte(&serial->sendQ, (uint8_t)((r & 0xFF00)>>8));
-            serial_convert_and_enqueue_byte(&serial->sendQ, (uint8_t)( r & 0x00FF));
-            serial_convert_and_enqueue_byte(&serial->sendQ, l_expected);
+            serial_convert_and_enqueue_byte(&serial->serphy.sendQ, (uint8_t)((s & 0xFF00)>>8));
+            serial_convert_and_enqueue_byte(&serial->serphy.sendQ, (uint8_t)( s & 0x00FF));
+            serial_convert_and_enqueue_byte(&serial->serphy.sendQ, (uint8_t)((r & 0xFF00)>>8));
+            serial_convert_and_enqueue_byte(&serial->serphy.sendQ, (uint8_t)( r & 0x00FF));
+            serial_convert_and_enqueue_byte(&serial->serphy.sendQ, l_expected);
         }
         // convert and copy message data
         while (l_curr < l_expected) {
-            if (msg_for_others) serial_convert_and_enqueue_byte(&serial->sendQ, bus->sRecvMsg.auBuf[5 + l_curr]);
+            if (msg_for_others) serial_convert_and_enqueue_byte(&serial->serphy.sendQ, bus->sRecvMsg.auBuf[5 + l_curr]);
             if (msg_for_me) msg[l_curr] = bus->sRecvMsg.auBuf[5 + l_curr];
             l_curr++;
         }
         // finally end message with a newline char.
         if (msg_for_others) {
-            q_put_byte(&serial->sendQ, '\n');
-            serial_phy_initiate_sending(serial);
+            q_put_byte(&serial->serphy.sendQ, '\n');
+            serial_phy_initiate_sending(&serial->serphy);
         }
         if (msg_for_me) {
             *sender = s;
-            *len = l_curr;
+            *length = l_curr;
         }
 
         // reset bus to IDLE state, so we are ready to receive the next message

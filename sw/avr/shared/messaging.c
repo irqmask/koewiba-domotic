@@ -37,22 +37,23 @@
 #endif
 
 #include "bus.h"
-#ifdef MESAGING_SERIAL
+#ifdef MESSAGING_SERIAL
   #include "serialcomm.h"
 #endif
+#include "led_debug.h"
 
 // --- Definitions -------------------------------------------------------------
 
 /**
- * @subsection ALARMCLOCK_APPCONFIG
- * Configuration of alarmclock module.
+ * @subsection MESSAGING_APPCONFIG
+ * Configuration of messaging module.
  * @{
  */
 #ifndef MESSAGING_APPCONFIG
   #define MESSAGING_APPCONFIG 1
   #define MESAGING_BUS        1 // default: messaging over bus
   #undef  MESAGING_SERIAL       // default: no messaging over serial
-#endif // ALARMCLOCK_APPCONFIG
+#endif // MESSAGING_APPCONFIG
 /** @} */
 
 // --- Type definitions --------------------------------------------------------
@@ -63,7 +64,7 @@
 
 extern sBus_t           g_bus;
 #ifdef MESSAGING_SERIAL
-  extern scomm_phy_t    g_serial;
+  extern scomm_phy_t    *g_serphy;
 #endif
 
 // --- Module global variables -------------------------------------------------
@@ -76,7 +77,7 @@ extern sBus_t           g_bus;
 
 #if MESSAGING_SERIAL
 
-inline bool message_send(uint16_t receiver, uint8_t msglen, const uint8_t *msg)
+inline bool message_send(uint16_t receiver, uint8_t length, const uint8_t *msg)
 {
     bool retval = false;
     bool send_over_bus = true;
@@ -99,12 +100,16 @@ inline bool message_send(uint16_t receiver, uint8_t msglen, const uint8_t *msg)
         send_over_bus = false;
         send_over_serial = true;
     }
+    else {
+    }
 
     if (send_over_bus) {
-        retval = bus_send_message(&g_bus, receiver, msglen, msg);
+        retval = bus_send_message(&g_bus, receiver, length, msg);
     }
     if (send_over_serial) {
-        retval |= serial_send_message(&g_serial, receiver, msglen, msg);
+        LED_ERROR_TOGGLE;
+
+        retval |= serial_send_message(g_serphy, g_bus.sCfg.uOwnAddress, receiver, length, msg);
     }
     return retval;
 }

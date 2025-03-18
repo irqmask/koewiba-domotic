@@ -197,7 +197,7 @@ int main(void)
     io_initialize();
     spi_master_init_blk();
     timer_initialize();
-    register_get(MOD_eReg_ModuleID, 0, &module_id);
+    register_get(MOD_eReg_ModuleID, NULL, &module_id);
 
     bus_configure(&g_bus, module_id); // configure a bus node with address 1
     bus_scheduler_initialize(&g_bus, &g_sched, 0);// initialize bus on UART 0

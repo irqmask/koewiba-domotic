@@ -23,6 +23,7 @@
 #include "bus.h"
 #include "input.h"
 #include "ledskeys.h"
+#include "messaging.h"
 #include "register.h"
 
 #include "avr/io.h"
@@ -51,7 +52,7 @@ extern void app_register_set  (uint8_t reg_no, uint32_t value);
 
 // --- Local functions ---------------------------------------------------------
 
-static void on_keypress_send (sBus_t* bus, uint8_t key_index)
+static void on_keypress_send (uint8_t key_index)
 {
     uint16_t receiver;
     uint8_t msg[4];
@@ -60,11 +61,11 @@ static void on_keypress_send (sBus_t* bus, uint8_t key_index)
         msg[0] = eCMD_SET_REG_8BIT;
         msg[1] = g_on_key_set_register[key_index].register_id;
         msg[2] = g_on_key_set_register[key_index].value;
-        bus_send_message(bus, receiver, 3, msg);
+        message_send(receiver, 3, msg);
     }
 }
 
-static void app_check_keys (sBus_t* bus)
+static void app_check_keys (void)
 {
     uint8_t pressed_keys, index;
 
@@ -72,7 +73,7 @@ static void app_check_keys (sBus_t* bus)
     if (pressed_keys != 0x00) sleep_prevent(0x01, 0); // Reset sleep prevention bit as soon as pinchange-interrupt is processed.
     for (index=0; index<APP_NUM_KEYS; index++) {
         if (pressed_keys & (1<<index)) {
-            on_keypress_send(bus, index);
+            on_keypress_send(index);
         }
     }
 }
@@ -199,7 +200,7 @@ void app_background (sBus_t* bus)
 {
     input_background();
     leds_keys_background();
-    app_check_keys(bus);
+    app_check_keys();
 }
 
 /** @} */

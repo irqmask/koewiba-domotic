@@ -38,10 +38,11 @@
 
 // --- Local variables ---------------------------------------------------------
 
-static sBus_t           g_bus;
 static timer_data_t     g_LED_timer;
 
 // --- Global variables --------------------------------------------------------
+
+sBus_t                  g_bus;
 
 // --- Module global variables -------------------------------------------------
 

@@ -26,6 +26,7 @@
 #include "blindctrl.h"
 #include "bus.h"
 #include "cmddef_common.h"
+#include "messaging.h"
 #include "motor.h"
 #include "timer.h"
 
@@ -154,14 +155,14 @@ static uint16_t calc_motor_time_up (uint8_t index)
  *
  * @param[in]   index   Index of the blind.
  */
-static void send_current_position (uint8_t index, sBus_t* bus)
+static void send_current_position (uint8_t index)
 {
     uint8_t msg[3];
 
     msg[0] = eCMD_STATE_8BIT;
     msg[1] = APP_eReg_B0_PositionCurrent + APP_NUM_REGS_PER_BLIND * index;
     msg[2] = g_blind_control[index].current_position;
-    bus_send_message(bus, BUS_BRDCSTADR, 3, msg);
+    message_send(BUS_BRDCSTADR, 3, msg);
 }
 
 /**
@@ -169,14 +170,14 @@ static void send_current_position (uint8_t index, sBus_t* bus)
  *
  * @param[in]   index   Index of the blind.
  */
-static void send_position_setpoint (uint8_t index, sBus_t* bus)
+static void send_position_setpoint (uint8_t index)
 {
     uint8_t msg[3];
 
     msg[0] = eCMD_STATE_8BIT;
     msg[1] = APP_eReg_B0_PositionSetPoint + APP_NUM_REGS_PER_BLIND * index;
     msg[2] = g_blind_control[index].position_setpoint;
-    bus_send_message(bus, BUS_BRDCSTADR, 3, msg);
+    message_send(BUS_BRDCSTADR, 3, msg);
 }
 
 /**
@@ -447,7 +448,7 @@ bool blinds_are_moving      (void)
 /**
  * Process blind control statemachine. Call this in the main loop.
  */
-void blinds_background      (sBus_t* bus)
+void blinds_background      ()
 {
     for (uint8_t index=0; index<BLIND_COUNT; index++) {
         switch (g_blind_control[index].blind_state) {
@@ -469,8 +470,8 @@ void blinds_background      (sBus_t* bus)
         case stopping:
             if (!motor_is_running(index)) {
                 g_blind_control[index].blind_state = idle;
-                send_current_position(index, bus);
-                send_position_setpoint(index, bus);
+                send_current_position(index);
+                send_position_setpoint(index);
                 g_blinds_active &= ~(1<<index);
             }
             break;
@@ -488,7 +489,7 @@ void blinds_background      (sBus_t* bus)
                 // fall-through to moving_down
             case moving_down:
                 update_current_position(index);
-                send_current_position(index, bus);
+                send_current_position(index);
                 break;
 
             case stopping:

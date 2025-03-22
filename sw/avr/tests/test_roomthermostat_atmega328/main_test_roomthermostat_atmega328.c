@@ -49,6 +49,7 @@
 #include "gdisplay.h"
 #include "eeprom_spi.h"
 #include "led_debug.h"
+#include "messaging.h"
 #include "register.h"
 #include "spi.h"
 #include "timer.h"
@@ -60,10 +61,11 @@
 
 // --- Local variables ---------------------------------------------------------
 
-static sBus_t           g_bus;
 static timer_data_t     g_LED_timer;
 
 // --- Global variables --------------------------------------------------------
+
+sBus_t                  g_bus;
 
 // --- Module global variables -------------------------------------------------
 
@@ -231,7 +233,7 @@ int main(void)
             }
             // report EEProm test status
             msg[0] = 0xEF; // currently unused command number
-            bus_send_message(&g_bus, 0x0002, 2, msg); // send message to address 0x0002
+            message_send(0x0002, 2, msg); // send message to address 0x0002
         }
 
         // check for message and read it

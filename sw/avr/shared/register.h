@@ -77,23 +77,19 @@ void        register_set_u16        (uint8_t                reg_no,
 void        register_set_u32        (uint8_t                reg_no,
                                      uint32_t               value);
 
-void        register_do_command     (sBus_t*                bus,
-                                     uint16_t               sender,
+void        register_do_command     (uint16_t               sender,
                                      uint8_t                msglen,
                                      uint8_t*               msg);
 
-void        register_send_u8        (sBus_t*                bus,
-                                     uint16_t               receiver,
+void        register_send_u8        (uint16_t               receiver,
                                      uint8_t                reg_no,
                                      uint8_t                value);
 
-void        register_send_u16       (sBus_t*                bus,
-                                     uint16_t               receiver,
+void        register_send_u16       (uint16_t               receiver,
                                      uint8_t                reg_no,
                                      uint16_t               value);
 
-void        register_send_u32       (sBus_t*                bus,
-                                     uint16_t               receiver,
+void        register_send_u32       (uint16_t               receiver,
                                      uint8_t                reg_no,
                                      uint32_t               value);
 

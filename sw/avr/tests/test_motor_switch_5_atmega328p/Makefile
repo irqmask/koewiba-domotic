@@ -16,6 +16,7 @@ SRC = ../shared/bus_transport.c \
       shared/eeprom_spi.c \
       shared/led_debug.c \
       shared/main_avr.c \
+      shared/messaging.c \
       shared/register.c \
       shared/sleepmode.c \
       shared/sn74595.c \

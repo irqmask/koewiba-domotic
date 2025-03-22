@@ -19,6 +19,7 @@ SRC = ../shared/bus_transport.c \
       shared/gdisplay_font_x8.c \
       shared/gdisplay_font_x16.c \
       shared/led_debug.c \
+      shared/messaging.c \
       shared/register.c \
       shared/sleepmode.c \
       shared/timer.c \

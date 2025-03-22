@@ -41,6 +41,7 @@
 #include "appconfig.h"
 #include "contacts.h"
 #include "led_debug.h"
+#include "messaging.h"
 
 // --- Definitions -------------------------------------------------------------
 
@@ -107,7 +108,7 @@ static void forward_uart_buffer(void)
     for (uint8_t i = 0; i < g_uart_rx_idx; i++) {
         msg[1 + i] = g_uart_rx_buffer[i];
     }
-    bus_send_message(&g_bus, app_debug_receiver, 1 + g_uart_rx_idx, msg);
+    message_send(app_debug_receiver, 1 + g_uart_rx_idx, msg);
 }
 
 // --- Module global functions -------------------------------------------------

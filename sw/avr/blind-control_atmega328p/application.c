@@ -165,7 +165,7 @@ void app_background (sBus_t* bus)
     }
 
     motors_background();
-    blinds_background(bus);
+    blinds_background();
 
     if (timer_is_elapsed(&g_seconds_timer)) {
         timer_start(&g_seconds_timer, TIMER_MS_2_TICKS(1000));

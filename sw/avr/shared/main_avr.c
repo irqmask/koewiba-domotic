@@ -40,6 +40,7 @@
 #endif
 #include "bus.h"
 #include "cmddef_common.h"
+#include "messaging.h"
 #include "moddef_common.h"
 #include "queue.h"
 #include "register.h"
@@ -130,7 +131,7 @@ static inline void answer_version_info_request (uint16_t sender)
     for (i=0; i<sizeof(app_versioninfo); i++) {
         msg[i + 1] = pgm_read_byte(&app_versioninfo[i]);
     }
-    bus_send_message(&g_bus, sender, sizeof(msg), msg);
+    message_send(sender, sizeof(msg), msg);
 }
 
 /// first entry point to interpret incoming messages.
@@ -138,13 +139,13 @@ static inline void interpret_message (uint16_t sender, uint8_t msglen, uint8_t* 
 {
     switch (msg[0]) {
     case eCMD_REQUEST_REG:
-        // fallthrough
+        // fall through
     case eCMD_SET_REG_8BIT:
-        // fallthrough
+        // fall through
     case eCMD_SET_REG_16BIT:
-        // fallthrough
+        // fall through
     case eCMD_SET_REG_32BIT:
-        register_do_command(&g_bus, sender, msglen, msg);
+        register_do_command(sender, msglen, msg);
         break;
 
     case eCMD_REQUEST_INFO_OF_TYPE:
@@ -155,13 +156,13 @@ static inline void interpret_message (uint16_t sender, uint8_t msglen, uint8_t* 
 
 #ifndef NO_BLOCK_MESSAGE
     case eCMD_BLOCK_START:
-        block_message_start(&g_bus, sender, msglen, msg);
+        block_message_start(sender, msglen, msg);
         break;
     case eCMD_BLOCK_DATA:
-        block_message_data (&g_bus, sender, msglen, msg);
+        block_message_data (sender, msglen, msg);
         break;
     case eCMD_BLOCK_END:
-        block_message_end  (&g_bus, sender, msglen, msg);
+        block_message_end  (sender, msglen, msg);
         //no break
     case eCMD_BLOCK_RESET:
         block_data_reset();

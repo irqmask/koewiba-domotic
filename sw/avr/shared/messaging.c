@@ -1,17 +1,15 @@
 /**
- * @addtogroup BLINDCTRL
- * @brief Public interface of blind control.
- *
- * This module contains functions to control the blind. It makes use of the
- * motor module and controls movement by timing.
+ * @addtogroup MESSAGE
  *
  * @{
- * @file    blindctrl.h
- * @brief   This module contains functions to control the blind.
+ * @file    messaging.c
+ * @brief   A module to send and receive messages over bus and other media.
  *
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
 /*
+ * Copyright (C) 2025 christian <irqmask@web.de>
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -25,21 +23,40 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef _BLINDCTRL_H_
-#define _BLINDCTRL_H_
 
 // --- Include section ---------------------------------------------------------
 
 #include "prjtypes.h"
+#include "messaging.h"
+
+#ifdef HAS_PCBCONFIG_H
+ #include "pcbconfig.h"
+#endif
+#ifdef HAS_APPCONFIG_H
+ #include "appconfig.h"
+#endif
+
 #include "bus.h"
 
 // --- Definitions -------------------------------------------------------------
+
+/**
+ * @subsection ALARMCLOCK_APPCONFIG
+ * Configuration of alarmclock module.
+ * @{
+ */
+#ifndef MESSAGE_APPCONFIG
+  #define MESSAGE_SOMETHING 42
+#endif // ALARMCLOCK_APPCONFIG
+/** @} */
 
 // --- Type definitions --------------------------------------------------------
 
 // --- Local variables ---------------------------------------------------------
 
 // --- Global variables --------------------------------------------------------
+
+extern sBus_t  g_bus;
 
 // --- Module global variables -------------------------------------------------
 
@@ -49,36 +66,7 @@
 
 // --- Global functions --------------------------------------------------------
 
-
-void blind_move_to_position         (uint8_t index, uint8_t position);
-
-void blind_stop                     (uint8_t index);
-
-uint8_t blind_get_current_position  (uint8_t index);
-
-uint8_t blind_get_position_setpoint (uint8_t index);
-
-uint8_t blind_get_reaction_delay    (uint8_t index);
-
-void blind_set_reaction_delay       (uint8_t index, uint8_t reaction_delay);
-
-uint16_t blind_get_duration_open    (uint8_t index);
-
-void blind_set_duration_open        (uint8_t index, uint16_t duration);
-
-uint16_t blind_get_duration_close   (uint8_t index);
-
-void blind_set_duration_close       (uint8_t index, uint16_t duration);
-
-void blind_set_mode                 (uint8_t index, uint8_t mode);
-
-bool blind_is_moving                (uint8_t index);
-
-void blinds_initialize      (void);
-
-void blinds_background      (void);
-
-bool blinds_are_moving      (void);
-
-#endif /* _BLINDCTRL_H_ */
-/** @} */
+inline bool message_send(uint16_t receiver, uint8_t msglen, const uint8_t *msg)
+{
+    return bus_send_message(&g_bus, receiver, msglen, msg);
+}

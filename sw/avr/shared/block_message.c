@@ -30,6 +30,7 @@
 #include "cmddef_common.h"
 #include "crc16.h"
 #include "eeprom_spi.h"
+#include "messaging.h"
 #include "moddef_common.h"
 #include "prjtypes.h"
 #include "register.h"
@@ -38,7 +39,7 @@
 static timer_data_t     g_timer;    //!< transmission timer to detect timeouts
 static block_data_t     g_bd;       //!< status data of current_transmission
 
-static void send_ack_message (sBus_t* bus, uint16_t receiver, uint8_t parent_cmd)
+static void send_ack_message (uint16_t receiver, uint8_t parent_cmd)
 {
     uint8_t msg[5];
 
@@ -46,10 +47,10 @@ static void send_ack_message (sBus_t* bus, uint16_t receiver, uint8_t parent_cmd
     msg[1] = parent_cmd;
     msg[2] = g_bd.last_offset >> 8;
     msg[3] = g_bd.last_offset & 0x00FF;
-    bus_send_message(bus, receiver, 4, msg);
+    message_send(receiver, 4, msg);
 }
 
-static void send_nak_message (sBus_t* bus, uint16_t receiver, uint8_t parent_cmd)
+static void send_nak_message (uint16_t receiver, uint8_t parent_cmd)
 {
     uint8_t msg[5];
 
@@ -57,10 +58,10 @@ static void send_nak_message (sBus_t* bus, uint16_t receiver, uint8_t parent_cmd
     msg[1] = parent_cmd;
     msg[2] = g_bd.additional_info1;
     msg[3] = g_bd.additional_info2;
-    bus_send_message(bus, receiver, 4, msg);
+    message_send(receiver, 4, msg);
 }
 
-static void send_block_info_message (sBus_t* bus, uint16_t receiver, uint16_t crc_host, uint16_t crc_local, uint32_t length)
+static void send_block_info_message (uint16_t receiver, uint16_t crc_host, uint16_t crc_local, uint32_t length)
 {
     uint8_t msg[10];
 
@@ -74,7 +75,7 @@ static void send_block_info_message (sBus_t* bus, uint16_t receiver, uint16_t cr
     msg[7] = (uint8_t)((length >> 8) & 0x000000FF);
     msg[8] = (uint8_t)(length & 0x000000FF);
 
-    bus_send_message(bus, receiver, 9, msg);
+    message_send(receiver, 9, msg);
 }
 
 static bool process_eeprom_block_start (uint8_t msglen, uint8_t* msg)
@@ -179,7 +180,7 @@ static bool process_eeprom_block_end (uint8_t msglen, uint8_t* msg)
 }
 
 
-bool block_message_start (sBus_t* bus, uint16_t sender, uint8_t msglen, uint8_t* msg)
+bool block_message_start (uint16_t sender, uint8_t msglen, uint8_t* msg)
 {
     bool ret = false;
 
@@ -202,14 +203,14 @@ bool block_message_start (sBus_t* bus, uint16_t sender, uint8_t msglen, uint8_t*
     } while (false);
     if (ret == true) {
         timer_start(&g_timer, TIMER_MS_2_TICKS(10000));
-        send_ack_message(bus, sender, eCMD_BLOCK_START);
+        send_ack_message(sender, eCMD_BLOCK_START);
     } else {
-        send_nak_message(bus, sender, eCMD_BLOCK_START);
+        send_nak_message(sender, eCMD_BLOCK_START);
     }
     return ret;
 }
 
-bool block_message_data (sBus_t* bus, uint16_t sender, uint8_t msglen, uint8_t* msg)
+bool block_message_data (uint16_t sender, uint8_t msglen, uint8_t* msg)
 {
     bool ret = false;
 
@@ -229,14 +230,14 @@ bool block_message_data (sBus_t* bus, uint16_t sender, uint8_t msglen, uint8_t* 
     } while (false);
     if (ret == true) {
         timer_start(&g_timer, TIMER_MS_2_TICKS(10000));
-        send_ack_message(bus, sender, eCMD_BLOCK_DATA);
+        send_ack_message(sender, eCMD_BLOCK_DATA);
     } else {
-        send_nak_message(bus, sender, eCMD_BLOCK_DATA);
+        send_nak_message(sender, eCMD_BLOCK_DATA);
     }
     return ret;
 }
 
-bool block_message_end (sBus_t* bus, uint16_t sender, uint8_t msglen, uint8_t* msg)
+bool block_message_end (uint16_t sender, uint8_t msglen, uint8_t* msg)
 {
     bool ret = true;
 
@@ -261,12 +262,12 @@ bool block_message_end (sBus_t* bus, uint16_t sender, uint8_t msglen, uint8_t* m
         ret = app_block_end(g_bd.sender, g_bd.blocktype);
 #endif
     } while (false);
-    send_block_info_message(bus, sender,
+    send_block_info_message(sender,
             g_bd.crc_host,
             g_bd.crc_local,
             g_bd.received);
     if (ret != true) {
-        send_nak_message (bus, sender, eCMD_BLOCK_END);
+        send_nak_message (sender, eCMD_BLOCK_END);
     }
 
     return ret;

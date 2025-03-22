@@ -66,8 +66,9 @@ static timer_data_t g_input_timer;
 // --- Global variables --------------------------------------------------------
 
 extern const unsigned char app_versioninfo[];
-static sBus_t   g_bus;
-scomm_phy_t     g_serial_phy;
+
+sBus_t              g_bus;
+scomm_phy_t         g_serial_phy;
 
 // --- Module global variables -------------------------------------------------
 
@@ -131,7 +132,7 @@ static inline void interpret_message (uint16_t sender, uint8_t msglen, uint8_t* 
     case eCMD_SET_REG_16BIT:
         // fallthrough
     case eCMD_SET_REG_32BIT:
-        register_do_command(&g_bus, sender, msglen, msg);
+        register_do_command(sender, msglen, msg);
         break;
 
     case eCMD_REQUEST_INFO_OF_TYPE:
@@ -142,13 +143,13 @@ static inline void interpret_message (uint16_t sender, uint8_t msglen, uint8_t* 
 
 #ifndef NO_BLOCK_MESSAGE
     case eCMD_BLOCK_START:
-        block_message_start(&g_bus, sender, msglen, msg);
+        block_message_start(sender, msglen, msg);
         break;
     case eCMD_BLOCK_DATA:
-        block_message_data (&g_bus, sender, msglen, msg);
+        block_message_data (sender, msglen, msg);
         break;
     case eCMD_BLOCK_END:
-        block_message_end  (&g_bus, sender, msglen, msg);
+        block_message_end  (sender, msglen, msg);
         //no break
     case eCMD_BLOCK_RESET:
         block_data_reset();

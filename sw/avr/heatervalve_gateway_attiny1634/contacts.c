@@ -30,19 +30,21 @@
 
 #include <stdint.h>
 
-// include
-#include "cmddef_common.h"
-// shared
-#include "bus.h"
-#include "input.h"
-#include "prjtypes.h"
-
 #ifdef HAS_APPCONFIG_H
  #include "appconfig.h"
 #endif
 #ifdef HAS_PCBCONFIG_H
  #include "pcbconfig.h"
 #endif
+
+// include
+#include "cmddef_common.h"
+// shared
+#include "bus.h"
+#include "prjtypes.h"
+// avr/shared
+#include "input.h"
+#include "messaging.h"
 
 // --- Definitions -------------------------------------------------------------
 
@@ -54,8 +56,6 @@
 // --- Local variables ---------------------------------------------------------
 
 // --- Global variables --------------------------------------------------------
-
-extern sBus_t   g_bus;
 
 // --- Module global variables -------------------------------------------------
 
@@ -72,7 +72,7 @@ static void send_contact_value(uint8_t index, uint8_t value)
     msg[0] = eCMD_STATE_8BIT;
     msg[1] = APP_eReg_Contact0State + index;
     msg[2] = value;
-    bus_send_message(&g_bus, BUS_BRDCSTADR, 3, msg);
+    message_send(BUS_BRDCSTADR, 3, msg);
 }
 
 // --- Module global functions -------------------------------------------------

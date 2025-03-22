@@ -241,7 +241,7 @@ void app_set_desired_temp(uint16_t desired_temp, bool publish)
     app_desired_temp = desired_temp;
     app_draw_desired_temp();
     if (publish) {
-    	register_send_u16(&g_bus, BUS_BRDCSTADR, APP_eReg_TempSetPoint, app_desired_temp);
+        register_send_u16(BUS_BRDCSTADR, APP_eReg_TempSetPoint, app_desired_temp);
     }
 }
 
@@ -469,7 +469,7 @@ void app_background (sBus_t* bus)
                 app_current_temp += g_temperature_offset;
                 if (app_current_temp != g_last_temperature) {
                     app_draw_current_temp();
-                    register_send_u16(bus, BUS_BRDCSTADR, APP_eReg_TempCurrent, app_current_temp);
+                    register_send_u16(BUS_BRDCSTADR, APP_eReg_TempCurrent, app_current_temp);
 
                     uint16_t diff;
                     if (app_current_temp > g_last_temperature)

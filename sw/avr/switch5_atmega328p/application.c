@@ -74,7 +74,7 @@ void app_send_state(uint8_t chn, uint8_t state)
 {
     uint8_t reg_no = APP_eReg_Chn0_SwitchCurrent;
     reg_no += (chn * APP_REGS_PER_CHN);
-    register_send_u8(&g_bus, BUS_BRDCSTADR, reg_no, state);
+    register_send_u8(BUS_BRDCSTADR, reg_no, state);
 }
 
 

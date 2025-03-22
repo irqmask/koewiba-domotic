@@ -15,6 +15,7 @@ SRC = ../shared/bus_transport.c \
       shared/bus_phy.c \
       shared/eeprom_spi.c \
       shared/input.c \
+      shared/messaging.c \
       shared/register.c \
       shared/sleepmode.c \
       shared/timer.c \

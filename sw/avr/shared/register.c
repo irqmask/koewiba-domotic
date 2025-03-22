@@ -35,6 +35,7 @@
 #include "moddef_common.h"
 
 #include "bus.h"
+#include "messaging.h"
 #include "register.h"
 #include "ucontroller.h"
 
@@ -62,8 +63,7 @@ uint8_t register_eeprom_array[APP_eCfg_Last] EEMEM;
  * @param[in] uSender
  * Sender of the request message.
  */
-static void answer_register_request (sBus_t*                bus,
-                                     uint8_t                reg_no,
+static void answer_register_request (uint8_t                reg_no,
                                      uint16_t               sender)
 {
     uint32_t    value;
@@ -72,13 +72,13 @@ static void answer_register_request (sBus_t*                bus,
     if (register_get(reg_no, &regtype, &value)) {
         switch (regtype) {
         case eRegType_U8:
-            register_send_u8(bus, sender, reg_no, (uint8_t)(value & 0x000000FF));
+            register_send_u8(sender, reg_no, (uint8_t)(value & 0x000000FF));
             break;
         case eRegType_U16:
-            register_send_u16(bus, sender, reg_no, (uint16_t)(value & 0x0000FFFF));
+            register_send_u16(sender, reg_no, (uint16_t)(value & 0x0000FFFF));
             break;
         case eRegType_U32:
-            register_send_u32(bus, sender, reg_no, value);
+            register_send_u32(sender, reg_no, value);
             break;
         default:
             break;
@@ -241,8 +241,7 @@ void        register_set_u32        (uint8_t                reg_no,
 /**
  * Command interpreter for register commands.
  */
-void        register_do_command     (sBus_t*                bus,
-                                     uint16_t               sender,
+void        register_do_command     (uint16_t               sender,
                                      uint8_t                msglen,
                                      uint8_t*               msg)
 {
@@ -254,7 +253,7 @@ void        register_do_command     (sBus_t*                bus,
     case eCMD_REQUEST_REG:
         // Format: <Command><Registernumber>
         if (msglen >= 2) {
-            answer_register_request(bus, msg[1], sender);
+            answer_register_request(msg[1], sender);
         }
         break;
     case eCMD_SET_REG_8BIT:
@@ -298,8 +297,7 @@ void        register_do_command     (sBus_t*                bus,
  * @param[in] uValue
  * Value to encode to the message.
  */
-void        register_send_u8        (sBus_t*                bus,
-                                     uint16_t               receiver,
+void        register_send_u8        (uint16_t               receiver,
                                      uint8_t                reg_no,
                                      uint8_t                value)
 {
@@ -308,7 +306,7 @@ void        register_send_u8        (sBus_t*                bus,
     msg[0] = eCMD_STATE_8BIT;
     msg[1] = reg_no;
     msg[2] = value;
-    bus_send_message(bus, receiver, sizeof(msg), msg);
+    message_send(receiver, sizeof(msg), msg);
 }
 
 /**
@@ -323,8 +321,7 @@ void        register_send_u8        (sBus_t*                bus,
  * @param[in] uValue
  * Value to encode to the message.
  */
-void        register_send_u16       (sBus_t*                bus,
-                                     uint16_t               receiver,
+void        register_send_u16       (uint16_t               receiver,
                                      uint8_t                reg_no,
                                      uint16_t               value)
 {
@@ -334,7 +331,7 @@ void        register_send_u16       (sBus_t*                bus,
     msg[1] = reg_no;
     msg[2] = value >> 8;
     msg[3] = value & 0x00FF;
-    bus_send_message(bus, receiver, sizeof(msg), msg);
+    message_send(receiver, sizeof(msg), msg);
 }
 
 /**
@@ -349,8 +346,7 @@ void        register_send_u16       (sBus_t*                bus,
  * @param[in] uValue
  * Value to encode to the message.
  */
-void        register_send_u32       (sBus_t*                bus,
-                                     uint16_t               receiver,
+void        register_send_u32       (uint16_t               receiver,
                                      uint8_t                reg_no,
                                      uint32_t               value)
 {
@@ -362,7 +358,7 @@ void        register_send_u32       (sBus_t*                bus,
     msg[3] = (value >> 16) & 0x000000FF;
     msg[4] = (value >> 8) & 0x000000FF;
     msg[5] = value & 0x000000FF;
-    bus_send_message(bus, receiver, sizeof(msg), msg);
+    message_send(receiver, sizeof(msg), msg);
 }
 
 /** @} */

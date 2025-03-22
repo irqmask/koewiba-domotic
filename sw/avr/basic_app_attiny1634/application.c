@@ -33,6 +33,7 @@
 #include "prjtypes.h"
 
 #include "led_debug.h"
+#include "register.h"
 
 // --- Definitions -------------------------------------------------------------
 

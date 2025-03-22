@@ -31,8 +31,10 @@
 #include <avr/io.h>
 
 #include "cmddef_common.h"
-#include "led2chn.h"
 #include "prjtypes.h"
+
+#include "led2chn.h"
+#include "messaging.h"
 #include "register.h"
 #include "sleepmode.h"
 #include "timer.h"
@@ -171,7 +173,7 @@ static void send_current_intensity(sBus_t* bus, uint8_t channel)
     msg[0] = eCMD_STATE_8BIT;
     msg[1] = APP_eReg_IntensityChn0Current + channel;
     msg[2] = g_led_current[channel];
-    bus_send_message(bus, BUS_BRDCSTADR, 3, msg);
+    message_send(BUS_BRDCSTADR, 3, msg);
 }
 
 static void send_intensity_setpoint (sBus_t* bus, uint8_t channel)
@@ -183,7 +185,7 @@ static void send_intensity_setpoint (sBus_t* bus, uint8_t channel)
     msg[0] = eCMD_STATE_8BIT;
     msg[1] = APP_eReg_IntensityChn0SetPoint + channel;
     msg[2] = g_led_setpoint[channel];
-    bus_send_message(bus, BUS_BRDCSTADR, 3, msg);
+    message_send(BUS_BRDCSTADR, 3, msg);
 }
 
 // --- Module global functions -------------------------------------------------

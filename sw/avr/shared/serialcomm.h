@@ -75,5 +75,7 @@ void scomm_initialize_uart1         (scomm_phy_t *phy);
 bool serial_phy_initiate_sending    (scomm_phy_t *phy);
 void serial_phy_check_q_level       (scomm_phy_t *phy);
 
+bool serial_send_message            (scomm_phy_t *phy, uint16_t sender, uint16_t receiver, uint8_t msglen, uint8_t *msg);
+
 #endif // _SERIALCOMM_H_
 /** @} */

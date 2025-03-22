@@ -37,6 +37,9 @@
 #endif
 
 #include "bus.h"
+#ifdef MESAGING_SERIAL
+  #include "serialcomm.h"
+#endif
 
 // --- Definitions -------------------------------------------------------------
 
@@ -45,8 +48,10 @@
  * Configuration of alarmclock module.
  * @{
  */
-#ifndef MESSAGE_APPCONFIG
-  #define MESSAGE_SOMETHING 42
+#ifndef MESSAGING_APPCONFIG
+  #define MESSAGING_APPCONFIG 1
+  #define MESAGING_BUS        1 // default: messaging over bus
+  #undef  MESAGING_SERIAL       // default: no messaging over serial
 #endif // ALARMCLOCK_APPCONFIG
 /** @} */
 
@@ -56,7 +61,10 @@
 
 // --- Global variables --------------------------------------------------------
 
-extern sBus_t  g_bus;
+extern sBus_t           g_bus;
+#ifdef MESSAGING_SERIAL
+  extern scomm_phy_t    g_serial;
+#endif
 
 // --- Module global variables -------------------------------------------------
 
@@ -66,7 +74,46 @@ extern sBus_t  g_bus;
 
 // --- Global functions --------------------------------------------------------
 
+#if MESSAGING_SERIAL
+
+inline bool message_send(uint16_t receiver, uint8_t msglen, const uint8_t *msg)
+{
+    bool retval = false;
+    bool send_over_bus = true;
+    bool send_over_serial = false;
+    uint8_t receiver_bus_segment = (receiver & BUS_SEGBRDCSTMASK) >> 8;
+
+    // is receiver the same module, then answer shall be routed over serial
+    if (receiver == g_bus.sCfg.uOwnAddress) {
+        send_over_serial = true;
+        send_over_bus = false;
+    }
+    // broadcast? then send to bus and serial
+    else if (receiver == BUS_BRDCSTADR) {
+        // send_over_bus = true; already set
+        send_over_serial = true;
+    }
+    // is receiver in other bus segment?
+    else if (receiver_bus_segment != g_bus.sCfg.uOwnExtAddress) {
+        // then it needs to be routed over serial line
+        send_over_bus = false;
+        send_over_serial = true;
+    }
+
+    if (send_over_bus) {
+        retval = bus_send_message(&g_bus, receiver, msglen, msg);
+    }
+    if (send_over_serial) {
+        retval |= serial_send_message(&g_serial, receiver, msglen, msg);
+    }
+    return retval;
+}
+
+#else
+
 inline bool message_send(uint16_t receiver, uint8_t msglen, const uint8_t *msg)
 {
     return bus_send_message(&g_bus, receiver, msglen, msg);
 }
+
+#endif

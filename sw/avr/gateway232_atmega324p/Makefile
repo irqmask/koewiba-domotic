@@ -17,13 +17,13 @@ SRC = ../shared/bus_transport.c \
       shared/input.c \
       shared/messaging.c \
       shared/register.c \
+      shared/serialcomm.c \
       shared/sleepmode.c \
       shared/timer.c \
       gateway232_atmega324p/appregister.c \
       gateway232_atmega324p/appversion.c \
       gateway232_atmega324p/bus_gateway.c \
       gateway232_atmega324p/main_gateway.c \
-      gateway232_atmega324p/serialcomm.c \
 
 # Place -I options here
 INCDIRS = -I. \

@@ -112,24 +112,6 @@ static bool convert_nibbles_to_byte (uint8_t nibble_h, uint8_t nibble_l, uint8_t
     return true;
 }
 
-static void convert_and_enqueue_byte (queue_t *q, uint8_t byte)
-{
-    uint8_t nibble;
-
-    nibble = byte >> 4;
-    if (nibble < 10) {
-        q_put_byte(q, nibble + '0');
-    } else {
-        q_put_byte(q, nibble + 'A' - 10);
-    }
-    nibble = byte & 0x0F;
-    if (nibble < 10) {
-        q_put_byte(q, nibble + '0');
-    } else {
-        q_put_byte(q, nibble + 'A' - 10);
-    }
-}
-
 static bgw_state_t bgw_send_message_to_bus (sBus_t* bus, scomm_phy_t* rs232_phy)
 {
     uint16_t saved_writepos;
@@ -187,6 +169,8 @@ static bgw_state_t bgw_send_message_to_bus (sBus_t* bus, scomm_phy_t* rs232_phy)
 // --- Module global functions -------------------------------------------------
 
 // --- Global functions --------------------------------------------------------
+
+extern void serial_convert_and_enqueue_byte (queue_t *q, uint8_t byte);
 
 /**
  * Receive a message on a serial line and forward it to the bus.
@@ -275,33 +259,6 @@ void bgw_forward_serial_msg (sBus_t* bus, scomm_phy_t* rs232_phy)
 }
 
 /**
- * Send a message on theserial line.
- *
- * @param[in]   serial  Handle to serial line.
- * @param[in]   sender  Sender of the message.
- * @param[in]   receiver Receiver of the message.
- * @param[in]  len     Length of message.
- * @param[in]  msg     Message payload.
- *
- * @returns true if a message was sent successfully, otherwise false.
- */
-bool bgw_send_serial_msg(scomm_phy_t *serial, uint16_t sender, uint16_t receiver, uint8_t len, uint8_t* msg)
-{
-    convert_and_enqueue_byte(&serial->sendQ, (uint8_t)((sender & 0xFF00)>>8));
-    convert_and_enqueue_byte(&serial->sendQ, (uint8_t)( sender & 0x00FF));
-    convert_and_enqueue_byte(&serial->sendQ, (uint8_t)((receiver & 0xFF00)>>8));
-    convert_and_enqueue_byte(&serial->sendQ, (uint8_t)( receiver & 0x00FF));
-    convert_and_enqueue_byte(&serial->sendQ, len);
-    for (uint8_t i=0; i<len; i++) {
-        convert_and_enqueue_byte(&serial->sendQ, msg[i]);
-    }
-    q_put_byte(&serial->sendQ, '\n');
-    serial_phy_initiate_sending(serial);
-
-    return true;
-}
-
-/**
  * Forward a message from bus to serial line.
  *
  * @param[in]   bus     Handle to bus.
@@ -346,15 +303,15 @@ bool bgw_forward_bus_msg (sBus_t *bus, scomm_phy_t *serial,
         l_curr = 0;
         if (msg_for_others) {
             // create message header on serial send queue
-            convert_and_enqueue_byte(&serial->sendQ, (uint8_t)((s & 0xFF00)>>8));
-            convert_and_enqueue_byte(&serial->sendQ, (uint8_t)( s & 0x00FF));
-            convert_and_enqueue_byte(&serial->sendQ, (uint8_t)((r & 0xFF00)>>8));
-            convert_and_enqueue_byte(&serial->sendQ, (uint8_t)( r & 0x00FF));
-            convert_and_enqueue_byte(&serial->sendQ, l_expected);
+            serial_convert_and_enqueue_byte(&serial->sendQ, (uint8_t)((s & 0xFF00)>>8));
+            serial_convert_and_enqueue_byte(&serial->sendQ, (uint8_t)( s & 0x00FF));
+            serial_convert_and_enqueue_byte(&serial->sendQ, (uint8_t)((r & 0xFF00)>>8));
+            serial_convert_and_enqueue_byte(&serial->sendQ, (uint8_t)( r & 0x00FF));
+            serial_convert_and_enqueue_byte(&serial->sendQ, l_expected);
         }
         // convert and copy message data
         while (l_curr < l_expected) {
-            if (msg_for_others) convert_and_enqueue_byte(&serial->sendQ, bus->sRecvMsg.auBuf[5 + l_curr]);
+            if (msg_for_others) serial_convert_and_enqueue_byte(&serial->sendQ, bus->sRecvMsg.auBuf[5 + l_curr]);
             if (msg_for_me) msg[l_curr] = bus->sRecvMsg.auBuf[5 + l_curr];
             l_curr++;
         }

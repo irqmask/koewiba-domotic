@@ -40,6 +40,10 @@
 #define BUS_MAXSENDMSGLEN   64 + 3   //!< Maximum length of a message to be sent.
 #define BUS_MAXRECVMSGLEN   64 + 3  //!< Maximum length of a message to be received.
 
+#define MESSAGING_APPCONFIG 1
+#define MESAGING_BUS        1
+#define MESAGING_SERIAL     1
+
 // --- Type definitions --------------------------------------------------------
 
 //! Application specific layout of registers

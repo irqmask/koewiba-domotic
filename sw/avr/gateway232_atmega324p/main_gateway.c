@@ -68,7 +68,7 @@ static timer_data_t g_input_timer;
 extern const unsigned char app_versioninfo[];
 
 sBus_t              g_bus;
-scomm_phy_t         g_serial_phy;
+scomm_phy_t         g_serial;
 
 // --- Module global variables -------------------------------------------------
 
@@ -126,11 +126,11 @@ static inline void interpret_message (uint16_t sender, uint8_t msglen, uint8_t* 
 {
     switch (msg[0]) {
     case eCMD_REQUEST_REG:
-        // fallthrough
+        // fall through
     case eCMD_SET_REG_8BIT:
-        // fallthrough
+        // fall through
     case eCMD_SET_REG_16BIT:
-        // fallthrough
+        // fall through
     case eCMD_SET_REG_32BIT:
         register_do_command(sender, msglen, msg);
         break;
@@ -179,7 +179,7 @@ static void send_input_state(uint8_t input, uint8_t value)
     cmd[2] = value;
 
     bus_send_message(&g_bus, g_bus.sCfg.uOwnAddress & BUS_SEGBRDCSTMASK, sizeof(cmd), cmd);
-    bgw_send_serial_msg(&g_serial_phy, g_bus.sCfg.uOwnAddress, BUS_BRDCSTADR, sizeof(cmd), cmd);
+    serial_send_message(&g_serial, g_bus.sCfg.uOwnAddress, BUS_BRDCSTADR, sizeof(cmd), cmd);
 }
 
 static void check_inputs(void)
@@ -211,7 +211,7 @@ int main(void)
     io_initialize();
     input_initialize();
     timer_initialize();
-    scomm_initialize_uart1(&g_serial_phy);
+    scomm_initialize_uart1(&g_serial);
 
     //register_set_u16(MOD_eReg_ModuleID, 0x0003);
     register_get(MOD_eReg_ModuleID, 0, &module_id);
@@ -228,11 +228,11 @@ int main(void)
     while (1) {
         // check for message and read it
         if (bus_get_message(&g_bus)) {
-            if (bgw_forward_bus_msg(&g_bus, &g_serial_phy, &sender, &msglen, msg)) {
+            if (bgw_forward_bus_msg(&g_bus, &g_serial, &sender, &msglen, msg)) {
                 interpret_message(sender, msglen, msg);
             }
         }
-        bgw_forward_serial_msg(&g_bus, &g_serial_phy);
+        bgw_forward_serial_msg(&g_bus, &g_serial);
 
         if (timer_is_elapsed(&g_input_timer)) {
             timer_start(&g_input_timer, TIMER_MS_2_TICKS(20));

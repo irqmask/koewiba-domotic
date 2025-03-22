@@ -132,21 +132,41 @@ ISR (INTERRUPT_UART_TRANS1)
     g_uart1phy->flags &= ~eSCOMM_TX_FL;
 }
 
-// --- Local functions ---------------------------------------------------------
+// --- Module local functions ---------------------------------------------------------
+
+void serial_convert_and_enqueue_byte (queue_t *q, uint8_t byte)
+{
+    uint8_t nibble;
+
+    nibble = byte >> 4;
+    if (nibble < 10) {
+        q_put_byte(q, nibble + '0');
+    } else {
+        q_put_byte(q, nibble + 'A' - 10);
+    }
+    nibble = byte & 0x0F;
+    if (nibble < 10) {
+        q_put_byte(q, nibble + '0');
+    } else {
+        q_put_byte(q, nibble + 'A' - 10);
+    }
+}
+
+// --- Global functions ---------------------------------------------------------
 
 /**
  * Initializes USART1 and the in-/outgoing queue.
  *
- * @param[in] psPhy     Handle of bus physical layer.
+ * @param[in] serial     Handle of bus physical layer.
  *
  * @returns:            nothing
  */
-void scomm_initialize_uart1 (scomm_phy_t* phy)
+void scomm_initialize_uart1 (scomm_phy_t* serial)
 {
-    g_uart1phy = phy; //assign the phy-handle for accessing it within the interrupt.
+    g_uart1phy = serial; //assign the phy-handle for accessing it within the interrupt.
     // initialize queues
-    q_initialize(&phy->recvQ, phy->recv_q_data, sizeof(phy->recv_q_data));
-    q_initialize(&phy->sendQ, phy->send_q_data, sizeof(phy->send_q_data));
+    q_initialize(&serial->recvQ, serial->recv_q_data, sizeof(serial->recv_q_data));
+    q_initialize(&serial->sendQ, serial->send_q_data, sizeof(serial->send_q_data));
     // initialize UART
     REGISTER_UBRRH1  = UBRRVALH;
     REGISTER_UBRRL1  = UBRRVALL;
@@ -159,13 +179,13 @@ void scomm_initialize_uart1 (scomm_phy_t* phy)
  * Send given number of data on the bus.
  * Sending is initiated, if the previous sending process finished.
  *
- * @param[in] psPhy     Handle of bus physical layer.
+ * @param[in] serial     Handle of serial interface.
  *
  * @returns TRUE: sending successfully initiated, otherwise FALSE.
  */
-bool serial_phy_initiate_sending (scomm_phy_t* phy)
+bool serial_phy_initiate_sending (scomm_phy_t* serial)
 {
-    queue_t *q = &phy->sendQ;
+    queue_t *q = &serial->sendQ;
 
     if (0 == q_get_pending(q)) return false;
     // Wait for empty transmit buffer
@@ -177,14 +197,43 @@ bool serial_phy_initiate_sending (scomm_phy_t* phy)
     return true;
 }
 
-/** */
-void serial_phy_check_q_level (scomm_phy_t* phy)
+/**
+ * @param[in] serial     Handle of serial interface.
+ */
+void serial_phy_check_q_level (scomm_phy_t* serial)
 {
-    queue_t *q = &phy->recvQ;
+    queue_t *q = &serial->recvQ;
 
     if (RECV_Q_MIN_CTS_THD >= ((q->size + q->writepos - q->readpos) % q->size)) {
         // if queue's free space is bigger than RECV_Q_MIN_CTS_THD byte,
         // signal host computer that we are ready to receive more bytes.
         clear_cts_pin();
     }
+}
+
+/**
+ * Send a message on the serial line.
+ *
+ * @param[in]   serial  Handle to serial line.
+ * @param[in]   sender  Sender of the message.
+ * @param[in]   receiver Receiver of the message.
+ * @param[in]  len     Length of message.
+ * @param[in]  msg     Message payload.
+ *
+ * @returns true if a message was sent successfully, otherwise false.
+ */
+bool serial_send_message (scomm_phy_t *serial, uint16_t sender, uint16_t receiver, uint8_t msglen, uint8_t *msg)
+{
+    serial_convert_and_enqueue_byte(&serial->sendQ, (uint8_t)((sender & 0xFF00)>>8));
+    serial_convert_and_enqueue_byte(&serial->sendQ, (uint8_t)( sender & 0x00FF));
+    serial_convert_and_enqueue_byte(&serial->sendQ, (uint8_t)((receiver & 0xFF00)>>8));
+    serial_convert_and_enqueue_byte(&serial->sendQ, (uint8_t)( receiver & 0x00FF));
+    serial_convert_and_enqueue_byte(&serial->sendQ, msglen);
+    for (uint8_t i=0; i<msglen; i++) {
+        serial_convert_and_enqueue_byte(&serial->sendQ, msg[i]);
+    }
+    q_put_byte(&serial->sendQ, '\n');
+    serial_phy_initiate_sending(serial);
+
+    return true;
 }

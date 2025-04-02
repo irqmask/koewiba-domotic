@@ -93,7 +93,6 @@ ISR(PCINT3_vect)
     // nothing to do here, but ISR is needed for sleep-mode
 }
 
-
 static void io_initialize(void)
 {
     DDRA  |= ((0<<DDA7) | (0<<DDA6) | (0<<DDA5) | (0<<DDA4) | (0<<DDA3) | (0<<DDA2) | (0<<DDA1) | (0<<DDA0) );

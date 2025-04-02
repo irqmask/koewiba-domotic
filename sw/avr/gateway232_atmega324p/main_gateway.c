@@ -73,25 +73,32 @@ scomm_phy_t     g_serial_phy;
 
 // --- Local functions ---------------------------------------------------------
 
-ISR(INTERRUPT_PINCHANGE0)
+ISR(PCINT0_vect)
 {
     // nothing to do here, but ISR is needed for sleep-mode
 }
 
-ISR(INTERRUPT_PINCHANGE1)
+ISR(PCINT1_vect)
 {
     // nothing to do here, but ISR is needed for sleep-mode
 }
 
-ISR(INTERRUPT_PINCHANGE2)
+ISR(PCINT2_vect)
 {
     // nothing to do here, but ISR is needed for sleep-mode
 }
+
+ISR(PCINT3_vect)
+{
+    // nothing to do here, but ISR is needed for sleep-mode
+}
+
 
 static void io_initialize(void)
 {
     DDRA  |= ((0<<DDA7) | (0<<DDA6) | (0<<DDA5) | (0<<DDA4) | (0<<DDA3) | (0<<DDA2) | (0<<DDA1) | (0<<DDA0) );
     PORTA |= ((0<<PA7)  |  (0<<PA6)  |  (0<<PA5)  |  (0<<PA4)  |  (1<<PA3)  |  (1<<PA2)  |  (1<<PA1)  |  (1<<PA0)  );
+    PCMSK0 |= ((1<<PCINT3) | (1<<PCINT2) | (1<<PCINT1) | (1<<PCINT0)); // activate pin-change-interrupts for the inputs
 
     DDRB  |= ((1<<DDB7) | (0<<DDB6) | (0<<DDB5) | (0<<DDB4) | (0<<DDB3) | (0<<DDB2) | (1<<DDB1) | (1<<DDB0) );
     PORTB |= ((0<<PB7)   |  (0<<PB6)  |  (0<<PB5)  |  (0<<PB4)  |  (0<<PB3)  |  (0<<PB2)  |  (0<<PB1)  |  (0<<PB0)  );
@@ -155,12 +162,8 @@ static inline void interpret_message (uint16_t sender, uint8_t msglen, uint8_t* 
 
     case eCMD_RESET:
         cli();
-#ifdef __AVR_ATtiny1634__
-        //TODO implement reset for attiny1634
-#else
         wdt_enable(WDTO_15MS);
-        while (1); // wait until watchdog resets the controller.
-#endif
+        while (1); // wait until watch-dog resets the controller.
         break;
 
     default:
@@ -221,8 +224,6 @@ int main(void)
 
     timer_start(&g_LED_timer, TIMER_MS_2_TICKS(1000));
     timer_start(&g_input_timer, TIMER_MS_2_TICKS(20));
-    // activate pin-change-interrupts for the inputs
-    PCMSK0 |= ((1<<PCINT3) | (1<<PCINT2) | (1<<PCINT1) | (1<<PCINT0));
 
     while (1) {
         // check for message and read it
@@ -247,9 +248,10 @@ int main(void)
         }
 
         if (sleep_check_and_goodnight() == true) {
-            // bus gone to sleep and now woken up
+            // bus gone to sleep and is now woken up
             // wait for first pending byte, then set module to running state
             g_bus.eState = eBus_InitWait;
+            sleep_request(false);
         }
     }
     return 0;

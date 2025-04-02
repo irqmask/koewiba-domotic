@@ -36,6 +36,7 @@
 
 #ifdef PRJCONF_UC_AVR
 #include "ucontroller.h"
+#include <avr/io.h>
 #include <avr/sleep.h>
 #endif
 
@@ -46,6 +47,9 @@
 #ifdef __AVR_ATtiny1634__
  #define sleep_pinchange_enable()    GIMSK |=  (1<<PCIE2)
  #define sleep_pinchange_disable()   GIMSK &= ~(1<<PCIE2)
+#elif __AVR_ATmega324P__
+ #define sleep_pinchange_enable()    PCICR |=  ((1<<PCIE3) | (1<<PCIE2) | (1<<PCIE1) | (1<<PCIE0))
+ #define sleep_pinchange_disable()   PCICR &= ~((1<<PCIE3) | (1<<PCIE2) | (1<<PCIE1) | (1<<PCIE0))
 #else
  #define sleep_pinchange_enable()    PCICR |=  ((1<<PCIE2) | (1<<PCIE1) | (1<<PCIE0))
  #define sleep_pinchange_disable()   PCICR &= ~((1<<PCIE2) | (1<<PCIE1) | (1<<PCIE0))

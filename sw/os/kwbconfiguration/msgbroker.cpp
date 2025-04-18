@@ -29,6 +29,7 @@
 // include
 #include "prjtypes.h"
 
+#include "log.h"
 #include "msgbroker.h"
 
 // --- Definitions -------------------------------------------------------------
@@ -56,17 +57,14 @@ void MsgBroker::registerForResponse(void *reference, msg_filter_t &filter_func, 
 //----------------------------------------------------------------------------
 void MsgBroker::unregisterForResponse(void *reference)
 {
-    std::vector<msg_filter_data_t> &l = this->response_handlers;
+    std::vector<msg_filter_data_t> &l = this->response_handlers;   
     std::vector<msg_filter_data_t>::iterator it = l.begin();
     while (it != l.end()) {
         if (it->reference == reference) {
             it = l.erase(it);
-            if (it == l.end()) {
-                return;
-            }
         }
         else {
-            it++;
+            ++it;
         }
     }
 }

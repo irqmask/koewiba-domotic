@@ -51,12 +51,12 @@
 // low-pulse width and fits it in tolerance windows to select if it is a
 // strobe-bit, a 0-bit or a 1-bit.
 
-#define PW_1_MIN    18  ///< Minimum pulse width for a valid "one" pulse.
-#define PW_1_MAX    40  ///< Maximum pulse width for a valid "one" pulse.
-#define PW_STB_MIN  47  ///< Minimum pulse width for a valid "strobe" pulse.
-#define PW_STB_MAX  69  ///< Maximum pulse width for a valid "strobe" pulse.
-#define PW_0_MIN    75  ///< Minimum pulse width for a valid "zero" pulse.
-#define PW_0_MAX    97  ///< Maximum pulse width for a valid "zero" pulse.
+#define PW_1_MIN    15  ///< Minimum pulse width for a valid "one" pulse.
+#define PW_1_MAX    35  ///< Maximum pulse width for a valid "one" pulse.
+#define PW_STB_MIN  39  ///< Minimum pulse width for a valid "strobe" pulse.
+#define PW_STB_MAX  60  ///< Maximum pulse width for a valid "strobe" pulse.
+#define PW_0_MIN    63  ///< Minimum pulse width for a valid "zero" pulse.
+#define PW_0_MAX    96  ///< Maximum pulse width for a valid "zero" pulse.
 
 /// number of samples (two bytes, each having 1 strobe-bit + 8 data-bits + 1 parity-bit)
 #define ZAGWIRE_SAMPLE_LEN          ((1 + 8 + 1) * 2)

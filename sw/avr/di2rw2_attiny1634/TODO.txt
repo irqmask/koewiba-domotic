@@ -1,0 +1,4 @@
+ Todo 'di2rw2_attiny1634':
+
+ - Umbau der Funktionalität 'Send_Relay_State_Message' in die application.c.
+   Alle Applikationsspezifischen Funktionen müssen auf diese Ebene. Relay.c kümmert sich nur um das Schalten der Relais.

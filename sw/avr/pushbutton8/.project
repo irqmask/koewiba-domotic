@@ -45,4 +45,22 @@
 			<locationURI>KWB_SHARED</locationURI>
 		</link>
 	</linkedResources>
+	<variableList>
+		<variable>
+			<name>KWB_AVR_INCLUDE</name>
+			<value>file:/home/mue/Projekte/koewiba-domotic/sw/avr/include</value>
+		</variable>
+		<variable>
+			<name>KWB_AVR_SHARED</name>
+			<value>file:/home/mue/Projekte/koewiba-domotic/sw/avr/shared</value>
+		</variable>
+		<variable>
+			<name>KWB_INCLUDE</name>
+			<value>file:/home/mue/Projekte/koewiba-domotic/sw/include</value>
+		</variable>
+		<variable>
+			<name>KWB_SHARED</name>
+			<value>file:/home/mue/Projekte/koewiba-domotic/sw/shared</value>
+		</variable>
+	</variableList>
 </projectDescription>

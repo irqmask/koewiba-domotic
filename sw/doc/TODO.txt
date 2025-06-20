@@ -1,7 +1,7 @@
 TODO allgemein
 - TODO ins Wiki überführen
 - Doku Hardware-Guidelines (Gemeinsame Anforderungen an alle Module, bzw Modulgruppe oder eines Prozessortyps z.B. EEPRom Anschlüsse, verwendeter UART, RS485 select, etc)
-- Verzeichn isstruktur
+- Verzeichnisstruktur
 
 
 TODO OS

@@ -23,6 +23,7 @@
  */
 // --- Include section ---------------------------------------------------------
 
+#include "appconfig.h"
 #include "blindctrl.h"
 #include "bus.h"
 #include "cmddef_common.h"
@@ -472,9 +473,9 @@ void blinds_background      ()
                 g_blind_control[index].blind_state = idle;
 
                 if(g_blind_control[index].current_position != g_blind_control[index].position_setpoint) {
-                	send_current_position(index, bus);
+                    send_current_position(index);
                 }
-                send_position_setpoint(index, bus);
+                send_position_setpoint(index);
                 g_blinds_active &= ~(1<<index);
             }
             break;

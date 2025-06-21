@@ -124,7 +124,7 @@ void app_on_command (uint16_t sender, uint8_t msglen, uint8_t* msg)
 void app_background (sBus_t* bus)
 {
     motors_background();
-    blinds_background(bus);
+    blinds_background();
     digital_output_background(bus);
 
     if (timer_is_elapsed(&g_seconds_timer)) {

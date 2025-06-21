@@ -24,9 +24,11 @@
 
 // --- Include section ---------------------------------------------------------
 
+#include "appconfig.h"
 #include "digital_output.h"
 #include "sn74595.h"
 #include "bus.h"
+#include "pcbconfig.h"
 
 // --- Type definitions --------------------------------------------------------
 

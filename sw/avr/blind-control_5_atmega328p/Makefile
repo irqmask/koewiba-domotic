@@ -1,6 +1,6 @@
-MCU = atmega328p
+MCU = atmega328pb
 FORMAT = ihex
-TARGET = blind-control_5_atmega328p
+TARGET = blind-control_5_atmega328pb
 
 ROOTDIR = $(subst \,/,$(shell pwd))/..
 include ../buildscripts/lib/lib_outputdirs.mk

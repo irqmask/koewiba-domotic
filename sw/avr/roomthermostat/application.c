@@ -82,8 +82,6 @@ static uint8_t      g_mode;
 
 // --- Global variables --------------------------------------------------------
 
-extern sBus_t  g_bus;
-
 // --- Module global variables -------------------------------------------------
 
 uint16_t app_current_temp, app_desired_temp;

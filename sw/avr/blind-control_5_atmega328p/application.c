@@ -10,7 +10,7 @@
  * @file    application.c
  * @brief   Application specific code of "blind-control_5+4_atmega328p" project.
  *
- * @author  Christian Verhalen
+ * @author  Christian Verhalen, Robert Mueller
  *///---------------------------------------------------------------------------
 /*
  * This program is free software: you can redistribute it and/or modify
@@ -33,10 +33,13 @@
 
 #include "prjtypes.h"
 
-#include "blindctrl.h"
-#include "digital_output.h"
+#include "alarmclock.h"
+#include "appconfig.h"
 #include "bus.h"
+#include "blindctrl.h"
+#include "blind_event.h"
 #include "cmddef_common.h"
+#include "digital_output.h"
 #include "datetime.h"
 #include "motor.h"
 #include "register.h"
@@ -81,6 +84,7 @@ void app_init (void)
     app_register_load();
 
     timer_start(&g_seconds_timer, TIMER_MS_2_TICKS(1000));
+    blind_event_evaluate_next_alarm(0);
 }
 
 /**
@@ -133,4 +137,20 @@ void app_background (sBus_t* bus)
     }
 }
 
+
+/**
+ *  Check every minute if one of the alarms triggers.
+ */
+void app_on_minute(void)
+{
+    int8_t alarm_idx = -1;
+
+    while(alarm_check(&alarm_idx)) {
+        if(0==alarm_idx) // blind event
+        {   uint8_t data;
+            alarm_get_data(alarm_idx, &data);
+            blind_event_process_alarm(data);
+        }
+    }
+}
 /** @} */

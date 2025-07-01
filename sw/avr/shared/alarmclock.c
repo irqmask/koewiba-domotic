@@ -63,6 +63,7 @@ typedef struct waketime {
     uint8_t days_of_week_mask;  //!< bitmask of days (of type 1<<dt_day_of_week_t)
                                 //!< MSB (1<<7) selects if alarm is active 1 or 
                                 //!< inactive 0.
+    uint8_t add_data;           //!< Additional data that can be used, when alarm is executed.
 } alarm_waketime_t;
 
 // --- Local variables ---------------------------------------------------------
@@ -161,6 +162,25 @@ uint8_t alarm_get_minute(int8_t index)
 }
 
 /** 
+ * Set data of alarm entry.
+ */
+void alarm_set_data(int8_t index, uint8_t data)
+{
+    if (index < 0 || index >= ALARM_COUNT) return;
+    g_waketimes[index].add_data = data;
+}
+
+/**
+ * Get data of alarm entry.
+ */
+bool alarm_get_data(int8_t index, uint8_t* p_data)
+{
+    if (index < 0 || index >= ALARM_COUNT) return false;
+    *p_data = g_waketimes[index].add_data;
+    return true;
+}
+
+/**
  * Set mask of days, when this alarm is active.
  */
 void alarm_set_days_of_week_mask(int8_t index, uint8_t days_of_week_mask)

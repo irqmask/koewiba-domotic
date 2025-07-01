@@ -39,6 +39,8 @@
 
 // --- Definitions -------------------------------------------------------------
 
+#define MINUTES_PER_WEEK    7*24*60
+
 // --- Type definitions --------------------------------------------------------
 
 // --- Global variables --------------------------------------------------------
@@ -60,6 +62,10 @@ uint8_t alarm_get_hour(int8_t index);
 void alarm_set_minute(int8_t index, uint8_t minute);
 
 uint8_t alarm_get_minute(int8_t index);
+
+void alarm_set_data(int8_t index, uint8_t data);
+
+bool alarm_get_data(int8_t index, uint8_t* p_data);
 
 void alarm_set_days_of_week_mask(int8_t index, uint8_t dow_mask);
 

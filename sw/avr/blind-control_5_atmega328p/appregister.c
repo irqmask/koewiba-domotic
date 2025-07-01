@@ -132,8 +132,59 @@ bool        app_register_get        (uint8_t                reg_no,
             break;
         }
         return true;
+    } else if (reg_no >= APP_eReg_MasterExclusionFlags &&
+               reg_no < (APP_eCfg_BlindEvent0_Weekday + APP_NOF_BLINDEVENTS*APP_NUM_REGS_PER_BLINDEVENT)) {
+
+        if(APP_eReg_BlindEvent0_Weekday <= reg_no)
+        { // calculate index of blind and normalize register number
+            index = (reg_no - APP_eReg_BlindEvent0_Weekday) / APP_NUM_REGS_PER_BLINDEVENT;
+            reg_no -= (index * APP_NUM_REGS_PER_BLINDEVENT);
+        }
+
+        switch (reg_no) {
+        case APP_eReg_MasterExclusionFlags:
+            eepindex = APP_eCfg_MasterExclusionFlags + index * NUM_EEBYTES_PER_BLINDEVENT;
+            *(uint8_t*)pvalue = eeprom_read_byte(&register_eeprom_array[eepindex]);
+            break;
+        case APP_eReg_BlindEventSunriseOffset:
+            eepindex = APP_eCfg_BlindEventSunriseOffset + index * NUM_EEBYTES_PER_BLINDEVENT;
+            *(uint8_t*)pvalue = eeprom_read_byte(&register_eeprom_array[eepindex]);
+            break;
+        case APP_eReg_BlindEventSunsetOffset:
+            eepindex = APP_eCfg_BlindEventSunsetOffset + index * NUM_EEBYTES_PER_BLINDEVENT;
+            *(uint8_t*)pvalue = eeprom_read_byte(&register_eeprom_array[eepindex]);
+            break;
+        case APP_eReg_BlindEvent0_Weekday:
+            eepindex = APP_eCfg_BlindEvent0_Weekday + index * NUM_EEBYTES_PER_BLINDEVENT;
+            *(uint8_t*)pvalue = eeprom_read_byte(&register_eeprom_array[eepindex]);
+            break;
+        case APP_eReg_BlindEvent0_Hour:
+            eepindex = APP_eCfg_BlindEvent0_Hour + index * NUM_EEBYTES_PER_BLINDEVENT;
+            *(uint8_t*)pvalue = eeprom_read_byte(&register_eeprom_array[eepindex]);
+            break;
+        case APP_eReg_BlindEvent0_Minute:
+            eepindex = APP_eCfg_BlindEvent0_Minute + index * NUM_EEBYTES_PER_BLINDEVENT;
+            *(uint8_t*)pvalue = eeprom_read_byte(&register_eeprom_array[eepindex]);
+            break;
+        case APP_eReg_BlindEvent0_Blinds:
+            eepindex = APP_eCfg_BlindEvent0_Blinds + index * NUM_EEBYTES_PER_BLINDEVENT;
+            *(uint8_t*)pvalue = eeprom_read_byte(&register_eeprom_array[eepindex]);
+            break;
+        case APP_eReg_BlindEvent0_PositionValue:
+            eepindex = APP_eCfg_BlindEvent0_PositionValue + index * NUM_EEBYTES_PER_BLINDEVENT;
+            *(uint8_t*)pvalue = eeprom_read_byte(&register_eeprom_array[eepindex]);
+            break;
+        case APP_eReg_BlindEvent0_ExclusionFlags:
+            eepindex = APP_eCfg_BlindEvent0_ExclusionFlags + index * NUM_EEBYTES_PER_BLINDEVENT;
+            *(uint8_t*)pvalue = eeprom_read_byte(&register_eeprom_array[eepindex]);
+            break;
+        default:
+            return false;
+            break;
+        }
+        return true;
     } else if (reg_no >= APP_eReg_Chn0_SwitchCurrent &&
-        reg_no < (APP_eReg_Chn0_SwitchCurrent + OUTPUT_COUNT*APP_NUM_REGS_PER_CHN)) {
+               reg_no < (APP_eReg_Chn0_SwitchCurrent + OUTPUT_COUNT*APP_NUM_REGS_PER_CHN)) {
 
         // calculate index of blind and normalize register number
         index = (reg_no - APP_eReg_Chn0_SwitchCurrent) / APP_NUM_REGS_PER_CHN;
@@ -162,7 +213,6 @@ bool        app_register_get        (uint8_t                reg_no,
             *(uint8_t*)pvalue = eeprom_read_byte((uint8_t*)&register_eeprom_array[eepindex]);
             *preg_type = eRegType_U16;
             break;
-
         default:
             return false;
             break;
@@ -255,8 +305,59 @@ void        app_register_set        (uint8_t                reg_no,
         default:
             break;
         }
+    } else if (reg_no >= APP_eReg_MasterExclusionFlags &&
+               reg_no < (APP_eCfg_BlindEvent0_Weekday + APP_NOF_BLINDEVENTS*APP_NUM_REGS_PER_BLINDEVENT)) {
+
+        // calculate index of blind event and normalize register number
+        if(APP_eReg_BlindEvent0_Weekday <= reg_no){
+            index = (reg_no - APP_eReg_BlindEvent0_Weekday) / APP_NUM_REGS_PER_BLINDEVENT;
+            reg_no -= (index * APP_NUM_REGS_PER_BLINDEVENT);
+        }
+        value8 = value & 0x000000FF;
+
+        switch (reg_no) {
+        // registers saved in EEProm
+        case APP_eReg_MasterExclusionFlags:
+            eepindex = APP_eCfg_MasterExclusionFlags;
+            eeprom_write_byte(&register_eeprom_array[eepindex], value8);
+            break;
+        case APP_eReg_BlindEventSunriseOffset:
+            eepindex = APP_eCfg_BlindEventSunriseOffset;
+            eeprom_write_byte(&register_eeprom_array[eepindex], value8);
+            break;
+        case APP_eReg_BlindEventSunsetOffset:
+            eepindex = APP_eCfg_BlindEventSunsetOffset;
+            eeprom_write_byte(&register_eeprom_array[eepindex], value8);
+            break;
+        case APP_eReg_BlindEvent0_Weekday:
+            eepindex = APP_eCfg_BlindEvent0_Weekday + index * NUM_EEBYTES_PER_BLINDEVENT;
+            eeprom_write_byte(&register_eeprom_array[eepindex], value8);
+            break;
+        case APP_eReg_BlindEvent0_Hour:
+            eepindex = APP_eCfg_BlindEvent0_Hour + index * NUM_EEBYTES_PER_BLINDEVENT;
+            eeprom_write_byte(&register_eeprom_array[eepindex], value8);
+            break;
+        case APP_eReg_BlindEvent0_Minute:
+            eepindex = APP_eCfg_BlindEvent0_Minute + index * NUM_EEBYTES_PER_BLINDEVENT;
+            eeprom_write_byte(&register_eeprom_array[eepindex], value8);
+            break;
+        case APP_eReg_BlindEvent0_Blinds:
+            eepindex = APP_eCfg_BlindEvent0_Blinds + index * NUM_EEBYTES_PER_BLINDEVENT;
+            eeprom_write_byte(&register_eeprom_array[eepindex], value8);
+            break;
+        case APP_eReg_BlindEvent0_PositionValue:
+            eepindex = APP_eCfg_BlindEvent0_PositionValue + index * NUM_EEBYTES_PER_BLINDEVENT;
+            eeprom_write_byte(&register_eeprom_array[eepindex], value8);
+            break;
+        case APP_eReg_BlindEvent0_ExclusionFlags:
+            eepindex = APP_eCfg_BlindEvent0_ExclusionFlags + index * NUM_EEBYTES_PER_BLINDEVENT;
+            eeprom_write_byte(&register_eeprom_array[eepindex], value8);
+            break;
+        default:
+            break;
+        }
     } else if (reg_no >= APP_eReg_Chn0_SwitchCurrent &&
-        reg_no < (APP_eReg_Chn0_SwitchCurrent + OUTPUT_COUNT*APP_NUM_REGS_PER_CHN)) {
+               reg_no < (APP_eReg_Chn0_SwitchCurrent + OUTPUT_COUNT*APP_NUM_REGS_PER_CHN)) {
 
         // calculate index of blind and normalize register number
         index = (reg_no - APP_eReg_Chn0_SwitchCurrent) / APP_NUM_REGS_PER_CHN;

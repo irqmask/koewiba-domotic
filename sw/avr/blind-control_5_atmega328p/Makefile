@@ -30,6 +30,7 @@ SRC = ../shared/bus_transport.c \
       blind-control_5_atmega328p/appregister.c \
       blind-control_5_atmega328p/appversion.c \
       blind-control_5_atmega328p/digital_output.c \
+      blind-control_5_atmega328p/blind_event.c \
 
 
 # Place -I options here

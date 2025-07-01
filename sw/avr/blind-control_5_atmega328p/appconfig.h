@@ -45,6 +45,9 @@
 #define BLIND_COUNT         5       //!< Number of blind which this software is capable to control.
 #define OUTPUT_COUNT        6       //!< Number of output channels which this software is capable to control.
 
+#define DATETIME_APPCONFIG  1
+#define DATETIME_APP_HAS_ON_MINUTE_FUNCTION 1
+
 #define APP_eSLEEPMASK_MOTOR    (1<<0)  //!< Mask used for sleep_prevent() function.
                                         //!< Prevent the controller to fall asleep if motor is moving.
 // --- Type definitions --------------------------------------------------------
@@ -117,110 +120,106 @@ typedef enum appregisters {
     APP_eReg_B4_Unused1,           //!< unused
     APP_eReg_B4_Last = APP_eReg_B4_Unused1,
 
-    APP_eReg_B0_TimeUp1_Weekday,     //!< Flags on which weekday this timer applies. Index flags with day-of-week
-    APP_eReg_B0_TimeUp1_Hour,        //!< Hour when blind wents up.
-    APP_eReg_B0_TimeUp1_Minute,      //!< Minute when blind wents up.
-    APP_eReg_B0_TimeUp1_unused_1,
-    APP_eReg_B0_TimeUp1_unused_0,
-    APP_eReg_B0_TimeDown1_Weekday,   //!< Flags on which weekday this timer applies. Index flags with day-of-week
-    APP_eReg_B0_TimeDown1_Hour,      //!< Hour when blind wents down.
-    APP_eReg_B0_TimeDown1_Minute,    //!< Minute when blind wents down.
-    APP_eReg_B0_TimeDown1_unused_1,
-    APP_eReg_B0_TimeDown1_unused_0,
-    APP_eReg_B0_TimeUp2_Weekday,     //!< Flags on which weekday this timer applies. Index flags with day-of-week
-    APP_eReg_B0_TimeUp2_Hour,        //!< Hour when blind wents up.
-    APP_eReg_B0_TimeUp2_Minute,      //!< Minute when blind wents up.
-    APP_eReg_B0_TimeUp2_unused_1,
-    APP_eReg_B0_TimeUp2_unused_0,
-    APP_eReg_B0_TimeDown2_Weekday,   //!< Flags on which weekday this timer applies. Index flags with day-of-week
-    APP_eReg_B0_TimeDown2_Hour,      //!< Hour when blind wents down.
-    APP_eReg_B0_TimeDown2_Minute,    //!< Minute when blind wents down.
-    APP_eReg_B0_TimeDown2_unused_1,
-    APP_eReg_B0_TimeDown2_unused_0,
-
-    APP_eReg_B1_TimeUp1_Weekday,     //!< Flags on which weekday this timer applies. Index flags with day-of-week
-    APP_eReg_B1_TimeUp1_Hour,        //!< Hour when blind wents up.
-    APP_eReg_B1_TimeUp1_Minute,      //!< Minute when blind wents up.
-    APP_eReg_B1_TimeUp1_unused_1,
-    APP_eReg_B1_TimeUp1_unused_0,
-    APP_eReg_B1_TimeDown1_Weekday,   //!< Flags on which weekday this timer applies. Index flags with day-of-week
-    APP_eReg_B1_TimeDown1_Hour,      //!< Hour when blind wents down.
-    APP_eReg_B1_TimeDown1_Minute,    //!< Minute when blind wents down.
-    APP_eReg_B1_TimeDown1_unused_1,
-    APP_eReg_B1_TimeDown1_unused_0,
-    APP_eReg_B1_TimeUp2_Weekday,     //!< Flags on which weekday this timer applies. Index flags with day-of-week
-    APP_eReg_B1_TimeUp2_Hour,        //!< Hour when blind wents up.
-    APP_eReg_B1_TimeUp2_Minute,      //!< Minute when blind wents up.
-    APP_eReg_B1_TimeUp2_unused_1,
-    APP_eReg_B1_TimeUp2_unused_0,
-    APP_eReg_B1_TimeDown2_Weekday,   //!< Flags on which weekday this timer applies. Index flags with day-of-week
-    APP_eReg_B1_TimeDown2_Hour,      //!< Hour when blind wents down.
-    APP_eReg_B1_TimeDown2_Minute,    //!< Minute when blind wents down.
-    APP_eReg_B1_TimeDown2_unused_1,
-    APP_eReg_B1_TimeDown2_unused_0,
-
-    APP_eReg_B2_TimeUp1_Weekday,     //!< Flags on which weekday this timer applies. Index flags with day-of-week
-    APP_eReg_B2_TimeUp1_Hour,        //!< Hour when blind wents up.
-    APP_eReg_B2_TimeUp1_Minute,      //!< Minute when blind wents up.
-    APP_eReg_B2_TimeUp1_unused_1,
-    APP_eReg_B2_TimeUp1_unused_0,
-    APP_eReg_B2_TimeDown1_Weekday,   //!< Flags on which weekday this timer applies. Index flags with day-of-week
-    APP_eReg_B2_TimeDown1_Hour,      //!< Hour when blind wents down.
-    APP_eReg_B2_TimeDown1_Minute,    //!< Minute when blind wents down.
-    APP_eReg_B2_TimeDown1_unused_1,
-    APP_eReg_B2_TimeDown1_unused_0,
-    APP_eReg_B2_TimeUp2_Weekday,     //!< Flags on which weekday this timer applies. Index flags with day-of-week
-    APP_eReg_B2_TimeUp2_Hour,        //!< Hour when blind wents up.
-    APP_eReg_B2_TimeUp2_Minute,      //!< Minute when blind wents up.
-    APP_eReg_B2_TimeUp2_unused_1,
-    APP_eReg_B2_TimeUp2_unused_0,
-    APP_eReg_B2_TimeDown2_Weekday,   //!< Flags on which weekday this timer applies. Index flags with day-of-week
-    APP_eReg_B2_TimeDown2_Hour,      //!< Hour when blind wents down.
-    APP_eReg_B2_TimeDown2_Minute,    //!< Minute when blind wents down.
-    APP_eReg_B2_TimeDown2_unused_1,
-    APP_eReg_B2_TimeDown2_unused_0,
-
-    APP_eReg_B3_TimeUp1_Weekday,     //!< Flags on which weekday this timer applies. Index flags with day-of-week
-    APP_eReg_B3_TimeUp1_Hour,        //!< Hour when blind wents up.
-    APP_eReg_B3_TimeUp1_Minute,      //!< Minute when blind wents up.
-    APP_eReg_B3_TimeUp1_unused_1,
-    APP_eReg_B3_TimeUp1_unused_0,
-    APP_eReg_B3_TimeDown1_Weekday,   //!< Flags on which weekday this timer applies. Index flags with day-of-week
-    APP_eReg_B3_TimeDown1_Hour,      //!< Hour when blind wents down.
-    APP_eReg_B3_TimeDown1_Minute,    //!< Minute when blind wents down.
-    APP_eReg_B3_TimeDown1_unused_1,
-    APP_eReg_B3_TimeDown1_unused_0,
-    APP_eReg_B3_TimeUp2_Weekday,     //!< Flags on which weekday this timer applies. Index flags with day-of-week
-    APP_eReg_B3_TimeUp2_Hour,        //!< Hour when blind wents up.
-    APP_eReg_B3_TimeUp2_Minute,      //!< Minute when blind wents up.
-    APP_eReg_B3_TimeUp2_unuMOD_eReg_FirstAppSpecificsed_1,
-    APP_eReg_B3_TimeUp2_unused_0,
-    APP_eReg_B3_TimeDown2_Weekday,   //!< Flags on which weekday this timer applies. Index flags with day-of-week
-    APP_eReg_B3_TimeDown2_Hour,      //!< Hour when blind wents down.
-    APP_eReg_B3_TimeDown2_Minute,    //!< Minute when blind wents down.
-    APP_eReg_B3_TimeDown2_unused_1,
-    APP_eReg_B3_TimeDown2_unused_0,
-
-    APP_eReg_B4_TimeUp1_Weekday,     //!< Flags on which weekday this timer applies. Index flags with day-of-week
-    APP_eReg_B4_TimeUp1_Hour,        //!< Hour when blind wents up.
-    APP_eReg_B4_TimeUp1_Minute,      //!< Minute when blind wents up.
-    APP_eReg_B4_TimeUp1_unused_1,
-    APP_eReg_B4_TimeUp1_unused_0,
-    APP_eReg_B4_TimeDown1_Weekday,   //!< Flags on which weekday this timer applies. Index flags with day-of-week
-    APP_eReg_B4_TimeDown1_Hour,      //!< Hour when blind wents down.
-    APP_eReg_B4_TimeDown1_Minute,    //!< Minute when blind wents down.
-    APP_eReg_B4_TimeDown1_unused_1,
-    APP_eReg_B4_TimeDown1_unused_0,
-    APP_eReg_B4_TimeUp2_Weekday,     //!< Flags on which weekday this timer applies. Index flags with day-of-week
-    APP_eReg_B4_TimeUp2_Hour,        //!< Hour when blind wents up.
-    APP_eReg_B4_TimeUp2_Minute,      //!< Minute when blind wents up.
-    APP_eReg_B4_TimeUp2_unused_1,
-    APP_eReg_B4_TimeUp2_unused_0,
-    APP_eReg_B4_TimeDown2_Weekday,   //!< Flags on which weekday this timer applies. Index flags with day-of-week
-    APP_eReg_B4_TimeDown2_Hour,      //!< Hour when blind wents down.
-    APP_eReg_B4_TimeDown2_Minute,    //!< Minute when blind wents down.
-    APP_eReg_B4_TimeDown2_unused_1,
-    APP_eReg_B4_TimeDown2_unused_0,
+    APP_eReg_MasterExclusionFlags,         //!< Action is not executed when: Bit0=Public holiday, Bit1=..., Bit7=General.
+    APP_eReg_BlindEventSunriseOffset,      //!< Minutes that are added to the event time in the morning when offset is activated.
+    APP_eReg_BlindEventSunsetOffset,       //!< Minutes that are subtracted from the event time in the evening when offset is activated.
+    App_eReg_BlindEvent_Unused,
+    APP_eReg_BlindEvent0_Weekday,          //!< Flags on which weekday this timer applies. Index flags with day-of-week.
+    APP_eReg_BlindEvent0_Hour,             //!< Hour when this timer applies.
+    APP_eReg_BlindEvent0_Minute,           //!< Minute when this timer applies.
+    APP_eReg_BlindEvent0_Blinds,           //!< Blinds involved in action. Bit0=Blind0, ..., Bit4=Blind4 .
+    APP_eReg_BlindEvent0_PositionValue,    //!< Target position of blind. 100 = completely closed. 0 = completely open.
+    APP_eReg_BlindEvent0_ExclusionFlags,   //!< When one of these Flags in 'MasterExclusionFlag' is set, action won't be executed.
+    APP_eReg_BlindEvent1_Weekday,          //!< Flags on which weekday this timer applies. Index flags with day-of-week.
+    APP_eReg_BlindEvent1_Hour,             //!< Hour when this timer applies.
+    APP_eReg_BlindEvent1_Minute,           //!< Minute when this timer applies.
+    APP_eReg_BlindEvent1_Blinds,           //!< Blinds involved in action. Bit0=Blind0, ..., Bit4=Blind4.
+    APP_eReg_BlindEvent1_PositionValue,    //!< Target position of blind. 100 = completely closed. 0 = completely open.
+    APP_eReg_BlindEvent1_ExclusionFlags,   //!< When one of these Flags in 'MasterExclusionFlag' is set, action won't be executed.
+    APP_eReg_BlindEvent2_Weekday,          //!< Flags on which weekday this timer applies. Index flags with day-of-week.
+    APP_eReg_BlindEvent2_Hour,             //!< Hour when this timer applies.
+    APP_eReg_BlindEvent2_Minute,           //!< Minute when this timer applies.
+    APP_eReg_BlindEvent2_Blinds,           //!< Blinds involved in action. Bit0=Blind0, ..., Bit4=Blind4 .
+    APP_eReg_BlindEvent2_PositionValue,    //!< Target position of blind. 100 = completely closed. 0 = completely open.
+    APP_eReg_BlindEvent2_ExclusionFlags,   //!< When one of these Flags in 'MasterExclusionFlag' is set, action won't be executed.
+    APP_eReg_BlindEvent3_Weekday,          //!< Flags on which weekday this timer applies. Index flags with day-of-week.
+    APP_eReg_BlindEvent3_Hour,             //!< Hour when this timer applies.
+    APP_eReg_BlindEvent3_Minute,           //!< Minute when this timer applies.
+    APP_eReg_BlindEvent3_Blinds,           //!< Blinds involved in action. Bit0=Blind0, ..., Bit4=Blind4.
+    APP_eReg_BlindEvent3_PositionValue,    //!< Target position of blind. 100 = completely closed. 0 = completely open.
+    APP_eReg_BlindEvent3_ExclusionFlags,   //!< When one of these Flags in 'MasterExclusionFlag' is set, action won't be executed.
+    APP_eReg_BlindEvent4_Weekday,          //!< Flags on which weekday this timer applies. Index flags with day-of-week.
+    APP_eReg_BlindEvent4_Hour,             //!< Hour when this timer applies.
+    APP_eReg_BlindEvent4_Minute,           //!< Minute when this timer applies.
+    APP_eReg_BlindEvent4_Blinds,           //!< Blinds involved in action. Bit0=Blind0, ..., Bit4=Blind4 .
+    APP_eReg_BlindEvent4_PositionValue,    //!< Target position of blind. 100 = completely closed. 0 = completely open.
+    APP_eReg_BlindEvent4_ExclusionFlags,   //!< When one of these Flags in 'MasterExclusionFlag' is set, action won't be executed.
+    APP_eReg_BlindEvent5_Weekday,          //!< Flags on which weekday this timer applies. Index flags with day-of-week.
+    APP_eReg_BlindEvent5_Hour,             //!< Hour when this timer applies.
+    APP_eReg_BlindEvent5_Minute,           //!< Minute when this timer applies.
+    APP_eReg_BlindEvent5_Blinds,           //!< Blinds involved in action. Bit0=Blind0, ..., Bit4=Blind4.
+    APP_eReg_BlindEvent5_PositionValue,    //!< Target position of blind. 100 = completely closed. 0 = completely open.
+    APP_eReg_BlindEvent5_ExclusionFlags,   //!< When one of these Flags in 'MasterExclusionFlag' is set, action won't be executed.
+    APP_eReg_BlindEvent6_Weekday,          //!< Flags on which weekday this timer applies. Index flags with day-of-week.
+    APP_eReg_BlindEvent6_Hour,             //!< Hour when this timer applies.
+    APP_eReg_BlindEvent6_Minute,           //!< Minute when this timer applies.
+    APP_eReg_BlindEvent6_Blinds,           //!< Blinds involved in action. Bit0=Blind0, ..., Bit4=Blind4 .
+    APP_eReg_BlindEvent6_PositionValue,    //!< Target position of blind. 100 = completely closed. 0 = completely open.
+    APP_eReg_BlindEvent6_ExclusionFlags,   //!< When one of these Flags in 'MasterExclusionFlag' is set, action won't be executed.
+    APP_eReg_BlindEvent7_Weekday,          //!< Flags on which weekday this timer applies. Index flags with day-of-week.
+    APP_eReg_BlindEvent7_Hour,             //!< Hour when this timer applies.
+    APP_eReg_BlindEvent7_Minute,           //!< Minute when this timer applies.
+    APP_eReg_BlindEvent7_Blinds,           //!< Blinds involved in action. Bit0=Blind0, ..., Bit4=Blind4.
+    APP_eReg_BlindEvent7_PositionValue,    //!< Target position of blind. 100 = completely closed. 0 = completely open.
+    APP_eReg_BlindEvent7_ExclusionFlags,   //!< When one of these Flags in 'MasterExclusionFlag' is set, action won't be executed.
+    APP_eReg_BlindEvent8_Weekday,          //!< Flags on which weekday this timer applies. Index flags with day-of-week.
+    APP_eReg_BlindEvent8_Hour,             //!< Hour when this timer applies.
+    APP_eReg_BlindEvent8_Minute,           //!< Minute when this timer applies.
+    APP_eReg_BlindEvent8_Blinds,           //!< Blinds involved in action. Bit0=Blind0, ..., Bit4=Blind4 .
+    APP_eReg_BlindEvent8_PositionValue,    //!< Target position of blind. 100 = completely closed. 0 = completely open.
+    APP_eReg_BlindEvent8_ExclusionFlags,   //!< When one of these Flags in 'MasterExclusionFlag' is set, action won't be executed.
+    APP_eReg_BlindEvent9_Weekday,          //!< Flags on which weekday this timer applies. Index flags with day-of-week.
+    APP_eReg_BlindEvent9_Hour,             //!< Hour when this timer applies.
+    APP_eReg_BlindEvent9_Minute,           //!< Minute when this timer applies.
+    APP_eReg_BlindEvent9_Blinds,           //!< Blinds involved in action. Bit0=Blind0, ..., Bit4=Blind4.
+    APP_eReg_BlindEvent9_PositionValue,    //!< Target position of blind. 100 = completely closed. 0 = completely open.
+    APP_eReg_BlindEvent9_ExclusionFlags,   //!< When one of these Flags in 'MasterExclusionFlag' is set, action won't be executed.
+    APP_eReg_BlindEvent10_Weekday,         //!< Flags on which weekday this timer applies. Index flags with day-of-week.
+    APP_eReg_BlindEvent10_Hour,            //!< Hour when this timer applies.
+    APP_eReg_BlindEvent10_Minute,          //!< Minute when this timer applies.
+    APP_eReg_BlindEvent10_Blinds,          //!< Blinds involved in action. Bit0=Blind0, ..., Bit4=Blind4 .
+    APP_eReg_BlindEvent10_PositionValue,   //!< Target position of blind. 100 = completely closed. 0 = completely open.
+    APP_eReg_BlindEvent10_ExclusionFlags,  //!< When one of these Flags in 'MasterExclusionFlag' is set, action won't be executed.
+    APP_eReg_BlindEvent11_Weekday,         //!< Flags on which weekday this timer applies. Index flags with day-of-week.
+    APP_eReg_BlindEvent11_Hour,            //!< Hour when this timer applies.
+    APP_eReg_BlindEvent11_Minute,          //!< Minute when this timer applies.
+    APP_eReg_BlindEvent11_Blinds,          //!< Blinds involved in action. Bit0=Blind0, ..., Bit4=Blind4.
+    APP_eReg_BlindEvent11_PositionValue,   //!< Target position of blind. 100 = completely closed. 0 = completely open.
+    APP_eReg_BlindEvent121_ExclusionFlags, //!< When one of these Flags in 'MasterExclusionFlag' is set, action won't be executed.
+    APP_eReg_BlindEvent12_Weekday,         //!< Flags on which weekday this timer applies. Index flags with day-of-week.
+    APP_eReg_BlindEvent12_Hour,            //!< Hour when this timer applies.
+    APP_eReg_BlindEvent12_Minute,          //!< Minute when this timer applies.
+    APP_eReg_BlindEvent12_Blinds,          //!< Blinds involved in action. Bit0=Blind0, ..., Bit4=Blind4 .
+    APP_eReg_BlindEvent12_PositionValue,   //!< Target position of blind. 100 = completely closed. 0 = completely open.
+    APP_eReg_BlindEvent12_ExclusionFlags,  //!< When one of these Flags in 'MasterExclusionFlag' is set, action won't be executed.
+    APP_eReg_BlindEvent13_Weekday,         //!< Flags on which weekday this timer applies. Index flags with day-of-week.
+    APP_eReg_BlindEvent13_Hour,            //!< Hour when this timer applies.
+    APP_eReg_BlindEvent13_Minute,          //!< Minute when this timer applies.
+    APP_eReg_BlindEvent13_Blinds,          //!< Blinds involved in action. Bit0=Blind0, ..., Bit4=Blind4.
+    APP_eReg_BlindEvent13_PositionValue,   //!< Target position of blind. 100 = completely closed. 0 = completely open.
+    APP_eReg_BlindEvent13_ExclusionFlags,  //!< When one of these Flags in 'MasterExclusionFlag' is set, action won't be executed.
+    APP_eReg_BlindEvent14_Weekday,         //!< Flags on which weekday this timer applies. Index flags with day-of-week.
+    APP_eReg_BlindEvent14_Hour,            //!< Hour when this timer applies.
+    APP_eReg_BlindEvent14_Minute,          //!< Minute when this timer applies.
+    APP_eReg_BlindEvent14_Blinds,          //!< Blinds involved in action. Bit0=Blind0, ..., Bit4=Blind4 .
+    APP_eReg_BlindEvent14_PositionValue,   //!< Target position of blind. 100 = completely closed. 0 = completely open.
+    APP_eReg_BlindEvent14_ExclusionFlags,  //!< When one of these Flags in 'MasterExclusionFlag' is set, action won't be executed.
+    APP_eReg_BlindEvent15_Weekday,         //!< Flags on which weekday this timer applies. Index flags with day-of-week.
+    APP_eReg_BlindEvent15_Hour,            //!< Hour when this timer applies.
+    APP_eReg_BlindEvent15_Minute,          //!< Minute when this timer applies.
+    APP_eReg_BlindEvent15_Blinds,          //!< Blinds involved in action. Bit0=Blind0, ..., Bit4=Blind4.
+    APP_eReg_BlindEvent15_PositionValue,   //!< Target position of blind. 100 = completely closed. 0 = completely open.
+    APP_eReg_BlindEvent15_ExclusionFlags,  //!< When one of these Flags in 'MasterExclusionFlag' is set, action won't be executed.
 
     APP_eReg_Chn0_SwitchCurrent,     //!< Current switch state (0...255)
     APP_eReg_Chn0_SwitchSetPoint,    //!< Target switch state (0...255)
@@ -273,6 +272,12 @@ typedef enum appregisters {
 #define APP_NUM_REGS_PER_BLIND (APP_eReg_B0_Last - APP_eReg_B0_PositionCurrent + 1)
 //! Number of registers per channel
 #define APP_NUM_REGS_PER_CHN (APP_eReg_Chn0_Mode - APP_eReg_Chn0_SwitchCurrent + 1)
+//! Number of registers per blind event
+#define APP_NUM_REGS_PER_BLINDEVENT (APP_eReg_BlindEvent0_ExclusionFlags - APP_eReg_BlindEvent0_Weekday + 1)
+
+
+//! Number of blind events
+#define APP_NOF_BLINDEVENTS (1+APP_eReg_BlindEvent15_ExclusionFlags-APP_eReg_BlindEvent0_Weekday / APP_NUM_REGS_PER_BLINDEVENT)
 
 
 //! Application specific layout of non volatile parameters (internal EEProm)
@@ -322,6 +327,106 @@ typedef enum appconfig {
     APP_eCfg_B4_DurationCloseHigh,
     APP_eCfg_B4_Mode,
 
+    APP_eCfg_MasterExclusionFlags,         //!< Action is not executed when: Bit0=Public holiday, Bit1=..., Bit7=General.
+    APP_eCfg_BlindEventSunriseOffset,      //!< Minutes that are added to the event time in the morning when offset is activated.
+    APP_eCfg_BlindEventSunsetOffset,       //!< Minutes that are subtracted from the event time in the evening when offset is activated.
+    APP_eCfg_BlindEvent0_Weekday,          //!< Flags on which weekday this timer applies. Index flags with day-of-week.
+    APP_eCfg_BlindEvent0_Hour,             //!< Hour when this timer applies.
+    APP_eCfg_BlindEvent0_Minute,           //!< Minute when this timer applies.
+    APP_eCfg_BlindEvent0_Blinds,           //!< Blinds involved in action. Bit0=Blind0, ..., Bit4=Blind4 .
+    APP_eCfg_BlindEvent0_PositionValue,    //!< Target position of blind. 100 = completely closed. 0 = completely open.
+    APP_eCfg_BlindEvent0_ExclusionFlags,   //!< When one of these Flags in 'MasterExclusionFlag' is set, action won't be executed.
+    APP_eCfg_BlindEvent1_Weekday,          //!< Flags on which weekday this timer applies. Index flags with day-of-week.
+    APP_eCfg_BlindEvent1_Hour,             //!< Hour when this timer applies.
+    APP_eCfg_BlindEvent1_Minute,           //!< Minute when this timer applies.
+    APP_eCfg_BlindEvent1_Blinds,           //!< Blinds involved in action. Bit0=Blind0, ..., Bit4=Blind4.
+    APP_eCfg_BlindEvent1_PositionValue,    //!< Target position of blind. 100 = completely closed. 0 = completely open.
+    APP_eCfg_BlindEvent1_ExclusionFlags,   //!< When one of these Flags in 'MasterExclusionFlag' is set, action won't be executed.
+    APP_eCfg_BlindEvent2_Weekday,          //!< Flags on which weekday this timer applies. Index flags with day-of-week.
+    APP_eCfg_BlindEvent2_Hour,             //!< Hour when this timer applies.
+    APP_eCfg_BlindEvent2_Minute,           //!< Minute when this timer applies.
+    APP_eCfg_BlindEvent2_Blinds,           //!< Blinds involved in action. Bit0=Blind0, ..., Bit4=Blind4 .
+    APP_eCfg_BlindEvent2_PositionValue,    //!< Target position of blind. 100 = completely closed. 0 = completely open.
+    APP_eCfg_BlindEvent2_ExclusionFlags,   //!< When one of these Flags in 'MasterExclusionFlag' is set, action won't be executed.
+    APP_eCfg_BlindEvent3_Weekday,          //!< Flags on which weekday this timer applies. Index flags with day-of-week.
+    APP_eCfg_BlindEvent3_Hour,             //!< Hour when this timer applies.
+    APP_eCfg_BlindEvent3_Minute,           //!< Minute when this timer applies.
+    APP_eCfg_BlindEvent3_Blinds,           //!< Blinds involved in action. Bit0=Blind0, ..., Bit4=Blind4.
+    APP_eCfg_BlindEvent3_PositionValue,    //!< Target position of blind. 100 = completely closed. 0 = completely open.
+    APP_eCfg_BlindEvent3_ExclusionFlags,   //!< When one of these Flags in 'MasterExclusionFlag' is set, action won't be executed.
+    APP_eCfg_BlindEvent4_Weekday,          //!< Flags on which weekday this timer applies. Index flags with day-of-week.
+    APP_eCfg_BlindEvent4_Hour,             //!< Hour when this timer applies.
+    APP_eCfg_BlindEvent4_Minute,           //!< Minute when this timer applies.
+    APP_eCfg_BlindEvent4_Blinds,           //!< Blinds involved in action. Bit0=Blind0, ..., Bit4=Blind4 .
+    APP_eCfg_BlindEvent4_PositionValue,    //!< Target position of blind. 100 = completely closed. 0 = completely open.
+    APP_eCfg_BlindEvent4_ExclusionFlags,   //!< When one of these Flags in 'MasterExclusionFlag' is set, action won't be executed.
+    APP_eCfg_BlindEvent5_Weekday,          //!< Flags on which weekday this timer applies. Index flags with day-of-week.
+    APP_eCfg_BlindEvent5_Hour,             //!< Hour when this timer applies.
+    APP_eCfg_BlindEvent5_Minute,           //!< Minute when this timer applies.
+    APP_eCfg_BlindEvent5_Blinds,           //!< Blinds involved in action. Bit0=Blind0, ..., Bit4=Blind4.
+    APP_eCfg_BlindEvent5_PositionValue,    //!< Target position of blind. 100 = completely closed. 0 = completely open.
+    APP_eCfg_BlindEvent5_ExclusionFlags,   //!< When one of these Flags in 'MasterExclusionFlag' is set, action won't be executed.
+    APP_eCfg_BlindEvent6_Weekday,          //!< Flags on which weekday this timer applies. Index flags with day-of-week.
+    APP_eCfg_BlindEvent6_Hour,             //!< Hour when this timer applies.
+    APP_eCfg_BlindEvent6_Minute,           //!< Minute when this timer applies.
+    APP_eCfg_BlindEvent6_Blinds,           //!< Blinds involved in action. Bit0=Blind0, ..., Bit4=Blind4 .
+    APP_eCfg_BlindEvent6_PositionValue,    //!< Target position of blind. 100 = completely closed. 0 = completely open.
+    APP_eCfg_BlindEvent6_ExclusionFlags,   //!< When one of these Flags in 'MasterExclusionFlag' is set, action won't be executed.
+    APP_eCfg_BlindEvent7_Weekday,          //!< Flags on which weekday this timer applies. Index flags with day-of-week.
+    APP_eCfg_BlindEvent7_Hour,             //!< Hour when this timer applies.
+    APP_eCfg_BlindEvent7_Minute,           //!< Minute when this timer applies.
+    APP_eCfg_BlindEvent7_Blinds,           //!< Blinds involved in action. Bit0=Blind0, ..., Bit4=Blind4.
+    APP_eCfg_BlindEvent7_PositionValue,    //!< Target position of blind. 100 = completely closed. 0 = completely open.
+    APP_eCfg_BlindEvent7_ExclusionFlags,   //!< When one of these Flags in 'MasterExclusionFlag' is set, action won't be executed.
+    APP_eCfg_BlindEvent8_Weekday,          //!< Flags on which weekday this timer applies. Index flags with day-of-week.
+    APP_eCfg_BlindEvent8_Hour,             //!< Hour when this timer applies.
+    APP_eCfg_BlindEvent8_Minute,           //!< Minute when this timer applies.
+    APP_eCfg_BlindEvent8_Blinds,           //!< Blinds involved in action. Bit0=Blind0, ..., Bit4=Blind4 .
+    APP_eCfg_BlindEvent8_PositionValue,    //!< Target position of blind. 100 = completely closed. 0 = completely open.
+    APP_eCfg_BlindEvent8_ExclusionFlags,   //!< When one of these Flags in 'MasterExclusionFlag' is set, action won't be executed.
+    APP_eCfg_BlindEvent9_Weekday,          //!< Flags on which weekday this timer applies. Index flags with day-of-week.
+    APP_eCfg_BlindEvent9_Hour,             //!< Hour when this timer applies.
+    APP_eCfg_BlindEvent9_Minute,           //!< Minute when this timer applies.
+    APP_eCfg_BlindEvent9_Blinds,           //!< Blinds involved in action. Bit0=Blind0, ..., Bit4=Blind4.
+    APP_eCfg_BlindEvent9_PositionValue,    //!< Target position of blind. 100 = completely closed. 0 = completely open.
+    APP_eCfg_BlindEvent9_ExclusionFlags,   //!< When one of these Flags in 'MasterExclusionFlag' is set, action won't be executed.
+    APP_eCfg_BlindEvent10_Weekday,         //!< Flags on which weekday this timer applies. Index flags with day-of-week.
+    APP_eCfg_BlindEvent10_Hour,            //!< Hour when this timer applies.
+    APP_eCfg_BlindEvent10_Minute,          //!< Minute when this timer applies.
+    APP_eCfg_BlindEvent10_Blinds,          //!< Blinds involved in action. Bit0=Blind0, ..., Bit4=Blind4 .
+    APP_eCfg_BlindEvent10_PositionValue,   //!< Target position of blind. 100 = completely closed. 0 = completely open.
+    APP_eCfg_BlindEvent10_ExclusionFlags,  //!< When one of these Flags in 'MasterExclusionFlag' is set, action won't be executed.
+    APP_eCfg_BlindEvent11_Weekday,         //!< Flags on which weekday this timer applies. Index flags with day-of-week.
+    APP_eCfg_BlindEvent11_Hour,            //!< Hour when this timer applies.
+    APP_eCfg_BlindEvent11_Minute,          //!< Minute when this timer applies.
+    APP_eCfg_BlindEvent11_Blinds,          //!< Blinds involved in action. Bit0=Blind0, ..., Bit4=Blind4.
+    APP_eCfg_BlindEvent11_PositionValue,   //!< Target position of blind. 100 = completely closed. 0 = completely open.
+    APP_eCfg_BlindEvent121_ExclusionFlags, //!< When one of these Flags in 'MasterExclusionFlag' is set, action won't be executed.
+    APP_eCfg_BlindEvent12_Weekday,         //!< Flags on which weekday this timer applies. Index flags with day-of-week.
+    APP_eCfg_BlindEvent12_Hour,            //!< Hour when this timer applies.
+    APP_eCfg_BlindEvent12_Minute,          //!< Minute when this timer applies.
+    APP_eCfg_BlindEvent12_Blinds,          //!< Blinds involved in action. Bit0=Blind0, ..., Bit4=Blind4 .
+    APP_eCfg_BlindEvent12_PositionValue,   //!< Target position of blind. 100 = completely closed. 0 = completely open.
+    APP_eCfg_BlindEvent12_ExclusionFlags,  //!< When one of these Flags in 'MasterExclusionFlag' is set, action won't be executed.
+    APP_eCfg_BlindEvent13_Weekday,         //!< Flags on which weekday this timer applies. Index flags with day-of-week.
+    APP_eCfg_BlindEvent13_Hour,            //!< Hour when this timer applies.
+    APP_eCfg_BlindEvent13_Minute,          //!< Minute when this timer applies.
+    APP_eCfg_BlindEvent13_Blinds,          //!< Blinds involved in action. Bit0=Blind0, ..., Bit4=Blind4.
+    APP_eCfg_BlindEvent13_PositionValue,   //!< Target position of blind. 100 = completely closed. 0 = completely open.
+    APP_eCfg_BlindEvent13_ExclusionFlags,  //!< When one of these Flags in 'MasterExclusionFlag' is set, action won't be executed.
+    APP_eCfg_BlindEvent14_Weekday,         //!< Flags on which weekday this timer applies. Index flags with day-of-week.
+    APP_eCfg_BlindEvent14_Hour,            //!< Hour when this timer applies.
+    APP_eCfg_BlindEvent14_Minute,          //!< Minute when this timer applies.
+    APP_eCfg_BlindEvent14_Blinds,          //!< Blinds involved in action. Bit0=Blind0, ..., Bit4=Blind4 .
+    APP_eCfg_BlindEvent14_PositionValue,   //!< Target position of blind. 100 = completely closed. 0 = completely open.
+    APP_eCfg_BlindEvent14_ExclusionFlags,  //!< When one of these Flags in 'MasterExclusionFlag' is set, action won't be executed.
+    APP_eCfg_BlindEvent15_Weekday,         //!< Flags on which weekday this timer applies. Index flags with day-of-week.
+    APP_eCfg_BlindEvent15_Hour,            //!< Hour when this timer applies.
+    APP_eCfg_BlindEvent15_Minute,          //!< Minute when this timer applies.
+    APP_eCfg_BlindEvent15_Blinds,          //!< Blinds involved in action. Bit0=Blind0, ..., Bit4=Blind4.
+    APP_eCfg_BlindEvent15_PositionValue,   //!< Target position of blind. 100 = completely closed. 0 = completely open.
+    APP_eCfg_BlindEvent15_ExclusionFlags,  //!< When one of these Flags in 'MasterExclusionFlag' is set, action won't be executed.
+
     APP_eCfg_Chn0_ThresholdOff,
     APP_eCfg_Chn0_ThresholdOn,
     APP_eCfg_Chn0_Mode,
@@ -349,6 +454,8 @@ typedef enum appconfig {
 #define NUM_EEBYTES_PER_BLIND (APP_eCfg_B1_ReactionDelay - APP_eCfg_B0_ReactionDelay)
 //! Number of configuration registers per channel
 #define NUM_EEBYTES_PER_CHN (APP_eCfg_Chn0_Mode - APP_eCfg_Chn0_ThresholdOff + 1)
+//! Number of eeprom bytes per blind event
+#define NUM_EEBYTES_PER_BLINDEVENT (APP_eCfg_BlindEvent0_ExclusionFlags - APP_eCfg_BlindEvent0_Weekday)
 
 // --- Local variables ---------------------------------------------------------
 

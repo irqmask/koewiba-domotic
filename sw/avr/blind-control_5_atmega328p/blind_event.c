@@ -88,10 +88,10 @@ static bool get_data_8bit_data_from_register(uint8_t reg_no, uint8_t* p_data)
  * @param[out]  minute    The minute of the next event found in event list.
  * @param[out]  retval    The index of the next event.
  */
-int8_t blind_event_get_next_alarm(uint8_t* day, uint8_t* hour, uint8_t* minute, uint8_t last_idx)
+static int8_t blind_event_get_next_alarm(uint8_t* day, uint8_t* hour, uint8_t* minute, uint8_t last_idx)
 {
     int8_t  retval = -1;
-    uint8_t ba_idx, ba_day;     //!< blind alarm index and day index
+    uint8_t be_idx, be_day;     //!< blind alarm index and day index
     uint8_t evt_days;           //!< blind alarm weekday bitfield
     uint8_t evt_hour;           //!< blind alarm hour
     uint8_t evt_minute;         //!< blind alarm minute
@@ -101,23 +101,25 @@ int8_t blind_event_get_next_alarm(uint8_t* day, uint8_t* hour, uint8_t* minute, 
     uint16_t diff_min = 0xFFFF; //!< minimum difference of minutes
 
     c_minutes = (*day)*24 + (*hour)*60 + *minute;
-    for(ba_idx=0; ba_idx<APP_NUM_REGS_PER_BLINDEVENT; ba_idx++){
-        if(last_idx == ba_idx) continue;
-        get_data_8bit_data_from_register(APP_eReg_BlindEvent0_Weekday, &evt_days);
-        get_data_8bit_data_from_register(APP_eReg_BlindEvent0_Hour   , &evt_hour);
-        get_data_8bit_data_from_register(APP_eReg_BlindEvent0_Minute , &evt_minute);
-        for(ba_day=0; ba_day<7; ba_day++)
+    for(be_idx=0; be_idx<APP_NOF_BLINDEVENTS; be_idx++){
+        uint8_t reg_offset = be_idx*APP_NUM_REGS_PER_BLINDEVENT;
+        if(last_idx == be_idx) continue;
+        get_data_8bit_data_from_register(APP_eReg_BlindEvent0_Weekday+reg_offset, &evt_days);
+        get_data_8bit_data_from_register(APP_eReg_BlindEvent0_Hour   +reg_offset, &evt_hour);
+        get_data_8bit_data_from_register(APP_eReg_BlindEvent0_Minute +reg_offset, &evt_minute);
+        if(59 < evt_minute || 23 < evt_hour) continue;
+        for(be_day=0; be_day<7; be_day++)
         {
-            if( 0 == ((1<<ba_day) & evt_days) ) continue;
-            e_minutes = 24*ba_day  + 60*evt_hour  + evt_minute;
+            if( 0 == ((1<<be_day) & evt_days) ) continue;
+            e_minutes = 24*be_day  + 60*evt_hour  + evt_minute;
             diff = (e_minutes<c_minutes)?(e_minutes+MINUTES_PER_WEEK-c_minutes):(e_minutes-c_minutes);
             if(diff < diff_min)
             {
                 diff_min = diff;
-                *day     = ba_day; // 0=Sunday
+                *day     = be_day; // 0=Sunday
                 *hour    = evt_hour;
                 *minute  = evt_minute;
-                retval = ba_idx;
+                retval = be_idx;
             }
         }
     }
@@ -134,8 +136,8 @@ int8_t blind_event_get_next_alarm(uint8_t* day, uint8_t* hour, uint8_t* minute, 
 int8_t blind_event_evaluate_next_alarm(uint8_t last_idx)
 {
     uint8_t be_day      = dt_get_day_of_week(); // 0=Sunday ... Saturday=6
-    uint8_t be_hour     = dt_get_hour();   //!< blind alarm hour
-    uint8_t be_minute   = dt_get_minute(); //!< blind alarm minute
+    uint8_t be_hour     = dt_get_hour();   //!< current hour
+    uint8_t be_minute   = dt_get_minute(); //!< current minute
 
     int8_t be_idx = blind_event_get_next_alarm(&be_day, &be_hour, &be_minute, last_idx);
     if(0 <= be_idx)
@@ -180,6 +182,57 @@ void blind_event_process_alarm(uint8_t event_idx)
             blind_move_to_position(b_idx, b_pos_val);
         }
     }
+}
+
+void test_blind_event_set_alarm(uint8_t idx)
+{
+	switch(idx)
+	{
+	case 0:
+		alarm_set(0, 0, 1, 0b01111111);
+		alarm_set_data(0, 0);
+		break;
+	case 1:
+		alarm_set(0, 0, 2, 0b01111111);
+		alarm_set_data(0, 1);
+		break;
+	case 2:
+		alarm_set(0, 0, 2, 0b01111111);
+		alarm_set_data(0, 2);
+		break;
+	case 3:
+		alarm_set(0, 0, 3, 0b01111111);
+		alarm_set_data(0, 3);
+		break;
+	case 4:
+		alarm_set(0, 0, 5, 0b01111111);
+		alarm_set_data(0, 4);
+		break;
+	case 5:
+		alarm_set(0, 0, 6, 0b01111111);
+		alarm_set_data(0, 5);
+		break;
+	case 6:
+		alarm_set(0, 0, 7, 0b01111111);
+		alarm_set_data(0, 6);
+		break;
+	case 7:
+		alarm_set(0, 0, 8, 0b01111111);
+		alarm_set_data(0, 7);
+		break;
+	case 8:
+		alarm_set(0, 0, 9, 0b01111111);
+		alarm_set_data(0, 8);
+		break;
+	case 9:
+		alarm_set(0, 0, 10, 0b01111111);
+		alarm_set_data(0, 9);
+		break;
+	default:
+		alarm_set(0, 0, 2, 0b00000000);
+		alarm_set_data(0, 0);
+		break;
+	}
 }
 
 /** @} */

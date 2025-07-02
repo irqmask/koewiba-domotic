@@ -155,16 +155,16 @@ last updated: 2025-06-28
 | 147 | 0x93 | BlindEvent12_ExclusionFlags  | When one of these Flags in 'MasterExclusionFlag' is set, action won't be executed        | uint8  | p   |
 | 148 | 0x94 | BlindEvent13_Weekday         | Flags on which weekday this timer applies. Index flags with day-of-week                  | uint8  | p   |
 | 149 | 0x95 | BlindEvent13_Hour            | Hour when this timer applies.                                                            | uint8  | p   |
-| 140 | 0x96 | BlindEvent13_Minute          | Minute when this timer applies.                                                          | uint8  | p   |
-| 141 | 0x97 | BlindEvent13_Blinds          | Blinds involved in action. Bit0=Blind0, ..., Bit4=Blind4                                 | uint8  | p   |
-| 142 | 0x98 | BlindEvent13_PositionValue   | Target position of blind. 100 = completely closed. 0 = completely open                   | uint8  | p   |
-| 143 | 0x99 | BlindEvent13_ExclusionFlags  | When one of these Flags in 'MasterExclusionFlag' is set, action won't be executed        | uint8  | p   |
-| 144 | 0x9A | BlindEvent14_Weekday         | Flags on which weekday this timer applies. Index flags with day-of-week                  | uint8  | p   |
-| 145 | 0x9B | BlindEvent14_Hour            | Hour when this timer applies.                                                            | uint8  | p   |
-| 146 | 0x9C | BlindEvent14_Minute          | Minute when this timer applies.                                                          | uint8  | p   |
-| 147 | 0x9D | BlindEvent14_Blinds          | Blinds involved in action. Bit0=Blind0, ..., Bit4=Blind4                                 | uint8  | p   |
-| 148 | 0x9E | BlindEvent14_PositionValue   | Target position of blind. 100 = completely closed. 0 = completely open                   | uint8  | p   |
-| 149 | 0x9F | BlindEvent14_ExclusionFlags  | When one of these Flags in 'MasterExclusionFlag' is set, action won't be executed        | uint8  | p   |
+| 150 | 0x96 | BlindEvent13_Minute          | Minute when this timer applies.                                                          | uint8  | p   |
+| 151 | 0x97 | BlindEvent13_Blinds          | Blinds involved in action. Bit0=Blind0, ..., Bit4=Blind4                                 | uint8  | p   |
+| 152 | 0x98 | BlindEvent13_PositionValue   | Target position of blind. 100 = completely closed. 0 = completely open                   | uint8  | p   |
+| 153 | 0x99 | BlindEvent13_ExclusionFlags  | When one of these Flags in 'MasterExclusionFlag' is set, action won't be executed        | uint8  | p   |
+| 154 | 0x9A | BlindEvent14_Weekday         | Flags on which weekday this timer applies. Index flags with day-of-week                  | uint8  | p   |
+| 155 | 0x9B | BlindEvent14_Hour            | Hour when this timer applies.                                                            | uint8  | p   |
+| 156 | 0x9C | BlindEvent14_Minute          | Minute when this timer applies.                                                          | uint8  | p   |
+| 157 | 0x9D | BlindEvent14_Blinds          | Blinds involved in action. Bit0=Blind0, ..., Bit4=Blind4                                 | uint8  | p   |
+| 158 | 0x9E | BlindEvent14_PositionValue   | Target position of blind. 100 = completely closed. 0 = completely open                   | uint8  | p   |
+| 159 | 0x9F | BlindEvent14_ExclusionFlags  | When one of these Flags in 'MasterExclusionFlag' is set, action won't be executed        | uint8  | p   |
 | 160 | 0xA0 | BlindEvent15_Weekday         | Flags on which weekday this timer applies. Index flags with day-of-week                  | uint8  | p   |
 | 161 | 0xA1 | BlindEvent15_Hour            | Hour when this timer applies.                                                            | uint8  | p   |
 | 162 | 0xA2 | BlindEvent15_Minute          | Minute when this timer applies.                                                          | uint8  | p   |

@@ -1,0 +1,1102 @@
+{
+  "name": "blindcontrol_5_plus",
+  "description": "Register layout of blindcontrol_5_plus module",
+  "regs": [
+    {
+      "index": 1,
+      "name": "ModuleID",
+      "type": "U16",
+      "format": "hex",
+      "access": "r"
+    },
+    {
+      "index": 2,
+      "name": "BldFlag",
+      "type": "U8",
+      "format": "hex",
+      "access": "r"
+    },
+    {
+      "index": 16,
+      "name": "PositionCurrent_Blind0",
+      "type": "U8",
+      "access": "r"
+    },
+    {
+      "index": 17,
+      "name": "PositionSetPoint_Blind0",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 18,
+      "name": "PositionDifference_Blind0",
+      "type": "U8",
+      "access": "r"
+    },
+    {
+      "index": 19,
+      "name": "ReactionDelay_Blind0",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 20,
+      "name": "DurationOpen_Blind0",
+      "type": "U16",
+      "access": "rw"
+    },
+    {
+      "index": 21,
+      "name": "DurationClose_Blind0",
+      "type": "U16",
+      "access": "rw"
+    },
+    {
+      "index": 26,
+      "name": "PositionCurrent_Blind1",
+      "type": "U8",
+      "access": "r"
+    },
+    {
+      "index": 27,
+      "name": "PositionSetPoint_Blind1",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 28,
+      "name": "PositionDifference_Blind1",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 29,
+      "name": "ReactionDelay_Blind1",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 30,
+      "name": "DurationOpen_Blind1",
+      "type": "U16",
+      "access": "rw"
+    },
+    {
+      "index": 31,
+      "name": "DurationClose_Blind1",
+      "type": "U16",
+      "access": "rw"
+    },
+    {
+      "index": 36,
+      "name": "PositionCurrent_Blind2",
+      "type": "U8",
+      "access": "r"
+    },
+    {
+      "index": 37,
+      "name": "PositionSetPoint_Blind2",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 38,
+      "name": "PositionDifference_Blind2",
+      "type": "U8",
+      "access": "r"
+    },
+    {
+      "index": 39,
+      "name": "ReactionDelay_Blind2",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 40,
+      "name": "DurationOpen_Blind2",
+      "type": "U16",
+      "access": "rw"
+    },
+    {
+      "index": 41,
+      "name": "DurationClose_Blind2",
+      "type": "U16",
+      "access": "rw"
+    },
+    {
+      "index": 46,
+      "name": "PositionCurrent_Blind3",
+      "type": "U8",
+      "access": "r"
+    },
+    {
+      "index": 47,
+      "name": "PositionSetPoint_Blind3",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 48,
+      "name": "PositionDifference_Blind3",
+      "type": "U8",
+      "access": "r"
+    },
+    {
+      "index": 49,
+      "name": "ReactionDelay_Blind3",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 50,
+      "name": "DurationOpen_Blind3",
+      "type": "U16",
+      "access": "rw"
+    },
+    {
+      "index": 51,
+      "name": "DurationClose_Blind3",
+      "type": "U16",
+      "access": "rw"
+    },
+    {
+      "index": 56,
+      "name": "PositionCurrent_Blind4",
+      "type": "U8",
+      "access": "r"
+    },
+    {
+      "index": 57,
+      "name": "PositionSetPoint_Blind4",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 58,
+      "name": "PositionDifference_Blind4",
+      "type": "U8",
+      "access": "r"
+    },
+    {
+      "index": 59,
+      "name": "ReactionDelay_Blind4",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 60,
+      "name": "DurationOpen_Blind4",
+      "type": "U16",
+      "access": "rw"
+    },
+    {
+      "index": 61,
+      "name": "DurationClose_Blind4",
+      "type": "U16",
+      "access": "rw"
+    },
+    {
+      "index": 66,
+      "name": "MasterExclusionFlags",
+      "type": "U8",
+      "format": "bin",
+      "access": "rw"
+    },
+    {
+      "index": 67,
+      "name": "BlindEventSunriseOffset",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 68,
+      "name": "BlindEventSunsetOffset",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 70,
+      "name": "BlindEvent0_WeekdayFlags",
+      "type": "U8",
+      "format": "bin",
+      "access": "rw"
+    },
+    {
+      "index": 71,
+      "name": "BlindEvent0_Hour",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 72,
+      "name": "BlindEvent0_Minute",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 73,
+      "name": "BlindEvent0_BlindFlags",
+      "type": "U8",
+      "format": "bin",
+      "access": "rw"
+    },
+    {
+      "index": 74,
+      "name": "BlindEvent0_PositionValue",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 75,
+      "name": "BlindEvent0_ExclusionFlags",
+      "type": "U8",
+      "format": "bin",
+      "access": "rw"
+    },
+    {
+      "index": 76,
+      "name": "BlindEvent1_WeekdayFlags",
+      "type": "U8",
+      "format": "bin",
+      "access": "rw"
+    },
+    {
+      "index": 77,
+      "name": "BlindEvent1_Hour",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 78,
+      "name": "BlindEvent1_Minute",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 79,
+      "name": "BlindEvent1_BlindFlags",
+      "type": "U8",
+      "format": "bin",
+      "access": "rw"
+    },
+    {
+      "index": 80,
+      "name": "BlindEvent1_PositionValue",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 81,
+      "name": "BlindEvent1_ExclusionFlags",
+      "type": "U8",
+      "format": "bin",
+      "access": "rw"
+    },
+    {
+      "index": 82,
+      "name": "BlindEvent2_WeekdayFlags",
+      "type": "U8",
+      "format": "bin",
+      "access": "rw"
+    },
+    {
+      "index": 83,
+      "name": "BlindEvent2_Hour",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 84,
+      "name": "BlindEvent2_Minute",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 85,
+      "name": "BlindEvent2_BlindFlags",
+      "type": "U8",
+      "format": "bin",
+      "access": "rw"
+    },
+    {
+      "index": 86,
+      "name": "BlindEvent2_PositionValue",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 87,
+      "name": "BlindEvent2_ExclusionFlags",
+      "type": "U8",
+      "format": "bin",
+      "access": "rw"
+    },
+    {
+      "index": 88,
+      "name": "BlindEvent3_WeekdayFlags",
+      "type": "U8",
+      "format": "bin",
+      "access": "rw"
+    },
+    {
+      "index": 89,
+      "name": "BlindEvent3_Hour",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 90,
+      "name": "BlindEvent3_Minute",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 91,
+      "name": "BlindEvent3_BlindFlags",
+      "type": "U8",
+      "format": "bin",
+      "access": "rw"
+    },
+    {
+      "index": 92,
+      "name": "BlindEvent3_PositionValue",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 93,
+      "name": "BlindEvent3_ExclusionFlags",
+      "type": "U8",
+      "format": "bin",
+      "access": "rw"
+    },
+    {
+      "index": 94,
+      "name": "BlindEvent4_WeekdayFlags",
+      "type": "U8",
+      "format": "bin",
+      "access": "rw"
+    },
+    {
+      "index": 95,
+      "name": "BlindEvent4_Hour",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 96,
+      "name": "BlindEvent4_Minute",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 97,
+      "name": "BlindEvent4_BlindFlags",
+      "type": "U8",
+      "format": "bin",
+      "access": "rw"
+    },
+    {
+      "index": 98,
+      "name": "BlindEvent4_PositionValue",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 99,
+      "name": "BlindEvent4_ExclusionFlags",
+      "type": "U8",
+      "format": "bin",
+      "access": "rw"
+    },
+    {
+      "index": 100,
+      "name": "BlindEvent5_WeekdayFlags",
+      "type": "U8",
+      "format": "bin",
+      "access": "rw"
+    },
+    {
+      "index": 101,
+      "name": "BlindEvent5_Hour",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 102,
+      "name": "BlindEvent5_Minute",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 103,
+      "name": "BlindEvent5_BlindFlags",
+      "type": "U8",
+      "format": "bin",
+      "access": "rw"
+    },
+    {
+      "index": 104,
+      "name": "BlindEvent5_PositionValue",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 105,
+      "name": "BlindEvent5_ExclusionFlags",
+      "type": "U8",
+      "format": "bin",
+      "access": "rw"
+    },
+    {
+      "index": 106,
+      "name": "BlindEvent6_WeekdayFlags",
+      "type": "U8",
+      "format": "bin",
+      "access": "rw"
+    },
+    {
+      "index": 107,
+      "name": "BlindEvent6_Hour",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 108,
+      "name": "BlindEvent6_Minute",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 109,
+      "name": "BlindEvent6_BlindFlags",
+      "type": "U8",
+      "format": "bin",
+      "access": "rw"
+    },
+    {
+      "index": 110,
+      "name": "BlindEvent6_PositionValue",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 111,
+      "name": "BlindEvent6_ExclusionFlags",
+      "type": "U8",
+      "format": "bin",
+      "access": "rw"
+    },
+    {
+      "index": 112,
+      "name": "BlindEvent7_WeekdayFlags",
+      "type": "U8",
+      "format": "bin",
+      "access": "rw"
+    },
+    {
+      "index": 113,
+      "name": "BlindEvent7_Hour",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 114,
+      "name": "BlindEvent7_Minute",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 115,
+      "name": "BlindEvent7_BlindFlags",
+      "type": "U8",
+      "format": "bin",
+      "access": "rw"
+    },
+    {
+      "index": 116,
+      "name": "BlindEvent7_PositionValue",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 117,
+      "name": "BlindEvent7_ExclusionFlags",
+      "type": "U8",
+      "format": "bin",
+      "access": "rw"
+    },
+    {
+      "index": 118,
+      "name": "BlindEvent8_WeekdayFlags",
+      "type": "U8",
+      "format": "bin",
+      "access": "rw"
+    },
+    {
+      "index": 119,
+      "name": "BlindEvent8_Hour",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 120,
+      "name": "BlindEvent8_Minute",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 121,
+      "name": "BlindEvent8_BlindFlags",
+      "type": "U8",
+      "format": "bin",
+      "access": "rw"
+    },
+    {
+      "index": 122,
+      "name": "BlindEvent8_PositionValue",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 123,
+      "name": "BlindEvent8_ExclusionFlags",
+      "type": "U8",
+      "format": "bin",
+      "access": "rw"
+    },
+    {
+      "index": 124,
+      "name": "BlindEvent9_WeekdayFlags",
+      "type": "U8",
+      "format": "bin",
+      "access": "rw"
+    },
+    {
+      "index": 125,
+      "name": "BlindEvent9_Hour",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 126,
+      "name": "BlindEvent9_Minute",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 127,
+      "name": "BlindEvent9_BlindFlags",
+      "type": "U8",
+      "format": "bin",
+      "access": "rw"
+    },
+    {
+      "index": 128,
+      "name": "BlindEvent9_PositionValue",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 129,
+      "name": "BlindEvent9_ExclusionFlags",
+      "type": "U8",
+      "format": "bin",
+      "access": "rw"
+    },
+    {
+      "index": 130,
+      "name": "BlindEvent10_WeekdayFlags",
+      "type": "U8",
+      "format": "bin",
+      "access": "rw"
+    },
+    {
+      "index": 131,
+      "name": "BlindEvent10_Hour",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 132,
+      "name": "BlindEvent10_Minute",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 133,
+      "name": "BlindEvent10_BlindFlags",
+      "type": "U8",
+      "format": "bin",
+      "access": "rw"
+    },
+    {
+      "index": 134,
+      "name": "BlindEvent10_PositionValue",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 135,
+      "name": "BlindEvent10_ExclusionFlags",
+      "type": "U8",
+      "format": "bin",
+      "access": "rw"
+    },
+    {
+      "index": 136,
+      "name": "BlindEvent11_WeekdayFlags",
+      "type": "U8",
+      "format": "bin",
+      "access": "rw"
+    },
+    {
+      "index": 137,
+      "name": "BlindEvent11_Hour",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 138,
+      "name": "BlindEvent11_Minute",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 139,
+      "name": "BlindEvent11_BlindFlags",
+      "type": "U8",
+      "format": "bin",
+      "access": "rw"
+    },
+    {
+      "index": 140,
+      "name": "BlindEvent11_PositionValue",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 141,
+      "name": "BlindEvent11_ExclusionFlags",
+      "type": "U8",
+      "format": "bin",
+      "access": "rw"
+    },
+    {
+      "index": 142,
+      "name": "BlindEvent12_WeekdayFlags",
+      "type": "U8",
+      "format": "bin",
+      "access": "rw"
+    },
+    {
+      "index": 143,
+      "name": "BlindEvent12_Hour",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 144,
+      "name": "BlindEvent12_Minute",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 145,
+      "name": "BlindEvent12_BlindFlags",
+      "type": "U8",
+      "format": "bin",
+      "access": "rw"
+    },
+    {
+      "index": 146,
+      "name": "BlindEvent12_PositionValue",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 147,
+      "name": "BlindEvent12_ExclusionFlags",
+      "type": "U8",
+      "format": "bin",
+      "access": "rw"
+    },
+    {
+      "index": 148,
+      "name": "BlindEvent13_WeekdayFlags",
+      "type": "U8",
+      "format": "bin",
+      "access": "rw"
+    },
+    {
+      "index": 149,
+      "name": "BlindEvent13_Hour",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 150,
+      "name": "BlindEvent13_Minute",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 151,
+      "name": "BlindEvent13_BlindFlags",
+      "type": "U8",
+      "format": "bin",
+      "access": "rw"
+    },
+    {
+      "index": 152,
+      "name": "BlindEvent13_PositionValue",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 153,
+      "name": "BlindEvent13_ExclusionFlags",
+      "type": "U8",
+      "format": "bin",
+      "access": "rw"
+    },
+    {
+      "index": 154,
+      "name": "BlindEvent14_WeekdayFlags",
+      "type": "U8",
+      "format": "bin",
+      "access": "rw"
+    },
+    {
+      "index": 155,
+      "name": "BlindEvent14_Hour",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 156,
+      "name": "BlindEvent14_Minute",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 157,
+      "name": "BlindEvent14_BlindFlags",
+      "type": "U8",
+      "format": "bin",
+      "access": "rw"
+    },
+    {
+      "index": 158,
+      "name": "BlindEvent14_PositionValue",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 159,
+      "name": "BlindEvent14_ExclusionFlags",
+      "type": "U8",
+      "format": "bin",
+      "access": "rw"
+    },
+    {
+      "index": 160,
+      "name": "BlindEvent15_WeekdayFlags",
+      "type": "U8",
+      "format": "bin",
+      "access": "rw"
+    },
+    {
+      "index": 161,
+      "name": "BlindEvent15_Hour",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 162,
+      "name": "BlindEvent15_Minute",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 163,
+      "name": "BlindEvent15_BlindFlags",
+      "type": "U8",
+      "format": "bin",
+      "access": "rw"
+    },
+    {
+      "index": 164,
+      "name": "BlindEvent15_PositionValue",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 165,
+      "name": "BlindEvent15_ExclusionFlags",
+      "type": "U8",
+      "format": "bin",
+      "access": "rw"
+    },
+    {
+      "index": 166,
+      "name": "Chn0_SwitchCurrent",
+      "type": "U8",
+      "access": "r"
+    },
+    {
+      "index": 167,
+      "name": "Chn0_SwitchSetPoint",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 168,
+      "name": "Chn0_ThresholdOff",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 169,
+      "name": "Chn0_ThresholdOn",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 171,
+      "name": "Chn1_SwitchCurrent",
+      "type": "U8",
+      "access": "r"
+    },
+    {
+      "index": 172,
+      "name": "Chn1_SwitchSetPoint",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 173,
+      "name": "Chn1_ThresholdOff",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 174,
+      "name": "Chn1_ThresholdOn",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 176,
+      "name": "Chn2_SwitchCurrent",
+      "type": "U8",
+      "access": "r"
+    },
+    {
+      "index": 177,
+      "name": "Chn2_SwitchSetPoint",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 178,
+      "name": "Chn2_ThresholdOff",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 179,
+      "name": "Chn2_ThresholdOn",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 181,
+      "name": "Chn3_SwitchCurrent",
+      "type": "U8",
+      "access": "r"
+    },
+    {
+      "index": 182,
+      "name": "Chn3_SwitchSetPoint",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 183,
+      "name": "Chn3_ThresholdOff",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 184,
+      "name": "Chn3_ThresholdOn",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 186,
+      "name": "Chn4_SwitchCurrent",
+      "type": "U8",
+      "access": "r"
+    },
+    {
+      "index": 187,
+      "name": "Chn4_SwitchSetPoint",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 188,
+      "name": "Chn4_ThresholdOff",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 189,
+      "name": "Chn4_ThresholdOn",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 191,
+      "name": "Chn5_SwitchCurrent",
+      "type": "U8",
+      "access": "r"
+    },
+    {
+      "index": 192,
+      "name": "Chn5_SwitchSetPoint",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 193,
+      "name": "Chn5_ThresholdOff",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 194,
+      "name": "Chn5_ThresholdOn",
+      "type": "U8",
+      "access": "rw"
+    },
+    {
+      "index": 223,
+      "name": "Year",
+      "type": "U16",
+      "access": "r"
+    },
+    {
+      "index": 224,
+      "name": "Month",
+      "type": "U8",
+      "access": "r"
+    },
+    {
+      "index": 225,
+      "name": "Day",
+      "type": "U8",
+      "access": "r"
+    },
+    {
+      "index": 226,
+      "name": "DOW",
+      "type": "U8",
+      "access": "r"
+    },
+    {
+      "index": 227,
+      "name": "Hour",
+      "type": "U8",
+      "access": "r"
+    },
+    {
+      "index": 228,
+      "name": "Minute",
+      "type": "U8",
+      "access": "r"
+    },
+    {
+      "index": 229,
+      "name": "Second",
+      "type": "U8",
+      "access": "r"
+    },
+    {
+      "index": 230,
+      "name": "DeviceSignature0",
+      "type": "U8",
+      "format": "hex",
+      "access": "r"
+    },
+    {
+      "index": 231,
+      "name": "DeviceSignature1",
+      "type": "U8",
+      "format": "hex",
+      "access": "r"
+    },
+    {
+      "index": 232,
+      "name": "DeviceSignature2",
+      "type": "U8",
+      "format": "hex",
+      "access": "r"
+    },
+    {
+      "index": 233,
+      "name": "DeviceSignature3",
+      "type": "U8",
+      "format": "hex",
+      "access": "r"
+    },
+    {
+      "index": 234,
+      "name": "BoardID",
+      "type": "U16",
+      "format": "hex",
+      "access": "r"
+    },
+    {
+      "index": 235,
+      "name": "BoardRev",
+      "type": "U8",
+      "access": "r"
+    },
+    {
+      "index": 236,
+      "name": "AppID",
+      "type": "U16",
+      "format": "hex",
+      "access": "r"
+    },
+    {
+      "index": 237,
+      "name": "AppVersionMajor",
+      "type": "U8",
+      "access": "r"
+    },
+    {
+      "index": 238,
+      "name": "AppVersionMinor",
+      "type": "U8",
+      "access": "r"
+    },
+    {
+      "index": 239,
+      "name": "AppVersionBugfix",
+      "type": "U8",
+      "access": "r"
+    },
+    {
+      "index": 240,
+      "name": "AppVersionHash",
+      "type": "U32",
+      "format": "hex",
+      "access": "r"
+    }
+    ]
+}

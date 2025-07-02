@@ -79,12 +79,12 @@ void app_init (void)
     blinds_initialize();
     digital_output_initialize();
     dt_initialize();
-
+    alarm_initialize();
     // load application parameters
     app_register_load();
 
     timer_start(&g_seconds_timer, TIMER_MS_2_TICKS(1000));
-    blind_event_evaluate_next_alarm(0);
+    blind_event_evaluate_next_alarm(0xFF);
 }
 
 /**
@@ -143,13 +143,17 @@ void app_background (sBus_t* bus)
  */
 void app_on_minute(void)
 {
-    int8_t alarm_idx = -1;
+    int8_t  alarm_idx = -1;
+    uint8_t last_data = 0xFF;
 
     while(alarm_check(&alarm_idx)) {
         if(0==alarm_idx) // blind event
-        {   uint8_t data;
+        {
+            uint8_t data;
             alarm_get_data(alarm_idx, &data);
+            if(last_data == data) return;
             blind_event_process_alarm(data);
+            last_data = data;
         }
     }
 }

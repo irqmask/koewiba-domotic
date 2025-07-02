@@ -48,6 +48,8 @@
 #define DATETIME_APPCONFIG  1
 #define DATETIME_APP_HAS_ON_MINUTE_FUNCTION 1
 
+#define TIMER_WAKEUP		1
+
 #define APP_eSLEEPMASK_MOTOR    (1<<0)  //!< Mask used for sleep_prevent() function.
                                         //!< Prevent the controller to fall asleep if motor is moving.
 // --- Type definitions --------------------------------------------------------
@@ -195,7 +197,7 @@ typedef enum appregisters {
     APP_eReg_BlindEvent11_Minute,          //!< Minute when this timer applies.
     APP_eReg_BlindEvent11_Blinds,          //!< Blinds involved in action. Bit0=Blind0, ..., Bit4=Blind4.
     APP_eReg_BlindEvent11_PositionValue,   //!< Target position of blind. 100 = completely closed. 0 = completely open.
-    APP_eReg_BlindEvent121_ExclusionFlags, //!< When one of these Flags in 'MasterExclusionFlag' is set, action won't be executed.
+    APP_eReg_BlindEvent11_ExclusionFlags, //!< When one of these Flags in 'MasterExclusionFlag' is set, action won't be executed.
     APP_eReg_BlindEvent12_Weekday,         //!< Flags on which weekday this timer applies. Index flags with day-of-week.
     APP_eReg_BlindEvent12_Hour,            //!< Hour when this timer applies.
     APP_eReg_BlindEvent12_Minute,          //!< Minute when this timer applies.
@@ -277,7 +279,7 @@ typedef enum appregisters {
 
 
 //! Number of blind events
-#define APP_NOF_BLINDEVENTS (1+APP_eReg_BlindEvent15_ExclusionFlags-APP_eReg_BlindEvent0_Weekday / APP_NUM_REGS_PER_BLINDEVENT)
+#define APP_NOF_BLINDEVENTS ((1+APP_eReg_BlindEvent15_ExclusionFlags-APP_eReg_BlindEvent0_Weekday) / APP_NUM_REGS_PER_BLINDEVENT)
 
 
 //! Application specific layout of non volatile parameters (internal EEProm)
@@ -401,7 +403,7 @@ typedef enum appconfig {
     APP_eCfg_BlindEvent11_Minute,          //!< Minute when this timer applies.
     APP_eCfg_BlindEvent11_Blinds,          //!< Blinds involved in action. Bit0=Blind0, ..., Bit4=Blind4.
     APP_eCfg_BlindEvent11_PositionValue,   //!< Target position of blind. 100 = completely closed. 0 = completely open.
-    APP_eCfg_BlindEvent121_ExclusionFlags, //!< When one of these Flags in 'MasterExclusionFlag' is set, action won't be executed.
+    APP_eCfg_BlindEvent11_ExclusionFlags, //!< When one of these Flags in 'MasterExclusionFlag' is set, action won't be executed.
     APP_eCfg_BlindEvent12_Weekday,         //!< Flags on which weekday this timer applies. Index flags with day-of-week.
     APP_eCfg_BlindEvent12_Hour,            //!< Hour when this timer applies.
     APP_eCfg_BlindEvent12_Minute,          //!< Minute when this timer applies.
@@ -453,9 +455,9 @@ typedef enum appconfig {
 //! Number of eeprom bytes per blind
 #define NUM_EEBYTES_PER_BLIND (APP_eCfg_B1_ReactionDelay - APP_eCfg_B0_ReactionDelay)
 //! Number of configuration registers per channel
-#define NUM_EEBYTES_PER_CHN (APP_eCfg_Chn0_Mode - APP_eCfg_Chn0_ThresholdOff + 1)
+#define NUM_EEBYTES_PER_CHN (APP_eCfg_Chn1_ThresholdOff - APP_eCfg_Chn0_ThresholdOff)
 //! Number of eeprom bytes per blind event
-#define NUM_EEBYTES_PER_BLINDEVENT (APP_eCfg_BlindEvent0_ExclusionFlags - APP_eCfg_BlindEvent0_Weekday)
+#define NUM_EEBYTES_PER_BLINDEVENT (APP_eCfg_BlindEvent1_Weekday - APP_eCfg_BlindEvent0_Weekday)
 
 // --- Local variables ---------------------------------------------------------
 

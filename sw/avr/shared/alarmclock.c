@@ -228,7 +228,7 @@ bool alarm_check(int8_t* index)
     uint8_t dow;
     
     for (ii=0; ii<ALARM_COUNT; ii++) {
-        if ((g_waketimes[ii].days_of_week_mask & ALARM_ACTIVE) == 0) continue;
+        //if ((g_waketimes[ii].days_of_week_mask & ALARM_ACTIVE) == 0) continue;
         dow = dt_get_day_of_week();
         if (((1<<dow) & g_waketimes[ii].days_of_week_mask) == 0) continue;
         if (g_waketimes[ii].hour == dt_get_hour() &&

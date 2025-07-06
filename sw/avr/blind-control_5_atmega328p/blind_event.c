@@ -65,6 +65,7 @@ extern bool app_register_get        (uint8_t                reg_no,
 
 /**
  * Get a 8bit content from register.
+ *
  * @param[in]   reg_no  The index of the register.
  * @param[out]  p_data  The data pointer the register content is written into.
  * @return      retval  The validity of the read value.
@@ -76,34 +77,39 @@ static bool get_data_8bit_data_from_register(uint8_t reg_no, uint8_t* p_data)
 }
 
 /**
- * Determines the next “time event” that occurs after the time specified in the arguments.
- * The event can also take place simultaneously. The argument “last_idx” must be specified
- * to prevent the same event from being found again.
+ * Determines the next “time event” that occurs after or simultaneous to the time
+ * specified in the arguments. If there is more than one event with the same time,
+ * the amount of events with the same time is count and the index of the last
+ * of them is returned at the first time. At the second time the counter is
+ * decreased and the second last index is returned.This continues until each
+ * simultaneous event has been returned once.
+ *
  * @param[in]   day       The day the search should start.
  * @param[in]   hour      The hour the search should start.
  * @param[in]   minute    The minute the search should start.
- * @param[in]   last_idx  The event index that was processed just before.
  * @param[out]  day       The day of the next event found in event list.
  * @param[out]  hour      The hour of the next event found in event list.
  * @param[out]  minute    The minute of the next event found in event list.
  * @param[out]  retval    The index of the next event.
  */
-static int8_t blind_event_get_next_alarm(uint8_t* day, uint8_t* hour, uint8_t* minute, uint8_t last_idx)
+static int8_t blind_event_get_next_alarm(uint8_t* day, uint8_t* hour, uint8_t* minute)
 {
     int8_t  retval = -1;
-    uint8_t be_idx, be_day;     //!< blind alarm index and day index
-    uint8_t evt_days;           //!< blind alarm weekday bitfield
-    uint8_t evt_hour;           //!< blind alarm hour
-    uint8_t evt_minute;         //!< blind alarm minute
-    uint16_t c_minutes;         //!< current amount of minutes since week begin.
-    uint16_t e_minutes;         //!< events amount of minutes from week begin.
-    uint16_t diff;              //!< difference between current day and the event day
-    uint16_t diff_min = 0xFFFF; //!< minimum difference of minutes
+    uint8_t be_idx, be_day;                 //!< blind alarm index and day index
+    uint8_t evt_days;                       //!< blind alarm weekday bitfield
+    uint8_t evt_hour;                       //!< blind alarm hour
+    uint8_t evt_minute;                     //!< blind alarm minute
+    uint16_t c_minutes;                     //!< current amount of minutes since week begin.
+    uint16_t e_minutes;                     //!< events amount of minutes from week begin.
+    uint16_t diff;                          //!< difference between current day and the event day
+    uint16_t diff_min = 0xFFFF;             //!< minimum difference of minutes
+    uint8_t equal_time_loop_cnt = 0;        //!< events with current time already found in this loop run
+    uint8_t	equal_evttime_cnt = 0;          //!< events with equal event time found in this loop run
+    static uint8_t	equal_nextevent_cnt = 0;//!< number of next events with the same event time
 
     c_minutes = (*day)*24 + (*hour)*60 + *minute;
     for(be_idx=0; be_idx<APP_NOF_BLINDEVENTS; be_idx++){
         uint8_t reg_offset = be_idx*APP_NUM_REGS_PER_BLINDEVENT;
-        if(last_idx == be_idx) continue;
         get_data_8bit_data_from_register(APP_eReg_BlindEvent0_Weekday+reg_offset, &evt_days);
         get_data_8bit_data_from_register(APP_eReg_BlindEvent0_Hour   +reg_offset, &evt_hour);
         get_data_8bit_data_from_register(APP_eReg_BlindEvent0_Minute +reg_offset, &evt_minute);
@@ -113,33 +119,61 @@ static int8_t blind_event_get_next_alarm(uint8_t* day, uint8_t* hour, uint8_t* m
             if( 0 == ((1<<be_day) & evt_days) ) continue;
             e_minutes = 24*be_day  + 60*evt_hour  + evt_minute;
             diff = (e_minutes<c_minutes)?(e_minutes+MINUTES_PER_WEEK-c_minutes):(e_minutes-c_minutes);
-            if(diff < diff_min)
+            if(0 < diff)
             {
-                diff_min = diff;
-                *day     = be_day; // 0=Sunday
-                *hour    = evt_hour;
-                *minute  = evt_minute;
-                retval = be_idx;
+                if(diff < diff_min)
+                {
+                    equal_evttime_cnt = 0;
+                    diff_min = diff;
+                    *day     = be_day; // 0=Sunday
+                    *hour    = evt_hour;
+                    *minute  = evt_minute;
+                    retval = be_idx;
+                }
+                else if(diff == diff_min)
+                {   // Event entry with the same time like the next event
+                    equal_evttime_cnt++;
+                    retval = be_idx;
+                }
+            }
+            else // diff = 0
+            { /* This is one of the event entries that should be processed by now but
+                 dependent on the event entries still pending it will be skipped. */
+                equal_time_loop_cnt++; // last entry of the same time is already processed
+                if(equal_time_loop_cnt == equal_nextevent_cnt)
+                {
+                    *day     = be_day; // 0=Sunday
+                    *hour    = evt_hour;
+                    *minute  = evt_minute;
+                    retval = be_idx;
+                    equal_nextevent_cnt--;
+                    equal_time_loop_cnt = 0;
+                    return retval;
+                }
             }
         }
+    }
+    if(0 == equal_nextevent_cnt)
+    { /*the number of next events happening at the same time must not be set
+        before all current events are processed.*/
+        equal_nextevent_cnt = equal_evttime_cnt;
     }
     return retval;
 }
 
 /**
- * Configures the next “time event” that will occur from now on in the alarm clock
- * and adds the event index as 'additional data'. The argument “last_idx” must be
- * specified to prevent the same event from being found again.
- * @param[in]   last_idx  The event index that was processed just before.
+ * Sets the next “time event” in the alarm clock and adds the blind event index
+ * as 'additional data'.
+ *
  * @return      retval    The index of the next event.
  */
-int8_t blind_event_evaluate_next_alarm(uint8_t last_idx)
+int8_t blind_event_evaluate_next_alarm(void)
 {
     uint8_t be_day      = dt_get_day_of_week(); // 0=Sunday ... Saturday=6
     uint8_t be_hour     = dt_get_hour();   //!< current hour
     uint8_t be_minute   = dt_get_minute(); //!< current minute
 
-    int8_t be_idx = blind_event_get_next_alarm(&be_day, &be_hour, &be_minute, last_idx);
+    int8_t be_idx = blind_event_get_next_alarm(&be_day, &be_hour, &be_minute);
     if(0 <= be_idx)
     {
         alarm_set(0, be_hour, be_minute, (1<<be_day));
@@ -155,6 +189,7 @@ int8_t blind_event_evaluate_next_alarm(uint8_t last_idx)
  * - reading the position value out of the event register.
  * - starting the movement of blinds that are configured in the event register.
  * - configuring the next blind event in the alarm clock.
+ *
  * @param[in]   event_idx  The event index that should be processed.
  */
 void blind_event_process_alarm(uint8_t event_idx)
@@ -165,7 +200,7 @@ void blind_event_process_alarm(uint8_t event_idx)
     uint8_t curr_exclflags = 0x00;
     uint8_t b_pos_val;
 
-    blind_event_evaluate_next_alarm(event_idx);
+    blind_event_evaluate_next_alarm();
 
     reg_offset = event_idx*APP_NUM_REGS_PER_BLINDEVENT;
 
@@ -182,6 +217,21 @@ void blind_event_process_alarm(uint8_t event_idx)
             blind_move_to_position(b_idx, b_pos_val);
         }
     }
+}
+
+uint8_t blind_event_get_next_alarm_hour(void)
+{
+    return alarm_get_hour(0);
+}
+uint8_t blind_event_get_next_alarm_minute(void)
+{
+    return alarm_get_minute(0);
+}
+uint8_t blind_event_get_next_alarm_data(void)
+{
+    uint8_t p_data;
+    alarm_get_data(0, &p_data);
+    return p_data;
 }
 
 void test_blind_event_set_alarm(uint8_t idx)

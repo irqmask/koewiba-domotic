@@ -123,9 +123,9 @@ typedef enum appregisters {
     APP_eReg_B4_Last = APP_eReg_B4_Unused1,
 
     APP_eReg_MasterExclusionFlags,         //!< Action is not executed when: Bit0=Public holiday, Bit1=..., Bit7=General.
-    APP_eReg_BlindEventSunriseOffset,      //!< Minutes that are added to the event time in the morning when offset is activated.
-    APP_eReg_BlindEventSunsetOffset,       //!< Minutes that are subtracted from the event time in the evening when offset is activated.
-    App_eReg_BlindEvent_Unused,
+    APP_eReg_BlindEvent_SunriseOffset,     //!< Minutes that are added to the event time in the morning when offset is activated.
+    APP_eReg_BlindEvent_SunsetOffset,      //!< Minutes that are subtracted from the event time in the evening when offset is activated.
+    App_eReg_BlindEvent_NextEventID,       //!< Index of the next BlindEvent that will occur.
     APP_eReg_BlindEvent0_Weekday,          //!< Flags on which weekday this timer applies. Index flags with day-of-week.
     APP_eReg_BlindEvent0_Hour,             //!< Hour when this timer applies.
     APP_eReg_BlindEvent0_Minute,           //!< Minute when this timer applies.
@@ -222,42 +222,44 @@ typedef enum appregisters {
     APP_eReg_BlindEvent15_Blinds,          //!< Blinds involved in action. Bit0=Blind0, ..., Bit4=Blind4.
     APP_eReg_BlindEvent15_PositionValue,   //!< Target position of blind. 100 = completely closed. 0 = completely open.
     APP_eReg_BlindEvent15_ExclusionFlags,  //!< When one of these Flags in 'MasterExclusionFlag' is set, action won't be executed.
+    App_eReg_BlindEvent_Last = APP_eReg_BlindEvent15_ExclusionFlags,
 
-    APP_eReg_Chn0_SwitchCurrent,     //!< Current switch state (0...255)
-    APP_eReg_Chn0_SwitchSetPoint,    //!< Target switch state (0...255)
-    APP_eReg_Chn0_ThresholdOff,      //!< If value goes below, channel switches off
-    APP_eReg_Chn0_ThresholdOn,       //!< If value goes above, channel switches on
-    APP_eReg_Chn0_Mode,              //!< not used yet
+    APP_eReg_Chn0_SwitchCurrent = 176,     //!< Current switch state (0...255)
+    APP_eReg_Chn0_SwitchSetPoint,          //!< Target switch state (0...255)
+    APP_eReg_Chn0_ThresholdOff,            //!< If value goes below, channel switches off
+    APP_eReg_Chn0_ThresholdOn,             //!< If value goes above, channel switches on
+    APP_eReg_Chn0_Mode,                    //!< not used yet
 
-    APP_eReg_Chn1_SwitchCurrent,     //!< Current switch state (0...255)
-    APP_eReg_Chn1_SwitchSetPoint,    //!< Target switch state (0...255)
-    APP_eReg_Chn1_ThresholdOff,      //!< If value goes below, channel switches off
-    APP_eReg_Chn1_ThresholdOn,       //!< If value goes above, channel switches on
-    APP_eReg_Chn1_Mode,              //!< not used yet
+    APP_eReg_Chn1_SwitchCurrent,           //!< Current switch state (0...255)
+    APP_eReg_Chn1_SwitchSetPoint,          //!< Target switch state (0...255)
+    APP_eReg_Chn1_ThresholdOff,            //!< If value goes below, channel switches off
+    APP_eReg_Chn1_ThresholdOn,             //!< If value goes above, channel switches on
+    APP_eReg_Chn1_Mode,                    //!< not used yet
 
-    APP_eReg_Chn2_SwitchCurrent,     //!< Current switch state (0...255)
-    APP_eReg_Chn2_SwitchSetPoint,    //!< Target switch state (0...255)
-    APP_eReg_Chn2_ThresholdOff,      //!< If value goes below, channel switches off
-    APP_eReg_Chn2_ThresholdOn,       //!< If value goes above, channel switches on
-    APP_eReg_Chn2_Mode,              //!< not used yet
+    APP_eReg_Chn2_SwitchCurrent,           //!< Current switch state (0...255)
+    APP_eReg_Chn2_SwitchSetPoint,          //!< Target switch state (0...255)
+    APP_eReg_Chn2_ThresholdOff,            //!< If value goes below, channel switches off
+    APP_eReg_Chn2_ThresholdOn,             //!< If value goes above, channel switches on
+    APP_eReg_Chn2_Mode,                    //!< not used yet
 
-    APP_eReg_Chn3_SwitchCurrent,     //!< Current switch state (0...255)
-    APP_eReg_Chn3_SwitchSetPoint,    //!< Target switch state (0...255)
-    APP_eReg_Chn3_ThresholdOff,      //!< If value goes below, channel switches off
-    APP_eReg_Chn3_ThresholdOn,       //!< If value goes above, channel switches on
-    APP_eReg_Chn3_Mode,              //!< not used yet
+    APP_eReg_Chn3_SwitchCurrent,           //!< Current switch state (0...255)
+    APP_eReg_Chn3_SwitchSetPoint,          //!< Target switch state (0...255)
+    APP_eReg_Chn3_ThresholdOff,            //!< If value goes below, channel switches off
+    APP_eReg_Chn3_ThresholdOn,             //!< If value goes above, channel switches on
+    APP_eReg_Chn3_Mode,                    //!< not used yet
 
-    APP_eReg_Chn4_SwitchCurrent,     //!< Current switch state (0...255)
-    APP_eReg_Chn4_SwitchSetPoint,    //!< Target switch state (0...255)
-    APP_eReg_Chn4_ThresholdOff,      //!< If value goes below, channel switches off
-    APP_eReg_Chn4_ThresholdOn,       //!< If value goes above, channel switches on
-    APP_eReg_Chn4_Mode,              //!< not used yet
+    APP_eReg_Chn4_SwitchCurrent,           //!< Current switch state (0...255)
+    APP_eReg_Chn4_SwitchSetPoint,          //!< Target switch state (0...255)
+    APP_eReg_Chn4_ThresholdOff,            //!< If value goes below, channel switches off
+    APP_eReg_Chn4_ThresholdOn,             //!< If value goes above, channel switches on
+    APP_eReg_Chn4_Mode,                    //!< not used yet
 
-    APP_eReg_Chn5_SwitchCurrent,     //!< Current switch state (0...255)
-    APP_eReg_Chn5_SwitchSetPoint,    //!< Target switch state (0...255)
-    APP_eReg_Chn5_ThresholdOff,      //!< If value goes below, channel switches off
-    APP_eReg_Chn5_ThresholdOn,       //!< If value goes above, channel switches on
-    APP_eReg_Chn5_Mode,              //!< not used yet
+    APP_eReg_Chn5_SwitchCurrent,           //!< Current switch state (0...255)
+    APP_eReg_Chn5_SwitchSetPoint,          //!< Target switch state (0...255)
+    APP_eReg_Chn5_ThresholdOff,            //!< If value goes below, channel switches off
+    APP_eReg_Chn5_ThresholdOn,             //!< If value goes above, channel switches on
+    APP_eReg_Chn5_Mode,                    //!< not used yet
+    APP_eReg_Chn_Last = APP_eReg_Chn5_Mode,
 
     APP_eReg_Year = 223,        //!< Current year.
     APP_eReg_Month,             //!< Current month.
@@ -279,7 +281,7 @@ typedef enum appregisters {
 
 
 //! Number of blind events
-#define APP_NOF_BLINDEVENTS ((1+APP_eReg_BlindEvent15_ExclusionFlags-APP_eReg_BlindEvent0_Weekday) / APP_NUM_REGS_PER_BLINDEVENT)
+#define APP_NOF_BLINDEVENTS ((1+App_eReg_BlindEvent_Last-APP_eReg_BlindEvent0_Weekday) / APP_NUM_REGS_PER_BLINDEVENT)
 
 
 //! Application specific layout of non volatile parameters (internal EEProm)

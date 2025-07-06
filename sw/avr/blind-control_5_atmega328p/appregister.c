@@ -133,7 +133,7 @@ bool        app_register_get        (uint8_t                reg_no,
         }
         return true;
     } else if (reg_no >= APP_eReg_MasterExclusionFlags &&
-               reg_no < (APP_eReg_BlindEvent15_ExclusionFlags + 1)) {
+               reg_no < (App_eReg_BlindEvent_Last + 1)) {
         // calculate index of blind and normalize register number for BlindEvent blocks.
         if(APP_eReg_BlindEvent0_Weekday <= reg_no)
         {
@@ -142,15 +142,18 @@ bool        app_register_get        (uint8_t                reg_no,
         }
 
         switch (reg_no) {
+        case App_eReg_BlindEvent_NextEventID:
+            *(uint8_t*)pvalue = blind_event_get_next_alarm_data();
+            break;
         case APP_eReg_MasterExclusionFlags:
             eepindex = APP_eCfg_MasterExclusionFlags;
             *(uint8_t*)pvalue = eeprom_read_byte(&register_eeprom_array[eepindex]);
             break;
-        case APP_eReg_BlindEventSunriseOffset:
+        case APP_eReg_BlindEvent_SunriseOffset:
             eepindex = APP_eCfg_BlindEventSunriseOffset;
             *(uint8_t*)pvalue = eeprom_read_byte(&register_eeprom_array[eepindex]);
             break;
-        case APP_eReg_BlindEventSunsetOffset:
+        case APP_eReg_BlindEvent_SunsetOffset:
             eepindex = APP_eCfg_BlindEventSunsetOffset;
             *(uint8_t*)pvalue = eeprom_read_byte(&register_eeprom_array[eepindex]);
             break;
@@ -206,12 +209,10 @@ bool        app_register_get        (uint8_t                reg_no,
         case APP_eReg_Chn0_ThresholdOn:
             eepindex = APP_eCfg_Chn0_ThresholdOn + index * NUM_EEBYTES_PER_CHN;
             *(uint8_t*)pvalue = eeprom_read_byte((uint8_t*)&register_eeprom_array[eepindex]);
-            *preg_type = eRegType_U16;
             break;
         case APP_eReg_Chn0_Mode:
             eepindex = APP_eCfg_Chn0_Mode + index * NUM_EEBYTES_PER_CHN;
             *(uint8_t*)pvalue = eeprom_read_byte((uint8_t*)&register_eeprom_array[eepindex]);
-            *preg_type = eRegType_U16;
             break;
         default:
             return false;
@@ -305,7 +306,7 @@ void        app_register_set        (uint8_t                reg_no,
             break;
         }
     } else if (reg_no >= APP_eReg_MasterExclusionFlags &&
-               reg_no < (APP_eReg_BlindEvent15_ExclusionFlags + 1)) {
+               reg_no < (App_eReg_BlindEvent_Last + 1)) {
         // calculate index of blind event and normalize register number
         if(APP_eReg_BlindEvent0_Weekday <= reg_no){
             index = (reg_no - APP_eReg_BlindEvent0_Weekday) / APP_NUM_REGS_PER_BLINDEVENT;
@@ -319,11 +320,11 @@ void        app_register_set        (uint8_t                reg_no,
             eepindex = APP_eCfg_MasterExclusionFlags;
             eeprom_write_byte(&register_eeprom_array[eepindex], value8);
             break;
-        case APP_eReg_BlindEventSunriseOffset:
+        case APP_eReg_BlindEvent_SunriseOffset:
             eepindex = APP_eCfg_BlindEventSunriseOffset;
             eeprom_write_byte(&register_eeprom_array[eepindex], value8);
             break;
-        case APP_eReg_BlindEventSunsetOffset:
+        case APP_eReg_BlindEvent_SunsetOffset:
             eepindex = APP_eCfg_BlindEventSunsetOffset;
             eeprom_write_byte(&register_eeprom_array[eepindex], value8);
             break;
@@ -354,7 +355,7 @@ void        app_register_set        (uint8_t                reg_no,
         default:
             break;
         }
-        blind_event_evaluate_next_alarm(0xFF);
+        blind_event_evaluate_next_alarm();
     } else if (reg_no >= APP_eReg_Chn0_SwitchCurrent &&
                reg_no < (APP_eReg_Chn0_SwitchCurrent + OUTPUT_COUNT*APP_NUM_REGS_PER_CHN)) {
         // calculate index of blind and normalize register number
@@ -412,19 +413,19 @@ void        app_register_set        (uint8_t                reg_no,
         case APP_eReg_DayOfWeek:
             value8 = value & 0x000000FF;
             dt_set_day_of_week(value8);
-            blind_event_evaluate_next_alarm(0xFF);
+            blind_event_evaluate_next_alarm();
             break;
 
         case APP_eReg_Hour:
             value8 = value & 0x000000FF;
             dt_set_hour(value8);
-            blind_event_evaluate_next_alarm(0xFF);
+            blind_event_evaluate_next_alarm();
             break;
 
         case APP_eReg_Minute:
             value8 = value & 0x000000FF;
             dt_set_minute(value8);
-            blind_event_evaluate_next_alarm(0xFF);
+            blind_event_evaluate_next_alarm();
             break;
 
         case APP_eReg_Second:

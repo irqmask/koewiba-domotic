@@ -29,10 +29,13 @@
 #ifndef BLIND_EVENT_H_
 #define BLIND_EVENT_H_
 
-int8_t blind_event_evaluate_next_alarm(uint8_t last_idx);
+int8_t blind_event_evaluate_next_alarm(void);
 
 void blind_event_process_alarm(uint8_t event_idx);
 
+uint8_t blind_event_get_next_alarm_minute(void);
+uint8_t blind_event_get_next_alarm_hour(void);
+uint8_t blind_event_get_next_alarm_data(void);
 
 void test_blind_event_set_alarm(uint8_t idx);
 

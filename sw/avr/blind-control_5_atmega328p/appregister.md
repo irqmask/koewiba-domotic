@@ -72,9 +72,9 @@ last updated: 2025-06-28
 | 064 | 0x40 | unused                       |                                                                                          |        |     |
 | 065 | 0x41 | unused                       |                                                                                          |        |     |
 | 066 | 0x42 | MasterExclusionFlags         | Action is not executed when: Bit0=Public holiday, Bit1=..., Bit7=General                 | uint8  | p   |
-| 067 | 0x43 | BlindEventSunriseOffset      | Minutes that are added to the event time in the morning when offset is activated         | uint8  | v   |
-| 068 | 0x44 | BlindEventSunsetOffset       | Minutes that are subtracted from the event time in the evening when offset is activated. | uint8  | v   |
-| 069 | 0x45 | unused                       |                                                                                          |        |     |
+| 067 | 0x43 | BlindEvent_SunriseOffset     | Minutes that are added to the event time in the morning when offset is activated         | uint8  | v   |
+| 068 | 0x44 | BlindEvent_SunsetOffset      | Minutes that are subtracted from the event time in the evening when offset is activated. | uint8  | v   |
+| 069 | 0x45 | BlindEvent_NextEventID       | Index of the next BlindEvent that will occur.                                            | uint8  | vro |
 | 070 | 0x46 | BlindEvent0_Weekday          | Flags on which weekday this timer applies. Index flags with day-of-week                  | uint8  | p   |
 | 071 | 0x47 | BlindEvent0_Hour             | Hour when this timer applies.                                                            | uint8  | p   |
 | 072 | 0x48 | BlindEvent0_Minute           | Minute when this timer applies.                                                          | uint8  | p   |
@@ -171,46 +171,46 @@ last updated: 2025-06-28
 | 163 | 0xA3 | BlindEvent15_Blinds          | Blinds involved in action. Bit0=Blind0, ..., Bit4=Blind4                                 | uint8  | p   |
 | 164 | 0xA4 | BlindEvent15_PositionValue   | Target position of blind. 100 = completely closed. 0 = completely open                   | uint8  | p   |
 | 165 | 0xA5 | BlindEvent15_ExclusionFlags  | When one of these Flags in 'MasterExclusionFlag' is set, action won't be executed        | uint8  | p   |
-| 166 | 0xA6 | Chn0SwitchCurrent            | Output current value 0...255                                                             | uint8  | vro |
-| 167 | 0xA7 | Chn0SwitchSetPoint           | Output target value 0...255                                                              | uint8  | v   |
-| 168 | 0xA8 | Chn0ThresholdOff             | If value goes below, channel switches off                                                | uint8  | p   |
-| 169 | 0xA9 | Chn0ThresholdOn              | If value goes above, channel switches on                                                 | uint8  | p   |
-| 170 | 0xAA | Chn0Mode                     | Not used yet.                                                                            | uint8  | p   |
-| 171 | 0xAB | Chn1SwitchCurrent            | Output current value 0...255                                                             | uint8  | vro |
-| 172 | 0xAC | Chn1SwitchSetPoint           | Output target value 0...255                                                              | uint8  | v   |
-| 173 | 0xAD | Chn1ThresholdOff             | If value goes below, channel switches off                                                | uint8  | p   |
-| 174 | 0xAE | Chn1ThresholdOn              | If value goes above, channel switches on                                                 | uint8  | p   |
-| 175 | 0xAF | Chn1Mode                     | Not used yet.                                                                            | uint8  | p   |
-| 176 | 0xB0 | Chn2SwitchCurrent            | Output current value 0...255                                                             | uint8  | vro |
-| 177 | 0xB1 | Chn2SwitchSetPoint           | Output target value 0...255                                                              | uint8  | v   |
-| 178 | 0xB2 | Chn2ThresholdOff             | If value goes below, channel switches off                                                | uint8  | p   |
-| 179 | 0xB3 | Chn2ThresholdOn              | If value goes above, channel switches on                                                 | uint8  | p   |
-| 180 | 0xB4 | Chn2Mode                     | Not used yet.                                                                            | uint8  | p   |
-| 181 | 0xB5 | Chn3SwitchCurrent            | Output current value 0...255                                                             | uint8  | vro |
-| 182 | 0xB6 | Chn3SwitchSetPoint           | Output target value 0...255                                                              | uint8  | v   |
-| 183 | 0xB7 | Chn3ThresholdOff             | If value goes below, channel switches off                                                | uint8  | p   |
-| 184 | 0xB8 | Chn3ThresholdOn              | If value goes above, channel switches on                                                 | uint8  | p   |
-| 185 | 0xB9 | Chn3Mode                     | Not used yet.                                                                            | uint8  | p   |
-| 186 | 0xBA | Chn4SwitchCurrent            | Output current value 0...255                                                             | uint8  | vro |
-| 187 | 0xBB | Chn4SwitchSetPoint           | Output target value 0...255                                                              | uint8  | v   |
-| 188 | 0xBC | Chn4ThresholdOff             | If value goes below, channel switches off                                                | uint8  | p   |
-| 189 | 0xBD | Chn4ThresholdOn              | If value goes above, channel switches on                                                 | uint8  | p   |
-| 190 | 0xBE | Chn4Mode                     | Not used yet.                                                                            | uint8  | p   |
-| 191 | 0xBF | Chn5SwitchCurrent            | Output current value 0...255                                                             | uint8  | vro |
-| 192 | 0xC0 | Chn5SwitchSetPoint           | Output target value 0...255                                                              | uint8  | v   |
-| 193 | 0xC1 | Chn5ThresholdOff             | If value goes below, channel switches off                                                | uint8  | p   |
-| 194 | 0xC2 | Chn5ThresholdOn              | If value goes above, channel switches on                                                 | uint8  | p   |
-| 195 | 0xC3 | Chn5Mode                     | Not used yet.                                                                            | uint8  | p   |
-| 196 | 0xC4 |
-| 197 | 0xC5 |
-| 198 | 0xC6 |
-| 199 | 0xC7 |
-| 200 | 0xC8 |
-| 201 | 0xC9 |
-| 202 | 0xCA |
-| 203 | 0xCB |
-| 204 | 0xCC |
-| 205 | 0xCD |
+| 166 | 0xA6 |
+| 167 | 0xA7 |
+| 168 | 0xA8 |
+| 169 | 0xA9 |
+| 170 | 0xAA |
+| 171 | 0xAB |
+| 172 | 0xAC |
+| 173 | 0xAD |
+| 174 | 0xAE |
+| 175 | 0xAF |
+| 176 | 0xB0 | Chn0SwitchCurrent            | Output current value 0...255                                                             | uint8  | vro |
+| 177 | 0xB1 | Chn0SwitchSetPoint           | Output target value 0...255                                                              | uint8  | v   |
+| 178 | 0xB2 | Chn0ThresholdOff             | If value goes below, channel switches off                                                | uint8  | p   |
+| 179 | 0xB3 | Chn0ThresholdOn              | If value goes above, channel switches on                                                 | uint8  | p   |
+| 180 | 0xB4 | Chn0Mode                     | Not used yet.                                                                            | uint8  | p   |
+| 181 | 0xB5 | Chn1SwitchCurrent            | Output current value 0...255                                                             | uint8  | vro |
+| 182 | 0xB6 | Chn1SwitchSetPoint           | Output target value 0...255                                                              | uint8  | v   |
+| 183 | 0xB7 | Chn1ThresholdOff             | If value goes below, channel switches off                                                | uint8  | p   |
+| 184 | 0xB8 | Chn1ThresholdOn              | If value goes above, channel switches on                                                 | uint8  | p   |
+| 185 | 0xB9 | Chn1Mode                     | Not used yet.                                                                            | uint8  | p   |
+| 186 | 0xBA | Chn2SwitchCurrent            | Output current value 0...255                                                             | uint8  | vro |
+| 187 | 0xBB | Chn2SwitchSetPoint           | Output target value 0...255                                                              | uint8  | v   |
+| 188 | 0xBC | Chn2ThresholdOff             | If value goes below, channel switches off                                                | uint8  | p   |
+| 189 | 0xBD | Chn2ThresholdOn              | If value goes above, channel switches on                                                 | uint8  | p   |
+| 190 | 0xBE | Chn2Mode                     | Not used yet.                                                                            | uint8  | p   |
+| 191 | 0xBF | Chn3SwitchCurrent            | Output current value 0...255                                                             | uint8  | vro |
+| 192 | 0xC0 | Chn3SwitchSetPoint           | Output target value 0...255                                                              | uint8  | v   |
+| 193 | 0xC1 | Chn3ThresholdOff             | If value goes below, channel switches off                                                | uint8  | p   |
+| 194 | 0xC2 | Chn3ThresholdOn              | If value goes above, channel switches on                                                 | uint8  | p   |
+| 195 | 0xC3 | Chn3Mode                     | Not used yet.                                                                            | uint8  | p   |
+| 196 | 0xC4 | Chn4SwitchCurrent            | Output current value 0...255                                                             | uint8  | vro |
+| 197 | 0xC5 | Chn4SwitchSetPoint           | Output target value 0...255                                                              | uint8  | v   |
+| 198 | 0xC6 | Chn4ThresholdOff             | If value goes below, channel switches off                                                | uint8  | p   |
+| 199 | 0xC7 | Chn4ThresholdOn              | If value goes above, channel switches on                                                 | uint8  | p   |
+| 200 | 0xC8 | Chn4Mode                     | Not used yet.                                                                            | uint8  | p   |
+| 201 | 0xC9 | Chn5SwitchCurrent            | Output current value 0...255                                                             | uint8  | vro |
+| 202 | 0xCA | Chn5SwitchSetPoint           | Output target value 0...255                                                              | uint8  | v   |
+| 203 | 0xCB | Chn5ThresholdOff             | If value goes below, channel switches off                                                | uint8  | p   |
+| 204 | 0xCC | Chn5ThresholdOn              | If value goes above, channel switches on                                                 | uint8  | p   |
+| 205 | 0xCD | Chn5Mode                     | Not used yet.                                                                            | uint8  | p   |
 | 206 | 0xCE |
 | 207 | 0xCF |
 | 208 | 0xD0 |

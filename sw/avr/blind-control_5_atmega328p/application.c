@@ -84,7 +84,7 @@ void app_init (void)
     app_register_load();
 
     timer_start(&g_seconds_timer, TIMER_MS_2_TICKS(1000));
-    blind_event_evaluate_next_alarm(0xFF);
+    blind_event_evaluate_next_alarm();
 }
 
 /**

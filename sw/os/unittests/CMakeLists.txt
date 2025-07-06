@@ -1,7 +1,19 @@
 # unittests
-cmake_minimum_required (VERSION 3.0)
+cmake_minimum_required (VERSION 3.16)
 
 cmake_policy(SET CMP0015 NEW)
+include(FetchContent)
+
+## thirdparty projects ########################################################
+
+#### googletest ###############################################################
+FetchContent_Declare(googletest GIT_REPOSITORY https://github.com/google/googletest.git GIT_TAG release-1.12.1)
+FetchContent_MakeAvailable(googletest)
+
+#### nlohmann-json ############################################################
+FetchContent_Declare(json URL https://github.com/nlohmann/json/releases/download/v3.12.0/json.tar.xz)
+FetchContent_MakeAvailable(json)
+
 
 include_directories (
     ../../include
@@ -10,13 +22,13 @@ include_directories (
     ../libkwb
     ../libsystem
     ../shared
-    ${googletest_INCLUDE_DIR}
     ${CMAKE_CURRENT_BINARY_DIR}
 )
 
 # system dependent include directories
 # ---------------------------------------------------------
 if (WIN32)
+
 else (WIN32)
     include_directories (
         ../3rd_party/libsafec/include
@@ -24,7 +36,6 @@ else (WIN32)
 endif (WIN32)
 
 link_directories (
-    ${googletest_LIBRARY_DIR}
     ${CMAKE_CURRENT_BINARY_DIR}
 )
 
@@ -87,6 +98,9 @@ source_group(os\\shared FILES ${os_shared_SRCS})
 
 # executable
 # ---------------------------------------------------------
+
+enable_testing()
+
 if (WIN32)
     add_executable ( unittests ${include_SRCS} ${shared_SRCS} ${os_include_SRCS} ${os_shared_SRCS} ${unittests_SRCS} )
     # install ( TARGETS unittests RUNTIME DESTINATION . )
@@ -101,7 +115,8 @@ set_property(TARGET unittests PROPERTY CXX_STANDARD 11)
 # ---------------------------------------------------------
 target_link_libraries (unittests libkwb)
 target_link_libraries (unittests libsystem)
-target_link_libraries (unittests gtest)
+target_link_libraries (unittests GTest::gtest)
+target_link_libraries (unittests nlohmann_json::nlohmann_json)
 
 if (WIN32)
 else (WIN32)
@@ -111,3 +126,5 @@ endif (WIN32)
 
 add_dependencies (unittests libsystem)
 
+include(GoogleTest)
+gtest_discover_tests(unittests)

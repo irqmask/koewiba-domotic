@@ -31,11 +31,6 @@
 
 #include "gtest/gtest.h"
 
-#include "prjconf.h"
-
-// include
-#include "prjtypes.h"
-
 // libkwb
 #include "connection_socket.h"
 #include "log.h"
@@ -114,12 +109,16 @@ protected:
 //----------------------------------------------------------------------------
 void ConnectionSocketTest::incomingCallback(const msg_t &message, void *reference)
 {
+    (void)message;
+    (void)reference;
     ConnectionSocketTest::incomingCallbackCalled++;
 }
 
 //----------------------------------------------------------------------------
 void ConnectionSocketTest::closeCallback(const std::string &uri, void *reference)
 {
+    (void)uri;
+    (void)reference;
     ConnectionSocketTest::closeCallbackCalled++;
 }
 
@@ -182,7 +181,11 @@ void ConnectionSocketTest::serverThread(ConnectionSocketTest *reference)
                 temp = message.receiver;
                 message.receiver = message.sender;
                 message.sender = temp;
-                sys_socket_send(pfd.fd, &message, sizeof(message));
+                ssize_t written = sys_socket_send(pfd.fd, &message, sizeof(message));
+                if (written != sizeof(message))
+                {
+                    log_error("message not (completely) written %zd", written);
+                }
             }
         }
     }
@@ -199,7 +202,7 @@ void ConnectionSocketTest::serverThread(ConnectionSocketTest *reference)
 //----------------------------------------------------------------------------
 void ConnectionSocketTest::clientThread(ConnectionSocketTest *reference)
 {
-
+    (void)reference;
 }
 
 /// @test Test splitting an URI string into IPv4 address and port number.

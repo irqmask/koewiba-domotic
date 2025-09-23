@@ -537,7 +537,7 @@ FirmwareUpdate::FirmwareUpdate()
 FirmwareUpdate::FirmwareUpdate(std::shared_ptr<Connection> connection)
     : FirmwareUpdate()
 {
-    this->connection = connection;
+    this->connection = std::move(connection);
 
     using std::placeholders::_1;
     using std::placeholders::_2;

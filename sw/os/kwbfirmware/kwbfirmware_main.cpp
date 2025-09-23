@@ -315,7 +315,7 @@ int main(int argc, char *argv[])
             break;
         }
 
-        FirmwareUpdate fwu(conn);
+        FirmwareUpdate fwu(std::move(conn));
 
         fwu.registerProgressFunc(print_progress, NULL);
 

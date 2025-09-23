@@ -45,6 +45,8 @@
     #include <winsock.h>
 #endif
 
+#include <string.h>
+
 #include "syssocket.h"
 
 // --- Definitions -------------------------------------------------------------

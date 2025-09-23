@@ -12,8 +12,8 @@ Exception::Exception(const char *file, uint32_t line, const char *function)
     , line(line)
     , function(function)
 {
-    memset(message, sizeof(message), 0);
-    memset(full_message, sizeof(full_message), 0);
+    memset(message, 0, sizeof(message));
+    memset(full_message, 0, sizeof(full_message));
 }
 
 //----------------------------------------------------------------------------

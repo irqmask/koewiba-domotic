@@ -107,7 +107,7 @@ void ModuleFile::fromJson(const nlohmann::json &json)
     catch(Exception &e) {
         throw OperationFailed(LOC, "modules json object parsing error %s", e.what());
     }
-    this->modules = modules;
+    this->modules = std::move(modules);
 }
 
 /** @} */

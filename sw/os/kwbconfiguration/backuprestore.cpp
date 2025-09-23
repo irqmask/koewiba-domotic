@@ -42,13 +42,13 @@ void BackupRestore::backup(uint16_t moduleId, const std::string & regValueFile, 
             read_success = false;
         }
         r.value = val;
-        log_msg(LOG_INFO, "Read register index %d -> value %d", r.index, r.value);
+        log_msg(LOG_INFO, "Read register index %d -> value %ld", r.index, r.value);
     }
 
     // save values to json
     for (auto &r : regs) {
         json jr = r.toJson();
-        log_msg(LOG_INFO, "Save register to file: index %d value %d", r.index, r.value);
+        log_msg(LOG_INFO, "Save register to file: index %d value %ld", r.index, r.value);
         jregs.emplace_back(jr);
     }
 
@@ -76,8 +76,8 @@ void BackupRestore::restore(uint16_t moduleId,
 
     std::vector<ModuleRegisterJson> regs = loadValueFile(regValueFile, moduleIdFile);
     if (moduleId != moduleIdFile) {
-        log_msg(LOG_ERROR, "Mismatch of moduleId. Module id in file 0x%04X is not equal to selected module id 0x%04X");
-        throw OperationFailed(LOC, "Mismatch of moduleId. Module id in file 0x%04X is not equal to selected module id 0x%04X");
+        log_msg(LOG_ERROR, "Mismatch of moduleId. Module id in file 0x%04X is not equal to selected module id 0x%04X", moduleId, moduleIdFile);
+        throw OperationFailed(LOC, "Mismatch of moduleId. Module id in file 0x%04X is not equal to selected module id 0x%04X", moduleId, moduleIdFile);
     }
 
     // read register values from module
@@ -87,7 +87,7 @@ void BackupRestore::restore(uint16_t moduleId,
             continue;
         }
         if (!app.writeRegister(r.index, r.value)) {
-            log_msg(LOG_ERROR, "Unable to write register %d, value %d", r.index, r.value);
+            log_msg(LOG_ERROR, "Unable to write register %d, value %ld", r.index, r.value);
             write_success = false;
             continue;
         }
@@ -98,7 +98,7 @@ void BackupRestore::restore(uint16_t moduleId,
             continue;
         }
         if (read_value != r.value) {
-            log_msg(LOG_ERROR, "register %d value mismatch. written %d, read %d", r.index, r.value, read_value);
+            log_msg(LOG_ERROR, "register %d value mismatch. written %ld, read %d", r.index, r.value, read_value);
             write_success = false;
             continue;
         }

@@ -305,7 +305,8 @@ sys_fd_t sys_socket_accept(sys_fd_t server_fd, char *address, size_t address_len
     socklen_t   sockinfolen = sizeof(sockinfo_t);
 
     fd = accept(server_fd, (struct sockaddr *)&sockinfo, &sockinfolen);
-    sys_socket_get_address(fd, &sockinfo, address, address_len, port);
+    if (fd >= 0)
+        sys_socket_get_address(fd, &sockinfo, address, address_len, port);
     return fd;
 #elif defined (PRJCONF_WINDOWS)
     //TODO implement windows version

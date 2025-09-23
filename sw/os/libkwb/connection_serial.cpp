@@ -48,6 +48,7 @@
 // type of connections.
 static void incomingMessageHdl(const msg_t &message, void *reference, void *arg)
 {
+    (void)reference;
     ConnectionSerial *sercon = (ConnectionSerial *)arg;
     sercon->onIncomingMessage(message);
 }
@@ -55,6 +56,8 @@ static void incomingMessageHdl(const msg_t &message, void *reference, void *arg)
 // will be called from when a connection is closed.
 static void closeConnectionHdl(const std::string &uri, void *reference, void *arg)
 {
+    (void)uri;
+    (void)reference;
     ConnectionSerial *sercon = (ConnectionSerial *)arg;
     sercon->onConnectionClosed();
 }
@@ -62,10 +65,19 @@ static void closeConnectionHdl(const std::string &uri, void *reference, void *ar
 // --- Class member functions --------------------------------------------------
 
 //----------------------------------------------------------------------------
-ConnectionSerial::ConnectionSerial(ioloop_t *io, std::string uri, bool configure)
+ConnectionSerial::ConnectionSerial(ioloop_t *io, const std::string &uri, bool configure)
     : Connection(io, uri)
     , baudrate(57600)
+    , fd(-1)
+    , incomingState(eSER_RECV_STATE_IDLE)
+    , incomingNumReceived(0)
+    , outgoingLength(0)
+    , outgoingWritten(0)
 {
+    memset(incomingBuffer, 0, sizeof(incomingBuffer));
+    memset(outgoingBuffer, 0, sizeof(outgoingBuffer));
+    memset(&incomingMessage, 0, sizeof(incomingMessage));
+
     open(configure);
 }
 
@@ -147,14 +159,16 @@ void ConnectionSerial::send(const msg_t &message)
         }
         else {
             log_msg(LOG_VERBOSE2, "SERIAL S RAW %s", outgoingBuffer);
-            outgoingWritten = sys_serial_send(fd,
+            ssize_t written = sys_serial_send(fd,
                                               (void *)outgoingBuffer,
                                               outgoingLength);
-            if (outgoingWritten < 0) {
+            if (written < 0) {
                 log_sys_error("SERIAL Send failed!");
                 rc = eERR_SYSTEM;
+                break;
             }
-            else if (outgoingWritten < outgoingLength) {
+            outgoingWritten = written;
+            if (outgoingWritten < outgoingLength) {
                 log_warning("SERIAL Not all bytes written");
                 rc = eRUNNING;
             }
@@ -171,7 +185,7 @@ void ConnectionSerial::receive()
 {
     char c;
     size_t received_bytes;
-    bool complete;
+    bool complete = false;
 
     do {
         // reveive message

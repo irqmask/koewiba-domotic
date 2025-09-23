@@ -91,6 +91,7 @@ void UIMain::onMenuChoice()
     case 'x': {
         leave_menu = true;
         g_end_application = true;
+        break;
     }
     default:
         UIConsole::onMenuChoice();

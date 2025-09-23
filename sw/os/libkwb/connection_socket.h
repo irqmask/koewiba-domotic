@@ -46,7 +46,7 @@ public:
      * @param[in]   fd          File descriptor of established connection (optional
      *                          for server usage)
      */
-    ConnectionSocket(ioloop_t *io, std::string uri, sys_fd_t fd = INVALID_FD);
+    ConnectionSocket(ioloop_t *io, const std::string &uri, sys_fd_t fd = INVALID_FD);
 
     /**
      * Closes active connection.

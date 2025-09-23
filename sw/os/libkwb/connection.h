@@ -56,7 +56,7 @@ public:
      * @param[in]   io      Pointer to existing IO-loop instance.
      * @param[in]   uri     Address or path to device of connection.
      */
-    Connection(ioloop_t *io, std::string uri);
+    Connection(ioloop_t *io, const std::string &uri);
 
     /**
      * No need for cleanup in base-class
@@ -73,7 +73,7 @@ public:
      *
      * @param[in]   func        Function of type #msg_incom_func_t to be called.
      */
-    void setIncomingHandler(incom_func_t func);
+    void setIncomingHandler(incom_func_t &func);
 
     /**
      * Unregister "incomming message" callback. No function will be called when

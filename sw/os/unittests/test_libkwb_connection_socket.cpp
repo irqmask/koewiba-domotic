@@ -286,9 +286,9 @@ TEST_F(ConnectionSocketTest, send_and_receive)
     message.receiver = 0x0002;
     message.length = 4;
     message.data[0] = 42;
-    message.data[0] = 43;
-    message.data[0] = 44;
-    message.data[0] = 45;
+    message.data[1] = 43;
+    message.data[2] = 44;
+    message.data[3] = 45;
 
     conn->send(message);
 

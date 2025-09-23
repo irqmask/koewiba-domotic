@@ -65,7 +65,7 @@ protected:
     //! Buffer for exception message
     char message[2048];
     //! Buffer for full message containing also filename, line and function name
-    char full_message[4096];
+    char full_message[2048 + 512];
 
     /**
      * Compile error message from format string and full message from message, file, line and function.

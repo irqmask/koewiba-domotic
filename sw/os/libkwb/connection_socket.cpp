@@ -61,7 +61,7 @@ static void closeConnectionHdl(const std::string &uri, void *reference, void *ar
 // --- Class member functions --------------------------------------------------
 
 //----------------------------------------------------------------------------
-ConnectionSocket::ConnectionSocket(ioloop_t *io, std::string uri, sys_fd_t fd)
+ConnectionSocket::ConnectionSocket(ioloop_t *io, const std::string &uri, sys_fd_t fd)
     : Connection(io, uri)
     , fd(fd)
 {
@@ -172,7 +172,7 @@ void ConnectionSocket::receive()
         }
 
         if (received_bytes != sizeof(message)) {
-            log_sys_error("SOCKET Invaid size %d of incoming message", received_bytes);
+            log_sys_error("SOCKET Invaid size %zu of incoming message", received_bytes);
             break;
         }
 

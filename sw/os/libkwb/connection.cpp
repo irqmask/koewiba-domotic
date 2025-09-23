@@ -33,13 +33,14 @@
 #include "connection.h"
 
 //----------------------------------------------------------------------------
-Connection::Connection(ioloop_t *io, std::string uri)
+Connection::Connection(ioloop_t *io, const std::string &uri)
     : extOnIncomingMsg(nullptr)
     , extOnIncomingMsgArg(nullptr)
     , extOnConnectionClosed(nullptr)
     , extOnConnectionClosedArg(nullptr)
     , ioloop(io)
     , uri(uri)
+    , ownNodeId(0)
     , segmentId(0)
 {
 }
@@ -56,7 +57,7 @@ const std::string Connection::getName()
 }
 
 //----------------------------------------------------------------------------
-void Connection::setIncomingHandler(incom_func_t func)
+void Connection::setIncomingHandler(incom_func_t &func)
 {
     extOnIncomingMsg = func;
 }
@@ -129,6 +130,7 @@ bool Connection::addressIsInConnectionsSegment(uint16_t nodeAddress)
 ////////////////////////////////////////////////////////////////////////////////
 void Connection::send(const msg_t &message)
 {
+    (void)message;
 }
 
 /** @} */

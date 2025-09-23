@@ -140,18 +140,19 @@ bool Application::writeRegister(uint8_t registerId, int value)
 //----------------------------------------------------------------------------
 bool Application::verifyRegister(uint8_t registerId, int value, int &readValue)
 {
+    bool rc = false;
     try {
-        readRegister(registerId, readValue);
+        rc = readRegister(registerId, readValue);
         if (value != readValue) {
             throw OperationFailed(LOC, "read value %d does not match previous written value %d!", readValue, value);
         }
     }
     catch (Exception &e) {
         log_error("verify of register %d of node 0x%04x failed!\n%s\n", registerId, selectedModule, e.what());
-        return false;
+        rc = false;
     }
 
-    return true;
+    return rc;
 }
 
 //----------------------------------------------------------------------------

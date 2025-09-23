@@ -49,7 +49,7 @@ public:
      * @param[in]   uri         Devicename of serial device.
      * @param[in]   configure   Configure serial parameters e.g. baudrate (default true)
      */
-    ConnectionSerial(ioloop_t *io, std::string uri, bool configure = true);
+    ConnectionSerial(ioloop_t *io, const std::string &uri, bool configure = true);
 
     /**
      * Closes active connection.

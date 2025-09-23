@@ -50,10 +50,11 @@
 
 using namespace std::chrono_literals;
 Action::Action(Connection &conn, MsgBroker &broker)
-    : msgBroker(broker)
-    , connection(conn)
+    : connection(conn)
+    , msgBroker(broker)
     , timeout(5s)
     , timeoutOccurred(false)
+    , isRunning(false)
 {
 }
 

@@ -77,7 +77,7 @@ void Connection::onIncomingMessage(const msg_t &message)
 }
 
 //----------------------------------------------------------------------------
-void Connection::setConnectionHandler(conn_func_t func)
+void Connection::setConnectionHandler(conn_func_t &func)
 {
     this->extOnConnectionClosed = func;
 }

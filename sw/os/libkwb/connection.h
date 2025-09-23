@@ -94,7 +94,7 @@ public:
      *
      * @param[in]   func        Function of type #msg_conn_func_t to be called.
      */
-    void setConnectionHandler(conn_func_t func);
+    void setConnectionHandler(conn_func_t &func);
 
     /**
      * Unregister "OnClose" callback. No function will be called when connection

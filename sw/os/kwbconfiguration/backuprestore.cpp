@@ -82,7 +82,7 @@ void BackupRestore::restore(uint16_t moduleId,
 
     // read register values from module
     for (auto &r : regs) {
-        log_msg(LOG_INFO, "Reg index %d value %d", r.index, r.value);
+        log_msg(LOG_INFO, "Reg index %d value %ld", r.index, r.value);
         if ((r.accessMask & eREG_ACCESS_WRITE) == 0) {
             continue;
         }

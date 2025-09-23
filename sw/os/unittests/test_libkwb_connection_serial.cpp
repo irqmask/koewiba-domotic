@@ -202,6 +202,8 @@ void ConnectionSerialTest::pipeRecvThread(ConnectionSerialTest *reference)
     struct pollfd pfd = {INVALID_FD, POLLIN, 0};
 
     pfd.fd = sys_serial_open(PIPE_DEVICE_NAME);
+    if (pfd.fd < 0)
+        return;
 
     while (reference->echoThreadRunning && !complete) {
         if (poll(&pfd, 1, 100) > 0) {

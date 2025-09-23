@@ -74,7 +74,7 @@ void UIConsole::display()
 }
 
 //----------------------------------------------------------------------------
-uint32_t UIConsole::queryU32(std::string query_text, uint32_t lowest_allowed, uint32_t highest_allowed)
+uint32_t UIConsole::queryU32(const std::string &query_text, uint32_t lowest_allowed, uint32_t highest_allowed)
 {
     bool input_is_valid = false;
     std::string user_input;
@@ -101,19 +101,19 @@ uint32_t UIConsole::queryU32(std::string query_text, uint32_t lowest_allowed, ui
 }
 
 //----------------------------------------------------------------------------
-uint16_t UIConsole::queryU16(std::string query_text, uint16_t lowest_allowed, uint16_t highest_allowed)
+uint16_t UIConsole::queryU16(const std::string &query_text, uint16_t lowest_allowed, uint16_t highest_allowed)
 {
     return (uint16_t)queryU32(query_text, lowest_allowed, highest_allowed);
 }
 
 //----------------------------------------------------------------------------
-uint8_t UIConsole::queryU8(std::string query_text, uint8_t lowest_allowed, uint8_t highest_allowed)
+uint8_t UIConsole::queryU8(const std::string &query_text, uint8_t lowest_allowed, uint8_t highest_allowed)
 {
     return (uint8_t)queryU32(query_text, lowest_allowed, highest_allowed);
 }
 
 //----------------------------------------------------------------------------
-int32_t UIConsole::queryI32(std::string query_text, int32_t lowest_allowed, int32_t highest_allowed)
+int32_t UIConsole::queryI32(const std::string &query_text, int32_t lowest_allowed, int32_t highest_allowed)
 {
     bool input_is_valid = false;
     std::string user_input;
@@ -140,19 +140,19 @@ int32_t UIConsole::queryI32(std::string query_text, int32_t lowest_allowed, int3
 }
 
 //----------------------------------------------------------------------------
-int16_t UIConsole::queryI16(std::string query_text, int16_t lowest_allowed, int16_t highest_allowed)
+int16_t UIConsole::queryI16(const std::string &query_text, int16_t lowest_allowed, int16_t highest_allowed)
 {
     return (int16_t)queryI32(query_text, lowest_allowed, highest_allowed);
 }
 
 //----------------------------------------------------------------------------
-int8_t UIConsole::queryI8(std::string query_text, int8_t lowest_allowed, int8_t highest_allowed)
+int8_t UIConsole::queryI8(const std::string &query_text, int8_t lowest_allowed, int8_t highest_allowed)
 {
     return (int8_t)queryI32(query_text, lowest_allowed, highest_allowed);
 }
 
 //----------------------------------------------------------------------------
-char UIConsole::queryChar(std::string query_text)
+char UIConsole::queryChar(const std::string &query_text)
 {
     char c;
 

@@ -51,7 +51,7 @@ MsgBroker::MsgBroker()
 void MsgBroker::registerForResponse(void *reference, msg_filter_t &filter_func, incom_func_t &handler_func)
 {
     msg_filter_data_t filter = { reference, filter_func, handler_func };
-    this->response_handlers.push_back(filter);
+    this->response_handlers.emplace_back(filter);
 }
 
 //----------------------------------------------------------------------------
@@ -72,8 +72,7 @@ void MsgBroker::unregisterForResponse(void *reference)
 //----------------------------------------------------------------------------
 void MsgBroker::handleIncomingMessage(const msg_t &message, void *reference)
 {
-    (reference);
-    for (auto receiver_data : this->response_handlers) {
+    for (const auto &receiver_data : this->response_handlers) {
         if (receiver_data.msg_filter(message)) {
             receiver_data.msg_handler(message, reference);
             unregisterForResponse(receiver_data.reference);

@@ -79,6 +79,8 @@ set (kwbconfiguration_SRCS
     cfg_module_json.h
     cfg_module_register.hpp
     cfg_module_register_json.h
+    cmd.hpp
+    cmd_handler.h
     kwbconfiguration_version.h
     msgbroker.h
     uiconsole.h
@@ -101,6 +103,7 @@ set (kwbconfiguration_SRCS
     cfg_module_file.cpp
     cfg_module_json.cpp
     cfg_module_register_json.cpp
+    cmd_handler.cpp
     kwbconfiguration_main.cpp
     msgbroker.cpp
     uiconsole.cpp

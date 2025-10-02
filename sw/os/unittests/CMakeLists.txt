@@ -79,11 +79,12 @@ set (unittests_SRCS
     test_json.cpp
     test_libsystem_threads.cpp
     test_libsystem_time.cpp
-    
+
     test_libkwb_connection.cpp
     test_libkwb_connection_serial.cpp
     test_libkwb_connection_socket.cpp
 
+    test_configuration_cmd.cpp
     test_configuration_register.cpp
     test_configuration_module.cpp
     test_configuration_modules.cpp

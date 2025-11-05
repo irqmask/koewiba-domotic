@@ -53,21 +53,14 @@ public:
      * Constructor
      * @param[in]   conn        Reference to established connection to a
      *                          KWB bus os router
-     * @param[in]   broker      Reference to message broker.
      * @param[in]   moduleAddr  (optional, default = 0) Module address to communicate with.
      */
-    ActionWithResponse(Connection &conn, MsgBroker &broker, uint16_t moduleAddr = 0);
+    ActionWithResponse(std::shared_ptr<Connection> conn, uint16_t moduleAddr = 0);
 
-    virtual void cancel() override;
-    virtual bool isFinished() override;
-    /**
-     * Wait until the response has been received or timeout occurred.
-     * @returns true if response has been received, otherwise false.
-     */
-    virtual void waitFinished() override;
-
+    virtual void abort();
 
 protected:
+    friend class ActionHandler;
     virtual bool formMessage() override = 0;
 
     /**
@@ -85,10 +78,8 @@ protected:
      * @param[in]   reference   Reference given by libkwb connections incoming
      *                          message handler.
      */
-    virtual void handleResponse(const msg_t &message, void *reference) = 0;
+    virtual void processResponse(const msg_t &message, void *reference) = 0;
 
-    //! Flag if message has been received.
-    bool     messageReceived;
     //! Message, which has been received during this action.
     msg_t    receivedMessage;
 };

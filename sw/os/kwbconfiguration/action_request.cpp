@@ -33,6 +33,7 @@
 // include
 #include "prjconf.h"
 // libkwb
+#include "connection.h"
 #include "exceptions.h"
 
 // --- Definitions -------------------------------------------------------------
@@ -45,10 +46,9 @@
 
 // --- Class implementation  ---------------------------------------------------
 
-ActionRequest::ActionRequest(Connection   &conn,
-                             MsgBroker    &broker,
+ActionRequest::ActionRequest(std::shared_ptr<Connection> conn,
                              uint16_t     moduleAddr)
-    : Action(conn, broker)
+    : connection(conn)
     , moduleAddr(moduleAddr)
     , messageToSend({0})
 {
@@ -58,31 +58,13 @@ ActionRequest::ActionRequest(Connection   &conn,
 void ActionRequest::start()
 {
     try {
-        Action::start();
         formMessage();
-        connection.send(messageToSend);
+        connection->send(messageToSend);
+        CommandBase::start();
     }
     catch (Exception &e) {
         throw OperationFailed(LOC, "Cannot start action! Error occured:\n%s", e.what());
     }
-}
-
-//----------------------------------------------------------------------------
-bool ActionRequest::isFinished()
-{
-    return timeoutOccurred;
-}
-
-//----------------------------------------------------------------------------
-void ActionRequest::waitFinished()
-{
-    checkTimeout();
-}
-
-//----------------------------------------------------------------------------
-void ActionRequest::cancel()
-{
-    // nothing to cancel here
 }
 
 /** @} */

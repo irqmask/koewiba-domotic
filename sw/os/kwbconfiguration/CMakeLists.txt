@@ -3,6 +3,9 @@ cmake_minimum_required (VERSION 3.16)
 
 cmake_policy(SET CMP0135 NEW)
 
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 FetchContent_Declare(json URL https://github.com/nlohmann/json/releases/download/v3.12.0/json.tar.xz)
 FetchContent_MakeAvailable(json)
 
@@ -63,16 +66,13 @@ set (os_include_SRCS
 )
 
 set (kwbconfiguration_SRCS
-    action.h
-    action_helper.hpp
+    action_handler.h
 
     action_request.h
     action_with_response.h
 
     action_read_register.h
     action_write_register.h
-
-    action_read_module_info.h
 
     application.h
     backuprestore.h
@@ -84,21 +84,17 @@ set (kwbconfiguration_SRCS
     cmd.hpp
     cmd_handler.h
     kwbconfiguration_version.h
-    msgbroker.h
     uiconsole.h
     uimain.h
     uiallmodules.h
     uisinglemodule.h
 
-    action.cpp
-
+    action_handler.cpp
     action_request.cpp
     action_with_response.cpp
 
     action_read_register.cpp
     action_write_register.cpp
-
-    action_read_module_info.cpp
 
     application.cpp
     backuprestore.cpp
@@ -107,7 +103,6 @@ set (kwbconfiguration_SRCS
     cfg_module_register_json.cpp
     cmd_handler.cpp
     kwbconfiguration_main.cpp
-    msgbroker.cpp
     uiconsole.cpp
     uimain.cpp
     uiallmodules.cpp

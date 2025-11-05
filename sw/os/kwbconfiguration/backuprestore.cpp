@@ -6,11 +6,11 @@
 
 #include <nlohmann/json.hpp>
 
+#include "action_handler.h"
 #include "application.h"
 #include "connection.h"
 #include "exceptions.h"
 #include "log.h"
-#include "msgbroker.h"
 
 using namespace nlohmann;
 
@@ -21,7 +21,7 @@ BackupRestore::BackupRestore(Application &app)
 }
 
 //----------------------------------------------------------------------------
-void BackupRestore::backup(uint16_t moduleId, const std::string & regValueFile, const std::string & regLayoutFile)
+void BackupRestore::backup(uint16_t moduleId, const std::string &regValueFile, const std::string &regLayoutFile)
 {
     bool read_success = true;
     // load register layout
@@ -37,8 +37,11 @@ void BackupRestore::backup(uint16_t moduleId, const std::string & regValueFile, 
     // read register values from module
     for (auto &r : regs) {
         int32_t val = 0;
-        if (!app.readRegister(r.index, val)) {
-            log_msg(LOG_ERROR, "Unable to read register %d", r.index);
+        try {
+            app.readRegister(moduleId, r.index, val);
+        }
+        catch (Exception &e) {
+            log_msg(LOG_ERROR, "Unable to read register %d\n%s", r.index, e.what());
             read_success = false;
         }
         r.value = val;
@@ -61,14 +64,16 @@ void BackupRestore::backup(uint16_t moduleId, const std::string & regValueFile, 
     o << std::setw(4) << modules_array << std::endl;
     o.close();
     if (!read_success) {
-        throw OperationFailed(LOC, "Error occurred reading register values! Not all registers have been read correctly from the module!");
+        throw OperationFailed(LOC,
+                              "Error occurred reading register values! Not all registers have been read correctly from the module!");
     }
-    log_msg(LOG_INFO, "Backup of registers of module 0x%04X successfully written to file %s", moduleId, regValueFile.c_str());
+    log_msg(LOG_INFO, "Backup of registers of module 0x%04X successfully written to file %s", moduleId,
+            regValueFile.c_str());
 }
 
 //----------------------------------------------------------------------------
 void BackupRestore::restore(uint16_t moduleId,
-                            const std::string & regValueFile)
+                            const std::string &regValueFile)
 {
     bool write_success = true;
     uint16_t moduleIdFile = 0;
@@ -76,8 +81,10 @@ void BackupRestore::restore(uint16_t moduleId,
 
     std::vector<ModuleRegisterJson> regs = loadValueFile(regValueFile, moduleIdFile);
     if (moduleId != moduleIdFile) {
-        log_msg(LOG_ERROR, "Mismatch of moduleId. Module id in file 0x%04X is not equal to selected module id 0x%04X", moduleId, moduleIdFile);
-        throw OperationFailed(LOC, "Mismatch of moduleId. Module id in file 0x%04X is not equal to selected module id 0x%04X", moduleId, moduleIdFile);
+        log_msg(LOG_ERROR, "Mismatch of moduleId. Module id in file 0x%04X is not equal to selected module id 0x%04X", moduleId,
+                moduleIdFile);
+        throw OperationFailed(LOC, "Mismatch of moduleId. Module id in file 0x%04X is not equal to selected module id 0x%04X",
+                              moduleId, moduleIdFile);
     }
 
     // read register values from module
@@ -86,14 +93,20 @@ void BackupRestore::restore(uint16_t moduleId,
         if ((r.accessMask & eREG_ACCESS_WRITE) == 0) {
             continue;
         }
-        if (!app.writeRegister(r.index, r.value)) {
-            log_msg(LOG_ERROR, "Unable to write register %d, value %ld", r.index, r.value);
+        try {
+            app.writeRegister(moduleId, r.index, r.value);
+        }
+        catch (Exception &e) {
+            log_msg(LOG_ERROR, "Unable to write register %d, value %ld\n%s", r.index, r.value, e.what());
             write_success = false;
             continue;
         }
         int32_t read_value = 0;
-        if (!app.readRegister(r.index, read_value)) {
-            log_msg(LOG_ERROR, "Unable to verify register %d", r.index);
+        try {
+            app.readRegister(moduleId, r.index, read_value);
+        }
+        catch (Exception &e) {
+            log_msg(LOG_ERROR, "Unable to verify register %d\n%s", r.index, e.what());
             write_success = false;
             continue;
         }
@@ -104,7 +117,8 @@ void BackupRestore::restore(uint16_t moduleId,
         }
     }
     if (!write_success) {
-        throw OperationFailed(LOC, "Error occurred writing register values! Not all registers have been written correctly to the module!");
+        throw OperationFailed(LOC,
+                              "Error occurred writing register values! Not all registers have been written correctly to the module!");
     }
 }
 
@@ -132,7 +146,7 @@ std::vector<ModuleRegisterJson> BackupRestore::loadLayoutFile(std::string filena
         std::ifstream ifs(filename, std::ios::in);
         ifs >> layout;
     }
-    catch (std::exception & e) {
+    catch (std::exception &e) {
         throw ResourceMissing(LOC, "Unable to read layout file %s! %s", filename.c_str(), e.what());
     }
 
@@ -161,7 +175,7 @@ std::vector<ModuleRegisterJson> BackupRestore::loadValueFile(std::string filenam
         std::ifstream ifs(filename, std::ios::in);
         ifs >> all_modules_all_regs;
     }
-    catch (std::exception & e) {
+    catch (std::exception &e) {
         throw ResourceMissing(LOC, "Unable to read values file! %s\n%s", filename.c_str(), e.what());
     }
     std::vector<ModuleRegisterJson> regs;
@@ -169,7 +183,7 @@ std::vector<ModuleRegisterJson> BackupRestore::loadValueFile(std::string filenam
     if (!all_modules_all_regs.is_array()) {
         throw InvalidParameter(LOC, "value file %s format wrong. expected outer entity beeing an array!", filename.c_str());
     }
-    for (auto & jmod : all_modules_all_regs) {
+    for (auto &jmod : all_modules_all_regs) {
         if (!jmod.contains("nodeid")) {
             throw InvalidParameter(LOC, "expected module to have parameter nodeid!");
         }

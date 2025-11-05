@@ -29,8 +29,11 @@
 
 // include
 #include "prjtypes.h"
+// libkwb
+#include "connection.h"
+#include "message.h"
 
-#include "action.h"
+#include "cmd.hpp"
 
 // --- Definitions -------------------------------------------------------------
 
@@ -42,26 +45,24 @@
 
 // --- Class definition --------------------------------------------------------
 
+class ActionHandler;
+
 /**
  * Action to send a request / command to a bus module. A response is not
  * expected in this case.
  */
-class ActionRequest : public Action
+class ActionRequest : public CommandBase
 {
 public:
     /**
      * Constructor
      * @param[in]   conn        Reference to established connection to a
      *                          KWB bus os router
-     * @param[in]   broker      Reference to message broker.
      * @param[in]   moduleAddr  (optional, default=0) Module address to communicate with.
      */
-    ActionRequest(Connection &conn, MsgBroker &broker, uint16_t moduleAddr = 0);
+    ActionRequest(std::shared_ptr<Connection> conn, uint16_t moduleAddr = 0);
 
     virtual void start() override;
-    virtual bool isFinished() override;
-    virtual void waitFinished() override;
-    virtual void cancel() override;
 
     /**
      * Set the address of the module to communicate with.
@@ -76,11 +77,16 @@ public:
     uint16_t getModuleAddress();
 
 protected:
+    friend class ActionHandler;
+
     /**
      * Form a message to be sent to the bus module.
      * @returns true, if the messge was successfully formed, otherwise false.
      */
     virtual bool formMessage() = 0;
+
+    //! Reference to established connection.
+    std::shared_ptr<Connection> connection;
 
     //! Address of module to perform action with.
     uint16_t moduleAddr;

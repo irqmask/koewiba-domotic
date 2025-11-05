@@ -2,8 +2,8 @@
  * @addtogroup KWBCONFIGURATION
  *
  * @{
- * @file    action_helper.hpp
- * @brief   Actions: Manage and run actions of a module.
+ * @file    action_handler.h
+ * @brief   Broker which sorts incomming messages to running actions.
  *///---------------------------------------------------------------------------
 /*
  * Copyright (C) 2025  christian <irqmask@web.de>
@@ -25,20 +25,20 @@
 
 // --- Include section ---------------------------------------------------------
 
-#include "prjconf.h"
+#include <functional>
+#include <mutex>
+#include <vector>
 
-#include <string>
+#include "prjconf.h"
 
 // include
 #include "prjtypes.h"
-#include "moddef_common.h"
 
-// os/libkwb
+// libkwb
 #include "connection.h"
-#include "exceptions.h"
-#include "log.h"
+#include "message.h"
 
-#include "msgbroker.h"
+#include "cmd_handler.h"
 
 // --- Definitions -------------------------------------------------------------
 
@@ -48,20 +48,29 @@
 
 // --- Global variables --------------------------------------------------------
 
-// --- Global methods ----------------------------------------------------------
+// --- Class definition --------------------------------------------------------
 
-template <typename ActionType, typename T, typename...  Args>
-void runActionBlocking(Connection &connection, MsgBroker &msgBroker, uint16_t nodeId, T &result, Args... args)
+/**
+ * Message broker class. Used to sort incoming messages to pending requests that
+ * have been made before.
+ */
+class ActionHandler : public CommandHandler
 {
-    try {
-        ActionType a(connection, msgBroker, nodeId, args...);
-        a.start();
-        a.waitFinished();
-        result = a.getValue();
-    }
-    catch (Exception &e) {
-        throw OperationFailed(LOC, "Action %s for node 0x%04x failed\n%s", typeid(ActionType).name(), nodeId, e.what());
-    }
-}
+public:
+    /**
+     * Default constructor
+     */
+    ActionHandler();
+
+    /**
+     * Handler for incoming message. Will distribute the messges to registered
+     * listeners.
+     *
+     * @param[in]   message     Incoming message
+     * @param[in]   reference   Reference to connection which received the
+     *                          message.
+     */
+    void handleIncomingMessage(const msg_t &message, void *reference);
+};
 
 /** @} */

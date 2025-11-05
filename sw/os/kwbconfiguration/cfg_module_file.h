@@ -54,11 +54,14 @@ public:
     ModuleFile();
     ModuleFile(const std::string &filename);
 
-    void fromFile(const std::string & filename);
+    void fromFile(const std::string &filename);
     void fromString(const std::string &jsonString);
     void fromJson(const nlohmann::json &json);
 
-    std::vector<ModuleJson> getModules() { return modules; };
+    std::vector<ModuleJson> getModules()
+    {
+        return modules;
+    };
 
 protected:
     std::vector<ModuleJson> modules;

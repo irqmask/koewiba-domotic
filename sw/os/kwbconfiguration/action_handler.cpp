@@ -2,7 +2,7 @@
  * @addtogroup KWBCONFIGURATION
  *
  * @{
- * @file    msgbroker.cpp
+ * @file    action_handler.cpp
  * @brief   Broker which sorts incomming messages to running actions.
  *///---------------------------------------------------------------------------
 /*
@@ -25,12 +25,14 @@
 // --- Include section ---------------------------------------------------------
 
 #include "prjconf.h"
+#include "action_handler.h"
 
 // include
 #include "prjtypes.h"
 
 #include "log.h"
-#include "msgbroker.h"
+
+#include "action_with_response.h"
 
 // --- Definitions -------------------------------------------------------------
 
@@ -42,40 +44,23 @@
 
 // --- Class implementation  ---------------------------------------------------
 
-MsgBroker::MsgBroker()
+//----------------------------------------------------------------------------
+ActionHandler::ActionHandler()
 {
-    this->response_handlers.clear();
 }
 
 //----------------------------------------------------------------------------
-void MsgBroker::registerForResponse(void *reference, msg_filter_t &filter_func, incom_func_t &handler_func)
+void ActionHandler::handleIncomingMessage(const msg_t &message, void *reference)
 {
-    msg_filter_data_t filter = { reference, filter_func, handler_func };
-    this->response_handlers.emplace_back(filter);
-}
+    std::lock_guard<std::recursive_mutex> lock(mutex);
 
-//----------------------------------------------------------------------------
-void MsgBroker::unregisterForResponse(void *reference)
-{
-    std::vector<msg_filter_data_t> &l = this->response_handlers;   
-    std::vector<msg_filter_data_t>::iterator it = l.begin();
-    while (it != l.end()) {
-        if (it->reference == reference) {
-            it = l.erase(it);
+    for (auto action : this->runQueue) {
+        auto awr = std::dynamic_pointer_cast<ActionWithResponse>(action);
+        if (awr == nullptr) {
+            continue;
         }
-        else {
-            ++it;
-        }
-    }
-}
-
-//----------------------------------------------------------------------------
-void MsgBroker::handleIncomingMessage(const msg_t &message, void *reference)
-{
-    for (const auto &receiver_data : this->response_handlers) {
-        if (receiver_data.msg_filter(message)) {
-            receiver_data.msg_handler(message, reference);
-            unregisterForResponse(receiver_data.reference);
+        if (awr->filterResponse(message)) {
+            awr->processResponse(message, awr.get());
         }
     }
 }

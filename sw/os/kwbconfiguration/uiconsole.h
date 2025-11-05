@@ -95,7 +95,8 @@ protected:
      *
      * @return User input as unsigned 32bit integer.
      */
-    virtual uint32_t queryU32(const std::string &query_text, uint32_t lowest_allowed = 0, uint32_t highest_allowed = 0xFFFFFFFF);
+    virtual uint32_t queryU32(const std::string &query_text, uint32_t lowest_allowed = 0,
+                              uint32_t highest_allowed = 0xFFFFFFFF);
 
     /**
      * Query an unsigned 16bit integer as user input.
@@ -106,7 +107,8 @@ protected:
      *
      * @return User input as unsigned 16bit integer.
      */
-    virtual uint16_t queryU16(const std::string &query_text, uint16_t lowest_allowed = 0, uint16_t highest_allowed = 0xFFFF);
+    virtual uint16_t queryU16(const std::string &query_text, uint16_t lowest_allowed = 0,
+                              uint16_t highest_allowed = 0xFFFF);
 
     /**
      * Query an unsigned 8bit integer as user input.
@@ -128,7 +130,8 @@ protected:
      *
      * @return User input as signed 32bit integer.
      */
-    virtual int32_t queryI32(const std::string &query_text, int32_t lowest_allowed = INT_MIN, int32_t highest_allowed = INT_MAX);
+    virtual int32_t queryI32(const std::string &query_text, int32_t lowest_allowed = INT_MIN,
+                             int32_t highest_allowed = INT_MAX);
 
     /**
      * Query a signed 16bit integer as user input.
@@ -139,7 +142,8 @@ protected:
      *
      * @return User input as signed 16bit integer.
      */
-    virtual int16_t queryI16(const std::string &query_text, int16_t lowest_allowed = SHRT_MIN, int16_t highest_allowed = SHRT_MAX);
+    virtual int16_t queryI16(const std::string &query_text, int16_t lowest_allowed = SHRT_MIN,
+                             int16_t highest_allowed = SHRT_MAX);
 
     /**
      * Query a signed 8bit integer as user input.
@@ -150,7 +154,8 @@ protected:
      *
      * @return User input as signed 8bit integer.
      */
-    virtual int8_t queryI8(const std::string &query_text, int8_t lowest_allowed = CHAR_MIN, int8_t highest_allowed = CHAR_MAX);
+    virtual int8_t queryI8(const std::string &query_text, int8_t lowest_allowed = CHAR_MIN,
+                           int8_t highest_allowed = CHAR_MAX);
 
     //! Selected menu item by the user.
     char        last_choice;

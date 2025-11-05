@@ -68,7 +68,7 @@ void ModuleFile::fromFile(const std::string &filename)
         std::ifstream ifs(filename, std::ios::in);
         ifs >> all_modules;
     }
-    catch (std::exception & e) {
+    catch (std::exception &e) {
         throw ResourceMissing(LOC, "Unable to read values file! %s\n%s", filename.c_str(), e.what());
     }
     fromJson(all_modules);
@@ -81,7 +81,7 @@ void ModuleFile::fromString(const std::string &jsonString)
     try {
         all_modules = json::parse(jsonString);
     }
-    catch (std::exception & e) {
+    catch (std::exception &e) {
         throw ResourceMissing(LOC, "Unable to parse JSON string!\n%s", e.what());
     }
     fromJson(all_modules);
@@ -104,7 +104,7 @@ void ModuleFile::fromJson(const nlohmann::json &json)
             modules.emplace_back(m);
         }
     }
-    catch(Exception &e) {
+    catch (Exception &e) {
         throw OperationFailed(LOC, "modules json object parsing error %s", e.what());
     }
     this->modules = std::move(modules);

@@ -66,7 +66,8 @@ ModuleRegisterJson::ModuleRegisterJson()
 }
 
 //----------------------------------------------------------------------------
-ModuleRegisterJson::ModuleRegisterJson(uint16_t index, const RegType &type, uint8_t accessMask, const std::string &name, const ValueFormat &format, int64_t value)
+ModuleRegisterJson::ModuleRegisterJson(uint16_t index, const RegType &type, uint8_t accessMask, const std::string &name,
+                                       const ValueFormat &format, int64_t value)
     : ModuleRegister(index, type, accessMask, name, format, value)
 {
 }
@@ -141,12 +142,10 @@ void ModuleRegisterJson::fromJson(const nlohmann::json &j)
 //----------------------------------------------------------------------------
 json ModuleRegisterJson::toJson() const
 {
-    if (type == RegType::eINVALID)
-    {
+    if (type == RegType::eINVALID) {
         throw LogicError(LOC, "Cannot convert type RegType::eUNSPECIFIED to JSON");
     }
-    if (format == ValueFormat::eUNSPECIFIED)
-    {
+    if (format == ValueFormat::eUNSPECIFIED) {
         throw LogicError(LOC, "Cannot convert format ValueFormat::eUNSPECIFIED to JSON");
     }
     auto jr = json::object();
@@ -177,13 +176,15 @@ uint16_t ModuleRegisterJson::getRegIndexFromJson(const json &j)
     }
     if (!j["index"].is_number_unsigned()) {
         std::string kv = j;
-        throw InvalidParameter(LOC, "Invalid format of parameter 'index'. expected entity 'index' beeing unsigned 16bit integer but is %s!", kv.c_str());
+        throw InvalidParameter(LOC,
+                               "Invalid format of parameter 'index'. expected entity 'index' beeing unsigned 16bit integer but is %s!", kv.c_str());
     }
 
     uint64_t val = j.value<uint64_t>("index", 0);
     if (val > UINT16_MAX) {
         std::string kv = j;
-        throw InvalidParameter(LOC, "Invalid format of parameter 'index'. expected entity 'index' beeing unsigned 16bit integer but is %s!", kv.c_str());
+        throw InvalidParameter(LOC,
+                               "Invalid format of parameter 'index'. expected entity 'index' beeing unsigned 16bit integer but is %s!", kv.c_str());
     }
 
     return static_cast<uint16_t>(val);
@@ -193,12 +194,15 @@ uint16_t ModuleRegisterJson::getRegIndexFromJson(const json &j)
 RegType ModuleRegisterJson::getRegTypeFromJson(const json &j)
 {
     if (!j.contains("type")) {
-        throw InvalidParameter(LOC, "Missing parameter 'type'. expected entity 'type' beeing 'u8', 'u16', 'u32', 'i8', 'i16', 'i32' !");
+        throw InvalidParameter(LOC,
+                               "Missing parameter 'type'. expected entity 'type' beeing 'u8', 'u16', 'u32', 'i8', 'i16', 'i32' !");
     }
     RegType rt = j["type"].get<RegType>();
     if (rt == RegType::eINVALID) {
         std::string kv = j["type"];
-        throw InvalidParameter(LOC, "Invalid value '%s' for parameter 'type'. expected entity 'type' beeing 'u8', 'u16', 'u32', 'i8', 'i16', 'i32' !", kv.c_str());
+        throw InvalidParameter(LOC,
+                               "Invalid value '%s' for parameter 'type'. expected entity 'type' beeing 'u8', 'u16', 'u32', 'i8', 'i16', 'i32' !",
+                               kv.c_str());
     }
     return rt;
 }
@@ -246,7 +250,9 @@ ValueFormat ModuleRegisterJson::getValueFormatFromJson(const nlohmann::json &j)
 
     if (vf == ValueFormat::eUNSPECIFIED) {
         std::string kv = j["format"];
-        throw InvalidParameter(LOC, "Invalid value '%s' for parameter 'type'. expected entity 'type' beeing 'u8', 'u16', 'u32', 'i8', 'i16', 'i32' !", kv.c_str());
+        throw InvalidParameter(LOC,
+                               "Invalid value '%s' for parameter 'type'. expected entity 'type' beeing 'u8', 'u16', 'u32', 'i8', 'i16', 'i32' !",
+                               kv.c_str());
     }
     return vf;
 }
@@ -261,7 +267,8 @@ T ModuleRegisterJson::getRegValueFromJson(const nlohmann::json &j)
     T v = 0;
     if (j["value"].is_number()) {
         if (format != ValueFormat::eDECIMAL) {
-            throw InvalidParameter(LOC, "Expected parameter 'value' needs to be a string for proper prefix for binary '0b', octal '0o' or hexadecimal '0x' values!");
+            throw InvalidParameter(LOC,
+                                   "Expected parameter 'value' needs to be a string for proper prefix for binary '0b', octal '0o' or hexadecimal '0x' values!");
         }
         v = j.value<T>("value", 0);
     }

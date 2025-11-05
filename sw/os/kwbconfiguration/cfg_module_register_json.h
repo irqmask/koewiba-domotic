@@ -44,7 +44,7 @@
 
 // --- Global variables --------------------------------------------------------
 
-NLOHMANN_JSON_SERIALIZE_ENUM( RegType, {
+NLOHMANN_JSON_SERIALIZE_ENUM(RegType, {
     {RegType::eINVALID, nullptr},
     {RegType::eU8, "u8"},
     {RegType::eU8, "U8"},
@@ -61,7 +61,7 @@ NLOHMANN_JSON_SERIALIZE_ENUM( RegType, {
 })
 
 // map TaskState values to JSON as strings
-NLOHMANN_JSON_SERIALIZE_ENUM( ValueFormat, {
+NLOHMANN_JSON_SERIALIZE_ENUM(ValueFormat, {
     {ValueFormat::eUNSPECIFIED, nullptr},
     {ValueFormat::eBINARY, "bin"},
     {ValueFormat::eOCTAL, "oct"},
@@ -75,7 +75,8 @@ class ModuleRegisterJson : public ModuleRegister
 {
 public:
     ModuleRegisterJson();
-    ModuleRegisterJson(uint16_t idx, const RegType &t, uint8_t access, const std::string &n, const ValueFormat &f, int64_t v);
+    ModuleRegisterJson(uint16_t idx, const RegType &t, uint8_t access, const std::string &n, const ValueFormat &f,
+                       int64_t v);
     virtual ~ModuleRegisterJson();
 
     virtual void fromJson(const char *jsonString);

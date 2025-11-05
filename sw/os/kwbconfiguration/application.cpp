@@ -41,6 +41,7 @@
 
 // include
 #include "prjtypes.h"
+#include "moddef_common.h"
 
 // os/include
 #include "error_codes.h"
@@ -50,7 +51,7 @@
 #include "exceptions.h"
 #include "log.h"
 
-#include "action_helper.hpp"
+#include "action_handler.h"
 #include "action_read_register.h"
 #include "action_write_register.h"
 
@@ -59,6 +60,8 @@
 // --- Type definitions --------------------------------------------------------
 
 // --- Local variables ---------------------------------------------------------
+
+constexpr std::chrono::seconds Application::defaultTimeout;
 
 // --- Global variables --------------------------------------------------------
 
@@ -70,11 +73,11 @@
 
 // --- Global functions --------------------------------------------------------
 
-Application::Application(Connection     &conn,
-                         MsgBroker      &broker)
-    : msgEndpoint(conn)
-    , msgBroker(broker)
-    , selectedModule(0)
+Application::Application(std::shared_ptr<Connection> conn,
+                         std::shared_ptr<CommandHandler> cmdhandler)
+    : selectedModule(0)
+    , msgEndpoint(conn)
+    , handler(cmdhandler)
 {
 }
 
@@ -93,81 +96,82 @@ uint16_t Application::getSelectedModule()
 // obsolete repeating every action in application -> better move into dedicated actions
 
 //----------------------------------------------------------------------------
-bool Application::readRegister(uint8_t registerId, int &value)
+void Application::readRegister(uint16_t moduleId, uint8_t registerId, int32_t &value)
 {
     try {
-        ActionReadRegister action_read_reg(msgEndpoint, msgBroker, selectedModule, registerId);
-        action_read_reg.start();
-        action_read_reg.waitFinished();
-        value = action_read_reg.getValue();
+        if (moduleId == 0) {
+            moduleId = selectedModule;
+        }
+        auto cmd = handler->start<ActionReadRegister>(msgEndpoint, moduleId, registerId);
+        handler->waitFinished(cmd->id(), this->defaultTimeout);
+        value = cmd->getValue();
     }
     catch (Exception &e) {
-        log_error("read register %d of node 0x%04x failed!\n%s\n", registerId, selectedModule, e.what());
-        return false;
+        throw OperationFailed(LOC, "read register %d of node 0x%04x failed!\n%s", registerId, moduleId, e.what());
     }
-    return true;
 }
 
 //----------------------------------------------------------------------------
-bool Application::writeRegister(uint8_t registerId, int value)
+void Application::writeRegister(uint16_t moduleId, uint8_t registerId, int32_t value)
 {
     try {
-        ActionWriteRegister action_write_reg(msgEndpoint, msgBroker, selectedModule, registerId);
-        action_write_reg.setValue(value);
-
-        // hack, remove when register layout is known to the program
-        if (value > 65535) {
-            action_write_reg.setRegisterFormat(eCMD_SET_REG_32BIT);
+        if (moduleId == 0) {
+            moduleId = selectedModule;
         }
-        else if (value > 255) {
-            action_write_reg.setRegisterFormat(eCMD_SET_REG_16BIT);
-        }
-        else {
-            action_write_reg.setRegisterFormat(eCMD_SET_REG_8BIT);
-        }
-
-        action_write_reg.start();
-        action_write_reg.waitFinished();
+        auto cmd = handler->start<ActionWriteRegister>(msgEndpoint, moduleId, registerId, value);
+        handler->waitFinished(cmd->id(), this->defaultTimeout);
     }
     catch (Exception &e) {
-        log_error("write register %d of node 0x%04x failed!\n%s\n", registerId, selectedModule, e.what());
-        return false;
+        throw OperationFailed(LOC, "write register %d of node 0x%04x failed!\n%s", registerId, moduleId, e.what());
     }
-
-    return true;
 }
 
 //----------------------------------------------------------------------------
-bool Application::verifyRegister(uint8_t registerId, int value, int &readValue)
+void Application::verifyRegister(uint16_t moduleId, uint8_t registerId, int value, int &readValue)
 {
-    bool rc = false;
     try {
-        rc = readRegister(registerId, readValue);
+        if (moduleId == 0) {
+            moduleId = selectedModule;
+        }
+        readRegister(moduleId, registerId, readValue);
         if (value != readValue) {
             throw OperationFailed(LOC, "read value %d does not match previous written value %d!", readValue, value);
         }
     }
     catch (Exception &e) {
-        log_error("verify of register %d of node 0x%04x failed!\n%s\n", registerId, selectedModule, e.what());
-        rc = false;
+        throw OperationFailed(LOC, "verify of register %d of node 0x%04x failed!\n%s", registerId, moduleId, e.what());
     }
-
-    return rc;
 }
 
 //----------------------------------------------------------------------------
-template<typename ActionType, typename T, typename... Args>
-bool Application::runAction(uint16_t nodeId, T &result, Args... args)
+void Application::readModuleInfo(uint16_t moduleId, ModuleInfo &mi)
 {
-    try {
-        runActionBlocking(this->msgEndpoint, this->msgBroker, nodeId, args...);
+    if (moduleId == 0) {
+        moduleId = selectedModule;
     }
-    catch (Exception & e) {
-        log_error("%s", e.what());
-        return false;
-    }
-    return true;
+    int32_t regval;
+    readRegister(moduleId, MOD_eReg_BoardID, regval);
+    mi.boardId = regval;
+    readRegister(moduleId, MOD_eReg_BoardRev, regval);
+    mi.boardRev = regval;
+    readRegister(moduleId, MOD_eReg_AppID, regval);
+    mi.appId = regval;
+    readRegister(moduleId, MOD_eReg_AppVersionMajor, regval);
+    mi.majorVersion = regval;
+    readRegister(moduleId, MOD_eReg_AppVersionMinor, regval);
+    mi.minorVersion = regval;
+    readRegister(moduleId, MOD_eReg_AppVersionBugfix, regval);
+    mi.bugfixVersion = regval;
+    readRegister(moduleId, MOD_eReg_AppVersionHash, regval);
+    mi.versionHash = regval;
+    readRegister(moduleId, MOD_eReg_DeviceSignature0, regval);
+    mi.controllerId[0] = regval;
+    readRegister(moduleId, MOD_eReg_DeviceSignature1, regval);
+    mi.controllerId[1] = regval;
+    readRegister(moduleId, MOD_eReg_DeviceSignature2, regval);
+    mi.controllerId[2] = regval;
+    readRegister(moduleId, MOD_eReg_DeviceSignature3, regval);
+    mi.controllerId[3] = regval;
 }
-
 
 /** @} */

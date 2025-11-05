@@ -43,14 +43,14 @@
 // --- Class implementation  ---------------------------------------------------
 
 
-ActionWriteRegister::ActionWriteRegister(Connection   &conn,
-                                         MsgBroker    &broker,
+ActionWriteRegister::ActionWriteRegister(std::shared_ptr<Connection> conn,
                                          uint16_t     moduleAddr,
-                                         uint8_t      registerId)
-    : ActionRequest(conn, broker, moduleAddr)
+                                         uint8_t      registerId,
+                                         int32_t      value)
+    : ActionRequest(conn, moduleAddr)
     , registerId(registerId)
     , registerFormat(eCMD_NAK)
-    , value(0)
+    , value(value)
 {
 }
 
@@ -72,8 +72,20 @@ bool ActionWriteRegister::formMessage()
     if (moduleAddr == 0) {
         return false;
     }
+
+    // hack, remove when register layout is known to the program
+    if (value > 65535) {
+        registerFormat = eCMD_SET_REG_32BIT;
+    }
+    else if (value > 255) {
+        registerFormat = eCMD_SET_REG_16BIT;
+    }
+    else {
+        registerFormat = eCMD_SET_REG_8BIT;
+    }
+
     messageToSend.receiver = moduleAddr;
-    messageToSend.sender = connection.getOwnNodeId();
+    messageToSend.sender = connection->getOwnNodeId();
     messageToSend.data[0] = registerFormat;
     messageToSend.data[1] = registerId;
 
@@ -98,6 +110,12 @@ bool ActionWriteRegister::formMessage()
         return false;
     }
     return true;
+}
+
+void ActionWriteRegister::runABit()
+{
+    // command was sent, nothing further to do
+    setFinished();
 }
 
 //----------------------------------------------------------------------------

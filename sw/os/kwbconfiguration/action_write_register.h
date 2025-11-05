@@ -53,11 +53,10 @@ public:
      * Constructor
      * @param[in]   conn        Reference to established connection to a
      *                          KWB bus os router
-     * @param[in]   broker      Reference to message broker.
      * @param[in]   moduleAddr  (optional, default = 0) Module address to communicate with.
      * @param[in]   registerId  Id of register to write to.
      */
-    ActionWriteRegister(Connection &conn, MsgBroker &broker, uint16_t moduleAddr = 0, uint8_t registerId = 0);
+    ActionWriteRegister(std::shared_ptr<Connection> conn, uint16_t moduleAddr = 0, uint8_t registerId = 0, int32_t val = 0);
 
     /**
      * Set the id of the register to write to.
@@ -97,13 +96,14 @@ public:
 
 protected:
     virtual bool formMessage() override;
+    virtual void runABit() override;
 
     //! Id of register to write to.
     uint8_t         registerId;
     //! Format of the register to write.
     cmd_common_t    registerFormat;
     //! Value to write into the register.
-    int             value;
+    int32_t         value;
 };
 
 /** @} */

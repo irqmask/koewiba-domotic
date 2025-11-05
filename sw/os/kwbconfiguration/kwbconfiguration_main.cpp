@@ -69,9 +69,9 @@ extern "C" {
 #include "sysgetopt.h"
 #include "systime.h"
 
+#include "action_handler.h"
 #include "action_read_register.h"
 #include "application.h"
-#include "msgbroker.h"
 #include "uimain.h"
 
 // --- Definitions -------------------------------------------------------------
@@ -281,13 +281,13 @@ int main(int argc, char *argv[])
         ioloop_init(&mainloop);
         ioloop_set_default_timeout(&mainloop, 1);
 
-        MsgBroker broker;
+        auto arni = std::make_shared<ActionHandler>();
         std::shared_ptr<Connection> conn;
 
         // connect to the bus
         using std::placeholders::_1;
         using std::placeholders::_2;
-        incom_func_t handleIncomingMessageFunc = std::bind(&MsgBroker::handleIncomingMessage, &broker, _1, _2);
+        incom_func_t handleIncomingMessageFunc = std::bind(&ActionHandler::handleIncomingMessage, arni, _1, _2);
 
         log_msg(LOG_STATUS, "Own node Id is 0x%04X", options.own_node_id);
 
@@ -325,7 +325,7 @@ int main(int argc, char *argv[])
         conn->setOwnNodeId(options.own_node_id);
 
         // instantiate application, ui and its thread
-        Application app(*conn, broker);
+        Application app(conn, arni);
         UIMain uimain(app);
 
         std::thread ui_thread(&UIMain::run, &uimain);
@@ -333,6 +333,7 @@ int main(int argc, char *argv[])
         std::cout << "entering mainloop" << std::endl;
         while (!g_end_application) {
             ioloop_run_once(&mainloop);
+            arni->fetchAndStart();
         }
         ui_thread.join();
         std::cout << "..bye!" << std::endl;

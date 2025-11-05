@@ -113,20 +113,21 @@ void UISingleModule::readVersion()
         return;
     }
     std::cout << "Read version of module ID: 0x" << std::hex << selected_module_id << std::endl;
-    if (app.readRegister(MOD_eReg_AppVersionMajor, major) &&
-        app.readRegister(MOD_eReg_AppVersionMinor, minor) &&
-        app.readRegister(MOD_eReg_AppVersionBugfix, bugfix)) {
-
-        if (app.readRegister(MOD_eReg_AppVersionHash, dummy)) {
-            hash = dummy;
-            std::cout << "Version: " << major << "." << minor << "." << bugfix << " #" << std::hex << hash << std::endl;
-        }
-        else {
-            std::cout << "Version: " << major << "." << minor << "." << bugfix << std::endl;
-        }
+    try {
+        app.readRegister(selected_module_id, MOD_eReg_AppVersionMajor, major);
+        app.readRegister(selected_module_id, MOD_eReg_AppVersionMinor, minor);
+        app.readRegister(selected_module_id, MOD_eReg_AppVersionBugfix, bugfix);
     }
-    else {
-        std::cout << "reading version failed!" << std::endl;
+    catch (Exception &e) {
+        std::cout << "reading version failed!\n" << e.what() << std::endl;
+    }
+    try {
+        app.readRegister(selected_module_id, MOD_eReg_AppVersionHash, dummy);
+        hash = dummy;
+        std::cout << "Version: " << major << "." << minor << "." << bugfix << " #" << std::hex << hash << std::endl;
+    }
+    catch (Exception &e) {
+        std::cout << "Version: " << major << "." << minor << "." << bugfix << std::endl;
     }
 }
 
@@ -144,10 +145,11 @@ void UISingleModule::readRegister()
     std::cout << "Read register of module ID: 0x" << std::hex << selected_module_id << std::endl;
     register_id = queryU8("Please select register: ");
     std::cout << "Module: 0x" << std::hex << selected_module_id << " Register: 0x" << std::hex << +register_id << " ";
-    if (app.readRegister(register_id, value)) {
+    try {
+        app.readRegister(selected_module_id, register_id, value);
         std::cout << "Value: " << std::dec << value << " / 0x" << std::hex << value << " successfully read." << std::endl;
     }
-    else {
+    catch (Exception &e) {
         std::cout << "reading failed!" << std::endl;
     }
 }
@@ -167,17 +169,19 @@ void UISingleModule::writeRegister()
     register_id = queryU8("Please select register: ");
     value = queryU32("Please enter value: ");
     std::cout << "Module: 0x" << std::hex << selected_module_id << " Register: 0x" << std::hex << +register_id << " ";
-    if (app.writeRegister(register_id, value)) {
+    try {
+        app.writeRegister(selected_module_id, register_id, value);
         std::cout << "Value: " << std::dec << value << " / 0x" << std::hex << value << " written." << std::endl;
     }
-    else {
-        std::cout << "writing failed!" << std::endl;
+    catch (Exception &e) {
+        std::cout << "writing failed!\n" << e.what() << std::endl;
     }
     std::cout << "Module: 0x" << std::hex << selected_module_id << " Register: 0x" << std::hex << +register_id << " ";
-    if (app.verifyRegister(register_id, value, read_back_value)) {
+    try {
+        app.verifyRegister(selected_module_id, register_id, value, read_back_value);
         std::cout << "Value: " << std::dec << value << " / 0x" << std::hex << value << " successfully verified." << std::endl;
     }
-    else {
+    catch (Exception &e) {
         std::cout << "verification failed: written " << value << " read " << read_back_value << "!" << std::endl;
     }
 }
@@ -192,9 +196,7 @@ void UISingleModule::backupModule()
 
         int32_t temp = 0;
         uint16_t appid = 0;
-        if (!app.readRegister(MOD_eReg_AppID, temp)) {
-            throw OperationFailed(LOC, "Unable to read application ID");
-        }
+        app.readRegister(selected_module_id, MOD_eReg_AppID, temp);
         appid = static_cast<uint16_t>(temp);
         br.backup(selected_module_id,
                   BackupRestore::createValuesFilename(selected_module_id),
@@ -227,52 +229,36 @@ void UISingleModule::setTime()
 {
     uint16_t selected_module_id = app.getSelectedModule();
     int year = 0, month = 0, day = 0, dow = 0, hour = 0, minute = 0, second = 0;
-    bool success = false;
 
-    do {
-        if (selected_module_id == 0) {
-            std::cout << "no module selected!" << std::endl;
-            break;
-        }
+    if (selected_module_id == 0) {
+        std::cout << "no module selected!" << std::endl;
+        return;
+    }
 
-        std::time_t t = std::time(0);
+    std::time_t t = std::time(0);
 
-        tm *now = std::localtime(&t);
-        year = now->tm_year + 1900;
-        month = now->tm_mon + 1;
-        day = now->tm_mday;
-        dow = now->tm_wday;
-        hour = now->tm_hour;
-        minute = now->tm_min;
-        second = now->tm_sec;
+    tm *now = std::localtime(&t);
+    year = now->tm_year + 1900;
+    month = now->tm_mon + 1;
+    day = now->tm_mday;
+    dow = now->tm_wday;
+    hour = now->tm_hour;
+    minute = now->tm_min;
+    second = now->tm_sec;
 
-        if (!app.writeRegister(223, year)) {
-            break;
-        }
-        if (!app.writeRegister(224, month)) {
-            break;
-        }
-        if (!app.writeRegister(225, day)) {
-            break;
-        }
-        if (!app.writeRegister(226, dow)) {
-            break;
-        }
-        if (!app.writeRegister(227, hour)) {
-            break;
-        }
-        if (!app.writeRegister(228, minute)) {
-            break;
-        }
-        if (!app.writeRegister(229, second)) {
-            break;
-        }
+    try {
+        app.writeRegister(selected_module_id, 223, year);
+        app.writeRegister(selected_module_id, 224, month);
+        app.writeRegister(selected_module_id, 225, day);
+        app.writeRegister(selected_module_id, 226, dow);
+        app.writeRegister(selected_module_id, 227, hour);
+        app.writeRegister(selected_module_id, 228, minute);
+        app.writeRegister(selected_module_id, 229, second);
 
         fprintf(stdout, "Set time of module ID: 0x%04X %04d-%02d-%02d dow %d %02d:%02d:%02d\n", selected_module_id, year, month,
                 day, dow, hour, minute, second);
-        success = true;
-    } while (false);
-    if (!success) {
+    }
+    catch (Exception &e) {
         fprintf(stdout, "Get time of module ID: 0x%04X FAILED\n", selected_module_id);
     }
 }
@@ -282,39 +268,23 @@ void UISingleModule::getTime()
 {
     uint16_t selected_module_id = app.getSelectedModule();
     int year = 0, month = 0, day = 0, dow = 0, hour = 0, minute = 0, second = 0;
-    bool success = false;
 
-    do {
-        if (selected_module_id == 0) {
-            std::cout << "no module selected!" << std::endl;
-            break;
-        }
-        if (!app.readRegister(223, year)) {
-            break;
-        }
-        if (!app.readRegister(224, month)) {
-            break;
-        }
-        if (!app.readRegister(225, day)) {
-            break;
-        }
-        if (!app.readRegister(226, dow)) {
-            break;
-        }
-        if (!app.readRegister(227, hour)) {
-            break;
-        }
-        if (!app.readRegister(228, minute)) {
-            break;
-        }
-        if (!app.readRegister(229, second)) {
-            break;
-        }
+    if (selected_module_id == 0) {
+        std::cout << "no module selected!" << std::endl;
+        return;
+    }
+    try {
+        app.readRegister(selected_module_id, 223, year);
+        app.readRegister(selected_module_id, 224, month);
+        app.readRegister(selected_module_id, 225, day);
+        app.readRegister(selected_module_id, 226, dow);
+        app.readRegister(selected_module_id, 227, hour);
+        app.readRegister(selected_module_id, 228, minute);
+        app.readRegister(selected_module_id, 229, second);
         fprintf(stdout, "Get time of module ID: 0x%04X %04d-%02d-%02d dow %d %02d:%02d:%02d\n", selected_module_id, year, month,
                 day, dow, hour, minute, second);
-        success = true;
-    } while (false);
-    if (!success) {
+    }
+    catch (Exception &e) {
         fprintf(stdout, "Get time of module ID: 0x%04X FAILED\n", selected_module_id);
     }
 }

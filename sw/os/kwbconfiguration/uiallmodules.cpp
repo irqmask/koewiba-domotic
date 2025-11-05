@@ -26,11 +26,18 @@
 
 #include "uiallmodules.h"
 
+#if defined (PRJCONF_UNIX) || \
+    defined (PRJCONF_POSIX) || \
+    defined (PRJCONF_LINUX)
+extern "C" {
+#include <safe_lib.h>
+}
+#endif
+
 // os/libkwb
 #include "exceptions.h"
 #include "log.h"
 
-#include "action_read_module_info.h"
 #include "cfg_module_file.h"
 #include "cfg_module_json.h"
 
@@ -105,7 +112,8 @@ void UIAllModules::listAllFromFile()
         std::cout << "Modules from file " << filename << std::endl;
         std::cout << "  ModId  AppId  Name              Description" << std::endl;
         for (auto &module : modules) {
-            fprintf(stdout, "  0x%04x 0x%04x %16s %s\n", module.nodeId, module.appId, module.name.c_str(), module.description.c_str());
+            fprintf(stdout, "  0x%04x 0x%04x %16s %s\n", module.nodeId, module.appId, module.name.c_str(),
+                    module.description.c_str());
         }
     }
     catch (Exception &e) {
@@ -122,22 +130,23 @@ void UIAllModules::readAllVersions()
     ModuleFile mf(filename);
     std::vector<ModuleJson> modules = mf.getModules();
 
-    std::cout << "Modules from file " << filename << std::endl;
-    std::cout << "  ModId  AppId  Name              AppId  BoardId.BoardRev Version   ControllerId" << std::endl;
+    std::stringstream output;
+    output << "Modules from file " << filename << std::endl;
+    output << "  ModId  AppId  Name             AppId   Version     BoardId.BoardRev ControllerId" << std::endl;
     for (auto &module : modules) {
         try {
-            ActionReadModuleInfo armi(app.getMsgEndpoint(), app.getMsgBroker(), module.nodeId);
-            armi.start();
-            armi.waitFinished();
-            auto ctrlId = armi.getControllerId();
-            fprintf(stdout, "  0x%04x 0x%04x %16s 0x%04x %2d.%02d.%03d-g%08x  0x%04x.%d %02x:%02x:%02x:%02x\n",
-                    module.nodeId, module.appId, module.name.c_str(),
-                    armi.getAppId(), armi.getMajorVersion(), armi.getMinorVersion(), armi.getBugfixVersion(), armi.getVersionHash(), armi.getBoardId(), armi.getBoardRev(),
-                    ctrlId[0], ctrlId[1], ctrlId[2], ctrlId[3]);
-
+            struct ModuleInfo mi;
+            app.readModuleInfo(module.nodeId, mi);
+            char line[256];
+            snprintf(line, sizeof(line) - 1, "  0x%04x 0x%04x %16s 0x%04x %2d.%02d.%03d-g%08x  0x%04x.%d %02x:%02x:%02x:%02x\n",
+                     module.nodeId, module.appId, module.name.c_str(),
+                     mi.appId, mi.majorVersion, mi.minorVersion, mi.bugfixVersion, mi.versionHash, mi.boardId, mi.boardRev,
+                     mi.controllerId[0], mi.controllerId[1], mi.controllerId[2], mi.controllerId[3]);
+            output << line;
         }
         catch (Exception &e) {
             log_error("%s", e.what());
         }
     }
+    std::cout << output.str();
 }

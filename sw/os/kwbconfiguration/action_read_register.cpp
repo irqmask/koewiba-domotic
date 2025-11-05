@@ -46,11 +46,10 @@
 
 // --- Class implementation  ---------------------------------------------------
 
-ActionReadRegister::ActionReadRegister(Connection   &msgep,
-                                       MsgBroker    &broker,
+ActionReadRegister::ActionReadRegister(std::shared_ptr<Connection> conn,
                                        uint16_t     moduleAddr,
                                        uint8_t      registerId)
-    : ActionWithResponse(msgep, broker, moduleAddr)
+    : ActionWithResponse(conn, moduleAddr)
     , registerId(registerId)
 {
 }
@@ -74,11 +73,16 @@ bool ActionReadRegister::formMessage()
         return false;
     }
     messageToSend.receiver = moduleAddr;
-    messageToSend.sender = connection.getOwnNodeId();
+    messageToSend.sender = connection->getOwnNodeId();
     messageToSend.length = 2;
     messageToSend.data[0] = eCMD_REQUEST_REG;
     messageToSend.data[1] = registerId;
     return true;
+}
+
+void ActionReadRegister::runABit()
+{
+
 }
 
 //----------------------------------------------------------------------------
@@ -99,10 +103,10 @@ bool ActionReadRegister::filterResponse(const msg_t &message)
 }
 
 //----------------------------------------------------------------------------
-void ActionReadRegister::handleResponse(const msg_t &message, void *reference)
+void ActionReadRegister::processResponse(const msg_t &message, void *reference)
 {
     receivedMessage = message;
-    messageReceived = true;
+    setFinished();
 }
 
 //----------------------------------------------------------------------------

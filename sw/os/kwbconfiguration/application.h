@@ -27,6 +27,8 @@
 
 #include "prjconf.h"
 
+#include <array>
+#include <chrono>
 #include <iostream>
 #include <list>
 
@@ -35,11 +37,26 @@
 
 // os/libkwb
 #include "connection.h"
-#include "msgbroker.h"
+
+// os/kwbconfiguration
+#include "action_handler.h"
 
 // --- Definitions -------------------------------------------------------------
 
 // --- Type definitions --------------------------------------------------------
+
+struct ModuleInfo {
+    uint16_t nodeId;
+
+    std::array<uint8_t, 4> controllerId;
+    uint16_t boardId;
+    uint8_t boardRev;
+    uint16_t appId;
+    uint8_t majorVersion;
+    uint8_t minorVersion;
+    uint8_t bugfixVersion;
+    uint32_t versionHash;
+};
 
 // --- Local variables ---------------------------------------------------------
 
@@ -58,14 +75,12 @@ public:
      * @param[in]   conn            Reference to connection to kwbrouter or serial gateway
      * @param[in]   broker          Reference to message broker
      */
-    Application(Connection &conn, MsgBroker &broker);
+    Application(std::shared_ptr<Connection> conn, std::shared_ptr<CommandHandler> cmdhandler);
 
-    MsgBroker &getMsgBroker() { return msgBroker; };
-
-    Connection &getMsgEndpoint() { return msgEndpoint; };
-
-    template <typename ActionType, typename T, typename...  Args>
-    bool runAction(uint16_t nodeId, T &result, Args... args);
+    std::shared_ptr<Connection> getMsgEndpoint()
+    {
+        return msgEndpoint;
+    };
 
     /**
      * Select the module to work with.
@@ -85,9 +100,9 @@ public:
      * @param[in]   registerId  Id of the register to read.
      * @param[out]  value       The read value
      *
-     * @return true, if the register has successfully been read, otherwise false.
+     * @throws OperationFailed if reading a register value failed.
      */
-    bool readRegister(uint8_t registerId, int &value);
+    void readRegister(uint16_t moduleId, uint8_t registerId, int32_t &value);
 
     /**
      * Write into a register of a module.
@@ -95,10 +110,9 @@ public:
      * @param[in]   registerId  Id of the register to write.
      * @param[in]   value       Value to write into the register
      *
-     * @return true, if the value has successfully been written into the register,
-     *         otherwise false.
+     * @throws OperationFailed if writing to the register failed.
      */
-    bool writeRegister(uint8_t registerId, int value);
+    void writeRegister(uint16_t moduleId, uint8_t registerId, int32_t value);
 
     /**
      * Verify a register value against a given value.
@@ -107,17 +121,32 @@ public:
      * @param[in]   value       Expected value
      * @param[out]  readValue   Value read from the register
      *
-     * @return true, if the read value matches the expected value, otherwise false.
+     * @throws OperationFailed if reading failed or read value does not match expected value.
      */
-    bool verifyRegister(uint8_t registerId, int value, int &readValue);
+    void verifyRegister(uint16_t moduleId, uint8_t registerId, int value, int &readValue);
+
+    /**
+     * Read module information from modules registers.
+     *
+     * @param[in]   moduleId    Register Id to read the value from
+     * @param[out]  mi          Structure containing the module information
+     *
+     * @throws OperationFailed if reading a register value failed.
+     */
+    void readModuleInfo(uint16_t moduleId, ModuleInfo &mi);
 
 protected:
+    static constexpr std::chrono::seconds defaultTimeout = std::chrono::seconds(2);
+
     //! Currently selected module
-    uint16_t            selectedModule;
-    //! Referenc to message broker
-    MsgBroker           &msgBroker;
+    uint16_t                        selectedModule;
+    //! Reference to command handler
+    std::shared_ptr<CommandHandler> handler;
+
+    //std::shared_ptr<MsgBroker>      msgBroker;
     //! Reference to connection to the KWB sytsem
-    Connection          &msgEndpoint;
+    std::shared_ptr<Connection>     msgEndpoint;
+
 };
 
 // -----------------------------------------------------------------------------

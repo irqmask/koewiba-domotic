@@ -1,0 +1,23 @@
+@startuml
+main -> main : ActionHandler
+activate Application
+Application -> ActionHandler : start<ActionReadRegister>()
+activate ActionHandler
+ActionHandler -> ActionHandler : make_shared<ActionReadRegister>()
+ActionHandler -> startQueue : push_back(action)
+
+main -> ActionHandler : fetchAndStart()
+ActionHandler -> startQueue : pop_front()
+startQueue -> ActionHandler : action<ActionReadRegister>
+ActionHandler -> ActionRequest : start()
+ActionRequest -> ActionReadRegister : formMessage()
+ActionReadRegister -> ActionRequest : message
+ActionRequest -> Connection : send(message)
+ActionReadRegister -> Cmd : start()
+
+Application -> ActionHandler : waitFinished()
+deactivate Application
+ActionHandler --> Application : finished
+activate Application
+
+@enduml

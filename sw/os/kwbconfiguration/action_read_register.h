@@ -52,11 +52,10 @@ public:
      * Constructor
      * @param[in]   conn        Reference to established connection to a
      *                          KWB bus os router
-     * @param[in]   broker      Reference to message broker.
      * @param[in]   moduleAddr  (optional, default = 0) Module address to communicate with.
      * @param[in]   registerId  Id of register to query.
      */
-    ActionReadRegister(Connection &conn, MsgBroker &broker, uint16_t moduleAddr = 0, uint8_t registerId = 0);
+    ActionReadRegister(std::shared_ptr<Connection> conn, uint16_t moduleAddr = 0, uint8_t registerId = 0);
 
     /**
      * Set register id to query.
@@ -78,8 +77,9 @@ public:
 
 protected:
     virtual bool formMessage() override;
+    virtual void runABit() override;
     virtual bool filterResponse(const msg_t &message) override;
-    virtual void handleResponse(const msg_t &message, void *reference) override;
+    virtual void processResponse(const msg_t &message, void *reference) override;
 
     //! Id of register to query.
     uint8_t registerId;

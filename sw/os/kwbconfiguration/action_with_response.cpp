@@ -42,40 +42,17 @@
 
 // --- Class implementation  ---------------------------------------------------
 
-ActionWithResponse::ActionWithResponse(Connection   &conn,
-                                       MsgBroker    &broker,
+ActionWithResponse::ActionWithResponse(std::shared_ptr<Connection> conn,
                                        uint16_t     moduleAddr)
-    : ActionRequest(conn, broker, moduleAddr)
+    : ActionRequest(conn, moduleAddr)
     , receivedMessage({0})
-    , messageReceived(false)
 {
-    using std::placeholders::_1;
-    using std::placeholders::_2;
-    msg_filter_t filterResponseFunc = std::bind(&ActionWithResponse::filterResponse, this, _1);
-    incom_func_t handleResponseFunc = std::bind(&ActionWithResponse::handleResponse, this, _1, _2);
-
-    msgBroker.registerForResponse(this, filterResponseFunc, handleResponseFunc);
 }
 
 //----------------------------------------------------------------------------
-void ActionWithResponse::cancel()
+void ActionWithResponse::abort()
 {
-    msgBroker.unregisterForResponse(this);
-}
-
-//----------------------------------------------------------------------------
-bool ActionWithResponse::isFinished()
-{
-    return timeoutOccurred || messageReceived;
-}
-
-//----------------------------------------------------------------------------
-void ActionWithResponse::waitFinished()
-{
-    while (!messageReceived) {
-        checkTimeout();
-        std::this_thread::yield(); // better wait for an event
-    }
+    ActionRequest::abort();
 }
 
 /** @} */

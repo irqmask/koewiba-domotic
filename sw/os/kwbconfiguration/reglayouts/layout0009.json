@@ -37,7 +37,7 @@
     },
     {
       "index": 19,
-      "name": "Key_RemoteValue",
+      "name": "Key0_RemoteValue",
       "type": "U8",
       "access": "rw"
     },
@@ -86,7 +86,7 @@
     },
     {
       "index": 27,
-      "name": "Key_RemoteValue",
+      "name": "Key1_RemoteValue",
       "type": "U8",
       "access": "rw"
     },
@@ -135,7 +135,7 @@
     },
     {
       "index": 35,
-      "name": "Key_RemoteValue",
+      "name": "Key2_RemoteValue",
       "type": "U8",
       "access": "rw"
     },
@@ -184,7 +184,7 @@
     },
     {
       "index": 43,
-      "name": "Key_RemoteValue",
+      "name": "Key3_RemoteValue",
       "type": "U8",
       "access": "rw"
     },
@@ -233,7 +233,7 @@
     },
     {
       "index": 51,
-      "name": "Key_RemoteValue",
+      "name": "Key4_RemoteValue",
       "type": "U8",
       "access": "rw"
     },
@@ -282,7 +282,7 @@
     },
     {
       "index": 59,
-      "name": "Key_RemoteValue",
+      "name": "Key5_RemoteValue",
       "type": "U8",
       "access": "rw"
     },
@@ -331,7 +331,7 @@
     },
     {
       "index": 67,
-      "name": "Key_RemoteValue",
+      "name": "Key6_RemoteValue",
       "type": "U8",
       "access": "rw"
     },
@@ -380,7 +380,7 @@
     },
     {
       "index": 75,
-      "name": "Key_RemoteValue",
+      "name": "Key7_RemoteValue",
       "type": "U8",
       "access": "rw"
     },

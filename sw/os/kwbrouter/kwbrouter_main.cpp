@@ -52,6 +52,7 @@ extern "C" {
 // include
 #include "kwb_defines.h"
 #include "prjtypes.h"
+#include "version.h"
 
 // libkwb
 #include "connection_serial.h"
@@ -303,7 +304,7 @@ int main(int argc, char *argv[])
     do {
         // all logs on
         log_set_mask(0xFFFFFFFF & ~LOG_VERBOSE2);
-        log_msg(LOG_INFO, "kwbrouter...");
+        log_msg(LOG_INFO, "kwbrouter... v%s", VERSION_PRODUCT);
 
         // set default options for kwbrouter
         set_options(&options,

@@ -51,6 +51,7 @@ extern "C" {
 // os/include
 #include "error_codes.h"
 #include "kwb_defines.h"
+#include "version.h"
 
 // os/libkwb
 #include "connection_serial.h"
@@ -271,7 +272,7 @@ int main(int argc, char *argv[])
 
     do {
         log_set_mask(0xFFFFFFFF & ~LOG_VERBOSE2);
-        log_msg(LOG_INFO, "kwbfirmware...");
+        log_msg(LOG_INFO, "kwbfirmware... v%s", VERSION_PRODUCT);
 
         // set default options for kwbfirmware
         set_options(&options,

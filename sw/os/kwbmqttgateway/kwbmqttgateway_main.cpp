@@ -57,6 +57,9 @@ extern "C" {
 // shared
 #include "crc16.h"
 
+// os/include
+#include "version.h"
+
 // os/libkwb
 #include "connection.h"
 #include "connection_socket.h"
@@ -486,7 +489,7 @@ int main(int argc, char *argv[])
     do {
         // all logs on
         log_set_mask(0xFFFFFFFF & ~LOG_VERBOSE2);
-        log_msg(LOG_INFO, "kwbmqttgateway...");
+        log_msg(LOG_INFO, "kwbmqttgateway...v%s", VERSION_PRODUCT);
 
         g_handles.ioloop = &mainloop;
         // set default options for kwbmqttgateway

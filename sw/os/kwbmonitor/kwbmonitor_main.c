@@ -47,6 +47,9 @@
 // include
 #include "prjtypes.h"
 
+// os/include
+#include "version.h"
+
 // libsystem
 #include "sysconsole.h"
 #include "syserror.h"
@@ -227,7 +230,7 @@ int main(int argc, char *argv[])
     options_t options;
     bool running = true;
 
-    fprintf(stderr, "kwbmonitor...\n");
+    fprintf(stderr, "kwbmonitor... v%s\n", VERSION_PRODUCT);
     setbuf(stdout, NULL);       // disable buffering of stdout
 
     do {

@@ -48,6 +48,7 @@
 // os/include
 #include "error_codes.h"
 #include "kwb_defines.h"
+#include "version.h"
 
 // os/libsystem
 #include "sysgetopt.h"
@@ -134,7 +135,7 @@ int main(int argc, char *argv[])
     int state = 1;
 
     log_set_mask(0xFFFFFFFF);
-    log_msg(LOG_INFO, "kwbtest...");
+    log_msg(LOG_INFO, "kwbtest...v%s", VERSION_PRODUCT);
     ioloop_init(&mainloop);
 
     try {

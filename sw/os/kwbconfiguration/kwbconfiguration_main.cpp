@@ -57,6 +57,7 @@ extern "C" {
 // os/include
 #include "error_codes.h"
 #include "kwb_defines.h"
+#include "version.h"
 
 // os/libkwb
 #include "connection_serial.h"
@@ -260,7 +261,7 @@ int main(int argc, char *argv[])
     ioloop_t            mainloop;
 
     log_set_mask(0xFFFFFFFF & ~(KWB_LOG_INTERCOMM | KWB_LOG_VERBOSE1 | LOG_VERBOSE2));
-    log_msg(LOG_INFO, "kwbconfiguration...");
+    log_msg(LOG_INFO, "kwbconfiguration... v%s", VERSION_PRODUCT);
 
     do {
         // set default options for kwbrouter

@@ -2,6 +2,8 @@
 cmake_minimum_required (VERSION 3.16)
 
 cmake_policy(SET CMP0015 NEW)
+cmake_policy(SET CMP0135 NEW)
+
 include(FetchContent)
 
 ## thirdparty projects ########################################################

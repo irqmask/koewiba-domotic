@@ -58,6 +58,8 @@
 #define DISP_TIMEOUT_OFF    60  //!< timeout when display is switched off
 
 #define TEMP_GLITCH_LIMIT   500 //!< absolute glitch limit +/- in Kelvin
+#define TEMP_ARRAY_LEN      8   //!< length of array for temerature average calculation
+#define TEMP_HYSTERESIS     19  //!< hysteresis for sending altered temperature value
 
 // --- Type definitions --------------------------------------------------------
 
@@ -85,6 +87,8 @@ static uint8_t      g_mode;
 // --- Module global variables -------------------------------------------------
 
 uint16_t app_current_temp, app_desired_temp;
+uint16_t tempval_array[TEMP_ARRAY_LEN];
+uint32_t tempval_array_sum = 0;
 
 // --- Local functions ---------------------------------------------------------
 
@@ -357,6 +361,26 @@ void app_draw_window()
 // --- Global functions --------------------------------------------------------
 
 /**
+ * Reads measurement value from temperature sensor converts it into 1/100K
+ * temperature value and adds an optional offset.
+ * @return  16 Bit temperature value
+ */
+uint16_t app_get_temp_from_zacwire(void)
+{
+    uint16_t raw_temp, temp=0;
+    if (zagw_sampling_done()) {
+        raw_temp = zagw_get_raw();
+        zagw_start_sampling();
+        if (raw_temp != 0) {
+            temp = zagw_get_temperature(raw_temp);
+            temp += g_temperature_offset;
+            return temp;
+        }
+    }
+    return 0;
+}
+
+/**
  * Application specific initializations.
  *
  * Executed if common code initialization passed.
@@ -381,7 +405,7 @@ void app_init (void)
     g_display_timeout = DISP_TIMEOUT_DIM - 1;
 
     // initialize volatile registers
-    app_current_temp = 27315 + 1000;
+    app_current_temp = 0;
     app_desired_temp = 27315 + 2000;
     g_last_temperature = 0;
     g_old_desired_temp = 0;
@@ -396,9 +420,9 @@ void app_init (void)
     gdisp_goto_col_line(0, 0);
     gdisp_put_text("SOLL       IST");
     app_draw_desired_temp();
-    app_draw_current_temp();
     app_draw_window();
     zagw_start_sampling();
+
 }
 
 /**
@@ -434,13 +458,47 @@ void app_on_command (uint16_t sender, uint8_t msglen, uint8_t* msg)
 }
 
 /**
+ * Gets 1/100K measurement value and calculates an average value.
+ * Additional glitch recognition and counting.
+ * @return  16 bit average temperature value
+ */
+
+uint16_t app_read_temperature(void)
+{
+    static uint8_t  w=0;
+    uint16_t temp;
+
+    temp = app_get_temp_from_zacwire();
+    if(0 != temp){
+        tempval_array_sum -= tempval_array[w];
+        tempval_array_sum += temp;
+        tempval_array[w++] = temp;
+        w = w % TEMP_ARRAY_LEN;
+        if(0 != tempval_array[TEMP_ARRAY_LEN-1]){
+            uint16_t diff;
+            if (temp > g_last_temperature)
+                diff = temp - g_last_temperature;
+            else
+                diff = g_last_temperature - temp;
+
+            if (diff > TEMP_GLITCH_LIMIT) {
+                g_temperature_glitches++;
+                //gdisp_goto_col_line(0, 4);
+                //draw_value8(g_temperature_glitches);
+            }
+            return tempval_array_sum>>3;
+        }
+    }
+    return 0;
+}
+
+/**
  * Application specific background code.
  *
  * Executed once per main loop cycle.
  */
 void app_background (sBus_t* bus)
 {
-    uint16_t raw_temp;
 
     input_background();
 
@@ -455,33 +513,20 @@ void app_background (sBus_t* bus)
 
     // do every 1s ...
     if (timer_is_elapsed(&g_seconds_timer)) {
+        uint16_t avrg_temp =0;
         timer_start(&g_seconds_timer, TIMER_MS_2_TICKS(1000));
         dt_tick_second();
 
         // read and display temperature
-        if (zagw_sampling_done()) {
-            raw_temp = zagw_get_raw();
-            zagw_start_sampling();
-            if (raw_temp != 0) {
-                app_current_temp = zagw_get_temperature(raw_temp);
-                app_current_temp += g_temperature_offset;
-                if (app_current_temp != g_last_temperature) {
-                    app_draw_current_temp();
-                    register_send_u16(BUS_BRDCSTADR, APP_eReg_TempCurrent, app_current_temp);
-
-                    uint16_t diff;
-                    if (app_current_temp > g_last_temperature)
-                        diff = app_current_temp - g_last_temperature;
-                    else
-                        diff = g_last_temperature - app_current_temp;
-
-                    if (diff > TEMP_GLITCH_LIMIT) {
-                        g_temperature_glitches++;
-                        //gdisp_goto_col_line(0, 4);
-                        //draw_value8(g_temperature_glitches);
-                    }
-                    g_last_temperature = app_current_temp;
-                }
+        avrg_temp = app_read_temperature();
+        if(0 != avrg_temp){
+            app_current_temp = avrg_temp;
+            if ((app_current_temp > g_last_temperature + TEMP_HYSTERESIS) ||
+                (app_current_temp < g_last_temperature - TEMP_HYSTERESIS)   )
+            {
+                app_draw_current_temp();
+                register_send_u16(BUS_BRDCSTADR, APP_eReg_TempCurrent, app_current_temp);
+                g_last_temperature = app_current_temp;
             }
         }
 

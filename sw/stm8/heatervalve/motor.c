@@ -33,6 +33,8 @@
 // include
 #include "stm8l052c6.h"
 
+#include "adc.h"
+#include "debug.h"
 #include "timer.h"
 
 #ifdef HAS_APPCONFIG_H
@@ -45,21 +47,26 @@
 #define MOTOR_E6 (1 << 6)
 #define MOTOR_C4 (1 << 4)
 #define MOTOR_C7 (1 << 7)
+#define MOTOR_ADC 5
 
-// --- Type definitions --------------------------------------------------------
 
-#define MOTOR_DUR_AWAY_FROM_HOME    10000   //!< duration in ms to drive away
+#define MOTOR_DUR_AWAY_FROM_HOME     5000   //!< duration in ms to drive away
                                             //!< from home during initialization
 #define MOTOR_DUR_SEEK_HOME         30000   //!< duration in ms to seek towards
                                             //!< home during initialization
 
 #define MOTOR_DUR_FULL_OPEN         29000   //!< duration to fully open valve
 
+#define MOTOR_ADC_THD_BLK_LOW        1500   //!< Threshold to detect motor block
+#define MOTOR_ADC_THD_BLK_HIGH       2036   //!< Threshold to detect motor block
+
 // valve's opening time without mechanical load 29s.
 // valve's closing time without mechanical load 29s.
-
 // motor home is the complete open position of the valve.
 // valve's pin is completely out, this devices pin is completely in.
+
+// --- Type definitions --------------------------------------------------------
+
 
 typedef enum
 {
@@ -78,6 +85,9 @@ static uint16_t g_timer;
 static uint32_t g_start;
 static uint16_t g_pos_desired;
 static uint16_t g_pos;
+static uint16_t g_last_reads[4];
+static uint16_t g_last_read_sum;
+
 
 // --- Global variables --------------------------------------------------------
 
@@ -85,6 +95,36 @@ static uint16_t g_pos;
 
 // --- Local functions ---------------------------------------------------------
 
+static uint16_t filter_motor_val(uint16_t val)
+{
+    static uint8_t idx = 0;
+
+    g_last_read_sum -= g_last_reads[idx];
+    g_last_reads[idx] = val;
+    g_last_read_sum +=  val;
+
+    idx++;
+    if (idx > 3) idx = 0;
+
+    return g_last_read_sum >> 2; // div 8
+}
+
+
+static bool motor_block_detected(void)
+{
+    uint16_t mv;
+    if (!adc_conversion_ready(MOTOR_ADC)) {
+        return false;
+    }
+    mv = adc_read();
+    mv = filter_motor_val(mv);
+    printf("mot %d\n", mv);
+    if (mv > MOTOR_ADC_THD_BLK_LOW && mv < MOTOR_ADC_THD_BLK_HIGH) {
+        LOG_DEBUG("# BLOCKED!\n");
+        return true;
+    }
+    return false;
+}
 // --- Module global functions -------------------------------------------------
 
 // --- Global functions --------------------------------------------------------
@@ -198,23 +238,29 @@ void motor_background(void)
 
     case MOTOR_MOVING_AWAY_FROM_HOME:
         elapsed = timer_get_millis() - g_start;
-        if (elapsed >= g_timer) {
+        if (elapsed >= g_timer || (motor_block_detected() && elapsed > 500)) {
             motor_set(true, false);
             g_start = timer_get_millis();
             g_timer = MOTOR_DUR_SEEK_HOME;
             g_state = MOTOR_MOVING_TOWARDS_HOME;
         }
+        else {
+            adc_start(MOTOR_ADC);
+        }
         break;
 
     case MOTOR_MOVING_TOWARDS_HOME:
         elapsed = timer_get_millis() - g_start;
-        if (elapsed >= g_timer) {
+        if (elapsed >= g_timer || (motor_block_detected() && elapsed > 500)) {
             motor_set(false, false);
             g_timer = 0;
             g_state = MOTOR_IDLE;
             g_pos = 1000; // valve is fully open now
             g_pos_desired = 1000;
             printf("mp %04x\n", g_pos);
+        }
+        else {
+            adc_start(MOTOR_ADC);
         }
         break;
 

@@ -109,7 +109,7 @@ void TIM1_UPD_OVF_TRG_COM_IRQHandler() __interrupt(IPT_TIM1_UPD_OVF_TRG_COM)
 {
     timer_irq_handler();
     app_irq_every_millisec();
-    TIM1_SR1 = ~(uint8_t)TIM_SR1_UIF;
+    TIM1_SR1 = ~TIM_SR1_UIF;
 }
 
 /** @} */

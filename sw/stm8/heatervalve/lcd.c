@@ -414,7 +414,7 @@ void lcd_disp_value(uint16_t value, uint8_t decpoint)
                 lcd_digit(digit - 1, ' ');
             }
         } else {
-            uint8_t dv = value % 10;
+            dv = value % 10;
             value = value / 10;
             lcd_digit(digit - 1, dv);
         }
@@ -433,8 +433,9 @@ void lcd_disp_value(uint16_t value, uint8_t decpoint)
 void lcd_disp_symbol(char symbol, bool on)
 {
     // FIXME implement displaying various symbols
+    (void)symbol;
     (void)on;
-    switch (symbol) {
+    /*switch (symbol) {
     case 'D':
         if (on) {
 
@@ -445,7 +446,7 @@ void lcd_disp_symbol(char symbol, bool on)
         break;
     default:
         break;
-    }
+    }*/
 }
 
 /** @} */

@@ -97,7 +97,7 @@ void forward_temp_setpoint(void)
 
 void app_send_debug_string(const char* str)
 {
-    uint8_t msg[40];
+    uint8_t msg[BUS_MAXSENDMSGLEN];
 
     if (app_debug_receiver == 0x0000 || app_debug_receiver == 0xFFFF) {
         return;

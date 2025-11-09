@@ -49,5 +49,7 @@ bool enc_val_changed(void);
 
 uint8_t enc_read(void);
 
+void enc_background(void);
+
 #endif // _ENCODER_H_
 /** @} */

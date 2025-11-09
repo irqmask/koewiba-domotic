@@ -14,6 +14,7 @@ SOURCES       = adc.c \
                 lcd.c \
                 main.c \
                 motor.c \
+                tempsens.c \
                 timer.c \
                 uart.c \
                 queue.c

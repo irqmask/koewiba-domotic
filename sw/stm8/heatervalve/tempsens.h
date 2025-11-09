@@ -1,15 +1,15 @@
 /**
- * @addtogroup STM8_ADC
+ * @addtogroup TEMPSENS
  * @brief A module to interface STM8 AD converter.
  *
  * @{
- * @file    adc.h
- * @brief   A module to interface STM8 AD converter.
+ * @file    tempsens.h
+ * @brief   A module to read the NTC temperature sensor
  *
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
 /*
- * Copyright (C) 2022  christian <irqmask@web.de>
+ * Copyright (C) 2025  christian <irqmask@web.de>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,16 +25,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _STM8_ADC_H_
-#define _STM8_ADC_H_
+#ifndef _TEMPSENS_H_
+#define _TEMPSENS_H_
 
 // --- Include section ---------------------------------------------------------
 
-#include <stdbool.h>
 #include <stdint.h>
 
 // --- Definitions -------------------------------------------------------------
-
 
 // --- Type definitions --------------------------------------------------------
 
@@ -42,15 +40,13 @@
 
 // --- Global functions --------------------------------------------------------
 
-void adc_initialize(void);
+void tempsens_initialize(void);
 
-void adc_start(uint8_t chn);
+void tempsens_start_conversion(void);
 
-bool adc_running(void);
+int16_t tempsens_read(void);
 
-bool adc_conversion_ready(uint8_t chn);
+void tempsens_background(void);
 
-uint16_t adc_read(void);
-
-#endif // _STM8_ADC_H_
+#endif // _TEMPSENS_H_
 /** @} */

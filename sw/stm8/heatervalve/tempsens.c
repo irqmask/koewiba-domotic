@@ -2,13 +2,13 @@
  * @addtogroup STM8_ADC
  *
  * @{
- * @file    adc.c
+ * @file    tempsens.c
  * @brief   A module to interface STM8 AD converter.
  *
  * @author  Christian Verhalen
  *///---------------------------------------------------------------------------
 /*
- * Copyright (C) 2022  christian <irqmask@web.de>
+ * Copyright (C) 2025  christian <irqmask@web.de>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,7 +26,9 @@
 
 // --- Include section ---------------------------------------------------------
 
-#include "adc.h"
+#include "tempsens.h"
+
+#include <stdio.h>
 
 // include
 #include "stm8l052c6.h"
@@ -35,18 +37,21 @@
  #include "appconfig.h"
 #endif
 
+#include "adc.h"
 #include "debug.h"
 
 // --- Definitions -------------------------------------------------------------
 
-#define ADC_CHN_MASK 0x1F
-#define ADC_RUN_MASK 0x80
+//! ADC channel of temperature sensor
+#define TEMPSENS_ADC    24
+//! Linear correction factor
+#define TEMP_M          (-43)
+//! Linear correction offset
+#define TEMP_B          3135
 
 // --- Type definitions --------------------------------------------------------
 
 // --- Local variables ---------------------------------------------------------
-
-static uint8_t g_adc_status;
 
 // --- Global variables --------------------------------------------------------
 
@@ -59,78 +64,56 @@ static uint8_t g_adc_status;
 // --- Global functions --------------------------------------------------------
 
 /**
- * Initialize AD converter.
+ * Initialize the temperature sensor.
  */
-void adc_initialize(void)
+void tempsens_initialize(void)
 {
-    CLK_PCKENR2 |= CLK_PCKENR2_ADC1; // enable clock
-    ADC1_CR1 |= ADC1_CR1_ADON; // wake up, 12bit resolution
-    ADC1_CR2 |= ADC1_CR2_SMPT_384; // 384 ADC clock cycles
-    ADC1_SQR1 |= ADC1_SQR1_DMAOFF; // disable DMA
-    g_adc_status = 0;
+    // enable power for temperature sensor
+    PD_DDR |= (1 << 4);
+    PD_CR1 |= (1 << 4);
+    PD_ODR &= ~(1 << 4);
 }
 
 /**
- * Start ADC conversion on given channel
- * @param[in] chn   ADC channel
+ * Start temperatur sensor conversion
  */
-void adc_start(uint8_t chn)
+void tempsens_start_conversion(void)
 {
-    if (g_adc_status & ADC_RUN_MASK) {
-        puts("conflict\n");
-        return;
+    if (adc_running() == false) {
+        PD_ODR |= (1 << 4); // switch sensor on
+        adc_start(TEMPSENS_ADC);
     }
+}
 
-    if (chn == 5) {
-        ADC1_SQR1 = 0;
-        ADC1_SQR2 = 0;
-        ADC1_SQR3 = 0;
-        ADC1_SQR4 = (1 << 5); // Select ADC IN 5
-    } else if (chn == 24) {
-        ADC1_SQR1 |= (1 << 0); // Select ADC IN 24
-        ADC1_SQR2 = 0;
-        ADC1_SQR3 = 0;
-        ADC1_SQR4 = 0;
-    } else {
-        return;
+/**
+ * Read the temperature value.
+ */
+int16_t tempsens_read(void)
+{
+    int16_t adcv, temp;
+    adcv = adc_read();
+    // convert ADC value into temperature
+    // T = (adc - TEMP_B) * 10 / TEMP_M
+    adcv = adcv - TEMP_B;
+    // multiply by 10: v*10 = v*8 + v*2
+    temp = adcv << 3;
+    adcv = temp + (adcv << 1);
+    // divide by TEMP_M
+    adcv = adcv / TEMP_M;
+    PD_ODR &= ~(1 << 4); // switch sensor off
+    return adcv;
+}
+
+/**
+ * Start temperature measument and output temperature
+ */
+void tempsens_background(void)
+{
+    uint16_t temp_loc;
+    if (adc_conversion_ready(TEMPSENS_ADC)) {
+        temp_loc = tempsens_read();
+        printf("t %04X\n", temp_loc);
     }
-
-    ADC1_CR1 |= ADC1_CR1_START;
-    g_adc_status = (chn & ADC_CHN_MASK) | ADC_RUN_MASK;
-}
-
-/**
- * @returns true, if ADC is still running, otherwise false.
- */
-bool adc_running(void)
-{
-    return (g_adc_status & ADC_RUN_MASK) != 0;
-}
-
-/**
- * @returns true, if conversion is ready, otherwise false.
- */
-bool adc_conversion_ready(uint8_t chn)
-{
-    if ((g_adc_status & ADC_CHN_MASK) != chn) {
-        return false;
-    }
-    return (ADC1_SR & ADC1_SR_EOC) != 0;
-}
-
-/**
- * Read converted ADC value and reset ADC.
- * ADC can be started again.
- * @returns ADC value
- */
-uint16_t adc_read(void)
-{
-    uint8_t adcH, adcL;
-
-    adcH = ADC1_DRH;
-    adcL = ADC1_DRL;
-    g_adc_status &= ~ADC_RUN_MASK;
-    return (adcL | (adcH << 8));
 }
 
 /** @} */

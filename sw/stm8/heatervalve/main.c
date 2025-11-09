@@ -10,6 +10,7 @@
 #include "encoder.h"
 #include "lcd.h"
 #include "motor.h"
+#include "tempsens.h"
 #include "timer.h"
 #include "uart.h"
 
@@ -35,11 +36,7 @@ void app_irq_every_millisec(void)
 void main(void)
 {
     char c;
-    //uint16_t adc, oldadc;
-    //int16_t diff = 0;
-    //char buf[16];
 
-    char ticks_written = 0;
     char lcd_test_value = 0;
     initClock();
     uart_initialize();
@@ -52,6 +49,7 @@ void main(void)
     lcd_digit(3, '-');
 
     adc_initialize();
+    tempsens_initialize();
     enc_initialize();
 
     timer_initialize();
@@ -62,7 +60,6 @@ void main(void)
     cmd_initialize();
 
     LOG_DEBUG("# init complete\n");
-
     while (1) {
         if (uart_rx_pending()) {
             c = uart_rx_data();
@@ -70,20 +67,13 @@ void main(void)
         }
 
         motor_background();
-        /*
-        adc = adc_read();
-        diff = adc - oldadc;
-        if (adc < 2037) {
-            dec2bcd(adc, buf);
+        tempsens_background();
+
+        if ((timer_get_millis() % 250) == 0) {
+            enc_background();
         }
-        oldadc = adc;
-        */
-        if ((timer_get_millis() % 500) == 0) {
-            if (enc_val_changed()) {
-                printf("enc %02x\n", enc_read());
-            }
-        } else {
-            ticks_written = 0;
+        if ((timer_get_millis() % 1000) == 0) {
+            tempsens_start_conversion();
         }
     }
 }

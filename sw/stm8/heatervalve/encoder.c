@@ -28,6 +28,8 @@
 
 #include "encoder.h"
 
+#include <stdio.h>
+
 // include
 #include "stm8l052c6.h"
 
@@ -153,4 +155,13 @@ uint8_t enc_read()
     return g_encval;
 }
 
+/**
+ * Encode background task
+ */
+void enc_background(void)
+{
+    if (enc_val_changed()) {
+        printf("enc %02x\n", enc_read());
+    }
+}
 /** @} */

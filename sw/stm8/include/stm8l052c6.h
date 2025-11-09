@@ -1101,6 +1101,15 @@
 #define ADC1_CR1_START (1 << 1)
 #define ADC1_CR1_ADON (1 << 0)
 
+#define ADC1_CR2_SMPT_004 (0)
+#define ADC1_CR2_SMPT_009 (1)
+#define ADC1_CR2_SMPT_016 (2)
+#define ADC1_CR2_SMPT_024 (3)
+#define ADC1_CR2_SMPT_048 (4)
+#define ADC1_CR2_SMPT_096 (5)
+#define ADC1_CR2_SMPT_192 (6)
+#define ADC1_CR2_SMPT_384 (7)
+
 #define ADC1_SR_OVER (1 << 2)
 #define ADC1_SR_AWD (1 << 1)
 #define ADC1_SR_EOC (1 << 0)

@@ -216,7 +216,7 @@ void app_init (void)
     g_led_changing[0] = false;
     g_led_changing[1] = false;
 
-    // workaround, don't sleep
+    // FIXME workaround, don't sleep
     sleep_prevent(1<<0, 1);
 }
 

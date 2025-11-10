@@ -128,8 +128,8 @@ static void interpret_message(void)
 void hv_initialize(void)
 {
     // setup reset line
-    DDRB &= ~(1<<PB3);
-    PORTB &= ~(1<<PB3);
+    DDRB &= ~(1<<PB3);  // input
+    PORTB &= ~(1<<PB3); // no pull-up
 
     hv_reset(true);
     uart_init_blk1(UART_BAUDRATE);
@@ -146,10 +146,11 @@ void hv_initialize(void)
 void hv_reset(bool on)
 {
     if (on) {
-        DDRB |= (1<<PB3);
+        PORTB &= ~(1<<PB3);
+        DDRB |= (1<<PB3);  // output to GND
     }
     else {
-        DDRB &= ~(1<<PB3);
+        DDRB &= ~(1<<PB3); // input
     }
 }
 

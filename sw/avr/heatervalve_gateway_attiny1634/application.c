@@ -30,11 +30,13 @@
  */
 // --- Include section ---------------------------------------------------------
 
+#include <avr/interrupt.h>
 #include <avr/io.h>
 
 #include "prjtypes.h"
 #include "cmddef_common.h"
 #include "register.h"
+#include "sleepmode.h"
 #include "spi.h"
 #include "timer.h"
 #include "uart.h"
@@ -71,6 +73,11 @@ uint16_t        app_debug_receiver;         //!< module id of receiver of debug 
                                             //!< if set to 0x0000 or 0xFFFF no debug messages will be sent.
 
 // --- Local functions ---------------------------------------------------------
+
+ISR(USART1_RXS_vect)
+{
+    UCSR1D = (1<<RXS1);
+}
 
 void display_temp_setpoint(void)
 {
@@ -174,6 +181,21 @@ void app_init (void)
     PCMSK0 |= ((1<<PCINT1) | (1<<PCINT2)); // wake-up by pin change on contact inputs
 }
 
+
+void app_on_sleep_entry(void)
+{
+    UCSR1D = (1<<RXSIE1) | (1<<SFDE1);
+    LED_ERROR_ON;
+}
+
+
+void app_on_sleep_exit(void)
+{
+    UCSR1D = 0;
+    LED_ERROR_OFF;
+}
+
+
 /**
  * Application specific ISR for pin change interrupt.
  *
@@ -224,7 +246,7 @@ void app_on_command (uint16_t sender, uint8_t msglen, uint8_t* msg)
 void app_background (void)
 {
     if (timer_is_elapsed(&g_timer)) {
-        timer_start(&g_timer, TIMER_MS_2_TICKS(1000));
+        timer_start(&g_timer, TIMER_MS_2_TICKS(300));
         LED_ERROR_TOGGLE;
     }
 

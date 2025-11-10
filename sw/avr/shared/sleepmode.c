@@ -31,7 +31,12 @@
 
 #include "sleepmode.h"
 
-#include "pcbconfig.h"
+#ifdef HAS_PCBCONFIG_H
+ #include "pcbconfig.h"
+#endif
+#ifdef HAS_APPCONFIG_H
+ #include "appconfig.h"
+#endif
 
 // --- Definitions -------------------------------------------------------------
 
@@ -89,6 +94,10 @@ bool sleep_check_and_goodnight(void)
         // disable clock-timer, otherwise IRQ will cause immediate wakeup.
         timer_sleep(true);
 
+#ifdef APP_HAS_SLEEP_HANDLER
+        app_on_sleep_entry();
+#endif
+
         // sleep till byte is received or key is pressed.
         sleep_pinchange_enable();
         sleep_set_mode(SLEEP_MODE_IDLE);
@@ -99,6 +108,11 @@ bool sleep_check_and_goodnight(void)
 
         _delay_ms(1);      // wait for sys-clock becoming stable
         sleep_pinchange_disable();
+
+#ifdef APP_HAS_SLEEP_HANDLER
+        app_on_sleep_exit();
+#endif
+
         // enable timer
         timer_sleep(false);
 

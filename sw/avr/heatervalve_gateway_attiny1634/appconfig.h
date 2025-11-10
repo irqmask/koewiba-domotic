@@ -44,6 +44,8 @@
 #define UART_BAUDRATE           9600    //!< Baudrate for second UART interfacing heatervalve module.
 #define APP_HAS_BLOCK_HANDLER   1       //!< Application has block start and block end handler.
 
+#define APP_HAS_SLEEP_HANDLER   1       //!< Application has additional entry and exit functions for the sleep mode.
+
 // --- Type definitions --------------------------------------------------------
 
 //! Application specific layout of registers
@@ -137,6 +139,9 @@ extern uint16_t app_regulation_kp;
 extern void app_register_load(void);
 
 // --- Global functions --------------------------------------------------------
+
+extern void app_on_sleep_entry(void);
+extern void app_on_sleep_exit(void);
 
 #endif /* _APPCONFIG_H_ */
 /** @} */
